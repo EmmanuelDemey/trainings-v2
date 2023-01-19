@@ -23,66 +23,105 @@ drawings:
 css: unocss
 ---
 
-# Introduction à l'Accessibilité Numérique
+# Suite Elastic
 
 ---
 
-# Plan 
-
-* Introduction
-** Définition de l'Accessibilité Numérique
-** Legislation
-** Comment est utilisé le Web ? 
-** Les référentils nationaux et internationaux
-
-* Bonnes Pratiques Générales
-** Gestion du contenu
-** Gestion des images
-** Gestion des vidéos et de l'audio
-** Intéraction avec la page
-** Expérience Utilisateur
-
-* Mise en pratique de ces bonnes pratiques
-** Sur les réseaux sociaux : Twitter, LinkedIN, Facebook et Instagram
-** Sur votre site internet utilisant Wordpress
-
-* Auditer 
-** Comment s'assurer du bon respect des bonnes pratiques
-** Audits manuels 
-** Présentation d'outils
+# Plan
 
 ---
-
-# Introduction 
-
+src: ./pages/01_presentation_general.md
+hide: false
 ---
 
-# Utilisation du Numérique 
-
+---
+src: ./pages/02_indexation.md
+hide: false
 ---
 
-# Legislation 
-
+---
+src: ./pages/03_schema.md
+hide: false
 ---
 
-# Pratiques pour un créateur de contenu 
-
-<!-- 
-pour la création de site
-pour la création de document Word / PDF
-pour la publication de vidéo
--->
-
+---
+src: ./pages/04_recherche.md
+hide: false
 ---
 
-# Pratique sur les réseaux sociaux 
+---
+src: ./pages/05_agregation.md
+hide: false
+---
 
-<!-- 
-Twitter
-Facebool / Instagram
-LinkedIN
--->
+---
+src: ./pages/06_ingest.md
+hide: false
+---
 
+---
+src: ./pages/07_operating.md
+hide: false
+---
+
+---
+src: ./pages/08_sdk.md
+hide: false
+---
+
+---
+src: ./pages/09_sql.md
+hide: false
+---
+
+---
+src: ./pages/10_dimensionnement.md
+hide: false
+---
+
+---
+src: ./pages/11_retention.md
+hide: false
+---
+
+---
+src: ./pages/12_monitoring.md
+hide: false
+---
+
+---
+src: ./pages/13_alerting.md
+hide: false
+---
+
+---
+src: ./pages/14_securite.md
+hide: false
+---
+
+---
+src: ./pages/15_snapshot_restore.md
+hide: false
+---
+
+---
+src: ./pages/16_logstash.md
+hide: false
+---
+
+---
+src: ./pages/17_kibana.md
+hide: false
+---
+
+---
+src: ./pages/18_beat.md
+hide: false
+---
+
+---
+src: ./pages/19_apm.md
+hide: false
 ---
 
 # Welcome to Slidev

@@ -23,67 +23,23 @@ drawings:
 css: unocss
 ---
 
-# Introduction à l'Accessibilité Numérique
+# Angular
 
 ---
 
-# Plan 
+# Plan
 
 * Introduction
-** Définition de l'Accessibilité Numérique
-** Legislation
-** Comment est utilisé le Web ? 
-** Les référentils nationaux et internationaux
+* Approche Orientée Composant
+* Services
+* Router
+* RX.js
+* Http
+* Directives
+* Pipe
+* Tests unitaires
 
-* Bonnes Pratiques Générales
-** Gestion du contenu
-** Gestion des images
-** Gestion des vidéos et de l'audio
-** Intéraction avec la page
-** Expérience Utilisateur
-
-* Mise en pratique de ces bonnes pratiques
-** Sur les réseaux sociaux : Twitter, LinkedIN, Facebook et Instagram
-** Sur votre site internet utilisant Wordpress
-
-* Auditer 
-** Comment s'assurer du bon respect des bonnes pratiques
-** Audits manuels 
-** Présentation d'outils
-
----
-
-# Introduction 
-
----
-
-# Utilisation du Numérique 
-
----
-
-# Legislation 
-
----
-
-# Pratiques pour un créateur de contenu 
-
-<!-- 
-pour la création de site
-pour la création de document Word / PDF
-pour la publication de vidéo
--->
-
----
-
-# Pratique sur les réseaux sociaux 
-
-<!-- 
-Twitter
-Facebool / Instagram
-LinkedIN
--->
-
----
+--- 
 
 # Welcome to Slidev
 
