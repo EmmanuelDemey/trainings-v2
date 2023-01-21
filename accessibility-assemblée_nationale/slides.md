@@ -57,6 +57,12 @@ css: unocss
 
 ---
 
+# Quelques Statistiques
+
+* 12 millions de Français sont en situations de handicap en France
+
+---
+
 # Utilisation du Numérique 
 
 ---
@@ -65,7 +71,7 @@ css: unocss
 
 ---
 
-# Pratiques pour un créateur de contenu 
+# Bonnes Pratiques Générales
 
 <!-- 
 pour la création de site
@@ -74,6 +80,23 @@ pour la publication de vidéo
 -->
 
 ---
+
+# Contrates
+
+* Le contraste est une comparaison entre la couleur d'un contenu en premier plan par rapport à la couleur du fond. 
+
+<!--
+TODO: 
+
+Touver un exemple de contenu ou le contraste n'est pas bon
+Parler de Contrast Checker Monsido
+-->
+
+---
+
+# Mise en pratique de ces bonnes pratiques
+
+--- 
 
 # Pratique sur les réseaux sociaux 
 
@@ -84,6 +107,10 @@ LinkedIN
 -->
 
 ---
+
+# Auditer
+
+--- 
 
 # Welcome to Slidev
 
