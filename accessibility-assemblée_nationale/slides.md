@@ -81,7 +81,7 @@ pour la publication de vidéo
 
 ---
 
-# Contrates
+# Contraste
 
 * Le contraste est une comparaison entre la couleur d'un contenu en premier plan par rapport à la couleur du fond. 
 
@@ -93,6 +93,10 @@ Parler de Contrast Checker Monsido
 -->
 
 ---
+
+# Contraste - Outillage
+
+* [Color-pair Contrast Testing](https://color.a11y.com/)
 
 # Mise en pratique de ces bonnes pratiques
 
