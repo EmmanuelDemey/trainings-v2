@@ -30,32 +30,47 @@ css: unocss
 # Plan 
 
 * Introduction
-** Définition de l'Accessibilité Numérique
-** Legislation
-** Comment est utilisé le Web ? 
-** Les référentils nationaux et internationaux
+  * Définition de l'Accessibilité Numérique
+  * Legislation
+  * Comment est utilisé le Web ? 
+  * Les référentils nationaux et internationaux
 
 * Bonnes Pratiques Générales
-** Gestion du contenu
-** Gestion des images
-** Gestion des vidéos et de l'audio
-** Intéraction avec la page
-** Expérience Utilisateur
+  * Gestion du contenu
+  * Gestion des images
+  * Gestion des vidéos et de l'audio
+  * Intéraction avec la page
+  * Expérience Utilisateur
+
+
+
+--- 
+
+# Plan 
 
 * Mise en pratique de ces bonnes pratiques
-** Sur les réseaux sociaux : Twitter, LinkedIN, Facebook et Instagram
-** Sur votre site internet utilisant Wordpress
+  * Sur les réseaux sociaux : Twitter, LinkedIN, Facebook et Instagram
+  * Sur votre site internet utilisant Wordpress
 
 * Auditer 
-** Comment s'assurer du bon respect des bonnes pratiques
-** Audits manuels 
-** Présentation d'outils
+  * Comment s'assurer du bon respect des bonnes pratiques
+  * Audits manuels 
+  * Présentation d'outils
 
 ---
 
 # Introduction 
 
 ---
+
+# Standarts
+
+* WCAG
+** ISO 40500
+** EN 301 549
+** RGAA
+* ATAG
+* UUAG
 
 # Quelques Statistiques
 
@@ -69,10 +84,23 @@ css: unocss
 
 # Legislation 
 
+* American with Disabilities Act (ADA)
+
 ---
 
 # Bonnes Pratiques Générales
 
+---
+
+# Problèmes les plus rencontrés
+
+* D'après les procès aux Etats-Unis
+  * Absence d'alternative textuelle sur une image
+  * Contraste de couleur insuffisant
+  * Problème d'accès au clavier
+  * Absence de libellés sur les formulaires
+  * Liens sans alternatives textuelles ou non optimales
+   
 <!-- 
 pour la création de site
 pour la création de document Word / PDF
