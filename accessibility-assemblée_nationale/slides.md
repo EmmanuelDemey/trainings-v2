@@ -82,6 +82,18 @@ css: unocss
 
 ---
 
+# Synthétiseur Vocal 
+
+* Le synthétiseur vocal est utilisé à une vitesse très élevé
+
+---
+
+# Synthétiseur Vocal 
+
+* https://youtu.be/dEbl5jvLKGQ
+
+--- 
+
 # Legislation 
 
 * American with Disabilities Act (ADA)
