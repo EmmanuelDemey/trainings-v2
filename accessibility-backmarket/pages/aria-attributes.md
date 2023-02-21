@@ -247,6 +247,40 @@ window.customElements.define('button-switch', SwitchButton)
 
 ---
 
+# Aria-Label
+
+* When we have multiple HTML elements with the same visible text, you must add an **aria-label** attribute in order to provide more inforamtions
+  * Focusable elements
+  * Landmarks
+
+```html
+<button aria-label="book on monday"> Book this slot </button>
+<button aria-label="book on tuesday"> Book this slot </button>
+<button aria-label="book on wenesday"> Book this slot </button>
+<button aria-label="book on thurday"> Book this slot </button>
+<button aria-label="book on friday"> Book this slot </button>
+
+```
+
+--- 
+
+# Breadcrumb
+
+* If you have a breadcrump on your page, the last item of the breadcrumb
+  * should not be a link
+  * or we should add tha `aria-current=page` attribute
+* The **aria-current** attribute can have different value : **page**, **true**, **step**, ...
+
+```html
+<ol>
+  <li><a href="#"> Category 1</a></li>
+  <li><a href="#"> Category 2</a></li>
+  <li><a href="#" aria-current="page"> Product </a></li>
+</ol>
+```
+
+---
+
 # Checkbox Custom
 
 ```html
@@ -318,3 +352,9 @@ input[aria-invalid='true']{
     background: red;
 }
 ```
+
+--- 
+
+# The first rule of using ARIA states
+
+> If you can use a native HTML element or attribute with the semantics and behavior you require already built in, instead of re-purposing an element and adding an ARIA role, state or property to make it accessible, then do so."

@@ -62,15 +62,11 @@ css: unocss
   * Links
   * Tables
   * Forms
+  * Complex component
 
 ---
 
 # Plan
-
-* Technical Usecases 
-  * Modals
-  * Complex components
-  * Accessibility Best Practices with Vue.js
 
 * Auditing
   * Manual evaluation
@@ -86,81 +82,214 @@ layout: cover
 
 # What is Web Accessibility ? 
 
+> Give the user full access to content and functionalities, despite physical or material constraints 
+
+<style>
+blockquote {
+  font-size: 3rem !important;
+  margin-top: 5rem !important;
+}
+blockquote p {
+  line-height: 3rem !important;
+}
+</style>
+
 ---
 
-# Ethics and deontology
+# What a Web should be
+
+* In order to work correctly on all user agent, a web page should be 
+  * Perceivable
+  * Operable
+  * Understandable
+  * Robust
+
+* These is the 4 stamenet defined in the WCAG standard
+* In order to do so, you have to choose the element that best represents the nature of the content
+
+--- 
+
+# Worst code ever
+
+* This is a code we find a lot on website and that is not accessible
+
+```html
+<div 
+	(click)=‘open()’ class=‘button’>
+  Click me
+</div>
+
+<a href="#" onclick="..."> Click here </a>
+
+<button> <a> ... </a> </button>
+
+<div class="list">
+  <div> ... </div>
+  <div> ... </div>
+  <div> ... </div>
+  <div> ... </div>
+</div>
+```
+
+--- 
+
+# Better code
+
+* this is a code we find a lot on website and that is not accessible
+
+```html
+<div class=‘button’
+	(click)=‘open()’
+	role=‘button’
+	tabindex=‘0’>
+  Click me
+</div>
+```
+
+```css
+div.button {
+  display: inline-block;
+  border-radius: 0,5rem;
+  …
+}
+div.button:hover {…}
+div.button:focus {…}
+```
+
+--- 
+
+# What is a User Agent ?
+
+> Any device capable of understanding a web page
+
+<style>
+blockquote {
+  font-size: 3rem !important;
+  margin-top: 5rem !important;
+}
+blockquote p {
+  line-height: 3rem !important;
+}
+</style>
 
 ---
-
-# Legal obligations
-
----
-
-# How to use the Web ?
-
----
-
-# Presentation of the various technical aids
 
 ---
 layout: cover
 ---
 
----
-src: ./pages/aria-attributes.md
----
+# How users read the web
 
-# Semantic Web 
+--- 
 
----
-
-# HTML
-
----
-
-# Accessiblity Tree
+![Arbre de décision](/images/device.png)
 
 ---
 src: ./pages/screen-readers.md
 --- 
 
-# Best Practices
+--- 
+
+
+# Accessibility on a Project
+
+* Everyone is responsible for it
+* We need to collaborate
+* We need to test, test, test
+* Mobile first is your friend
+
+--- 
+
+# Browser and AT support
+
+* Operating system being used,
+* Operating system’s version,
+* Browser being used,
+* Browser’s version,
+* Assistive technology being used,
+* Assistive technology’s version, and
+* Complexity of the underlying code."
+
+--- 
+
+# Legal obligations
+
+* When you are in France, you have some obligation
+  * Audit your website via thanks to the RGAA
+  * publish an accessibility statement
+  * Define a 3-year plan with a list of actions
+  
+---
+
+# Standards
+
+* In order to audit a website, we have at least two standards
+  * WCAG
+  * RGAA
 
 ---
 layout: cover
 ---
 
-# Standards
+# PW: Let's have a look to the W3C standard
+
+--- 
+
+# Semantic HTML 
+
+![Arbre de décision](/images/w3c.png)
+
+--- 
+
+# Semantic HTML 
+
+* The HTML specification provide a lot of semantic element
+* Depdending of the browser support you need, you must use them
+* **An HTML element is accessible by default**
+* If you are not 100% about something, have a loot to the specification
+* Here are some commons errors
+  * Unfocusable element
+  * Duplicated id
+  * Unacceptable attributes on some HTML elements
+  * Unacceptable child for an HTML element
 
 ---
 
-# Section 508
+# Landmarks
+
+* We have multiple HTML elements usefull to strucure correctlu your web page
+  * header
+  * footer
+  * main
+  * aside
+  * nav
+  * section
+  * article
+  * form
+  * search
+
+--- 
+
+# Other HTML elements
+
+* Ul/Li - Ol/Li - Dl/Dd/Dt
+* Dialog
+* inert
+* Progress
+* Details
 
 ---
-
-# WCAG 2.0
-
+layout: cover
 ---
 
-# RGAA
+# PW Let's write simple Home Page of an Ecommerce website
 
----
-
-# WAI-ARIA
-
----
-
-# Accessiweb
 
 ---
 layout: cover
 ---
 
 # Technical Usecases
-
----
-
-# General design
 
 ---
 src: ./pages/focus.md
@@ -172,7 +301,7 @@ src: ./pages/focus.md
 
 * Some Screen readers will select the right voice based on the lang of your page
 * You must
-  * define the default lang of the web pag
+  * define the default lang of the web page
   * define everytime you have a part of the page that is not using the default lang
 
 ```html
@@ -186,6 +315,18 @@ src: ./pages/focus.md
 ```
 
 ---
+
+# Abbreviation
+
+* If you are uing abreviation, you must define the full value the first time the abbreviation appear
+
+```html
+<p>
+  here is an abbreviation  <abbr title="spécification">spec</abbr>
+</p>
+```
+
+--- 
 
 # Titles
 
@@ -231,6 +372,12 @@ const app = new Vue({
 
 * A PR is opened in order to manage thie behavior internally in Vue.js : https://github.com/vuejs/vue-router/issues/2488
 
+---
+layout: cover
+---
+
+# PW Add a Product page to your application and respect the previous best practices
+
 --- 
 
 # Images
@@ -262,21 +409,106 @@ const app = new Vue({
 
 --- 
 
-# Links
+# Images
+
+![Arbre de décision](/images/image.png)
+
+--- 
+
+# Tables
+
+* When creating a table, you must respect theses rules
+  * Use the semantic html elements = table, thead, tr, th, td, tbody
+  * Add a (visually-hidden) caption
+  * If you have two levels of headers, you must use the **scope** attribute
 
 ---
 
 # Tables
 
+* Here is full example of an HTML table
+
+```html
+<table>
+    <caption>Things to eat</caption>
+    <thead>
+        <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Price</th>
+            <th scope="col">Vegan</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">Peach</th>
+            <td>1.99 €</td>
+            <td>yes</td>
+        </tr>
+        <tr>
+            <th scope="row">Cucumber</th>
+            <td>0.99 €</td>
+            <td>yes</td>
+        </tr>
+        <tr>
+            <th scope="row">Cheeseburger</th>
+            <td>7.99 €</td>
+            <td>no</td>
+        </tr>
+        <tr>
+            <th scope="row">Eggplant</th>
+            <td>1.35 €</td>
+            <td>yes</td>
+        </tr>
+    </tbody>
+</table>
+```
+
 ---
 src: ./pages/form.md
 ---
 
-# Modals
-
+---
+layout: cover
 ---
 
 # Complex components
+
+--- 
+
+# Complex components
+
+* When you need complex component, you have to develop them from scratch
+  * because they are not available in the HTML specification
+* Here are few example of complex component
+  * Tooltip
+  * Carousel
+  * Tab
+  * Menu Bar
+* The **WAI-ARIA** Practices provide a pattern library with few complex component. 
+* If your component does not exist in the library, you need to understand correctly the ARIA specifications
+
+---
+src: ./pages/aria-attributes.md
+---
+
+---
+layout: cover
+---
+
+# Let's write a tooltip together
+
+
+---
+layout: cover
+---
+
+# Let's write a Tab together
+
+---
+layout: cover
+---
+
+# On the Product Page, let's add a custom radio group in order to select a color
 
 ---
 
@@ -307,11 +539,11 @@ src: ./pages/form.md
 
 * Each vocabulary provides multiples properties you can add on your HTML
 * Here is an example for the vocabulary `Restaurant` :
-** name
-** image
-** geo
-** events
-** ...
+  * name
+  * image
+  * geo
+  * events
+  * ...
 
 ---
 
@@ -381,8 +613,10 @@ src: ./pages/form.md
 ```
 
 ---
+layout: cover
+---
 
-# Accessibility Best Practices with Vue.js
+# Add Microdata to the Product Page 
 
 ---
 src: ./pages/auditing.md

@@ -1,11 +1,3 @@
----
-layout: cover
----
-
-# Forms
-
----
-
 # Form Controls
 
 * When developing a form, we have multiple HTML element available
@@ -49,8 +41,19 @@ layout: cover
 # Labels
 
 * Browser are not able *for the moment* to translate strings defined in a attribute. 
-  * If you need to define an invisible label and the browser need to be able to translate it, 
-  * We will use a utility CSS class
+  * Firefox,
+  * Safari,
+  * Chromium browsers other than Chrome or Edge (Vivaldi, Opera, Brave, Arc, etc.),
+  * Internet Explorer,
+  * PlayStation Internet Browser
+  * ...
+
+--- 
+
+# Labels
+
+* If you need to define an invisible label and the browser need to be able to translate it, 
+* You need to use this utility class
 
 ```css
 .sr-only {
@@ -74,6 +77,80 @@ layout: cover
 
 --- 
 
+# Placeholder
+
+* A placeholder is not an option for an input label
+  * Can’t be automatically translated;
+  * Is oftentimes used in place of a label, locking out assistive technology;
+  * Can hide important information when content is entered;
+  * Can be too light-colored to be legible;
+  * Has limited styling options;
+  * May look like pre-filled information and be skipped over.
+
+--- 
+
+# Add help for your user
+
+* If you want a specifiv format for your field, please define the format directly
+  * via la label
+  * via **aria-describedby**
+
+```html
+<label for="expire">Expiration date (MM/YYYY): </label>
+<input type="text" name="expire" id="expire">
+```
+
+--- 
+
+# Fieldset
+
+* You can create a logical group of inputs with the **fieldset** element
+* If you use a fieldset, you must always define a **legend**
+
+```html
+<form>
+  <fieldset>
+    <legend>Choose your favorite monster</legend>
+
+    <input type="radio" id="kraken" name="monster" value="K">
+    <label for="kraken">Kraken</label><br>
+
+    <input type="radio" id="sasquatch" name="monster" value="S">
+    <label for="sasquatch">Sasquatch</label><br>
+
+    <input type="radio" id="mothman" name="monster" value="M" />
+    <label for="mothman">Mothman</label>
+  </fieldset>
+</form>
+
+```
+
+--- 
+
+# Required fields
+
+* When a field is a required, you should add the *required* or *aria-required* attributes
+* For people that does not use Screen Readers, you must visually indicate that this input is required
+
+```html
+<label> Firstname (obligatoire) <input /></label>
+```
+
+```html
+<form action="#" method="post">
+  <p>Note: * denotes a required field</p>
+  <div>
+    <label for="usrname">Login name *:</label>
+    <input aria-required="true" type="text">
+  </div>
+  <div>
+    <label for="pwd">Password *:</label>
+    <input aria-required="true" type="password">
+  </div>
+</form>
+```
+
+---
 
 # Errors Managment
 
@@ -155,6 +232,22 @@ document.querySelector('form').addEventListener('submit', () => {
 
 ---
 
+# Autocomplete
+
+* Here is a list of possible values for the autocomplete attribute
+  * given-name
+  * family-name
+  * email
+  * username
+  * street-address
+  * country
+  * postal-code
+  * ...
+* You will find a full list here https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
+...
+
+--- 
+
 # DataList
 
 * Component used to provide an easy autocomplete behavior
@@ -180,3 +273,9 @@ document.querySelector('form').addEventListener('submit', () => {
 * If you need to implement a dynamic autocomplete (with data coming from the server for example), 
 * you need to follow the **Combobox Pattern** from the WAI ARIA Authoring Practices Guide
 * https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
+
+---
+layout: cover
+---
+
+# PW : Add a Shipping form on your third page 

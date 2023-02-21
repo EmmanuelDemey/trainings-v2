@@ -109,8 +109,7 @@ id=1 role=WebArea name="Demo"
 * Speed
 
 ---
+layout: cover
+---
 
-# PWX
-
-* Take few minutes to use a screen reader based on a website you already know
-* Select the right screen reader based what your operating system support.
+# Take few minutes to use a screen reader based on a website you already know

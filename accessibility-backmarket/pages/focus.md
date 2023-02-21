@@ -2,7 +2,7 @@
 
 * On a web page, only these three categories are focusable by default
   * Form Controls
-  * Links
+  * Links **with a href**
   * Buttons
 
 * If you need to make an unsemantic element focusable, you need to use the **tabindex** attribute.
@@ -11,6 +11,8 @@
   * -1 : the element will only be focusable programmatically
   * 0 : the element will be focusable like a form control, link or button
   * higher than 0 : we will change the focus order
+
+> BTW a link with a href equal to **#**, is a button !
 
 --- 
 

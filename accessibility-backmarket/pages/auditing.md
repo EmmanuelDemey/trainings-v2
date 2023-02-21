@@ -193,11 +193,19 @@ test('should not have any automatically detectable WCAG A or AA violations', asy
 
 ---
 
-# PW
+# Other tools
 
-* In this PW, you should give a try to the following tools on your Vue.js application
-  * ESLint and its Vue.js Accessibility plugin
-  * Testing Library with its utility methods
-  * Playwright and its Axe support
+* Web Developer extension
+* Tota11y
+* WAVE
+* Color Contrast / Tanaguru
+* Aviewer
+* Validator HTML/CSS
+* Andy 
+* Voiceover.js
 
 ---
+layout: cover
+---
+
+# Add ESLint, Testing Library and Playwright on your project
