@@ -144,7 +144,7 @@
 
 # State
 
-* A `state` can be added thanks to the **aria-** prefix on any HTML elements.
+* A **state** can be added thanks to the **aria-** prefix on any HTML elements.
 * Theses states will be updated via JavaScript
 
 ```html

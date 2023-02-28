@@ -31,10 +31,18 @@ css: unocss
 
 * Introduction
   * What is Web Accessibility ?
-  * Ethics and deontology
   * Legal obligations
   * How to use the Web ?
   * Presentation of the various technical aids (NVDA, VoiceOver, etc.)
+
+* Standards
+  * WCAG 2.0
+  * RGAA
+  * WAI-ARIA
+
+--- 
+
+# Plan 
 
 * Semantic Web
   * HTML
@@ -44,22 +52,9 @@ css: unocss
   * Best Practices
 
 
-
---- 
-
-# Plan 
-
-* Standards
-  * Section 508
-  * WCAG 2.0
-  * RGAA
-  * WAI-ARIA
-  * Accessiweb
-
 * Technical Usecases 
   * General design
   * Images
-  * Links
   * Tables
   * Forms
   * Complex component
@@ -104,7 +99,7 @@ blockquote p {
   * Understandable
   * Robust
 
-* These is the 4 stamenet defined in the WCAG standard
+* These is the 4 statements defined in the WCAG standard
 * In order to do so, you have to choose the element that best represents the nature of the content
 
 --- 
@@ -115,7 +110,7 @@ blockquote p {
 
 ```html
 <div 
-	(click)=‘open()’ class=‘button’>
+	onclick=‘open()’ class=‘button’>
   Click me
 </div>
 
@@ -135,11 +130,11 @@ blockquote p {
 
 # Better code
 
-* this is a code we find a lot on website and that is not accessible
+* A better way to write the same code, but not perfect
 
 ```html
 <div class=‘button’
-	(click)=‘open()’
+	onclick=‘open()’
 	role=‘button’
 	tabindex=‘0’>
   Click me
@@ -173,6 +168,15 @@ blockquote p {
 </style>
 
 ---
+
+# What is a User Agent ?
+
+* A Browser
+* A Screen Reader
+* A Braille Display
+* A Bot
+* A Script
+* ...
 
 ---
 layout: cover
@@ -208,14 +212,14 @@ src: ./pages/screen-readers.md
 * Browser’s version,
 * Assistive technology being used,
 * Assistive technology’s version, and
-* Complexity of the underlying code."
+* Complexity of the underlying code.
 
 --- 
 
 # Legal obligations
 
 * When you are in France, you have some obligation
-  * Audit your website via thanks to the RGAA
+  * Audit your website thanks to the RGAA standard
   * publish an accessibility statement
   * Define a 3-year plan with a list of actions
   
@@ -224,8 +228,8 @@ src: ./pages/screen-readers.md
 # Standards
 
 * In order to audit a website, we have at least two standards
-  * WCAG
-  * RGAA
+  * WCAG (International)
+  * RGAA (France, based on the WCAG)
 
 ---
 layout: cover
@@ -244,9 +248,9 @@ layout: cover
 # Semantic HTML 
 
 * The HTML specification provide a lot of semantic element
-* Depdending of the browser support you need, you must use them
+* Depending of the browser support you need, you must use them
 * **An HTML element is accessible by default**
-* If you are not 100% about something, have a loot to the specification
+* If you are not 100% about something, have a look to the specification
 * Here are some commons errors
   * Unfocusable element
   * Duplicated id
@@ -373,11 +377,6 @@ const app = new Vue({
 * A PR is opened in order to manage thie behavior internally in Vue.js : https://github.com/vuejs/vue-router/issues/2488
 
 ---
-layout: cover
----
-
-# PW Add a Product page to your application and respect the previous best practices
-
 --- 
 
 # Images
@@ -418,7 +417,10 @@ layout: cover
 # Tables
 
 * When creating a table, you must respect theses rules
-  * Use the semantic html elements = table, thead, tr, th, td, tbody
+  * Use the semantic html elements
+    * table
+    * thead, tr, th
+    * tbody, tr, tf
   * Add a (visually-hidden) caption
   * If you have two levels of headers, you must use the **scope** attribute
 
@@ -447,16 +449,6 @@ layout: cover
         <tr>
             <th scope="row">Cucumber</th>
             <td>0.99 €</td>
-            <td>yes</td>
-        </tr>
-        <tr>
-            <th scope="row">Cheeseburger</th>
-            <td>7.99 €</td>
-            <td>no</td>
-        </tr>
-        <tr>
-            <th scope="row">Eggplant</th>
-            <td>1.35 €</td>
             <td>yes</td>
         </tr>
     </tbody>
@@ -508,7 +500,7 @@ layout: cover
 layout: cover
 ---
 
-# On the Product Page, let's add a custom radio group in order to select a color
+# Let's create a custom radio group in order to select a color for example.
 
 ---
 
@@ -616,7 +608,7 @@ layout: cover
 layout: cover
 ---
 
-# Add Microdata to the Product Page 
+# PW Add Microdata to the Product Page 
 
 ---
 src: ./pages/auditing.md

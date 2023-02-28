@@ -4,6 +4,12 @@
   * Form Controls
   * Links **with a href**
   * Buttons
+* All other elements are not focusable (but clickable)! 
+  * They are not accessible.
+
+---
+
+# Focus Managment
 
 * If you need to make an unsemantic element focusable, you need to use the **tabindex** attribute.
 
@@ -55,12 +61,21 @@ document.querySelector('span').focus();
   * For example: Cookies banner
 
 ---
+layout: cover
+---
 
-# Focus Managment
+# Question :  How would you improve a page with a cookies banner ? 
 
-* How would you improve a page with a cookies banner ? 
-* How would you make invisible elements unfocusale ? 
-* How would you make items on the background unfocusable ? 
+---
+layout: cover
+---
+
+# Question :  How would you make invisible elements unfocusable ? 
+
+---
+layout: cover
+---
+# Question :  How would you make items on the background unfocusable ? 
 
 ---
 
@@ -106,3 +121,6 @@ document.querySelector('span').focus();
     top: 0;
 }
 ```
+
+---
+

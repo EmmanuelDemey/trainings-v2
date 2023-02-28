@@ -1,6 +1,6 @@
 # Form Controls
 
-* When developing a form, we have multiple HTML element available
+* When developing a form, we have multiple HTML elements 
   * inputs (text, date, number, ...)
   * textarea
   * checkbox and radio
@@ -92,7 +92,7 @@
 # Add help for your user
 
 * If you want a specifiv format for your field, please define the format directly
-  * via la label
+  * via the label
   * via **aria-describedby**
 
 ```html
@@ -130,6 +130,7 @@
 # Required fields
 
 * When a field is a required, you should add the *required* or *aria-required* attributes
+* The **required** attribute will enable the client-slide validation. The **aria-required** won't
 * For people that does not use Screen Readers, you must visually indicate that this input is required
 
 ```html
@@ -174,6 +175,7 @@
 
 * When an input is invalid, you should set the **aria-invalid** attribute
 * You do not need extra CSS class like the **error** CSS class used previously
+  * *Hello Angular*
 * You can now use more semantic CSS rules
 
 ```html
@@ -278,4 +280,4 @@ document.querySelector('form').addEventListener('submit', () => {
 layout: cover
 ---
 
-# PW : Add a Shipping form on your third page 
+# PW : Create the HTML for a shipping form

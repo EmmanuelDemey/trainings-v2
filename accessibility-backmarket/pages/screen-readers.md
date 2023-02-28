@@ -2,20 +2,26 @@
 
 * Used mostly by people with visual disabilities
 * It converts a digital content to an audio or braille stream
-* Provide some shortcust in order to reduce the reading of the page
-* When the Screen reader reads the content of the page, the speed is at 350 word per minu
+* Provide some shortcuts in order to reduce the reading of the page
+* When the Screen reader reads the content of the page, the speed is at 350 words per minut
 
 --- 
 
 # Screen Readers
 
 * How a screen reader is able to communicate with a browser ?
-    * The browser will generate :
-    * DOM: Document Object Model 
-    * CSSOM: CSS Object Model
-    * Accessibility Tree
+* Once the HTML stream is downloaded by the browser,
+* It will generate :
+    * **DOM**: Document Object Model 
+    * **CSSOM**: CSS Object Model
+    * **Accessibility Tree**
+* We have a direct relation between the **Document Object Model** and the **Accessibility Tree**
+    * If the DOM is not optimal, the Accessibility Tree won't be optimal
+--- 
 
-* The Accessibility Tree will be exposed to native Accessibility *driver*
+# Screen Readers
+
+* The Accessibility Tree will be exposed to native Accessibility *drivers*
     * OSX Accessibility Platform (OSX)
     * UI Automation (Microsoft)
     * MS Active Accessibility (Microsoft)
@@ -23,7 +29,7 @@
 
 * Screen Readers will also use these natives drivers
 
-* Everytime an *event* is triggered on your web page, the browser will expose the new state of your tree
+* Everytime an *event* is triggered on your web page (**click** on a button, **type** something on an input field), the browser will expose the new state of your tree
 ---
 
 # Screen Readers
@@ -51,7 +57,24 @@ id=1 role=WebArea name="Demo"
         id=5 role=Button name="OK"
 ```
 
+* Each node has a role and some properties
+    * These informations will be explained later during this training session.
+
+---
+
+# Screen Readers
+
 * Chromium-based browser provide tools in order to visualize this tree.
+
+![Arbre de décision](/images/a11ytreelocal.png)
+
+---
+
+# Screen Readers
+
+* Chromium-based browser provide tools in order to visualize this tree.
+
+![Arbre de décision](/images/a11ytreeglobal.png)
 
 ---
 
@@ -81,8 +104,8 @@ id=1 role=WebArea name="Demo"
 
 * Each Screen Readers provide a **Rotor**
 * Feature that allow to
-* visualize the structure of the page
-* browse easliy 
+    * visualize the structure of the page
+    * browse easliy 
 
 ---
 
