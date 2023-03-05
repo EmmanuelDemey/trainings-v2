@@ -1,7 +1,7 @@
 # Screen Readers
 
 * Used mostly by people with visual disabilities
-* It converts a digital content to an audio or braille stream
+* It converts a digital content to an audio or braille streams
 * Provide some shortcuts in order to reduce the reading of the page
 * When the Screen reader reads the content of the page, the speed is at 350 words per minut
 
@@ -17,6 +17,9 @@
     * **Accessibility Tree**
 * We have a direct relation between the **Document Object Model** and the **Accessibility Tree**
     * If the DOM is not optimal, the Accessibility Tree won't be optimal
+
+> The accessibility tree and the DOM tree are parallel structures. Roughly speaking the accessibility tree is a subset of the DOM tree (W3C).
+
 --- 
 
 # Screen Readers
@@ -135,4 +138,17 @@ id=1 role=WebArea name="Demo"
 layout: cover
 ---
 
-# Take few minutes to use a screen reader based on a website you already know
+# PW Take few minutes to use a screen reader on a website you already know
+
+---
+
+# Switch Control
+
+![Switch Control](/images/switchcontrol.png)
+
+---
+layout: cover
+---
+
+# PW Take few minutes to use the Switch Control on a website you already know
+

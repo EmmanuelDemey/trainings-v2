@@ -173,7 +173,7 @@ test('properly handles v-model', async () => {
 * Provide a package in order to run accessibility checks on tested pages
 
 ```shell
-npm i -D @axe-core/playwrite 
+npm i -D @axe-core/playwright 
 ```
 
 ```javascript 

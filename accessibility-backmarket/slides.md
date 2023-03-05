@@ -494,13 +494,13 @@ layout: cover
 layout: cover
 ---
 
-# Let's write a Tab together
+# Let's write a custom radio group together
 
 ---
 layout: cover
 ---
 
-# Let's create a custom radio group in order to select a color for example.
+# Let's create a Tab component
 
 ---
 

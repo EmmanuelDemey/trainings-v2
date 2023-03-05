@@ -141,12 +141,12 @@
 <form action="#" method="post">
   <p>Note: * denotes a required field</p>
   <div>
-    <label for="usrname">Login name *:</label>
-    <input aria-required="true" type="text">
+    <label for="usrname">Login name <span aria-hidden="true">*</span>:</label>
+    <input id="usrname" aria-required="true" type="text">
   </div>
   <div>
-    <label for="pwd">Password *:</label>
-    <input aria-required="true" type="password">
+    <label for="pwd">Password <span aria-hidden="true">*</span>:</label>
+    <input id="pwd" aria-required="true" type="password">
   </div>
 </form>
 ```
@@ -280,4 +280,4 @@ document.querySelector('form').addEventListener('submit', () => {
 layout: cover
 ---
 
-# PW : Create the HTML for a shipping form
+# PW : Create the HTML for a checkout form
