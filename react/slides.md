@@ -70,3 +70,20 @@ css: unocss
 # Redux Toolkit
 
 ---
+
+# createSelector 
+
+* la méthode `createSelector`est une méthode définie dans le module `reselect`
+* Elle permet de créer un sélecteur d'une partie du state tout en gardant en mémoire le résultat de calculs réalisés précédemment. 
+
+```javascript
+const selectNumCompletedTodos = createSelector(
+  (state) => state.todos,
+  (todos) => todos.filter((todo) => todo.completed).length
+)
+
+export const CompletedTodosCounter = () => {
+  const numCompletedTodos = useSelector(selectNumCompletedTodos)
+  return <div>{numCompletedTodos}</div>
+}
+```

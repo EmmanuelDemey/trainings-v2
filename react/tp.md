@@ -2,20 +2,8 @@
 
 Dans ce document, nous allons présenter la partie pratique de la formation. 
 
-## Approche Orientée Composant
+## Redux
 
-## Services
+Voici euqleus liens qui peuvent vous être utiles pour le bon déroulé de cette partie pratique
 
-## Router
-
-## RX.js
-
-## Http
-
-Pour les besoins de cette partie pratique, nous allons consommer une API existante : [Fake Store API](https://fakestoreapi.com/)
-
-## Directives
-
-## Pipe
-
-## Tests unitaires
+* Utilisation du hook `useSelector` (https://react-redux.js.org/api/hooks#useselector)
