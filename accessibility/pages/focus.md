@@ -1,6 +1,6 @@
 # Focus Managment
 
-* On a web page, only these three categories are focusable by default
+* On a web page, only these three categories of elements are focusable by default
   * Form Controls
   * Links **with a href**
   * Buttons
@@ -11,7 +11,7 @@
 
 # Focus Managment
 
-* If you need to make an unsemantic element focusable, you need to use the **tabindex** attribute.
+* If you need to make an unfocusable element focusable, you need to use the **tabindex** attribute.
 
 * The attribute accepts three values
   * -1 : the element will only be focusable programmatically

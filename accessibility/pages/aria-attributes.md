@@ -1,6 +1,6 @@
 # ARIA attributes
 
-* You must use first HTML Element
+* You must use first native HTML elements
 * When this it nos possible, and **only** when it is not possible
     * You can create your own HTML structure based on unsemantic elements
     * And add extra metadatas to give the missing semantic
@@ -60,7 +60,7 @@
 
 # Roles
 
-* Les rôles sont découpés en six catégories :
+* Roles can be grouped into six categories :
     * Abstract Role
     * Document Structure Role (toolbar, ...)
     * Landmark Role

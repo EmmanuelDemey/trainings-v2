@@ -69,7 +69,7 @@ id=1 role=WebArea name="Demo"
 
 * Chromium-based browser provide tools in order to visualize this tree.
 
-![Arbre de décision](/images/a11ytreelocal.png)
+![Chrome devtools providing an Accessibility Tree Panel](/images/a11ytreelocal.png)
 
 ---
 
@@ -77,7 +77,7 @@ id=1 role=WebArea name="Demo"
 
 * Chromium-based browser provide tools in order to visualize this tree.
 
-![Arbre de décision](/images/a11ytreeglobal.png)
+![Chrome devtools providing an Accessibility Tree Panel](/images/a11ytreeglobal.png)
 
 ---
 

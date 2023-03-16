@@ -13,11 +13,11 @@ layout: cover
     * UX
     * Performance
 
-* You need manual evaluation in order to be sure your application is 
+* You need manual evaluation in order to be sure your application is accessible
 
-* Add **Is the feature fully accessible?** in your definition of done
+* Add **Is the feature fully accessible?** to your definition of done
 
-* Work people with disabilities during the build of the application
+* Work with people with disabilities during the build of the application
     
 ---
 
@@ -200,7 +200,6 @@ test('should not have any automatically detectable WCAG A or AA violations', asy
 * WAVE
 * Color Contrast / Tanaguru
 * Aviewer
-* Validator HTML/CSS
 * Andy 
 * Voiceover.js
 

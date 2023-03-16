@@ -99,7 +99,7 @@ blockquote p {
   * Understandable
   * Robust
 
-* These is the 4 statements defined in the WCAG standard
+* These are the 4 statements defined in the WCAG standard
 * In order to do so, you have to choose the element that best represents the nature of the content
 
 --- 
@@ -186,7 +186,7 @@ layout: cover
 
 --- 
 
-![Arbre de décision](/images/device.png)
+![Image représentant des appareils utilisés par des personnes en situation de handicap](/images/device.png)
 
 ---
 src: ./pages/screen-readers.md
@@ -220,7 +220,7 @@ src: ./pages/screen-readers.md
 
 * When you are in France, you have some obligation
   * Audit your website thanks to the RGAA standard
-  * publish an accessibility statement
+  * Publish an accessibility statement
   * Define a 3-year plan with a list of actions
   
 ---
@@ -241,7 +241,7 @@ layout: cover
 
 # Semantic HTML 
 
-![Arbre de décision](/images/w3c.png)
+![Page du W3C expliquant un élement HTML](/images/w3c.png)
 
 --- 
 
@@ -253,15 +253,15 @@ layout: cover
 * If you are not 100% about something, have a look to the specification
 * Here are some commons errors
   * Unfocusable element
-  * Duplicated id
+  * Duplicated ids
   * Unacceptable attributes on some HTML elements
-  * Unacceptable child for an HTML element
+  * Unacceptable children for an HTML element
 
 ---
 
 # Landmarks
 
-* We have multiple HTML elements usefull to strucure correctlu your web page
+* We have multiple HTML elements usefull to strucure correctly a web page
   * header
   * footer
   * main
@@ -353,7 +353,7 @@ Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
 
 # Titles
 
-* When you develop a **SPA**, you have give manually the focus everytime the user is redirected from one page to another. 
+* When you develop a **SPA**, you have to give manually the focus everytime the user is redirected from one page to another. 
 
 ```javascript
 const app = new Vue({
@@ -419,8 +419,9 @@ const app = new Vue({
 * When creating a table, you must respect theses rules
   * Use the semantic html elements
     * table
-    * thead, tr, th
-    * tbody, tr, tf
+    * thead
+    * tbody, tr, td
+    * tfoot
   * Add a (visually-hidden) caption
   * If you have two levels of headers, you must use the **scope** attribute
 
@@ -506,9 +507,9 @@ layout: cover
 
 # Microdata
 
-* API used to *business* metadata to an HTML page
+* API used to add *business* metadata to an HTML page
 * Useful in order make our website unserstandable by a device
-* You can multiple syntaxes
+* You can use multiple syntaxes
   * Schema.org
   * JSON LD
   * RDF
