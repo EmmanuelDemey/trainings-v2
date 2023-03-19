@@ -142,7 +142,54 @@ Parler de Contrast Checker Monsido
 
 --- 
 
+# Outils
+
+* Outils intégrés aux navigateurs
+* WAVE / Axe
+* Color Contrast / Tanaguru
+* Aviewer
+* Andi
+* Voiceover.js
+
+
+--- 
+
 # Pratique sur les réseaux sociaux 
+
+* En plus de votre message en lui-meme, vous devez
+proposer des alternatives aux images que vous poster sur 
+les réseaux sociaux. 
+
+* Twitter
+* LinkedIN
+* Facebook
+* Instangram
+
+--- 
+
+# Twitter
+
+![Arbre de décision](/images/Twitter.png)
+
+---
+
+# LinkedIN
+
+![Arbre de décision](/images/LinkedIn.png)
+
+---
+
+# Facebook
+
+![Arbre de décision](/images/Facebook.png)
+
+---
+
+# Instagram
+
+![Arbre de décision](/images/Instagram.png)
+
+---
 
 <!-- 
 Twitter

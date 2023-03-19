@@ -200,7 +200,7 @@ test('should not have any automatically detectable WCAG A or AA violations', asy
 * WAVE
 * Color Contrast / Tanaguru
 * Aviewer
-* Andy 
+* Andi 
 * Voiceover.js
 
 ---
