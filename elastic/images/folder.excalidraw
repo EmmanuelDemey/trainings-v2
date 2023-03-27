@@ -1,0 +1,33 @@
+{
+  "type": "excalidraw",
+  "version": 1,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "id": "urSIfP8NwRNvPllDz1mnF",
+      "type": "text",
+      "x": 672.40234375,
+      "y": 122.39453125,
+      "width": 282,
+      "height": 475,
+      "angle": 0,
+      "strokeColor": "#000000",
+      "backgroundColor": "transparent",
+      "fillStyle": "hachure",
+      "strokeWidth": 1,
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 418866013,
+      "version": 372,
+      "versionNonce": 77403347,
+      "isDeleted": false,
+      "text": "/ elasticsearch\n|_ bin\n   |_ elasticsearch\n   |_ elasticsearch-migrate\n   |_ ...\n|_ config\n   |_ elasticsearch.keystore\n   |_ elasticsearch.yml\n   |_ jvm.options\n   |_ log4j2.properties\n   |_ role_mapping.yml\n   |_ roles.yml\n   |_ uses\n   |_ users_roles\n|_ data\n|_ lib\n|_ logs\n|_ modules\n|_ plugins",
+      "font": "20px Virgil",
+      "textAlign": "left",
+      "baseline": 468
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  }
+}
