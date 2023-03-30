@@ -133,6 +133,109 @@ Pour les personnes ayant de l'avance dans la partie pratique, vous pouvez contin
 
 * Depuis Kibana, vous pouvez indexer un jeu de données d'exemple. Une fois indexé, naviguez à traver Kibana afin d'en découvrir les possibilités.
 
+## TP1 Indexation
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html[Getting Started with Elasticsearch]
+* https://www.elastic.co/blog/how-many-shards-should-i-have-in-my-elasticsearch-cluster[How many shards should I have in my Elasticsearch cluster?]
+
+
+Lors de TP, nous allons mettre en pratique les points suivants :
+
+* Indexer des documents
+* Récupérer, modifier et supprimer des documents
+* Exécuter des requêtes bulk
+
+### Indexation
+
+Afin de créer un jeu de données, nous allons utiliser le site https://www.json-generator.com/[json-generator.com].
+
+Veuillez utiliser le générateur suivant :
+
+```json
+[
+  '{{repeat(3, 3)}}',
+  {
+    isActive: '{{bool()}}',
+    balance: '{{floating(1000, 4000, 2, "$0,0.00")}}',
+    picture: 'http://placehold.it/32x32',
+    age: '{{integer(20, 40)}}',
+    eyeColor: '{{random("blue", "brown", "green")}}',
+    name: '{{firstName()}} {{surname()}}',
+    gender: '{{gender()}}',
+    company: '{{company().toUpperCase()}}',
+    email: '{{email()}}',
+    phone: '+1 {{phone()}}',
+    address: '{{integer(100, 999)}} {{street()}}, {{city()}}, {{state()}}, {{integer(100, 10000)}}',
+    about: '{{lorem(1, "paragraphs")}}',
+    registered: '{{date(new Date(2014, 0, 1), new Date(), "YYYY-MM-dd")}}',
+    location: {
+		lat: '{{floating(48.866667, 90)}}',
+		lon: '{{floating(2.333333, 180)}}'
+	},
+    tags: [
+      '{{repeat(7)}}',
+      '{{lorem(1, "words")}}'
+    ],
+    friends: [
+      '{{repeat(3)}}',
+      {
+        id: '{{index()}}',
+        name: '{{firstName()}} {{surname()}}'
+      }
+    ]
+  }
+]
+```
+
+Nous allons tout d'abord indexer unitairement dans un index `person-v1` les objets générés par ce site.
+
+Nous allons de plus créer un alias `person` pointant vers l'index que nous venons de créer.
+
+### Manipulation des documents
+
+Avec les données que nous venons d'indexer, exécutez des requêtes permettant de réaliser les actions suivantes :
+
+* Récupérer un document à partir de l'identifiant généré par Elasticsearch.
+* Modifier un document
+* Supprimer un document
+
+### Requêtes Bulk
+
+Afin de manipuler les requêtes bulk, indexez les mêmes documents indexés précédement mais dans un nouvel index `person-v2` en utilisant cette API.
+
+Faites la modification nécessaire pour que l'alias `person` pointe vers ce nouvel index.
+
+Vérifiez que les requêtes exécutées précédemment sont toujours fonctionnelles suite à ces modifications.
+
+### Alias
+
+Nous allons créer deux alias supplémentaires pour l'index `person-v2` :
+
+* Un qui pointe sur les document dont la propriété `gender` est égale à `male`
+* Un qui pointe sur les document dont la propriété `gender` est égale à `female`
+
+Vérifiez que des requêtes de recherche sur l'un de ces indexes retournent bien les bonnes données.
+
+### Recherche
+
+Faites une simple recherche avec la syntaxe suivante pour retourner un sous-ensemble des données indexées.
+
+```
+GET /person/_search?q=...
+```
+
+=== Status du cluster
+
+Vous pouvez vérifier le status du cluster grâce à la requête suivante :
+
+```
+GET /_cluster/health
+```
+
+Pouvez-vous expliquer pourquoi vous obtenez ce résultat ? Que pouvez-vous faire pour avoir un cluster dans un état `green` ?
+
 ## TP 10 - SQL
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :

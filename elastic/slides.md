@@ -35,6 +35,11 @@ hide: false
 ---
 
 ---
+src: ./pages/02_indexation.md
+hide: false
+---
+
+---
 src: ./pages/10_sql.md
 hide: false
 ---

@@ -204,7 +204,8 @@ test('should not have any automatically detectable WCAG A or AA violations', asy
 * Voiceover.js
 
 ---
-layout: cover
+opr
+
 ---
 
 # PW Add ESLint, Testing Library and Playwright on your project
