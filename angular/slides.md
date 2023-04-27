@@ -41,6 +41,110 @@ css: unocss
 
 --- 
 
+# Introduction
+
+---
+
+# Approche Orientée Composant
+
+---
+
+# ngFor
+
+* Nous pouvons utiliser *trackBy* afin d'améliorer les performances de l'application 
+
+```html
+<ul>
+  <li *ngFor="let item of items; trackBy: trackById">{{ item }}</li>
+</ul>
+```
+
+```javascript
+trackById(index: number, item: any): number {
+  return item.id;
+}
+```
+
+---
+
+# ViewChild et ViewChildren
+
+* Pour récupérer un ou plusieurs éléments HTML depuis la classe TypeScript 
+
+```javascript
+import { Component, ViewChild } from '@angular/core';
+import { ChildComponent } from './child.component';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-child></app-child>
+    <button (click)="logChildData()">Log Child Data</button>
+  `,
+})
+export class ParentComponent {
+  @ViewChild(ChildComponent) childComponent: ChildComponent;
+
+  logChildData() {
+    console.log(this.childComponent.data);
+  }
+}
+```
+
+---
+
+# ContentChild et ContentChildren
+
+---
+
+# Services
+
+---
+
+# Router
+
+---
+
+# RX.js
+
+---
+
+# Http
+
+---
+
+# Directives
+
+---
+
+# Pipe
+
+---
+
+# Pure
+
+* Afin d'éviter d'exécuter le pipe a chaque phase de rendu, nous pouvons définir un pipe pure
+* Celui-ci ne sera exécuté que si les paramètres en entrée sont modifiés. 
+
+```javascript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'LowerCasePipe',
+  pure: true,
+})
+export class LowerCasePipe implements PipeTransform {
+  transform(value: string): string {
+    return value.toUpperCase();
+  }
+}
+```
+
+---
+# Tests unitaires
+
+---
+
 # Welcome to Slidev
 
 Presentation slides for developers
