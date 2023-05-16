@@ -10,3 +10,6 @@
   to = "/.well-known/:splat"
   status = 200
 
+[[edge_functions]]
+  path = "/*"
+  function = "auth"
