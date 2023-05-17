@@ -1,0 +1,57 @@
+=== Gestion du style
+
+* Bonne pratique de définir une feuille de styles par composant
+** Meilleure maintenabilité
+** Si le composant n'est jamais utilisé, la feuille de style ne sera jamais importée.
+* Les syntaxes Less, Sass ou SCSS sont utilisables.
+
+=== Gestion du style
+
+[source, javascript]
+----
+import './nav.css';
+
+export const Nav = () => {
+
+}
+----
+
+=== Gestion du style
+
+* Pour scoper la feuille de style d'un composant, vous pouvez utiliser des classes CSS "à usage unique".
+* Et utiliser cette classe CSS dans vos sélecteurs ou dans vos déclarations imbriquées SCSS.
+
+[source, javascript]
+----
+import './nav.css';
+
+export const Nav = () => {
+    return (
+        <nav className="nav">
+            ...
+        </nav>
+    );
+}
+----
+
+=== CSS-in-JS
+
+* Une autre syntaxe est également possible via le pattern `CSS-in-JS`
+* Permet de `scoper` les feuilles de styles aux composants
+* Permet de ne pas importer la feuille de style si le composant n'est plus importé
+* Plusieurs librairies sont disponibles comme par exemple `styled-component` ou `emotion`.
+
+=== CSS-in-JS
+
+[source, javascript]
+----
+import { css } from 'emotion'
+
+export const Nav = () => {
+    return (
+        <nav className={css`background: #eee;`}>
+            ...
+        </nav>
+    )
+}
+----

@@ -1,0 +1,89 @@
+== PW10 - Internationalisation
+
+[TIP]
+=====================================================================
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://react.i18next.com/[react-i18next]
+* https://bulma.io/documentation/elements/button/[Les boutons avec Bulma]
+
+=====================================================================
+
+Dans cette dernière partie pratique, nous allons internationaliser l'application.
+
+Nous allons tout d'abord installer le module `react-i18next` en executant la commande suivante.
+
+[source]
+----
+npm install react-i18next i18next
+----
+
+Nous allons ensuite créer un fichier `i18n.js` dans lequel nous allons configurer le module.
+
+Dans ce fichier, nous allons tout d'abord définir les traductions pour le français et l'anglais des différentes chaines de caractéres
+de l'application (sauf celles affichant le nombre de personnages aimés par l'utilisateur )
+
+Une fois cette configuration realisée, nous allons initialiser le module `react-i18next`.
+
+[source, javascript]
+----
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+
+const resources = { ... }
+i18n
+  .use(initReactI18next) // passes i18n down to react-i18next
+  .init({
+    resources,
+    lng: "en",
+  });
+
+export default i18n;
+----
+
+La dernière étape est d'internationaliser le message indiquant le nombre de personnes que l'utilisateur aime.
+Pour cela, nous allons tout d'abord installer le module `i18next-icu`.
+
+[source]
+----
+npm install i18next-icu
+----
+
+Une fois installé, nous devons l'ajouter à la configuration du module `react-i18next`.
+
+[source, javascript]
+----
+import ICU from "i18next-icu";
+
+...
+
+i18n
+  .use(new ICU({}))
+----
+
+Dans la configuration définie précédemment, nous allons ajouter un message, via la syntaxe ICU, permettant d'internationaliser le dernier message de notre application.
+
+[source]
+----
+<h2>Vous aimez X personnages</h2>
+----
+
+Une fois cette configuration réalisée, nous allons à présent pouvoir intégrer `react-i18next` dans l'application. Dans le fichier `App.js`, importez le module précédemment crée.
+
+Dans les composants `PeopleList`, `DumbPeopleItem` et  `DumbHome`, utilisez la méthode `useTranslation` pour récupérer puis ensuite afficher le message souhaité.
+
+Dans le composant `DumbHome`, ajoutez deux boutons permettant de choisir la langue française ou anglaise. Pour cela, vous pouvez utiliser le code HTML suivant :
+
+[source, html]
+----
+<div className="is-pulled-right">
+  <button type="button" className="button" onClick={ ... }>
+    FR
+  </button>
+  <button type="button" className="button" onClick={ ... }>
+    EN
+  </button>
+</div>
+----
+

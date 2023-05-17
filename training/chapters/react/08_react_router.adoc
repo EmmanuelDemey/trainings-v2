@@ -1,0 +1,149 @@
+== React Router
+
+=== React Router
+
+* Ce module permet de définir les pages de notre application
+* Pour chaque `path`, nous allons définir un composant
+* React Router sera en charge d'instancier le composant et d'afficher le rendu
+
+=== React Router
+
+* Pour cela, nous allons utiliser les composants :
+** `HashRouter` et `BrowserRouter`
+** `Routes`
+** `Route`
+
+=== React Router - Configuration des routes
+
+* Nous devons tout d'abord choisir la stratégie de route que nous souhaitons
+** HashRouter : http://monsite.com/#mapage
+** BrowserRouter : http://monsite.com/mapage
+* Attention avec la stratégie *BrowserRouter*, une configuration serveur est nécessaire
+
+=== React Router
+
+[source, javascript]
+----
+import { BrowserRouter } from 'react-router-dom';
+
+const App =  () => (
+    <BrowserRouter>
+      ...
+    </BrowserRouter>
+);
+----
+
+=== React Router
+
+* Nous allons ensuite définir les routes de notre application
+
+[source, javascript]
+----
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import NotFound from './not-found';
+import Home from './home';
+import Contact from './contact';
+
+const App =  () => (
+    <BrowserRouter>
+      <Routes>
+          <Route path="/" elements={<Home />}></Route>
+          <Route path="/contact/:id" elements={<Contact />}></Route>
+          <Route path="*" element={<NotFound />}></Route>
+      </Routes>
+    </BrowserRouter>
+);
+
+export default App;
+----
+
+[.notes]
+--
+* Attention en v6 le composant Switch est renommé en Routes
+--
+
+=== React Router - Link
+
+* Nous allons créer des liens via le composant *Link*
+
+[source, javascript]
+----
+import { Link } from 'react-router-dom';
+
+const PeopleItem = () => {
+    return (
+        <Link to={`/contact/1`}>
+            Luke Skywalker
+        </Link>
+    )
+}
+
+export default PeopleItem;
+----
+
+=== React Router - hooks
+
+* Des hooks sont à votre disposition pour faciliter la récupération de données liées au router
+** `useParams`
+** `useHistory`
+** `useLocation`
+** `useRouteMatch`
+
+=== React Router - hooks
+
+[source, javascript]
+----
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+const Contact = () => {
+  const { id } = useParams();
+  const [contact, setContact] = useState({});
+
+  useEffect(() => {
+      fetchContact(id).then(c => setContact(c))
+  }, [id]);
+
+  return (
+    <h2>{ contact.name }</h2>
+  );
+}
+
+export default Contact;
+----
+
+=== Lazy Loading
+
+* Dès que l'application grossit, utile de faire du *lazy-loading*
+* Permet de diminuer la taille du livrable principal
+* Les modules lazy-loadés seront téléchargés si et seulement si l'utilisateur va sur la page cible
+
+=== Lazy Loading
+
+[source, javascript]
+----
+import {lazy, Suspense} from 'react';
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
+
+import Loading from './loading';
+import NotFound from './not-found';
+import Home from './home';
+
+const Contact = lazy(() => import('./contact'));
+
+const App =  () => (
+        <BrowserRouter>
+          <Routes>
+              <Route path="/" elements={<Home />}></Route>
+              <Route path="/contact/:id" elements={
+                    <Suspense fallback={<Loading />}>
+                        <Contact />
+                    </Suspense>
+              }></Route>
+              <Route path="*" element={<NotFound />}></Route>
+          </Routes>
+        </BrowserRouter>
+);
+
+export default App;
+----
