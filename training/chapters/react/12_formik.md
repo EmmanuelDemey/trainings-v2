@@ -1,22 +1,30 @@
-== Formik
+---
+layout: cover
+---
+
+# Formik
+
+--- 
+
+# Formik
 
 * Module permettant de simplifier la gestion d'un formulaire
-** les valeurs
-** son état
-** la validation
-** les événements
+  * les valeurs
+  * son état
+  * la validation
+  * les événements
 
-[source]
-----
+```shell
 npm i formik
-----
+```
 
-=== useFormik hooks
+---
+
+# useFormik hooks
 
 * L'une des solutions proposées est d'utiliser le hook `useFormik`;
 
-[source, javascript]
-----
+```javascript
 import { useFormik } from 'formik';
 
 const SignupFormComponent = () => {
@@ -43,14 +51,15 @@ const SignupFormComponent = () => {
      </form>
     );
 };
-----
+```
 
-=== Validation
+---
+
+# Validation
 
 * Nous pouvons définir une méthode de validation lors de l'initialisation de Formik.
 
-[source, javascript]
-----
+```javascript
 import { useFormik } from 'formik';
 
 const SignupFormComponent = () => {
@@ -71,14 +80,15 @@ const SignupFormComponent = () => {
     });
     return ...;
 };
-----
+```
 
-=== Validation via Yup
+---
+
+# Validation via Yup
 
 * Nous pouvons également faire la validation via la création d'un schéma `Yup`
 
-[source, javascript]
-----
+```javascript
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -97,15 +107,16 @@ const SignupFormComponent = () => {
     });
     return ...;
 };
-----
+```
 
-=== Object errors
+---
+
+# Object errors
 
 * Une fois la donnée validée, vous pouvez récupérer son état pour éventuellement afficher
 un message d'erreur
 
-[source, javascript]
-----
+```javascript
 <input
      id="email"
      name="email"
@@ -114,4 +125,4 @@ un message d'erreur
      value={formik.values.email}
     />
 {formik.errors.email ? <div>{formik.errors.email}</div> : null}
-----
+```

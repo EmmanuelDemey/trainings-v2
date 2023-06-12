@@ -1,6 +1,12 @@
-== TypeScript
+---
+layout: cover
+---
 
-=== TypeScript
+# TypeScript
+
+---
+
+# TypeScript
 
 * Typescript est un superset de JavaScript
 * Développé par Microsoft et utilisé dans de nombreux projets
@@ -8,66 +14,73 @@
 * Nécessite une phase de compilation
 * Les fichiers utilisent l'extension `.ts`
 
-=== Utiliser TypeScript avec React
+---
 
-[source]
-----
+# Utiliser TypeScript avec React
+
+```shell
 create-react-app demo --template typescript
-----
+```
 
-=== Types
+---
+
+# Types
 
 * Nous pouvons :
-** typer les paramètres des fonctions
-** typer les valeurs retournées des fonctions
-** typer les variables d'une instance d'un objet
-** créer des interface
-** définir des génériques
+    * typer les paramètres des fonctions
+    * typer les valeurs retournées des fonctions
+    * typer les variables d'une instance d'un objet
+    * créer des interface
+    * définir des génériques
 
-=== Types
+--- 
 
-[source, typescript]
-----
+# Types
+
+```typescript
 function lowercase(word: string): string {
     return word.toLowerCase();
 }
-----
+```
 
-=== Types
+---
+
+# Types
 
 * Si nous utilisons la méthode avec la mauvaise signature, nous allons avoir des erreurs de compilation.
 
-[source, typescript]
-----
+```typescript
 lowercase("react") // OK
 lowercase(1) // TypeScript Error
 lowercase("react").length // OK
 lowercase("react").push({ }) // TypeScript Error
-----
+```
 
-=== Custom Types
+---
+
+# Custom Types
 
 * Nous pouvons définir des types custom via :
-** des classes
-** des interfaces
-** via le mot clé `type`
+    * des classes
+    * des interfaces
+    * via le mot clé `type`
 
-[source]
-----
+```typescript
 type User = {
     firstName: string;
     lastName: string;
     age ?: number
 }
 const user: User = { firstName: 'James`, lastName: 'Bond' };
-----
+```
 
-=== Typer les props
+---
+
+# Typer les props
 
 * Nous allons utiliser le même mot clé afin de typer les `props` d'un composant.
 
-[source, typescript]
-----
+```typescript
 import { FC } from "react"
 
 type UserCardProps = {
@@ -76,4 +89,4 @@ type UserCardProps = {
 const UserCard: FC<UserCardProps> = ({ user }) => {
 
 }
-----
+```

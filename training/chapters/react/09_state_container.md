@@ -1,71 +1,88 @@
-== State Container
+---
+layout: cover
+---
 
-=== State Container
+# State Container
+
+---
+
+# State Container
 
 image::../images/propHell.png[]
 
-=== State Container
+---
+
+# State Container
 
 * Une gestion centralisée de l'état de l'application permet :
-** D'avoir une seule source de vérité
-** Centraliser toutes les actions sur cet état
-** Eviter de passer des props de composant en composant enfant
-** Eviter d'avoir du code spaghetti
+  * D'avoir une seule source de vérité
+  * Centraliser toutes les actions sur cet état
+  * Eviter de passer des props de composant en composant enfant
+  * Eviter d'avoir du code spaghetti
 
-=== State Container
+---
+
+# State Container
 
 * Attention le mindset à avoir est différent de celui que nous avons depuis le début de cette formation
 * Plusieurs solutions possibles : Context, Redux, MobX ou encore Recoil
 
 include::./includes/10_context.adoc[]
 
-=== Redux
+---
+
+# Redux
 
 * Redux est une librairie que nous devons installer via NPM
 * Elle propose une architecture unidirectionnelle de la gestion de la donnée.
 
-=== Redux
+---
+
+# Redux
 
 * Plusieurs acteurs vont intervenir :
-** Le `Store`
-** Le `State`
-** Les actions
-** Les reducers
-** Les sélecteurs
+  * Le `Store`
+  * Le `State`
+  * Les actions
+  * Les reducers
+  * Les sélecteurs
 
-[.notes]
---
-* Pour le public ayant fait du Angular, il faut indiquer que redux est un principe similaire à ngRX
---
+---
 
-=== Redux
+# Redux
 
 image::../images/dumb.png[]
 
-=== Redux
+---
+
+# Redux
 
 image::../images/redux.png[]
 
-=== Redux
+---
+
+# Redux
 
 * Avant d'utiliser Redux, nous devons d'abord l'installer
 
-[source]
-----
+```shell
 npm install redux react-redux redux-logger
-----
+```
 
-=== Redux - Reducers
+---
+
+# Redux - Reducers
 
 * Un reducer est une fonction acceptant deux paramètres
-** le `state` précédent
-** une action
+  * le `state` précédent
+  * une action
 * Il doit retourner le nouveau `state`
 
-=== Redux - Reducers
+---
 
-[source, javascript]
-----
+# Redux - Reducers
+
+```javascript
 export function count(state, action) {
   switch (action.type) {
     case "INC":
@@ -76,14 +93,15 @@ export function count(state, action) {
       return state;
   }
 }
-----
+```
 
-=== Redux - Création
+---
+
+# Redux - Création
 
 * Nous sommes à présent capable d'initialiser notre Store
 
-[source, javascript]
-----
+```javascript
 import { createStore, applyMiddleware, compose } from "redux";
 import { createLogger } from "redux-logger";
 import { count } from "./reducer";
@@ -94,12 +112,13 @@ const store = createStore(
   compose(applyMiddleware(createLogger())
 );
 export default store;
-----
+```
 
-=== Redux - Création
+---
 
-[source, javascript]
-----
+# Redux - Création
+
+```javascript
 import { createStore, combineReducers, applyMiddleware, compose } from "redux";
 import { createLogger } from "redux-logger";
 import { todos } from './todos'
@@ -114,14 +133,15 @@ const store = createStore(
   compose(applyMiddleware(createLogger())
 );
 export default store;
-----
+```
 
-=== Redux - Création
+---
+
+# Redux - Création
 
 * Pour activer le plugin Chrome `Redux`
 
-[source, javascript]
-----
+```javascript
 import { createStore, combineReducers, applyMiddleware, compose } from "redux";
 import { createLogger } from "redux-logger";
 import { todos } from './todos'
@@ -138,31 +158,35 @@ const store = createStore(
   composeEnhancers(applyMiddleware(createLogger())
 );
 export default store;
-----
+```
 
-=== Redux - Activation du store
+---
+
+# Redux - Activation du store
 
 * Pour activer le store, nous allons, un peu comme un Context, wrapper une partie de notre application par un composant `Provider`
 
-[source, javascript]
-----
+```javascript
 import { Provider } from "react-redux";
 import store from "./store";
 ...
 <Provider store={store}>
     ...
 </Provider>
-----
+```
 
-=== Redux - Conmposant connecté
+---
+
+# Redux - Conmposant connecté
 
 * Dernière étape est de créer nos `DumbComponent` et `ConnectedComponent`
 * Toutes les données et actions récupérées par les composants connectés seront disponibles en `props` dans le `DumbComponent`
 
-=== Redux - Composant connecté
+---
 
-[source, javascript]
-----
+# Redux - Composant connecté
+
+```javascript
 import { connect } from "react-redux";
 ...
 
@@ -177,14 +201,15 @@ export const DumbCounter = ({
     <button onClick={() => inc(1)}> +1 </button>
   </>
 }
-----
+```
 
-=== Redux - Hooks
+---
+
+# Redux - Hooks
 
 * React Redux propose les hooks `useDispatch` et `useSelector`.
 
-[source, javascript]
-----
+```javascript
 import { useDispatch, useSelector} from "react-redux";
 import { getCount } from "./store";
 
@@ -202,28 +227,32 @@ export const DumbCounter = () => {
       </>
   )
 }
-----
+```
 
-=== Redux - Selecteurs
+---
+
+# Redux - Selecteurs
 
 * Afin de faciliter l'accés au `store`, nous allons définir des sélecteurs
 
-[source, javascript]
-----
+```javascript
 export const getCount = (state) => state;
 export const isGreaterThan = (state, limit) => state > limit;
-----
+```
 
-=== Structure de fichiers
+---
+
+# Structure de fichiers
 
 * Nous pouvons trouver deux types de structures pour définir un store Redux :
-** Découpage technique (un répertoire actions, un répertoire reducers, ...)
-** Découpage fonctionnel (à privilégier)
+  * Découpage technique (un répertoire actions, un répertoire reducers, ...)
+  * Découpage fonctionnel (à privilégier)
 
-=== Structure de fichiers
+---
 
-[source, javascript]
-----
+# Structure de fichiers
+
+```javascript
 // Example de fichier manipulant une partie du state
 
 export const INC = 'INC';
@@ -235,20 +264,23 @@ export const incr = (p) => ({ type: INC, payload: p});
 export const decr = (p) => ({ type: DECR, payload: p});
 
 export default function reducer(state, action) {}
-----
+```
 
-=== Outils
+---
+
+# Outils
 
 * Nous vous conseillons d'installer les outils suivants :
-** React Redux : Plugin Chrome
-** Redux Toolkit : Librairie utilitaire permettant "simplifier" la création d'un store.
+  * React Redux : Plugin Chrome
+  * Redux Toolkit : Librairie utilitaire permettant "simplifier" la création d'un store.
 
-=== Redux Toolkit
+---
+
+# Redux Toolkit
 
 * Une partie d'un `store Redux` sera configuré via un `Slice`.
 
-[source, javascript]
-----
+```javascript
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
@@ -267,27 +299,29 @@ export const counterSlice = createSlice({
     }
   }
 })
-----
+```
 
-=== Redux Toolkit
+---
+
+# Redux Toolkit
 
 * Un `slice` pour ainsi exposer
-** les actions que nous pourrons utiliser dans nos composants
-** le `reducer` que nous pourrons activer dans notre `store`
+  * les actions que nous pourrons utiliser dans nos composants
+  * le `reducer` que nous pourrons activer dans notre `store`
 
-[source, javascript]
-----
+```javascript
 export const { inc, decr } = counterSlice.actions
 
 export default counterSlice.reducer
-----
+```
 
-=== Redux Toolkit - Reducer
+---
+
+# Redux Toolkit - Reducer
 
 * Enregistrement du `reducer` dans le `store`
 
-[source, javascript]
-----
+```javascript
 import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from '../features/counter/counterSlice'
 
@@ -296,14 +330,15 @@ export default configureStore({
     counter: counterReducer,
   },
 })
-----
+```
 
-=== Redux Toolkit - Actions
+---
+
+# Redux Toolkit - Actions
 
 * Utilisation des actions générées dans un composant
 
-[source, javascript]
-----
+```javascript
 import { RootState } from '../../app/store'
 import { useSelector, useDispatch } from 'react-redux'
 import { decr, inc } from './counterSlice'
@@ -320,4 +355,4 @@ export function Counter() {
     </>
   )
 }
-----
+```

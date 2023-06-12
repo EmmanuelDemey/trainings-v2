@@ -1,26 +1,36 @@
-== Génération de la vue
+---
+layout: cover
+---
 
-=== JSX
+# Génération de la vue
+
+---
+
+# JSX
 
 * JSX est une extension du langage JavaScript
 * Il apporte du sucre syntaxique permettant de manipuler les éléments d'une application React
 * Il sera ensuite "converti" par des outils comme *Babel*
 * React possède plusieurs `renderer` : `react-dom`, `next.js` ou encore `react native`
 
-=== JSX
+---
 
-[source, javascript]
-----
+# JSX
+
+```javascript
 ReactDOM.render(
   <HelloMessage content={'Hello'}>
     <Title content={'World'}/>
   </HelloMessage>,
   document.getElementById('root')
 )
-----
+```
 
-[source, javascript]
-----
+---
+
+# JSX
+
+```javascript
 ReactDOM.render(
   React.createElement(
     HelloMessage, {content: 'Hello'},
@@ -28,18 +38,21 @@ ReactDOM.render(
     ),
   document.getElementById('root')
 )
-----
+```
 
-=== Interpolation
+---
+
+# Interpolation
 
 * L'interpolation est le mécanisme permettant d'insérer une valeur dans du code JSX.
 * Nous utilisons la syntaxe `{ expession }`.
 * Attention : `class` et `for` sont des mots reservés en JavaScript. Il faut donc utiliser `className` et `htmlFor`.
 
-=== Interpolation
+---
 
-[source, javascript]
-----
+# Interpolation
+
+```javascript
 const App = () => {
    const title = 'Title';
    const src = 'http://domain.com/image.png';
@@ -52,18 +65,21 @@ const App = () => {
    );
 }
 export default App;
-----
+```
 
-=== Fragment
+---
+
+# Fragment
 
 * Un composant React doit toujours étre composé d'un élément `root`.
 * Afin d'éviter d'insérer des éléments HTML inutiles, vous pouvez utiliser les `Fragment`.
 * Utilisation des balises `<Fragment>...</Fragment>` ou `<>...</>`
 
-=== Fragment
+---
 
-[source, javascript]
-----
+# Fragment
+
+```javascript
 import { Fragment } from 'react';
 
 const App = () => {
@@ -78,29 +94,31 @@ const App = () => {
    );
 }
 export default App;
-----
+```
 
-=== JSX et JavaScript
+---
+
+# JSX et JavaScript
 
 * Facilité de manipuler des éléments HTML via l'utilisation des méthodes disponibles dans l'API JavaScript
 * Nous pouvons par exemple afficher un élément JSX en fonction d'une condition.
 
-[source, javascript]
-----
+```javascript
 const LogoutButton = () => {
     const isLoggedIN = ....
 
     return isLoggedIN && <button>Logout</button>
 }
 export default LogoutButton;
-----
+```
 
-=== JSX et JavaScript
+---
+
+# JSX et JavaScript
 
 * Ou encore avoir autant d'éléments JSX que d'éléments dans un tableau
 
-[source, javascript]
-----
+```javascript
 const Nav = () => {
     const menuItems = [ ... ];
     return (
@@ -112,14 +130,18 @@ const Nav = () => {
     )
 }
 export default Nav;
-----
+```
 
-=== Utilisation de l'attribut key
+---
+
+# Utilisation de l'attribut key
 
 * Pour des raisons de performance, il est recommandé de définir l'attribut `key` dès que nous itérons sur un tableau.
 * Soit en utilisant l'attribut `index` soit via une propriété de l'objet
 
-=== Utilisation de l'attribut key
+---
+
+# Utilisation de l'attribut key
 
 [source, javascript]
 ----

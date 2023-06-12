@@ -1,15 +1,23 @@
-== Outillage
+---
+layout: cover
+---
+
+# Outillage
+
+---
 
 include::../../../../front_ecosystem/slides/asciidoc/chapters/webpack.adoc[]
 
-=== Outillage
+---
+
+# Outillage
 
 * A cela nous pourrions ajouter :
-** Prettier
-** ESLint
-** Cypress
-** Husky
-** Storybook
+    * Prettier
+    * ESLint
+    * Cypress
+    * Husky
+    * Storybook
 
 include::../../../../front_ecosystem/slides/asciidoc/chapters/prettier.adoc[]
 
@@ -21,10 +29,12 @@ include::../../../../front_ecosystem/slides/asciidoc/chapters/husky.adoc[]
 
 include::../../../../front_ecosystem/slides/asciidoc/chapters/storybook.adoc[]
 
-=== Outils complémentaires
+---
+
+# Outils complémentaires
 
 * Nous vous conseillons d'installer les outils suivants :
-** React Developer Tools : Plugin Chrome pour les applications React
-** Plugin VSCode Prettier `esbenp.prettier-vscode`
-** Plugin VSCode ESLint `dbaeumer.vscode-eslint`
+    * React Developer Tools : Plugin Chrome pour les applications React
+    * Plugin VSCode Prettier `esbenp.prettier-vscode`
+    * Plugin VSCode ESLint `dbaeumer.vscode-eslint`
 

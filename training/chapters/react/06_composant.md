@@ -1,6 +1,12 @@
-== Les composants
+---
+layout: cover
+---
 
-=== Structure d'une application React
+# Les composants
+
+---
+
+# Structure d'une application React
 
 * Une application est composée de composants React
 * Ces composants vont formés un arbre de composants
@@ -8,61 +14,70 @@
 * Algorithme de mise à jour se basant sur un Virtual DOM
 * Optimisation possible (memoization).
 
-=== Virtual DOM
+---
+
+# Virtual DOM
 
 * Le Virtual DOM est une représentation en mémoire du DOM
 * Une fois la méthode du composant exécuté, un Virtual DOM est créé
 * Ce nouveau Virtual DOM est comparé avec le précédent
 * A partir de cette comparaison, React va déterminé les manipulations du DOM nécessaires
 
-=== Les composants
+---
+
+# Les composants
 
 * Un composant peut etre
-** `stateless`
-** `statefull`
+    * `stateless`
+    * `statefull`
 * Nous pouvons les définir
-** via des fonctions
-** via des classes.
+    * via des fonctions
+    * via des classes.
 
-=== Les composants
+---
+
+# Les composants
 
 * Un composant pourra accepter des paramètres, que nous nommons `props`.
 * Si un `props` change, le composant sera regéné
 
-=== Les composants
+---
+
+# Les composants
 
 * Définition d'un composant en utilisant une `fonction`.
 
-[source, javascript]
-----
+```javascript
 // <Title content={'Content Title'} />
 const Title = ( props ) => {
     return <h1> { props.content } </h1>
 }
 export default Title;
-----
+```
 
-=== Les composants
+---
+
+# Les composants
 
 * Destructuration des `props` avant la génération du rendu.
 
-[source, javascript]
-----
+```javascript
 // <Title content={'Content Title'} />
 const Title = ( { content } ) => {
     return <h1> { content } </h1>
 }
 
 export default Title;
-----
+```
 
-=== Les composants
+---
+
+# Les composants
 
 * Définition d'un composant en utilisant une `class`.
 * Les classes étaient plutôt utilisées pour les composants stateful (avant l'apparition des `hooks`)
 
-[source, javascript]
-----
+```javascript
 import { Component } from 'react';
 
 // <Title content={'Content Title'} />
@@ -73,14 +88,15 @@ class Title extends Component {
 }
 
 export default Title;
-----
+```
 
-=== Les composants
+---
+
+# Les composants
 
 * Destructuration des `props` avant la génération du rendu.
 
-[source, javascript]
-----
+```javascript
 import { Component } from 'react';
 
 // <Title content={'Content Title'} />
@@ -92,48 +108,53 @@ class Title extends Component {
 }
 
 export default Title;
-----
+```
 
-=== Les props
+---
+
+# Les props
 
 * Nous avons la possibilité de définir un arbre d'éléments. Il sera accessible via la `props` `children`.
 
-[source, javascript]
-----
+```javascript
 // <Title>Content Title</Title>
 const Title = ( { children } ) => {
     return <h1> { children } </h1>
 }
 export default Title;
-----
+```
 
-=== Render props
+---
+
+# Render props
 
 * Il est possible de définir un `children` comme une fonction
 * Ceci permet de recevoir de la donnée depuis le composant parent.
 * N'est plus trop recommandé. Il est préférable d'utiliser le `Context` et les `hooks`
 * Attention aux espaces !
 
-=== Les props
+---
+
+# Les props
 
 * Si nous souhaitons étre notifié lors d'une action d'un composant enfant, nous allons passer des fonctions
 en `props` à notre composant.
 
-[source, javascript]
-----
+```javascript
 //<ValidationButton action={() => { alert('validated)}} />
 const ValidationButton = ({action}) => {
     return <button className="btn" onClick={action}>Validate</button>;
 }
 export default ValidationButton;
-----
+```
 
-=== Les appels de fonction
+---
+
+# Les appels de fonction
 
 * Nous pouvons définir des fonctions qui seront appelées suite à l'interaction de l'utilisateur
 
-[source, javascript]
-----
+```javascript
 const CollapsiblePanel = () =>{
     const togglePanel = () => alert("togglePanel");
 
@@ -149,42 +170,50 @@ const CollapsiblePanel = () =>{
     )
 }
 export default CollapsiblePanel;
-----
+```
 
-=== Les composants - Bonnes pratiques
+---
+
+# Les composants - Bonnes pratiques
 
 * Nous évitons d'écrire des composants usine à gaz
 * Trop de `props` complexifiera la maintenabilité du composant
 * Nous préférons suivre l'architecture atomique (atome, molécule, organisme, ... page)
 
-=== Composant statefull
+---
+
+# Composant statefull
 
 * Avant de présenter les *hook*, un composant statefull ne pouvait étre défini que via une classe.
 * Pour modifier l'état du composant, nous devons appeler la méthode `setState`.
 * A chaque fois que le `state` est modifié, le composant est regénéré.
 
-=== Composant statefull
+---
+
+# Composant statefull
 
 * Elle accepte deux signatures :
-** un objet partiel permettant de faire la mise à jour.
-** une fonction qui retourne un objet partiel
+    * un objet partiel permettant de faire la mise à jour.
+    * une fonction qui retourne un objet partiel
 
-=== Higher Order Component
+---
+
+# Higher Order Component
 
 * Un HoC est juste le fait d'appeler une méthode qui :
-** prend en paramètre un composant
-** retourne ce composant avec des fonctionnalités supplémentaires.
+    * prend en paramètre un composant
+    * retourne ce composant avec des fonctionnalités supplémentaires.
 
-[source]
-----
+```javascript
 const withTranslation = Component => EnhancedComponent;
 // withTranslation(UserCard)
-----
+```
 
-=== Higher Order Component
+---
 
-[source, javascript]
-----
+# Higher Order Component
+
+```javascript
 // const AppWithPreference = withPreferences(App)
 function withPreferences(WrappedComponent) {
   return () => {
@@ -192,26 +221,28 @@ function withPreferences(WrappedComponent) {
     return <WrappedComponent preferences={preferences} {...this.props} />;
   };
 }
-----
+```
 
-=== Structure du projet
+---
+
+# Structure du projet
 
 * Deux structures de projets sont possibles
 * Découpage technique
 
-[source]
-----
+```
 /src
     /components
     /utils
-----
+```
 
-=== Structure du projet
+---
+
+# Structure du projet
 
 * Découpage métier (puis éventuellement technique)
 
-[source]
-----
+```javascript
 /src
     /feature-1
         /components
@@ -220,14 +251,15 @@ function withPreferences(WrappedComponent) {
         /components
     /shared
         /components
-----
+```
 
-=== Structure complète
+---
+
+# Structure complète
 
 * Les feuilles de style et les tests unitaires se situent dans le même repertoire.
 
-[source]
-----
+```
 /src
     /feature-1
         /components
@@ -235,18 +267,21 @@ function withPreferences(WrappedComponent) {
                 /menu.js
                 /style.css
                 /menu.spec.js
-----
+```
 
-=== PropTypes
+---
+
+# PropTypes
 
 * Les PropTypes permettent de définir le type des paramètres d'un composant
 * Si ses types ne sont pas respectés, un *warning* sera émis dans la console de votre navigateur.
 * Nous pouvons également définir si une propriété est obligatoire
 
-=== PropTypes
+---
 
-[source, javascript]
-----
+# PropTypes
+
+```javascript
 import PropTypes from 'prop-types';
 
 const Title = ({content}) => <h1>{content}</h1>;
@@ -256,14 +291,15 @@ Title.propTypes = {
 };
 
 export default Title;
-----
+```
 
-=== PropTypes
+---
+
+# PropTypes
 
 * Plusieurs types sont disponibles
 
-[source, javascript]
-----
+```javascript
 PropTypes.array,
 PropTypes.bool,
 PropTypes.func,
@@ -275,14 +311,15 @@ PropTypes.oneOfType([
     PropTypes.number
 ]),
 PropTypes.arrayOf(PropTypes.number)
-----
+```
 
-=== PropTypes et valeur par défaut
+---
+
+# PropTypes et valeur par défaut
 
 * De manière similaire, nous pouvons définir des valeurs par défaut.
 
-[source, javascript]
-----
+```javascript
 import PropTypes from 'prop-types';
 
 const Title = ({content}) => <h1>{content}</h1>;
@@ -294,14 +331,15 @@ Title.defaultProps = {
     content: 'Default Title';
 }
 export default Title;
-----
+```
 
-=== PropTypes et valeur par défaut
+---
+
+# PropTypes et valeur par défaut
 
 * Pour des raisons de performance, vous devez éviter de définir la valeur par défaut directement dans la signature de la méthode
 
-[source, javascript]
-----
+```javascript
 import PropTypes from 'prop-types';
 
 const Title = ({content = 'Default Title'})
@@ -312,7 +350,7 @@ Title.propTypes = {
 };
 
 export default Title;
-----
+```
 
 include::./includes/06_css.adoc[]
 

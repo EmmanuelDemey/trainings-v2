@@ -1,21 +1,29 @@
-== React Query
+---
+layout: cover
+---
+
+# React Query
+
+--- 
+
+# React Query
 
 * React Query est une librairie permettant de simplifier la gestion des appels APIs
-** Gestion de l'état du traitement asynchrone
-** Gestion de la mise en cache
-** Gestion de la révocation du cache
+  * Gestion de l'état du traitement asynchrone
+  * Gestion de la mise en cache
+  * Gestion de la révocation du cache
 
-[source, shell]
-----
+```shell
 npm i react-query
-----
+```
 
-=== QueryClientProvider
+---
+
+# QueryClientProvider
 
 * La première étape est d'englober votre application (ou une partie) par le composant QueryClientProvider.
 
-[source, javascript]
-----
+```javascript
 import {
    QueryClient,
    QueryClientProvider,
@@ -33,14 +41,15 @@ import {
      </QueryClientProvider>
    )
  }
-----
+```
 
-=== useQuery
+---
+
+# useQuery
 
 * Nous pouvons à présent utiliser `useQuery` pour mettre en cache le résultat d'un traitement asynchrone
 
-[source, javascript]
-----
+```javascript
 function Todos() {
    const { data, isLoading } = useQuery('todos', () => fetch(...).then(response => response.json()))
 
@@ -54,15 +63,16 @@ function Todos() {
      </div>
    )
  }
-----
+```
 
-=== useMutation
+---
+
+# useMutation
 
 * Si vous souhaitez exécuter des requetes de création/mise à jour/suppression, nous allons utiliser le hook `useMutation`.
 * Nous allons pouvoir révoquer une partie du cache en cas de succès d'une mutation.
 
-[source, javascript]
-----
+```javascript
 function Todos() {
    const queryClient = useQueryClient()
    const query = useQuery('todos', getTodos)
@@ -89,5 +99,4 @@ function Todos() {
      </div>
    )
  }
-
-----
+```
