@@ -1,22 +1,16 @@
-== PW8 - React Router
-
-[TIP]
-=====================================================================
+## PW8 - React Router
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * https://reacttraining.com/react-router/web/guides/quick-start[React Router]
 
-=====================================================================
-
 Nous allons à présent ajouter une deuxième page à notre application. Cette page sera utilisée lorsque l'utilisateur cliquera sur le nom d'un personnage. Elle affichera les informations du personnage selectionné.
 
 Vous devez tout d'abord installer la dépendance `react-router-dom`.
 
-[source]
-----
+```shell
 npm install react-router-dom
-----
+```
 
 Un fois installée, suivez les étapes suivantes afin d'implémenter le fonctionnel souhaité :
 
@@ -28,20 +22,14 @@ Un fois installée, suivez les étapes suivantes afin d'implémenter le fonction
 * Vous pouvez éventuellement réutiliser le hook `useFetch` créé précédemment pour récupérer les informations du personnage.
 * Si vous avez ajouté un loader pour le composant `Person`, vous pouvez également externaliser ce loader dans un nouveau composant React.
 
-[TIP]
-=====================================================================
-
 L'API utilisée ne retourne pas d'identifiant pour les objets.
 Vous pouvez tout de même en calculer un en se basant sur la propriété `url` de l'objet.
 Pour cela, vous pouvez utiliser la fonction suivante :
 
-[source, javascript]
-----
+```javascript
 // http://swapi.dev/api/people/1/
 function getIDFromUrl(url){
     const withoutPrefix = url.replace("https://swapi.dev/api/people/", "")
     return withoutPrefix.replace("/", "");
 }
-----
-
-=====================================================================
+```

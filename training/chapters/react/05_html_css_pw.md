@@ -1,13 +1,8 @@
-== PW4 - Template
-
-[TIP]
-=====================================================================
+## PW4 - Template
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array/map[Array.prototypemap]
-
-=====================================================================
 
 Dans ce TP, nous allons afficher des personnages de Star Wars. Nous n'allons pas créer de nouveaux composants ou encore récupérer les données depuis une API Rest pour le moment.
 
@@ -15,8 +10,7 @@ Tout se fera en mémoire pour le moment et dans le fichier `App.js`.
 
 Dans ce fichier, déclarez une variable contenant cette valeur :
 
-[source, json]
-----
+```json
 [{
             "name": "Luke Skywalker",
             "height": "172",
@@ -126,14 +120,13 @@ Dans ce fichier, déclarez une variable contenant cette valeur :
             "url": "http://swapi.dev/api/people/4/"
         }
 ]
-----
+```
 
 Dans un prochain TP, nous récupérons cette donné directement depuis l'API swapi.
 
 Dans l'implementation du composant `App`, ajoutez ce template HTML
 
-[source]
-----
+```html
 <table className="table is-fullwidth">
   <thead>
     <tr>
@@ -151,7 +144,7 @@ Dans l'implementation du composant `App`, ajoutez ce template HTML
     </tr>
   </tbody>
 </table>
-----
+```
 
 Vous devez ensuite générer autant de balise `tr` que de personnages à afficher Pour cela, nous allons utiliser la méthode `map`.
 

@@ -143,8 +143,7 @@ export default Nav;
 
 # Utilisation de l'attribut key
 
-[source, javascript]
-----
+```javascript
 const Nav = () => {
     const menuItems = [ ... ];
     return (
@@ -156,4 +155,4 @@ const Nav = () => {
     )
 }
 export default Nav;
-----
+```

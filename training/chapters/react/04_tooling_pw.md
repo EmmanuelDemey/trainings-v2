@@ -1,24 +1,18 @@
-== PW3 - Outillage
-
-[TIP]
-=====================================================================
+# PW3 - Outillage
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * https://www.cypress.io/[Cypress]
-=====================================================================
 
 Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
 
-[source]
-----
+```shell
 npm install -D cypress
-----
+```
 
 Une fois installée, nous allons ajouter un script dans notre fichier `package.json`.
 
-[source]
-----
+```json
 {
   "scripts":{
     "cypress:open": "cypress open",

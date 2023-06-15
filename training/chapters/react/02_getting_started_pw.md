@@ -1,7 +1,4 @@
-== PW1 - Getting Started
-
-[TIP]
-=====================================================================
+## PW1 - Getting Started
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
@@ -9,38 +6,33 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 * https://create-react-app.dev/[create-react-app]
 * https://bulma.io/[Bulma]
 
-=====================================================================
 
 Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `create-react-app`.
 
 Dans votre terminal, veuillez exécuter les commandes suivantes :
 
-[source]
-----
+```shell
 npm install -g create-react-app
 create-react-app training
-----
+```
 
 Une fois le projet créé, vous pouvez exécuter les commandes suivantes afin de vérifier qu'il est bien fonctionnel.
 
-[source]
-----
+```shell
 cd training
 npm run start
-----
+```
 
 Nous allons ensuite installer la librairie CSS `Bulma`, nous permettant de nous aider lors de la création du style de notre application.
 Pour cela, vous devez exécuter la commande suivante :
 
-[source]
-----
+```shell
 npm install bulma
-----
+```
 
 Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/index.js`.
 
-[source, javascript]
-----
+```javascript
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
@@ -59,12 +51,11 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-----
+```
 
 Nous allons ensuite intégrer le *layout* de base de la librairie Bulma. Modifiez tout d'abord le contenu du fichier `public/index.html` avec le contenu suivante :
 
-[source, html]
-----
+```html
 <!DOCTYPE html>
 <html>
   <head>
@@ -76,12 +67,11 @@ Nous allons ensuite intégrer le *layout* de base de la librairie Bulma. Modifie
     <div id="root"></div>
   </body>
 </html>
-----
+```
 
 Nous allons terminer par la modification du fichier `src/App.js`.
 
-[source, javascript]
-----
+```javascript
 import "./App.css";
 
 function App() {
@@ -98,13 +88,12 @@ function App() {
 }
 
 export default App;
-----
+```
 
 Vous pouvez également générer la version de production et émuler le fonctionnement d'un serveur web.
 
-[source]
-----
+```shell
 npm run build
 cd build
 npx serve
-----
+```
