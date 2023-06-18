@@ -10,11 +10,11 @@ layout: cover
 # Tests unitaires
 
 * Pour l'écriture des tests unitaires, nous conseillons deux librairies :
-* *Jest*:
-** Pour la structration de la suite de tests
-** Pour les mocks
-** Pour les assertions
-* *@testing-library* pour la génération d'un composant React
+* **Jest**:
+  * Pour la structration de la suite de tests
+  * Pour les mocks
+  * Pour les assertions
+* **@testing-library** pour la génération d'un composant React
 
 ---
 

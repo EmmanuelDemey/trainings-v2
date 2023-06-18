@@ -1,14 +1,9 @@
-== PW2 - Tests unitaires
-
-[TIP]
-=====================================================================
+## PW2 - Tests unitaires
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * https://jestjs.io/[Jest]
 * https://github.com/testing-library/jest-dom[Liste de matchers]
-
-=====================================================================
 
 Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez
 l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
@@ -22,8 +17,7 @@ Vous pouvez par exemple vérifier que le document contient
 
 Pour lancer les tests, vous pouvez exécuter la commande suivante :
 
-[source]
-----
+```shell
 npm run test
-----
+```
 

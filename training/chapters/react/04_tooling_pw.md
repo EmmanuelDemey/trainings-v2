@@ -19,7 +19,7 @@ Une fois installée, nous allons ajouter un script dans notre fichier `package.j
     "cypress:run": "cypress run"
   }
 }
-----
+```
 
 Si à présent vous exécutez la commande `npm run cypress:open`, l'interface graphique doit étre visible vous permettant de lancer les tests générés par Cypress.
 

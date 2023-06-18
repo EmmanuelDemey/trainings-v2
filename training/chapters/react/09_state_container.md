@@ -8,12 +8,6 @@ layout: cover
 
 # State Container
 
-image::../images/propHell.png[]
-
----
-
-# State Container
-
 * Une gestion centralisée de l'état de l'application permet :
   * D'avoir une seule source de vérité
   * Centraliser toutes les actions sur cet état
@@ -27,8 +21,9 @@ image::../images/propHell.png[]
 * Attention le mindset à avoir est différent de celui que nous avons depuis le début de cette formation
 * Plusieurs solutions possibles : Context, Redux, MobX ou encore Recoil
 
-include::./includes/10_context.adoc[]
-
+---
+src: ./includes/10_context.md
+hide: false
 ---
 
 # Redux
@@ -46,18 +41,6 @@ include::./includes/10_context.adoc[]
   * Les actions
   * Les reducers
   * Les sélecteurs
-
----
-
-# Redux
-
-image::../images/dumb.png[]
-
----
-
-# Redux
-
-image::../images/redux.png[]
 
 ---
 

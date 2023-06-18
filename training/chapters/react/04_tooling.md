@@ -5,10 +5,10 @@ layout: cover
 # Outillage
 
 ---
-
-include::../../../../front_ecosystem/slides/asciidoc/chapters/webpack.adoc[]
-
+src: ../webpack.md
+hide: false
 ---
+
 
 # Outillage
 
@@ -19,17 +19,31 @@ include::../../../../front_ecosystem/slides/asciidoc/chapters/webpack.adoc[]
     * Husky
     * Storybook
 
-include::../../../../front_ecosystem/slides/asciidoc/chapters/prettier.adoc[]
-
-include::../../../../front_ecosystem/slides/asciidoc/chapters/eslint.adoc[]
-
-include::../../../../front_ecosystem/slides/asciidoc/chapters/cypress.adoc[]
-
-include::../../../../front_ecosystem/slides/asciidoc/chapters/husky.adoc[]
-
-include::../../../../front_ecosystem/slides/asciidoc/chapters/storybook.adoc[]
+---
+src: ../prettier.md
+hide: false
+---
 
 ---
+src: ../eslint.md
+hide: false
+---
+
+---
+src: ../cypress.md
+hide: false
+---
+
+---
+src: ../husky.md
+hide: false
+---
+
+---
+src: ../storybook.md
+hide: false
+---
+
 
 # Outils complémentaires
 

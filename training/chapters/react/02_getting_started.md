@@ -19,7 +19,9 @@ layout: cover
 
 * Il est nécessaire d'importer d'autres librairies pour développer une application complète
     * react-router
-    * react-redux / MobX
+    * react-redux / MobX / Recoil
+    * Formik
+    * React Query
     * axios
     * ...
 
@@ -29,11 +31,10 @@ layout: cover
 
 * Pour créer un nouveau projet React, nous allons utiliser le module `create-react-app`
 * Ce module permet de créer un squelette de projet et de configurer l'ensemble des outils nécessaires
-* Des solutions concurrentes existent comme *Nx*
+* Des solutions concurrentes existent comme **Nx** et **Vite**
 
 ```shell
-npm install -g create-react-app
-create-react-app demo
+npx create-react-app demo --template typescript
 ```
 
 ---

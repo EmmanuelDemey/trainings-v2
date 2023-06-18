@@ -1,19 +1,22 @@
-=== Context
+# Context
 
 * Un context un objet natif de React permettant de propager de la donnée sur tous les éléments d'un arbre
 * Cette syntaxe permet d'éviter le passage de `props` de composant en composant
 * Tous les `consumer` seront regénéres si le context change
 
-=== Context
+---
+
+# Context
 
 * Se base sur deux concepts :
-** `Provider` : ou la donnée est centralisée
-** `Consumer` : client permettant d'intéragir avec cette donnée
+    * `Provider` : ou la donnée est centralisée
+    * `Consumer` : client permettant d'intéragir avec cette donnée
 
-=== Création du context
+---
 
-[source, javascript]
-----
+# Création du context
+
+```javascript
 export const themes = {
   light: {
   },
@@ -24,12 +27,13 @@ export const themes = {
 export const ThemeContext = React.createContext(
   themes.dark // valeur par défaut
 );
-----
+```
 
-=== Création du Provider
+---
 
-[source, javascript]
-----
+# Création du Provider
+
+```javascript
 import { ThemeContext, themes } from './context';
 
 const App = () => {
@@ -40,14 +44,15 @@ const App = () => {
     )
 }
 export default App;
-----
+```
 
-=== Abonnement au context
+---
+
+# Abonnement au context
 
 * Nous pouvons également consommer cette donnée avec le hook `useContext`
 
-[source, javascript]
-----
+```javascript
 const Button = () => {
     const theme = useContext(ThemeContext);
 
@@ -59,15 +64,16 @@ const Button = () => {
     );
 }
 export default Button;
-----
+```
 
-=== Lecture et Ecriture
+---
+
+# Lecture et Ecriture
 
 * Un context n'est pas limité qu'à de la données en lecture seule .
 * Nous pouvons y définir également des fonctions permettant de modifier cette données.
 
-[source, javascript]
-----
+```javascript
 import { DataContext } from './context';
 
 const App = () => {
@@ -79,12 +85,13 @@ const App = () => {
     )
 }
 export default App;
-----
+```
 
-=== Lecture et Ecriture
+---
 
-[source, javascript]
-----
+# Lecture et Ecriture
+
+```javascript
 import { DataContext } from './context';
 
 const Form = () => {
@@ -97,14 +104,15 @@ const Form = () => {
     )
 }
 export default Form;
-----
+```
 
-=== Bonnes pratiques
+---
+
+# Bonnes pratiques
 
 * Nous recommandons de créer son propre `Provider` et son propre `hook`.
 
-[source, javascript]
-----
+```javascript
 export const themes = {
   light: {
   },
@@ -118,4 +126,4 @@ export const ThemeContext = React.createContext(
 
 export const ThemeProvider = ThemeContext.Provider;
 export const useTheme = () => useContext(ThemeContext);
-----
+```
