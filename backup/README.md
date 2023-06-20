@@ -1,1 +1,0 @@
-# trainings-v2
