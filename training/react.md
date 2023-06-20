@@ -28,6 +28,11 @@ css: unocss
 # React.js
 
 ---
+src: ./chapters/react/11_typescript.md
+hide: false
+---
+
+---
 src: ./chapters/react/02_getting_started.md
 hide: false
 ---
@@ -69,11 +74,6 @@ hide: false
 
 ---
 src: ./chapters/react/10_i18n.md
-hide: false
----
-
----
-src: ./chapters/react/11_typescript.md
 hide: false
 ---
 

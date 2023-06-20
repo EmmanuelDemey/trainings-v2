@@ -17,27 +17,31 @@ layout: cover
 
 # JSX
 
-```javascript
-ReactDOM.render(
-  <HelloMessage content={'Hello'}>
-    <Title content={'World'}/>
-  </HelloMessage>,
-  document.getElementById('root')
-)
+```jsx
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 ```
 
 ---
 
 # JSX
 
-```javascript
-ReactDOM.render(
+```jsx
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
   React.createElement(
     HelloMessage, {content: 'Hello'},
       React.createElement(Title, {content: 'World'}, null)
-    ),
-  document.getElementById('root')
-)
+    )
+);
 ```
 
 ---
@@ -54,8 +58,8 @@ ReactDOM.render(
 
 ```javascript
 const App = () => {
-   const title = 'Title';
-   const src = 'http://domain.com/image.png';
+   const title: string = 'Title';
+   const src: string = 'http://domain.com/image.png';
 
    return (
        <div>
@@ -83,8 +87,8 @@ export default App;
 import { Fragment } from 'react';
 
 const App = () => {
-   const title = 'Title';
-   const src = 'http://domain.com/image.png';
+   const title: string = 'Title';
+   const src: string = 'http://domain.com/image.png';
 
    return (
        <Fragment>
@@ -119,8 +123,13 @@ export default LogoutButton;
 * Ou encore avoir autant d'éléments JSX que d'éléments dans un tableau
 
 ```javascript
+type MenuItem = {
+    link: string;
+    label: string;
+}
+
 const Nav = () => {
-    const menuItems = [ ... ];
+    const menuItems: MenuItem[] = [ ... ];
     return (
         <ul>
             {menuItems.map(({link, label}) => {
@@ -145,7 +154,7 @@ export default Nav;
 
 ```javascript
 const Nav = () => {
-    const menuItems = [ ... ];
+    const menuItems: MenuItem[] = [ ... ];
     return (
         <ul>
             {menuItems.map(({link, label}, index) => {

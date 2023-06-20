@@ -13,7 +13,7 @@ Dans votre terminal, veuillez exécuter les commandes suivantes :
 
 ```shell
 npm install -g create-react-app
-create-react-app training
+create-react-app training --template typescript
 ```
 
 Une fois le projet créé, vous pouvez exécuter les commandes suivantes afin de vérifier qu'il est bien fonctionnel.
@@ -30,21 +30,23 @@ Pour cela, vous devez exécuter la commande suivante :
 npm install bulma
 ```
 
-Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/index.js`.
+Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/index.tsx`.
 
 ```javascript
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "bulma/css/bulma.css";
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
@@ -57,7 +59,7 @@ Nous allons ensuite intégrer le *layout* de base de la librairie Bulma. Modifie
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -69,9 +71,9 @@ Nous allons ensuite intégrer le *layout* de base de la librairie Bulma. Modifie
 </html>
 ```
 
-Nous allons terminer par la modification du fichier `src/App.js`.
+Nous allons terminer par la modification du fichier `src/App.tsx`.
 
-```javascript
+```typescript
 import "./App.css";
 
 function App() {

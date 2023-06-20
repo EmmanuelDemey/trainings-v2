@@ -16,14 +16,6 @@ layout: cover
 
 ---
 
-# Utiliser TypeScript avec React
-
-```shell
-create-react-app demo --template typescript
-```
-
----
-
 # Types
 
 * Nous pouvons :
@@ -76,17 +68,3 @@ const user: User = { firstName: 'James`, lastName: 'Bond' };
 
 ---
 
-# Typer les props
-
-* Nous allons utiliser le même mot clé afin de typer les `props` d'un composant.
-
-```typescript
-import { FC } from "react"
-
-type UserCardProps = {
-    user: User;
-}
-const UserCard: FC<UserCardProps> = ({ user }) => {
-
-}
-```
