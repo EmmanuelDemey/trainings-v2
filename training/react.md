@@ -28,6 +28,11 @@ css: unocss
 # React.js
 
 ---
+src: ./chapters/react/11_typescript.md
+hide: false
+---
+
+---
 src: ./chapters/react/02_getting_started.md
 hide: false
 ---
@@ -37,3 +42,47 @@ src: ./chapters/react/03_unit_test.md
 hide: false
 ---
 
+---
+src: ./chapters/react/04_tooling.md
+hide: false
+---
+
+---
+src: ./chapters/react/05_html_css.md
+hide: false
+---
+
+---
+src: ./chapters/react/06_composant.md
+hide: false
+---
+
+---
+src: ./chapters/react/07_hooks.md
+hide: false
+---
+
+---
+src: ./chapters/react/08_react_router.md
+hide: false
+---
+
+---
+src: ./chapters/react/09_state_container.md
+hide: false
+---
+
+---
+src: ./chapters/react/10_i18n.md
+hide: false
+---
+
+---
+src: ./chapters/react/12_formik.md
+hide: false
+---
+
+---
+src: ./chapters/react/13_react_query.md
+hide: false
+---

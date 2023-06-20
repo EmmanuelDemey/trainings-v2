@@ -6,15 +6,14 @@ layout: cover
 
 ---
 
-
 # Tests unitaires
 
 * Pour l'écriture des tests unitaires, nous conseillons deux librairies :
-* *Jest*:
-** Pour la structration de la suite de tests
-** Pour les mocks
-** Pour les assertions
-* *@testing-library* pour la génération d'un composant React
+* **Jest**:
+  * Pour la structration de la suite de tests
+  * Pour les mocks
+  * Pour les assertions
+* **@testing-library** pour la génération d'un composant React
 
 ---
 
@@ -22,7 +21,7 @@ layout: cover
 
 * Jest propose des méthodes permettant de structurer une suite de tests
 
-```javascript
+```typescript
 describe('<MyComponent />', () => {
     describe('state 1', () => {
         it('should be hidden', () => {
@@ -43,7 +42,7 @@ describe('<MyComponent />', () => {
 
 * Nous avons la possibilité des définir des fonctions de "configuration"
 
-```javascript
+```typescript
 describe('<MyComponent />', () => {
     describe('state 1', () => {
         beforeEach(() => {
@@ -68,7 +67,7 @@ describe('<MyComponent />', () => {
 
 # Jest - mocks
 
-```javascript
+```typescript
 import get from './list';
 import api from 'js/remote-api/api';
 
@@ -154,7 +153,7 @@ exports[`renders correctly 1`] = `
 
 # Sélectionner des éléments
 
-```javascript
+```typescript
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 
@@ -173,7 +172,7 @@ describe('<Comment />', () => {
 
 * Il est conseillé d'utiliser `@testing-library/user-event` pour les interactions utilisateurs
 
-```javascript
+```typescript
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -192,7 +191,7 @@ describe('<Comment />', () => {
 
 * Afin de faciliter la maintenance de vos tests, vous pourriez suivre la structure suivante :
 
-```javascript
+```typescript
 import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
