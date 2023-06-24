@@ -18,10 +18,10 @@ layout: cover
 # Présentation Générale
 
 * Il est nécessaire d'importer d'autres librairies pour développer une application complète
-    * react-router
-    * react-redux / MobX / Recoil
-    * Formik
-    * React Query
+    * react-router / TanStack Router
+    * Redux Toolkit / MobX / Recoil / Zustand
+    * Formik / React Hook Form
+    * React Query / SWR
     * axios
     * ...
 
