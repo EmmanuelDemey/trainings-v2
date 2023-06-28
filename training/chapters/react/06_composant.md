@@ -13,6 +13,7 @@ layout: cover
 * A chaque fois qu'un composant est "modifié", lui et ces enfants seront regénérés
 * Algorithme de mise à jour se basant sur un Virtual DOM
 * Optimisation possible (memoization).
+* Vous pouvez utiliser une extention **React DevTools** afin de pouvoir debugger votre arbre de composants
 
 ---
 
@@ -351,6 +352,8 @@ Title.propTypes = {
 
 export default Title;
 ```
+
+---
 
 include::./includes/06_css.adoc[]
 

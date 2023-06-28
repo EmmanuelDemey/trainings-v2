@@ -57,7 +57,7 @@ npx create-react-app demo --template typescript
 # Outillage
 
 * Voici la liste des outils configurés par `create-react-app`
-    * Les librairie `react` et `react-dom`
+    * Les librairies `react` et `react-dom`
     * Webpack
     * Jest
     * ESLint

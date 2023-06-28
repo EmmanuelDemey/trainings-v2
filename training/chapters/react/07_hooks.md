@@ -43,7 +43,40 @@ const CollapsiblePanel = () => {
     return (
         <section>
             <h2>
-                <button onClick={() => setOpened(!opened)}>
+                <button type="button" onClick={() => setOpened(!opened)}>
+                    Title
+                </button>
+            </h2>
+            {opened && <div> ... </div>}
+        </section>
+    )
+}
+export default CollapsiblePanel;
+```
+
+---
+
+# Hook - Automatic Batching
+
+* Depuis **React 18**, React ne met à jour le composant qu'une seule fois même si plusieurs *state* sont mis à jour. 
+* Cette fonctionnalité se nomme **Automatic Batching**
+
+```jsx
+import { useState }  from 'react';
+
+const CollapsiblePanel = () => {
+    const [opened, setOpened] = useState(true);
+    const [focused, setFocused] = useState(true);
+
+    const onClickHandler = () => {
+        setOpened(!opened);
+        setFocused(!focused)
+    }
+
+    return (
+        <section>
+            <h2>
+                <button type="button" onClick={onClickHandler}>
                     Title
                 </button>
             </h2>
@@ -114,7 +147,7 @@ useEffect(function saveForm(){
 * Attention lorsque vous avez du code asynchrone dans le useEffect
 * La fonction retournera une `Promise` si nous utilisons `async/await`
 
-```
+```javascript
 // Erreur
 useEffect(async () => {
     await fetch();
@@ -177,7 +210,7 @@ export default Button;
 # Hook - useCallback
 
 * Ce hook permet d'éviter de redéfinir une nouvelle instance à chaque rendu d'un composant
-* Notre fonction est `memoizé`
+* Notre fonction est `memoizée`
 
 ```javascript
 import { useCallback }  from 'react';

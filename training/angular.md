@@ -33,6 +33,46 @@ css: unocss
 layout: cover
 ---
 
+# Composants 
+
+---
+
+# Composants Standalone
+
+* Angular propose une nouvelle solution pour activer les composants globalement via les **Standalone component**
+* Avant, nous étions obligé d'utiliser des **ngModule**
+
+```typescript
+@Component({
+  selector: 'app-foo',
+  standalone: true,
+  templateUrl: './foo.component.html',
+})
+export class FooComponent {
+           👇
+}
+```
+
+---
+
+# Input obligatoires
+
+* Depuis **Angular 16**, nous pouvons définir que des *input* sont obligatoires. 
+
+```typescript
+@Component({
+  selector: 'app-error',
+  standalone: true,
+  templateUrl: './error.component.html',
+})
+export class ErrorMessage {
+           
+  @Input({ required: true }) error: string;
+
+}
+```
+---
+
 # Directives
 
 ---
@@ -70,6 +110,71 @@ export class RootComponent {
 ---
 
 # NgSwitch
+
+---
+
+---
+layout: cover
+---
+
+# Services
+
+---
+
+# Services 
+
+* Angular met à disposition un système d'*Injection de Dépendance*
+* Un service est une simple classe permettant d'implémenter la couche métier de l'application. 
+
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  provideIn: 'root'
+})
+export class UserService {
+
+  getUser(id: string): User {
+
+  }
+
+  getUsers(): User[] {
+    
+  }
+}
+```
+
+---
+
+# Service
+
+* Deux solutions sont disponibles pour injecter ces services
+  * Via la constructeur d'un composant/directive/services
+
+```typescript
+import { Component } from '@angular/core';
+import { UserService } from './user.service';
+
+@Component({})
+export class UserProfilComponent {
+
+  constructor(private userService: UserService){
+
+  }
+}
+```
+
+  * via l'utilisation de la nouvelle méthode `inject`
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { UserService } from './user.service';
+
+@Component({})
+export class UserProfilComponent {
+  userService = inject(UserService);
+}
+```
 
 ---
 
@@ -118,4 +223,76 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptors([retryInterceptor({ count: 1})]))
   ]
 }).catch(error => console.error(err));
+```
+
+---
+
+---
+layout: cover
+---
+
+# Router
+
+---
+
+# Router - @Input
+
+* Nous pouvons *mapper* la configuration du router à des `Input` du composant (*page*)
+* Pour cela,  nous allons utiliser la méthode `withComponentInputBinding` lors de la configuration du Router
+
+```typescript
+const routes: Routes = [
+  {
+    path: "search/:id",
+    component: SearchComponent,
+    data: { title: "Search" },
+    resolve: { searchData: SearchDataResolver }
+  },
+];
+
+bootstrapApplication(App, {
+  providers: [
+    provideRouter(routes, 
+        withComponentInputBinding()
+    )
+  ],
+});
+```
+
+```typescript
+@Component({})
+export class SearchComponent implements OnInit {
+    @Input() query?: string; 
+    @Input('id') pathId?: string; 
+    @Input('title') dataTitle?: string;
+    @Input('searchData') resolvedData?: any; 
+
+    ngOnInit() {  }
+}
+```
+---
+
+# Router
+
+* Nous pouvons définir des **guards** afin de savoir si nous pouvons ou pas faire certaines choses avant un changement de page
+  * `canActivate`
+  * `canActivateChild`
+  * `canDeactivate`
+  * `canLoad`
+  * `canMatch`
+
+```typescript
+const routes = [
+  {
+    path: ‘admin’,
+    canActivate: [() => inject(LoginService).isLoggedIn()]
+  },
+  {
+    path: ‘edit’,
+    component: EditCmp,
+    canDeactivate: [
+      (component: EditCmp) => !component.hasUnsavedChanges
+    ]
+  }
+];
 ```

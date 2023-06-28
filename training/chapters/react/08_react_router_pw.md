@@ -28,7 +28,7 @@ Pour cela, vous pouvez utiliser la fonction suivante :
 
 ```javascript
 // http://swapi.dev/api/people/1/
-function getIDFromUrl(url){
+function getIDFromUrl(url: string){
     const withoutPrefix = url.replace("https://swapi.dev/api/people/", "")
     return withoutPrefix.replace("/", "");
 }
