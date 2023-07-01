@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+const { exec, execSync } = require('child_process');
 const fs = require('fs');
 const { mdToPdf } = require('md-to-pdf');
 const { join } = require('path');
@@ -8,12 +8,12 @@ const { join } = require('path');
     mds.forEach(md => {
         const base = md.replace('.md', '');
         console.log(`building ${md}`)
-        exec(`npm run build -- ${md} --base ${base} --out dist/${base}`)
+        execSync(`npm run build -- ${md} --base ${base} --out dist/${base}`)
     })
 
     const pws = fs.readdirSync('.').filter(p => p.endsWith('_pw.md'));
     for(let pw of pws){
-        console.log(pw)
+        console.log(`building pw ${pw}`)
         const pdf = await mdToPdf({ path: pw }).catch(console.error);
 
 	if (pdf) {
