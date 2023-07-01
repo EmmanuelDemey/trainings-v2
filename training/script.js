@@ -1,4 +1,4 @@
-const { exec, execSync } = require('child_process');
+const { execSync } = require('child_process');
 const fs = require('fs');
 const { mdToPdf } = require('md-to-pdf');
 const { join } = require('path');
@@ -9,6 +9,7 @@ const { join } = require('path');
         const base = md.replace('.md', '');
         console.log(`building ${md}`)
         execSync(`npm run build -- ${md} --base /${base} --out dist/${base}`)
+        execSync(`npm run export -- ${md} --with-toc --output dist/${base}.pdf`)
     })
 
     const pws = fs.readdirSync('.').filter(p => p.endsWith('_pw.md'));

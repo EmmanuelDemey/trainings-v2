@@ -12,6 +12,7 @@
     "@slidev/theme-seriph": "*"
   },
   "devDependencies": {
-    "md-to-pdf": "^5.2.4"
+    "md-to-pdf": "^5.2.4",
+    "playwright-chromium": "^1.35.1"
   }
 }
