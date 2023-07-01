@@ -10,5 +10,8 @@
     "@slidev/cli": "^0.40.16",
     "@slidev/theme-default": "*",
     "@slidev/theme-seriph": "*"
+  },
+  "devDependencies": {
+    "md-to-pdf": "^5.2.4"
   }
 }
