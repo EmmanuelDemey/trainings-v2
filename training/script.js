@@ -4,11 +4,11 @@ const { mdToPdf } = require('md-to-pdf');
 const { join } = require('path');
 
 (async () => {
-    const mds = fs.readdirSync('.').filter(p => p.endsWith('.md') && !p.endsWith('_pw.md')).filter(p => !p.startsWith('README'));
+    const mds = fs.readdirSync('.').filter(p => p.endsWith('react.md') && !p.endsWith('_pw.md')).filter(p => !p.startsWith('README'));
     mds.forEach(md => {
         const base = md.replace('.md', '');
         console.log(`building ${md}`)
-        execSync(`npm run build -- ${md} --base ${base} --out dist/${base}`)
+        execSync(`npm run build -- ${md} --base /${base} --out dist/${base}`)
     })
 
     const pws = fs.readdirSync('.').filter(p => p.endsWith('_pw.md'));
