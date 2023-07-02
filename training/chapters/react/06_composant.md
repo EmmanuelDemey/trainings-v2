@@ -50,7 +50,11 @@ layout: cover
 
 ```javascript
 // <Title content={'Content Title'} />
-const Title = ( props ) => {
+type TitleProps = {
+    content: string
+};
+
+const Title = ( props: TitleProps ) => {
     return <h1> { props.content } </h1>
 }
 export default Title;
@@ -64,7 +68,11 @@ export default Title;
 
 ```javascript
 // <Title content={'Content Title'} />
-const Title = ( { content } ) => {
+type TitleProps = {
+    content: string
+};
+
+const Title = ( { content }: TitleProps ) => {
     return <h1> { content } </h1>
 }
 
@@ -82,7 +90,11 @@ export default Title;
 import { Component } from 'react';
 
 // <Title content={'Content Title'} />
-class Title extends Component {
+type TitleProps = {
+    content: string
+};
+
+class Title extends Component<TitleProps> {
     render(){
         return <h1> { this.props.content } </h1>
     }
@@ -101,7 +113,11 @@ export default Title;
 import { Component } from 'react';
 
 // <Title content={'Content Title'} />
-class Title extends Component {
+type TitleProps = {
+    content: string
+};
+
+class Title extends Component<TitleProps> {
     render(){
         const { content } = this.props;
         return <h1> { content } </h1>
@@ -119,7 +135,11 @@ export default Title;
 
 ```javascript
 // <Title>Content Title</Title>
-const Title = ( { children } ) => {
+type TitleProps = {
+    children: React.ReactNode
+};
+
+const Title = ( { children }: TitleProps ) => {
     return <h1> { children } </h1>
 }
 export default Title;
@@ -143,7 +163,11 @@ en `props` à notre composant.
 
 ```javascript
 //<ValidationButton action={() => { alert('validated)}} />
-const ValidationButton = ({action}) => {
+type ValidationButtonProps = {
+    action: (event: Event) => void 
+};
+
+const ValidationButton = ({action}: ValidationButtonProps) => {
     return <button className="btn" onClick={action}>Validate</button>;
 }
 export default ValidationButton;
@@ -272,50 +296,6 @@ function withPreferences(WrappedComponent) {
 
 ---
 
-# PropTypes
-
-* Les PropTypes permettent de définir le type des paramètres d'un composant
-* Si ses types ne sont pas respectés, un *warning* sera émis dans la console de votre navigateur.
-* Nous pouvons également définir si une propriété est obligatoire
-
----
-
-# PropTypes
-
-```javascript
-import PropTypes from 'prop-types';
-
-const Title = ({content}) => <h1>{content}</h1>;
-
-Title.propTypes = {
-  content: PropTypes.string.isRequired
-};
-
-export default Title;
-```
-
----
-
-# PropTypes
-
-* Plusieurs types sont disponibles
-
-```javascript
-PropTypes.array,
-PropTypes.bool,
-PropTypes.func,
-PropTypes.number,
-PropTypes.object,
-PropTypes.string,
-PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-]),
-PropTypes.arrayOf(PropTypes.number)
-```
-
----
-
 # PropTypes et valeur par défaut
 
 * De manière similaire, nous pouvons définir des valeurs par défaut.
@@ -346,11 +326,28 @@ import PropTypes from 'prop-types';
 const Title = ({content = 'Default Title'})
                     => <h1>{content}</h1>;
 
-Title.propTypes = {
-  content: PropTypes.string.isRequired
-};
-
 export default Title;
+```
+
+---
+
+# ComponentProps
+
+* React propose un type avancé permettant de récupérer dynamiquement le type des *props* d'un élément HTML ou composant React. 
+
+```typescript
+import { ComponentProps } from "react";
+import { Button } from "some-external-library";
+
+type MyButtonProps = ComponentProps<typeof Button>;
+
+type MyDivProps = ComponentProps<"div"> & {
+  myProp: string;
+};
+const MyDiv = ({ myProp, ...props }: MyDivProps) => {
+  console.log(myProp!);
+  return <div {...props} />;
+};
 ```
 
 ---

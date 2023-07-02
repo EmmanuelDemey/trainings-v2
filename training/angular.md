@@ -178,6 +178,43 @@ export class UserProfilComponent {
 
 ---
 
+# InjectionToken
+
+* Si le *provider* n'est pas défini via un classe, nous pouvons utiliser la classe `InjectionToken`
+
+```typescript
+import { NgModule, InjectionToken } from '@angular/core';
+
+export const API_URL = new InjectionToken<string>('api_url');
+
+
+@NgModule({
+  providers: [ { provide: API_URL, useValue: 'http://api'}]
+})
+export class AppModule {
+
+}
+```
+
+```typescript
+import { Injectable, Inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { API_URL } from './app.module';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  constructor(private http: HttpClient, @Inject(API_URL) private apiUrl: string) { }
+
+  getUsers() {
+    return this.http.get(`${this.apiUrl}/users`);
+  }
+}
+```
+
+---
+
 ---
 layout: cover
 ---
