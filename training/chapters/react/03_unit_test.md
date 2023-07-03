@@ -10,7 +10,7 @@ layout: cover
 
 * Pour l'écriture des tests unitaires, nous conseillons deux librairies :
 * **Jest**:
-  * Pour la structration de la suite de tests
+  * Pour la structuration de la suite de tests
   * Pour les mocks
   * Pour les assertions
 * **@testing-library** pour la génération d'un composant React
@@ -148,10 +148,6 @@ exports[`renders correctly 1`] = `
 * Librairie utilitaire permettant de
   * générer l'HTML d'un composant React
   * de manipuler cet HTML pour faire des assertions
-
----
-
-# Sélectionner des éléments
 
 ```typescript
 import '@testing-library/jest-dom';

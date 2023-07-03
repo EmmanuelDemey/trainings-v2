@@ -59,7 +59,7 @@ npx create-react-app demo --template typescript
 * Voici la liste des outils configurés par `create-react-app`
     * Les librairies `react` et `react-dom`
     * Webpack
-    * Jest
+    * Jest et Testing Library
     * ESLint
     * Progressive Web App
     * Core Web Vitals

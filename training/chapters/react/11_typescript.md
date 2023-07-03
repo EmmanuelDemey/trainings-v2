@@ -24,6 +24,7 @@ layout: cover
     * typer les variables d'une instance d'un objet
     * créer des interface
     * définir des génériques
+    * utiliser des types avancés
 
 --- 
 
@@ -34,10 +35,6 @@ function lowercase(word: string): string {
     return word.toLowerCase();
 }
 ```
-
----
-
-# Types
 
 * Si nous utilisons la méthode avec la mauvaise signature, nous allons avoir des erreurs de compilation.
 
@@ -65,6 +62,3 @@ type User = {
 }
 const user: User = { firstName: 'James`, lastName: 'Bond' };
 ```
-
----
-

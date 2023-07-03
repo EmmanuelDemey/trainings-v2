@@ -1,6 +1,6 @@
 # Formation React
 
-Dans cette application, nous allons développer une application permettant la visualisation des personnages du film Star Wars.
+Dans cette application, nous allons développer une application permettant la visualisation des personnages des films Star Wars.
 
 ## PW1 - Getting Started
 
