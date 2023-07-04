@@ -339,18 +339,13 @@ export default Title;
 import { ComponentProps } from "react";
 import { Button } from "some-external-library";
 
-type MyButtonProps = ComponentProps<typeof Button>;
+//type MyButtonProps = ComponentProps<typeof Button>;
 
-type MyDivProps = ComponentProps<"div"> & {
-  myProp: string;
+type CustomButtonProps = ComponentProps<"button"> & {
+  label: string;
 };
-const MyDiv = ({ myProp, ...props }: MyDivProps) => {
-  console.log(myProp!);
-  return <div {...props} />;
+const CustomButton = ({ label, ...props }: CustomButtonProps) => {
+  return <button {...props}>{label}</button>;
 };
 ```
-
----
-
-include::./includes/06_css.adoc[]
 
