@@ -13,11 +13,6 @@ layout: cover
   * Centraliser toutes les actions sur cet état
   * Eviter de passer des props de composant en composant enfant
   * Eviter d'avoir du code spaghetti
-
----
-
-# State Container
-
 * Attention le mindset à avoir est différent de celui que nous avons depuis le début de cette formation
 * Plusieurs solutions possibles : Context, Redux, MobX ou encore Recoil
 
@@ -26,15 +21,12 @@ src: ./includes/10_context.md
 hide: false
 ---
 
+--- 
+
 # Redux
 
 * Redux est une librairie que nous devons installer via NPM
 * Elle propose une architecture unidirectionnelle de la gestion de la donnée.
-
----
-
-# Redux
-
 * Plusieurs acteurs vont intervenir :
   * Le `Store`
   * Le `State`
@@ -60,10 +52,6 @@ npm install redux react-redux redux-logger
   * le `state` précédent
   * une action
 * Il doit retourner le nouveau `state`
-
----
-
-# Redux - Reducers
 
 ```javascript
 export function count(state, action) {
@@ -100,6 +88,8 @@ export default store;
 ---
 
 # Redux - Création
+
+* Dans une vraie application, nous allons avoir plusieurs **Reducers**
 
 ```javascript
 import { createStore, combineReducers, applyMiddleware, compose } from "redux";
@@ -165,38 +155,57 @@ import store from "./store";
 * Dernière étape est de créer nos `DumbComponent` et `ConnectedComponent`
 * Toutes les données et actions récupérées par les composants connectés seront disponibles en `props` dans le `DumbComponent`
 
----
-
-# Redux - Composant connecté
-
 ```javascript
-import { connect } from "react-redux";
-...
-
 export const DumbCounter = ({
-  count,
-  inc,
-  decr,
-}) => {
+  count, inc, decr,
+}) => (
   <>
     <button onClick={() => decr(1)}> -1 </button>
     <span> {count} </span>
     <button onClick={() => inc(1)}> +1 </button>
   </>
+)
+```
+
+---
+
+# Redux - Conmposant connecté
+
+* Une fois le *Dumb component* créé, nous allons pouvois le connecter au store. 
+
+```javascript
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => {
+  return {
+    count: state.count, 
+  }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    inc: () => dispatch({ type: 'INCREMENT' }),
+    decr: () => dispatch({ type: 'DECREMENT' }),
+  }
+}
+
+export const DumbCounter = ...
+
+export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
 ```
 
 ---
 
 # Redux - Hooks
 
+* Créer cette séparation, n'est pas une obligation. Votre composant peut directement intéragir avec Redux. 
 * React Redux propose les hooks `useDispatch` et `useSelector`.
 
 ```javascript
 import { useDispatch, useSelector} from "react-redux";
 import { getCount } from "./store";
 
-export const DumbCounter = () => {
+export default () => {
   const count = useSelector(state => getCount(state))
   const dispatch = useDispatch();
   const inc = (p) => dispatch({ type: 'INC', payload: p})
@@ -219,8 +228,25 @@ export const DumbCounter = () => {
 * Afin de faciliter l'accés au `store`, nous allons définir des sélecteurs
 
 ```javascript
-export const getCount = (state) => state;
+
+
+import { connect } from "react-redux";
+
+export const getCounter = (state) => state;
 export const isGreaterThan = (state, limit) => state > limit;
+
+const mapStateToProps = (state) => {
+  return {
+    count: getCounter(state),
+    isGreaterThan100: isGreaterThan(state, 100) 
+  }
+}
+
+const mapDispatchToProps = ...
+
+export const DumbCounter = ...
+
+export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
 ```
 
 ---
@@ -230,10 +256,6 @@ export const isGreaterThan = (state, limit) => state > limit;
 * Nous pouvons trouver deux types de structures pour définir un store Redux :
   * Découpage technique (un répertoire actions, un répertoire reducers, ...)
   * Découpage fonctionnel (à privilégier)
-
----
-
-# Structure de fichiers
 
 ```javascript
 // Example de fichier manipulant une partie du state
@@ -261,12 +283,16 @@ export default function reducer(state, action) {}
 
 # Redux Toolkit
 
+* Redux évolue et propose à présent une solution mieux packagé pour intéragir avec les Stores.
 * Une partie d'un `store Redux` sera configuré via un `Slice`.
+* La méthode **createSlice** utilise **createAction**, **createReducer** et la librairie **Immer**.
 
 ```javascript
 import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 
-const initialState = {
+type CounterState = { value: number }
+const initialState: CounterState = {
   value: 0,
 }
 
@@ -274,10 +300,10 @@ export const counterSlice = createSlice({
   name: 'counter',
   initialState,
   reducers: {
-    inc: (state, action) => {
+    inc: (state, action: PayloadAction<number>) => {
       state.value += action.payload
     },
-    decr: (state, action) => {
+    decr: (state, action: PayloadAction<number>) => {
       state.value -= action.payload
     }
   }
@@ -293,8 +319,22 @@ export const counterSlice = createSlice({
   * le `reducer` que nous pourrons activer dans notre `store`
 
 ```javascript
-export const { inc, decr } = counterSlice.actions
+import { createSlice } from '@reduxjs/toolkit'
 
+const initialState = {
+  value: 0,
+}
+
+export const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {
+    inc: ...,
+    decr: ...
+  }
+})
+
+export const { inc, decr } = counterSlice.actions
 export default counterSlice.reducer
 ```
 
@@ -308,11 +348,15 @@ export default counterSlice.reducer
 import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from '../features/counter/counterSlice'
 
-export default configureStore({
+const store = configureStore({
   reducer: {
     counter: counterReducer,
   },
 })
+
+export type RootState = ReturnType<typeof store.getState>
+export default store
+
 ```
 
 ---
@@ -338,4 +382,112 @@ export function Counter() {
     </>
   )
 }
+```
+
+---
+layout: cover
+---
+
+# Travaux Pratiques
+
+---
+
+# Introduction à Redux Saga
+
+* Redux Saga est un librairie permettant de rendre les code asynchrone
+  * plus simple à implémenter
+  * plus simple à maintenir
+  * plus simple à tester
+
+* Il utilise une syntaxe JavaScript que nous nommons les **générateurs**.
+* Il se veut le concurrent de **redux-thunk** sans le *callback hell** 
+* Possibe d'utiliser une version typé de Saga via le module **typed-redux-saga**.
+
+```shell
+npm install redux-saga
+```
+
+--- 
+
+# Installation
+
+* Saga est un *middleware* à Redux. 
+
+```javascript
+import { configureStore } from '@reduxjs/toolkit'
+import createSagaMiddleware from 'redux-saga'
+
+import reducer from './reducers'
+import mySaga from './sagas'
+
+const sagaMiddleware = createSagaMiddleware()
+const store = configureStore({
+  reducer, 
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sagaMiddleware),
+})
+
+sagaMiddleware.run(mySaga)
+
+```
+
+--- 
+
+# Concepts fondamentaux
+
+```javascript
+import { call, put, takeEvery, takeLatest } from 'redux-saga/effects'
+import Api from '...'
+
+export function* fetchUser(action) {
+  try {
+    const user = yield call(Api.fetchUser, action.payload.userId)
+    yield put({ type: 'USER_FETCH_SUCCEEDED', user: user })
+  } catch (e) {
+    yield put({ type: 'USER_FETCH_FAILED', message: e.message })
+  }
+}
+
+
+function* mySaga() {
+  yield takeEvery('USER_FETCH_REQUESTED', fetchUser)
+  // yield takeLatest('USER_FETCH_REQUESTED', fetchUser)
+}
+
+export default mySaga
+```
+
+---
+
+# Tests Unitaires
+
+* L'un des avantages poussés par Saga est sa testabilité. 
+
+```javascript
+import { call, put } from 'redux-saga/effects'
+import Api from '...'
+import { fetchUser } from './sagas'
+
+test('fetchUser Saga test', (assert) => {
+  const gen = fetchUser({ payload: {userId: 1 }})
+
+  assert.deepEqual(
+    gen.next().value,
+    call(Api.fetchUser, 1),
+    'fetchUser Saga must call Api.fetchUser(1)'
+  )
+
+  assert.deepEqual(
+    gen.next().value,
+    put({type: 'USER_FETCH_SUCCEEDED'}),
+    'fetchUser Saga must dispatch an USER_FETCH_SUCCEEDED action'
+  )
+
+  assert.deepEqual(
+    gen.next(),
+    { done: true, value: undefined },
+    'fetchUser Saga must be done'
+  )
+
+  assert.end()
+})
 ```

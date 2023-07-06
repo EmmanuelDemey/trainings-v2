@@ -3,18 +3,15 @@
 * Un context un objet natif de React permettant de propager de la donnée sur tous les éléments d'un arbre
 * Cette syntaxe permet d'éviter le passage de `props` de composant en composant
 * Tous les `consumer` seront regénéres si le context change
-
----
-
-# Context
-
-* Se base sur deux concepts :
+* Ce mécanisme se base sur deux concepts :
     * `Provider` : ou la donnée est centralisée
     * `Consumer` : client permettant d'intéragir avec cette donnée
 
 ---
 
 # Création du context
+
+* Voici comment nous devons créer un **Context** 
 
 ```javascript
 export const themes = {
@@ -33,6 +30,8 @@ export const ThemeContext = React.createContext(
 
 # Création du Provider
 
+* Une fois créé, nous pouvons l'utiliser via le **Provider** associé. 
+
 ```javascript
 import { ThemeContext, themes } from './context';
 
@@ -50,7 +49,7 @@ export default App;
 
 # Abonnement au context
 
-* Nous pouvons également consommer cette donnée avec le hook `useContext`
+* Nous pouvons consommer cette donnée avec le hook `useContext`
 
 ```javascript
 const Button = () => {
@@ -70,8 +69,8 @@ export default Button;
 
 # Lecture et Ecriture
 
-* Un context n'est pas limité qu'à de la données en lecture seule .
-* Nous pouvons y définir également des fonctions permettant de modifier cette données.
+* Un context n'est pas limité qu'à de la donnée en lecture seule .
+* Nous pouvons y définir également des fonctions permettant de modifier cette donnée.
 
 ```javascript
 import { DataContext } from './context';

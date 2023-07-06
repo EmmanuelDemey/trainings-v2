@@ -52,3 +52,8 @@ hide: false
     * Plugin VSCode Prettier `esbenp.prettier-vscode`
     * Plugin VSCode ESLint `dbaeumer.vscode-eslint`
 
+---
+layout: cover
+---
+
+# Travaux Pratiques

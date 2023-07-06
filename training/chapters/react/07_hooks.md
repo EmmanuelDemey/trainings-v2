@@ -12,10 +12,6 @@ layout: cover
 * Nous permet d'accrocher du code (`to hook`) au cycle de vie du composant
 * React propose des *hooks* par défaut, mais il est possible de créer les notres
 
----
-
-# Hook
-
 * Un hook possède quelques contraintes :
     * Ne peut pas étre défini dans des loop, if, sous-fonctions,...
     * Ne peut être utilisé que par des composants implémentés avec une fonction
@@ -25,6 +21,7 @@ layout: cover
 # Hook - useState
 
 * Permet de définir l'état d'un composant
+* C'est l'équivalent du **this.setState** d'un composant utilisant la syntaxe des classes
 * La valeur retournée est un tuple composé
     * de la valeur du state
     * d'une méthode permettant de le modifier
@@ -62,8 +59,6 @@ export default CollapsiblePanel;
 * Cette fonctionnalité se nomme **Automatic Batching**
 
 ```jsx
-import { useState }  from 'react';
-
 const CollapsiblePanel = () => {
     const [opened, setOpened] = useState(true);
     const [focused, setFocused] = useState(true);
@@ -84,7 +79,6 @@ const CollapsiblePanel = () => {
         </section>
     )
 }
-export default CollapsiblePanel;
 ```
 
 ---
@@ -92,12 +86,9 @@ export default CollapsiblePanel;
 # Hook - useEffect
 
 * Hook permettant de définir des effets de bords
+* C'est l'équivalent du **componentWill*** d'un composant utilisant la syntaxe des classes
 * Un effet peut éventuellement nécessité une phase de `cleanup`
 * Définition d'un tableau de dépendances pour éviter les exécutions multiples
-
----
-
-# Hook - useEffect
 
 ```javascript
 const [id, setId] = useState('');
@@ -153,10 +144,6 @@ useEffect(async () => {
     await fetch();
 }, [])
 ```
-
----
-
-# Hook - useEffect
 
 * Vous devez définir le traitement asynchrone dans une nouvelle fonction
 
@@ -231,7 +218,7 @@ export default Button;
 
 # Hook - custom
 
-* Nous pouvons définir nos propres hook
+* Nous pouvons définir nos propres hooks
 * Un hook custom correspond à un wrapper sur des hooks existant
 * Permet de cacher la complexité d'une implémentation
 
@@ -257,3 +244,9 @@ export default () => {
     )
 }
 ```
+
+---
+layout: cover
+---
+
+# Travaux Pratiques

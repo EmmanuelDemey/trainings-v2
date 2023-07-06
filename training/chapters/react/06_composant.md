@@ -9,8 +9,8 @@ layout: cover
 # Structure d'une application React
 
 * Une application est composée de composants React
-* Ces composants vont formés un arbre de composants
-* A chaque fois qu'un composant est "modifié", lui et ces enfants seront regénérés
+* Ces composants vont former un arbre de composants
+* A chaque fois qu'un composant est "modifié", lui et ses enfants seront regénérés
 * Algorithme de mise à jour se basant sur un Virtual DOM
 * Optimisation possible (memoization).
 * Vous pouvez utiliser une extention **React DevTools** afin de pouvoir debugger votre arbre de composants
@@ -223,33 +223,6 @@ export default CollapsiblePanel;
 
 ---
 
-# Higher Order Component
-
-* Un HoC est juste le fait d'appeler une méthode qui :
-    * prend en paramètre un composant
-    * retourne ce composant avec des fonctionnalités supplémentaires.
-
-```javascript
-const withTranslation = Component => EnhancedComponent;
-// withTranslation(UserCard)
-```
-
----
-
-# Higher Order Component
-
-```javascript
-// const AppWithPreference = withPreferences(App)
-function withPreferences(WrappedComponent) {
-  return () => {
-    const preferences = localStorage.getItem('preferences');
-    return <WrappedComponent preferences={preferences} {...this.props} />;
-  };
-}
-```
-
----
-
 # Structure du projet
 
 * Deux structures de projets sont possibles
@@ -349,3 +322,38 @@ const CustomButton = ({ label, ...props }: CustomButtonProps) => {
 };
 ```
 
+---
+layout: cover
+---
+
+# Travaux Pratiques
+
+---
+
+# Higher Order Component
+
+* Un HoC est juste le fait d'appeler une méthode qui :
+    * prend en paramètre un composant
+    * retourne ce composant avec des fonctionnalités supplémentaires.
+
+```javascript
+const withTranslation = Component => EnhancedComponent;
+// withTranslation(UserCard)
+```
+
+* Vous allez retrouver ce pattern dans de nombreuses librairies
+
+```javascript
+// const AppWithPreference = withPreferences(App)
+function withPreferences(WrappedComponent) {
+  return () => {
+    const preferences = localStorage.getItem('preferences');
+    return <WrappedComponent preferences={preferences} {...this.props} />;
+  };
+}
+```
+
+---
+src: ./includes/06_css.md
+hide: false
+---
