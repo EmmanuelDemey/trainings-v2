@@ -234,6 +234,13 @@ export class UserService {
 
 ---
 
+# Reactivité - Signals
+
+
+* Depuis Angular 16, l'API des **Signals** est en *Developer Preview*
+
+---
+
 ---
 layout: cover
 ---
@@ -247,14 +254,50 @@ layout: cover
 * Voici des examples d'operateurs
 
 * `of`
-* `interval`
-* `combineLatest`
-* `merge`
-* `map`
-* `disctingUntilChanged`
-* `mergeMap` ou `switchMap`
+* `map` et `filter`
+* `switchMap`
+* `catchError`
 * `tap`
 * `takeUntil`
+* `debounceTime`
+* `disctingUntilChanged`
+* `combineLatest`
+
+---
+
+# `of`
+
+---
+
+# `map` et `filter`
+
+---
+
+# `switchMap`
+
+---
+
+# `catchError`
+
+---
+
+# `tap`
+
+---
+
+# `takeUntil`
+
+---
+
+# `debounceTime`
+
+---
+
+# `disctingUntilChanged`
+
+---
+
+# `combineLatest`
 
 ---
 layout: cover
