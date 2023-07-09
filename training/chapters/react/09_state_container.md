@@ -57,9 +57,9 @@ npm install redux react-redux redux-logger
 export function count(state, action) {
   switch (action.type) {
     case "INC":
-      return state + action.payload;
+      return state.value + action.payload;
     case "DECR":
-      return state - action.payload;
+      return state.value - action.payload;
     default:
       return state;
   }
@@ -79,7 +79,9 @@ import { count } from "./reducer";
 
 const store = createStore(
   count,
-  0,
+  {
+    value: 0
+  },
   compose(applyMiddleware(createLogger())
 );
 export default store;
@@ -178,14 +180,14 @@ import { connect } from "react-redux";
 
 const mapStateToProps = (state) => {
   return {
-    count: state.count, 
+    count: state.count.value, 
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    inc: () => dispatch({ type: 'INCREMENT' }),
-    decr: () => dispatch({ type: 'DECREMENT' }),
+    inc: (p) => dispatch({ type: 'INCREMENT', payload: p }),
+    decr: (p) => dispatch({ type: 'DECREMENT' paryload: p}),
   }
 }
 
@@ -206,7 +208,7 @@ import { useDispatch, useSelector} from "react-redux";
 import { getCount } from "./store";
 
 export default () => {
-  const count = useSelector(state => getCount(state))
+  const count = useSelector(state => state.count.value)
   const dispatch = useDispatch();
   const inc = (p) => dispatch({ type: 'INC', payload: p})
   const decr = (p) => dispatch({ type: 'DECR', payload: p})
@@ -232,8 +234,8 @@ export default () => {
 
 import { connect } from "react-redux";
 
-export const getCounter = (state) => state;
-export const isGreaterThan = (state, limit) => state > limit;
+export const getCounter = (state) => state.count.value;
+export const isGreaterThan = (state, limit) => state.count.value > limit;
 
 const mapStateToProps = (state) => {
   return {
@@ -263,21 +265,13 @@ export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
 export const INC = 'INC';
 export const DECR = 'DECR';
 
-export const getCount = state => state;
+export const getCount = state => state.count.value;
 
 export const incr = (p) => ({ type: INC, payload: p});
 export const decr = (p) => ({ type: DECR, payload: p});
 
 export default function reducer(state, action) {}
 ```
-
----
-
-# Outils
-
-* Nous vous conseillons d'installer les outils suivants :
-  * React Redux : Plugin Chrome
-  * Redux Toolkit : Librairie utilitaire permettant "simplifier" la création d'un store.
 
 ---
 

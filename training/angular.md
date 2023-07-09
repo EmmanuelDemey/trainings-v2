@@ -109,6 +109,25 @@ export class RootComponent {
 
 ---
 
+# ngFor - trackBy
+
+* Syntaxe permettant d'identifier un élément dans la liste de données manipulée par le **ngFor**
+* Permet d'améliorer les performances de l'application 
+
+```html
+<li *ngFor="let item of items; index as i; trackBy: trackByFn">...</li>
+```
+
+```typescript
+class Component {
+  public userTrackBy(index, user) {
+    return user.id;
+  }
+}
+```
+
+---
+
 # NgSwitch
 
 ---
@@ -332,4 +351,17 @@ const routes = [
     ]
   }
 ];
+```
+
+---
+
+# Tests E2E
+
+* Historiquement, Angular proposé une intégration de **Protractor**
+* **Protractor** est à présent déprécié, mais Angular propose des intégrations à des solutions connues
+** Cypress
+** Nighwatch
+
+```shell
+npx @angular/cli e2e
 ```

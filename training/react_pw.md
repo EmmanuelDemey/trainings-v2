@@ -333,9 +333,6 @@ Nous allons ensuite externaliser le code créé précédemment dans trois compos
 * `PeopleTable` : Ce composant aura en charge la génération du tableau.
 * `PeopleItem` : Ce composant aura en charge la génération d'un item du tableau.
 
-Nous vous conseillons d'ajouter les `PropTypes` au fur et à mesure afin de bénéficier des warnings si vous utilisez le composant de la mauvaise façon.
-
-
 Comme partie bonus, nous allons créer une méthode `withTitle` pour définir un HoC. Ce HoC aura pour but de définir le titre de la page.
 Cette méthode sera utilisée de cette façon.
 
@@ -343,7 +340,7 @@ Cette méthode sera utilisée de cette façon.
 const componentWithTitle = withTitle(Component, 'Titre de la page');
 ```
 
-## PW7 - Hook
+## PW6 - Hook
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
@@ -394,7 +391,7 @@ const [data, loading] = useFetch();
 
 Si vous avez fait la partie bonus précédente, il se peut que ce hook gère plus de choses.
 
-## PW8 - React Router
+## PW7 - React Router
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
@@ -430,7 +427,7 @@ function getIDFromUrl(url: string){
 }
 ```
 
-## PW9 - State Container
+## PW8 - State Container
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
@@ -442,28 +439,14 @@ Dans ce TP, nous allons ajouter la fonctionnalité permettant d'aimer des person
 Avant de commencer, nous devons tout d'abord installer les dépendances nécessaires.
 
 ```shell
-npm install redux react-redux redux-logger
+npm install redux react-redux @reduxjs/toolkit
 ```
 
 Les actions qui pourront étre exécutées par l'utilisateur sont des actions permettant d'aimer (LIKE) ou ne plus aimer (DISLIKE) un personnage.
 
-Nous allons commencer tout d'abord par le reducer de notre store.
-Implémentez une méthode `starWarsLike` qui, en fonction de ces paramètres `state` et `action`, retourne la nouvelle valeur du `state`.
+Nous allons commencer tout d'abord par le slice permettant de gérer le tableau de personnages aimés.
 
-Une fois ce reducer défini, nous pouvons créé notre store. Pour cela nous allons faire appel à la méthode `createStore`.
-Afin de faciliter le debogage , nous allons ajouter le middleware `redux-logger`.
-
-```javascript
-import { createLogger } from "redux-logger";
-import { createStore, applyMiddleware, compose } from "redux";
-import { starWarsLike } from "./starWarsLike";
-
-const store = createStore(
-  starWarsLike,
-  [],
-  compose(applyMiddleware(createLogger()))
-);
-```
+Une fois ce slice défini, nous pouvons créer notre store. Pour cela nous allons faire appel à la méthode `createStore`.
 
 Dans l'ensemble de notre application, nous allons avoir besoin de deux informations relatives au `store`
 * Le nombre de personnages mis en favoris
@@ -498,7 +481,7 @@ Connectez les composants `Home` et `PeopleItem` permettant d'implémenter le fon
 
 
 
-## PW10 - Internationalisation
+## PW9 - Internationalisation
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 

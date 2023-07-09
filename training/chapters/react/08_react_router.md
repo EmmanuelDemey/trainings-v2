@@ -51,11 +51,18 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import Contact from './contact';
 
-const router = createBrowserRouter([{
+const router = createBrowserRouter([
+  {
+    path: "contact/:id",
+    element: <Contact />,
+  },
+  {
     path: "about",
     element: <div>About</div>,
-}]);
+  }
+]);
 
 const App =  () => (
     <RouterProvider router={router} />
