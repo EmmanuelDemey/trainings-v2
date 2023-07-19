@@ -2,11 +2,11 @@
 layout: cover
 ---
 
-# React Query
+# TanStack Query
 
 --- 
 
-# React Query
+# TanStack Query
 
 * React Query est une librairie permettant de simplifier la gestion des appels APIs
   * Gestion de l'état du traitement asynchrone
@@ -28,11 +28,15 @@ import {
    QueryClient,
    QueryClientProvider,
  } from 'react-query'
- import { getTodos, postTodo } from '../my-api'
+import { getTodos, postTodo } from '../my-api'
 
- // Create a client
- const queryClient = new QueryClient()
-
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: Infinity
+		}
+	}
+})
  function App() {
    return (
      // Provide the client to your App
@@ -51,7 +55,7 @@ import {
 
 ```javascript
 function Todos() {
-   const { data, isLoading } = useQuery('todos', () => fetch(...).then(response => response.json()))
+   const { data } = useQuery('todos', () => fetch(...).then(response => response.json()))
 
    return (
      <div>
@@ -63,6 +67,47 @@ function Todos() {
      </div>
    )
  }
+```
+
+---
+
+# Queries
+
+* Voici une liste des propriétés retournées par l'utilisation du hook `useQuery`
+  * isLoading
+  * isError
+  * isSuccess
+  * isIdle
+  * error
+  * data
+  * status
+
+---
+
+# Queries
+
+* Voici un exemple complet de **useQuery**
+
+```typescript
+function Todos() {
+  const { isLoading, isError, data, error } = useQuery('todos', fetchTodoList)
+
+  if (isLoading) {
+    return <span>Loading...</span>
+  }
+
+  if (isError) {
+    return <span>Error: {error.message}</span>
+  }
+
+  return (
+    <ul>
+      {data.map(todo => (
+        <li key={todo.id}>{todo.title}</li>
+      ))}
+    </ul>
+  )
+}
 ```
 
 ---
@@ -85,13 +130,9 @@ function Todos() {
 
    return (
      <div>
-       <ul> ... </ul>
        <button
          onClick={() => {
-           mutation.mutate({
-             id: Date.now(),
-             title: 'Do Laundry',
-           })
+           mutation.mutate({ ... })
          }}
        >
          Add Todo

@@ -1,6 +1,6 @@
 # Formation React
 
-Dans cette application, nous allons développer une application permettant la visualisation des personnages des films Star Wars.
+Durant cette formation, nous allons développer une application permettant la visualisation des personnages des films Star Wars.
 
 ## PW1 - Getting Started
 
@@ -278,7 +278,7 @@ Dans ce fichier, déclarez une variable contenant cette valeur :
 ]
 ```
 
-Dans un prochain TP, nous récupérons cette donné directement depuis l'API swapi.
+Dans un prochain TP, nous récupérons cette donnée directement depuis l'API swapi.
 
 Dans l'implementation du composant `App`, ajoutez ce template HTML
 
@@ -347,7 +347,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 * Hook[https://fr.reactjs.org/docs/hooks-intro.html]
 * https://swapi.dev/[SWAPI]
 
-Dans les travaux précédents, les données étaient définies en mémoire. Nous allons dans ce TP, récupéz les données
+Dans les travaux précédents, les données étaient définies en mémoire. Nous allons dans ce TP récuper les données
 depuis l'API REST swapi.
 
 Nous allons tout d'abord supprimer le tableau défini précédemment
@@ -559,3 +559,23 @@ Dans le composant `DumbHome`, ajoutez deux boutons permettant de choisir la lang
 </div>
 ```
 
+## PW10 - Formik
+
+Afin de mettre en place **Formik** sur notre application, un TP a été ajouté permettant de s'initier à ce module. 
+
+Dans la page affichant le détail d'un personnage, nous allons à présent mettre un formulaire (rien ne se passera au click sur le bouton submit malheureusement, car nous n'avons pas la main en écriture sur l'API).
+
+Dans le formulaire, vous devez resepectez les contraintes suivantes : 
+* Le nom est obligatoire
+* La propriété *hair_color* doit utiliser un composant *select*
+* La propriété *gender* doit utiliser des *radios*
+* La propriété *height* doit obligatoirement être supérieur à 0
+
+A fin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates. 
+
+
+
+
+## PW11 - TanStack Query
+
+Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)

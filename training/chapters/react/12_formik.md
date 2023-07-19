@@ -20,9 +20,53 @@ npm i formik
 
 ---
 
-# useFormik hooks
+# Formik - Utilisation 
 
-* L'une des solutions proposées est d'utiliser le hook `useFormik`;
+* Nous avons trois syntaxes pour utiliser **Formik** dans une application 
+  * Utilisation d'un composant React **Formik**
+  * Utilisation d'un jook **useFormik**
+  * Utilisation d'un HOC **withFormik**
+
+---
+
+
+# Formik - Utilisation 
+
+* Voici un exemple avec le composant `Formik`;
+
+```javascript
+import { Formik } from 'formik';
+
+const SignupFormComponent = () => {
+    return (
+     <Formik
+        initialValues={{
+          email: '',
+        }}
+        onSubmit={values => ... }
+     >{({
+        handleSubmit, handleChange, values
+      }) => (
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="email">Email Address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          onChange={handleChange}
+          value={values.email}
+        />
+      </form>
+      )}</Formik>
+    );
+};
+```
+
+--- 
+
+# useFormik hook
+
+* Voici un exemple similaire via l'utilisation du hook `useFormik`;
 
 ```javascript
 import { useFormik } from 'formik';
@@ -32,9 +76,7 @@ const SignupFormComponent = () => {
      initialValues: {
        email: '',
      },
-     onSubmit: values => {
-       alert(JSON.stringify(values, null, 2));
-     },
+     onSubmit: values => { ... },
     });
     return (
      <form onSubmit={formik.handleSubmit}>
@@ -54,6 +96,50 @@ const SignupFormComponent = () => {
 ```
 
 ---
+
+# withFormik
+
+* Voici un exemple similaire via l'utilisation du HOC `withFormik`;
+
+```javascript
+import { withFormik } from 'formik';
+
+const SignupFormComponent = ({ handleSubmit, handleChange, values}) => {
+    return (
+     <form onSubmit={handleSubmit}>
+       <label htmlFor="email">Email Address</label>
+       <input
+         id="email"
+         name="email"
+         type="email"
+         onChange={handleChange}
+         value={values.email}
+       />
+
+       <button type="submit">Submit</button>
+     </form>
+    );
+};
+export default withFormik({
+  initialValues: { email: '' },
+  onSubmit: values => { ... },
+})(SignupFormComponent)
+```
+
+---
+
+# Propriétés retournés par useFormik et Formik
+
+* Voici une liste partielle des propriétés retournés par le hook *useFormik* ou le composant *Formik*
+  * values
+  * errors
+  * touched
+  * handleChange
+  * handleBlur
+  * handleSubmit
+  * isSubmitting
+
+--- 
 
 # Validation
 
@@ -126,3 +212,55 @@ un message d'erreur
     />
 {formik.errors.email ? <div>{formik.errors.email}</div> : null}
 ```
+
+---
+
+# useField
+
+* Nous pouvons intéragir avec le composant **Formik** dans un composant enfant, via l'utilisation du hook *useField* (merci le **Context**).
+
+```typescript
+import React from 'react';
+import { useField, Form, FormikProps, Formik } from 'formik';
+
+const MyTextField = ({ label, ...props }) => {
+  const [field, meta, helpers] = useField(props);
+  return (
+    <>
+      <label>
+        {label}
+        <input {...field} {...props} />
+      </label>
+      {meta.touched && meta.error ? (
+        <div className="error">{meta.error}</div>
+      ) : null}
+    </>
+  );
+};
+```
+
+---
+
+# useField
+
+```typescript
+const Example = () => (
+  <div>
+    <h1>My Form</h1>
+    <Formik ...>
+      {(props: FormikProps<Values>) => (
+        <Form>
+          <MyTextField name="firstName" type="text" label="First Name" />
+          <button type="submit">Submit</button>
+        </Form>
+      )}
+    </Formik>
+  </div>
+);
+```
+
+---
+layout: cover
+---
+
+# Travaux Pratiques

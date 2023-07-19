@@ -81,8 +81,7 @@ const store = createStore(
   count,
   {
     value: 0
-  },
-  compose(applyMiddleware(createLogger())
+  }
 );
 export default store;
 ```
@@ -92,6 +91,53 @@ export default store;
 # Redux - Création
 
 * Dans une vraie application, nous allons avoir plusieurs **Reducers**
+
+```javascript
+import { createStore, combineReducers, applyMiddleware, compose } from "redux";
+import { createLogger } from "redux-logger";
+import { todos } from './todos'
+import { count } from './count'
+
+const store = createStore(
+  combineReducers({
+    todos,
+    count
+  }),
+  {},
+  compose(applyMiddleware(createLogger())
+);
+export default store;
+```
+
+---
+
+# Redux - Middlewares
+
+* Nous pouvons associer des *middlewares* à Redux. 
+* Ils seront exécutés à chaque actions émises.
+
+```typescript
+const middleware: ThunkMiddleware<State, BasicAction, ExtraThunkArg> =
+  ({ dispatch, getState }) =>
+  next =>
+  action => {
+    // The thunk middleware looks for any functions that were passed to `store.dispatch`.
+    // If this "action" is really a function, call it and return the result.
+    if (typeof action === 'function') {
+      // Inject the store's `dispatch` and `getState` methods, as well as any "extra arg"
+      return action(dispatch, getState, extraArgument)
+    }
+
+    // Otherwise, pass the action down the middleware chain as usual
+    return next(action)
+  }
+```
+
+---
+
+# Redux - Middlewares
+
+* Voici un exemple avec le middleware **redux-logger**.
 
 ```javascript
 import { createStore, combineReducers, applyMiddleware, compose } from "redux";
