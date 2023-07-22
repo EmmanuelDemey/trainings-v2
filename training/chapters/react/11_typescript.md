@@ -1,7 +1,4 @@
----
-layout: cover
----
-
+@cover
 # TypeScript
 
 ---

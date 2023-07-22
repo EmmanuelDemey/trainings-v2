@@ -26,7 +26,6 @@ css: unocss
 ---
 
 # React.js
-
 ---
 src: ./chapters/react/11_typescript.md
 hide: false
