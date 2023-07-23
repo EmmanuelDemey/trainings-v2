@@ -74,6 +74,29 @@ Done in 3.53s.
 
 ---
 
+# Execution 
+
+Pour exécuter une fichier typescript, nous avons deux solutions
+
+* Une compilation via **tsc** et ensuite vous exécutez via **node**
+
+```shell
+tsc index.ts
+node index.js
+```
+
+* Une compilation et une exécution via **ts-node**
+
+```shell
+ts-node index.ts
+```
+
+---
+
+# Type Guards
+
+---
+
 # Generics
 
 ---
