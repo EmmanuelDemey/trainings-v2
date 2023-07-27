@@ -26,3 +26,82 @@ css: unocss
 ---
 
 # Git
+
+---
+
+# Introduction à Git :
+
+---
+
+# Configuration initiale
+
+---
+
+# Concepts fondamentaux de Git
+
+---
+
+# Commandes de base
+
+---
+
+# git init 
+
+---
+
+# git add
+
+---
+
+# git commit
+
+---
+
+# git status
+
+---
+
+# git log
+
+---
+
+# git diff
+
+
+---
+
+# Gestion des branches
+
+---
+
+# Travail collaboratif avec Git
+
+---
+
+# Fonctionnalités avancées
+
+---
+
+# Git stash
+
+---
+
+# Git rebase
+
+---
+
+# Git cherry-pick
+
+---
+
+# Git reset
+
+---
+
+# Bonnes pratiques et workflows
+
+---
+
+# Utilisation de plateformes de collaboration 
+
+---

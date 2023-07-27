@@ -127,7 +127,7 @@ Pour lancer les tests, vous pouvez exécuter la commande suivante :
 npm run test
 ```
 
-# PW3 - Outillage
+## PW3 - Outillage
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 

@@ -12,7 +12,13 @@
     "@slidev/theme-seriph": "*"
   },
   "devDependencies": {
+    "@types/node": "^20.4.4",
+    "fs-extra": "^11.1.1",
+    "just-kebab-case": "^4.2.0",
+    "kebab-case": "^1.0.2",
     "md-to-pdf": "^5.2.4",
-    "playwright-chromium": "^1.35.1"
+    "n-readlines": "^1.0.1",
+    "playwright-chromium": "^1.35.1",
+    "replace-in-file": "^7.0.1"
   }
 }
