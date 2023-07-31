@@ -37,6 +37,30 @@ css: unocss
 
 ---
 
+
+# Les classes et l'héritage en TypeScript
+
+---
+
+
+# Les Scopes
+
+* Sur les variables d'instances, de nombreux *keywords* peuvent être utilisés. 
+  * private
+  * public
+  * protected
+  * readonly
+
+```typescript
+export class UserController {
+  private name: string;
+
+  readonly private service: UserService;
+}
+```
+
+---
+
 # Les types avancés
 
 * Nous allons aborder dans cette partie les types avancés proposés par le langage
@@ -189,10 +213,6 @@ const validateAge = (age: number | string) => {
   }
 };
 ```
-
----
-
-# Les classes et l'héritage en TypeScript
 
 ---
 
