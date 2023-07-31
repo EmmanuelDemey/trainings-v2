@@ -234,6 +234,15 @@ export class UserService {
 
 ---
 
+# State Container 
+
+* Si vous souhaitez utiliser des librairies similaires à l'écosystème Redux en React, nous pouvons utiliser 
+  * Akita
+  * NGXS
+  * NGRX
+
+---
+
 # Reactivité - Signals
 
 
