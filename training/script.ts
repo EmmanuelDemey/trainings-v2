@@ -1,3 +1,5 @@
+import {cpSync, existsSync} from "fs";
+
 const { execSync } = require("child_process");
 const fs = require("fs");
 const { mdToPdf } = require("md-to-pdf");
@@ -7,17 +9,26 @@ const kebabCase = require("just-kebab-case");
 const targetDist = "dist";
 const fse = require('fs-extra');
 
-const generateAstroWebSite = (pw: string, dest: string): Promise<void> => {
-  if(pw === 'angular_pw.md'){
-    return Promise.resolve();
-  }
-  const distFolder = join(dest, pw.replace("pw.md", "website__"));
+const TRAINING_PLATFORM_HIDDEN_FOLDER = join(__dirname, ".training_platform");
+
+const downloadAstroTemplate = (distFolder: string) => {
   execSync(`npm create astro@latest -- ${distFolder} --no-install --template starlight --no-git --typescript strict`, { stdio: 'inherit'})
   execSync(`cd ${distFolder}`, { stdio: 'inherit'});
   process.chdir(distFolder);
   execSync(`npm i`, { stdio: 'inherit'});
   process.chdir(__dirname)
+}
+const generateAstroWebSite = (pw: string, dest: string): Promise<void> => {
+  if(pw === 'angular_pw.md'){
+    return Promise.resolve();
+  }
+  const distFolder = join(dest, pw.replace("pw.md", "website__"));
+  if(!existsSync(TRAINING_PLATFORM_HIDDEN_FOLDER)){
+    downloadAstroTemplate(TRAINING_PLATFORM_HIDDEN_FOLDER);
+  }
 
+  fse.copySync(TRAINING_PLATFORM_HIDDEN_FOLDER, distFolder);
+  
   try {
     const nReadlines = require("n-readlines");
     const broadbandLines = new nReadlines(pw);
