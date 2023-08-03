@@ -13,6 +13,16 @@
 
 ---
 
+# IDE
+
+* Plusieurs IDE peuvent être utilisée pour écrire du code TypeScript
+  * WebStorm
+  * Intellij IDEA
+  * Visual Studio Code
+    * ajout de l'extension **yoavbls.pretty-ts-errors**
+
+---
+
 # Types
 
 * Nous pouvons :
