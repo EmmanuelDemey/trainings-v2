@@ -4,12 +4,13 @@ Durant cette formation, nous allons développer une application permettant la vi
 
 ## PW1 - Getting Started
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://fr.reactjs.org/[React]
-* https://create-react-app.dev/[create-react-app]
-* https://bulma.io/[Bulma]
-
+* [React](https://fr.reactjs.org/)
+* [create-react-app](https://create-react-app.dev/)
+* [Bulma](https://bulma.io/)
+:::
 
 Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `create-react-app`.
 
@@ -106,13 +107,14 @@ npx serve
 
 ## PW2 - Tests unitaires
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://jestjs.io/[Jest]
-* https://github.com/testing-library/jest-dom[Liste de matchers]
+* [Jest](https://jestjs.io/)
+* [Liste de matchers](https://github.com/testing-library/jest-dom)
+:::
 
-Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez
-l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
+Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
 
 La seule chose à faire dans ce TP est de modifier le test unitaire existant afin de coller avec les modifications apportées dans le TP précédent.
 
@@ -129,9 +131,11 @@ npm run test
 
 ## PW3 - Outillage
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://www.cypress.io/[Cypress]
+* [Cypress](https://www.cypress.io/)
+:::
 
 Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
 
@@ -156,13 +160,15 @@ Vous devez à présent supprimer les tests générés et créer vos propres test
 
 ## PW4 - Template
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array/map[Array.prototypemap]
+* [Array.prototypemap](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array/map)
+:::
 
 Dans ce TP, nous allons afficher des personnages de Star Wars. Nous n'allons pas créer de nouveaux composants ou encore récupérer les données depuis une API Rest pour le moment.
 
-Tout se fera en mémoire pour le moment et dans le fichier `App.js`.
+Tout se fera en mémoire pour le moment et dans le fichier `App.tsx`.
 
 Dans ce fichier, déclarez une variable contenant cette valeur :
 
@@ -289,7 +295,6 @@ Dans l'implementation du composant `App`, ajoutez ce template HTML
       <th>Nom</th>
       <th>Genre</th>
       <th>Année de naissance</th>
-
     </tr>
   </thead>
   <tbody>
@@ -306,9 +311,11 @@ Vous devez ensuite générer autant de balise `tr` que de personnages à affiche
 
 ## PW5 - Composant
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://fr.reactjs.org/docs/react-component.html[React Components]
+* [React Components](https://fr.reactjs.org/docs/react-component.html)
+:::
 
 
 Nous allons à présent ajouter un champ de recherche permettant de filtrer les personnages. Juste au dessus du tableau, ajoutez le code HTML ci-dessous :
@@ -316,22 +323,18 @@ Nous allons à présent ajouter un champ de recherche permettant de filtrer les 
 ```html
 <div className="field">
     <div className="control">
-        <input
-        className="input is-info"
-        type="text"
-        />
+        <input className="input is-info" type="text" />
     </div>
 </div>
 ```
-
-Vous etes pour l'instant incapable de filtre la liste de personnages, car nous n'avons pas encore aborder les hooks. Pour le moment,
-affichez dans la console la valeur du champ de formulaire dès que l'utilisateur insère une lettre.
 
 Nous allons ensuite externaliser le code créé précédemment dans trois composants bien spécifique :
 
 * `PeopleFilter` : Ce composant aura en charge de gérer le champ de formulaire permettant de filtrer les personnages
 * `PeopleTable` : Ce composant aura en charge la génération du tableau.
 * `PeopleItem` : Ce composant aura en charge la génération d'un item du tableau.
+
+Veuillez faire le nécessaire pour que le tableau de personnages soit soit filtré à chaque lettre insérée dans le champ de formulaire. 
 
 Comme partie bonus, nous allons créer une méthode `withTitle` pour définir un HoC. Ce HoC aura pour but de définir le titre de la page.
 Cette méthode sera utilisée de cette façon.
@@ -342,10 +345,12 @@ const componentWithTitle = withTitle(Component, 'Titre de la page');
 
 ## PW6 - Hook
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* Hook[https://fr.reactjs.org/docs/hooks-intro.html]
-* https://swapi.dev/[SWAPI]
+* [https://fr.reactjs.org/docs/hooks-intro.html](Hook)
+* [SWAPI](https://swapi.dev/)
+:::
 
 Dans les travaux précédents, les données étaient définies en mémoire. Nous allons dans ce TP récuper les données
 depuis l'API REST swapi.
@@ -355,7 +360,7 @@ Nous allons tout d'abord supprimer le tableau défini précédemment
 Une fois cette étape réalisée, définissez un nouvelle variable d'état via le hook `useState`. Nous nommerons
 cette variable `people`. A présent c'est sur cette variable que vous devriez appliquer votre filtre.
 
-Via l'utilisation du hook `useEffect`, faites un requéte `GET` vers le endpoint : `https://swapi.dev/api/people/`. Faites attention à la structure de la réponse HTTP.
+Via l'utilisation du hook `useEffect`, faites une requéte `GET` vers le endpoint : `https://swapi.dev/api/people/`. Faites attention à la structure de la réponse HTTP.
 
 Nous allons également ajouter un `loader` dans les cas ou l'API pourrait prendre du temps pour répondre. Ce loader sera affiché en fonction d'une nouvelle donnée disponible dans une variable d'état du composant.
 
@@ -385,7 +390,7 @@ des données et la gestion de la variable `loading`.
 
 Ce hook s'utilisera de cette façon :
 
-```javascript
+```typescript
 const [data, loading] = useFetch();
 ```
 
@@ -393,9 +398,11 @@ Si vous avez fait la partie bonus précédente, il se peut que ce hook gère plu
 
 ## PW7 - React Router
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://reacttraining.com/react-router/web/guides/quick-start[React Router]
+* [React Router](https://reacttraining.com/react-router/web/guides/quick-start)
+:::
 
 Nous allons à présent ajouter une deuxième page à notre application. Cette page sera utilisée lorsque l'utilisateur cliquera sur le nom d'un personnage. Elle affichera les informations du personnage selectionné.
 
@@ -419,9 +426,9 @@ L'API utilisée ne retourne pas d'identifiant pour les objets.
 Vous pouvez tout de même en calculer un en se basant sur la propriété `url` de l'objet.
 Pour cela, vous pouvez utiliser la fonction suivante :
 
-```javascript
+```typescript
 // http://swapi.dev/api/people/1/
-function getIDFromUrl(url: string){
+function getIDFromUrl(url: string): string{
     const withoutPrefix = url.replace("https://swapi.dev/api/people/", "")
     return withoutPrefix.replace("/", "");
 }
@@ -429,10 +436,12 @@ function getIDFromUrl(url: string){
 
 ## PW8 - State Container
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://redux.js.org/basics/usage-with-react[React Redux]
-* https://bulma.io/documentation/elements/button/[Les boutons avec Bulma]
+* [React Redux](https://redux.js.org/basics/usage-with-react)
+* [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
+:::
 
 Dans ce TP, nous allons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un store Redux.
 
@@ -483,10 +492,12 @@ Connectez les composants `Home` et `PeopleItem` permettant d'implémenter le fon
 
 ## PW9 - Internationalisation
 
+:::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://react.i18next.com/[react-i18next]
-* https://bulma.io/documentation/elements/button/[Les boutons avec Bulma]
+* [react-i18next](https://react.i18next.com/)
+* [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
+:::
 
 Dans cette dernière partie pratique, nous allons internationaliser l'application.
 
@@ -496,7 +507,7 @@ Nous allons tout d'abord installer le module `react-i18next` en executant la com
 npm install react-i18next i18next
 ```
 
-Nous allons ensuite créer un fichier `i18n.js` dans lequel nous allons configurer le module.
+Nous allons ensuite créer un fichier `i18n.ts` dans lequel nous allons configurer le module.
 
 Dans ce fichier, nous allons tout d'abord définir les traductions pour le français et l'anglais des différentes chaines de caractéres
 de l'application (sauf celles affichant le nombre de personnages aimés par l'utilisateur )
@@ -527,7 +538,7 @@ npm install i18next-icu
 
 Une fois installé, nous devons l'ajouter à la configuration du module `react-i18next`.
 
-```javascript
+```typescript
 import ICU from "i18next-icu";
 
 ...
@@ -561,6 +572,12 @@ Dans le composant `DumbHome`, ajoutez deux boutons permettant de choisir la lang
 
 ## PW10 - Formik
 
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* [Formik](https://formik.org/)
+:::
+
 Afin de mettre en place **Formik** sur notre application, un TP a été ajouté permettant de s'initier à ce module. 
 
 Dans la page affichant le détail d'un personnage, nous allons à présent mettre un formulaire (rien ne se passera au click sur le bouton submit malheureusement, car nous n'avons pas la main en écriture sur l'API).
@@ -574,8 +591,12 @@ Dans le formulaire, vous devez resepectez les contraintes suivantes :
 A fin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates. 
 
 
-
-
 ## PW11 - TanStack Query
+
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* [TanStack Query](https://tanstack.com/query/latest/docs/react/overview)
+:::
 
 Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)
