@@ -140,6 +140,28 @@ class Component {
 
 ---
 
+# @Attribute
+
+* Dans une directive, si vous souhaitez récupérer, en lecture seule, la valeur d'un attribut présent sur l'élément sur lequel vous avez mis la directive, vous pouvez utiliser la directive **@Attribute**
+
+```typescript
+import { Directive, Attribute } from '@angular/core'
+@Directive({
+  selector: '[appType]'
+})
+export class TypeDirective {
+  constructor( @Attribute('type') private inputType: string) {
+    if(type === 'text'){
+      // ...
+    } else {
+      // ...
+    }
+  }
+}
+```
+
+---
+
 ---
 layout: cover
 ---
@@ -413,6 +435,40 @@ const routes = [
 ];
 ```
 
+---
+
+# Named Outlet
+
+* Nous pouvons avoir plusieurs *outlet* 
+  * Celle par défaut sera nomméé **primary**
+
+```typescript
+const routes: Routes= [{
+  path: 'products/:id', component: ProductListComponent
+}, {
+  path: 'products/:id', component:ProductSidebarComponent,outlet:'sidebar'
+}];
+```
+
+```html
+<a
+  [routerLink]="[{ 
+    outlets: { 
+      primary: ['products', '1'], 
+      sidebar: ['products', '1'] 
+    } 
+  }]"
+  >Product</a
+>
+<div class="row">
+  <div class="col-8">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="col-4">
+    <router-outlet name="sidebar"></router-outlet>
+  </div>
+</div>
+```
 ---
 
 # Tests E2E
