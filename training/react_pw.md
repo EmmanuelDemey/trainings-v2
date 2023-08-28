@@ -170,7 +170,7 @@ Dans ce TP, nous allons afficher des personnages de Star Wars. Nous n'allons pas
 
 Tout se fera en mémoire pour le moment et dans le fichier `App.tsx`.
 
-Dans ce fichier, déclarez une variable contenant cette valeur :
+Dans ce fichier, déclarez une variable contenant le tableau suivant :
 
 ```json
 [{
@@ -282,6 +282,31 @@ Dans ce fichier, déclarez une variable contenant cette valeur :
             "url": "http://swapi.dev/api/people/4/"
         }
 ]
+```
+
+
+Afin de bénéficier de toutes la puissance de TypeScript, vous pouvez typer la variable précédente en utilisant ce type. 
+
+```typescript
+type Person = {
+  name: string
+  height: string
+  mass: string
+  hair_color: string
+  skin_color: string
+  eye_color: string
+  birth_year: string
+  gender: string
+  homeworld: string
+  films: string[]
+  species: any[]
+  vehicles: string[]
+  starships: string[]
+  created: string
+  edited: string
+  url: string
+}
+type People = Array<Person>
 ```
 
 Dans un prochain TP, nous récupérons cette donnée directement depuis l'API swapi.

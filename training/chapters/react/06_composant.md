@@ -136,10 +136,9 @@ export default Title;
 ```javascript
 // <Title>Content Title</Title>
 type TitleProps = {
-    children: React.ReactNode
 };
 
-const Title = ( { children }: TitleProps ) => {
+const Title = ( { children }: TitleProps & PropsWithChildren ) => {
     return <h1> { children } </h1>
 }
 export default Title;
@@ -345,10 +344,10 @@ const withTranslation = Component => EnhancedComponent;
 
 ```javascript
 // const AppWithPreference = withPreferences(App)
-function withPreferences(WrappedComponent) {
-  return () => {
+function withPreferences(WrappedComponent: ComponentType) {
+  return (props: any) => {
     const preferences = localStorage.getItem('preferences');
-    return <WrappedComponent preferences={preferences} {...this.props} />;
+    return <WrappedComponent preferences={preferences} {props} />;
   };
 }
 ```
