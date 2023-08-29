@@ -410,7 +410,7 @@ export class SearchComponent implements OnInit {
 ```
 ---
 
-# Router
+# Router - Guard
 
 * Nous pouvons définir des **guards** afin de savoir si nous pouvons ou pas faire certaines choses avant un changement de page
   * `canActivate`
@@ -432,6 +432,39 @@ const routes = [
       (component: EditCmp) => !component.hasUnsavedChanges
     ]
   }
+];
+```
+
+---
+
+# Router - Guard
+
+* Pour configurer un guard fontionnel, vous pouvez par exemple créer une **factory** grâce à laquelle nous pourrons définir le paramètrage. 
+
+```typescript
+export const roleGuard = (role: 'MANAGER' | 'ADMIN'): CanActivateFn => {
+  const guard: CanActivateFn = () => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
+
+    const hasAccess = authService.hasRole(role);
+    return hasAccess ? true : router.createUrlTree(['/unauthorized']);
+  };
+
+  return guard;
+};
+
+export const routes: Routes = [
+  { 
+    path: 'admin', 
+    component: AdminComponent, 
+    canActivate: [roleGuard(ROLES.ADMIN)],
+  },
+  { 
+    path: 'manager', 
+    component: ManagerComponent,
+    canActivate: [roleGuard(ROLES.MANAGER)],
+  },
 ];
 ```
 
