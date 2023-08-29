@@ -54,12 +54,16 @@ npm install redux react-redux redux-logger
 * Il doit retourner le nouveau `state`
 
 ```javascript
-export function count(state, action) {
+export function count(state: { value: number}, action: { type: string, payload: number }) {
   switch (action.type) {
     case "INC":
-      return state.value + action.payload;
+      return {
+        value: state.value + action.payload
+      };
     case "DECR":
-      return state.value - action.payload;
+      return {
+        value: state.value - action.payload
+      }
     default:
       return state;
   }
@@ -94,7 +98,6 @@ export default store;
 
 ```javascript
 import { createStore, combineReducers, applyMiddleware, compose } from "redux";
-import { createLogger } from "redux-logger";
 import { todos } from './todos'
 import { count } from './count'
 
@@ -103,8 +106,7 @@ const store = createStore(
     todos,
     count
   }),
-  {},
-  compose(applyMiddleware(createLogger())
+  {}
 );
 export default store;
 ```
@@ -198,15 +200,20 @@ import store from "./store";
 
 ---
 
-# Redux - Conmposant connecté
+# Redux - Composant connecté
 
 * Dernière étape est de créer nos `DumbComponent` et `ConnectedComponent`
 * Toutes les données et actions récupérées par les composants connectés seront disponibles en `props` dans le `DumbComponent`
 
 ```javascript
+type DumbCounterProps = {
+  count: number;
+  inc: (value: number) => void,
+  decr: (value: number) => void
+}
 export const DumbCounter = ({
   count, inc, decr,
-}) => (
+}: DumbCounterProps) => (
   <>
     <button onClick={() => decr(1)}> -1 </button>
     <span> {count} </span>
@@ -217,7 +224,7 @@ export const DumbCounter = ({
 
 ---
 
-# Redux - Conmposant connecté
+# Redux - Composant connecté
 
 * Une fois le *Dumb component* créé, nous allons pouvois le connecter au store. 
 
@@ -232,8 +239,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    inc: (p) => dispatch({ type: 'INCREMENT', payload: p }),
-    decr: (p) => dispatch({ type: 'DECREMENT' paryload: p}),
+    inc: (p: number) => dispatch({ type: 'INCREMENT', payload: p }),
+    decr: (p: number) => dispatch({ type: 'DECREMENT' paryload: p}),
   }
 }
 
@@ -256,8 +263,8 @@ import { getCount } from "./store";
 export default () => {
   const count = useSelector(state => state.count.value)
   const dispatch = useDispatch();
-  const inc = (p) => dispatch({ type: 'INC', payload: p})
-  const decr = (p) => dispatch({ type: 'DECR', payload: p})
+  const inc = (p: number) => dispatch({ type: 'INC', payload: p})
+  const decr = (p: number) => dispatch({ type: 'DECR', payload: p})
 
   return (
       <>
@@ -276,8 +283,6 @@ export default () => {
 * Afin de faciliter l'accés au `store`, nous allons définir des sélecteurs
 
 ```javascript
-
-
 import { connect } from "react-redux";
 
 export const getCounter = (state) => state.count.value;
@@ -323,7 +328,7 @@ export default function reducer(state, action) {}
 
 # Redux Toolkit
 
-* Redux évolue et propose à présent une solution mieux packagé pour intéragir avec les Stores.
+* Redux évolue et propose à présent une solution mieux packagée pour intéragir avec les Stores.
 * Une partie d'un `store Redux` sera configuré via un `Slice`.
 * La méthode **createSlice** utilise **createAction**, **createReducer** et la librairie **Immer**.
 
@@ -354,7 +359,7 @@ export const counterSlice = createSlice({
 
 # Redux Toolkit
 
-* Un `slice` pour ainsi exposer
+* Un `slice` peut ainsi exposer
   * les actions que nous pourrons utiliser dans nos composants
   * le `reducer` que nous pourrons activer dans notre `store`
 
@@ -384,7 +389,7 @@ export default counterSlice.reducer
 
 * Enregistrement du `reducer` dans le `store`
 
-```javascript
+```typescript
 import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from '../features/counter/counterSlice'
 
