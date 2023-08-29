@@ -35,7 +35,36 @@ css: unocss
 
 # Configuration initiale
 
+* Pour intialiser un projet nous allons exécuter la commande suivante
+
+```shell
+git init
+```
+
+* Le resultat sera la création d'un répertoire *.git*
+
 ---
+
+# .gitconfig
+
+* Fichier de configuration permettant de configurer GIT. 
+  * Peut etre défini localement à un projet ou globalement à votre système. 
+
+```
+[init]
+  defaultBranch = main
+
+[help]
+  autocorrect = 8
+
+[core]
+  editor = \"C:\\Users\\Rob\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code\" --wait
+
+[alias]
+  hist = log --oneline --graph --decorate --all
+```
+
+--- 
 
 # Concepts fondamentaux de Git
 
