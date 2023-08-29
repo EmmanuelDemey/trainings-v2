@@ -39,6 +39,33 @@ export const Nav = () => {
 
 ---
 
+# CSS Modules
+
+* Vous pouvez également utiliser les **CSS Modules**
+* CRA fournit par défaut le support et l'outillage nécessaire. 
+* A la compilation, un classe CSS unique sera générée
+* Le fichier CSS doit absolument être suffixé par **.module.css**. 
+
+```css
+.nav {
+  ...
+}
+```
+
+```typescript
+import styles from './nav.module.css';
+
+export const Nav = () => {
+    return (
+        <nav className={styles.nav}>
+            ...
+        </nav>
+    );
+}
+```
+
+---
+
 # CSS-in-JS
 
 * Une autre syntaxe est également possible via le pattern `CSS-in-JS`

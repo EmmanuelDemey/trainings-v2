@@ -149,14 +149,14 @@ const Contact = lazy(() => import('./contact'));
 
 const router = createBrowserRouter([{
     path: "contact/:id",
-    element: <div>About</div>,
-}, {
-    path: "about",
     element: (
       <Suspense fallback={<Loading />}>
           <Contact />
       </Suspense>
-    ),
+    )
+}, {
+    path: "about",
+    element: <div>About</div>
 }]);
 
 const App =  () => (
