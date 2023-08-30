@@ -2,7 +2,7 @@
 
 Dans ce document, nous allons présenter la partie pratique de la formation. 
 
-## TP1 Présentation générale
+## TP XX Présentation générale
 
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -236,7 +236,34 @@ GET /_cluster/health
 
 Pouvez-vous expliquer pourquoi vous obtenez ce résultat ? Que pouvez-vous faire pour avoir un cluster dans un état `green` ?
 
-## TP 10 - SQL
+## TP2 - Schéma
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html[Mapping]
+
+Commencons par récupérer le `mapping` des index créés précédemment.
+
+```
+GET person-v2/_mapping
+```
+
+Créez un `template` afin de définir le mapping suivant (nous nous basons sur le jeu de données retournés par le site json-generator.com)
+
+* Les propriétés `picture` ne doit pas être indexé.
+* Les propriétés `eyeColor`, `gender`, `phone` ne doivent pas étre analysées.
+* Les propriétés `name`, `company`, `address`, `about` doivent être analysées (seule, cette représentation est utile).
+* Le champ `registered` doit étre de type `Date`. Vous devriez spécifier le format supporté. Pour nos données, le format à utiliser sera `yyyy-MM-dd`.
+* Convertissez l'object `location` en un objet de type `geo_point`
+
+Une fois le template créé, réindexez les documents de l'index `person-v2` dans un index `person-v3`.
+
+Modifiez l'alias `person` pour pointer vers `person-v3`
+
+Essayez de trouver des requêtes qui retournaient des résultats avec l'ancienne configuration, mais plus à présent. Essayez de comprendre pourquoi vous obtenez ce résultat.
+
+
+## TP XX - SQL
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
@@ -249,3 +276,39 @@ sur les agrégations.
 * Calculer le nombre de personnes par genre
 * Calculer le nombre de personnes par genre et par couleur des yeux
 * Calculer le nombre de personnes par genre et par année d'enregistrement (propriété `registered`).
+
+# TP XX - APM
+
+Nous allons initiliser une application Spring Boot, sur laquelle nous allons activer APM.
+
+* Installez, configurez et démarrez un serveur Elastic APM avec les informations de connexion données par le formatteur.
+* Nous allons utiliser le projet PetClinic pour tester APM. Executez la commande suivante :
+
+```
+git clone https://github.com/spring-projects/spring-petclinic
+```
+
+* Ajoutez la dépendance
+
+```xml
+<dependency>
+  <groupId>co.elastic.apm</groupId>
+  <artifactId>apm-agent-attach</artifactId>
+  <version>1.34.1</version>
+</dependency>
+````
+
+* Configurez l'agent APM.
+  * Ajoutez votre prénom dans le nom du service, afin de le différencier dans l'interface de Kibana
+  * Ajoutez l'URL du serveur APM
+  * Définissez l'environnement comme étant l'environnement de production
+
+* Démarrer votre application Spring Boot et assurer qu'à la première requête HTTP reçue, un log sera envoyé dans Elasticsearch.
+* Jetez un coup d'oeil au `Service Map` et assurez-vous que la base de données `h2` utilisée est bien visible.
+
+* Dupliquez le projet Spring Boot
+  * Modifiez le port HTTP utilisé (utilisant le paramètre `server.port` dans le fichier de configuration application.properties)
+  * Ajouter APM sur cette deuxième instance (avec un nom différent)
+  * Faite le nécessaire que pour le endpoint '/vets' du premier service appel le endpoint '/vets' du deuxième.
+  * Assurez-vous que les informations arrivent correctement dans APM et qu'une transaction est composé de `span` exécutés par les deux services.
+* Créez une page web permettant de consommer le endpoint `/vets` et ajoutez une intégration RUM
