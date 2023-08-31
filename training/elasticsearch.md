@@ -40,6 +40,31 @@ hide: false
 ---
 
 ---
+src: ./chapters/elasticsearch/03_schema.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/04_recherche.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/05_agregation.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/06_ingest.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/07_operating.md
+hide: false
+---
+
+---
 src: ./chapters/elasticsearch/10_sql.md
 hide: false
 ---

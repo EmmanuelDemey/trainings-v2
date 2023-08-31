@@ -134,3 +134,9 @@ git init
 # Utilisation de plateformes de collaboration 
 
 ---
+
+# Pour aller plus loin 
+
+[Git, sous le capot (David Blanchet)](https://www.youtube.com/watch?v=Ns1_jDbB0Xg)
+
+---

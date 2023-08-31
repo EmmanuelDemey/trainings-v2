@@ -262,6 +262,123 @@ Modifiez l'alias `person` pour pointer vers `person-v3`
 
 Essayez de trouver des requêtes qui retournaient des résultats avec l'ancienne configuration, mais plus à présent. Essayez de comprendre pourquoi vous obtenez ce résultat.
 
+## TP3 - Recherche
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html[Query DSL]
+
+Nous allons à présent faire des recherches sur le jeu de données que nous venons d'indexer. Pour cela, le formateur vous proposera une requête bulk afin d'indexer un plus grand nombre de documents.
+
+Exécutez des requêtes permettant de répondre aux questions suivantes :
+
+* Combien de personnes sont des femmes ?
+* Combien de personnes ont un age supérieur à 20 ans ?
+* Combien d'hommes ont un age supérieur à 20 ans ?
+* Retournez toutes les personnes qui ont un age supérieur à 20 ans, et dont la balance est comprise entre $1000 et $2000. (vous devriez avoir quelques problèmes sur ce point)
+* Trouvez toutes les personnes qui sont situées à moins de 10km de Paris.
+
+Pour les personnes ayant de l'avance dans la partie pratique, vous pouvez continuer avec les actions suivantes :
+
+* Depuis Kibana, essayer de faire depuis la page `Discover` les mêmes recherches que celles définies précédemment.
+
+## TP4 - Agrégation
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html[Aggregations]
+
+Nous allons dans cette partie pratique réaliser des requêtes d'agrégations sur les données que nous venons d'indexer.
+
+* Calculer l'age moyen des personnes indexées
+* Calculer le nombre de personnes par genre
+* Calculer le nombre de personnes par genre et par couleur des yeux
+* Calculer le nombre de personnes par genre et par année d'enregistrement (propriété `registered`).
+* Par année, calculer la répartition des genres (male/female) et l’âge moyen des personnes. ET, récupérer l’année ou l’âge moyen est le plus élevé.
+* Modifier la requête précédente pour n'obtenir que les buckets des années ou l’âge moyen est supérieur à 28.
+* Modifier la requête précédente pour savoir qui est la personne la plus agée de cette `bucket` créée précédemment. Restituer uniquement certaines informations (name, âge).
+
+Pour les personnes ayant de l'avance dans la partie pratique, vous pouvez continuer avec les actions suivantes :
+
+* Vous pouvez essayer de les implémenter également via des widgets Kibana.
+
+## TP5 - Ingest
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/7.10/ingest.html[Ingest Node]
+
+Les documents que nous avons indexé depuis le début de cette formation possédent une propriété correspondant à une valeur monétaire (`balance`).
+
+Vous devez mettre en place un pipeline d'ingestion permettant de supprimer la devise de chaque valeur, convertir la donnée en flottant et l'enregistrer dans une nouvelle propriété `convertedBalance`.
+
+Une fois ce pipeline testé et créé dans Elasticsearch, vous pouvez réindexer les données de l'index `person-v3` dans un nouvel index `person-v4` en utilisant cette pipeline.
+
+Essayer de réaliser une requête `range` sur le champ `balance`.
+
+Une fois les données réindexées, vérifier qu'une requête de type `range` sur le champ `convertedBalance` fonctionne.
+
+## TP7 - Operating
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles : 
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore-apis.html[Snapshot and restore API
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html[Cluster stats API]
+
+Dans ce TP, je vous propose de mettre en place trois choses : 
+
+* Nous allons tout d'abord démarrer un nouveau noeud dans notre cluster.
+
+Pour cela, nous allons tout d'abord copier le répertoire `config` dans un autre répertoire que nous nommerons `config2`. 
+
+Dans le fichier `elasticsearch.yml` de ce nouveau répertoire, modifiez les propriétés suivantes :
+
+* node.name: node-2
+* path.data: <-- afin de pointer vers autre répertoire que le noeud 1 -->
+* path.logs: <-- afin de pointer vers autre répertoire que le noeud 1 -->
+
+Une fois cette configuration réalisée, lancez le nouveau noeud. Vous trouverez ci-dessous les commandes pour Linux/MacOS (modifiez le chemin absolu en fonction de votre système d'exploitation): 
+
+* Syntaxe pour Linux / MacOS
+
+En une seule instruction:
+
+```
+ES_PATH_CONF=/Users/emmanueldemey/Downloads/elasticsearch-7.10.1/config2/ ./bin/elasticsearch
+```
+
+Une fois lancé, si vous exécutez la requête suivante, vous devriez voir vos deux noeuds .
+
+```
+GET _cat/nodes
+```
+
+Assurez-vous que votre index à présent ait un statut `green`.
+
+Si vous utilisez Docker pour lancer Elasticsearch, la société Elastic propose une configuration pour Docker Compose
+sur la documentation officielle.
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html[Elasticsearch et Docker Compose]
+
+
+* Mettons en place un système de backup de notre index.
+
+Ajouter dans le fichier de configuration `elasticsearch.yml` la configuration suivante:
+
+```
+path:
+  repo:
+    - ./backups
+```
+
+puis redémarrer les noeuds.
+
+Vous pouvez ensuite créer un `repository` `my fs_backup` de type `fs`.
+Réaliser une snapshot de l'index `person-v3` dans ce repository.
+
+Une fois cette snapshot réalisée, faites un `restore` dans un nouvel index que nous nommerons de la même façon mais suffixé par `_backup`.
+
+* Vous pouvez également utiliser l'API `cluster stats` afin de visualiser les statistiques de notre cluster et essayer d'en comprendre la signification.
 
 ## TP XX - SQL
 
