@@ -21,7 +21,7 @@ layout: cover
     * react-router / TanStack Router
     * Redux Toolkit / MobX / Recoil / Zustand / Jotai / XState / Akita
     * Formik / React Hook Form
-    * React Query / SWR
+    * React Query / SWR / RTK Query
     * axios
     * ...
 
