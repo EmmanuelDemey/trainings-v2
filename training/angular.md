@@ -526,6 +526,100 @@ export const routes: Routes = [
 
 ---
 
+# Resolver
+
+* Un rsolver est un mécanisme permettant 
+  * d'aller récupérer la donnée nécessaire pour une page
+  * de le faire avant la redirection vers cette même page
+  * d'éviter de le faire dans le composant lui-même 
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class ProductResolver implements Resolve<Observable<Product>> {
+  constructor(
+      private service: ProductService
+  ) {}
+
+  resolve(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<Product>{
+    const productId = this.route.snapshot.paramMap.get('productId');
+    
+    return this.service.getProduct(productId);
+  }
+}
+```
+
+---
+
+# Resolver
+
+* Pour enregistrer ce resolver, nous devons le définir dans la configuration de la route
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { ProductComponent } from '../products/product.component';
+import { ProductResolver } from '../product.resolver';
+import { CanActivateGuard } from '../core/guards/can-activate.guard';
+
+const routes: Routes = [
+    {
+        path: 'product/:productId',
+        component: ProductComponent,
+        resolve: {
+            product: ProductResolver
+        }
+    },
+];
+
+@NgModule({
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+---
+
+
+# Resolver
+
+* Dernière étape, nous allons récupérer ces données depuis les composants grâce à l'observable data de l'objet **ActivatedRoute**
+
+```typescript
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { Product } from '../shared/models/products.model';
+
+@Component({
+    selector: 'app-product',
+    templateUrl: './product.component.html',
+    styleUrls: ['./product.component.scss']
+})
+export class ProductComponent implements OnInit, OnDestroy {
+    public product: Product;
+    private productSubscription: Subscription;
+
+    constructor(
+        private productsService: ProductsService,
+        private route: ActivatedRoute,
+    ) {
+      this.productSubscription = this.route.data.subscribe((data) => {
+            this.product = data.product;
+        });
+    }
+
+    ngOnDestroy() {
+      this.productSubscription?.unsubscribe();
+    }
+}
+```
+---
+
 # Named Outlet
 
 * Nous pouvons avoir plusieurs *outlet* 
