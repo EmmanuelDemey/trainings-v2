@@ -145,13 +145,13 @@ const generateSlides = () => {
     .readdirSync(".")
     .filter((p: string) => p.endsWith("react.md") && !p.endsWith("_pw.md"))
     .filter((p: string) => !p.startsWith("README"));
-
   return Promise.all(
     mds.map((md: string) => {
       return new Promise((resolve) => {
         const base = md.replace(".md", "");
         console.log(`building ${md}`);
         exec(`npm run build -- ${md} --base /${base} --out dist/${base}`, () => {
+          console.log(`exporting ${md}`);
           exec(`npm run export -- ${md} --with-toc --output dist/${base}.pdf`, () => resolve("done"));
         });
       });

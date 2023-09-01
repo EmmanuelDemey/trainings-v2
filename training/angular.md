@@ -166,6 +166,62 @@ export class TypeDirective {
 layout: cover
 ---
 
+# Forms
+
+---
+
+# Template Driven Form
+
+---
+
+# Reactive Form
+
+---
+
+# Custom Validators
+
+* Nous pouvons créer nos propres validateurs
+  * Doit étendre la classe **Validator**
+  * Doit implémenter la classe **Validate**
+  * Doit s'autoenregistrer dans le token **NG_VALIDATORS**
+
+```typescript
+import { Directive } from '@angular/core';
+import { NG_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
+
+@Directive({
+  selector('[ageMin]'),
+  providers: [{
+    provide: NG_VALIDATORS,
+    useExisting: AgeMinDirective,
+    multi: true
+  }]
+})
+export class AgeMinDirective extends Validator {
+  validate(control: AbstractControl): ValidationErrors | null {
+    if(control.value === null || control.value === ''){
+      return null;
+    }
+
+    if(Integer(control.value) > 18){
+      return null;
+    }
+
+    return {
+      ageMin: {
+        ageTooYoung: true
+      }
+    }
+  }
+}
+```
+
+---
+
+---
+layout: cover
+---
+
 # Services
 
 ---
