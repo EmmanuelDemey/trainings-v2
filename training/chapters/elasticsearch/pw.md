@@ -380,6 +380,50 @@ Une fois cette snapshot réalisée, faites un `restore` dans un nouvel index que
 
 * Vous pouvez également utiliser l'API `cluster stats` afin de visualiser les statistiques de notre cluster et essayer d'en comprendre la signification.
 
+## TP8 - SDK
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html[Elasticsearch Node.js client]
+
+Dans ce TP, nous allons tout simplement initier un projet Node.js permettant de faire nos premières requêtes vers un cluster Elasticsearch.
+
+Nous allons tout d'abord initier le projet Node.js. dans un  nouveau répertoire, exécutez la commande suivante :
+
+```
+npm init --yes
+```
+
+Vous pouvez à présent installer la dépendance `@elastic/elasticsearch`.
+
+```
+npm install @elastic/elasticsearch
+```
+
+Dans un nouveau fichier `src/index.js`, nous allons importer le module précédemment installé afin de créer un client Elasticsearch.
+
+```
+const { Client } = require('@elastic/elasticsearch')
+const fs = require('fs');
+
+const client = new Client({
+    node: 'https://localhost:9200',
+
+    auth: {
+        username: 'elastic',
+        password: 'XXX'
+    },
+    tls: {
+      ca: fs.readFileSync('./config/certs/http_ca.crt'),
+      rejectUnauthorized: false
+    }
+})
+```
+
+Une fois le projet créé, vous pouvez à present ajouter dans le fichier `src/index.js` le code nécessaire pour
+refaire les requêtes des TPs 4 et 5.
+
+
 ## TP XX - SQL
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -429,3 +473,120 @@ git clone https://github.com/spring-projects/spring-petclinic
   * Faite le nécessaire que pour le endpoint '/vets' du premier service appel le endpoint '/vets' du deuxième.
   * Assurez-vous que les informations arrivent correctement dans APM et qu'une transaction est composé de `span` exécutés par les deux services.
 * Créez une page web permettant de consommer le endpoint `/vets` et ajoutez une intégration RUM
+
+## TP3 - Dimensionnement
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/run-elasticsearch-locally.html[Run Elasticsearch locally]
+
+Nous allons dans cette partie pratique démarrer un second noeud dans notre cluster.
+
+* Pour cela, nous devons récupérer un nouveau `enrollment-token` depuis le noeud existant pour l'utiliser lors du lancement du nouveau noeud
+
+```
+bin/elasticsearch-create-enrollment-token -s node
+bin/elasticsearch --enrollment-token <enrollment-token>
+```
+
+* Grace aux API de monitoring, assurez-vous que les deux sont bien disponibles et qu'ils communiquent correctement.
+
+```
+GET /_cat/indices
+```
+
+* Votre cluster doit avoir à présent un status `green`. Pourquoi ?
+* Exécutez la requete `GET _cat/shards` et vérifiez que l'ensemble des shards sont correctement assignés
+* Appliquez une configuration pour que les shards (primary et replicas) ne doivent pas etre positionnés sur la même machine
+(ce qui est le cas pour l'instant dans cette formation, car nous sommes en local)
+
+* Afin de tester les APIs permettant d'avoir un impact sur la répartition des shards, exécutez une requête permettant d'interdire l'allocation de nos shards
+sur l'un de vos deux noeuds (en utilisant la propriété `_name` par exemple.) Le status de votre cluster devrait changé.
+
+## TP4 - Retention
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/8.4/ilm-shrink.html[Shrink API]
+* https://www.elastic.co/guide/en/elasticsearch/reference/8.4/ilm-index-lifecycle.html[ILM]
+
+* Afin de manipuler la `Shrink API`, veuillez réindexer un jeu de donnée existant dans un nouvel index avec la configuration suivante:
+  * nombre de shard: 5
+  * nombre de replicas: 1
+
+* Utilisez la `Shrink API`, afin de migrer notre index vers un nouvel index ayant 1 seul shard et aucun shard réplica.
+
+* Via l'API ou via l'interface graphique de Kibana, veuillez créez un ILM permettant de faire ce `shrink` pour tous les index d'un jour d'ancienneté.
+
+* Appliquez cet ILM à un nouvel template que vous allez associer à des indexes nommés `kibana*`. Ces indexes devront également avoir la configuration suivante:
+  * nombre de shard: 5
+  * nombre de replicas: 1
+
+* Indexez des documents dans un nouvel index respectant le pattern défini précédemment.
+
+* Faudra attendre demain pour vérifier que le `shrink` a correctement été exécuté
+
+## TP5 - Monitoring
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-slowlog.html[SlowLog]
+* https://www.elastic.co/guide/en/elasticsearch/reference/8.4/configuring-metricbeat.html[Collecting Elasticsearch monitoring data with Metricbeat]
+* https://www.elastic.co/guide/en/elasticsearch/reference/8.4/configuring-filebeat.html[Collecting Elasticsearch monitoring data with Filebeat]
+
+Dans ce TP, nous allons commencer par activer les slowlog puis mettre en place la stack `Beat`
+
+* Dans le fichier de configuration, définissez une configuration de slowlog. Attention, les seuils
+doivent etre très petits pour que vous puissiez avoir un résultat pour vos requetes.
+
+* Une fois configuré, faites une requête. Et vérifiez que logs ont été écrites dans un fichier.
+
+* Modifiez cette configuration à la volée via l'API '_settings'.
+
+
+Dans cette partie pratique, nous allons mettre en place *Metricbeat* et *Filebeat*.
+
+* Téléchargez, configurez et lancez *Metricbeat* afin d'indexer dans Elasticsearch les métriques de votre Elasticsearch
+(Il sera peut etre recommandé de monitorer un autre cluster Elasticsearch, pour éviter d'envoyer les données dans le même cluster)
+
+* Avec la configuration par défaut, metricbeat communique avec elasticsearch via le protocole http, sans autorisation. Pensez à mettre à jour les champs nécessaires dans le fichier **metricbeat.yml**.
+
+```
+# -- Elasticsearch Output --
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  protocol: "https"
+
+  username: "elastic"
+  password: "password"
+  ssl:
+    verification_mode: none
+```
+
+* Dans un premier temps, utilisez l'instruction **setup** pour précharger les objets nécessaires à metricbeat dans Kibana.
+
+* Une fois cette étape réalisée, vous pouvez lancer le binaire de metricbeat (option -e pour avoir plus de traces).
+
+* Depuis Kibana, parcourez les pages `Observability` pour visualiser les données indexées.
+
+* Téléchargez, configurez et lancez *Filebeat* afin d'indexer les logs dans Elasticsearch.
+
+* Avant de lancer le binaire filebeat, modifier le fichier de configuration avec:
+
+```
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  protocol: "https"
+  username: "elastic"
+  password: "password"
+  ssl:
+    verification_mode: none
+```
+
+* Activez Filebeat pour aller récupérer les lignes de logs du cluster Elasticsearch que nous souhaitons monitorer.
+
+* Vous pouvez ensuite executer le **setup**, puis lancer le binaire heartbeat.
+
+* Dans la vue **Observalibility** de Kibana, vous devriez dorénavant voir des données correspondant aux logs indexés.

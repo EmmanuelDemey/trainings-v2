@@ -65,7 +65,26 @@ hide: false
 ---
 
 ---
+src: ./chapters/elasticsearch/08_sdk.md
+hide: false
+---
+
+---
 src: ./chapters/elasticsearch/10_sql.md
 hide: false
 ---
 
+---
+src: ./chapters/elasticsearch/11_dimentionnement.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/12_retention.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/13_monitoring.md
+hide: false
+---

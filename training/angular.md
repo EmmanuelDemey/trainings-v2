@@ -283,6 +283,16 @@ export class UserProfilComponent {
 
 ---
 
+# Stratégies
+
+* Nous avons plusieurs stratégies pour définir des *provider*
+  * useClass
+  * useFactory
+  * useValue
+  * useExisting
+
+---
+
 # InjectionToken
 
 * Si le *provider* n'est pas défini via un classe, nous pouvons utiliser la classe `InjectionToken`
@@ -293,10 +303,10 @@ import { NgModule, InjectionToken } from '@angular/core';
 export const API_URL = new InjectionToken<string>('api_url');
 
 
-@NgModule({
+@Component({
   providers: [ { provide: API_URL, useValue: 'http://api'}]
 })
-export class AppModule {
+export class AppComponent {
 
 }
 ```
