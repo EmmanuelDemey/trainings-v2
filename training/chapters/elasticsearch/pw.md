@@ -590,3 +590,21 @@ output.elasticsearch:
 * Vous pouvez ensuite executer le **setup**, puis lancer le binaire heartbeat.
 
 * Dans la vue **Observalibility** de Kibana, vous devriez dorénavant voir des données correspondant aux logs indexés.
+
+## TP6 - Alerting
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/8.4/xpack-alerting.html[Watcher]
+
+
+Dans cette partie pratique, nous allons mettre en place une solution d'alerting respectant les critères suivants
+
+* Créez une alerte qui
+  * s'exécute toutes les 10 minutes
+  * Vérifie si il y a un vol dont le retard est supérieur à 0
+  * Indexe une alerte si au moins un document est détecté
+
+* Indexez un nouveau document qui respect la requête précédente.
+
+* Visualisez ces données depuis la page `Discover` de Kibana.

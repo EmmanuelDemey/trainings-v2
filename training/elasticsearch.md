@@ -88,3 +88,8 @@ hide: false
 src: ./chapters/elasticsearch/13_monitoring.md
 hide: false
 ---
+
+---
+src: ./chapters/elasticsearch/14_alerting.md
+hide: false
+---
