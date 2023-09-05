@@ -176,6 +176,23 @@ layout: cover
 
 # Reactive Form
 
+* Plusieurs méthodes sont à votre disposition sur l'objet *FormGroup* 
+
+```typescript
+@Component({ ... })
+export class FormComponent {
+  form = inject(FormBuilder).group({
+    name: ['Emeline'],
+    email: ['emeline@gmail.com', { disabled: true }]
+  })
+
+  constructor(){
+    console.log(this.form.value); // { name: 'Emeline' }
+    console.log(this.form.getRawValue()); // { name: 'Emeline', email: 'emeline@gmail.com' }
+  }
+}
+```
+
 ---
 
 # Custom Validators
