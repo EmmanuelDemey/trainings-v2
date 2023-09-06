@@ -608,3 +608,24 @@ Dans cette partie pratique, nous allons mettre en place une solution d'alerting 
 * Indexez un nouveau document qui respect la requête précédente.
 
 * Visualisez ces données depuis la page `Discover` de Kibana.
+
+## TP6 - Sécurité
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://discuss.elastic.co/t/authentication-for-kibana-unknown-setting-xpack-security-enabled/254434/2[Activation de la sécurité pour les utilisateurs de Docker et Docker Compose]
+
+Dans ce TP, nous allons mettre en place la partie sécurité sur notre cluster.
+
+* Via l'API créez un nouveau rôle ne donnant accès qu'aux index `person-*`
+* Créez un nouvel utilisateur ayant le rôle créé précédemment
+* Assurez-vous que le role et l'utilisateur précédemment créés sont bien fonctionnels. (il ne devrait pas avoir accès aux index interne de Elasticsearch)
+* Ajoutez au rôle précédemment des contraintes sur les propriétés et sur les documents retournés.
+  * Par exemple, il ne doit pas pouvoir récupérer la propriété `age`
+  * Il doit pouvoir récupérer que les documents ayant la propriété `gender` égale à `female`
+
+
+Comme partie bonus, vous pouvez :
+
+* Créer un utilisateur depuis l'interface graphique de Kibana
+* Créer des `spaces` et des utilisateurs ayant accès à l'un d'entre eux

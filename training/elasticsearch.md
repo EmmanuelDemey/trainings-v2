@@ -93,3 +93,8 @@ hide: false
 src: ./chapters/elasticsearch/14_alerting.md
 hide: false
 ---
+
+---
+src: ./chapters/elasticsearch/15_security.md
+hide: false
+---
