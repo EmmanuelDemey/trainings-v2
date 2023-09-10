@@ -98,3 +98,28 @@ hide: false
 src: ./chapters/elasticsearch/15_security.md
 hide: false
 ---
+
+---
+src: ./chapters/elasticsearch/16_backup.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/17_logstash.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/18_kibana.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/19_beat.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/20_apm.md
+hide: false
+---

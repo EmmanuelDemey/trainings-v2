@@ -1,9 +1,17 @@
+---
+layout: cover
+---
+
+# APM
+
+---
+
 # APM
 
 * Nous allons aborder dans ce chapitre comment monitorer une application Java
-** Présenter le ECS
-** Gérer les logs applicatifs
-** Mettre en en place un APM
+    * Présenter le ECS
+    * Gérer les logs applicatifs
+    * Mettre en en place un APM
 
 ---
 

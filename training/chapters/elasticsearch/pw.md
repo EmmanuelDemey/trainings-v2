@@ -629,3 +629,250 @@ Comme partie bonus, vous pouvez :
 
 * Créer un utilisateur depuis l'interface graphique de Kibana
 * Créer des `spaces` et des utilisateurs ayant accès à l'un d'entre eux
+
+## TP9 - Snapshot And Restore
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore-apis.html[Snapshot and restore API]
+
+Dans ce TP, je vous propose de mettre en place un système de backup de notre index.
+
+Ajouter dans le fichier de configuration `elasticsearch.yml` la configuration suivante:
+
+```
+path:
+  repo:
+    - ./backups
+```
+
+Puis redémarrer votre noeud.
+
+Vous pouvez ensuite créer un `repository` `my fs_backup` de type `fs`.
+Réaliser une snapshot de l'index `person-v3` dans ce repository.
+
+Une fois cette snapshot réalisée, faites un `restore` dans un nouvel index que nous nommerons de la même façon mais suffixé par `_backup`.
+
+* Vous pouvez également utiliser l'API `cluster stats` afin de visualiser les statistiques de notre cluster et essayer d'en comprendre la signification.
+
+Comme partie bonus, vous pouvez :
+
+* Refaire le même traitement mais depuis l'interface de Kibana
+* Créer et exécuter un SLM
+
+Pour exécuter un SLM sans avoir besoin d'attendre, vous pouvez utiliser le endpoint `_execute`
+
+```
+POST _slm/policy/nightly-snapshots/_execute
+```
+
+## TP8 - Logstash
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/logstash/current/index.html[Logstash]
+
+Avec un input de type `stdin`, définissez un pipeline Logstash permettant d'indexer ce type de log dans Elasticsearch :
+
+```
+2022-02-28 12:16:57.129 INFO 3416 com.howtodoinjava.demo.Application: Simple log statement with inputs 1, 2 and 3
+```
+
+Dans ce message, nous allons pouvoir extraire les propriétés :
+
+* timestamp
+* level
+* duration
+* class
+* message
+
+Faites en sorte de :
+
+* valider le format de la propriété **timestamp**
+* remplacer la valeur de la propriété par défaut **@timestamp** par celle de **timestamp**
+* forcer le format de la propriété **duration** à integer
+
+Dans un premier temps, utilisez l'output **stdout** avec le plugin **rubydebug**.
+
+Configurez un nouvel output vers **elasticsearch**, lorsque vous obtenez un résultat ressemblant à:
+
+```
+{
+    "@timestamp" => 2022-02-28T11:16:57.129Z,
+         "event" => {
+        "original" => "2022-02-28 12:16:57.129 INFO 3416 com.howtodoinjava.demo.Application: Simple log statement with inputs 1, 2 and 3"
+    },
+          "host" => {
+        "hostname" => "macbook-pro-de-maxime.home"
+    },
+     "timestamp" => "2022-02-28 12:16:57.129",
+         "level" => "INFO",
+       "message" => "Simple log statement with inputs 1, 2 and 3",
+      "@version" => "1",
+      "duration" => 3416,
+         "class" => "com.howtodoinjava.demo.Application"
+}
+```
+
+Afin de vous aider à debugger, vous pouvez laisser l'input stdout, et ajouter un input **elasticsearch**.
+
+La sécurité étant désormais activée par défaut, la configuration devrait ressembler à:
+
+```
+elasticsearch {
+    hosts => ["https://localhost:9200"]
+    index => "logs-%{+YYYY.MM.dd}"
+    user => "elastic"
+    password => "PASSWORD"
+    ssl => true
+    cacert => "/path/to/elasticsearch-8.1.0/config/certs/http_ca.crt"
+    data_stream => false
+  }
+```
+
+Pour cet exercice, nous désactivons la création automatique de datastream pour indexer dans des indexs journaliers **logs-xxx**.
+
+Depuis Kibana, visualisez depuis la page `Discover`, les données fraichement indexées depuis Logstash.
+
+### Parsing de logs Apache
+
+#### Génération de logs Apache
+
+Dans un second temps, nous allons indexer des logs Apache.
+
+Vous pouvez soit:
+
+* demander au formateur de vous fournir des logs d'exemple
+* si vous avez python3 sur votre machine:
+  * clone le projet https://github.com/modye/Fake-Apache-Log-Generator et générer des logs
+  * ce projet est un fork de https://github.com/kiritbasu/Fake-Apache-Log-Generator, en y ajoutant la gestion du timezone Europe/Paris
+
+```
+# Installer les dépendances nécessaires
+~> pip install -r requirements.txt
+
+# Générer 100 logs dans un fichier http-xxxx.log
+~> python3 apache-fake-log-gen.py -n 100 -o LOG
+```
+
+#### Configuration de Logstash
+
+Modifier votre fichier de configuration en y ajoutant un input permettant d'écouter des fichiers. Pensez à typer différemment les inputs pour la suite du processing.
+
+Astuce: les configurations suivantes permettent de ne pas sauvegarder l'offset de lecture de l'input Logstash. A chaque redémarrage de Logstash, toutes les lignes des fichiers seront lues.
+
+```
+sincedb_path => "/dev/null"
+start_position => "beginning"
+```
+
+Astuce: il existe un pattern grok prédéfini permettant de gérer les logs apache.
+
+Indexez dans un datastream Elasticsearch les logs Apache.
+
+Depuis Kibana, visualisez depuis la page `Discover`, les données fraichement indexées depuis Logstash.
+
+Dans Kibana, parcourir la page `Observability`.
+
+Imaginez et implémentez dans Kibana un dashboard permettant de traiter nos logs Apache. Par exemple:
+
+* un histogramme des données entrantes
+  * pour chaque barre, la répartition des status de réponse (http.response.status_code)
+* le nombre de bytes moyen (http.response.body.bytes)
+* une visualisation permettant de mettre en avant les services les plus sollicités (url.original)
+* ... soyez créatifs :)
+
+Pour les personnes ayant de l'avance dans la partie pratique, vous pouvez continuer avec les actions suivantes :
+
+* Remplacer l'input dans Logstash par un input **beats**. Mettre en place filebeat pour traiter nos logs Apache.
+
+== TP7 - Beat
+
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+* https://www.elastic.co/guide/en/beats/metricbeat/current/index.html[MetricBeat]
+* https://www.elastic.co/guide/en/beats/heartbeat/current/index.html[HeartBeat]
+
+Dans cette partie pratique, nous allons mettre en place *Metricbeat* et *Heartbeat*.
+
+* Téléchargez, configurez et lancez *Metricbeat* afin d'indexer dans Elasticsearch les métriques de votre ordinateur
+
+Executez la commande suivante pour lister les modules disponibles et activés:
+
+```
+./metricbeat modules list
+```
+
+Avec la configuration par défaut, metricbeat communique avec elasticsearch via le protocole http, sans autorisation. Pensez à mettre à jour les champs nécessaires dans le fichier **metricbeat.yml**.
+
+```
+# -- Elasticsearch Output --
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  protocol: "https"
+
+  username: "elastic"
+  password: "password"
+  ssl:
+    enabled: true
+    ca_trusted_fingerprint: "cf4ed25b2efef5fe9e043c565937c9ccb5d8b8e4fd5a71877d63ad608a496f1e"
+```
+
+Dans un premier temps, utilisez l'instruction **setup** pour précharger les objets nécessaires à metricbeat dans Kibana.
+
+Une fois cette étape réalisée, vous pouvez lancer le binaire de metricbeat (option -e pour avoir plus de traces).
+
+Parcourir les dashboard installés dans Kibana pour visualiser les métriques de votre système.
+
+Activez un module supplémentaire en ligne de commande.
+Que contient le dossier *modules.d* ?
+
+* Téléchargez, configurez et lancez *Heartbeat* afin d'indexer dans Elasticsearch la disponibilité du cluster Elasticsearch lui-même (localhost:9200)
+
+Avant de lancer le binaire heartbeat, modifier le fichier de configuration avec:
+
+```
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  protocol: "https"
+  username: "elastic"
+  password: "password"
+  ssl:
+    certificate_authorities: ['/pathtoelasticsearch/config/certs/http_ca.crt']
+    supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+```
+
+Etant donné que nous souhaitons monitorer notre noeud elasticsearch lui-même, configurez également le **monitor** heartbeat.
+
+```
+heartbeat.monitors:
+- type: http
+  enabled: true
+  id: my-monitor
+  name: My Monitor
+  urls: ["https://localhost:9200"]
+  schedule: '@every 10s'
+  ssl:
+    certificate_authorities: ['/pathtoelasticsearch/config/certs/http_ca.crt']
+    supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+```
+
+Vous pouvez ensuite executer le **setup**, puis lancer le binaire heartbeat.
+
+Dans la vue **Observalibility** de Kibana, vous devriez dorénavant voir des données de **Monitors**.
+
+* Quel est le statut des pings que nous envoyons à Elasticsearch ? Utilisez Kibana pour parcourir les pings et comprendre ce qu'il se passe.
+* Pourquoi nous retrouvons nous dans cette situation ?
+
+Utilisez Kibana pour générer une nouvelle clé d'API permettant de communiquer avec Elasticsearch (Stack Management > API keys).
+
+Modifiez la configuration de votre monitor heartbeat pour ajouter un header d'authorization.
+
+Vous pouvez tester votre clé d'api en utilisant curl:
+
+```
+curl -XGET https://localhost:9200 --cacert /pathtoelasticsearch/config/certs/http_ca.crt --header "Authorization: ApiKey yourkey"
+```
+
