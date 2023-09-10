@@ -23,6 +23,7 @@ layout: cover
     * Formik / React Hook Form
     * React Query / SWR / RTK Query
     * axios
+    * react-i18next / Format.JS
     * ...
 
 ---
