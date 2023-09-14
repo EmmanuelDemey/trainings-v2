@@ -83,6 +83,43 @@ const CollapsiblePanel = () => {
 
 ---
 
+# Hook - useReducer
+
+* **useReducer** est un hook permettant de faire un traitement similaire au **useState**. 
+    * Modifier l'état interne d'un composant
+    * Nous allons *dispatcher* une action
+    * Puis créer un *reducer* permettant de *muter* l'état du composant. 
+
+```typescript
+import { useReducer } from 'react';
+
+function reducer(state, action) {
+  if (action.type === 'incremented_age') {
+    return {
+      age: state.age + 1
+    };
+  }
+  throw Error('Unknown action.');
+}
+
+export default function Counter() {
+  const [state, dispatch] = useReducer(reducer, { age: 42 });
+
+  return (
+    <>
+      <button onClick={() => {
+        dispatch({ type: 'incremented_age' })
+      }}>
+        Increment age
+      </button>
+      <p>Hello! You are {state.age}.</p>
+    </>
+  );
+}
+```
+
+--- 
+
 # Hook - useEffect
 
 * Hook permettant de définir des effets de bords

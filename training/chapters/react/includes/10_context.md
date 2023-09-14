@@ -105,6 +105,30 @@ const Form = () => {
 export default Form;
 ```
 
+
+---
+
+# Utilisation d'un context avec useReducer
+
+* Nous pouvons bien evidemment utiliser le hook *useReducer* dans un Context
+    * Nous nous approchons de la syntaxe de *Redux* . 
+
+```typescript
+import { TasksContext, TasksDispatchContext } from './TasksContext.js';
+
+export default function TaskApp() {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
+  // ...
+  return (
+    <TasksContext.Provider value={tasks}>
+      <TasksDispatchContext.Provider value={dispatch}>
+        ...
+      </TasksDispatchContext.Provider>
+    </TasksContext.Provider>
+  );
+}
+```
+
 ---
 
 # Bonnes pratiques
