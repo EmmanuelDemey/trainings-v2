@@ -141,3 +141,23 @@ function Todos() {
    )
  }
 ```
+
+---
+
+# StoragePersister
+
+* Possibilité de définir des stratégies de persistance synchrone et/ou asynchrone. 
+
+```typescript
+import { persistQueryClient } from '@tanstack/react-query-persist-client'
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+
+const queryClient = new QueryClient({ ... })
+
+const localStoragePersister = createSyncStoragePersister({ storage: window.localStorage })
+
+persistQueryClient({
+  queryClient,
+  persister: localStoragePersister,
+})
+```
