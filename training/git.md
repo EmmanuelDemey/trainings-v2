@@ -135,6 +135,43 @@ git init
 
 ---
 
+# Github Actions
+
+* Github Actions est la soultion permettant d'optimiser le cycle de vie d'un projet
+  * Intégration Continue
+  * Déploiment Continu
+* Possibilité de définir ds actions qui seront exécutées automatiquement en fonction d'un evenement Github. 
+* La configuration se réalise via un fichier YAML dans le repertoire `.github/workflows`
+
+```yaml
+name: Quality
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  test-build:
+    name: Test & build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 16 ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - run: yarn
+      # Build modules
+      - run: yarn build
+      - run: yarn test:coverage
+```
+
+---
+
 # Pour aller plus loin 
 
 [Git, sous le capot (David Blanchet)](https://www.youtube.com/watch?v=Ns1_jDbB0Xg)
