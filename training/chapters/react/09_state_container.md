@@ -239,8 +239,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    inc: (p: number) => dispatch({ type: 'INCREMENT', payload: p }),
-    decr: (p: number) => dispatch({ type: 'DECREMENT' paryload: p}),
+    inc: (p: number) => dispatch({ type: 'INC', payload: p }),
+    decr: (p: number) => dispatch({ type: 'DECR' paryload: p}),
   }
 }
 
@@ -253,7 +253,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
 
 # Redux - Hooks
 
-* Créer cette séparation, n'est pas une obligation. Votre composant peut directement intéragir avec Redux. 
+* Créer cette séparation n'est pas une obligation. Votre composant peut directement intéragir avec Redux. 
 * React Redux propose les hooks `useDispatch` et `useSelector`.
 
 ```javascript
@@ -421,9 +421,9 @@ export function Counter() {
 
   return (
     <>
-        <button onClick={() => dispatch(decr())}> -1 </button>
+        <button onClick={() => dispatch(decr(1))}> -1 </button>
         <span> {count} </span>
-        <button onClick={() => dispatch(inc())}> +1 </button>
+        <button onClick={() => dispatch(inc(1))}> +1 </button>
     </>
   )
 }

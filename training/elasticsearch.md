@@ -26,10 +26,6 @@ css: unocss
 # Suite Elastic
 
 ---
-
-# Plan
-
----
 src: ./chapters/elasticsearch/01_presentation_general.md
 hide: false
 ---

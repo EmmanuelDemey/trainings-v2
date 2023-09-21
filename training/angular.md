@@ -493,6 +493,43 @@ export class SearchComponent implements OnInit {
 ```
 ---
 
+# Nested Routes
+
+* Nous ne sommes pas limiter à un seul niveau de routes. 
+* Nous pouvons avoir plusieurs **router-outlet** imbriqués.
+* Pour cela, nous allons définir des routes imbriquées. 
+
+```typescript
+const routes: Routes = [
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    children: [
+      { path: 'overview', component: OverviewComponent },
+      { path: 'statistics', component: StatisticsComponent },
+    ],
+  },
+];
+```
+
+---
+
+# Lazy Loading
+
+* Le mécanisme de **Lazy Loading** permet de télécharger le code JavaScript d'une page, seulement si nous allons sur cette page
+* Le *bundle* intial en sera donc réduit. Un gain en terme de performance sera détectable. 
+
+```typescript
+const routes: Routes = [
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule),
+  },
+];
+```
+
+---
+
 # Router - Guard
 
 * Nous pouvons définir des **guards** afin de savoir si nous pouvons ou pas faire certaines choses avant un changement de page
