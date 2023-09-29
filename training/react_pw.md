@@ -2,6 +2,27 @@
 
 Durant cette formation, nous allons développer une application permettant la visualisation des personnages des films Star Wars.
 
+Si vous utilisez VSCode, voici des snippets de code que j'utilise souvant. N'hésitez pas à créer les votre. 
+
+```json
+{
+	"useStateTS": {
+		"scope": "typescript",
+		"prefix": "useState",
+		"body": [
+	 		"const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState<$2>($3)",
+	 	],
+	},
+	"useStateJS": {
+		"scope": "javascript",
+		"prefix": "useState",
+		"body": [
+	 		"const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState($2)",
+	 	],
+	}
+}
+```
+
 ## PW1 - Getting Started
 
 :::note
