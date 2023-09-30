@@ -13,17 +13,17 @@
 
 * Voici comment nous devons créer un **Context** 
 
-```javascript
-export const themes = {
+```typescript
+import { createContext } from 'react';
+
+export const themes: { [key:string]: Theme } = {
   light: {
   },
   dark: {
   },
 };
 
-export const ThemeContext = React.createContext(
-  themes.dark // valeur par défaut
-);
+export const ThemeContext = createContext<Theme | undefined>(/* valeur par défaut */);
 ```
 
 ---
@@ -32,7 +32,7 @@ export const ThemeContext = React.createContext(
 
 * Une fois créé, nous pouvons l'utiliser via le **Provider** associé. 
 
-```javascript
+```typescript
 import { ThemeContext, themes } from './context';
 
 const App = () => {
@@ -148,5 +148,13 @@ export const ThemeContext = React.createContext(
 );
 
 export const ThemeProvider = ThemeContext.Provider;
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
+
+  return context;
+}
 ```
