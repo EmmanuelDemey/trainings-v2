@@ -643,6 +643,8 @@ A fin d'améliorer notre formulaire, vous devez également ajouter les messages 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * [TanStack Query](https://tanstack.com/query/latest/docs/react/overview)
+* [TanStack Query v4](https://www.learnwithjason.dev/tanstack-query-v4)
+* [Le server state facile avec Tanstack Query](https://www.youtube.com/watch?v=kNaBVAdwbR4)
 :::
 
 Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)
