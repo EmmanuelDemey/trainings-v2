@@ -590,6 +590,27 @@ export const routes: Routes = [
 
 ---
 
+# Router - Guard - CanMatch
+
+* Le guard *canMatch* peut être utile si vous souhaitez activer une route même si deux objets de configuration utilisent le même *path*
+
+```typescript
+export const routes: Routes = [
+  { 
+    path: 'room', 
+    component: AdminComponent, 
+    canMatch: [roleGuard(ROLES.TEACHER)],
+  },
+  { 
+    path: 'room', 
+    component: ManagerComponent,
+    canMatch: [roleGuard(ROLES.STUDENT)],
+  },
+];
+```
+
+---
+
 # Resolver
 
 * Un rsolver est un mécanisme permettant 
