@@ -131,6 +131,7 @@ module *log4j2-ecs-layout* proposé par Elastic.
     * des métriques
     * des erreurs
     * ...
+* D'autres solutions existent : Dynatrace, Datadog ou encore NewRelic
 
 --- 
 
