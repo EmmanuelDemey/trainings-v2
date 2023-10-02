@@ -14,7 +14,7 @@ layout: cover
   * Gestion de la révocation du cache
 
 ```shell
-npm i react-query
+npm i @tanstack/react-query @tanstack/react-query-devtools
 ```
 
 ---
@@ -29,6 +29,7 @@ import {
    QueryClientProvider,
  } from 'react-query'
 import { getTodos, postTodo } from '../my-api'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -42,6 +43,7 @@ const queryClient = new QueryClient({
      // Provide the client to your App
      <QueryClientProvider client={queryClient}>
        <Todos />
+       <ReactQueryDevtools initialIsOpen={false} />
      </QueryClientProvider>
    )
  }
