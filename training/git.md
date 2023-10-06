@@ -137,11 +137,12 @@ git init
 
 # Github Actions
 
-* Github Actions est la soultion permettant d'optimiser le cycle de vie d'un projet
+* Github Actions est la solution permettant d'optimiser le cycle de vie d'un projet
   * Intégration Continue
   * Déploiment Continu
 * Possibilité de définir ds actions qui seront exécutées automatiquement en fonction d'un evenement Github. 
 * La configuration se réalise via un fichier YAML dans le repertoire `.github/workflows`
+* Pour tester en local vos workflow, vous pouvez utiliser l'outil en ligne de commande **act**
 
 ```yaml
 name: Quality
