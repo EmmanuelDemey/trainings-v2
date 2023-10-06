@@ -50,6 +50,25 @@ css: unocss
 
 # Les classes et l'héritage en TypeScript
 
+* **JavaScript** et **TypeScript** propose un système d'héritage
+  * utilise le mécanisme de *prototype* disponible dans le langage **JavaScript**
+* Nous pouvons utiliser le mot clé **super** pour faire appel à l'implémentation de la méthode parent
+
+```typescript
+export class Dog extends Animal {
+  voice: string = "ouaf";
+
+  constructor(name: string){
+    super(name)
+  }
+
+  sayHello(){
+    super.sayHello(this.voice);
+  }
+
+}
+```
+
 ---
 
 
@@ -66,6 +85,16 @@ export class UserController {
   private name: string;
 
   readonly private service: UserService;
+}
+```
+
+* Nous pouvons définir directement le scope dans la signature du constructeur .
+
+```typescript
+export class UserController {
+  constructor(private name: string){
+    
+  }
 }
 ```
 
@@ -86,18 +115,21 @@ export class UserController {
 
 # Generics
 
+* Les **Generics** permet de paramètrer via des types.
+* Cela permet de réutiliser du code tout en gardant le coté *type safe*
+
 ```typescript
 const clone = <T>(object: T) => {
   const clonedObject: T = JSON.parse(JSON.stringify(object));
   return clonedObject;
 };
 
-const user = {
+const user: User = {
   firstName: 'Manu',
   lastName: 'Demey'
 };
 
-const user2 = clone(user);
+const user2 = clone<User>(user);
 ```
 
 ---
@@ -279,6 +311,10 @@ Emit time:                  0.00s
 Total time:                 3.32s
 Done in 3.53s.
 ```
+
+---
+
+# Fichiers de Définition
 
 ---
 

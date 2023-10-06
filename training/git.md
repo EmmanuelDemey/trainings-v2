@@ -99,6 +99,20 @@ git init
 
 ---
 
+# .gitignore
+
+* Fichier permettant de définir les fichiers qui ne doivent pas être versionné par GIT
+  * `.dll`, `*.class`, `dist`, `build`, `*.o`...
+* Ce fichier de configuration doit par contre lui être versionné. 
+
+```
+doc.txt
+*.class
+dist
+```
+
+---
+
 # Gestion des branches
 
 ---
