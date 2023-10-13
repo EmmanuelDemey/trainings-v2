@@ -135,6 +135,57 @@ type UserAndAnimal = User & Animal;
 
 ---
 
+# Union
+
+```typescript
+type Stage = "empty" | "personalInfo" | "billingInfo";
+
+function allowSubmit(stage: Stage) {}
+
+allowSubmit("empty"); // OK
+allowSubmit("inPayment"); // Error: Argument of type '"inPayment"'
+```
+
+---
+
+# Union
+
+```typescript
+type PostAttachment = {
+  type: string; // Can be "image", "video" or "audio"
+  url: string;
+  altText?: string;
+  lowResUrl?: string;
+  thumbnailUrl?: string;
+  autoplay?: boolean;
+};
+```
+
+```typescript
+type Image = {
+  type: "image";
+  url: string;
+  altText: string;
+  lowResUrl: string;
+};
+
+type Video = {
+  type: "video";
+  url: string;
+  altText: string;
+  thumbnailUrl: string;
+  autoplay: boolean;
+};
+
+type Audio = {
+  type: "audio";
+  url: string;
+  autoplay: boolean;
+};
+
+type PostAttachment = Image | Video | Audio;
+```
+
 ---
 
 src: ./chapters/typescript/advanced-types.md
