@@ -5,7 +5,7 @@ theme: seriph
 # like them? see https://unsplash.com/collections/94734566/slidev
 background: https://source.unsplash.com/collection/94734566/1920x1080
 # apply any windi css classes to the current slide
-class: 'text-center'
+class: "text-center"
 # https://sli.dev/custom/highlighters.html
 highlighter: shiki
 # show line numbers in code blocks
@@ -35,20 +35,20 @@ css: unocss
 
 # Configuration initiale
 
-* Pour intialiser un projet nous allons exécuter la commande suivante
+- Pour intialiser un projet nous allons exécuter la commande suivante
 
 ```shell
 git init
 ```
 
-* Le resultat sera la création d'un répertoire *.git*
+- Le resultat sera la création d'un répertoire _.git_
 
 ---
 
 # .gitconfig
 
-* Fichier de configuration permettant de configurer GIT. 
-  * Peut etre défini localement à un projet ou globalement à votre système. 
+- Fichier de configuration permettant de configurer GIT.
+  - Peut etre défini localement à un projet ou globalement à votre système.
 
 ```
 [init]
@@ -64,9 +64,38 @@ git init
   hist = log --oneline --graph --decorate --all
 ```
 
---- 
+---
 
 # Concepts fondamentaux de Git
+
+---
+
+# SHA
+
+- Les différents types d'objets (abordés par la suite), sont labelisé via une chaine de caractères
+- Cette chaine de aractères est en fait une chaine SHA1 contenant
+  - une empreinte du contenu du fichier
+  - des métadonnées
+- Si l'un de ses deux éléments est différent, le SHA1 sera différent, nous aurons donc deux objets différents dans Git.
+
+---
+
+# Les Différents types d'objet
+
+```shell
+$ find .git/objects -type f
+.git/objects/d6/70460b4b4aece5915caf5c68d12f560a9fe3e4
+```
+
+---
+
+# Les Commandes
+
+- Dans Git, il existe deux types de commandes :
+  - les commandes _porcelain_ : celles que nous allons utiliser la plupart du temps.
+  - les commandes _plumbing_ : commandes bas niveau, utilisées par les commandes _porcelain_.
+
+Dans le reste de cette formation, nous présenterons que les commandes _porcelain_.
 
 ---
 
@@ -74,7 +103,7 @@ git init
 
 ---
 
-# git init 
+# git init
 
 ---
 
@@ -96,14 +125,13 @@ git init
 
 # git diff
 
-
 ---
 
 # .gitignore
 
-* Fichier permettant de définir les fichiers qui ne doivent pas être versionné par GIT
-  * `.dll`, `*.class`, `dist`, `build`, `*.o`...
-* Ce fichier de configuration doit par contre lui être versionné. 
+- Fichier permettant de définir les fichiers qui ne doivent pas être versionné par GIT
+  - `.dll`, `*.class`, `dist`, `build`, `*.o`...
+- Ce fichier de configuration doit par contre lui être versionné.
 
 ```
 doc.txt
@@ -145,18 +173,18 @@ dist
 
 ---
 
-# Utilisation de plateformes de collaboration 
+# Utilisation de plateformes de collaboration
 
 ---
 
 # Github Actions
 
-* Github Actions est la solution permettant d'optimiser le cycle de vie d'un projet
-  * Intégration Continue
-  * Déploiment Continu
-* Possibilité de définir ds actions qui seront exécutées automatiquement en fonction d'un evenement Github. 
-* La configuration se réalise via un fichier YAML dans le repertoire `.github/workflows`
-* Pour tester en local vos workflow, vous pouvez utiliser l'outil en ligne de commande **act**
+- Github Actions est la solution permettant d'optimiser le cycle de vie d'un projet
+  - Intégration Continue
+  - Déploiment Continu
+- Possibilité de définir ds actions qui seront exécutées automatiquement en fonction d'un evenement Github.
+- La configuration se réalise via un fichier YAML dans le repertoire `.github/workflows`
+- Pour tester en local vos workflow, vous pouvez utiliser l'outil en ligne de commande **act**
 
 ```yaml
 name: Quality
@@ -173,7 +201,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ 16 ]
+        node: [16]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -187,7 +215,7 @@ jobs:
 
 ---
 
-# Pour aller plus loin 
+# Pour aller plus loin
 
 [Git, sous le capot (David Blanchet)](https://www.youtube.com/watch?v=Ns1_jDbB0Xg)
 
