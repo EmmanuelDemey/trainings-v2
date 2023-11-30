@@ -8,18 +8,18 @@ layout: cover
 
 # Tests unitaires
 
-* Pour l'écriture des tests unitaires, nous conseillons deux librairies :
-* **Jest**:
-  * Pour la structuration de la suite de tests
-  * Pour les mocks
-  * Pour les assertions
-* **@testing-library** pour la génération d'un composant React
+- Pour l'écriture des tests unitaires, nous conseillons deux librairies :
+- **Jest**:
+  - Pour la structuration de la suite de tests
+  - Pour les mocks
+  - Pour les assertions
+- **@testing-library** pour la génération d'un composant React
 
 ---
 
 # Jest
 
-* Jest propose des méthodes permettant de structurer une suite de tests
+- Jest propose des méthodes permettant de structurer une suite de tests
 
 ```typescript
 describe('<MyComponent />', () => {
@@ -36,11 +36,12 @@ describe('<MyComponent />', () => {
     });
 })
 ```
+
 ---
 
 # Jest
 
-* Nous avons la possibilité des définir des fonctions de "configuration"
+- Nous avons la possibilité des définir des fonctions de "configuration"
 
 ```typescript
 describe('<MyComponent />', () => {
@@ -60,8 +61,8 @@ describe('<MyComponent />', () => {
 
 # Jest - mocks
 
-* Utilisation des mocks pour modifier l'implementation d'une méthode
-* Utilisation des `spies` pour s'assurer qu'une méthode a bien été appelée
+- Utilisation des mocks pour modifier l'implementation d'une méthode
+- Utilisation des `spies` pour s'assurer qu'une méthode a bien été appelée
 
 ---
 
@@ -93,23 +94,21 @@ describe('Api', () => {
 
 # Snapshot testing
 
-* Permet de prendre un instantané d'un composant
-* Cet instantané sera sauvegardé et versionné dans votre projet
-* Lors des prochains tests, il sera comparé avec le nouvel état du composant
+- Permet de prendre un instantané d'un composant
+- Cet instantané sera sauvegardé et versionné dans votre projet
+- Lors des prochains tests, il sera comparé avec le nouvel état du composant
 
 ---
 
 # Snapshot testing
 
 ```jsx
-import React from 'react';
-import Link from '../Link.react';
-import renderer from 'react-test-renderer';
+import React from "react";
+import Link from "../Link.react";
+import renderer from "react-test-renderer";
 
-it('renders correctly', () => {
-  const tree = renderer
-    .create(<Link page="http://www.facebook.com">Facebook</Link>)
-    .toJSON();
+it("renders correctly", () => {
+  const tree = renderer.create(<Link page="http://www.facebook.com">Facebook</Link>).toJSON();
   expect(tree).toMatchSnapshot();
 });
 ```
@@ -131,32 +130,31 @@ exports[`renders correctly 1`] = `
 `;
 ```
 
-
---- 
+---
 
 # Jest - Options
 
-* `jest`
-* `jest --watchAll`
-* `jest --coverage=true`
-* CLI intéractive
+- `jest`
+- `jest --watchAll`
+- `jest --coverage=true`
+- CLI intéractive
 
 ---
 
 # @testing-library
 
-* Librairie utilitaire permettant de
-  * générer l'HTML d'un composant React
-  * de manipuler cet HTML pour faire des assertions
+- Librairie utilitaire permettant de
+  - générer l'HTML d'un composant React
+  - de manipuler cet HTML pour faire des assertions
 
 ```typescript
-import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import "@testing-library/jest-dom";
+import { render, screen } from "@testing-library/react";
 
-describe('<Comment />', () => {
-  it('should be disabled by default', () => {
+describe("<Comment />", () => {
+  it("should be disabled by default", () => {
     render(<Comment />);
-    expect(screen.getByRole('button')).not.toHaveAttribute('disabled')
+    expect(screen.getByRole("button")).not.toHaveAttribute("disabled");
     //expect(screen.getByRole('button')).toBeDisabled();
   });
 });
@@ -166,18 +164,18 @@ describe('<Comment />', () => {
 
 # Émettre des événements
 
-* Il est conseillé d'utiliser `@testing-library/user-event` pour les interactions utilisateurs
+- Il est conseillé d'utiliser `@testing-library/user-event` pour les interactions utilisateurs
 
 ```typescript
-import { render } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
-describe('<Comment />', () => {
-    it('type', async () => {
-      render(<Comment />)
-      await userEvent.type(textbox, 'Hello,{enter}World!')
-      expect(button).not.toBeDisabled();
-    })
+describe("<Comment />", () => {
+  it("type", async () => {
+    render(<Comment />);
+    await userEvent.type(textbox, "Hello,{enter}World!");
+    expect(button).not.toBeDisabled();
+  });
 });
 ```
 
@@ -185,25 +183,25 @@ describe('<Comment />', () => {
 
 # Structuration
 
-* Afin de faciliter la maintenance de vos tests, vous pourriez suivre la structure suivante :
+- Afin de faciliter la maintenance de vos tests, vous pourriez suivre la structure suivante :
 
 ```typescript
-import { render } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
-describe('<Comment />', () => {
-    function renderToScreen(){
-        render(<Comment />)
-        return {
-            textbox: screen.getByRole('textbox'),
-            button: container.getByRole('button')
-        }
-    }
-    it('type', async () => {
-      const {textbox, button} = renderToScreen();
-      await userEvent.type(textbox, 'Hello,{enter}World!')
-      expect(button).not.toBeDisabled();
-    })
+describe("<Comment />", () => {
+  function renderToScreen() {
+    render(<Comment />);
+    return {
+      textbox: screen.getByRole("textbox"),
+      button: container.getByRole("button"),
+    };
+  }
+  it("type", async () => {
+    const { textbox, button } = renderToScreen();
+    await userEvent.type(textbox, "Hello,{enter}World!");
+    expect(button).not.toBeDisabled();
+  });
 });
 ```
 
@@ -211,13 +209,13 @@ describe('<Comment />', () => {
 
 # Matchers
 
-* `toBeDisabled`
-* `toBeEmpty`
-* `toHaveClass`
-* `toHaveFocus`
-* `toHaveTextContent`
-* `toHaveValue`
-* ...
+- `toBeDisabled`
+- `toBeEmpty`
+- `toHaveClass`
+- `toHaveFocus`
+- `toHaveTextContent`
+- `toHaveValue`
+- ...
 
 ---
 
@@ -229,12 +227,11 @@ describe('<Comment />', () => {
     "test": "react-scripts test",
     "test:ci": "npm run test -- --watchAll=false"
   }
-
 }
 ```
 
 ---
-layout: cover
----
+
+## layout: cover
 
 # Travaux Pratiques

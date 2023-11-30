@@ -35,6 +35,16 @@ hide: false
 ---
 
 ---
+src: ../cypress.md
+hide: true
+---
+
+---
+src: ../playwright.md
+hide: false
+---
+
+---
 src: ../husky.md
 hide: false
 ---

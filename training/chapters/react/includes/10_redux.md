@@ -2,6 +2,7 @@
 
 - Redux est une librairie que nous devons installer via NPM
 - Elle propose une architecture unidirectionnelle de la gestion de la donnée.
+- Elle peutêtre étendue via l'utilisation des modules **redux-saga**, **redux-observable**, **redux-persist** ...
 - Plusieurs acteurs vont intervenir :
   - Le `Store`
   - Le `State`

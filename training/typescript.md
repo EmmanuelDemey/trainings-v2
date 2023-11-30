@@ -33,6 +33,163 @@ css: unocss
 
 ---
 
+# Ligne de commande
+
+- Pour initier un projet TypeScript simple, nous pouvons utiliser la ligne de commande suivante.
+
+```
+cd project
+npm init --yes
+npm install -D typescript
+npx tsc -init
+```
+
+- Une fichier de configuration `tsconfig.json` sera créé
+
+```json
+{
+  "name": "tsc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+
+➜  tsc npm i -D typescript
+
+added 1 package, and audited 2 packages in 6s
+
+found 0 vulnerabilities
+➜  tsc npx tsc init
+error TS6231: Could not resolve the path 'init' with the extensions: '.ts', '.tsx', '.d.ts', '.cts', '.d.cts', '.mts', '.d.mts'.
+  The file is in the program because:
+    Root file specified for compilation
+
+
+Found 1 error.
+
+➜  tsc npx tsc -init
+
+Created a new tsconfig.json with:
+                                                                                                                     TS
+  target: es2016
+  module: commonjs
+  strict: true
+  esModuleInterop: true
+  skipLibCheck: true
+  forceConsistentCasingInFileNames: true
+
+
+You can learn more at https://aka.ms/tsconfig
+➜  tsc npx tsc -initc
+➜  tsc cat tsconfig.json
+{
+  "compilerOptions": {
+
+    /* Language and Environment */
+    "target": "es2016",
+
+    /* Modules */
+    "module": "commonjs",
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+---
+
+# Compilation
+
+- Nous pouvons à présent compiler et créer un fichier typescript.
+
+```typescript
+console.log("hello");
+```
+
+```shell
+npx tsc
+npx tsc hello.ts
+```
+
+- Un fichier JavaScript du même nom sera créé.
+
+---
+
+# Fonctionnement d'une compilation
+
+- Quand nous executions le compulateur, plusieurs briques sont en fait exécutées les unes à la suite des autres
+  - le _scanner_ pour générer une stream de Token
+  - le _parser_ pour générer un Abstract Syntax Tree (AST)
+  - le _binder_ pour connecter les différentes parties du code afin de bénéfichier du type checking
+  - le _checker_ pour la vérification des types dans votre programme
+  * le _emitter_ pour la génération du JavaScript
+
+---
+
+# Options avancée de la ligne de commande
+
+- `npx tsc --showConfig` permet de visualiser la configuration effective du compilateur
+
+```shell
+npx tsc --showConfig
+{
+    "compilerOptions": {
+        "target": "es2016",
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true
+    },
+    "files": [
+        "./hello.ts"
+    ]
+}
+```
+
+---
+
+# Options avancée de la ligne de commande
+
+- `npx tsc --listFiles` va lister les fichier TypeScript qui seront manipulés par le compilateur.
+
+```shell
+ npx tsc --listFiles
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es5.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2016.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.dom.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.dom.iterable.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.webworker.importscripts.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.scripthost.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.core.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.collection.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.generator.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.iterable.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.promise.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.proxy.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.reflect.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.symbol.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2016.array.include.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.decorators.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.decorators.legacy.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2016.full.d.ts
+/Users/emmanueldemey/Documents/workspaces/testbed/tsc/hello.ts
+```
+
 # IDE
 
 - Plusieurs IDE peuvent être utilisée pour écrire du code TypeScript
@@ -40,6 +197,53 @@ css: unocss
   - Intellij IDEA
   - Visual Studio Code
     - ajout de l'extension **yoavbls.pretty-ts-errors**
+
+---
+
+# Les bases de TypeScript
+
+- Pour déclarer une variable, nous avons les mêmes mots clés que JavaScript
+
+```typescript
+var firstName = "Manu";
+let firstName = "Manu";
+const firstName = "Manu";
+```
+
+- Nous avons également le mot clé `using` permettant de faciliter la phase de cleanup quand la variable n'est plus nécessaire.
+
+```typescript
+const getConnection = () => {
+  const connection = getDb();
+
+  return {
+    connection,
+    //Symbol.asyncDispose
+    [Symbol.dispose]: () => {
+      connection.close();
+    },
+  };
+};
+
+using { connection } = getConnection();
+```
+
+# Les bases de TypeScript
+
+- `const` permet d'indiquer que la variable n'est pas réassignée.
+- Mais nous pouvons tout de même la modifier
+
+```typescript
+const user = {};
+user.firstName = "Manu";
+```
+
+- Si nous souhaitons indiquer que la variable n'est absolument pas modifible, nous pouvons utiliser la syntaxe `as const`
+
+```typescript
+const user = {} as const;
+user.firstName = "Manu"; // Error
+```
 
 ---
 
@@ -104,6 +308,7 @@ export class UserController {
   - Partial, Pick, Omit et Required
   - Branding
   - MappedTyped
+  - Recursive Types
   - Conditional Types
 
 ---
@@ -232,6 +437,22 @@ type CommentId = Brand<number, "CommentId">;
 
 ---
 
+# Template Literals
+
+```typescript
+type ChessLetter = "A" | "B" | "C";
+type ChessNumber = 1 | 2 | 3;
+type Board = `${ChessLetter}${ChessNumber}`;
+```
+
+```typescript
+type RGBCss = `rgb(${number}, ${number}, ${number})`;
+const wrongCSS: RGBCss = "rgb(1, 1)"; // Error
+const correctCSS: RGBCss = "rgb(1, 1, 1)";
+```
+
+---
+
 # Mapped Types
 
 ```typescript
@@ -249,10 +470,54 @@ type ReadonlyPoint = Readonly<Point>;
 
 ---
 
+# Mapped Types
+
+```typescript
+type Event = {
+  add: string;
+  remove: string;
+  move: string;
+};
+
+type EventKeys = keyof Event;
+type OnEvent = {
+  [Key in EventKeys as `on${Capitalize<Key>}`]: () => any;
+};
+
+const eventHandlers: OnEvent = {
+  onAdd: () => {},
+  onRemove () => {},
+  onMove: () => {},
+}
+```
+
+---
+
 # Conditional Types
 
 ```typescript
 type NonNullable<T> = T extends null | undefined ? never : T;
+```
+
+---
+
+# Recursive Types
+
+- Tout comme la récurisivité en programmation, nous pouvons utiliser ce mécanisme pour définir des types évolués.
+
+```typescript
+// Ceci est une réimplementation du Awaited
+type Awaited<T> = T extends Array<infer Inner> ? Awaited<Inner> : T;
+```
+
+- Voici un exemple un peu plus compliqué.
+
+```typescript
+type RGBTuple = Tuple<3, number>;
+
+type Typle<Length, TupleType, Acc extends TupleType[] = []> = Acc["length"] extends Length
+  ? Acc
+  : Tuple<Length, TupleType, [...Acc, TupleType]>;
 ```
 
 ---
