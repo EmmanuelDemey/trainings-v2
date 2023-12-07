@@ -13,7 +13,7 @@ npx playwright test --ui
 
 ---
 
-# Cypress
+# Playwright
 
 ```javascript
 import {test, expect, Page, Locator} from '@playwright/test';
@@ -48,7 +48,7 @@ test(' Connexion  KO', async ({ page }) => {
 
 ---
 
-# Cypress
+# Playwright
 
 - Création de scripts dans le `package.json`
 
