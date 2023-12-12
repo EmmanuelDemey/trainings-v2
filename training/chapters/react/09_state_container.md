@@ -17,27 +17,21 @@ layout: cover
 - Plusieurs solutions possibles : Context, Redux, MobX ou encore Recoil
 
 ---
-
 src: ./includes/10_context.md
 hide: false
-
 ---
 
+---
 src: ./includes/10_redux.md
 hide: false
-
 ---
 
 ---
-
 src: ./includes/10_redux_toolkit.md
 hide: false
-
 ---
 
 ---
-
 src: ./includes/10_saga.md
 hide: false
-
 ---

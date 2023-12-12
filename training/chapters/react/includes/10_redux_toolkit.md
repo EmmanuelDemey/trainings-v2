@@ -158,9 +158,8 @@ const todosSlice = createSlice({
 ```
 
 ---
-
-## layout: cover
+layout: cover
+---
 
 # Travaux Pratiques
 
----

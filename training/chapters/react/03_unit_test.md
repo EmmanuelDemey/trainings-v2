@@ -231,7 +231,7 @@ describe("<Comment />", () => {
 ```
 
 ---
-
-## layout: cover
+layout: cover
+---
 
 # Travaux Pratiques

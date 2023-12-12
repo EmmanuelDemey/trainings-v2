@@ -9,7 +9,7 @@
 
 # Gestion du style
 
-```javascript
+```typescript
 import './nav.css';
 
 export const Nav = () => {
@@ -25,7 +25,7 @@ export const Nav = () => {
 * Et utiliser cette classe CSS dans vos sélecteurs ou dans vos déclarations imbriquées SCSS.
 * Vous pouvez également manipuler des syntaxe **BEM** afin de normaliser vos noms de classes CSS.
 
-```javascript
+```typescript
 import './nav.css';
 
 export const Nav = () => {
@@ -73,7 +73,7 @@ export const Nav = () => {
 * Permet de ne pas importer la feuille de style si le composant n'est plus importé
 * Plusieurs librairies sont disponibles comme par exemple `styled-component`, `styleX` ou `emotion`.
 
-```javascript
+```typescript
 import { css } from 'emotion'
 
 export const Nav = () => {
@@ -98,13 +98,11 @@ const Title = styled.h1`
   color: #BF4F74;
 `;
 
-// Create a Wrapper component that'll render a <section> tag with some styles
 const Wrapper = styled.section`
   padding: 4em;
   background: papayawhip;
 `;
 
-// Use Title and Wrapper like any other React component – except they're styled!
 const App = () => (
   <Wrapper>
     <Title>
