@@ -71,7 +71,7 @@ export const Nav = () => {
 * Une autre syntaxe est également possible via le pattern `CSS-in-JS`
 * Permet de `scoper` les feuilles de styles aux composants
 * Permet de ne pas importer la feuille de style si le composant n'est plus importé
-* Plusieurs librairies sont disponibles comme par exemple `styled-component` ou `emotion`.
+* Plusieurs librairies sont disponibles comme par exemple `styled-component`, `styleX` ou `emotion`.
 
 ```javascript
 import { css } from 'emotion'
