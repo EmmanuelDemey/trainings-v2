@@ -4,7 +4,7 @@ Durant cette formation, nous allons développer un petit utilitaire en ligne de 
 
 ## PW1 - Getting Started
 
-* Initier un projet 
+* Initier un projet TypeScript avec un fichier TypeScript `cli.ts` exposant une fonction basique
 * Vérifier que la compilation fonctionne
 * Tester ts-node
 * Installer jest et écrire un premier test et eslint

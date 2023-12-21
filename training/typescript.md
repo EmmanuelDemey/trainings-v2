@@ -28,176 +28,8 @@ css: unocss
 # TypeScript
 
 ---
-
-# Introduction à TypeScript
-
----
-
-# Ligne de commande
-
-- Pour initier un projet TypeScript simple, nous pouvons utiliser la ligne de commande suivante.
-
-```
-cd project
-npm init --yes
-npm install -D typescript
-npx tsc -init
-```
-
-- Une fichier de configuration `tsconfig.json` sera créé
-
-```json
-{
-  "name": "tsc",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
-}
-
-
-➜  tsc npm i -D typescript
-
-added 1 package, and audited 2 packages in 6s
-
-found 0 vulnerabilities
-➜  tsc npx tsc init
-error TS6231: Could not resolve the path 'init' with the extensions: '.ts', '.tsx', '.d.ts', '.cts', '.d.cts', '.mts', '.d.mts'.
-  The file is in the program because:
-    Root file specified for compilation
-
-
-Found 1 error.
-
-➜  tsc npx tsc -init
-
-Created a new tsconfig.json with:
-                                                                                                                     TS
-  target: es2016
-  module: commonjs
-  strict: true
-  esModuleInterop: true
-  skipLibCheck: true
-  forceConsistentCasingInFileNames: true
-
-
-You can learn more at https://aka.ms/tsconfig
-➜  tsc npx tsc -initc
-➜  tsc cat tsconfig.json
-{
-  "compilerOptions": {
-
-    /* Language and Environment */
-    "target": "es2016",
-
-    /* Modules */
-    "module": "commonjs",
-
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-
-    /* Type Checking */
-    "strict": true,
-    "skipLibCheck": true
-  }
-}
-```
-
----
-
-# Compilation
-
-- Nous pouvons à présent compiler et créer un fichier typescript.
-
-```typescript
-console.log("hello");
-```
-
-```shell
-npx tsc
-npx tsc hello.ts
-```
-
-- Un fichier JavaScript du même nom sera créé.
-
----
-
-# Fonctionnement d'une compilation
-
-- Quand nous executions le compulateur, plusieurs briques sont en fait exécutées les unes à la suite des autres
-  - le _scanner_ pour générer une stream de Token
-  - le _parser_ pour générer un Abstract Syntax Tree (AST)
-  - le _binder_ pour connecter les différentes parties du code afin de bénéfichier du type checking
-  - le _checker_ pour la vérification des types dans votre programme
-  * le _emitter_ pour la génération du JavaScript
-
----
-
-# Options avancée de la ligne de commande
-
-- `npx tsc --showConfig` permet de visualiser la configuration effective du compilateur
-
-```shell
-npx tsc --showConfig
-{
-    "compilerOptions": {
-        "target": "es2016",
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true
-    },
-    "files": [
-        "./hello.ts"
-    ]
-}
-```
-
----
-
-# Options avancée de la ligne de commande
-
-- `npx tsc --listFiles` va lister les fichier TypeScript qui seront manipulés par le compilateur.
-
-```shell
- npx tsc --listFiles
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es5.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2016.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.dom.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.dom.iterable.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.webworker.importscripts.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.scripthost.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.core.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.collection.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.generator.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.iterable.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.promise.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.proxy.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.reflect.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.symbol.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2016.array.include.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.decorators.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.decorators.legacy.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/node_modules/typescript/lib/lib.es2016.full.d.ts
-/Users/emmanueldemey/Documents/workspaces/testbed/tsc/hello.ts
-```
-
-# IDE
-
-- Plusieurs IDE peuvent être utilisée pour écrire du code TypeScript
-  - WebStorm
-  - Intellij IDEA
-  - Visual Studio Code
-    - ajout de l'extension **yoavbls.pretty-ts-errors**
-
+src: ./chapters/typescript/setup.md
+hide: false
 ---
 
 # Les bases de TypeScript
@@ -312,10 +144,8 @@ export class UserController {
   - Conditional Types
 
 ---
-
 src: ./chapters/typescript/generics.md
 hide: false
-
 ---
 
 # Literal Types
@@ -547,10 +377,217 @@ const validateAge = (age: number | string) => {
 
 # Les décorateurs
 
-- Class Decorators
-- Method Decorators
-- Property Decorators
-- Parameter Decorators
+- Les décorateurs sont des mots clés préfixés par **@**
+- Très utilisés dans **Angular** et **Nest.js**
+- Ils ne s'appliquent que sur des classes
+- Nous avons 5 types de décorateurs
+  - Class Decorators
+  - Property Decorators
+  - Method Decorators
+  - Accessor Decorators
+  - Parameter Decorators
+
+---
+
+# Class Decorators
+
+```typescript
+type ClassDecorator = <TFunction extends Function>
+  (target: TFunction) => TFunction | void;
+```
+
+```typescript
+type Constructor = { new (...args: any[]): any };
+
+function toString<T extends Constructor>(BaseClass: T) {
+  return class extends BaseClass {
+    toString() {
+      return JSON.stringify(this);
+    }
+  };
+}
+
+@toString
+class C {
+  public foo = "foo";
+  public num = 24;
+}
+
+console.log(new C().toString())
+// -> {"foo":"foo","num":24}
+```
+
+---
+
+# Property Decorators
+
+```typescript
+type PropertyDecorator =
+  (target: Object, propertyKey: string | symbol) => void;
+```
+
+```typescript
+function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function observable(target: any, key: string): any {
+  // prop -> onPropChange
+  const targetKey = "on" + capitalizeFirstLetter(key) + "Change";
+
+  target[targetKey] =
+    function (fn: (prev: any, next: any) => void) {
+      let prev = this[key];
+      Reflect.defineProperty(this, key, {
+        set(next) {
+          fn(prev, next);
+          prev = next;
+        }
+      })
+    };
+}
+
+class C {
+  @observable
+  foo = -1;
+
+  @observable
+  bar = "bar";
+}
+
+const c = new C();
+
+c.onFooChange((prev, next) => console.log(`prev: ${prev}, next: ${next}`))
+c.onBarChange((prev, next) => console.log(`prev: ${prev}, next: ${next}`))
+
+c.foo = 100; // -> prev: -1, next: 100
+c.bar = "baz"; // -> prev: bar, next: baz
+```
+
+---
+
+# Method Decorators
+
+```typescript
+type MethodDecorator = <T>(
+  target: Object,
+  propertyKey: string | symbol,
+  descriptor: TypedPropertyDescriptor<T>
+) => TypedPropertyDescriptor<T> | void;
+```
+
+```typescript
+function logger(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value;
+
+  descriptor.value = function (...args) {
+    console.log('params: ', ...args);
+    const result = original.call(this, ...args);
+    console.log('result: ', result);
+    return result;
+  }
+}
+
+class C {
+  @logger
+  add(x: number, y:number ) {
+    return x + y;
+  }
+}
+
+const c = new C();
+c.add(1, 2);
+```
+
+---
+
+# Accessor Decorators
+
+```typescript
+function immutable(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.set;
+
+  descriptor.set = function (value: any) {
+    return original.call(this, { ...value })
+  }
+}
+
+class C {
+  private _point = { x: 0, y: 0 }
+
+  @immutable
+  set point(value: { x: number, y: number }) {
+    this._point = value;
+  }
+
+  get point() {
+    return this._point;
+  }
+}
+
+const c = new C();
+const point = { x: 1, y: 1 }
+c.point = point;
+
+console.log(c.point === point)
+```
+
+---
+
+# Parameter Decorators 
+
+```typescript
+type ParameterDecorator = (
+  target: Object,
+  propertyKey: string | symbol,
+  parameterIndex: number
+) => void;
+```
+
+```typescript
+import "reflect-metadata";
+const requiredMetadataKey = Symbol("required");
+ 
+function required(target: Object, propertyKey: string | symbol, parameterIndex: number) {
+  let existingRequiredParameters: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyKey) || [];
+  existingRequiredParameters.push(parameterIndex);
+  Reflect.defineMetadata( requiredMetadataKey, existingRequiredParameters, target, propertyKey);
+}
+ 
+function validate(target: any, propertyName: string, descriptor: TypedPropertyDescriptor<Function>) {
+  let method = descriptor.value!;
+ 
+  descriptor.value = function () {
+    let requiredParameters: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyName);
+    if (requiredParameters) {
+      for (let parameterIndex of requiredParameters) {
+        if (parameterIndex >= arguments.length || arguments[parameterIndex] === undefined) {
+          throw new Error("Missing required argument.");
+        }
+      }
+    }
+    return method.apply(this, arguments);
+  };
+}
+
+class BugReport {
+  type = "report";
+  title: string;
+ 
+  constructor(t: string) {
+    this.title = t;
+  }
+ 
+  @validate
+  print(@required verbose: boolean) {
+    if (verbose) {
+      return `type: ${this.type}\ntitle: ${this.title}`;
+    } else {
+     return this.title; 
+    }
+  }
+}
+```
 
 ---
 
@@ -602,34 +639,6 @@ Done in 3.53s.
 
 ---
 
-# Execution
-
-Pour exécuter une fichier typescript, nous avons deux solutions
-
-- Une compilation via **tsc** et ensuite vous exécutez via **node**
-
-```shell
-tsc index.ts
-node index.js
-```
-
-- Une compilation et une exécution via **ts-node**
-
-```shell
-ts-node index.ts
-```
-
----
-
-# Tests unitaires
-
----
-
-# Projet pratique
-
-// Faire un TP de todolist en ligne
-
----
 
 # Liens
 

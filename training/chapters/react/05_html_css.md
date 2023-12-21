@@ -33,13 +33,15 @@ root.render(
 # JSX
 
 ```jsx
+import { createElement } from 'react';
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  React.createElement(
+  createElement(
     HelloMessage, {content: 'Hello'},
-      React.createElement(Title, {content: 'World'}, null)
+      createElement(Title, {content: 'World'}, null)
     )
 );
 ```
