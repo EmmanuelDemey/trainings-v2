@@ -63,12 +63,12 @@ hide: false
 ---
 
 ---
-src: ./chapters/react/08_react_router.md
+src: ./chapters/react/08_state_container.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/09_state_container.md
+src: ./chapters/react/09_react_router.md
 hide: false
 ---
 
