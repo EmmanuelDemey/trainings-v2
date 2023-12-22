@@ -258,7 +258,7 @@ const Example = () => (
 ```
 
 ---
-
-## layout: cover
+layout: cover
+---
 
 # Travaux Pratiques
