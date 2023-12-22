@@ -54,11 +54,7 @@ root.render(
 * Nous utilisons la syntaxe `{ expession }`.
 * Attention : `class` et `for` sont des mots reservés en JavaScript. Il faut donc utiliser `className` et `htmlFor`.
 
----
-
-# Interpolation
-
-```javascript
+```typescript
 const App = () => {
    const title: string = 'Title';
    const src: string = 'http://domain.com/image.png';
@@ -77,15 +73,11 @@ export default App;
 
 # Fragment
 
-* Un composant React doit toujours étre composé d'un élément `root`.
+* Un composant React doit toujours retourner une grape de composants composés d'un élément `root`.
 * Afin d'éviter d'insérer des éléments HTML inutiles, vous pouvez utiliser les `Fragment`.
 * Utilisation des balises `<Fragment>...</Fragment>` ou `<>...</>`
 
----
-
-# Fragment
-
-```javascript
+```typescript
 import { Fragment } from 'react';
 
 const App = () => {
@@ -124,8 +116,9 @@ export default LogoutButton;
 
 * Ou encore avoir autant d'éléments JSX que d'éléments dans un tableau
 
-```javascript
+```typescript
 type MenuItem = {
+    id: string;
     link: string;
     label: string;
 }
@@ -148,19 +141,24 @@ export default Nav;
 # Utilisation de l'attribut key
 
 * Pour des raisons de performance, il est recommandé de définir l'attribut `key` dès que nous itérons sur un tableau.
-* Soit en utilisant l'attribut `index` soit via une propriété de l'objet
+* Nous pouvons utiliser 
+    * soit en utilisant l'attribut `index` des fonctions `forEach`et `map`
+    * soit via une propriété de l'objet
 
----
 
-# Utilisation de l'attribut key
+```typescript
+type MenuItem = {
+    id: string;
+    link: string;
+    label: string;
+}
 
-```javascript
 const Nav = () => {
     const menuItems: MenuItem[] = [ ... ];
     return (
         <ul>
-            {menuItems.map(({link, label}, index) => {
-                return <li key={index}><a href={link}>{label}</a></li>
+            {menuItems.map(({link, label, id}) => {
+                return <li key={id}><a href={link}>{label}</a></li>
             })}
         </ul>
     )

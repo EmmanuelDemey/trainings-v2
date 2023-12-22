@@ -84,12 +84,12 @@ hide: false
 
 ---
 src: ./chapters/react/12_react_hook_form.md
-hide: false
+hide: true
 ---
 
 ---
 src: ./chapters/react/13_react_query.md
-hide: false
+hide: true
 ---
 
 ---

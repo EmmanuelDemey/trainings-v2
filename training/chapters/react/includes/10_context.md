@@ -135,7 +135,7 @@ export default function TaskApp() {
 
 * Nous recommandons de créer son propre `Provider` et son propre `hook`.
 
-```javascript
+```typescript
 import { createContext } from 'react';
 
 export const themes = {
@@ -160,3 +160,9 @@ export const useTheme = () => {
   return context;
 }
 ```
+
+---
+layout: cover
+---
+
+# Travaux Pratiques

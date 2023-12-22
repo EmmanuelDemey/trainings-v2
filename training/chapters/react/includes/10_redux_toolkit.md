@@ -157,9 +157,3 @@ const todosSlice = createSlice({
 })
 ```
 
----
-layout: cover
----
-
-# Travaux Pratiques
-

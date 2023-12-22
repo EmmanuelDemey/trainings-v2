@@ -167,13 +167,17 @@ describe("<Comment />", () => {
 - Il est conseillé d'utiliser `@testing-library/user-event` pour les interactions utilisateurs
 
 ```typescript
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 describe("<Comment />", () => {
   it("type", async () => {
     render(<Comment />);
+    
+    const textbox = screen.getByRole("textbox");
     await userEvent.type(textbox, "Hello,{enter}World!");
+
+    const button = screen.getByRole("button");
     expect(button).not.toBeDisabled();
   });
 });

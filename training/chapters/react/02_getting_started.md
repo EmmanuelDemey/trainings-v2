@@ -8,10 +8,10 @@ layout: cover
 
 # Présentation Générale
 
-* React est une librairie développée par Facebook
+* React est une librairie développée par Meta
 * Elle permet de générer l'HTML de notre application
 * Et de le dynamiser
-* Utilisé dans de nombreux projets (Facebook lui même)
+* Utilisé dans de nombreux projets (Meta lui même)
 
 --- 
 
@@ -62,7 +62,6 @@ npx create-react-app demo --template typescript
     * Webpack
     * Jest et Testing Library
     * ESLint
-    * Progressive Web App
     * Core Web Vitals
     * Typescript
 

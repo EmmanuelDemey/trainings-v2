@@ -365,13 +365,6 @@ Nous allons ensuite externaliser le code créé précédemment dans trois compos
 
 Veuillez faire le nécessaire pour que le tableau de personnages soit soit filtré à chaque lettre insérée dans le champ de formulaire.
 
-Comme partie bonus, nous allons créer une méthode `withTitle` pour définir un HoC. Ce HoC aura pour but de définir le titre de la page.
-Cette méthode sera utilisée de cette façon.
-
-```javascript
-const componentWithTitle = withTitle(Component, "Titre de la page");
-```
-
 ## PW6 - Hook
 
 :::note

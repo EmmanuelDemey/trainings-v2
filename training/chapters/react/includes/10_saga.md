@@ -1,6 +1,6 @@
 # Introduction à Redux Saga
 
-- Redux Saga est un librairie permettant de rendre les code asynchrone
+- Redux Saga est un librairie permettant de rendre les codes asynchrones
 
   - plus simple à implémenter
   - plus simple à maintenir

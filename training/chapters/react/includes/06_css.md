@@ -3,6 +3,7 @@
 * Bonne pratique de définir une feuille de styles par composant
     * Meilleure maintenabilité
     * Si le composant n'est jamais utilisé, la feuille de style ne sera jamais importée.
+    * Attention: la feuille de styles ne sera pas scopée.
 * Les syntaxes Less, Sass ou SCSS sont utilisables.
 
 ---

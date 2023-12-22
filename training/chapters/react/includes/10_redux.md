@@ -48,40 +48,6 @@ export function count(state: { value: number }, action: { type: string; payload:
 
 ---
 
-# Redux - Immer
-
-- Ecrire du code immutable peut par dois être complexe à écrire (quand nous manipulons des tableaux ou des objets par exemple).
-- Nous pouvons utiliser la librairie **Immer** permettant d'écrire du code immutable avec un syntaxe mutable.
-
-```typescript
-export function userReducerWithoutImmer(state: User, action: { type: string; payload: Address }) {
-  switch (action.type) {
-    case "ADD_ADDRESS":
-      return {
-        ...state,
-        info: {
-          ...state.info,
-          address: action.payload,
-        },
-      };
-    default:
-      return state;
-  }
-}
-export function userReducerWithImmer(state: User, action: { type: string; payload: Address }) {
-  switch (action.type) {
-    case "ADD_ADDRESS":
-      return produce(state, (draftState) => {
-        state.info.address = action.payload;
-      });
-    default:
-      return state;
-  }
-}
-```
-
----
-
 # Redux - Création
 
 - Nous sommes à présent capable d'initialiser notre Store
@@ -305,6 +271,40 @@ const mapDispatchToProps = ...
 export const DumbCounter = ...
 
 export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
+```
+
+---
+
+# Redux - Immer
+
+- Ecrire du code immutable peut par dois être complexe à écrire (quand nous manipulons des tableaux ou des objets par exemple).
+- Nous pouvons utiliser la librairie **Immer** permettant d'écrire du code immutable avec un syntaxe mutable.
+
+```typescript
+export function userReducerWithoutImmer(state: User, action: { type: string; payload: Address }) {
+  switch (action.type) {
+    case "ADD_ADDRESS":
+      return {
+        ...state,
+        info: {
+          ...state.info,
+          address: action.payload,
+        },
+      };
+    default:
+      return state;
+  }
+}
+export function userReducerWithImmer(state: User, action: { type: string; payload: Address }) {
+  switch (action.type) {
+    case "ADD_ADDRESS":
+      return produce(state, (draftState) => {
+        state.info.address = action.payload;
+      });
+    default:
+      return state;
+  }
+}
 ```
 
 ---
