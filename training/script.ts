@@ -159,7 +159,7 @@ const generateSlides = () => {
   );
 };
 const generatePwWebsite = () => {
-  const pws: string[] = fs.readdirSync(".").filter((p: string) => p.endsWith("_pw.md"));
+  const pws: string[] = fs.readdirSync(".").filter((p: string) => p.endsWith("react_pw.md"));
   return Promise.all(
     pws.map((pw) => {
       console.log(`building pw ${pw}`);

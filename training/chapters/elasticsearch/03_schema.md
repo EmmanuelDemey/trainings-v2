@@ -814,6 +814,6 @@ PUT _index_template/template_1
 }
 ```
 
----
+--- 
 
 # Présentation de la documentation

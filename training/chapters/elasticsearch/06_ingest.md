@@ -179,3 +179,33 @@ POST _ingest/pipeline/_simulate
 ```
 
 ---
+
+# Indexation de documents
+
+* Si nous souhaitons organiser des documents (pdf, doc, xls, ...) nous devons indexer le contenu en base64
+* Elasticsearch fournit un préprocesseur **attachment** permettant d'extraire des informations du document indexé
+* Une fois ces informations récupérées, elles seront indexées comme n'importe quel document.
+
+```
+PUT _ingest/pipeline/blob
+{
+  "description": "Extract attachment information",
+    "processors": [
+      {
+        "attachment": {
+          "field": "data",
+          "remove_binary": true
+        }
+      }
+    ]
+}
+
+POST /blob_index/_doc?pipeline=blob
+{
+  "data": "Base64-content...=="
+}
+
+GET /blob_index/_search?q=elasticsearch
+```
+
+---
