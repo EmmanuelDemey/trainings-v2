@@ -768,6 +768,32 @@ export class ProductComponent implements OnInit, OnDestroy {
 
 ---
 
+# Guards et Resolvers
+
+* Nous pouvons configurer à quel moment les guards et resolvers doivent s'exécuter. 
+* Plusieurs valeurs sont possibles 
+  * always
+  * paramsChange
+  * paramsOrQueryParamsChange
+  * pathParamsChange
+  * pathParamsOrQueryParamsChange
+
+```typescript
+const routes: Routes = [
+  {
+    path: "product/:productId",
+    component: ProductComponent,
+    runGuardsAndResolvers: "always",
+    resolve: {
+      product: ProductResolver,
+    },
+  },
+];
+
+```
+
+---
+
 # Named Outlet
 
 - Nous pouvons avoir plusieurs _outlet_
