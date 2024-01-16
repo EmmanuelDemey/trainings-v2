@@ -27,11 +27,6 @@ disabled: true
 ---
 
 ---
-src: ./includes/10_redux_toolkit.md
-disabled: true
----
-
----
 src: ./includes/10_saga.md
 disabled: true
 ---

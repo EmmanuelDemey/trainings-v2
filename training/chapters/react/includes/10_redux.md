@@ -3,12 +3,14 @@
 - Redux est une librairie que nous devons installer via NPM
 - Elle propose une architecture unidirectionnelle de la gestion de la donnée.
 - Elle peutêtre étendue via l'utilisation des modules **redux-saga**, **redux-observable**, **redux-persist** ...
+- Il est préconisé d'utiliser une surcouche **@reduxjs/toolkit** qui facilite la manipulation du store
 - Plusieurs acteurs vont intervenir :
   - Le `Store`
   - Le `State`
   - Les actions
   - Les reducers
   - Les sélecteurs
+  - Les slices
 
 ---
 
@@ -17,304 +19,116 @@
 - Avant d'utiliser Redux, nous devons d'abord l'installer
 
 ```shell
-npm install redux react-redux redux-logger
+npm install @reduxjs/toolkit react-redux
 ```
 
----
+- Une partie d'un `store Redux` sera configuré via un `Slice`.
+- La méthode **createSlice** utilise **createAction**, **createReducer** et la librairie **Immer**.
 
-# Redux - Reducers
+```javascript
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 
-- Un reducer est une fonction acceptant deux paramètres
-  - le `state` précédent
-  - une action
-- Il doit retourner le nouveau `state`
-
-```typescript
-export function count(state: { value: number }, action: { type: string; payload: number }) {
-  switch (action.type) {
-    case "INC":
-      return {
-        value: state.value + action.payload,
-      };
-    case "DECR":
-      return {
-        value: state.value - action.payload,
-      };
-    default:
-      return state;
-  }
-}
-```
-
----
-
-# Redux - Création
-
-- Nous sommes à présent capable d'initialiser notre Store
-
-```typescript
-import { createStore, applyMiddleware, compose } from "redux";
-import { createLogger } from "redux-logger";
-import { count } from "./reducer";
-
-const store = createStore(count, {
+type CounterState = { value: number };
+const initialState: CounterState = {
   value: 0,
-});
-export default store;
-```
-
----
-
-# Redux - Création
-
-- Dans une vraie application, nous allons avoir plusieurs **Reducers**
-
-```typescript
-import { createStore, combineReducers, applyMiddleware, compose } from "redux";
-import { todos } from "./todos";
-import { count } from "./count";
-
-const store = createStore(
-  combineReducers({
-    todos,
-    count,
-  }),
-  {}
-);
-export default store;
-```
-
----
-
-# Redux - Middlewares
-
-- Nous pouvons associer des _middlewares_ à Redux.
-- Ils seront exécutés à chaque actions émises.
-
-```typescript
-const middleware: ThunkMiddleware<State, BasicAction, ExtraThunkArg> =
-  ({ dispatch, getState }) =>
-  (next) =>
-  (action) => {
-    // The thunk middleware looks for any functions that were passed to `store.dispatch`.
-    // If this "action" is really a function, call it and return the result.
-    if (typeof action === "function") {
-      // Inject the store's `dispatch` and `getState` methods, as well as any "extra arg"
-      return action(dispatch, getState, extraArgument);
-    }
-
-    // Otherwise, pass the action down the middleware chain as usual
-    return next(action);
-  };
-```
-
----
-
-# Redux - Middlewares
-
-- Voici un exemple avec le middleware **redux-logger**.
-
-```javascript
-import { createStore, combineReducers, applyMiddleware, compose } from "redux";
-import { createLogger } from "redux-logger";
-import { todos } from './todos'
-import { count } from './count'
-
-const store = createStore(
-  combineReducers({
-    todos,
-    count
-  }),
-  {},
-  compose(applyMiddleware(createLogger())
-);
-export default store;
-```
-
----
-
-# Redux - Création
-
-- Pour activer le plugin Chrome `Redux`
-
-```javascript
-import { createStore, combineReducers, applyMiddleware, compose } from "redux";
-import { createLogger } from "redux-logger";
-import { todos } from './todos'
-import { count } from './count'
-
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-const store = createStore(
-  combineReducers({
-    todos,
-    count
-  }),
-  {},
-  composeEnhancers(applyMiddleware(createLogger())
-);
-export default store;
-```
-
----
-
-# Redux - Activation du store
-
-- Pour activer le store, nous allons, un peu comme un Context, wrapper une partie de notre application par un composant `Provider`
-
-```javascript
-import { Provider } from "react-redux";
-import store from "./store";
-...
-<Provider store={store}>
-    ...
-</Provider>
-```
-
----
-
-# Redux - Composant connecté
-
-- Dernière étape est de créer nos `DumbComponent` et `ConnectedComponent`
-- Toutes les données et actions récupérées par les composants connectés seront disponibles en `props` dans le `DumbComponent`
-
-```javascript
-type DumbCounterProps = {
-  count: number,
-  inc: (value: number) => void,
-  decr: (value: number) => void,
 };
-export const DumbCounter = ({ count, inc, decr }: DumbCounterProps) => (
-  <>
-    <button onClick={() => decr(1)}> -1 </button>
-    <span> {count} </span>
-    <button onClick={() => inc(1)}> +1 </button>
-  </>
-);
+
+export const counterSlice = createSlice({
+  name: "counter",
+  initialState,
+  reducers: {
+    inc: (state, action: PayloadAction<number>) => {
+      state.value += action.payload;
+    },
+    decr: (state, action: PayloadAction<number>) => {
+      state.value -= action.payload;
+    },
+  },
+});
 ```
 
 ---
 
-# Redux - Composant connecté
+# Redux Toolkit
 
-- Une fois le _Dumb component_ créé, nous allons pouvois le connecter au store.
+- Un `slice` peut ainsi exposer
+  - les actions que nous pourrons utiliser dans nos composants
+  - le `reducer` que nous pourrons activer dans notre `store`
 
 ```javascript
-import { connect } from "react-redux";
+import { createSlice } from '@reduxjs/toolkit'
 
-const mapStateToProps = (state) => {
-  return {
-    count: state.count.value,
-  }
+const initialState = {
+  value: 0,
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    inc: (p: number) => dispatch({ type: 'INC', payload: p }),
-    decr: (p: number) => dispatch({ type: 'DECR' paryload: p}),
+export const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {
+    inc: ...,
+    decr: ...
   }
-}
+})
 
-export const DumbCounter = ...
-
-export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
+export const { inc, decr } = counterSlice.actions
+export default counterSlice.reducer
 ```
 
 ---
 
-# Redux - Hooks
+# Redux Toolkit - Reducer
 
-- Créer cette séparation n'est pas une obligation. Votre composant peut directement intéragir avec Redux.
-- React Redux propose les hooks `useDispatch` et `useSelector`.
+- Enregistrement du `reducer` dans le `store`
+
+```typescript
+import { configureStore } from "@reduxjs/toolkit";
+import counterReducer from "../features/counter/counterSlice";
+
+const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export default store;
+```
+
+---
+
+# Redux Toolkit - Actions
+
+- Utilisation des actions générées dans un composant
 
 ```javascript
-import { useDispatch, useSelector } from "react-redux";
-import { getCount } from "./store";
+import { RootState } from "../../app/store";
+import { useSelector, useDispatch } from "react-redux";
+import { decr, inc } from "./counterSlice";
 
-export default () => {
-  const count = useSelector((state) => state.count.value);
+export function Counter() {
+  const count = useSelector((state: RootState) => state.counter.value);
   const dispatch = useDispatch();
-  const inc = (p: number) => dispatch({ type: "INC", payload: p });
-  const decr = (p: number) => dispatch({ type: "DECR", payload: p });
 
   return (
     <>
-      <button onClick={() => decr(1)}> -1 </button>
+      <button onClick={() => dispatch(decr(1))}> -1 </button>
       <span> {count} </span>
-      <button onClick={() => inc(1)}> +1 </button>
+      <button onClick={() => dispatch(inc(1))}> +1 </button>
     </>
   );
-};
-```
-
----
-
-# Redux - Selecteurs
-
-- Afin de faciliter l'accés au `store`, nous allons définir des sélecteurs
-
-```javascript
-import { connect } from "react-redux";
-
-export const getCounter = (state) => state.count.value;
-export const isGreaterThan = (state, limit) => state.count.value > limit;
-
-const mapStateToProps = (state) => {
-  return {
-    count: getCounter(state),
-    isGreaterThan100: isGreaterThan(state, 100)
-  }
 }
-
-const mapDispatchToProps = ...
-
-export const DumbCounter = ...
-
-export default connect(mapStateToProps, mapDispatchToProps)(DumbCounter);
 ```
 
 ---
 
-# Redux - Immer
+# Redux Toolkit - createSelector
 
-- Ecrire du code immutable peut par dois être complexe à écrire (quand nous manipulons des tableaux ou des objets par exemple).
-- Nous pouvons utiliser la librairie **Immer** permettant d'écrire du code immutable avec un syntaxe mutable.
+- Redux Toolkit réexporte la fonction **createSelector** du module **reselect**
 
 ```typescript
-export function userReducerWithoutImmer(state: User, action: { type: string; payload: Address }) {
-  switch (action.type) {
-    case "ADD_ADDRESS":
-      return {
-        ...state,
-        info: {
-          ...state.info,
-          address: action.payload,
-        },
-      };
-    default:
-      return state;
-  }
-}
-export function userReducerWithImmer(state: User, action: { type: string; payload: Address }) {
-  switch (action.type) {
-    case "ADD_ADDRESS":
-      return produce(state, (draftState) => {
-        state.info.address = action.payload;
-      });
-    default:
-      return state;
-  }
-}
-```
-
----
-
-# Redux et Reselect
-
-- Nous pouvons utiliser la libraire **reselect** afin d'avoir des _selecteurs_ mémoisé.
-
-```typescript
-import { createSelector } from "reselect";
+mport { createSelector } from "@reduxjs/toolkit";
 
 const selectShopItems = (state) => state.shop.items;
 const selectTaxPercent = (state) => state.shop.taxPercent;
@@ -334,53 +148,34 @@ const selectTotal = createSelector(selectSubtotal, selectTax, (subtotal, tax) =>
 
 ---
 
-# Redux Thunk
+# Redux Toolkit - createAsyncThunk
 
-- Le middleware **Redux Thunk** permet d'avoir du code asynchrone dans les actions _dispatchées_
+- Redux Toolkit active par défaut **Redux Thunk**
+- Pour créer un thunk, nous allons utiliser la méthode **createAsyncThunk**
+- Nous pourrons automatiquement intéragir avec les différents états du traitement asynchrone: pending, fulfilled ou rejected
 
 ```typescript
-import { createStore, applyMiddleware } from "redux";
-import thunk from "redux-thunk";
-import rootReducer from "./reducers/index";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
+  const response = await client.get('/fakeApi/todos')
+  return response.todos
+})
 
-export const fetchTodoById = (todoId) => async (dispatch, getState) => {
-  const response = await client.get(`/fakeApi/todo/${todoId}`);
-  dispatch(todosLoaded(response.todos));
-};
-
-/**
- function TodoComponent({ todoId }) {
-  const dispatch = useDispatch()
-
-  const onFetchClicked = () => {
-    dispatch(fetchTodoById(todoId))
+const todosSlice = createSlice({
+  name: 'todos',
+  initialState,
+  reducers: { },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchTodos.pending, (state, action) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchTodos.fulfilled, (state, action) => {
+        ...
+      })
   }
-}
- */
-```
-
----
-
-# Structure de fichiers
-
-- Nous pouvons trouver deux types de structures pour définir un store Redux :
-  - Découpage technique (un répertoire actions, un répertoire reducers, ...)
-  - Découpage fonctionnel (à privilégier)
-
-```javascript
-// Example de fichier manipulant une partie du state
-
-export const INC = "INC";
-export const DECR = "DECR";
-
-export const getCount = (state) => state.count.value;
-
-export const incr = (p) => ({ type: INC, payload: p });
-export const decr = (p) => ({ type: DECR, payload: p });
-
-export default function reducer(state, action) {}
+})
 ```
 
 ---
