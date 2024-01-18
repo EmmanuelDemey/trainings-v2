@@ -436,5 +436,3 @@ POST /sales/_search
 ---
 
 # Démo avec  Kibana
-
----

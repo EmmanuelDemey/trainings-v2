@@ -102,20 +102,20 @@ hide: false
 
 ---
 src: ./chapters/elasticsearch/17_logstash.md
-hide: false
+hide: true
 ---
 
 ---
 src: ./chapters/elasticsearch/18_kibana.md
-hide: false
+hide: true
 ---
 
 ---
 src: ./chapters/elasticsearch/19_beat.md
-hide: false
+hide: true
 ---
 
 ---
 src: ./chapters/elasticsearch/20_apm.md
-hide: false
+hide: true
 ---

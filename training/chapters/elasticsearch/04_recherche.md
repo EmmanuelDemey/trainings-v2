@@ -45,6 +45,7 @@ GET /movies/_search?q=title:titanic AND (year:[1990 TO 2000])
 GET /movies/_search?q=titanic&sort=year:desc&size:100&from=101
 ```
 
+---
 
 # La DSL Elasticsearch
 
@@ -526,5 +527,3 @@ POST /cluster_one:movie/_search
   }
 }
 ```
-
----

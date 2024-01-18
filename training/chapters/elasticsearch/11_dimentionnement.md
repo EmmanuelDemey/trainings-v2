@@ -33,7 +33,7 @@ PUT /movies
 * Deux types de shards existent :
     * **primary shards** et **replica shards**
 * Les **primary shards** sont d'abord utilisés à l'indexation
-* Les ** primary** et **replicas** sont utilisés de la même façon lors de la recherche
+* Les **primary** et **replicas** sont utilisés de la même façon lors de la recherche
 * Un shard correspond à une instance Lucene
 
 ---
@@ -117,13 +117,13 @@ GET /_cluster/health
 
 # Statut d'un cluster
 
-image::../images/cluster_yellow.png[]
+![](/images/cluster_yellow.png)
 
 ---
 
 # Statut d'un cluster
 
-image::../images/cluster_green.png[]
+![](/images/cluster_green.png)
 
 ---
 
@@ -239,5 +239,3 @@ PUT _cluster/settings
     * Un shard doit contenir entre 10GB et 50GB
     * Un noeud pouvant être `master` doit avoir 1GB heap par 3000 index
     * Un noeud data doit avoir 1KB heap par champ et par index
-
----

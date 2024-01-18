@@ -11,17 +11,11 @@ layout: cover
 * Elasticsearch est utilisable via de simples requêtes HTTPs
 * De nombreux SDK existent pour intégrer dans du Java, JavaScript, .NET, PHP ...
 
-# SDK Node.js
-
 ```
 npm install @elastic/elasticsearch
 ```
 
----
-
-# SDK Node.js
-
-```
+```javascript
 const { Client } = require('@elastic/elasticsearch')
 const fs = require('fs');
 
@@ -43,7 +37,7 @@ const client = new Client({
 
 # SDK Node.js
 
-```
+```javascript
 const { body } = await client./* action */({
     index: 'INDEX NAME',
     body: {
@@ -56,7 +50,7 @@ const { body } = await client./* action */({
 
 # SDK Node.js
 
-```
+```javascript
 await client.index({
     index: 'game-of-thrones',
     body: {
@@ -70,7 +64,7 @@ await client.index({
 
 # SDK Node.js
 
-```
+```javascript
 const { body } = await client.search({
     index: 'products',
     body: {
@@ -83,7 +77,7 @@ const { body } = await client.search({
 
 # SDK Node.js
 
-```
+```javascript
 client.cat.indices({
   help: true,
   s: 'index'
@@ -93,5 +87,3 @@ client.cat.indices({
 ---
 
 # Présentation de la documentation
-
----

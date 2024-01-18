@@ -110,19 +110,19 @@ POST /movies/_shrink/shrinked-movies
 
 # DataStream
 
-image::../images/data-streams-diagram.svg[]
+![](/images/data-streams-diagram.svg)
 
 ---
 
 # DataStream
 
-image::../images/data-streams-search-request.svg[]
+![](/images/data-streams-search-request.svg)
 
 ---
 
 # DataStream
 
-image::../images/data-streams-index-request.svg[]
+![](/images/data-streams-index-request.svg)
 
 ---
 
@@ -187,5 +187,3 @@ PUT _index_template/timeseries_template
 ---
 
 # Gestion des ILM depuis Kibana
-
----

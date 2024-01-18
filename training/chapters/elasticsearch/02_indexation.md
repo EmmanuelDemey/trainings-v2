@@ -95,6 +95,8 @@ GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 }
 ```
 
+--- 
+
 # Mise à jour d'un document
 
 * Nous pouvons mettre à jour un document via une requête `PUT`
@@ -260,7 +262,7 @@ PUT /movies
 * Deux types de shards existent :
     * **primary shards** et **replica shards**
 * Les **primary shards** sont d'abord utilisés à l'indexation
-* Les ** primary** et **replicas** sont utilisés de la même façon lors de la recherche
+* Les **primary** et **replicas** sont utilisés de la même façon lors de la recherche
 * Un shard correspond à une instance Lucene
 
 ---

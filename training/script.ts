@@ -143,7 +143,7 @@ title: Slides
 const generateSlides = () => {
   const mds: string[] = fs
     .readdirSync(".")
-    .filter((p: string) => p.endsWith("react.md") && !p.endsWith("_pw.md"))
+    .filter((p: string) => (p.endsWith("react.md") || p.endsWith("elasticsearch.md")) && !p.endsWith("_pw.md"))
     .filter((p: string) => !p.startsWith("README"));
   return Promise.all(
     mds.map((md: string) => {

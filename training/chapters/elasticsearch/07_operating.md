@@ -20,43 +20,43 @@ layout: cover
 
 # Internals
 
-image::../images/internals1.png[]
+![](/images/internals1.png)
 
 ---
 
-# !
+# Internals
 
-image::../images/internals2.png[]
-
----
-
-# !
-
-image::../images/internals3.png[]
+![](/images/internals2.png)
 
 ---
 
-# !
+# Internals
 
-image::../images/internals4.png[]
-
----
-
-# !
-
-image::../images/internals5.png[]
+![](/images/internals3.png)
 
 ---
 
-# !
+# Internals
 
-image::../images/internals6.png[]
+![](/images/internals4.png)
 
 ---
 
-# !
+# Internals
 
-image::../images/internals7.png[]
+![](/images/internals5.png)
+
+---
+
+# Internals
+
+![](/images/internals6.png)
+
+---
+
+# Internals
+
+![](/images/internals7.png)
 
 ---
 
@@ -560,5 +560,3 @@ POST /my-index/_shrink/my-shrunk-index
 ---
 
 # Démo Alerting
-
----

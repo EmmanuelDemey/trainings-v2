@@ -552,13 +552,13 @@ PUT movies
 
 # Les Analyzers
 
-image::../images/analyzer_example.png[]
+![](/images/analyzer_example.png)
 
 ---
 
 # Les Analyzers
 
-image::../images/analyzer3.png[]
+![](/images/analyzer3.png)
 
 ---
 
@@ -568,21 +568,23 @@ image::../images/analyzer3.png[]
 * Bonne pratique : utiliser un alias afin d'éviter de changer le code applicatif
 * Reindexation via un système de batch ou via la _reindex_ API
 
-# !
+---
 
-image::../images/reindex1.png[]
+# Modification du Mapping
+
+![](/images/reindex1.png)
 
 ---
 
-# !
+# Modification du Mapping
 
-image::../images/reindex2.png[]
+![](/images/reindex2.png)
 
 ---
 
-# !
+# Modification du Mapping
 
-image::../images/reindex3.png[]
+![](/images/reindex3.png)
 
 ---
 
