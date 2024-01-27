@@ -416,20 +416,20 @@ const [data, loading] = useFetch();
 
 Si vous avez fait la partie bonus précédente, il se peut que ce hook gère plus de choses.
 
-## PW8 - State Container
+## PW7 - State Container
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [API Context](https://react.dev/learn/passing-data-deeply-with-context)
 - [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
-:::
+  :::
 
 Dans ce TP, nous allons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
 
 Les actions qui pourront étre exécutées par l'utilisateur sont des actions permettant d'aimer (LIKE) ou ne plus aimer (DISLIKE) un personnage.
 
-Nous allons commencer tout d'abord par définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer 
+Nous allons commencer tout d'abord par définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer
 
 - un tbleau de personnages
 - une fonction permettant d'ajouter un personnage
@@ -505,7 +505,6 @@ function getIDFromUrl(url: string): string {
   return withoutPrefix.replace("/", "");
 }
 ```
-
 
 ## PW9 - Internationalisation
 
