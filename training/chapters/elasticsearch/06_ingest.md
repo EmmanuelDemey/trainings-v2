@@ -207,5 +207,3 @@ POST /blob_index/_doc?pipeline=blob
 
 GET /blob_index/_search?q=elasticsearch
 ```
-
----

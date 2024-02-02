@@ -140,10 +140,10 @@ title: Slides
   return Promise.resolve();
 };
 
-const generateSlides = () => {
+const generateSlides = (training: string) => {
   const mds: string[] = fs
     .readdirSync(".")
-    .filter((p: string) => (p.endsWith("react.md") || p.endsWith("elasticsearch.md")) && !p.endsWith("_pw.md"))
+    .filter((p: string) => p.endsWith(training + ".md") && !p.endsWith("_pw.md"))
     .filter((p: string) => !p.startsWith("README"));
   return Promise.all(
     mds.map((md: string) => {
@@ -158,8 +158,8 @@ const generateSlides = () => {
     })
   );
 };
-const generatePwWebsite = () => {
-  const pws: string[] = fs.readdirSync(".").filter((p: string) => p.endsWith("react_pw.md"));
+const generatePwWebsite = (training: string) => {
+  const pws: string[] = fs.readdirSync(".").filter((p: string) => p.endsWith(training + "_pw.md"));
   return Promise.all(
     pws.map((pw) => {
       console.log(`building pw ${pw}`);
@@ -179,5 +179,5 @@ const generatePwWebsite = () => {
   fs.rmSync("dist", { recursive: true, force: true });
   mkdirSync("dist");
 
-  await Promise.all([generateSlides(), generatePwWebsite()]);
+  await Promise.all([generateSlides(process.argv[2]), generatePwWebsite(process.argv[2])]);
 })();

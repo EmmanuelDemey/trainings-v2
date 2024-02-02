@@ -548,10 +548,6 @@ PUT /my-index-000001/_settings
 ./bin/*beat -e
 ```
 
----
-
-# Architecture
-
 ```
 output.elasticsearch:
 hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
@@ -562,10 +558,6 @@ hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
 # Heartbeat
 
 * Agent permettant de s'assurer de la disponibilité d'un service
-
----
-
-# Heartbeat
 
 ```
 heartbeat.monitors:
@@ -580,10 +572,6 @@ service_name: apm-service-name
 id: my-http-service
 name: My HTTP Service
 ```
-
----
-
-# Heartbeat
 
 ```
 ./heartbeat setup -e
@@ -601,10 +589,6 @@ name: My HTTP Service
 filebeat modules enable system nginx mysql
 ```
 
----
-
-# Filebeat
-
 ```
 ./filebeat setup -e
 ./filebeat -e
@@ -621,10 +605,6 @@ filebeat modules enable system nginx mysql
 metricbeat modules enable apache mysql
 ```
 
----
-
-# Metricbeat
-
 ```
 ./metricbeat setup -e
 ./metricbeat -e
@@ -637,18 +617,10 @@ metricbeat modules enable apache mysql
 * Agent permettant d'indexer des paquets réseau transitant dans un système d'informations
 * Possibilité d'activer des modules permettant de supporter des trames standardisées.
 
----
-
-# Packetbeat
-
 ```
 ./packetbeat setup -e
 ./packetbeat -e
 ```
-
----
-
-# Packetbeat
 
 ```
 packetbeat.protocols:

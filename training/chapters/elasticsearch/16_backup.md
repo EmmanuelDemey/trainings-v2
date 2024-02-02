@@ -28,7 +28,7 @@ layout: cover
 
 * Première chose à faire est de créer un `repository` 
 * Possibilité d'utiliser différents types
-    * Shared fiel system, Read-only URL
+    * Shared file system, Read-only URL
     * Azure, S3, Google Cloud Storage
     * Via des plugins: Hadoop Distributed File System
 
@@ -98,13 +98,11 @@ PUT _slm/policy/nightly-snapshots
 }
 ```
 
----
-
-# Création automatique du Snapshot
-
+<v-click>
 ```
 POST _slm/policy/nightly-snapshots/_execute
 ```
+</v-click>
 
 ---
 
@@ -139,7 +137,12 @@ POST /_snapshot/my_fs_backup/snapshot_1/_restore
 ```
 
 ---
+layout: cover
+---
 
 # Démo dans Kibana
 
 ---
+layout: cover
+---
+# Partie Pratique

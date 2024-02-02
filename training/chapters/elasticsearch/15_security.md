@@ -49,7 +49,7 @@ bin/elasticsearch-setup-passwords interactive
 POST /_security/role/events_admin
 {
   "run_as": [ "admin" ],
-  "cluster": [ "monitor"]
+  "cluster": [ "monitor"],
   "indices" : [
     {
       "names" : [ "events*" ],
@@ -84,7 +84,7 @@ POST /_security/user/johndoe
   "full_name" : "John Doe",
   "email" : "john.doe@anony.mous",
   "roles" : [ "events_admin" ]
-}'
+}
 ```
 
 ---
@@ -225,11 +225,18 @@ xpack.security.audit.logfile.events.ignore_filters.<policy_name>.users:
     * ...
 
 ---
+layout: cover
+---
 
 # Démo dans Kibana
 
+---
+layout: cover
 ---
 
 # Les Spaces dans Kibana
 
 ---
+layout: cover
+---
+# Partie Pratique

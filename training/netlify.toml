@@ -3,7 +3,7 @@
 
 [build]
   publish = "dist"
-  command = "node script.js"
+  command = "npx ts-node script.ts"
 
 [[redirects]]
   from = "/.well-known/*"

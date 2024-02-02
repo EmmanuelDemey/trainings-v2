@@ -10,6 +10,9 @@ layout: cover
 
 * Elasticsearch est utilisable via de simples requêtes HTTPs
 * De nombreux SDK existent pour intégrer dans du Java, JavaScript, .NET, PHP ...
+    * https://github.com/elastic/elasticsearch-php
+    * https://github.com/elastic/elasticsearch-js
+    * https://github.com/elastic/elasticsearch-java
 
 ```
 npm install @elastic/elasticsearch
@@ -85,5 +88,11 @@ client.cat.indices({
 ```
 
 ---
-
+layout: cover
+---
 # Présentation de la documentation
+
+---
+layout: cover
+---
+# Partie Pratique

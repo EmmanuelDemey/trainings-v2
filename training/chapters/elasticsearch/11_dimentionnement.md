@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# Dimentionnement
+# Dimensionnement
 
 ---
 
@@ -239,3 +239,8 @@ PUT _cluster/settings
     * Un shard doit contenir entre 10GB et 50GB
     * Un noeud pouvant être `master` doit avoir 1GB heap par 3000 index
     * Un noeud data doit avoir 1KB heap par champ et par index
+
+---
+layout: cover
+---
+# Partie Pratique

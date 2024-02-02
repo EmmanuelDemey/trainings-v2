@@ -185,5 +185,12 @@ PUT _index_template/timeseries_template
 ```
 
 ---
+layout: cover
+---
 
 # Gestion des ILM depuis Kibana
+
+---
+layout: cover
+---
+# Partie Pratique

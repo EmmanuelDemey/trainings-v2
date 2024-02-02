@@ -554,9 +554,12 @@ POST /my-index/_shrink/my-shrunk-index
     * Toutes les cinq minutes, enregistrer le dernier document ayant pour auteur ...
 
 ---
+layout: cover
+---
 
 # Démo Monitoring via Kibana
 
 ---
-
-# Démo Alerting
+layout: cover
+---
+# Partie Pratique

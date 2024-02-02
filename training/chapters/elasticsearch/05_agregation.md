@@ -430,9 +430,16 @@ POST /sales/_search
 ```
 
 ---
-
+layout: cover
+---
 # Présentation de la documentation
 
 ---
-
+layout: cover
+---
 # Démo avec  Kibana
+
+---
+layout: cover
+---
+# Partie Pratique

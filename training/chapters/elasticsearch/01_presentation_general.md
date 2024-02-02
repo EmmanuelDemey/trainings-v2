@@ -270,5 +270,6 @@ node.ml: false
     * Kibana
 
 ---
-
+layout: cover
+---
 # Démo Elasticsearch et Kibana

@@ -185,7 +185,12 @@ PUT _watcher/watch/cluster_health_watch
 ```
 
 ---
+layout: cover
+---
 
 # Demo de Alerting sur Kibana
 
 ---
+layout: cover
+---
+# Partie Pratique

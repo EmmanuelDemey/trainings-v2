@@ -1,6 +1,7 @@
 ---
 layout: cover
 ---
+
 # Indexation
 
 ---
@@ -515,8 +516,13 @@ POST /_aliases
 POST /_aliases
 {
     "actions" : [
-        { "remove" : { "index" : "movies-v2", "alias" : "movies" } },
-        { "add" : { "index" : "movies-v1", "alias" : "movies" } }
+        { "add" : { "index" : "movies-v2", "alias" : "movies" } },
+        { "remove" : { "index" : "movies-v1", "alias" : "movies" } }
     ]
 }
 ```
+
+---
+layout: cover
+---
+# Partie Pratique

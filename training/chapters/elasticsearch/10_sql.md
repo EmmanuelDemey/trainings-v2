@@ -83,3 +83,8 @@ FROM emp
 GROUP BY l
 HAVING c BETWEEN 15 AND 20;
 ```
+
+---
+layout: cover
+---
+# Partie Pratique

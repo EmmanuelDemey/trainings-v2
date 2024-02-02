@@ -41,6 +41,11 @@ hide: false
 ---
 
 ---
+src: ./chapters/elasticsearch/03bis_schema.md
+hide: false
+---
+
+---
 src: ./chapters/elasticsearch/04_recherche.md
 hide: false
 ---

@@ -527,3 +527,8 @@ POST /cluster_one:movie/_search
   }
 }
 ```
+
+---
+layout: cover
+---
+# Partie Pratique
