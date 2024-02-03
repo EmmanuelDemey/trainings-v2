@@ -63,7 +63,7 @@ PUT /_snapshot/backups_1
 {
     "type": "fs",
     "settings": {
-        "location": "/mount/backups_1"
+        "location": "/mount/backups_1/sub_folder"
     }
 }
 ```
@@ -109,7 +109,7 @@ POST _slm/policy/nightly-snapshots/_execute
 # Création manuelle du Snapshot
 
 ```
-PUT /_snapshot/my_fs_backup/snapshot_1?wait_for_completion=true
+PUT /_snapshot/backups_1/snapshot_1?wait_for_completion=true
 {
   "indices": "index_1,index_2",
   "ignore_unavailable": true,
@@ -125,7 +125,7 @@ PUT /_snapshot/my_fs_backup/snapshot_1?wait_for_completion=true
 # Restore du Snapshot
 
 ```
-POST /_snapshot/my_fs_backup/snapshot_1/_restore
+POST /_snapshot/backups_1/snapshot_1/_restore
 {
   "indices": "index_1,index_2",
   "ignore_unavailable": true,

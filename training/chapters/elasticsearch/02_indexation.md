@@ -389,29 +389,6 @@ action.disable_delete_all_indices: true
 
 ---
 
-# Open et Close API
-
-* Un index peut etre ouvert ou fermé
-* Le fait de fermer un index peut améliorer les performances de votre cluster
-* Les données seront toujours indexées mais pas recherchables
-
-```
-POST /twitter/_open
-POST /twitter/_close
-```
-
----
-
-# Open et Close API
-
-* Il est recommandé de désactiver la possibilité de clore tous les indexes
-
-```
-action.disable_close_all_indices: true
-```
-
----
-
 # Bulk API
 
 * L'API `bulk` permet de faire plusieurs requêtes d'indexation, de modification ou de suppression en une seule requête HTTP
