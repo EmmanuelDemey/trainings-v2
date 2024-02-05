@@ -6,6 +6,16 @@
   command = "npx ts-node script.ts"
 
 [[redirects]]
+  from = "/elasticsearch/*"
+  to = "/elasticsearch/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/react/*"
+  to = "/react/index.html"
+  status = 200
+
+[[redirects]]
   from = "/.well-known/*"
   to = "/.well-known/:splat"
   status = 200
