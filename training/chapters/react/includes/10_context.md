@@ -16,7 +16,7 @@
 ```typescript
 import { createContext } from 'react';
 
-export const themes: { [key:string]: Theme } = {
+export const themes: Record<string, Theme> = {
   light: {
   },
   dark: {
