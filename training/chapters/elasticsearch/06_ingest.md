@@ -2,15 +2,31 @@
 layout: cover
 ---
 
+
 # Ingest Pipelines
 
 ---
 
-# Ingest Pipeline
+# What Are Ingest Pipelines?
 
-* Les pipelines d'Ingestion permettent de modifier la donnée avant indexation
-* Identique à des pipelines *Logstash*.
-* Peuvent être exécutés par des noeuds spécifiques : **Ingest Node**.
+* A series of processors that pre-process documents before indexing
+* Allows transformation, enrichment, and manipulation of data
+* Each pipeline consists of one or more processors executed in order
+
+```
+PUT _ingest/pipeline/my_pipeline
+{
+  "description": "My first ingest pipeline",
+  "processors": [
+    {
+      "set": {
+        "field": "field_name",
+        "value": "value"
+      }
+    }
+  ]
+}
+```
 
 ```
 node.ingest: false
@@ -18,192 +34,150 @@ node.ingest: false
 
 ---
 
-# Création
+# Why Use Ingest Pipelines? 
 
-```
-PUT _ingest/pipeline/my_pipeline_id
+* Data normalization and standardization
+* Enrichment with additional data sources
+* Removal of unnecessary data fields
+* Improved indexing efficiency and search relevance
+* Case Studies:
+  * Log data normalization for centralized logging systems
+  * Enriching e-commerce transactions with customer data
+  * Preprocessing social media data for sentiment analysis
+
+---
+
+# Core Components of an Ingest Pipeline
+
+* Processors: Perform operations on documents
+* Conditions: Define when a processor should be executed
+* Failures: Handling of processing errors
+
+```json
 {
-  "description" : "describe pipeline",
-  "processors" : [
-    {
-      "set" : {
-        "field": "firstName",
-        "value": "Emmanuel"
-      }
-    }
-  ]
-}
-```
-
----
-
-# Utilisation #1
-
-```
-PUT my-index/_doc/1?pipeline=my_pipeline_id
-{
-  "lastName": "Demey"
-}
-```
-
----
-
-# Utilisation #2
-
-```
-POST _bulk
-{ "index" : { "_index" : "my-index", "_id" : "1", "pipeline": "my_pipeline_id" } }
-{ "lastName": "Demey" }
-```
-
----
-
-# Utilisation #3
-
-```
-PUT my-index/_settings
-{
-  "index.default_pipeline": "my_pipeline_id"
-}
-```
-
----
-
-# Processeurs
-
-* Set
-* Drop
-* Grok
-* Convert
-* ...
-
----
-
-# Processeur Drop
-
-```
-PUT _ingest/pipeline/my-pipeline-id
-{
-  "description": "drop document if the network name is Guest",
-  "processors" : [
-    {
-        "drop": {
-            "if" : "ctx.network_name == 'Guest'"
-        }
-    }
-  ]
-}
-```
-
----
-
-# Processeur Convert
-
-```
-PUT _ingest/pipeline/my-pipeline-id
-{
-  "description": "converts the content of the id field to an integer",
-  "processors" : [
-    {
-      "convert" : {
-        "field" : "id",
-        "type": "integer"
-      }
-    }
-  ]
-}
-```
-
----
-
-# Processeur Grok
-
-* Convertir une chaine de caractère en document JSON
-    * 192.168.1.13 POST /service/create 143 7
-
-```
-{
-  "duration": 7,
-  "request": "/service/create",
-  "method": "POST",
-  "bytes": 143,
-  "client": "192.168.1.13"
-}
-```
-
----
-
-# Processeur Grok
-
-```
-PUT _ingest/pipeline/my-pipeline-id
-{
-  "description": "converts a text into a JSON document",
   "processors": [
-      {
-        "grok": {
-          "field": "message",
-          "patterns": ["%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes:int} %{NUMBER:duration:double}"]
-        }
-      }
-    ]
+    { "set": { "field": "new_field", "value": "value" } },
+    { "remove": { "field": "unwanted_field" } }
+  ],
+  "on_failure": [
+    { "set": { "field": "error", "value": "{{ _ingest.on_failure_message }}" } }
+  ]
 }
 ```
 
 ---
 
-# Simulation d'un Pipeline
+# Common Processors
+
+* Set, Remove, Rename: Modify fields
+* Grok: Parses unstructured text
+* Date: Parses and formats dates
+* GeoIP: Adds geographical information based on IP
+
+```json
+{
+  "grok": { 
+    "field": "message", 
+    "patterns": ["%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}"] 
+  },
+  "date": { "field": "timestamp", "formats": ["ISO8601"] },
+  "geoip": { "field": "client" }
+}
+```
+
+---
+
+# Creating an Ingest Pipeline
+
+* Define the pipeline in the Elasticsearch API
+* Specify processors and their order
+* Test the pipeline with sample data
+
+```
+PUT _ingest/pipeline/my_custom_pipeline
+{
+  "processors": [
+    { "remove": { "field": "temp_field" } },
+    { "rename": { "field": "old_name", "target_field": "new_name" } }
+  ]
+}
+```
+
+---
+
+# How the Simulate API Works
+
+* Define a pipeline or use an existing one
+* Specify one or more sample documents to test
+* Analyze the output to understand how the pipeline transforms the data
 
 ```
 POST _ingest/pipeline/_simulate
 {
   "pipeline": {
-    "description" : "...",
+    "description": "Test pipeline",
     "processors": [
-      {
-        "grok": {
-          "field": "message",
-          "patterns": ["%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes:int} %{NUMBER:duration:double}"]
-        }
-      }
+      { "set": { "field": "new_field", "value": "value" } }
     ]
   },
-  "docs":[
-    {
-      "_source": {
-        "message": "55.3.244.1 GET /index.html 15824 0.043"
-      }
-    }
+  "docs": [
+    { "_source": { "field1": "data1" } }
   ]
 }
 ```
 
 ---
 
-# Indexation de documents
+# How to use an Ingest Pipeline
 
-* Si nous souhaitons organiser des documents (pdf, doc, xls, ...) nous devons indexer le contenu en base64
-* Elasticsearch fournit un préprocesseur **attachment** permettant d'extraire des informations du document indexé
-* Une fois ces informations récupérées, elles seront indexées comme n'importe quel document.
+* Index Templates
 
 ```
-PUT _ingest/pipeline/blob
+PUT _index_template/my_template
 {
-  "description": "Extract attachment information",
-    "processors": [
-      {
-        "attachment": {
-          "field": "data",
-          "remove_binary": true
-        }
-      }
-    ]
+  "index_patterns": ["logs-*"],
+  "template": {
+    "settings": {
+      "default_pipeline": "my_ingest_pipeline"
+    }
+  }
 }
-
-POST /blob_index/_doc?pipeline=blob
-{
-  "data": "Base64-content...=="
-}
-
-GET /blob_index/_search?q=elasticsearch
 ```
+
+* When Reindexing
+
+```
+POST _reindex
+{
+  "source": {
+    "index": "existing-index"
+  },
+  "dest": {
+    "index": "new-index",
+    "pipeline": "my_ingest_pipeline"
+  }
+}
+```
+
+* When indexing
+
+```
+PUT /my-index/_doc/1?pipeline=my_ingest_pipeline
+{
+  "field1": "value1",
+  "field2": "value2"
+}
+```
+
+---
+
+# Best Practices
+
+* Start with simple pipelines and incrementally add complexity
+* Use the simulate API to test pipelines
+  * Use realistic document samples for accurate testing
+  * Test with different variations of input data to cover all use cases
+  * Combine multiple processors to see cumulative effects
+  * Utilize the on_failure section to handle errors gracefully
+* Monitor pipeline performance and errors
+* Keep documentation up to date

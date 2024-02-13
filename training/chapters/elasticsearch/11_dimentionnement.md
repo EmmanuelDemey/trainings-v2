@@ -2,13 +2,13 @@
 layout: cover
 ---
 
-# Dimensionnement
+# Scaling
 
 ---
 
-# Gestion des indexes
+# Index Management
 
-* Nous pouvons créer des indexes manuellement
+* We can create indexes manually
 
 ```
 PUT /movies
@@ -27,18 +27,18 @@ PUT /movies
 
 ---
 
-# Gestion des indexes
+# Index Management
 
-* Dans la partie *settings*, nous allons définir les **shards** de notre index.
-* Deux types de shards existent :
-    * **primary shards** et **replica shards**
-* Les **primary shards** sont d'abord utilisés à l'indexation
-* Les **primary** et **replicas** sont utilisés de la même façon lors de la recherche
-* Un shard correspond à une instance Lucene
+* In the *settings* part, we define the **shards** of our index.
+* Two types of shards exist:
+    * **primary shards** and **replica shards**
+* The **primary shards** are initially used for indexing
+* Both **primary** and **replicas** are used equally for searching
+* A shard corresponds to a Lucene instance
 
 ---
 
-# Gestion des indexes
+# Index Management
 
 ```
 PUT /movies
@@ -52,9 +52,9 @@ PUT /movies
 
 ---
 
-# Gestion des indexes
+# Index Management
 
-* Nous pouvons modifier certains *settings* d'un index à posteriori
+* We can modify certain *settings* of an index afterwards
 
 ```
 PUT /movies/_settings
@@ -67,9 +67,9 @@ PUT /movies/_settings
 
 ---
 
-# Gestion des indexes
+# Index Management
 
-* Une configuration globale peut être définie dans le fichier `elasticsearch.yml`.
+* A global configuration can be set in the `elasticsearch.yml` file.
 
 ```
 index.number_of_shards: 1
@@ -78,12 +78,12 @@ index.number_of_replicas: 1
 
 ---
 
-# Statut d'un cluster
+# Cluster Status
 
-* Elasticsearch sera en charge de créer les shards et de les positionner au bon endroit
-* Un shard replica ne peut absolument pas être sur le même noeud que son shard primaire
-* Si c'est le cas, le status du cluster sera en `yellow`
-* Le cluster peut avoir le status `green`, `yellow` ou `red`.
+* Elasticsearch is responsible for creating shards and placing them in the right place
+* A replica shard cannot be on the same node as its primary shard
+* If it is the case, the cluster status will be `yellow`
+* The cluster can have the status `green`, `yellow`, or `red`.
 
 ```
 GET /_cluster/health
@@ -91,7 +91,7 @@ GET /_cluster/health
 
 ---
 
-# Statut d'un cluster
+# Cluster Status
 
 ```
 {
@@ -115,21 +115,21 @@ GET /_cluster/health
 
 ---
 
-# Statut d'un cluster
+# Cluster Status
 
 ![](/images/cluster_yellow.png)
 
 ---
 
-# Statut d'un cluster
+# Cluster Status
 
 ![](/images/cluster_green.png)
 
 ---
 
-# Topologie
+# Topology
 
-* Un noeud Elasticsearch peut avoir plusieurs rôles
+* An Elasticsearch node can have multiple roles
     * `master`
     * `data`
     * `data_content`
@@ -143,19 +143,19 @@ GET /_cluster/health
 
 ---
 
-# Topologie
+# Topology
 
-* Si un noeud n'a aucun role, il devient un `Coordinating only node`
-* Il aura comme tâches de
-    * Router les requêtes
-    * Réaliser la phase de consolidation des recherches
-    * Distribuer les requêtes `bulk`
+* If a node has no role, it becomes a `Coordinating only node`
+* It will have tasks like
+    * Routing queries
+    * Performing search phase consolidation
+    * Distributing `bulk` requests
 
 ---
 
-# Topologie
+# Topology
 
-* La définition des rôles d'un noeud se fait via le paramètre `node.roles`
+* Node roles are defined using the `node.roles` parameter
 
 ```
 node.roles: [ master ]
@@ -165,9 +165,8 @@ node.roles: [ master ]
 
 # Disk-based shard allocation
 
-* Nous pouvons définir des règles basées sur l'espace disque utilisé pour déterminer l'emplacement
- des shards.
-* Nous les nommons des `watermark`
+* We can define rules based on disk space used to determine shard placement.
+* We call them `watermarks`
 
 ```
 cluster.routing.allocation.disk.watermark.low: 85%
@@ -179,7 +178,7 @@ cluster.info.update.interval: 30s
 
 # Disk-based shard allocation
 
-* Nous pouvons modifier ces valeurs via l'API `_cluster/settings`
+* We can modify these values via the `_cluster/settings` API
 
 ```
 PUT _cluster/settings
@@ -196,19 +195,19 @@ PUT _cluster/settings
 
 # Shard allocation awareness
 
-* Nous pouvons définir des contraintes `custom à nos noeuds
-* Dans le but de définir dès règles d'allocation des primary shard et réplicas.
-* Par exemple, nous ne voulons pas pas que les shards se situent
-    * sur le même rack
-    * dans la même région
-    * sur le même povider Cloud
+* We can define custom constraints on our nodes
+* To define rules for allocating primary shards and replicas.
+* For example, we don't want shards to be located
+    * on the same rack
+    * in the same region
+    * on the same cloud provider
     * ....
 
 ---
 
 # Shard allocation awareness
 
-* Pour cela, nous utilisons les `attributes`
+* For this, we use `attributes`
 
 ```
 node.attr.rack_id: rack_one
@@ -219,8 +218,8 @@ cluster.routing.allocation.awareness.attributes: rack_id
 
 # Cluster-level shard allocation filtering
 
-* Enfin nous pouvons ajouter des contraintes supplémentaires via l'API `_cluster/settings`
-* En utilisant l'une des propriétés `_name`, `_ip`, `_host`, ...
+* Finally, we can add additional constraints via the `_cluster/settings` API
+* Using one of the properties `_name`, `_ip`, `_host`, ...
 
 ```
 PUT _cluster/settings
@@ -233,14 +232,16 @@ PUT _cluster/settings
 
 ---
 
-# Dimensionnement recommandé
+# Recommended Sizing
 
-* Elastic conseille de respecter les règles suivantes pour dimensionner son cluster
-    * Un shard doit contenir entre 10GB et 50GB
-    * Un noeud pouvant être `master` doit avoir 1GB heap par 3000 index
-    * Un noeud data doit avoir 1KB heap par champ et par index
+* Elastic advises following these rules to size your cluster
+    * A shard should contain between 10GB and 50GB
+    * A node that can be `master` should have 1GB heap per 3000 indices
+    * A data node should have 1KB heap per field and per index
 
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part
+
+The translation is complete! Let me know if there's anything else you need.

@@ -2,21 +2,26 @@
 layout: cover
 ---
 
-# Développons avec Elasticsearch
+# Developing with Elasticsearch
 
 ---
 
-# Utilisation d'un SDK
+# Using a SDK
 
-* Elasticsearch est utilisable via de simples requêtes HTTPs
-* De nombreux SDK existent pour intégrer dans du Java, JavaScript, .NET, PHP ...
-    * https://github.com/elastic/elasticsearch-php
-    * https://github.com/elastic/elasticsearch-js
-    * https://github.com/elastic/elasticsearch-java
+* Elasticsearch is usable via simple HTTP requests
+* Many SDKs exist for integration with Java, JavaScript, .NET, PHP, etc.
+    * [elasticsearch-php](https://github.com/elastic/elasticsearch-php)
+    * [elasticsearch-js](https://github.com/elastic/elasticsearch-js)
+    * [elasticsearch-java](https://github.com/elastic/elasticsearch-java)
 
 ```
 npm install @elastic/elasticsearch
 ```
+
+---
+
+# Using a SDK
+
 
 ```javascript
 const { Client } = require('@elastic/elasticsearch')
@@ -38,7 +43,7 @@ const client = new Client({
 
 ---
 
-# SDK Node.js
+# Node.js SDK
 
 ```javascript
 const { body } = await client./* action */({
@@ -51,7 +56,7 @@ const { body } = await client./* action */({
 
 ---
 
-# SDK Node.js
+# Node.js SDK
 
 ```javascript
 await client.index({
@@ -65,7 +70,7 @@ await client.index({
 
 ---
 
-# SDK Node.js
+# Node.js SDK
 
 ```javascript
 const { body } = await client.search({
@@ -78,7 +83,7 @@ const { body } = await client.search({
 
 ---
 
-# SDK Node.js
+# Node.js SDK
 
 ```javascript
 client.cat.indices({
@@ -90,9 +95,11 @@ client.cat.indices({
 ---
 layout: cover
 ---
-# Présentation de la documentation
+
+# Documentation Overview
 
 ---
 layout: cover
 ---
-# Partie Pratique
+
+# Practical Part

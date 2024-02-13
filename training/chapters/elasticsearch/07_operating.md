@@ -6,7 +6,7 @@ layout: cover
 
 ---
 
-# Topologie
+# Topology
 
 * Master Node
 * Data Node
@@ -14,7 +14,7 @@ layout: cover
 * Coordinator Node
 * Machine Learning Node
 * Transform Node
-* Remote-elligible Node
+* Remote-eligible Node
 
 ---
 
@@ -62,13 +62,13 @@ layout: cover
 
 # Slow Queries
 
-* Il est possible de logger les requêtes dépassant un certain temps
-* Cette configuration peut s'appliquer
-    * via la ligne de commande
-    * via le fichier elasticsearch.yml
-    * via la fichier log4j2.properties
-    * via l'API
-* La dernière solution a l'avantage de pouvoir être activé à chaud
+* It is possible to log queries exceeding a certain time
+* This configuration can be applied
+    * via the command line
+    * via the elasticsearch.yml file
+    * via the log4j2.properties file
+    * via the API
+* The last solution has the advantage of being able to be activated on the fly
 
 ---
 
@@ -99,12 +99,12 @@ PUT movies/_settings
 
 ---
 
-# API pour monitorer votre cluster
+# API to monitor your cluster
 
-* Plusieurs APIs sont disponibles pour récupérer des statistiques du cluster elasticsearch
-    * la cat API
-    * la Node info API
-    * la Cluster Stats API
+* Several APIs are available to retrieve statistics from the Elasticsearch cluster
+    * Cat API
+    * Node info API
+    * Cluster Stats API
 
 ---
 
@@ -164,7 +164,7 @@ GET /_nodes/nodeId1,nodeId2/_all
         {
           "name": "analysis-icu",
           "version": "{version}",
-          "description": "The ICU Analysis plugin integrates Lucene ICU module into elasticsearch, adding ICU relates analysis components.",
+          "description": "The ICU Analysis plugin integrates Lucene ICU module into elasticsearch, adding ICU related analysis components.",
           "classname": "org.elasticsearch.plugin.analysis.icu.AnalysisICUPlugin",
           "has_native_controller": false
         }
@@ -262,7 +262,9 @@ GET /_cluster/stats?human&pretty
          "stored_fields_memory": "1.2kb",
          "stored_fields_memory_in_bytes": 1248,
          "term_vectors_memory": "0b",
-         "term_vectors_memory_in_bytes": 0,
+         "term_vectors_memory_in_bytes":
+
+ 0,
          "norms_memory": "384b",
          "norms_memory_in_bytes": 384,
          "points_memory" : "0b",
@@ -374,7 +376,7 @@ GET /_cluster/stats?human&pretty
         {
           "name": "analysis-icu",
           "version": "7.8.0",
-          "description": "The ICU Analysis plugin integrates Lucene ICU module into elasticsearch, adding ICU relates analysis components.",
+          "description": "The ICU Analysis plugin integrates Lucene ICU module into elasticsearch, adding ICU related analysis components.",
           "classname": "org.elasticsearch.plugin.analysis.icu.AnalysisICUPlugin",
           "has_native_controller": false
         },
@@ -405,22 +407,22 @@ POST /_cluster/allocation/explain
 
 ---
 
-# Bonnes pratiques Sizing
+# Best Sizing Practices
 
-* Un shard doit contenir entre 20 et 40 Go
-* Le nombre de partitions par noeud inférieur a 20 par Go de mémoire configurée
-* Combien de nodes dois-je avoir ?
+* A shard should contain between 20 and 40 GB
+* The number of shards per node should be less than 20 per GB of configured memory
+* How many nodes should I have?
     * Total data nodes = Total storage (GB) / Memory per data node / Memory:Data ratio
-    * Total storage = Raw data * nb shards * (1 + 0.15 disk Watermark threshold + 0.1 Margin of error)
-    * Memory:Data ratio = ratio de performance pour vos données (hot zone 1:30, warm zone 1:160 etc.)
+    * Total storage = Raw data * number of shards * (1 + 0.15 disk Watermark threshold + 0.1 Margin of error)
+    * Memory:Data ratio = performance ratio for your data (hot zone 1:30, warm zone 1:160 etc.)
 
 ---
 
-# Pool de threads
+# Thread Pools
 
-* Les pools de thread ont des configurations par défaut qui sont adaptées dans la majorité des cas d'utilisation
-* Le pool de thread de search est configuré par défaut à ((# of allocated processors * 3) / 2) + 1 = 13 et une queue_size de 1000.
-* Possibilité de surcharger ses configurations
+* Thread pools have default configurations that are suitable for the majority of use cases
+* The search thread pool is configured by default to ((# of allocated processors * 3) / 2) + 1 = 13 and a queue_size of 1000.
+* Possibility to overload these configurations
 
 ```
 GET /_cat/thread_pool
@@ -428,7 +430,7 @@ GET /_cat/thread_pool
 
 ---
 
-# Pool de threads
+# Thread Pools
 
 ```
 GET /_cat/thread_pool?v&h=id,name,queue,rejected,completed
@@ -451,18 +453,18 @@ WR-MucALTGC98E2HPCCydQ write                                      0        0    
 
 # ILM policy (X-Pack)
 
-* Permet de gérer le cycle de vie des index
-* Plusieurs phases (Hot, warm, cold, frozen, delete)
-* Plusieurs actions (rollover, read-only, shrink, force merge ...)
-* Plusieurs critères de rollover (max_age, max_docs, max_primary_shard_size)
-* Disponible via API ou via Kibana
+* Manages the lifecycle of indices
+* Several phases (Hot, warm, cold, frozen, delete)
+* Several actions (rollover, read-only, shrink, force merge ...)
+* Several rollover criteria (max_age, max_docs, max_primary_shard_size)
+* Available via API or via Kibana
 
 ---
 
 # Shrink
 
-* Il n'est pas possible de changer le nombre de shards primaires d'un index
-* Permet de rétrécir un index dans un nouvel index avec moins de shards primaires.
+* It is not possible to change the number of primary shards of an index
+* Shrinks an index into a new index with fewer primary shards.
 
 ```
 POST /my-index/_shrink/my-shrunk-index
@@ -472,19 +474,21 @@ POST /my-index/_shrink/my-shrunk-index
 
 # Transform API (X-Pack)
 
-* Permet d'indexer automatiquement le résultat d'une "requête" sur des données existantes.
-* Il est alors possible de rechercher dans des données déja agrégées/traitées.
-* Plusieurs types de transform (pivot, latest)
-    * Toutes les cinq minutes, enregistrer le nombre maximum de ...
-    * Toutes les cinq minutes, enregistrer le dernier document ayant pour auteur ...
+* Automatically indexes the result of a "query" on existing data.
+* It is then possible to search in already aggregated/processed data.
+* Several
+
+ types of transform (pivot, latest)
+    * Every five minutes, save the maximum number of ...
+    * Every five minutes, save the last document authored by ...
 
 ---
 layout: cover
 ---
 
-# Démo Monitoring via Kibana
+# Monitoring Demo via Kibana
 
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part

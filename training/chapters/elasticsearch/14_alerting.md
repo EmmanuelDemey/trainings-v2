@@ -8,7 +8,7 @@ layout: cover
 
 # Alerting
 
-* Elasticsearch propose deux solutions pour mettre en place un système d'alerting
+* Elasticsearch offers two solutions to set up an alerting system
     * Watcher (Elasticsearch)
     * Alerting (Kibana)
 
@@ -16,8 +16,8 @@ layout: cover
 
 # Watcher
 
-* API permettant de créer et gérer des "écoutes"
-* Un `watch` est composé des propriétés
+* API allowing to create and manage "watches"
+* A `watch` is composed of properties
     * `trigger`
     * `input`
     * `condition`
@@ -60,7 +60,7 @@ PUT _watcher/watch/log_error_watch
 
 # Input
 
-* Peut etre de type `simple`, `search`, `http` ou `chain`
+* Can be of type `simple`, `search`, `http`, or `chain`
 
 ```
 {
@@ -82,7 +82,7 @@ PUT _watcher/watch/log_error_watch
 
 # Condition
 
-* Peut etre de type `always`, `never`, `compare`, `array_compare` ou `script`
+* Can be of type `always`, `never`, `compare`, `array_compare`, or `script`
 
 ```
 {
@@ -96,7 +96,7 @@ PUT _watcher/watch/log_error_watch
 
 # Actions
 
-* Peut etre de type `email`, `webhook`, `index`, `logging`, `slack`, `pagerduty` ou `jira`
+* Can be of type `email`, `webhook`, `index`, `logging`, `slack`, `pagerduty`, or `jira`
 
 ```
 {
@@ -116,9 +116,9 @@ PUT _watcher/watch/log_error_watch
 
 ---
 
-# Gestion des watcher
+# Watcher Management
 
-* Pour lister les wachers
+* To list the watchers
 
 ```
 POST /_watcher/_query/watches
@@ -127,7 +127,7 @@ POST /_watcher/_query/watches
 }
 ```
 
-* Pour supprimer un watcher, nous pouvons exécuter la requete suivante
+* To delete a watcher, we can execute the following request
 
 ```
 DELETE _watcher/watch/log_error_watch
@@ -135,9 +135,9 @@ DELETE _watcher/watch/log_error_watch
 
 ---
 
-# Historique
+# History
 
-* L'ensemble de ces exécutions seront enregistrées dans un index `.watcher-history*`
+* All of these executions will be recorded in an index `.watcher-history*`
 
 ```
 POST .watcher-history*/_search?pretty
@@ -150,7 +150,7 @@ POST .watcher-history*/_search?pretty
 
 ---
 
-# Exemple Concret
+# Concrete Example
 
 ```
 PUT _watcher/watch/cluster_health_watch
@@ -188,9 +188,9 @@ PUT _watcher/watch/cluster_health_watch
 layout: cover
 ---
 
-# Demo de Alerting sur Kibana
+# Kibana Alerting Demo
 
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part

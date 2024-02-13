@@ -8,18 +8,18 @@ layout: cover
 
 # APM
 
-* Nous allons aborder dans ce chapitre comment monitorer une application Java
-    * Présenter le ECS
-    * Gérer les logs applicatifs
-    * Mettre en en place un APM
+* In this chapter, we will cover how to monitor a Java application
+    * Introducing the ECS
+    * Managing application logs
+    * Setting up APM
 
 ---
 
 # Elastic Common Schema
 
-* **ECS** est une spécification permettant de standardiser les documents indexés dans Elasticsearch.
-* Cela permet de faciliter la recherche, visualisation et corrélation entre les documents
-* Toutes les solutions de la suite **Elastic** respectent cette spécification
+* **ECS** is a specification for standardizing documents indexed in Elasticsearch.
+* This makes it easier to search, visualize, and correlate between documents.
+* All solutions in the **Elastic** stack adhere to this specification.
 
 ```json
 {
@@ -77,11 +77,10 @@ layout: cover
 
 ---
 
-# Gérer les logs applicatifs
+# Managing Application Logs
 
-* Si vous souhaitez générer des logs applicatifs utilisant le *ECS*, il suffit d'utiliser le
-module *log4j2-ecs-layout* proposé par Elastic.
-* Il est fonctionnel avec les framework
+* If you want to generate application logs using *ECS*, simply use the *log4j2-ecs-layout* module provided by Elastic.
+* It works with frameworks like:
     * LogBack
     * Log4j2
     * Log4j
@@ -97,9 +96,9 @@ module *log4j2-ecs-layout* proposé par Elastic.
 
 ---
 
-# Configuration pour Spring Boot
+# Configuration for Spring Boot
 
-* Puis configurer LogBack (ici spécifique à Spring Boot)
+* Then configure LogBack (specific to Spring Boot here)
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -124,21 +123,21 @@ module *log4j2-ecs-layout* proposé par Elastic.
 # APM
 
 * APM = Application Performance Monitoring
-* Permet de monitorer un système en recoltant les temps d'exécutions
-    * de requêtes HTTP
-    * d'accès à une base de données
-    * d'une manipulation d'un cache
-    * des métriques
-    * des erreurs
+* Allows monitoring a system by collecting execution times
+    * of HTTP requests
+    * database accesses
+    * cache manipulation
+    * metrics
+    * errors
     * ...
-* D'autres solutions existent : Dynatrace, Datadog ou encore NewRelic
+* Other solutions exist: Dynatrace, Datadog, or NewRelic
 
 --- 
 
 # APM Installation
 
-* Avec l'intégration Elastic APM
-* Avec le serveur standalone APM
+* With Elastic APM integration
+* With standalone APM server
 
 ---
 
@@ -150,28 +149,28 @@ image::../images/apm.png[]
 
 # Installation
 
-* Pour mettre en oeuvre APM, il faudra
-    * lancer le serveur APM (configuration identique à celle de la stack Beat)
-    * installer une dépendance en fonction du langage de programmation utilisé
-    * visualiser les données depuis Kibana
+* To implement APM, you will need to:
+    * start the APM server (configuration similar to that of the Beat stack)
+    * install a dependency according to the programming language used
+    * view the data from Kibana
 
 ---
 
 # Installation
 
-* Pour lancer le serveur APM, il faudra
-    * éventuellement le configurer via le fichier `apm-server.yml`
-    * exécuter la commande `./apm-server -e`
+* To start the APM server, you will need to:
+    * optionally configure it via the `apm-server.yml` file
+    * execute the command `./apm-server -e`
 
 ---
 
-# Démo avec APM standalone
+# Demo with standalone APM
 
 ---
 
-# Langage supporté
+# Supported Languages
 
-* Il existe de nombreux Agent APM
+* There are many APM agents available:
     * Go
     * Java
     * Node.js
@@ -182,17 +181,17 @@ image::../images/apm.png[]
 
 ---
 
-# Agent Java
+# Java Agent
 
-* Agent supportant de multiple frameworks Java
-* Détecte par défaut les appels vers les bases de données, requetes HTTP, ...
-* Aucune modification de votre code est nécessaire
+* Agent supporting multiple Java frameworks
+* Automatically detects calls to databases, HTTP requests, etc.
+* No modification of your code is necessary
 
 ---
 
 # Installation
 
-* Activation automatique
+* Automatic activation
 
 ```xml
 <dependency>
@@ -206,7 +205,7 @@ image::../images/apm.png[]
 
 # Installation
 
-* Exemple d'activation pour une application Spring Boot
+* Example of activation for a Spring Boot application
 
 ```java
 package fr.emmanueldemey.apm;
@@ -230,7 +229,7 @@ public class ApmApplication {
 
 # Installation
 
-* Activation via la ligne de commande
+* Activation via the command line
 
 ```
 java -javaagent:/path/to/elastic-apm-agent-<version>.jar \
@@ -246,7 +245,7 @@ java -javaagent:/path/to/elastic-apm-agent-<version>.jar \
 
 # Configuration
 
-* La configuration sera à réalisée dans le fichier de configuration `src/main/resources/elasticapm.properties`
+* Configuration will be done in the `src/main/resources/elasticapm.properties` configuration file
 
 ```
 service_name=javalin
@@ -257,14 +256,14 @@ server_url=http://localhost:8200
 
 # Configuration
 
-* La configuration peut se faire également
-    * via des propriétés Java
+* Configuration can also be done
+    * via Java properties
 
 ```
 -Delastic.apm.service_name=my-cool-service
 ```
 
-    * via des variables d'environnement
+    * via environment variables
 
 ```
 ELASTIC_APM_SERVICE_NAME=my-cool-service
@@ -283,32 +282,34 @@ ELASTIC_APM_SERVICE_NAME=my-cool-service
 
 # Span
 
-* Un span contient des informations sur l'exécution d'un code
-* Il mesure du début à la fin de son exécution
-* Peut avoir des relations vers des spans enfants
-* Contient les propriétés `transaction.id`, `parent.id`, `name`, `type`
+* A span contains information about the execution of code
+* It measures from the beginning to the end of its execution
+* Can have relationships with child spans
+* Contains properties such as `transaction.id`, `parent.id`, `name`, `type`
 
 ---
 
 # Transaction
 
-* Une Transaction est un Span particulier
-* On peut définir une transaction comme étant l'unité de travail principal du code instrumenté
-* Possède des informations liés
-    * au service (environnement, framework, ...)
-    * le host (IP, architecture, ...)
-    * l'URL (domaine, port, ...)
+* A Transaction is a special Span
+* We can define a transaction as the main unit of work of the instrumented code
+* Possesses related information
+    * to the service (environment, framework, ...)
+    * the host (IP, architecture, ...)
+    * the URL (domain, port, ...)
 
 ---
 
 # Public API
 
-* Nous pouvons intéragir dans les `span` et `transactions` crées.
+* We
+
+ can interact with the created `span` and `transactions`.
     * Annotation
     * Public API
-    * OpenTelemetry ou OpenTracing Bridges
+    * OpenTelemetry or OpenTracing Bridges
 
-* Il faut installer la dépendance
+* Dependency installation is required
 
 ```xml
 <dependency>
@@ -358,7 +359,7 @@ public Response onOutgoingRequest(Request request) throws Exception {
 
 # SPAN API
 
-* Les types ne sont pas normés, mais Elastic propose une liste de type utilisée par l'ensemble des Agents APM
+* Types are not standardized, but Elastic provides a list of types used by all APM Agents
     * `app`
     * `db`
     * `cache`
@@ -369,7 +370,7 @@ public Response onOutgoingRequest(Request request) throws Exception {
 
 # SPAN API
 
-* Nous pouvons également ajouter des labels à la current span
+* We can also add labels to the current span
 
 ```java
 Span span = ElasticApm.currentSpan();
@@ -380,8 +381,8 @@ span.setLabel("foo", "bar");
 
 # Plugin API
 
-* Elastic propose également un SDK permettant de créer un plugin afin d'instrumenter votre code.
-* Ces plugins seront exécutés directement par l'agent Java
+* Elastic also provides an SDK to create a plugin to instrument your code.
+* These plugins will be executed directly by the Java agent
 
 ```java
 @Advice.OnMethodEnter(suppress = Throwable.class, inline = false)
@@ -397,7 +398,7 @@ public static void onExitHandle(@Advice.Thrown Throwable thrown, @Advice.Enter O
 
 # Distributing Tracing
 
-* La corrélation entre les différentes briques de votre infrastructure est possible grâce au header `trace-id`
+* Correlation between the different components of your infrastructure is possible thanks to the `trace-id` header
 
 ```java
 public Response onOutgoingRequest(Request request) throws Exception {
@@ -421,9 +422,9 @@ public Response onOutgoingRequest(Request request) throws Exception {
 
 # Service Map
 
-* Visualisation de l'ensemble des services instrumentés
-* Permet de voir les relations entre les services
-* Un service non instrumenté ou quand le header `traceparent` est absent, la connexion ne sera pas visible.
+* Visualization of all instrumented services
+* Allows to see the relationships between services
+* An uninstrumented service or when the `traceparent` header is absent, the connection will not be visible.
 
 image::../images/servicemap.png[]
 
@@ -432,18 +433,18 @@ image::../images/servicemap.png[]
 # RUM
 
 * RUM == Real User Monitoring
-* Permet de récupérer des métriques d'une application Web
+* Allows to retrieve metrics from a Web application
     * Load Time
     * API Request
-    * Navigation des SPQ
+    * Navigation of SPQ
     * Core Web Vitals
 
 ---
 
-# Configuration du Serveur
+# Server Configuration
 
-* Il faut premièrement activer RUM sur le serveur APM
-* Ainsi que configurer correctement les CORS
+* Firstly, you need to enable RUM on the APM server
+* As well as correctly configure CORS
 
 ```
 apm-server.rum.enabled: true
@@ -476,7 +477,7 @@ const apm = init({
 
 # API
 
-* Nous avons ensuite une API similaire au client Java
+* We then have an API similar to the Java client
 
 ```javascript
 apm.setUserContext(context)

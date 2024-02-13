@@ -1,38 +1,39 @@
 ---
 layout: cover
 ---
-# Les Analyzers
+
+# Analyzers
 
 ---
 
-# Les Analyzers
+# Analyzers
 
-* À chaque propriété de type `text`, la valeur sera analysée par Elasticsearch.
-* Cette phase `analyze` est composée de trois étapes :
-    * Les Char Filters
-    * Le Tokenizer
-    * Les Token Filters
-* Suite à la phase d'analyse, le résultat est placé dans un index inversé
+* Each property of type `text` will be analyzed by Elasticsearch.
+* This `analyze` phase consists of three steps:
+    * Char Filters
+    * Tokenizer
+    * Token Filters
+* After the analysis phase, the result is placed in a inverted index.
 
 ---
 
-# Les Analyzers
+# Analyzers
 
 ![](/images/analyzer.png)
 
 ---
 
-# Les Char Filters
+# Char Filters
 
-* Les *Char Filters* permettent de modifier le texte d'origine en supprimant, modifiant ou ajoutant des caractères.
-* Nous pouvons configurer plusieurs `Char Filters` pour un analyzer
-* Chaque implémentation est configurable
+* Char Filters allow modification of the original text by removing, modifying, or adding characters.
+* Multiple `Char Filters` can be configured for an analyzer.
+* Each implementation is configurable.
 
 ---
 
-# Les Char Filters
+# Char Filters
 
-* Seuls trois *Char Filters* sont disponibles :
+* Only three *Char Filters* are available:
   
 * `HTML Strip`
 
@@ -54,19 +55,20 @@ My license plate is ٢٥٠١٥
 My credit card is 123-456-789
 -> My credit card is 123_456_789
 ```
----
-
-# Les Tokenizers
-
-* Un tokenizer permet de définir comment le texte doit etre découpé.
-* Nous avons un token en entrée, et 0+ en sortie
-* Nous ne pouvons configurer qu'un seul Tokenizer pour un analyzer
-* Chaque implémentation est configurable
-* De nombreux tokenizers sont disponibles nativement
 
 ---
 
-# Les Tokenizers
+# Tokenizers
+
+* A tokenizer defines how the text should be broken down.
+* We have one token as input, and 0+ tokens as output.
+* Only one Tokenizer can be configured for an analyzer.
+* Each implementation is configurable.
+* Many tokenizers are available natively.
+
+---
+
+# Tokenizers
 
 * Whitespace tokenizer
 
@@ -102,17 +104,17 @@ Quick
 
 ---
 
-# Les Token Filters
+# Token Filters
 
-* Un token filter permet de modifier, supprimer ou ajouter des tokens à la liste précédemment créée
-* Utilisé pour supprimer les mots communs, gérer les synonymes, les conjugaisons, les accents, la casse ...
-* Nous pouvons configurer plusieurs Token Filters pour un analyzer
-* Chaque implémentation est configurable
-* De nombreux token filters sont disponibles nativement
+* A token filter allows modification, deletion, or addition of tokens to the previously created list.
+* Used to remove common words, manage synonyms, conjugations, accents, casing...
+* Multiple Token Filters can be configured for an analyzer.
+* Each implementation is configurable.
+* Many token filters are available natively.
 
 ---
 
-# Les Token Filters
+# Token Filters
 
 * Stop token filter
 
@@ -148,16 +150,16 @@ a quick fox jumps over the lazy dog
 
 ---
 
-# Les Analyzers custom
+# Custom Analyzers
 
-* A partir de ces éléments, nous pouvons créer nos propres Analyzer
-* Et ensuite les associer à certains champs de nos documents
-* Un analyzer peut être défini pour l'indexation et pour la recherche
-* Par défaut, celui de l'indexation est également utilisé pour la recherche
+* With these elements, we can create our own Analyzers.
+* And then associate them with certain fields in our documents.
+* An analyzer can be defined for indexing and for searching.
+* By default, the one for indexing is also used for searching.
 
 ---
 
-# Les Analyzers custom
+# Custom Analyzers
 
 ```
 PUT movies
@@ -184,7 +186,7 @@ PUT movies
 
 ---
 
-# Les Analyzers custom
+# Custom Analyzers
 
 ```
 PUT movies
@@ -202,9 +204,9 @@ PUT movies
 
 ---
 
-# Les Analyzers built-in
+# Built-in Analyzers
 
-* Vous pouvez également utiliser les analyzer built-in
+* You can also use the built-in analyzers
     * `Keyword`,
     * `Standard`
     * `Language`
@@ -226,45 +228,45 @@ PUT movies
 
 ---
 
-# Les Analyzers
+# Analyzers
 
 ![](/images/analyzer_example.png)
 
 ---
 
-# Les Analyzers
+# Analyzers
 
 ![](/images/analyzer3.png)
 
 ---
 
-# Modification du Mapping
+# Mapping Modification
 
-* Si le mapping change, une réindexation complète des données est nécessaire.
-* Bonne pratique : utiliser un alias afin d'éviter de changer le code applicatif
-* Reindexation via un système de batch ou via la _reindex_ API
+* If the mapping changes, a complete reindexing of the data is necessary.
+* Good practice: use an alias to avoid changing the application code.
+* Reindexing can be done via a batch system or using the _reindex_ API.
 
 ---
 
-# Modification du Mapping
+# Mapping Modification
 
 ![](/images/reindex1.png)
 
 ---
 
-# Modification du Mapping
+# Mapping Modification
 
 ![](/images/reindex2.png)
 
 ---
 
-# Modification du Mapping
+# Mapping Modification
 
 ![](/images/reindex3.png)
 
 ---
 
-# Configuration de l'alias
+# Alias Configuration
 
 ```
 POST /_aliases
@@ -290,7 +292,7 @@ POST /_aliases
 
 # Reindex API
 
-* Nous pouvons reindexer un index complet
+* We can reindex a complete index
 
 ```
 POST _reindex
@@ -308,7 +310,7 @@ POST _reindex
 
 # Reindex API
 
-* Mais également une partie en définissant une requête de recherche
+* Or just a portion by defining a search query
 
 ```
 POST _reindex
@@ -331,8 +333,8 @@ POST _reindex
 
 # Reindex API
 
-* Nous ne sommes pas limité qu'aux index d'un même cluster
-* Nous pouvons reindexer les données d'un cluster distant
+* We're not limited to indexes within the same cluster
+* We can reindex data from a remote cluster
 
 ```
 POST _reindex
@@ -356,9 +358,9 @@ POST _reindex
 
 ---
 
-# Tester vos mapping
+# Test Your Mapping
 
-* Elasticsearch met à disposition un endpoint permettant de tester vos mapping
+* Elasticsearch provides an endpoint for testing your mappings
 
 ```
 POST _analyze
@@ -370,13 +372,15 @@ POST _analyze
 
 ---
 
-# Tester vos mapping
+# Test Your Mapping
 
 ```
 {
   "tokens": [
     {
-      "token": "The",
+      "token
+
+": "The",
       "start_offset": 0,
       "end_offset": 3,
       "type": "word",
@@ -408,7 +412,7 @@ POST _analyze
 ```
 ---
 
-# Tester vos mappings
+# Test Your Mappings
 
 ```
 POST _analyze
@@ -420,7 +424,7 @@ POST _analyze
 ```
 ---
 
-# Tester vos mappings
+# Test Your Mappings
 
 ```
 POST my_index/_analyze
@@ -432,16 +436,16 @@ POST my_index/_analyze
 
 ---
 
-# Les Templates
+# Templates
 
-* Nous pouvons définir des templates `index` et `componant`
-* Permet de centraliser la configuration d'un index
-* Et de la réutiliser lorsqu'un nouvel index est créé
-* La mise en place de templates est une pratique recommandée
+* We can define `index` and `component` templates
+* This centralizes the configuration of an index
+* And can be reused when a new index is created
+* Using templates is a recommended practice
 
 ---
 
-# Les Component Templates
+# Component Templates
 
 ```
 PUT _component_template/component_template1
@@ -460,7 +464,7 @@ PUT _component_template/component_template1
 
 ---
 
-# Les Index Templates
+# Index Templates
 
 ```
 PUT _index_template/template_1
@@ -495,4 +499,4 @@ PUT _index_template/template_1
 ---
 layout: cover
 ---
-# Présentation de la documentation
+# Presentation of the Documentation

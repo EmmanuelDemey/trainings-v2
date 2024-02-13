@@ -8,7 +8,7 @@ layout: cover
 
 # Cluster Health APIs
 
-* API permettant de récupérer l'état de santé de son Cluster
+* API allowing to retrieve the health state of your Cluster
 
 ```
 GET /_cluster/health/
@@ -42,11 +42,11 @@ GET /_cluster/health/
 
 # CAT APIs
 
-* Ensemble d'API permettant de récupérer des informations de votre cluster
-    * sur les noeuds
-    * sur les indices
-    * sur les shards
-    * sur les templates
+* Set of APIs allowing to retrieve information about your cluster
+    * on nodes
+    * on indices
+    * on shards
+    * on templates
     * ...
 
 ---
@@ -67,8 +67,8 @@ GET _cat/nodes
 
 # CAT API
 
-* Activer le mode `verbose` avec le paramètre `v`
-* Certaines APIs acceptent d'autres paramètres.
+* Enable `verbose` mode with the `v` parameter
+* Some APIs accept other parameters.
 
 ```
 GET /_cat/indices?v
@@ -79,7 +79,7 @@ GET /_cat/indices?v&health=red
 
 # CAT API
 
-* Voici le résultat de l'appel `GET /_cat/shards`
+* Here is the result of the call `GET /_cat/shards`
 
 ```
 filebeat-7.10.0-2022.01.07-000014 0   P   UNASSIGNED
@@ -91,7 +91,7 @@ filebeat-7.9.3-2022.01.07-000015  2   r   UNASSIGNED
 
 # Cluster Allocation Explain API
 
-* API permettant de comprendre pourquoi un shard n'a pas été assigné
+* API allowing to understand why a shard has not been assigned
 
 ```
 GET _cluster/allocation/explain
@@ -106,7 +106,7 @@ GET _cluster/allocation/explain
 
 # Cluster Allocation Explain API
 
-* Voici le résultat de la requete précédente
+* Here is the result of the previous request
 
 ```
 {
@@ -139,17 +139,17 @@ GET _cluster/allocation/explain
 
 # Field Data Cache
 
-* Le `Field Data Cache` est utilisé pour stocker des informations utilisées notamment pour les aggrégation
-* Un cache sur-utilisé peut éventuellement indiqué l'utilisation de field data sur des champs analysés (`type=text`)
-* Nous pouvons monitorer cela via
-    * la `cat fielddata API`
-    * la `nodes stats API`
+* The `Field Data Cache` is used to store information used notably for aggregations
+* An overused cache may indicate field data usage on analyzed fields (`type=text`)
+* We can monitor this via
+    * the `cat fielddata API`
+    * the `nodes stats API`
 
 ---
 
 # Field Data Cache
 
-* Via la `cat fielddata API`
+* Via the `cat fielddata API`
 
 ```
 GET /_cat/fielddata?v=true
@@ -166,7 +166,7 @@ Nqk-6inXQq-OxUfOUI8jNQ 127.0.0.1 127.0.0.1 Nqk-6in soul    480b
 
 # Field Data Cache
 
-* Via la `nodes stats API`
+* Via the `nodes stats API`
 
 ```
 GET /_nodes/stats/indices/fielddata?fields=field1,field2
@@ -180,7 +180,7 @@ GET /_nodes/stats/indices/fielddata?fields=field*```
 
 ---
 
-# Autres APIs
+# Other APIs
 
 ```
 GET /_nodes/stats
@@ -256,6 +256,8 @@ GET /_cluster/stats?human&pretty
 ```
 
 ```
+
+
 {
    "_nodes" : {
       "total" : 1,
@@ -458,12 +460,12 @@ GET /_cluster/stats?human&pretty
 
 # slowlog
 
-* Mécanisme permettant de logger les requêtes dépassant un certain temps d'exécution
-* Ces informations seront disponibles dans un fichier de log spécifique
-* On peut configurer un threshold pour les requêtes de
-    * recherche (query)
-    * récupération (fetch)
-    * index (index)
+* Mechanism allowing to log requests exceeding a certain execution time
+* This information will be available in a specific log file
+* We can configure a threshold for queries of
+    * search (query)
+    * fetch
+    * index
 
 ---
 
@@ -478,7 +480,9 @@ index.search.slowlog.threshold.query.trace: 500ms
 index.search.slowlog.threshold.fetch.warn: 1s
 ...
 
-index.indexing.slowlog.threshold.index.warn: 10s
+index.index
+
+ing.slowlog.threshold.index.warn: 10s
 ...
 ```
 
@@ -486,7 +490,7 @@ index.indexing.slowlog.threshold.index.warn: 10s
 
 # slowlog
 
-* Nous pouvons également modifier ces paramètres à la volée
+* We can also modify these parameters on the fly
 
 ```
 PUT /my-index-000001/_settings
@@ -520,28 +524,28 @@ PUT /my-index-000001/_settings
 
 # Monitoring
 
-* La solution préconisé pour monitorer un cluster Elastic, est d'utiliser
+* The recommended solution for monitoring an Elastic cluster is to use
     * Metricbeat
     * Filebeat
     * Heartbeat
     * ...
-* Il est recommandé d'envoyer ces métrics dans un second cluster
+* It is recommended to send these metrics to a second cluster
 
 ---
 
 # Architecture
 
-* Agents écrits en Go
-* Collecteurs de données
-* Respectent la même philosophie de configuration
-* Configuration via un fichier YAML
-* Extensibles
+* Agents written in Go
+* Data collectors
+* Respect the same configuration philosophy
+* Configuration via a YAML file
+* Extensible
 
 ---
 
 # Architecture
 
-* Configuration via un fichier de configuration yaml
+* Configuration via a YAML configuration file
 
 ```
 ./bin/*beat setup -e
@@ -557,7 +561,7 @@ hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
 
 # Heartbeat
 
-* Agent permettant de s'assurer de la disponibilité d'un service
+* Agent used to ensure the availability of a service
 
 ```
 heartbeat.monitors:
@@ -582,8 +586,8 @@ name: My HTTP Service
 
 # Filebeat
 
-* Agent permettant d'indexer des lignes de logs
-* Possibilité d'activer des modules permettant de supporter des logs de produits open-source
+* Agent used to index log lines
+* Possibility to activate modules to support logs from open-source products
 
 ```
 filebeat modules enable system nginx mysql
@@ -598,8 +602,8 @@ filebeat modules enable system nginx mysql
 
 # Metricbeat
 
-* Agent permettant d'indexer des métriques d'un serveur ou d'un système
-* Possibilité d'activer des modules permettant de supporter des logs de produits open-source
+* Agent used to index metrics from a server or system
+* Possibility to activate modules to support logs from open-source products
 
 ```
 metricbeat modules enable apache mysql
@@ -614,8 +618,8 @@ metricbeat modules enable apache mysql
 
 # Packetbeat
 
-* Agent permettant d'indexer des paquets réseau transitant dans un système d'informations
-* Possibilité d'activer des modules permettant de supporter des trames standardisées.
+* Agent used to index network packets passing through an information system
+* Possibility to activate modules to support standardized frames.
 
 ```
 ./packetbeat setup -e
@@ -637,9 +641,9 @@ ports: [80, 8080, 8081, 5000, 8002]
 
 ---
 
-# Metricbeat avec Elasticsearch
+# Metricbeat with Elasticsearch
 
-* Il faut tout d'abord activer le monitoring sur le cluster
+* First, we need to enable monitoring on the cluster
 
 ```
 PUT _cluster/settings
@@ -652,7 +656,7 @@ PUT _cluster/settings
 
 ---
 
-# Metricbeat avec Elasticsearch
+# Metricbeat with Elasticsearch
 
 ```
 metricbeat modules enable elasticsearch-xpack
@@ -660,9 +664,9 @@ metricbeat modules enable elasticsearch-xpack
 
 ---
 
-# Metricbeat avec Elasticsearch
+# Metricbeat with Elasticsearch
 
-* Configurer le noeud que nous souhaitons monitorer
+* Configure the node we want to monitor
 
 ```
 #modules.d/elasticsearch-xpack.yml
@@ -675,9 +679,9 @@ metricbeat modules enable elasticsearch-xpack
 
 ---
 
-# Metricbeat avec Elasticsearch
+# Metricbeat with Elasticsearch
 
-* Configurer le cluster de monitoring
+* Configure the monitoring cluster
 
 ```
 #metricbeat.yml
@@ -691,18 +695,18 @@ output.elasticsearch:
 
 ---
 
-# Gestion des droits
+# Permission Management
 
-* Pour collecter, nous devons avoir le droit `remote_monitoring_collector`
-* Pour envoyer, nous devons avoir le droit `remote_monitoring_agent`
-* Nous pouvons utiliser l'utilisateur prédéfini `remote_monitoring_user`
+* To collect, we must have the `remote_monitoring_collector` right
+* To send, we must have the `remote_monitoring_agent` right
+* We can use the predefined user `remote_monitoring_user`
 
 ---
 
-# Filebeat avec Elasticsearch
+# Filebeat with Elasticsearch
 
-* La configuration pour Filebeat est similaire
-    * Installer et configurer Filebeat
+* The configuration for Filebeat is similar
+    * Install and configure Filebeat
 
 ```
 #filebeat.yml
@@ -716,11 +720,5 @@ setup.kibana:
   #password: "YOUR_PASSWORD"
 ```
 
----
-
-# Filebeat avec Elasticsearch
-
-* Activer le module Elasticsearch
-* Ajuster la configuration dans `modules.d/elasticsearch.yml`
-
----
+* Enable the Elasticsearch module
+* Adjust the configuration in `modules.d/elasticsearch.yml`

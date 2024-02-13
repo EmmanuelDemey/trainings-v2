@@ -2,50 +2,50 @@
 layout: cover
 ---
 
-# API Snapshot et Restore
+# Snapshot and Restore API
 
 ---
 
-# API Snapshot et Restore
+# Snapshot and Restore API
 
-* APIs permettant de définir des backup de nos données, afin de : 
-    * faire des backups régulier
-    * retrouver des données supprimées
-    * transférer des données entre deux clusters
-    * utiliser les Searchable Snapshot
-
----
-
-# API Snapshot et Restore
-
-* Nous pouvons faire un backup 
-    * d'un index entier ou d'une partie
-    * de l'état du cluster (Cluster settings, template, Ingest, ...)
+* APIs allowing us to define backups of our data, in order to:
+    * perform regular backups
+    * recover deleted data
+    * transfer data between two clusters
+    * use Searchable Snapshots
 
 ---
 
-# API Snapshot et Restore
+# Snapshot and Restore API
 
-* Première chose à faire est de créer un `repository` 
-* Possibilité d'utiliser différents types
+* We can create a backup of:
+    * an entire index or a portion
+    * the cluster state (Cluster settings, template, Ingest, ...)
+
+---
+
+# Snapshot and Restore API
+
+* First thing to do is to create a `repository`
+* Possibility to use different types
     * Shared file system, Read-only URL
     * Azure, S3, Google Cloud Storage
-    * Via des plugins: Hadoop Distributed File System
+    * Via plugins: Hadoop Distributed File System
 
 ---
 
-# API Snapshot et Restore
+# Snapshot and Restore API
 
-* L'action se compose de trois étapes :
-    * Création d'un repository
-    * Création du Snapshot
-    * Restore du Snapshot
+* The action consists of three steps:
+    * Creating a repository
+    * Creating the Snapshot
+    * Restoring the Snapshot
 
 ---
 
-# Création d'un repository
+# Creating a repository
 
-Configurer le repository dans `elasticsearch.yml`
+Configure the repository in `elasticsearch.yml`
 
 ```
 path:
@@ -56,7 +56,7 @@ path:
 
 ---
 
-# Création d'un repository
+# Creating a repository
 
 ```
 PUT /_snapshot/backups_1
@@ -70,15 +70,15 @@ PUT /_snapshot/backups_1
 
 ---
 
-# Création du Snapshot
+# Creating the Snapshot
 
-* Un snapshot peut être créé
-    * automatiquement grâce à règle `Snapshot Lifecycle Managment`
-    * manuellemment via l'utilisation d'une API
+* A snapshot can be created
+    * automatically through a `Snapshot Lifecycle Management` rule
+    * manually using an API
 
 ---
 
-# Création automatique du Snapshot
+# Automatic Snapshot Creation
 
 ```
 PUT _slm/policy/nightly-snapshots
@@ -98,15 +98,13 @@ PUT _slm/policy/nightly-snapshots
 }
 ```
 
-<v-click>
 ```
 POST _slm/policy/nightly-snapshots/_execute
 ```
-</v-click>
 
 ---
 
-# Création manuelle du Snapshot
+# Manual Snapshot Creation
 
 ```
 PUT /_snapshot/backups_1/snapshot_1?wait_for_completion=true
@@ -122,7 +120,7 @@ PUT /_snapshot/backups_1/snapshot_1?wait_for_completion=true
 
 ---
 
-# Restore du Snapshot
+# Restoring the Snapshot
 
 ```
 POST /_snapshot/backups_1/snapshot_1/_restore
@@ -140,9 +138,9 @@ POST /_snapshot/backups_1/snapshot_1/_restore
 layout: cover
 ---
 
-# Démo dans Kibana
+# Demo in Kibana
 
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part

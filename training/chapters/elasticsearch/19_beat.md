@@ -8,17 +8,17 @@ layout: cover
 
 # Architecture
 
-* Agents écrits en Go
-* Collecteurs de données
-* Respectent la même philosophie de configuration
-* Configuration via un fichier YAML
-* Extensibles
+* Agents written in Go
+* Data collectors
+* Follow the same configuration philosophy
+* Configured via a YAML file
+* Extensible
 
 ---
 
 # Architecture
 
-* Configuration via un fichier de configuration yaml
+* Configuration via a YAML configuration file
 
 ```
 ./bin/*beat setup -e
@@ -38,7 +38,7 @@ output.elasticsearch:
 
 # Heartbeat
 
-* Agent permettant de s'assurer de la disponibilité d'un service
+* Agent used to ensure the availability of a service
 
 ---
 
@@ -71,8 +71,8 @@ heartbeat.monitors:
 
 # Filebeat
 
-* Agent permettant d'indexer des lignes de logs
-* Possibilité d'activer des modules permettant de supporter des logs de produits open-source
+* Agent used to index log lines
+* Possibility to enable modules to support logs from open-source products
 
 ```
 filebeat modules enable system nginx mysql
@@ -91,8 +91,8 @@ filebeat modules enable system nginx mysql
 
 # Metricbeat
 
-* Agent permettant d'indexer des métriques d'un serveur ou d'un système
-* Possibilité d'activer des modules permettant de supporter des logs de produits open-source
+* Agent used to index server or system metrics
+* Possibility to enable modules to support logs from open-source products
 
 ```
 metricbeat modules enable apache mysql
@@ -111,8 +111,8 @@ metricbeat modules enable apache mysql
 
 # Packetbeat
 
-* Agent permettant d'indexer des paquets réseau transitant dans un système d'informations
-* Possibilité d'activer des modules permettant de supporter des trames standardisées.
+* Agent used to index network packets passing through an information system
+* Possibility to enable modules to support standardized frames.
 
 ---
 
@@ -142,9 +142,9 @@ packetbeat.protocols:
 
 ---
 
-# Bonnes Pratiques
+# Best Practices
 
-* Comme Logstash, nous pouvons configurer la taille du `bulk` et le nombre de `worker`
+* Like Logstash, we can configure the `bulk` size and the number of `workers`
 
 ```
 output.elasticsearch:

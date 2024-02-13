@@ -2,24 +2,24 @@
 layout: cover
 ---
 
-# Agrégations
+# Aggregations
 
 ---
 
-# Agrégation
+# Aggregations
 
-* Une agrégation est un moyen de faire une catégorisation de nos données.
-* Elles peuvent se faire sur tous les champs ayant le paramètrage `fielddata` à `true`
-* Ce paramètrage est a `true` par défaut pour tous les champs sauf ceux de type `text`
-    * Il est possible de forcer la valeur de `fielddata` à `true` pour les champs `text` analysés. C'est une pratique dangereuse.
-* Pour les champs de type `text`, vous devez avoir une seconde représentation de type `keyword`
+* An aggregation is a way to categorize our data.
+* They can be performed on all fields with the `fielddata` parameter set to `true`.
+* This parameter is `true` by default for all fields except those of type `text`.
+    * It is possible to force the value of `fielddata` to `true` for analyzed `text` fields. This is a dangerous practice.
+* For fields of type `text`, you must have a second representation of type `keyword`.
 
 ---
 
-# Agrégation
+# Aggregations
 
-* Les agrégations s'appliquent sur le résultat d'une requête
-* C'est un autre bloc objet dans le DSL
+* Aggregations are applied on the result of a query.
+* It's another object block in the DSL.
 
 ```
 POST person/_search
@@ -35,9 +35,9 @@ POST person/_search
 
 ---
 
-# Agrégation
+# Aggregations
 
-* Le résultat des agrégations sera rajouté à la réponse
+* The result of aggregations will be added to the response.
 
 ```
 POST person/_search
@@ -61,9 +61,9 @@ POST person/_search
 
 ---
 
-# Agrégation
+# Aggregations
 
-* Il est possible de ne pas renvoyer les `hits` de la query en positionnant la `size` à `0`
+* It's possible not to return the `hits` of the query by setting `size` to `0`.
 
 ```
 POST person/_search
@@ -77,16 +77,16 @@ POST person/_search
 
 ---
 
-# Agrégations de type Metric
+# Metric Aggregations
 
-* Type d'agrégation permettant de retourner une métrique
-    * ex: calculer un prix moyen
-* Impossible de créer des métriques imbriquées
-* Plusieurs types disponibles : `max`, `min`, `sum`, `avg`, `stats`, ...
+* Aggregation type that returns a metric.
+    * e.g., calculating an average price.
+* Impossible to create nested metrics.
+* Several types available: `max`, `min`, `sum`, `avg`, `stats`, ...
 
 ---
 
-# AVG Agrégations
+# AVG Aggregations
 
 ```
 POST /notes/_search?size=0
@@ -99,7 +99,7 @@ POST /notes/_search?size=0
 
 ---
 
-# AVG Agrégations
+# AVG Aggregations
 
 ```
 {
@@ -114,15 +114,15 @@ POST /notes/_search?size=0
 
 ---
 
-# Agrégations de type Bucket
+# Bucket Aggregations
 
-* Type d'agrégation permettant de créer des `buckets`
-* Chaque bucket pourra faire office d'une sous agrégation
-* Plusieurs types disponibles : `Date`, `Filters`, `Terms`, `geo_distance`, ...
+* Aggregation type that creates `buckets`.
+* Each bucket can act as a sub-aggregation.
+* Several types available: `Date`, `Filters`, `Terms`, `geo_distance`, ...
 
 ---
 
-# Agrégations de type Date
+# Date Aggregations
 
 ```
 POST /sales/_search?size=0
@@ -141,7 +141,7 @@ POST /sales/_search?size=0
 
 ---
 
-# Agrégations de type Date
+# Date Aggregations
 
 ```
 {
@@ -171,7 +171,7 @@ POST /sales/_search?size=0
 ```
 ---
 
-# Agrégations de type Filters
+# Filters Aggregations
 
 ```
 POST logs/_search
@@ -190,7 +190,7 @@ POST logs/_search
 
 ---
 
-# Agrégations de type Filters
+# Filters Aggregations
 
 ```
 {
@@ -215,9 +215,9 @@ POST logs/_search
 
 ---
 
-# Agrégations de type Terms
+# Terms Aggregations
 
-* Permet de regrouper les données en fonction d'une propriété
+* Groups data based on a property.
 
 ```
 POST /movies/_search
@@ -232,9 +232,9 @@ POST /movies/_search
 
 ---
 
-# Agrégations de type Terms
+# Terms Aggregations
 
-* Voici le résultat retourné
+* Here's the returned result.
 
 ```
 {
@@ -245,7 +245,7 @@ POST /movies/_search
             "sum_other_doc_count": 0,
             "buckets" : [
                 {
-                    "key" : "horreur",
+                    "key" : "horror",
                     "doc_count" : 6
                 },
                 {
@@ -253,7 +253,7 @@ POST /movies/_search
                     "doc_count" : 3
                 },
                 {
-                    "key" : "comedie",
+                    "key" : "comedy",
                     "doc_count" : 2
                 }
             ]
@@ -264,7 +264,7 @@ POST /movies/_search
 
 ---
 
-# Agrégations de type geo_distance
+# Geo_distance Aggregations
 
 ```
 POST /museums/_search?size=0
@@ -287,13 +287,15 @@ POST /museums/_search?size=0
 
 ---
 
-# Agrégations de type geo_distance
+# Geo_distance Aggregations
 
 ```
 {
     ...
     "aggregations": {
-        "rings_around_amsterdam" : {
+        "
+
+rings_around_amsterdam" : {
             "buckets": [
                 {
                     "key": "*-100000.0",
@@ -320,18 +322,18 @@ POST /museums/_search?size=0
 
 ---
 
-# Agrégations de type Pipeline
+# Pipeline Aggregations
 
-* Agrégation qui fonctionne avec la sortie d'une agrégation précédente.
-* Deux types d'agrégations
+* Aggregation that works with the output of a previous aggregation.
+* Two types of aggregations
     * Parent
     * Sibling
 
 ---
 
-# Agrégation Imbriqués
+# Nested Aggregations
 
-* Dès que nous utilisons des agrégations de type `bucket`, nous pouvons les imbriquer
+* As soon as we use `bucket` type aggregations, we can nest them.
 
 ```
 POST /movies/_search
@@ -351,7 +353,7 @@ POST /movies/_search
 
 ---
 
-# Agrégation de type Pipeline
+# Pipeline Aggregations
 
 ```
 POST /sales/_search
@@ -382,7 +384,7 @@ POST /sales/_search
 
 ---
 
-# Agrégation de type Pipeline
+# Pipeline Aggregations
 
 ```
 {
@@ -432,14 +434,17 @@ POST /sales/_search
 ---
 layout: cover
 ---
-# Présentation de la documentation
+
+# Documentation Presentation
 
 ---
 layout: cover
 ---
-# Démo avec  Kibana
+
+# Demo with Kibana
 
 ---
 layout: cover
 ---
-# Partie Pratique
+
+# Practical Part

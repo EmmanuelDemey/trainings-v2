@@ -2,25 +2,25 @@
 layout: cover
 ---
 
-# Le Mapping
+# Mapping
 
 ---
 
-# Le Mapping
+# Mapping
 
-* Le Mapping est la représentation qu'a Elasticsearch de vos données
-* Lors de l'indexation du premier document, Elasticsearch génère un mapping
-* Souvent, ce mapping n'est pas optimal et nécessite d'être optimisé.
-* Dans ce mapping, nous allons pouvoir :
-    * Définir les types des propriétés des documents
-    * Est-ce que ces propriétés doivent être ignorées et/ou indexées ?
-    * Si elles sont indexées, de quelle façon?
+* Mapping is Elasticsearch's representation of your data.
+* When indexing the first document, Elasticsearch generates a mapping.
+* Often, this mapping is not optimal and requires optimization.
+* In this mapping, we can:
+    * Define the types of document properties.
+    * Specify if these properties should be ignored and/or indexed.
+    * If indexed, in what way should they be indexed?
 
---- 
+---
 
-# Le Mapping
+# Mapping
 
-* Un mapping peut se définir à la création de l'index
+* Mapping can be defined when creating the index.
 
 ```
 PUT /movies
@@ -28,7 +28,7 @@ PUT /movies
   "mappings": {
     "properties": {
       "title":    { "type": "text" },
-      "year":  { "type": "number"  },
+      "year":  { "type": "integer"  },
       "directors":   { "type": "text"  }
     }
   }
@@ -37,10 +37,10 @@ PUT /movies
 
 ---
 
-# Le Mapping
+# Mapping
 
-* Nous pouvons également modifier un mapping.
-* Attention en fonction des modification apportées, cela nécessitera une reindexation
+* We can also modify a mapping.
+* Be careful, depending on the modifications made, this will require reindexing.
 
 ```
 PUT /movies/_mapping
@@ -55,15 +55,15 @@ PUT /movies/_mapping
 
 ---
 
-# Le Mapping
+# Mapping
 
-* Nous pouvons récupérer un mapping
+* We can retrieve a mapping.
 
 ```
 GET /movies/_mapping
 ```
 
-* Sa suppression se fera lors de la suppression de l'index
+* Its deletion will occur when deleting the index.
 
 ```
 DELETE /movies
@@ -71,9 +71,9 @@ DELETE /movies
 
 ---
 
-# Les types supportés
+# Supported Types
 
-* text, keyword, boolean et date
+* text, keyword, boolean, and date
 * object, nested, arrays, range
 * geo-point, geo-shape
 * ip
@@ -81,16 +81,16 @@ DELETE /movies
 
 ---
 
-# La propriété index
+# The Index Property
 
-* Cette propriété permet d'indiquer si une propriété doit être indexée
-* Si c'est le cas, nous pourrons l'utiliser dans nos recherches
-* Souvent, toutes les propriétés ne sont pas utiles à la recherche
-* Il est donc recommandé de bien optimiser votre mapping
+* This property indicates whether a property should be indexed.
+* If so, we can use it in our searches.
+* Often, not all properties are useful for search.
+* So, it is recommended to optimize your mapping well.
 
 ---
 
-# La propriété index
+# The Index Property
 
 ```
 PUT movies
@@ -108,10 +108,10 @@ PUT movies
 
 ---
 
-# Stockage du document d'origine
+# Storing the Original Document
 
-* Par défaut, le document indexé est récupérable via la propriété `_source`
-* Pour des raisons de performance et d'espace disque utilisé, vous pouvez désactiver cet objet
+* By default, the indexed document is retrievable via the `_source` property.
+* For performance and disk space usage reasons, you can disable this object.
 
 ```
 PUT movies
@@ -124,23 +124,23 @@ PUT movies
 }
 ```
 
-* Attention, désactiver la source rend impossible certaines opérations (simple get, update, update_by_query, reindex)
+* Be careful, disabling the source makes certain operations impossible (simple get, update, update_by_query, reindex).
 
 ---
 
-# La propriété fields
+# The Fields Property
 
-* Il est possible d'indexer une propriété de différentes façons
-    * pour gérer l'internationalisation
-    * pour pouvoir faire des agrégations
-    * pour réaliser des requêtes full-text, des filtres, de l'auto-complete... sur la même propriété
+* It is possible to index a property in different ways.
+    * to manage internationalization
+    * to be able to do aggregations
+    * to perform full-text queries, filters, auto-complete... on the same property
     * ...
 
 ---
 
-# La propriété fields
+# The Fields Property
 
-* Pour cela nous allons définir des `fields`
+* To do this, we will define `fields`.
 
 ```
 PUT movies
@@ -162,9 +162,9 @@ PUT movies
 
 ---
 
-# La propriété fields
+# The Fields Property
 
-* Nous pourrons ainsi faire des recherches sur la propriété `directors` et `directors.keyword`
+* We can thus search on the `directors` property and `directors.keyword` property.
 
 ```
 POST movies/_search
@@ -192,7 +192,7 @@ POST movies/_search
 
 # Object versus Nested
 
-* Il est possible de définir des propriétes de type `Object`
+* It is possible to define properties of type `Object`.
 
 ```
 PUT movies
@@ -214,8 +214,8 @@ PUT movies
 
 # Object versus Nested
 
-* Un problème survient quand nous avons un tableau d'objets.
-* Imaginons que notre film a été tourné par plusieurs réalisateurs
+* A problem arises when we have an array of objects.
+* Let's imagine that our movie was directed by multiple directors.
 
 ```
 POST /movies/_doc
@@ -231,7 +231,7 @@ POST /movies/_doc
 
 # Object versus Nested
 
-* Elasticsearch traduit cette structure dans une nouvelle représentation
+* Elasticsearch translates this structure into a new representation.
 
 ```
 {
@@ -244,9 +244,9 @@ POST /movies/_doc
 
 # Object versus Nested
 
-* Nous perdons ainsi les relations entre les propriétés
-* Ce qui pourrait avoir un impact sur les recherches exécutées
-* Par exemple, la recherche suivante retournerait le film précédent
+* We thus lose the relationships between properties.
+* This could impact the executed searches.
+* For example, the following search would return the previous movie.
 
 ```
 POST movies/_search
@@ -266,7 +266,7 @@ POST movies/_search
 
 # Object versus Nested
 
-* Pour éviter de perdre ces relations, nous pouvons utiliser le type `nested`.
+* To avoid losing these relationships, we can use the `nested` type.
 
 ```
 PUT movies
@@ -289,8 +289,8 @@ PUT movies
 
 # Dynamic Templates
 
-* Il existe une API permettant de définir des templates dynamiques
-* Nous ne la recommandons pas car seul vous connaissez la structure de vos données
+* There is an API for defining dynamic templates.
+* We do not recommend it because only you know the structure of your data.
 
 ```
 PUT movies
@@ -319,4 +319,5 @@ PUT movies
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Section
+

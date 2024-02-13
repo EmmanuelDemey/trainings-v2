@@ -2,27 +2,27 @@
 layout: cover
 ---
 
-# Retention 
+# Data Retention
 
 ---
 
-# Rétention
+# Retention
 
-* Plusieurs étapes possibles pour votre donnée
-    * Disponible "normalement"
+* Several possible stages for your data
+    * Available "normally"
     * `closed`
     * `shrinked`
     * `rollover-ed`
     * `snapshop-ed`
-    * Supprimée
-    * sur une configuration moins lourde
-    * sur un matériel moins performant
+    * Deleted
+    * On a less heavy configuration
+    * On less performing hardware
 
 ---
 
-# Suppression
+# Deletion
 
-* Suppression totale
+* Complete deletion
 
 ```
 DELETE movies/
@@ -30,7 +30,7 @@ DELETE movies/
 
 ---
 
-# Supression partielle
+# Partial Deletion
 
 ```
 POST /movies/_delete_by_query
@@ -45,11 +45,11 @@ POST /movies/_delete_by_query
 
 ---
 
-# Open et Close API
+# Open and Close API
 
-* Un index peut etre ouvert ou fermé
-* Le fait de fermer un index peut améliorer les performances de votre cluster
-* Les données seront toujours indexées mais pas recherchables
+* An index can be open or closed
+* Closing an index can improve your cluster's performance
+* Data will still be indexed but not searchable
 
 ```
 POST /twitter/_open
@@ -58,9 +58,9 @@ POST /twitter/_close
 
 ---
 
-# Open et Close API
+# Open and Close API
 
-* Il est recommandé de désactiver la possibilité de clore tous les indexes
+* It is recommended to disable the ability to close all indexes
 
 ```
 action.disable_close_all_indices: true
@@ -70,9 +70,8 @@ action.disable_close_all_indices: true
 
 # Shrink API
 
-* Permet de déplacer un index vers un nouvel index avec une configuration plus petite
-(moins de shards)
-* L'index, qui sera migré, doit être en lecture seule.
+* Allows moving an index to a new index with a smaller configuration (fewer shards)
+* The index being migrated must be read-only.
 
 ```
 PUT /movies/_settings
@@ -101,10 +100,10 @@ POST /movies/_shrink/shrinked-movies
 
 # DataStream
 
-* Mécanisme permettant de générer dynamiquement plusieurs indexes
-* Utile pour les données `time series`
-* Seul le dernier indexe sera disponible en écriture
-* Tous les indexes seront accessibles en lecture
+* Mechanism allowing dynamically generating multiple indexes
+* Useful for `time series` data
+* Only the latest index will be available for writing
+* All indexes will be accessible for reading
 
 ---
 
@@ -128,10 +127,10 @@ POST /movies/_shrink/shrinked-movies
 
 # ILM
 
-* La gestion de ce cycle de vie peut être réalisée
-    * manuellement
-    * via des scripts (Curator ?)
-    * via l`Index Lifecycle Managment API
+* Management of this lifecycle can be done
+    * manually
+    * via scripts (Curator?)
+    * via the Index Lifecycle Management API
 
 ---
 
@@ -168,7 +167,7 @@ PUT _ilm/policy/my_policy
 
 # ILM
 
-* Nous pouvons ainsi associer un ILM à un template
+* We can associate an ILM with a template
 
 ```
 PUT _index_template/timeseries_template
@@ -188,9 +187,11 @@ PUT _index_template/timeseries_template
 layout: cover
 ---
 
-# Gestion des ILM depuis Kibana
+# ILM Management from Kibana
 
 ---
 layout: cover
 ---
-# Partie Pratique
+
+# Practical Part
+

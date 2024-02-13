@@ -8,22 +8,22 @@ layout: cover
 
 # Logstash
 
-* Solution historique de la suite Elastic pour faire de l'ingestion de données
-* Logstash est un ETL
-    * E pour Extract
-    * T pour Transform
-    * L pour Load
-* La suite Beat n'est pas une solution concurrente à Logstash.
+* Historical solution in the Elastic suite for data ingestion
+* Logstash is an ETL
+    * E for Extract
+    * T for Transform
+    * L for Load
+* The Beats suite is not a competing solution to Logstash.
 
 ---
 
 # ETL
 
 * ETL
-    * E pour Extract = Inputs
-    * T pour Transform = Filters
-    * L pour Load = Outputs
-* Pour un même message reçu, nous pouvons avoir plusieurs éléments pour chaque étape.
+    * E for Extract = Inputs
+    * T for Transform = Filters
+    * L for Load = Outputs
+* For the same received message, we can have multiple elements for each step.
 
 ---
 
@@ -37,7 +37,7 @@ bin/logstash -f first-pipeline.conf
 
 ---
 
-# Fichier de configuration
+# Configuration File
 
 ```
 input {
@@ -153,7 +153,7 @@ output {
 
 # Debug
 
-* Pour tester votre fichier de configuration
+* To test your configuration file
 
 ```
 bin/logstash --config.test_and_exit -f <path_to_config_file>
@@ -186,8 +186,8 @@ filter {
 
 # Pipeline
 
-* Si vous avez plusieurs pipelines à exécuter, nous pouvons définir un fichier pipelines.yml.
-* Ce fichier doit être définir dans le répertoire `path.settings`
+* If you have multiple pipelines to execute, we can define a pipelines.yml file.
+* This file must be defined in the `path.settings` directory
 
 ```
 - pipeline.id: my-pipeline_1
@@ -202,7 +202,7 @@ filter {
 
 # Pipeline
 
-* Possibilité de faire une communication cross-pipeline
+* Possibility to perform cross-pipeline communication
 
 ```
 - pipeline.id: upstream
@@ -213,13 +213,13 @@ filter {
 
 ---
 
-# Optimisation
+# Optimization
 
-* Nous pouvons tuner Logstash via deux propriétés
-    * `workers` : le nombre maximal de traitements en parallèle
-    * `batch size` : le nombre d'éléments qui seront traités en un seul batch
-* Vous pouvez augmenter les `workers quand vous remarquez que le CPU n'est pas complètement utilisé.
-* Une augmentation du batch size nécessitera peut être une augmentation de la HEAP.
+* We can tune Logstash via two properties
+    * `workers`: the maximum number of parallel processes
+    * `batch size`: the number of items that will be processed in a single batch
+* You can increase `workers` when you notice that the CPU is not fully utilized.
+* Increasing the batch size may require increasing the HEAP.
 
 ```
 pipeline.workers: 12
@@ -230,7 +230,7 @@ pipeline.batch.size: 125
 
 # Monitoring
 
-* Logstash propose 4 API pour le monitoring
+* Logstash offers 4 APIs for monitoring
 
 ```
 curl -XGET localhost:9600/_node
@@ -243,6 +243,6 @@ curl -XGET localhost:9600/_node/hot_threads
 
 # Monitoring
 
-* Demo avec Kibana
+* Demo with Kibana
 
 ---

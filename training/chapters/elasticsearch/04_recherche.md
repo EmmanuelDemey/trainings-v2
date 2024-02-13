@@ -2,15 +2,15 @@
 layout: cover
 ---
 
-# Recherche
+# Search
 
 ---
 
-# Recherche
+# Search
 
-* Une fois les données indexées, nous pouvons exécuter des recherches
-* Nous allons utiliser le endpoint `_search`
-* Nous pouvons faire des recherches sur un ou plusieurs indexes/alias
+* Once the data is indexed, we can execute searches.
+* We will use the `_search` endpoint.
+* We can search on one or more indexes/aliases.
 
 ```
 POST /movies/_search
@@ -20,12 +20,12 @@ POST /movies-*/_search
 
 ---
 
-# La syntaxe Lucene
+# Lucene Syntax
 
-* Une première solution est d'utiliser la syntaxe Lucene
-* L'ensemble de la requête est définie dans l'URL
-* A utiliser seulement pour des requêtes très simples
-* Ces requêtes sont difficilement maintenables et ne permettent pas d'utiliser l'intégralité du DSL d'Elasticsearch
+* A first solution is to use the Lucene syntax.
+* The entire query is defined in the URL.
+* Only to be used for very simple queries.
+* These queries are hard to maintain and do not allow the full use of Elasticsearch DSL.
 
 ```
 GET /movies/_search?q=titanic
@@ -35,11 +35,11 @@ GET /movies/_search?q=title:titanic AND (year:[1990 TO 2000])
 
 ---
 
-# La syntaxe Lucene
+# Lucene Syntax
 
-* Cette syntaxe propose également de définir :
-    * le tri
-    * la pagination
+* This syntax also allows defining:
+    * sorting
+    * pagination
 
 ```
 GET /movies/_search?q=titanic&sort=year:desc&size:100&from=101
@@ -47,9 +47,9 @@ GET /movies/_search?q=titanic&sort=year:desc&size:100&from=101
 
 ---
 
-# La DSL Elasticsearch
+# Elasticsearch DSL
 
-* Pour des recherches plus complexes, nous vous conseillons d'utiliser la DSL d'Elasticsearch
+* For more complex searches, it's recommended to use the Elasticsearch DSL.
 
 ```
 POST /movies/_search
@@ -64,31 +64,31 @@ POST /movies/_search
 
 ---
 
-# Les recherches full text
+# Full Text Searches
 
-* Les recherches `full text` ("à la Google") permettent de manipuler les textes analysés
-* La chaîne de caractères recherchée sera elle-même analysée en fonction de la configuration
-* Nous pouvons utiliser le verbe `POST` (recommandé) ou `GET` (non-respect de la spécification HTTP1.1).
+* Full text searches allow manipulation of analyzed texts.
+* The searched string itself will be analyzed based on the configuration.
+* We can use the `POST` verb (recommended) or `GET` (not compliant with HTTP1.1 specification).
 
 ---
 
-# Les recherches full text
+# Full Text Searches
 
-* Les recherches `full text` retournent les résultats triés par pertinence (`score`)
-* Préserver un bon calcul du score est primordial
-* L'algorithme utilisé par défaut est le `BM25`, basé sur `TF/IDF`
+* Full text searches return results sorted by relevance (`score`).
+* Preserving a good score calculation is essential.
+* The default algorithm used is `BM25`, based on `TF/IDF`.
     * tfidf(t,d,D) = tf(t,d) × idf(t,D)
-    * tf = combien de fois apparait le terme `t` recherché dans le document `d`
-    * idf = combien de fois apparait le terme dans tous les documents `D`
-    * normalisé par la taille de la propriété
-    * éventuellement boosté
-* api `_explain`
+    * tf = how many times the searched term `t` appears in document `d`
+    * idf = how many times the term appears in all documents `D`
+    * normalized by the property's size
+    * optionally boosted
+* `_explain` API
 
 ---
 
 # Query String
 
-* Par exemple, la recherche de type `query_string` permet de réutiliser la syntaxe Lucene
+* For example, the `query_string` search type allows reusing the Lucene syntax.
 
 ```
 POST /movies/_search
@@ -106,7 +106,7 @@ POST /movies/_search
 
 # Match
 
-* Recherche de type `match`
+* `match` search type
 
 ```
 POST /movies/_search
@@ -125,7 +125,7 @@ POST /movies/_search
 
 # Match Phrase
 
-* Recherche de type `match_phrase`
+* `match_phrase` search type
 
 ```
 POST /movies/_search
@@ -142,7 +142,7 @@ POST /movies/_search
 
 # Multi Match
 
-* Recherche de type `multi_match`
+* `multi_match` search type
 
 ```
 POST /movies/_search
@@ -158,10 +158,10 @@ POST /movies/_search
 
 ---
 
-# Les recherches exactes
+# Exact Matches
 
-* Les recherches exactes permettent de manipuler les proriétés non analysées
-* La recherche ne sera pas du tout analysée. Attention aux pièges
+* Exact matches allow manipulation of non-analyzed properties.
+* The search will not be analyzed at all. Beware of pitfalls.
 
 ```
 POST /movies/_search
@@ -275,17 +275,17 @@ POST /movies/_search
 
 ---
 
-# Les filtres
+# Filters
 
-* Une recherche impactera toujours le calcul du score.
-* Si le score n'est pas utile, il est préférable d'utiliser des filtres
-* Plus performant que les recherches, pas de calcul du score et les résultats sont mis en cache.
+* A search will always impact the score calculation.
+* If the score is not useful, it's better to use filters.
+* More performant than searches, no score calculation and results are cached.
 
 ---
 
-# Les filtres
+# Filters
 
-* Cas d'utilisation principal, quand la réponse est oui ou non
+* Main use case, when the answer is yes or no.
 
 ```
 POST /movies/_search
@@ -302,9 +302,9 @@ POST /movies/_search
 
 ---
 
-# Les recherches géographiques
+# Geographical Searches
 
-* Afin de pouvoir exécuter des requêtes de recherche géographique, il est nécessaire d'avoir une propriété de type
+* In order to execute geographic search queries, it is necessary to have a property of type:
     * `geo_point`
     * `geo_shape`
 
@@ -325,7 +325,7 @@ PUT /movies
 
 # geo_distance box Query
 
-* Permet de retourner les documents dont la propriété `geo_point` est à une distance donnée
+* Returns documents where the `geo_point` property is within a given distance.
 
 ```
 POST /movies/_search
@@ -344,14 +344,14 @@ POST /movies/_search
 
 ---
 
-# Les recherches booléennes
+# Boolean Searches
 
-* Si vous souhaitez écrire une requéte complexe, nous pouvons utiliser la requête `bool`
-* Permet de définir des recherches `must`, `must_not`, `should` et `filter`
+* If you want to write a complex query, you can use the `bool` query.
+* Allows defining `must`, `must_not`, `should`, and `filter` searches.
 
 ---
 
-# Les recherches booléennes
+# Boolean Searches
 
 ```
 POST /movies/_search
@@ -369,6 +369,8 @@ POST /movies/_search
       "should" : [
         { "term" : { "category" : "history" } },
         { "term" : { "category" : "drama" } }
+
+
       ],
       "filter": {
         "term" : { "type" : "movie" }
@@ -381,15 +383,15 @@ POST /movies/_search
 
 ---
 
-# Le tri
+# Sorting
 
-* Par défaut, Elasticsearch retourne les documents triés en fonction du `_score`.
-* Nous pouvons modifier ce tri grâce à la propriété `sort`.
-* Nous pouvons définir plusieurs tris, ainsi que le sens : `asc` ou `desc`
+* By default, Elasticsearch returns documents sorted by `_score`.
+* We can modify this sorting using the `sort` property.
+* We can define multiple sorts and the direction: `asc` or `desc`.
 
 ---
 
-# Le tri
+# Sorting
 
 ```
 POST /movies/_search
@@ -408,9 +410,9 @@ POST /movies/_search
 
 # Pagination
 
-* Nous pouvons gérer la pagination à la main via les paramètre `from` et `size`.
-* Peu performant, il est recommandé d'utiliser la Scroll API pour les gros volumes.
-* La scroll API renvoie un curseur
+* We can manage pagination manually using the `from` and `size` parameters.
+* Not very efficient, it's recommended to use the Scroll API for large volumes.
+* The Scroll API returns a cursor.
 
 ```
 POST /movies?scroll=1m
@@ -454,16 +456,16 @@ POST /_search/scroll
 # Pagination
 
 * Point in time API
-* Utilisation de **search_after** avec un PIT
-* Approche dorénavant recommandée par Elastic
-* Permet de préserver l'état de l'index lors du parcours des différentes pages
+* Use of **search_after** with a PIT
+* Approach now recommended by Elastic
+* Preserves the index state while traversing different pages.
 
 ---
 
 # Score
 
-* Il est possible de modifier le score calculé
-* Nous allons utiliser le langage `Painless`
+* It's possible to modify the calculated score.
+* We will use the `Painless` language.
 
 ```
 GET /movies/_search
@@ -485,16 +487,16 @@ GET /movies/_search
 
 ---
 
-# Le Cross Cluster Search
+# Cross Cluster Search
 
-* Il est possible de faire une recherche sur plusieurs clusters
-* Pour cela, il est nécessaire de :
-    * configurer des remote clusters dans votre cluster local
-    * indiquer quel cluster vous souhaitez requêter lors de l'envoi d'une requête.
+* It's possible to search across multiple clusters.
+* To do this, it is necessary to:
+    * configure remote clusters in your local cluster
+    * indicate which cluster you want to query when sending a request.
 
 ---
 
-# Le Cross Cluster Search
+# Cross Cluster Search
 
 ```
 PUT _cluster/settings
@@ -515,7 +517,7 @@ PUT _cluster/settings
 
 ---
 
-# Le Cross Cluster Search
+# Cross Cluster Search
 
 ```
 POST /cluster_one:movie/_search
@@ -531,4 +533,4 @@ POST /cluster_one:movie/_search
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part

@@ -2,22 +2,22 @@
 layout: cover
 ---
 
-# Sécurité
+# Security
 
 ---
 
-# Sécurité
+# Security
 
-* Elasticsearch met à disposition plusieurs moyens de sécuriser notre cluster
-    * Authentification et Autorisation
-    * Intégrité de la données (SSL/TLS)
+* Elasticsearch provides several means to secure our cluster
+    * Authentication and Authorization
+    * Data integrity (SSL/TLS)
     * Audit
 
 ---
 
-# Sécurité
+# Security
 
-* Il faudra tout d'abord activer cette option dans le fichier elasticsearch.yml
+* First, we need to enable this option in the elasticsearch.yml file
 
 ```
 xpack.security.enabled: true
@@ -25,9 +25,9 @@ xpack.security.enabled: true
 
 ---
 
-# Sécurité
+# Security
 
-* Nous pouvons tout d'abord définir les mots de passes des utilisateurs techniques (`kibana_system`, `beats_system`, ...)
+* We can first define the passwords for technical users (`kibana_system`, `beats_system`, ...)
 
 ```
 bin/elasticsearch-setup-passwords interactive
@@ -35,15 +35,15 @@ bin/elasticsearch-setup-passwords interactive
 
 ---
 
-# Autorisation
+# Authorization
 
-* Nous pouvons définir des privilèges pour
-    * la gestion du cluster : `all`, `create_snapshot`, `monitor`, `manage`, ...
-    * Pour l'accès à un index : `all`, `create`, `create_doc`, `create_index`, `delete`, `manage`, ...
+* We can define privileges for
+    * Cluster management: `all`, `create_snapshot`, `monitor`, `manage`, ...
+    * Access to an index: `all`, `create`, `create_doc`, `create_index`, `delete`, `manage`, ...
 
 ---
 
-# Autorisation
+# Authorization
 
 ```
 POST /_security/role/events_admin
@@ -65,9 +65,9 @@ POST /_security/role/events_admin
 
 ---
 
-# Authentification
+# Authentication
 
-* La gestion de l'authentification peut être réalisée via différents `realm`
+* Authentication management can be done via different `realm`s
     * native
     * ldap / active_directory
     * file
@@ -75,7 +75,7 @@ POST /_security/role/events_admin
 
 ---
 
-# Création d'un utilisateur
+# Creating a User
 
 ```
 POST /_security/user/johndoe
@@ -89,9 +89,9 @@ POST /_security/user/johndoe
 
 ---
 
-# Définition d'une chaine de Realms
+# Defining a Chain of Realms
 
-* Nous pouvons définir une chaine de Realms
+* We can define a chain of Realms
 
 ```
 xpack.security.authc.realms:
@@ -112,7 +112,7 @@ xpack.security.authc.realms:
 
 # Role Mapping API
 
-* Grâce à la Role Mapping API, il est possible d'associer un role à un groupe d'utilisateurs (`dn`, `dc`, `cn`...)
+* Through the Role Mapping API, it's possible to associate a role with a group of users (`dn`, `dc`, `cn`...)
 
 ```
 PUT /_security/role_mapping/admin_user
@@ -145,7 +145,7 @@ POST _security/role/click_role
 
 ---
 
-# field level security
+# Field level security
 
 ```
 POST /_security/role/ro-person-company
@@ -164,11 +164,11 @@ POST /_security/role/ro-person-company
 
 ---
 
-# Génération d'une API Key
+# Generating an API Key
 
-* Il est également possible de définir une API Key
-* On lui définira des roles et privilèges comme pour un utilisateur
-* Une date d'expiration pourra lui être associée
+* It's also possible to define an API Key
+* We will define roles and privileges for it like for a user
+* An expiration date can be associated with it
 
 ```
 POST /_security/api_key
@@ -193,8 +193,8 @@ POST /_security/api_key
 
 # Audit
 
-* Nous pouvons configurer Elasticsearch pour enregister des événements liés à la sécurité
-* Les logs seront disponibles dans un fichier `<clustername>_audit.json`
+* We can configure Elasticsearch to record security-related events
+* The logs will be available in a `<clustername>_audit.json` file
 
 ```
 xpack.security.audit.enabled: true
@@ -202,7 +202,7 @@ xpack.security.audit.enabled: true
 
 ---
 
-# Configuration des audits
+# Audit Configuration
 
 ```
 xpack.security.audit.logfile.events.include:
@@ -216,7 +216,7 @@ xpack.security.audit.logfile.events.ignore_filters.<policy_name>.users:
 
 # Policy Name
 
-* ou `policy_name` représente l'événement qui sera enregistré
+* Where `policy_name` represents the event that will be recorded
     * `access_denied`
     * `access_granted`
     * `authentication_failed`
@@ -228,15 +228,15 @@ xpack.security.audit.logfile.events.ignore_filters.<policy_name>.users:
 layout: cover
 ---
 
-# Démo dans Kibana
+# Demo in Kibana
 
 ---
 layout: cover
 ---
 
-# Les Spaces dans Kibana
+# Spaces in Kibana
 
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part

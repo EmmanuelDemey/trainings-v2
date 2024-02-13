@@ -6,95 +6,95 @@ layout: cover
 
 ---
 
-# Présentation
+# Presentation
 
-* Kibana est une application web permettant de communiquer avec Elasticsearch
+* Kibana is a web application for interacting with Elasticsearch.
 
-Kibana permet (entre autres) de:
+Kibana allows (among other things):
 
-* visualiser les données présentes dans Elasticsearch dans des dashboards
-* exécuter et sauvegarder des requêtes complexes
-* parcourir les configurations de notre cluster
-* administrer et surveiller notre cluster
+* visualizing data present in Elasticsearch in dashboards
+* executing and saving complex queries
+* browsing cluster configurations
+* administering and monitoring our cluster
 
 ---
 
 # Architecture
 
-* Kibana doit nécessairement communiquer avec un cluster Elasticsearch
-* Cette configuration se fait dans le fichier de configuration **kibana.yml**
-* Depuis la version 8, un enrollment token vous sera demandé lors de la première connexion pour autoriser votre Kibana à communiquer avec votre cluster.
+* Kibana must necessarily communicate with an Elasticsearch cluster
+* This configuration is done in the **kibana.yml** configuration file
+* Starting from version 8, an enrollment token will be required during the first connection to authorize your Kibana to communicate with your cluster.
 
 ---
 
-# Accueil
+# Home
 
-image::../images/kibana/01-home.png[]
+![Home](../images/kibana/01-home.png)
 
 ---
 
 # Dashboard
 
-image::../images/kibana/02-dashboard.png[]
+![Dashboard](../images/kibana/02-dashboard.png)
 
 ---
 
 # Discover
 
-image::../images/kibana/03-discover.png[]
+![Discover](../images/kibana/03-discover.png)
 
 ---
 
-# Visualisation Lens
+# Lens Visualization
 
-image::../images/kibana/04-lens.png[]
-
----
-
-# Visualisation historique
-
-image::../images/kibana/05-aggregation-based.png[]
+![Lens](../images/kibana/04-lens.png)
 
 ---
 
-# Stream de logs
+# Historical Visualization
 
-image::../images/kibana/06-log-stream.png[]
-
----
-
-# Rôles et utilisateurs
-
-image::../images/kibana/07-roles.png[]
+![Aggregation Based](../images/kibana/05-aggregation-based.png)
 
 ---
 
-# Dataviews
+# Log Stream
 
-image::../images/kibana/08-dataviews.png[]
+![Log Stream](../images/kibana/06-log-stream.png)
 
 ---
 
-# Saved objects
+# Roles and Users
 
-image::../images/kibana/09-saved-objects.png[]
+![Roles](../images/kibana/07-roles.png)
+
+---
+
+# Data Views
+
+![Data Views](../images/kibana/08-dataviews.png)
+
+---
+
+# Saved Objects
+
+![Saved Objects](../images/kibana/09-saved-objects.png)
 
 ---
 
 # Spaces
 
-image::../images/kibana/10-spaces.png[]
+![Spaces](../images/kibana/10-spaces.png)
 
 ---
 
-# Lifecycle policies
+# Lifecycle Policies
 
-image::../images/kibana/11-lifecycle-policies.png[]
+![Lifecycle Policies](../images/kibana/11-lifecycle-policies.png)
 
 ---
 
 # Monitoring
 
-image::../images/kibana/12-monitoring.png[]
+![Monitoring](../images/kibana/12-monitoring.png)
 
 ---

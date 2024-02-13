@@ -8,9 +8,9 @@ layout: cover
 
 # SQL
 
-* Elasticsearch met à disposition une syntaxe SQL permettant d'exécuter des requêtes de recherche et d'agrégation.
-* Ces requêtes seront traduites par Elasticsearch en requetes historiques
-* Existe également un connecteur JDBC pour conntecter vos applicatifs directement à Elasticsearch en utilisant cette syntaxe.
+* Elasticsearch provides an SQL-like syntax for executing search and aggregation queries.
+* These queries will be translated by Elasticsearch into historical queries.
+* There is also a JDBC connector to connect your applications directly to Elasticsearch using this syntax.
 
 ---
 
@@ -32,12 +32,12 @@ POST /_sql?format=txt
 * TSV
 * TXT
 * YML
-* CBOR (binaire)
-* Smile (binaire)
+* CBOR (binary)
+* Smile (binary)
 
 ---
 
-# Syntaxe
+# Syntax
 
 ```
 SELECT [TOP [ count ] ] select_expr [, ...]
@@ -67,7 +67,7 @@ SELECT author, name FROM library WHERE MATCH(author, 'frank');
 
 ---
 
-# ORDERBY et LIMIT
+# ORDER BY and LIMIT
 
 ```
 SELECT emp_no FROM emp ORDER BY id LIMIT 2;
@@ -75,7 +75,7 @@ SELECT emp_no FROM emp ORDER BY id LIMIT 2;
 
 --- 
 
-# GROUP BY et HAVING
+# GROUP BY and HAVING
 
 ```
 SELECT languages AS l, COUNT(*) AS c
@@ -87,4 +87,4 @@ HAVING c BETWEEN 15 AND 20;
 ---
 layout: cover
 ---
-# Partie Pratique
+# Practical Part

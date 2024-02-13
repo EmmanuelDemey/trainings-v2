@@ -1,43 +1,43 @@
 ---
 layout: cover
 ---
-# Présentation générale
+# General Overview
 
 ---
 
-# Les moteurs de recherches
+# Search Engines
 
-* Dans notre monde de plus en plus connecté, un besoin de centraliser différentes informations est né
-* Afin de
-    * structurer
-    * requêter
-    * manipuler
-* ... Des informations venant d'origines différentes et de structures différentes.
+* In our increasingly connected world, there has emerged a need to centralize various pieces of information.
+* This is to:
+    * structure,
+    * query, and
+    * manipulate
+* ... information from different sources and in different structures.
 
 ---
 
-# Les moteurs de recherches
+# Search Engines
 
-* Le but principal est d'avoir une solution permettant :
-    * de rechercher rapidement et de manière pertinente
-    * de catégoriser les résultats d'une recherche
+* The main goal is to have a solution that allows:
+    * for quick and relevant searching, and
+    * categorization of search results.
 
 ---
  
-# Les solutions existantes
+# Existing Solutions
 
-* Plusieurs solutions de moteurs de recherche existent
-    * Librairie Java : Lucene
-    * Cluster : Solr, Elasticsearch, OpenSearch
-    * Solution SaaS : Algolia, Amazon, Azure, GCP, Elastic Cloud...
+* Several search engine solutions exist, including:
+    * Java library: Lucene
+    * Cluster: Solr, Elasticsearch, OpenSearch
+    * SaaS Solution: Algolia, Amazon, Azure, GCP, Elastic Cloud...
 
 --- 
 
 # Lucene
 
-* Librairie Java open-source permettant d'indexer des documents
-* Pouvant être intégrée à vos applications
-* Voici un exemple de code Lucene
+* An open-source Java library for indexing documents.
+* Can be integrated into your applications.
+* Here is an example of Lucene code:
 
 ```java
 String str = "foo bar";
@@ -50,20 +50,20 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
 
 ---
 
-# La suite Elastic
+# Elastic Stack
 
-* Un cluster Elasticsearch peut être utilisé comme :
-    * un moteur de recherche (Uber, Tinder, ...)
-    * une solution pour observer un système (Blizzard, ...)
-    * un SIEM (Indiana University, ...)
+* An Elasticsearch cluster can be used as:
+    * a search engine (Uber, Tinder, ...)
+    * a solution for system observation (Blizzard, ...)
+    * a SIEM (Indiana University, ...)
     * ...
 
 --- 
 
-# La suite Elastic
+# Elastic Stack
 
-* La suite Elastic est actuellement en version 8.1.0
-* La suite est composée de plusieurs produits :
+* The Elastic Stack is currently in version 8.12.0.
+* The suite is composed of several products:
     * Elasticsearch
     * Kibana
     * Beats
@@ -84,7 +84,7 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
 
 ---
 
-# La communauté
+# The Community
 
 * Helk
 * Eland
@@ -95,7 +95,7 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
 
 ---
 
-# Terminologie
+# Terminology
 
 * cluster
 * node
@@ -119,13 +119,13 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
 
 # Installation
 
-* Vous pouvez également utiliser Elasticsearch via :
+* You can also use Elasticsearch via:
 
     * Docker
     * Elastic Cloud Enterprise
     * Elastic Cloud
-    * Chart helm pour Kubernetes
-    * Marketplace de GCP, AWS, Clevercloud, ...
+    * Helm Chart for Kubernetes
+    * GCP, AWS, Clevercloud Marketplace, etc.
 
 ```shell
 docker run -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.10.1
@@ -133,17 +133,16 @@ docker run -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsear
 
 ---
 
-# Lancement
+# Launching
 
-* Pour lancer Elasticsearch, il faudra exécuter l'une des commandes suivantes
+* To start Elasticsearch, you need to execute one of the following commands:
 
 ```shell
 ./bin/elasticsearch
 .\bin\elasticsearch.bat
 ```
 
-
-* Vous devriez avoir le résultat suivant
+* You should see the following result:
 
 ```shell
 [Emmanuels-MBP] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
@@ -172,7 +171,7 @@ docker run -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsear
 
 # Configuration
 
-* Pour vérifier que votre cluster Elasticsearch est fonctionnel
+* To verify that your Elasticsearch cluster is functional
 
 ```shell
 GET http://localhost:9200/
@@ -182,7 +181,7 @@ GET http://localhost:9200/
 
 # Configuration
 
-* devrait retourner cette réponse
+* should return this response
 
 ```json
 {
@@ -190,7 +189,7 @@ GET http://localhost:9200/
   "cluster_name": "elasticsearch",
   "cluster_uuid": "p4rcLtCjQW6s3FRyT3lo1A",
   "version": {
-    "number": "8.3.3",
+    "number": "8.12.0",
     "build_flavor": "default",
     "build_type": "tar",
     "build_hash": "801fed82df74dbe537f89b71b098ccaff88d2c56",
@@ -208,7 +207,7 @@ GET http://localhost:9200/
 
 # Configuration
 
-* La configuration du cluster se fait dans le fichier de configuration `elasticsearch.yml`
+* Cluster configuration is done in the `elasticsearch.yml` configuration file
 
 ```yaml
 cluster.name: my-application
@@ -223,9 +222,9 @@ xpack.security.enabled: true
 
 ---
 
-# Noeuds
+# Nodes
 
-* Un noeud peut être de différents types
+* A node can be of different types
     * master
     * data
     * ingest
@@ -236,9 +235,9 @@ xpack.security.enabled: true
 
 ---
 
-# Noeuds
+# Nodes
 
-* La configuration se fait également dans le fichier `elasticsearch.yml`
+* Configuration is also done in the `elasticsearch.yml` file
 
 ```yaml
 node.master: true
@@ -251,7 +250,7 @@ node.ml: false
 
 # API
 
-* Tout endpoint contenant un `_` correspond à une API d'Elasticsearch
+* Any endpoint containing a `_` corresponds to an Elasticsearch API
     * _search
     * _explain
     * _analyze
@@ -261,15 +260,15 @@ node.ml: false
 
 ---
 
-# Manipuler Elasticsearch
+# Interacting with Elasticsearch
 
-* Vous pouvez intéragir avec Elasticsearch avec :
+* You can interact with Elasticsearch using:
     * curl
-    * un SDK (java, JavaScript, python, ...)
+    * an SDK (Java, JavaScript, Python, ...)
     * Postman
     * Kibana
 
 ---
 layout: cover
 ---
-# Démo Elasticsearch et Kibana
+# Elasticsearch and Kibana Demo
