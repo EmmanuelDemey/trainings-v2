@@ -23,9 +23,8 @@ npm install @elastic/elasticsearch
 # Using a SDK
 
 
-```javascript
-const { Client } = require('@elastic/elasticsearch')
-const fs = require('fs');
+```typescript
+import { Client } from '@elastic/elasticsearch';
 
 const client = new Client({
     node: 'https://localhost:9200',
@@ -33,10 +32,6 @@ const client = new Client({
     auth: {
         username: 'elastic',
         password: 'XXX'
-    },
-    tls: {
-      ca: fs.readFileSync('./config/certs/http_ca.crt'),
-      rejectUnauthorized: false
     }
 })
 ```
@@ -45,7 +40,11 @@ const client = new Client({
 
 # Node.js SDK
 
-```javascript
+```typescript
+import { Client } from '@elastic/elasticsearch';
+
+const client = new Client({ node: 'http://localhost:9200' });
+
 const { body } = await client./* action */({
     index: 'INDEX NAME',
     body: {
@@ -56,40 +55,76 @@ const { body } = await client./* action */({
 
 ---
 
-# Node.js SDK
+# Indexing with Node.js SDK
 
-```javascript
-await client.index({
-    index: 'game-of-thrones',
-    body: {
-        character: 'Tyrion Lannister',
-        quote: 'A mind needs books like a sword needs a whetstone.'
-    }
-});
+```typescript
+import { Client } from '@elastic/elasticsearch';
+
+const client = new Client({ node: 'http://localhost:9200' });
+
+async function indexDocument() {
+  const document = {
+    title: 'Sample Document',
+    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+  };
+
+  const response = await client.index({
+    index: 'documents',
+    body: document
+  });
+
+  console.log(response);
+}
+
+indexDocument().catch(console.error);
 ```
 
 ---
 
-# Node.js SDK
+# Searching with Node.js SDK
 
-```javascript
-const { body } = await client.search({
-    index: 'products',
+```typescript
+async function searchDocuments() {
+  const response = await client.search({
+    index: 'documents',
     body: {
-
+      query: {
+        match: { title: 'sample' }
+      }
     }
-})
+  });
+
+  console.log(response.hits.hits);
+}
+
+searchDocuments().catch(console.error);
+
 ```
 
 ---
 
-# Node.js SDK
+# Operating with Node.js SDK
 
-```javascript
-client.cat.indices({
-  help: true,
-  s: 'index'
-})
+```typescript
+import { Client } from '@elastic/elasticsearch';
+
+
+const client = new Client({ node: 'http://localhost:9200' });
+
+async function getClusterInfo() {
+  try {
+    const { body } = await client.cluster.stats();
+
+    console.log('Cluster Name:', body.cluster_name);
+    console.log('Cluster Status:', body.status);
+    console.log('Nodes Count:', body.nodes.count);
+    console.log('Indices Count:', body.indices.count);
+  } catch (error) {
+    console.error('Error retrieving cluster information:', error);
+  }
+}
+
+getClusterInfo();
 ```
 
 ---
