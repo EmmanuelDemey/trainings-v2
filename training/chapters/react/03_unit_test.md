@@ -59,6 +59,25 @@ describe('<MyComponent />', () => {
 
 ---
 
+# Jest - Assertions
+
+- Nous allons ensuite utiliser des **assertions** afin de vérifier le résultat de nos codes.
+
+```typescript
+import { getUser } from './user';
+
+describe('getUser', () => {
+   it('should return the current user', () => {
+      expect(getUser()).toEqual<User>({
+        name: 'Demey',
+        firstName: 'Emmanuel'
+      });
+   })
+})
+```
+
+---
+
 # Jest - mocks
 
 - Utilisation des mocks pour modifier l'implementation d'une méthode

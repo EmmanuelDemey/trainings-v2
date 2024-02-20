@@ -8,21 +8,21 @@ layout: cover
 
 # Retention
 
-* Several possible stages for your data
-    * Available "normally"
-    * `closed`
-    * `shrinked`
-    * `rollover-ed`
-    * `snapshop-ed`
-    * Deleted
-    * On a less heavy configuration
-    * On less performing hardware
+- Several possible stages for your data
+  - Available "normally"
+  - `closed`
+  - `shrinked`
+  - `rollover-ed`
+  - `snapshop-ed`
+  - Deleted
+  - On a less heavy configuration
+  - On less performing hardware
 
 ---
 
 # Deletion
 
-* Complete deletion
+- Complete deletion
 
 ```
 DELETE movies/
@@ -45,36 +45,90 @@ POST /movies/_delete_by_query
 
 ---
 
-# Open and Close API
+Bien sûr, je vais rédiger quelques slides en anglais pour votre formation sur Elasticsearch, en mettant l'accent sur les APIs "open" et "close" avec des exemples de requêtes et leurs réponses HTTP.
 
-* An index can be open or closed
-* Closing an index can improve your cluster's performance
-* Data will still be indexed but not searchable
+---
 
+# Open and Close APIs
+
+- Elasticsearch provides a rich set of RESTful APIs for managing your indices, data, and configurations.
+- Two important actions you can perform on your indices are "Opening" and "Closing" them.
+- **Open API** is used to open a closed index, making it available for search and indexing operations.
+- **Close API** is used to close an index, which prevents it from being searched or indexed but still allows for management operations.
+
+---
+
+# Closing an Index in Elasticsearch
+
+- Closing an index temporarily disables indexing and search operations on that index.
+- Useful for reducing resource consumption for indices that are not currently in use.
+- Syntax: `POST /<index>/_close`
+
+```http
+POST /my_index/_close
 ```
-POST /twitter/_open
-POST /twitter/_close
+
+```json
+{
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "indices": {
+    "my_index": {
+      "closed": true
+    }
+  }
+}
 ```
 
 ---
 
-# Open and Close API
+# Opening an Index in Elasticsearch
 
-* It is recommended to disable the ability to close all indexes
+- Opening a closed index makes it available again for search and indexing operations.
+- Syntax: `POST /<index>/_open`
 
+```http
+POST /my_index/_open
 ```
-action.disable_close_all_indices: true
+
+```json
+{
+  "acknowledged": true
+}
 ```
 
 ---
 
-# Shrink API
+# Considerations When Opening and Closing Indices
 
-* Allows moving an index to a new index with a smaller configuration (fewer shards)
-* The index being migrated must be read-only.
+- **Data Integrity:** Closing and opening indices do not affect the data stored within the index.
+- **Performance:** Closing indices can free up resources, improving the cluster's overall performance.
+- **Limitations:** Not all operations are allowed on closed indices, e.g., you cannot index documents into a closed index.
 
-```
-PUT /movies/_settings
+- Best Practices & Use Cases
+  - **Maintenance:** Close indices during maintenance to improve performance.
+  - **Archiving:** Close indices that contain historical data not frequently accessed.
+  - **Resource Management:** Close indices to free up resources like memory and reduce the load on the cluster.
+
+---
+
+Bien entendu, voici des slides détaillés sur la Shrink API d'Elasticsearch, avec des exemples de requêtes et leurs réponses HTTP.
+
+---
+
+# Introduction to Elasticsearch Shrink API
+
+- The Shrink API allows you to reduce the number of primary shards of an existing index.
+- Useful for optimizing storage and improving performance for indices with fewer documents.
+- Prerequisites: Index must be read-only, and the number of primary shards in the target index must be a factor of the number in the source index.
+
+# Preparing an Index for Shrinking
+
+- Before using the Shrink API, ensure the index is read-only by updating its settings.
+- Syntax: `PUT /<index>/_settings`
+
+```http
+PUT /my_index/_settings
 {
   "settings": {
     "index.blocks.write": true
@@ -82,17 +136,62 @@ PUT /movies/_settings
 }
 ```
 
+```json
+{
+  "acknowledged": true
+}
+```
+
+- After making the index read-only, you can proceed with the shrink operation.
+
 ---
 
-# Shrink API
+# Using the Shrink API
 
-```
-POST /movies/_shrink/shrinked-movies
+- To shrink an index, use the Shrink API and specify the target index name and settings.
+- Syntax: `POST /<source_index>/_shrink/<target_index>`
+
+```http
+POST /my_index/_shrink/my_index_shrinked
 {
   "settings": {
     "index.number_of_replicas": 1,
-    "index.number_of_shards": 1
+    "index.number_of_shards": 2,  // Target number of primary shards
+    "index.codec": "best_compression"  // Optional, for better compression
+  },
+  "aliases": {
+    "my_search_indices": {}
   }
+}
+```
+
+```json
+{
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "index": "my_index_shrinked"
+}
+```
+
+---
+
+# Post-Shrink Operations
+
+- Once the index is shrunk, you may want to make it writable again by updating its settings.
+- Syntax: `PUT /<shrinked_index>/_settings`
+
+```http
+PUT /my_index_shrinked/_settings
+{
+  "settings": {
+    "index.blocks.write": false
+  }
+}
+```
+
+```json
+{
+  "acknowledged": true
 }
 ```
 
@@ -100,10 +199,10 @@ POST /movies/_shrink/shrinked-movies
 
 # DataStream
 
-* Mechanism allowing dynamically generating multiple indexes
-* Useful for `time series` data
-* Only the latest index will be available for writing
-* All indexes will be accessible for reading
+- Mechanism allowing dynamically generating multiple indexes
+- Useful for `time series` data
+- Only the latest index will be available for writing
+- All indexes will be accessible for reading
 
 ---
 
@@ -127,10 +226,10 @@ POST /movies/_shrink/shrinked-movies
 
 # ILM
 
-* Management of this lifecycle can be done
-    * manually
-    * via scripts (Curator?)
-    * via the Index Lifecycle Management API
+- Management of this lifecycle can be done
+  - manually
+  - via scripts (Curator?)
+  - via the Index Lifecycle Management API
 
 ---
 
@@ -167,7 +266,7 @@ PUT _ilm/policy/my_policy
 
 # ILM
 
-* We can associate an ILM with a template
+- We can associate an ILM with a template
 
 ```
 PUT _index_template/timeseries_template
@@ -184,14 +283,13 @@ PUT _index_template/timeseries_template
 ```
 
 ---
-layout: cover
----
+
+## layout: cover
 
 # ILM Management from Kibana
 
 ---
-layout: cover
----
+
+## layout: cover
 
 # Practical Part
-

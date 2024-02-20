@@ -383,28 +383,132 @@ POST /movies/_search
 
 ---
 
-# Sorting
+# Introduction to Sorting in Elasticsearch
 
-* By default, Elasticsearch returns documents sorted by `_score`.
-* We can modify this sorting using the `sort` property.
-* We can define multiple sorts and the direction: `asc` or `desc`.
+- **Overview of Sorting:**
+  - Sorting arranges the search results based on specified criteria.
+  - By default, Elasticsearch sorts by relevance score, but you can customize this.
+
+- **Why Customize Sorting?**
+  - To present the most relevant or useful information first according to specific needs.
+  - Supports sorting by multiple fields, custom scripts, and geo-distance.
 
 ---
 
-# Sorting
+# Basic Sorting Syntax
 
-```
-POST /movies/_search
+- **Sorting by a Single Field:**
+  - Sort search results by a specific field in ascending or descending order.
+  - Example: Sorting by `date` field in descending order.
+
+```json
+GET /_search
 {
-  "query": {
-    ...
-  },
-  "sort": {
-    { "timestamp":   { "order": "desc" }},
-    { "_score": { "order": "desc" }}
-  }
+    "sort": [
+        { "date": { "order": "desc" } }
+    ],
+    "query": {
+        "match_all": {}
+    }
 }
 ```
+
+---
+
+# Sorting by Multiple Fields
+
+- **Multi-Field Sorting:**
+  - Sort results by multiple criteria for fine-grained control.
+  - Example: First sort by `status` (ascending), then by `date` (descending).
+
+```json
+GET /_search
+{
+    "sort": [
+        { "status": { "order": "asc" } },
+        { "date": { "order": "desc" } }
+    ],
+    "query": {
+        "match_all": {}
+    }
+}
+```
+
+---
+
+# Using Script-Based Sorting
+
+- **Script-Based Sorting:**
+  - Use scripts to sort by computed values or complex logic.
+  - Example: Sorting by a script that calculates a score based on multiple fields.
+
+```json
+GET /_search
+{
+    "sort": {
+        "_script": {
+        "type": "number",
+        "script": {
+            "source": "doc['views'].value * 0.5 + doc['likes'].value"
+        },
+        "order": "desc"
+        }
+    },
+    "query": {
+        "match_all": {}
+    }
+}
+```
+
+---
+
+# Sorting with Geo-Distance
+
+- **Geo-Distance Sorting:**
+  - Sort documents by distance from a geographic point, useful for location-based searches.
+  - Example: Sorting restaurants by distance from a user's location.
+
+```json
+GET /restaurants/_search
+{
+    "sort": [
+        {
+        "_geo_distance": {
+            "location": {
+            "lat": 40.715,
+            "lon": -73.984
+            },
+            "order": "asc",
+            "unit": "km"
+        }
+        }
+    ],
+    "query": {
+        "match_all": {}
+    }
+}
+```
+
+---
+
+### Slide 6: Best Practices for Sorting
+
+**Title:** Sorting Best Practices
+
+**Content:**
+- **Performance Considerations:**
+  - Sorting, especially script-based and geo-distance, can impact performance.
+  - Use with caution on large datasets and consider caching strategies.
+
+- **Field Data:**
+  - Text fields need to be keyword type or have a keyword sub-field for sorting.
+  - Ensure your mapping is set up correctly to support your sorting needs.
+
+- **Testing and Validation:**
+  - Validate sorting logic with a variety of queries to ensure it meets user expectations.
+  - Use the explain API to understand how sort values are calculated.
+
+**Image:** Checklist icon with key points listed.
 
 ---
 
@@ -462,73 +566,141 @@ POST /_search/scroll
 
 ---
 
-# Score
+# Introduction to Custom Scoring in Elasticsearch
 
-* It's possible to modify the calculated score.
-* We will use the `Painless` language.
+- **Overview of Scoring:**
+  - Elasticsearch uses a relevance score to rank search results.
+  - The score indicates how well each document matches the query.
 
-```
-GET /movies/_search
+- **Why Customize Scoring?**
+  - Tailor search results to specific business needs or user preferences.
+  - Enhance search relevance by incorporating custom logic or external data.
+
+---
+
+# The Role of Query DSL in Custom Scoring
+
+- **Query DSL (Domain Specific Language):**
+  - Powerful and flexible language for defining searches.
+  - Supports a wide range of queries for precise control over scoring.
+
+- **Types of Queries for Custom Scoring:**
+  - **Function Score Query:** Modify scores using mathematical functions.
+  - **Script Score Query:** Use scripts to calculate scores based on complex logic.
+
+---
+
+# Function Score Query Example
+
+- Boost the score of documents based on a numeric field (e.g., `popularity`).
+
+```json
+GET /_search
 {
     "query": {
         "function_score": {
-            "query": {
-                "match": { "title" : "Titanic" }
-            },
-            "script_score" : {
-                "script" : {
-                  "source": "1.0 / doc['notes'].value"
+            "query": { "match": { "title": "elasticsearch" } },
+            "functions": [
+                {
+                    "field_value_factor": {
+                        "field": "popularity",
+                        "factor": 1.2
+                    }
                 }
+            ],
+            "boost_mode": "multiply"
+        }
+    }
+}
+```
+
+- **Response:**
+```json
+{
+    "took": 30,
+    "hits": {
+        "total": 10,
+        "max_score": 5.2,
+        "hits": [
+        {
+            "_score": 5.2,
+            "_source": {
+            "title": "Elasticsearch Basics",
+            "popularity": 10
             }
         }
+        ]
     }
 }
 ```
 
----
-
-# Cross Cluster Search
-
-* It's possible to search across multiple clusters.
-* To do this, it is necessary to:
-    * configure remote clusters in your local cluster
-    * indicate which cluster you want to query when sending a request.
 
 ---
 
-# Cross Cluster Search
+# Best Practices for Custom Scoring
+
+- **Performance Considerations:**
+  - Custom scoring can impact query performance. Use it judiciously.
+  - Pre-compute values when possible to minimize runtime calculations.
+
+- **Testing and Validation:**
+  - Thoroughly test custom scoring rules to ensure they produce the desired results.
+  - Use explain API to understand how scores are calculated.
+
+- **Maintainability:**
+  - Keep scoring scripts and functions as simple and readable as possible.
+  - Document custom scoring logic for future reference.
+
+---
+
+# Introduction to Cross Cluster Search (CCS)
+
+- **What is Cross Cluster Search?**
+  - Allows searching across multiple Elasticsearch clusters.
+  - Enables querying and aggregating data from various clusters as if they were in a single index.
+
+- **Why use Cross Cluster Search?**
+  - Scalability: Search over large datasets distributed across clusters.
+  - Resilience: Mitigate risks of data loss and ensure high availability.
+  - Flexibility: Combine data from different domains without data migration.
+
+
+---
+
+# Setting Up Cross Cluster Search
+
+- **Configuring Remote Clusters:**
+  - Use the Cluster Settings API to specify remote clusters.
 
 ```
-PUT _cluster/settings
-{
-  "persistent": {
-    "cluster": {
-      "remote": {
-        "cluster_one": {
-          "seeds": [
-            "127.0.0.1:9300"
-          ]
-        }
-      }
-    }
-  }
+PUT /_cluster/settings 
+{ 
+    "persistent": { 
+        "cluster.remote.my_remote_cluster.seeds": ["host1:port", "host2:port"] 
+    } 
 }
 ```
 
+- **Searching Across Clusters:**
+  - Use the standard search API with cluster aliases.
+    - Example: `GET /my_remote_cluster:index_name/_search { "query": { "match_all": {} } }`
+
 ---
 
-# Cross Cluster Search
+# Considerations and Best Practices
 
-```
-POST /cluster_one:movie/_search
-{
-  "query": {
-    "match": {
-      "title": "Titanic"
-    }
-  }
-}
-```
+- **Network Latency:**
+  - Be aware of the network latency between clusters.
+  - Optimize your infrastructure for minimal delay.
+
+- **Security:**
+  - Secure inter-cluster communication.
+  - Implement necessary authentication and authorization mechanisms.
+
+- **Resource Management:**
+  - Monitor query performance and resource usage.
+  - Ensure balanced load across clusters.
+
 
 ---
 layout: cover
