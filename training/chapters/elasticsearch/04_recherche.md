@@ -491,11 +491,8 @@ GET /restaurants/_search
 
 ---
 
-### Slide 6: Best Practices for Sorting
+# Best Practices for Sorting
 
-**Title:** Sorting Best Practices
-
-**Content:**
 - **Performance Considerations:**
   - Sorting, especially script-based and geo-distance, can impact performance.
   - Use with caution on large datasets and consider caching strategies.
@@ -507,8 +504,6 @@ GET /restaurants/_search
 - **Testing and Validation:**
   - Validate sorting logic with a variety of queries to ensure it meets user expectations.
   - Use the explain API to understand how sort values are calculated.
-
-**Image:** Checklist icon with key points listed.
 
 ---
 

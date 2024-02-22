@@ -389,115 +389,74 @@ action.disable_delete_all_indices: true
 
 ---
 
-# Bulk API
-
-* The `bulk` API allows multiple indexing, updating, or deletion requests to be made in a single HTTP request.
-* API to use during bulk indexing
-* Each line of the `body` corresponds to an instruction
-
-```
-POST _bulk
-{ "index" : { "_index" : "movies", "_id" : "1" } }
-{ "name" : "Star Wars" }
-{ "delete" : { "_index" : "movies", "_id" : "2" } }
-{ "update" : {"_id" : "1", "_index" : "movies"} }
-{ "doc" : {"year" : 1970} }
-```
+Bien sûr, je vais vous préparer une série de slides en anglais qui couvrent l'API d'indexation de type bulk d'Elasticsearch, y compris des exemples de requêtes, les réponses HTTP correspondantes et des bonnes pratiques. Voici le plan des slides :
 
 ---
 
-# Bulk API
+# Introduction to Bulk API in Elasticsearch
 
-* It is recommended to increase or disable the *refresh_interval* during bulk indexing.
+- The Bulk API allows for indexing or updating multiple documents in a single request, which significantly improves performance compared to individual document indexing.
 
+- Each action within a bulk request needs to be specified on a separate line, followed by the document (for index and update actions) on the next line. 
+
+- Supported actions include `index`, `create`, `delete`, and `update`.
+
+---
+
+# Example of a Bulk Index Request
+
+- Example of a bulk request that indexes two documents into the `products` index.
+
+```json
+POST /_bulk
+{ "index" : { "_index" : "products", "_id" : "1" } }
+{ "name" : "Coffee", "price" : 10.5 }
+{ "index" : { "_index" : "products", "_id" : "2" } }
+{ "name" : "Tea", "price" : 9.5 }
 ```
-PUT movies/_settings
+```json
+{
+  "took": 30,
+  "errors": false,
+  "items": [
+    {"index": {"_index": "products", "_id": "1", "status": 201}},
+    {"index": {"_index": "products", "_id": "2", "status": 201}}
+  ]
+}
+```
+
+--- 
+
+# Handling Errors and Best Practices
+
+- Handling Errors in Bulk Requests
+  - Even if one or more actions fail, the bulk operation can still complete successfully for the rest. 
+  - Each action's result needs to be checked individually for errors.
+
+- Best Practices
+  - Splitting bulk requests into manageable sizes to avoid overloading the cluster. 
+  - A common practice is to keep the size of a bulk request under 15MB.
+  - Adjusting the refresh rate temporarily for large ingestions can improve performance.
+  - Monitoring the `thread_pool.bulk.queue` and `thread_pool.bulk.rejected` metrics to tune bulk request sizes and intervals.
+
+```http
+PUT products/_settings
 {
     "refresh_interval": "-1"
 }
 ```
 
-```
-PUT movies/_settings
+```http
+PUT products/_settings
 {
     "refresh_interval": "30s"
 }
 ```
 
 ---
-
-# Aliases
-
-* Aliases are a way to define a synonym for an index
-* This alias can point to a complete index, multiple indexes, or a portion of the data
-* It is recommended to use aliases. When applications consume the data, maintenance operations on the indexes will be transparent (reindexing, new format, etc.)
-
+src: ./chapters/aliases.md
+hide: false
 ---
-
-# Aliases
-
-* We can add aliases during the creation of an index
-* These aliases can be used in the same way as an index in search queries
-
-```
-PUT /movies
-{
-    "aliases" : {
-        "all" : {},
-        "horror" : {
-            "filter" : {
-                "term" : {"type" : "horror" }
-            }
-        }
-    }
-}
-```
-
----
-
-# Aliases
-
-* We can also add an alias afterward
-
-```
-POST /_aliases
-{
-    "actions" : [
-        { "add" : { "index" : "movies-v1", "alias" : "movies" } }
-    ]
-}
-```
-
----
-
-# Aliases
-
-* We can remove an alias
-
-```
-POST /_aliases
-{
-    "actions" : [
-        { "remove" : { "index" : "movies-v1", "alias" : "movies" } }
-    ]
-}
-```
-
----
-
-# Aliases
-
-* We can perform multiple actions in a single request
-
-```
-POST /_aliases
-{
-    "actions" : [
-        { "add" : { "index" : "movies-v2", "alias" : "movies" } },
-        { "remove" : { "index" : "movies-v1", "alias" : "movies" } }
-    ]
-}
-```
 
 ---
 layout: cover
