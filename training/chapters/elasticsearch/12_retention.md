@@ -45,9 +45,6 @@ POST /movies/_delete_by_query
 
 ---
 
-Bien sûr, je vais rédiger quelques slides en anglais pour votre formation sur Elasticsearch, en mettant l'accent sur les APIs "open" et "close" avec des exemples de requêtes et leurs réponses HTTP.
-
----
 
 # Open and Close APIs
 

@@ -609,6 +609,11 @@ GET /_search
 }
 ```
 
+---
+
+# Function Score Query Example
+
+
 - **Response:**
 ```json
 {

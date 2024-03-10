@@ -1,182 +1,84 @@
----
-layout: cover
----
 
-# Analyzers
+# Introduction to Elasticsearch Analyzers
 
----
-
-# Analyzers
-
-* Each property of type `text` will be analyzed by Elasticsearch.
-* This `analyze` phase consists of three steps:
-    * Char Filters
-    * Tokenizer
-    * Token Filters
-* After the analysis phase, the result is placed in a inverted index.
-
----
-
-# Analyzers
+- Definition: Analyzers process text data into tokens, enhancing search capabilities.
+- Components: Comprised of Char Filters, Tokenizer, and Token Filters.
+- Importance: Essential for improving search accuracy and performance.
 
 ![](/images/analyzer.png)
 
 ---
 
-# Char Filters
+# Char Filters Explained
 
-* Char Filters allow modification of the original text by removing, modifying, or adding characters.
-* Multiple `Char Filters` can be configured for an analyzer.
-* Each implementation is configurable.
+- Role: Preprocess text by modifying characters before tokenization.
 
----
-
-# Char Filters
-
-* Only three *Char Filters* are available:
-  
-* `HTML Strip`
-
-```
-<p>I&apos;m so <b>happy</b>!</p
--> \nI'm so happy!\n
-```
-
-* `Mapping`
-
-```
-My license plate is ٢٥٠١٥
--> My license plate is 25015
-```
-
-* `Pattern Replace`
-
-```
-My credit card is 123-456-789
--> My credit card is 123_456_789
-```
+  1. **HTML Strip**: Removes HTML tags from text.
+    - `"char_filter": ["html_strip"]`
+  2. **Mapping Char Filter**: Replaces specified characters.
+    - Custom mappings example: Replace `&` with `and`.
+    - `"char_filter": { "type": "mapping", "mappings": ["&=>and"]}`
 
 ---
 
-# Tokenizers
+# Tokenizers in Detail
 
-* A tokenizer defines how the text should be broken down.
-* We have one token as input, and 0+ tokens as output.
-* Only one Tokenizer can be configured for an analyzer.
-* Each implementation is configurable.
-* Many tokenizers are available natively.
+- Function: Splits text into individual tokens or words.
+  1. **Standard Tokenizer**: Splits text on word boundaries.
+  2. **Whitespace Tokenizer**: Splits text by whitespace.
+      - `"tokenizer": "whitespace"`
+  3. **Custom Tokenizer**: Tailored splitting logic.
+      - Example: A tokenizer that splits text at commas.
 
 ---
 
-# Tokenizers
+# Token Filters 
+- Purpose: Modify, remove, or add tokens after tokenization.
+  1. **Lowercase Filter**: Converts all tokens to lowercase.
+      - `"filter": ["lowercase"]`
+  2. **Stopword Filter**: Removes common "stop" words.
+      - `"filter": ["stop"]`
+  3. **Synonym Filter**: Maps tokens to specified synonyms.
+      - Define synonyms: `"filter": { "type": "synonym", "synonyms": ["quick,fast"] }`
 
-* Whitespace tokenizer
+---
 
+# Analyzers in Action: Standard Analyzer
+
+```json
+POST /_analyze
+{
+  "analyzer": "standard",
+  "text": "Quick Brown Foxes!"
+}
 ```
-The 2 QUICK Brown-Foxes jumped over the lazy dog's bone.
-
--> [ The, 2, QUICK, Brown-Foxes, jumped, over, the, lazy, dog's, bone. ]
-```
-
-* Letter tokenizer
-
-```
-The 2 QUICK Brown-Foxes jumped over the lazy dog's bone.
-
--> [ The, QUICK, Brown, Foxes, jumped, over, the, lazy, dog, s, bone ]
-```
-
-* Path Hierarchy tokenizer
-
-```
-/one/two/three
-
--> [ /one, /one/two, /one/two/three ]
-```
-
-* N-gram tokenizer
-
-```
-Quick
-
--> [ Q, Qu, u, ui, i, ic, c, ck, k]
+```json
+{
+  "tokens": [
+    {"token": "quick"},
+    {"token": "brown"},
+    {"token": "foxes"}
+  ]
+}
 ```
 
 ---
 
-# Token Filters
+# Analyzer Creation
 
-* A token filter allows modification, deletion, or addition of tokens to the previously created list.
-* Used to remove common words, manage synonyms, conjugations, accents, casing...
-* Multiple Token Filters can be configured for an analyzer.
-* Each implementation is configurable.
-* Many token filters are available natively.
+- Crafting a custom analyzer for specific needs.
 
----
-
-# Token Filters
-
-* Stop token filter
-
-```
-a quick fox jumps over the lazy dog
-
--> [ quick, fox, jumps, over, lazy, dog ]
-```
-
-* Ascii folding token filter
-
-```
-açaí à la carte
-
--> [ acai, a, la, carte ]
-```
-
-* Stemmer token filter
-
-```
-développeuse
-
--> developeu
-```
-
-* Synonym token filter
-
-```
-a quick fox jumps over the lazy dog
-
--> [ quick, fox, jumps, over, lazy, dog, hound ]
-```
-
----
-
-# Custom Analyzers
-
-* With these elements, we can create our own Analyzers.
-* And then associate them with certain fields in our documents.
-* An analyzer can be defined for indexing and for searching.
-* By default, the one for indexing is also used for searching.
-
----
-
-# Custom Analyzers
-
-```
-PUT movies
+```json
+PUT /my_custom_index
 {
   "settings": {
     "analysis": {
       "analyzer": {
         "my_custom_analyzer": {
           "type": "custom",
-          "tokenizer": "standard",
-          "char_filter": [
-            "html_strip"
-          ],
-          "filter": [
-            "lowercase",
-            "asciifolding"
-          ]
+          "char_filter": ["html_strip"],
+          "tokenizer": "whitespace",
+          "filter": ["lowercase", "asciifolding", "stop"]
         }
       }
     }
@@ -186,7 +88,46 @@ PUT movies
 
 ---
 
-# Custom Analyzers
+# Advanced Custom Analyzer Example
+
+- Demonstrating a complex analyzer setup for nuanced text processing.
+ 
+```json
+PUT /advanced_custom_index
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "advanced_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip", { "type": "mapping", "mappings": ["&=>and"] }],
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding", "stop", { "type": "synonym", "synonyms": ["quick,fast"] }]
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+# Testing Analyzers with the _analyze API
+
+- The `_analyze` API's role in refining Elasticsearch analyzers.
+- Example Test: Analyzing custom token filters.
+- **Example Request**:
+  ```json
+  POST /_analyze
+  {
+    "analyzer": "my_custom_analyzer",
+    "text": "The <b>Quick</b> Brown Foxes & Hares."
+  }
+  ```
+
+---
+
+# Configue Analyzer for a field
 
 ```
 PUT movies
@@ -201,43 +142,6 @@ PUT movies
   }
 }
 ```
-
----
-
-# Built-in Analyzers
-
-* You can also use the built-in analyzers
-    * `Keyword`,
-    * `Standard`
-    * `Language`
-    * ...
-
-```
-PUT movies
-{
-  "mappings": {
-    "properties": {
-      "title": {
-        "type": "text",
-        "analyzer": "french"
-      }
-    }
-  }
-}
-```
-
----
-
-# Analyzers
-
-![](/images/analyzer_example.png)
-
----
-
-# Analyzers
-
-![](/images/analyzer3.png)
-
 ---
 
 # Mapping Modification
@@ -352,146 +256,6 @@ POST _reindex
   },
   "dest": {
     "index": "movies_v2"
-  }
-}
-```
-
----
-
-# Test Your Mapping
-
-* Elasticsearch provides an endpoint for testing your mappings
-
-```
-POST _analyze
-{
-  "analyzer": "whitespace",
-  "text":     "The quick brown fox."
-}
-```
-
----
-
-# Test Your Mapping
-
-```
-{
-  "tokens": [
-    {
-      "token
-
-": "The",
-      "start_offset": 0,
-      "end_offset": 3,
-      "type": "word",
-      "position": 0
-    },
-    {
-      "token": "quick",
-      "start_offset": 4,
-      "end_offset": 9,
-      "type": "word",
-      "position": 1
-    },
-    {
-      "token": "brown",
-      "start_offset": 10,
-      "end_offset": 15,
-      "type": "word",
-      "position": 2
-    },
-    {
-      "token": "fox.",
-      "start_offset": 16,
-      "end_offset": 20,
-      "type": "word",
-      "position": 3
-    }
-  ]
-}
-```
----
-
-# Test Your Mappings
-
-```
-POST _analyze
-{
-  "tokenizer": "standard",
-  "filter":  [ "lowercase", "asciifolding" ],
-  "text":      "Is this déja vu?"
-}
-```
----
-
-# Test Your Mappings
-
-```
-POST my_index/_analyze
-{
-  "field": "my_text",
-  "text":  "Is this déjà vu?"
-}
-```
-
----
-
-# Templates
-
-* We can define `index` and `component` templates
-* This centralizes the configuration of an index
-* And can be reused when a new index is created
-* Using templates is a recommended practice
-
----
-
-# Component Templates
-
-```
-PUT _component_template/component_template1
-{
-  "template": {
-    "mappings": {
-      "properties": {
-        "@timestamp": {
-          "type": "date"
-        }
-      }
-    }
-  }
-}
-```
-
----
-
-# Index Templates
-
-```
-PUT _index_template/template_1
-{
-  "index_patterns": ["te*", "bar*"],
-  "template": {
-    "settings": {
-      "number_of_shards": 1
-    },
-    "mappings": {
-      "_source": {
-        "enabled": true
-      },
-      "properties": {
-        "host_name": {
-          "type": "keyword"
-        }
-      }
-    },
-    "aliases": {
-      "mydata": { }
-    }
-  },
-  "priority": 500,
-  "composed_of": ["component_template1"],
-  "_meta": {
-    "description": "my custom"
   }
 }
 ```

@@ -389,9 +389,6 @@ action.disable_delete_all_indices: true
 
 ---
 
-Bien sûr, je vais vous préparer une série de slides en anglais qui couvrent l'API d'indexation de type bulk d'Elasticsearch, y compris des exemples de requêtes, les réponses HTTP correspondantes et des bonnes pratiques. Voici le plan des slides :
-
----
 
 # Introduction to Bulk API in Elasticsearch
 
@@ -432,6 +429,10 @@ POST /_bulk
 - Handling Errors in Bulk Requests
   - Even if one or more actions fail, the bulk operation can still complete successfully for the rest. 
   - Each action's result needs to be checked individually for errors.
+
+---
+
+# Best Practices 
 
 - Best Practices
   - Splitting bulk requests into manageable sizes to avoid overloading the cluster. 

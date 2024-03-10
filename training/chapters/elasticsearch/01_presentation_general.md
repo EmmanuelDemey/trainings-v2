@@ -8,9 +8,9 @@ layout: cover
 # Search Engines
 
 * In our increasingly connected world, there has emerged a need to centralize various pieces of information.
-* This is to:
+* We need to:
     * structure,
-    * query, and
+    * query
     * manipulate
 * ... information from different sources and in different structures.
 

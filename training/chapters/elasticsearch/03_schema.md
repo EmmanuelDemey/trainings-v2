@@ -316,6 +316,83 @@ PUT movies
 }
 ```
 
+--- 
+
+# Index and Component Templates
+
+* We can define `index` and `component` templates
+* This centralizes the configuration of an index
+* And can be reused when a new index is created
+* Using templates is a recommended practice
+
+---
+
+# Index Templates
+
+```
+PUT _index_template/template_1
+{
+  "index_patterns": ["te*", "bar*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1
+    },
+    "mappings": {
+      "_source": {
+        "enabled": true
+      },
+      "properties": {
+        "host_name": {
+          "type": "keyword"
+        }
+      }
+    },
+    "aliases": {
+      "mydata": { }
+    }
+  },
+  "composed_of": ["component_template1"],
+}
+```
+
+# Component Templates
+
+* Index Templates can inherit components from one or more Component Templates.
+* This allows for flexible and modular index configuration.
+* Use Component Templates for common settings, mappings, or aliases to avoid duplication.
+* Define Index Templates with specific index patterns and compose them using relevant Component Templates.
+* Utilize versioning and priority settings to manage template overrides effectively.
+
+---
+
+# Component Templates
+
+```http
+PUT _component_template/component_template1
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        }
+      }
+    }
+  }
+}
+```
+
+```http
+PUT _index_template/template_1
+{
+  "index_patterns": ["te*", "bar*"],
+  "template": {
+    
+  },
+  "composed_of": ["component_template1"],
+}
+```
+
 ---
 layout: cover
 ---
