@@ -355,6 +355,8 @@ PUT _index_template/template_1
 }
 ```
 
+---
+
 # Component Templates
 
 * Index Templates can inherit components from one or more Component Templates.

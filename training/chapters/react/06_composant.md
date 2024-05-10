@@ -48,7 +48,7 @@ layout: cover
 
 * Définition d'un composant en utilisant une `fonction`.
 
-```javascript
+```typescript
 // <Title content={'Content Title'} />
 type TitleProps = {
     content: string
@@ -66,7 +66,7 @@ export default Title;
 
 * Destructuration des `props` avant la génération du rendu.
 
-```javascript
+```typescript
 // <Title content={'Content Title'} />
 type TitleProps = {
     content: string
@@ -86,7 +86,7 @@ export default Title;
 * Définition d'un composant en utilisant une `class`.
 * Les classes étaient plutôt utilisées pour les composants stateful (avant l'apparition des `hooks`)
 
-```javascript
+```typescript
 import { Component } from 'react';
 
 // <Title content={'Content Title'} />
@@ -109,7 +109,7 @@ export default Title;
 
 * Destructuration des `props` avant la génération du rendu.
 
-```javascript
+```typescript
 import { Component } from 'react';
 
 // <Title content={'Content Title'} />
@@ -133,7 +133,7 @@ export default Title;
 
 * Nous avons la possibilité de définir un arbre d'éléments. Il sera accessible via la `props` `children`.
 
-```javascript
+```typescript
 // <Title>Content Title</Title>
 type TitleProps = {
 };
@@ -160,7 +160,7 @@ export default Title;
 * Si nous souhaitons étre notifié lors d'une action d'un composant enfant, nous allons passer des fonctions
 en `props` à notre composant.
 
-```javascript
+```typescript
 //<ValidationButton action={() => { alert('validated)}} />
 type ValidationButtonProps = {
     action: (event: Event) => void 
@@ -178,7 +178,7 @@ export default ValidationButton;
 
 * Nous pouvons définir des fonctions qui seront appelées suite à l'interaction de l'utilisateur
 
-```javascript
+```typescript
 const CollapsiblePanel = () =>{
     const togglePanel = () => alert("togglePanel");
 
@@ -262,43 +262,8 @@ export default CollapsiblePanel;
         /components
             /menu
                 /menu.js
-                /style.css
+                /menu.css
                 /menu.spec.js
-```
-
----
-
-# PropTypes et valeur par défaut
-
-* De manière similaire, nous pouvons définir des valeurs par défaut.
-
-```javascript
-import PropTypes from 'prop-types';
-
-const Title = ({content}) => <h1>{content}</h1>;
-
-Title.propTypes = {
-  content: PropTypes.string
-};
-Title.defaultProps = {
-    content: 'Default Title';
-}
-export default Title;
-```
-
----
-
-# PropTypes et valeur par défaut
-
-* Pour des raisons de performance, vous devez éviter de définir la valeur par défaut directement dans la signature de la méthode
-
-```javascript
-import PropTypes from 'prop-types';
-
-const Title = ({content = 'Default Title'})
-                    => <h1>{content}</h1>;
-
-export default Title;
 ```
 
 ---
@@ -335,14 +300,14 @@ layout: cover
     * prend en paramètre un composant
     * retourne ce composant avec des fonctionnalités supplémentaires.
 
-```javascript
+```typescript
 const withTranslation = Component => EnhancedComponent;
 // withTranslation(UserCard)
 ```
 
 * Vous allez retrouver ce pattern dans de nombreuses librairies
 
-```javascript
+```typescript
 // const AppWithPreference = withPreferences(App)
 function withPreferences(WrappedComponent: ComponentType) {
   return (props: any) => {

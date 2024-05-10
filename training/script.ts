@@ -179,5 +179,8 @@ const generatePwWebsite = (training: string) => {
   fs.rmSync("dist", { recursive: true, force: true });
   mkdirSync("dist");
 
-  await Promise.all([generateSlides(process.argv[2]), generatePwWebsite(process.argv[2])]);
+  const projects = process.argv[2].split(",");
+  for (let project of projects) {
+    await Promise.all([generateSlides(project), generatePwWebsite(project)]);
+  }
 })();

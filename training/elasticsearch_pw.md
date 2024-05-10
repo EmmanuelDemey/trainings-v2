@@ -159,7 +159,7 @@ In this practical part, we will perform aggregation queries on the data we have 
 - Calculate the number of individuals by gender.
 - Calculate the number of individuals by gender and eye color.
 - Calculate the number of individuals by gender and by registration year (`registered` property).
-- For each year, calculate the distribution of genders (male/female) and the average age of individuals. Also, retrieve the year or the highest average age.
+- For each year, calculate the distribution of genders (male/female) and the average age of individuals. Also, retrieve the year with the highest average age.
 - Modify the previous query to only get the buckets of years where the average age is over 28.
 - Modify the previous query to find the oldest person in this previously created bucket. Only return certain information (name, age).
 
@@ -365,3 +365,13 @@ To execute an SLM without waiting, you can use the `_execute` endpoint:
 ```
 POST _slm/policy/nightly-snapshots/_execute
 ```
+
+## Lab 13 : Kibana
+
+We will create a complete dashboard to manipulate the Kibana UI. Within the same Kibana dashboard, you must:
+
+- Display a pie chart showing the distribution of Men / Women
+- Display the average age of individuals
+- Include a map to view their origin
+- Include a graph with two lines to see the evolution of the average age of men and women (using TSVB)
+- Add a dropdown to filter by the person's company"
