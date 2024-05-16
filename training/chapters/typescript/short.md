@@ -33,19 +33,11 @@
     * définir des génériques
     * utiliser des types avancés
 
---- 
-
-# Types
-
 ```typescript
 function lowercase(word: string): string {
     return word.toLowerCase();
 }
-```
 
-* Si nous utilisons la méthode avec la mauvaise signature, nous allons avoir des erreurs de compilation.
-
-```typescript
 lowercase("react") // OK
 lowercase(1) // TypeScript Error
 lowercase("react").length // OK

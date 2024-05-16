@@ -25,7 +25,7 @@ Si vous utilisez VSCode, voici des snippets de code que j'utilise souvant. N'hé
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [React](https://fr.reactjs.org/)
-- [create-react-app](https://create-react-app.dev/)
+- [Vite](https://vitejs.dev/guide/)
 - [Bulma](https://bulma.io/)
   :::
 
@@ -34,15 +34,14 @@ Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `
 Dans votre terminal, veuillez exécuter les commandes suivantes :
 
 ```shell
-npm install -g create-react-app
-create-react-app training --template typescript
+npm create vite@latest my-react-app -- --template react-ts
 ```
 
 Une fois le projet créé, vous pouvez exécuter les commandes suivantes afin de vérifier qu'il est bien fonctionnel.
 
 ```shell
 cd training
-npm run start
+npm run dev
 ```
 
 Nous allons ensuite installer la librairie CSS `Bulma`, nous permettant de nous aider lors de la création du style de notre application.
@@ -54,30 +53,21 @@ npm install bulma
 
 Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/index.tsx`.
 
-```javascript
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+```typescript
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
 import "bulma/css/bulma.css";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  </React.StrictMode>,
+)
 ```
 
-Nous allons ensuite intégrer le _layout_ de base de la librairie Bulma. Modifiez tout d'abord le contenu du fichier `public/index.html` avec le contenu suivante :
+Nous allons ensuite intégrer le _layout_ de base de la librairie Bulma. Modifiez tout d'abord le contenu du fichier `index.html` avec le contenu suivante :
 
 ```html
 <!DOCTYPE html>
@@ -118,7 +108,7 @@ Vous pouvez également générer la version de production et émuler le fonction
 
 ```shell
 npm run build
-cd build
+cd dist
 npx serve
 ```
 
@@ -127,9 +117,9 @@ npx serve
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-- [Jest](https://jestjs.io/)
+- [Vitest](https://vitest.dev/)
 - [Liste de matchers](https://github.com/testing-library/jest-dom)
-  :::
+:::
 
 Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
 
@@ -140,11 +130,6 @@ Vous pouvez par exemple vérifier que le document contient
 - un titre `h1` contenant la chaine de caractéres `Hello World`.
 - un paragraphe contenant la chaine de caractéres `Bulma`.
 
-Pour lancer les tests, vous pouvez exécuter la commande suivante :
-
-```shell
-npm run test
-```
 
 ## PW3 - Outillage
 
@@ -152,7 +137,7 @@ npm run test
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [Cypress](https://www.cypress.io/)
-  :::
+:::
 
 Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
 
@@ -363,7 +348,7 @@ Nous allons ensuite externaliser le code créé précédemment dans trois compos
 - `PeopleTable` : Ce composant aura en charge la génération du tableau.
 - `PeopleItem` : Ce composant aura en charge la génération d'un item du tableau.
 
-Veuillez faire le nécessaire pour que le tableau de personnages soit soit filtré à chaque lettre insérée dans le champ de formulaire.
+Veuillez faire le nécessaire pour que le tableau de personnages soit filtré à chaque lettre insérée dans le champ de formulaire. Pour cela, nous allons devoir utiliser un concept pas encore abordé dans la formation : le hook `useState`. Veuillez demander un conseil au formatteur si besoin.
 
 ## PW6 - Hook
 

@@ -11,11 +11,11 @@ layout: cover
 * JSX est une extension du langage JavaScript
 * Il apporte du sucre syntaxique permettant de manipuler les éléments d'une application React
 * Il sera ensuite "converti" par des outils comme *Babel*
-* React possède plusieurs `renderer` : `react-dom`, `next.js` ou encore `react native`
+* React possède plusieurs `renderer` : 
+    * `react-dom`, 
+    * `next.js` 
+    * `react native`
 
----
-
-# JSX
 
 ```jsx
 const root = ReactDOM.createRoot(

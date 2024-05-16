@@ -8,7 +8,7 @@ layout: cover
 
 # Présentation Générale
 
-* React est une librairie développée par Meta
+* React.js est une librairie développée par Meta
 * Elle permet de générer l'HTML de notre application
 * Et de le dynamiser
 * Utilisé dans de nombreux projets (Meta lui même)
@@ -28,41 +28,36 @@ layout: cover
 
 ---
 
-# create-react-app
+# vite
 
-* Pour créer un nouveau projet React, nous allons utiliser le module `create-react-app`
+* Pour créer un nouveau projet React, nous allons utiliser le module `vite`
 * Ce module permet de créer un squelette de projet et de configurer l'ensemble des outils nécessaires
-* Des solutions concurrentes existent comme **Nx** et **Vite**
+* Des solutions concurrentes existent comme **Nx** et **create-react-app**
 
 ```shell
-npx create-react-app demo --template typescript
+npm create vite@latest my-react-app -- --template react-ts
 ```
 
 ---
 
-# create-react-app
+# Vite
 
 * Le projet créé proposera plusieurs scripts
 
 ```json
 {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
 }
 ```
 
----
-
-# Outillage
-
-* Voici la liste des outils configurés par `create-react-app`
+* Voici la liste des outils configurés par `Vite`
     * Les librairies `react` et `react-dom`
-    * Webpack
-    * Jest et Testing Library
+    * Vite
+    * Vitest et Testing Library
     * ESLint
-    * Core Web Vitals
     * Typescript
 
 

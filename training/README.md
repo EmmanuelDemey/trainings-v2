@@ -1,11 +1,7 @@
-# Welcome to [Slidev](https://github.com/slidevjs/slidev)!
+# Framework Formation Philibert Consulting
 
-To start the slide show:
+Afin de lancer une formation, il suffit de lancer la commande suivante 
 
-- `npm install`
-- `npm run dev`
-- visit http://localhost:3030
-
-Edit the [slides.md](./slides.md) to see the changes.
-
-Learn more about Slidev on [documentations](https://sli.dev/).
+```shell
+npm run dev -- react.md
+```

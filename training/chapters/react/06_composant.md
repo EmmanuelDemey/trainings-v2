@@ -33,7 +33,8 @@ layout: cover
     * `statefull`
 * Nous pouvons les définir
     * via des fonctions
-    * via des classes.
+    * via des classes (**deprecated**).
+* Les composants `statefull` seront abordés dans un prochain chapitre.
 
 ---
 
@@ -203,22 +204,6 @@ export default CollapsiblePanel;
 * Nous évitons d'écrire des composants usine à gaz
 * Trop de `props` complexifiera la maintenabilité du composant
 * Nous préférons suivre l'architecture atomique (atome, molécule, organisme, ... page)
-
----
-
-# Composant statefull
-
-* Avant de présenter les *hook*, un composant statefull ne pouvait étre défini que via une classe.
-* Pour modifier l'état du composant, nous devons appeler la méthode `setState`.
-* A chaque fois que le `state` est modifié, le composant est regénéré.
-
----
-
-# Composant statefull
-
-* Elle accepte deux signatures :
-    * un objet partiel permettant de faire la mise à jour.
-    * une fonction qui retourne un objet partiel
 
 ---
 

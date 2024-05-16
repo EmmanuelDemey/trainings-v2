@@ -5,9 +5,6 @@ layout: cover
 # Outillage
 
 ---
-src: ../webpack.md
-hide: false
----
 
 
 # Outillage
@@ -15,7 +12,7 @@ hide: false
 * A cela nous pourrions ajouter :
     * Prettier
     * ESLint
-    * Cypress
+    * Cypress ou Playwright
     * Husky
     * Storybook
 

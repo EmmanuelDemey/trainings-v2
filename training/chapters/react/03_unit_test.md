@@ -9,7 +9,7 @@ layout: cover
 # Tests unitaires
 
 - Pour l'écriture des tests unitaires, nous conseillons deux librairies :
-- **Jest**:
+- **Vitest**:
   - Pour la structuration de la suite de tests
   - Pour les mocks
   - Pour les assertions
@@ -17,11 +17,13 @@ layout: cover
 
 ---
 
-# Jest
+# Vitest
 
-- Jest propose des méthodes permettant de structurer une suite de tests
+- Vitest propose des méthodes permettant de structurer une suite de tests
 
 ```typescript
+import { describe, it } from 'vitest';
+
 describe('<MyComponent />', () => {
     describe('state 1', () => {
         it('should be hidden', () => {
@@ -39,11 +41,13 @@ describe('<MyComponent />', () => {
 
 ---
 
-# Jest
+# Vitest
 
 - Nous avons la possibilité des définir des fonctions de "configuration"
 
 ```typescript
+import { describe, beforeEach, afterEach } from 'vitest';
+
 describe('<MyComponent />', () => {
     describe('state 1', () => {
         beforeEach(() => {
@@ -59,40 +63,35 @@ describe('<MyComponent />', () => {
 
 ---
 
-# Jest - Assertions
+# Vitest - Assertions
 
 - Nous allons ensuite utiliser des **assertions** afin de vérifier le résultat de nos codes.
 
 ```typescript
 import { getUser } from './user';
+import { describe, it, expect } from 'vitest';
 
 describe('getUser', () => {
    it('should return the current user', () => {
-      expect(getUser()).toEqual<User>({
-        name: 'Demey',
-        firstName: 'Emmanuel'
-      });
+      expect(1 + 2).toBe(3)
    })
 })
 ```
 
 ---
 
-# Jest - mocks
+# Vitest - mocks
 
 - Utilisation des mocks pour modifier l'implementation d'une méthode
 - Utilisation des `spies` pour s'assurer qu'une méthode a bien été appelée
 
----
-
-# Jest - mocks
-
 ```typescript
 import get from './list';
 import api from 'js/remote-api/api';
+import { describe, it, vi, expect } from 'vitest';
 
 const dispatch = jest.fn();
-jest.mock('js/remote-api/api');
+vi.mock('js/remote-api/api');
 
 describe('Api', () => {
 	it('should call this action with the right payload', async () => {
@@ -117,14 +116,11 @@ describe('Api', () => {
 - Cet instantané sera sauvegardé et versionné dans votre projet
 - Lors des prochains tests, il sera comparé avec le nouvel état du composant
 
----
-
-# Snapshot testing
-
 ```jsx
 import React from "react";
 import Link from "../Link.react";
 import renderer from "react-test-renderer";
+import { expect, it } from 'vitest';
 
 it("renders correctly", () => {
   const tree = renderer.create(<Link page="http://www.facebook.com">Facebook</Link>).toJSON();
@@ -153,9 +149,9 @@ exports[`renders correctly 1`] = `
 
 # Jest - Options
 
-- `jest`
-- `jest --watchAll`
-- `jest --coverage=true`
+- `vitest`
+- `vitest watch`
+- `vitest run --coverage=true`
 - CLI intéractive
 
 ---
@@ -169,6 +165,7 @@ exports[`renders correctly 1`] = `
 ```typescript
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
+import { expect, describe, it } from 'vitest';
 
 describe("<Comment />", () => {
   it("should be disabled by default", () => {
@@ -188,6 +185,7 @@ describe("<Comment />", () => {
 ```typescript
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { expect, describe, it } from 'vitest';
 
 describe("<Comment />", () => {
   it("type", async () => {
@@ -211,6 +209,7 @@ describe("<Comment />", () => {
 ```typescript
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { expect, describe, it } from 'vitest';
 
 describe("<Comment />", () => {
   function renderToScreen() {
@@ -239,19 +238,6 @@ describe("<Comment />", () => {
 - `toHaveTextContent`
 - `toHaveValue`
 - ...
-
----
-
-# Script NPM
-
-```json
-{
-  "scripts": {
-    "test": "react-scripts test",
-    "test:ci": "npm run test -- --watchAll=false"
-  }
-}
-```
 
 ---
 layout: cover

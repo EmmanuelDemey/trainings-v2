@@ -113,7 +113,6 @@ hero:
     fs.writeFileSync(`${distFolder}/src/content/docs/index.mdx`, index);
     for (let i = 0; i < pws.length; i++) {
       const pw = pws[i];
-      console.log(pw, i, pws.length);
       fs.writeFileSync(join(distFolder, "src/content/docs/guides", kebabCase(pwTitles[i]) + ".md"), pw.join("\r\n"));
     }
     fs.writeFileSync(
