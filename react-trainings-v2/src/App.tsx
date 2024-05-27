@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import PeopleFilter from './PeopleFilter';
 import PeopleTable from './PeopleTable';
-import PeopleItem from './PeopleItem';
+import { useFetch } from './hooks/fetch';
 
 export type Person = {
 	name: string;
@@ -22,38 +22,13 @@ export type Person = {
 	url?: string;
 };
 
-type People = Array<Person>;
+export type People = Array<Person>;
 
 function App() {
-	const [people, setPeople] = useState<People>([]);
 	const [filter, setFilter] = useState<string>('');
-	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string>('');
-
-	useEffect(() => {
-		setLoading(true);
-		fetch(`https://swapi.dev/api/people/?search=${filter}`)
-			.then((res) => {
-				if (!res.ok) {
-					throw new Error('Error');
-				}
-				return res.json();
-			})
-			.then((r) => r.results)
-			.then((results) => setPeople(results as People))
-			.catch((err: Error) => {
-				setError(err.message);
-			})
-			.finally(() => {
-				setLoading(false);
-			});
-	}, [setLoading, filter]);
-
-	useEffect(() => {});
-
-	const add = (p: Person) => {
-		setPeople([...people, p]);
-	};
+	const { data, loading, error } = useFetch(
+		`https://swapi.dev/api/people/?search=${filter}`
+	);
 
 	if (error) return <div>{error}</div>;
 
@@ -68,9 +43,8 @@ function App() {
 						max="100"
 					></progress>
 				) : (
-					<PeopleTable people={people} />
+					<PeopleTable people={data} />
 				)}
-				<PeopleItem add={add} />
 			</div>
 		</section>
 	);
