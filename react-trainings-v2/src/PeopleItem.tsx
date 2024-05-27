@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type Person } from './fake-data';
+import { type Person } from './App';
 
 const DEFAULT_PERSON: Person = { name: '', gender: '', birth_year: '' };
 
