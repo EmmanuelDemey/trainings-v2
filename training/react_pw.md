@@ -6,16 +6,16 @@ Si vous utilisez VSCode, voici des snippets de code que j'utilise souvant. N'hé
 
 ```json
 {
-  "useStateTS": {
-    "scope": "typescript",
-    "prefix": "useState",
-    "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState<$2>($3)"]
-  },
-  "useStateJS": {
-    "scope": "javascript",
-    "prefix": "useState",
-    "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState($2)"]
-  }
+	"useStateTS": {
+	  "scope": "typescript,typescriptreact",
+	  "prefix": "useState",
+	  "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState<$2>($3)"]
+	},
+	"useStateJS": {
+	  "scope": "javascript,javascriptreact",
+	  "prefix": "useState",
+	  "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState($2)"]
+	}
 }
 ```
 
