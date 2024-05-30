@@ -14,8 +14,8 @@ describe('Home', () => {
 	});
 
 	test('check h2 content', () => {
-		expect(screen.getByRole('heading', { level: 2 }).textContent).toContain(
-			'Vous'
+		expect(screen.getByRole('heading', { level: 2 }).textContent).toEqual(
+			'Count'
 		);
 	});
 });

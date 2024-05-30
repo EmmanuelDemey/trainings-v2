@@ -18,8 +18,8 @@ const PersonPage: FC = () => {
 				<Loader />
 			) : (
 				<ul>
-					{Object.entries(data).map(([k, v]) => (
-						<li>{`${k}: ${v}`}</li>
+					{Object.entries(data).map(([k, v], i) => (
+						<li key={i}>{`${k}: ${v}`}</li>
 					))}
 				</ul>
 			)}

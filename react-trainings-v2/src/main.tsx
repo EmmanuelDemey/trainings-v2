@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Home, NotFound, Person } from 'src/pages';
-import { Language } from 'src/common';
+import { Home, NotFound } from 'src/pages';
+const Person = lazy(() => import('src/pages/person'));
+import { Language, Loader } from 'src/common';
 import './i18n';
 import 'bulma/css/bulma.css';
 
@@ -14,7 +15,11 @@ const router = createBrowserRouter([
 	},
 	{
 		path: '/person/:id',
-		element: <Person />,
+		element: (
+			<Suspense fallback={<Loader />}>
+				<Person />
+			</Suspense>
+		),
 	},
 ]);
 
