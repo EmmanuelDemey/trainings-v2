@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import PeopleFilter from './PeopleFilter';
 import PeopleTable from './PeopleTable';
 import { useFetch } from 'src/hooks/fetch';
-import { count } from 'src/utils';
+import { count, getEnv } from 'src/utils';
 
 export type Person = {
 	name: string;
@@ -37,7 +37,7 @@ const HomePage: FC = () => {
 	> | null>(null);
 	const [likes, setLikes] = useState<Record<string, number>>({});
 	const { data, loading, error } = useFetch(
-		`https://swapi.dev/api/people/?search=${filter}`
+		`${getEnv('API_BASE_URL')}/?search=${filter}`
 	);
 
 	const updateLikes = (key: string, value: number) => {
