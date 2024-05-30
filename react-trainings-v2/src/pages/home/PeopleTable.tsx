@@ -1,6 +1,9 @@
 import { useContext } from 'react';
-import { type People, type Person } from './App';
-import { LikeContext } from './contexts';
+import { type People, type Person } from './component';
+import { LikeContext } from '../../contexts';
+import { Link } from 'react-router-dom';
+import { getIDFromUrl } from 'src/utils/url';
+import './person.css';
 
 type PeopleTableType = { people: People };
 
@@ -21,7 +24,9 @@ const PeopleTable = ({ people }: PeopleTableType) => {
 					const like: number = likes[name];
 					return (
 						<tr key={url}>
-							<td>{name}</td>
+							<td className="person">
+								<Link to={`/person/${getIDFromUrl(url)}`}>{name}</Link>
+							</td>
 							<td>{gender}</td>
 							<td>{birth_year}</td>
 							<td>

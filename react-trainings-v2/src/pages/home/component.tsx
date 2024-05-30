@@ -1,9 +1,10 @@
 import { useState, useEffect, FC } from 'react';
-import { LikeContext } from './contexts';
+import { LikeContext } from 'src/contexts';
+import { Loader } from 'src/common';
 import PeopleFilter from './PeopleFilter';
 import PeopleTable from './PeopleTable';
-import { useFetch } from './hooks/fetch';
-import { count } from './utils';
+import { useFetch } from 'src/hooks/fetch';
+import { count } from 'src/utils';
 
 export type Person = {
 	name: string;
@@ -26,7 +27,7 @@ export type Person = {
 
 export type People = Array<Person>;
 
-const App: FC = () => {
+const HomePage: FC = () => {
 	const [filter, setFilter] = useState<string>('');
 	const [initialLikes, setInitialLikes] = useState<Record<
 		string,
@@ -43,7 +44,13 @@ const App: FC = () => {
 
 	useEffect(() => {
 		if (!initialLikes) {
-			const init = data.reduce((acc, { name }) => ({ ...acc, [name]: 0 }), {});
+			const init = data.reduce(
+				(acc: Record<string, number>, { name }: { name: string }) => ({
+					...acc,
+					[name]: 0,
+				}),
+				{}
+			);
 			setLikes(init);
 			setInitialLikes(init);
 		}
@@ -58,10 +65,7 @@ const App: FC = () => {
 				<h2>{`Vous aimez ${count(likes)} personnages`}</h2>
 				<PeopleFilter value={filter} handleChange={setFilter} />
 				{loading ? (
-					<progress
-						className="progress is-small is-primary"
-						max="100"
-					></progress>
+					<Loader />
 				) : (
 					<LikeContext.Provider value={{ likes, updateLikes }}>
 						<PeopleTable people={data} />
@@ -72,4 +76,4 @@ const App: FC = () => {
 	);
 };
 
-export default App;
+export default HomePage;

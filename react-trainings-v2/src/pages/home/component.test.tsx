@@ -1,10 +1,10 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import Home from './component';
 
-describe('App', () => {
+describe('Home', () => {
 	beforeEach(() => {
-		render(<App />);
+		render(<Home />);
 	});
 
 	test('should check title', () => {
@@ -13,7 +13,9 @@ describe('App', () => {
 		).toBeDefined();
 	});
 
-	test('check p content', () => {
-		expect(screen.getByRole('paragraph').textContent).toContain('Bulma');
+	test('check h2 content', () => {
+		expect(screen.getByRole('heading', { level: 2 }).textContent).toContain(
+			'Vous'
+		);
 	});
 });

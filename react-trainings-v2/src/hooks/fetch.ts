@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type People } from '../App';
+import { type People } from 'src/pages/home/component';
 
 export const useFetch = (url: string) => {
 	const [data, setData] = useState<People>([]);
@@ -15,9 +15,8 @@ export const useFetch = (url: string) => {
 				}
 				return res.json();
 			})
-			.then((r) => r.results)
-			.then((results: People) => {
-				setData(results);
+			.then((r) => {
+				setData(r.results ? r.results : r);
 			})
 			.catch((err: Error) => {
 				setError(err.message);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type Person } from './App';
+import { type Person } from './component';
 
 const DEFAULT_PERSON: Person = { name: '', gender: '', birth_year: '' };
 
