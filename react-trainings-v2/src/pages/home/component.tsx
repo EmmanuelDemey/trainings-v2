@@ -1,6 +1,7 @@
 import { useState, useEffect, FC } from 'react';
 import { LikeContext } from 'src/contexts';
 import { Loader } from 'src/common';
+import { useTranslation } from 'react-i18next';
 import PeopleFilter from './PeopleFilter';
 import PeopleTable from './PeopleTable';
 import { useFetch } from 'src/hooks/fetch';
@@ -28,6 +29,7 @@ export type Person = {
 export type People = Array<Person>;
 
 const HomePage: FC = () => {
+	const { t } = useTranslation();
 	const [filter, setFilter] = useState<string>('');
 	const [initialLikes, setInitialLikes] = useState<Record<
 		string,
@@ -58,11 +60,13 @@ const HomePage: FC = () => {
 
 	if (error) return <div>{error}</div>;
 
+	const likeNb = count(likes);
+
 	return (
 		<section className="section">
 			<div className="container">
 				<h1 className="title">Hello World</h1>
-				<h2>{`Vous aimez ${count(likes)} personnages`}</h2>
+				<h2>{t('Count', { likeNb })}</h2>
 				<PeopleFilter value={filter} handleChange={setFilter} />
 				{loading ? (
 					<Loader />
