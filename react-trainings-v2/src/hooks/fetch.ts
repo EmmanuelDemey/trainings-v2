@@ -16,7 +16,9 @@ export const useFetch = (url: string) => {
 				return res.json();
 			})
 			.then((r) => r.results)
-			.then((results) => setData(results as People))
+			.then((results: People) => {
+				setData(results);
+			})
 			.catch((err: Error) => {
 				setError(err.message);
 			})
