@@ -34,13 +34,13 @@ Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `
 Dans votre terminal, veuillez exécuter les commandes suivantes :
 
 ```shell
-npm create vite@latest my-react-app -- --template react-ts
+npm create vite@latest react-trainings-v2 -- --template react-ts
 ```
 
 Une fois le projet créé, vous pouvez exécuter les commandes suivantes afin de vérifier qu'il est bien fonctionnel.
 
 ```shell
-cd training
+cd react-trainings-v2
 npm run dev
 ```
 
@@ -51,14 +51,13 @@ Pour cela, vous devez exécuter la commande suivante :
 npm install bulma
 ```
 
-Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/index.tsx`.
+Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/main.tsx`.
 
 ```typescript
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import "bulma/css/bulma.css";
+import App from './App'
+import 'bulma/css/bulma.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -79,6 +78,7 @@ Nous allons ensuite intégrer le _layout_ de base de la librairie Bulma. Modifie
   </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
 ```
@@ -119,16 +119,22 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 
 - [Vitest](https://vitest.dev/)
 - [Liste de matchers](https://github.com/testing-library/jest-dom)
+- [React testing library](https://testing-library.com/docs/react-testing-library/intro/)
 :::
 
 Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
-
-La seule chose à faire dans ce TP est de modifier le test unitaire existant afin de coller avec les modifications apportées dans le TP précédent.
 
 Vous pouvez par exemple vérifier que le document contient
 
 - un titre `h1` contenant la chaine de caractéres `Hello World`.
 - un paragraphe contenant la chaine de caractéres `Bulma`.
+
+En :
+
+- installant `vitest` et `react-testing-library`
+- créant un script `test` dans le fichier `package.json`
+- étendant la configuration vite dans le fichier `vite.config.ts`
+- ajoutant un fichier `App.test.tsx` dans `src`
 
 
 ## PW3 - Outillage
@@ -159,6 +165,12 @@ Une fois installée, nous allons ajouter un script dans notre fichier `package.j
 Si à présent vous exécutez la commande `npm run cypress:open`, l'interface graphique doit étre visible vous permettant de lancer les tests générés par Cypress.
 
 Vous devez à présent supprimer les tests générés et créer vos propres tests afin de tester l'interface graphique de votre application.
+
+- Installer les extensions VS Code pour `prettier` et `eslint`
+
+- Configurer `prettier` dans votre projet
+
+- Ajouter un fichier `.eslintignore` à la racine du projet pour exclure le linting pour le code auto-généré par Cypress
 
 ## PW4 - Template
 
@@ -359,8 +371,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [SWAPI](https://swapi.dev/)
   :::
 
-Dans les travaux précédents, les données étaient définies en mémoire. Nous allons dans ce TP récuper les données
-depuis l'API REST swapi.
+Dans les travaux précédents, les données étaient définies en mémoire. Nous allons récupérer dans ce TP les données depuis l'API REST swapi.
 
 Nous allons tout d'abord supprimer le tableau défini précédemment
 
@@ -382,16 +393,11 @@ if (loading) {
 Vous devez a présent faire le nécessaire pour définir cette variable `loading` au bon moment. Pour tester
 cet ajout, vous devrez peut-être ralentir votre connexion. Pour cela, vous pouvez émuler une connexion lente via les Devtools de votre navigateur.
 
-Pour finaliser cette partie pratique, dès que l'utilisateur modifie la valeur du champ de formulaire, réalisez une nouvelle requête HTTP afin
-d'exécuter la recherche coté API. Pour cela, vous devez utiliser la route `https://swapi.dev/api/people/?search=r2` ou `r2` est la chaine de
-caractères que l'utilisateur recherche.
+Pour finaliser cette partie pratique, dès que l'utilisateur modifie la valeur du champ de formulaire, réalisez une nouvelle requête HTTP afin d'exécuter la recherche coté API. Pour cela, vous devez utiliser la route `https://swapi.dev/api/people/?search=r2` ou `r2` est la chaine de caractères que l'utilisateur recherche.
 
-Comme partie bonus, nous allons gérer la pagination de notre tableau. En effet, l'API que nous utilisons retourne 10 personnages
-par page. Sur la page dévelopée, ajoutez deux boutons afin de naviguer de page en page, et ainsi visualiser l'ensemble
-des personnages de Star Wars.
+Comme partie bonus, nous allons gérer la pagination de notre tableau. En effet, l'API que nous utilisons retourne 10 personnages par page. Sur la page dévelopée, ajoutez deux boutons afin de naviguer de page en page, et ainsi visualiser l'ensemble des personnages de Star Wars.
 
-Comme seconde partie bonus, nous allons créer un `custom hook`. Ce hook, que nous nommerons `useFetch` devra gérer la récupération
-des données et la gestion de la variable `loading`.
+Comme seconde partie bonus, nous allons créer un `custom hook`. Ce hook, que nous nommerons `useFetch` devra gérer la récupération des données et la gestion de la variable `loading`.
 
 Ce hook s'utilisera de cette façon :
 
@@ -416,7 +422,7 @@ Les actions qui pourront étre exécutées par l'utilisateur sont des actions pe
 
 Nous allons commencer tout d'abord par définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer
 
-- un tbleau de personnages
+- un tableau de personnages
 - une fonction permettant d'ajouter un personnage
 - une fonction permettant de supprimer un personnage
 
@@ -458,7 +464,7 @@ Connectez les composants `Home` et `PeopleItem` au context afin d'implémenter l
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-- [React Router](https://reacttraining.com/react-router/web/guides/quick-start)
+- [React Router](https://reactrouter.com/en/main/start/tutorial)
   :::
 
 Nous allons à présent ajouter une deuxième page à notre application. Cette page sera utilisée lorsque l'utilisateur cliquera sur le nom d'un personnage. Elle affichera les informations du personnage selectionné.
@@ -534,14 +540,13 @@ La dernière étape est d'internationaliser le message indiquant le nombre de pe
 Pour cela, nous allons tout d'abord installer le module `i18next-icu`.
 
 ```shell
-npm install i18next-icu
+npm install i18next-icu intl-messageformat
 ```
 
 Une fois installé, nous devons l'ajouter à la configuration du module `react-i18next`.
 
 ```typescript
 import ICU from "i18next-icu";
-
 ...
 
 i18n
@@ -562,8 +567,8 @@ Dans le composant `DumbHome`, ajoutez deux boutons permettant de choisir la lang
 
 ```html
 <div className="is-pulled-right">
-  <button type="button" className="button" onClick="{" ... }>FR</button>
-  <button type="button" className="button" onClick="{" ... }>EN</button>
+  <button type="button" className="button" onClick="{...}">FR</button>
+  <button type="button" className="button" onClick="{...}">EN</button>
 </div>
 ```
 
@@ -586,7 +591,7 @@ Dans le formulaire, vous devez resepectez les contraintes suivantes :
 - La propriété _gender_ doit utiliser des _radios_
 - La propriété _height_ doit obligatoirement être supérieur à 0
 
-A fin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates.
+Afin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates.
 
 ## PW11 - TanStack Query
 
@@ -599,3 +604,73 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
   :::
 
 Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)
+
+## PW12 - Variables d'environnement
+
+:::note
+- [Vite env](https://vitejs.dev/guide/env-and-mode)
+  :::
+
+Externaliser la base de l'url de l'API consommée.
+Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `.env.local` surchargeant cette valeur. Utiliser cette variable d'environnement dans vos composants, de sorte que votre code soit portable.
+
+## PW13 - State manager : Recoil
+
+:::note
+- [Recoil](https://recoiljs.org/fr/docs/introduction/getting-started)
+  :::
+
+Nous avons utilisé l'API `context` pour gérer les likes jusqu'ici.
+Dans cette partie, nous allons externaliser la gestion des états des likes dans un state manager : recoil.
+
+Pour cela, nous allons tout d'abord installer le module `recoil`.
+
+```shell
+npm install recoil
+```
+
+Une fois installé, nous devons ajouter la provider recoil, `RecoilRoot` au niveau le plus haut de notre application (fichier `main.tsx`). Tous les composants enfants pourront alors communiquer avec les états gérés par recoil.
+
+```typescript
+...
+import { RecoilRoot } from "recoil";
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+	<React.StrictMode>
+		<RecoilRoot>
+			<RouterProvider router={router} />
+		</RecoilRoot>
+	</React.StrictMode>
+);
+```
+
+Nous allons ensuite définir un `atom` (morceau d'état).
+Nous pouvons créer un dossier `store` à la racine de src pour définir nos morceaux d'état
+
+```typescript
+const likeState = atom({
+  key: 'likeState',
+  default: {} as Record<string, number>,
+});
+```
+
+A la façon de `useState`, nous pouvons utiliser `useRecoilState` pour accéder à la valeur et au setter de l'atom `likeState`
+
+```typescript
+import { FC } from 'react'
+import { useRecoilState } from 'recoil'
+
+const Component: FC = () => {
+  const [text, setText] = useRecoilState(textState);
+  return ...
+}
+```
+
+# PW Bonus
+
+- React 19
+- factoriser les composants UI dans un répertoire `common` : fixer / améliorer un composant nécessitera la modification d'un seul fichier au lieu de X morceaux de jsx
+- dockeriser l'application :
+  - ajouter un fichier `Dockerfile`
+  - ajouter une configuration de CI
+- next.js
