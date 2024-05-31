@@ -32,7 +32,7 @@
 ```json
 {
   "scripts": {
-    "prettier": "prettier -l src/**/*.js"
+    "prettier": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\""
   }
 }
 ```
