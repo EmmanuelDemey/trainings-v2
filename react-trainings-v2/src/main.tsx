@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { RecoilRoot } from 'recoil';
 import { Home, NotFound } from 'src/pages';
 const Person = lazy(() => import('src/pages/person'));
 import { Language, Loader } from 'src/common';
@@ -25,7 +26,9 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
-		<Language />
-		<RouterProvider router={router} />
+		<RecoilRoot>
+			<Language />
+			<RouterProvider router={router} />
+		</RecoilRoot>
 	</React.StrictMode>
 );

@@ -1,14 +1,17 @@
-import { useContext } from 'react';
 import { type People, type Person } from './component';
-import { LikeContext } from '../../contexts';
 import { Link } from 'react-router-dom';
 import { getIDFromUrl } from 'src/utils/url';
 import './person.css';
+import { useRecoilState } from 'recoil';
+import { likeState } from 'src/store';
 
 type PeopleTableType = { people: People };
 
 const PeopleTable = ({ people }: PeopleTableType) => {
-	const { likes, updateLikes } = useContext(LikeContext);
+	const [likes, setLikes] = useRecoilState(likeState);
+	const updateLikes = (k: string, v: number): void => {
+		setLikes({ ...likes, [k]: v });
+	};
 	return (
 		<table className="table is-fullwidth">
 			<thead>

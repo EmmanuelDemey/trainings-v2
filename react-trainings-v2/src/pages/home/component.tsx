@@ -1,11 +1,12 @@
 import { useState, useEffect, FC } from 'react';
-import { LikeContext } from 'src/contexts';
 import { Loader } from 'src/common';
 import { useTranslation } from 'react-i18next';
 import PeopleFilter from './PeopleFilter';
 import PeopleTable from './PeopleTable';
 import { useFetch } from 'src/hooks/fetch';
 import { count, getEnv } from 'src/utils';
+import { useRecoilState } from 'recoil';
+import { likeState, initLikesState } from 'src/store';
 
 export type Person = {
 	name: string;
@@ -31,18 +32,12 @@ export type People = Array<Person>;
 const HomePage: FC = () => {
 	const { t } = useTranslation();
 	const [filter, setFilter] = useState<string>('');
-	const [initialLikes, setInitialLikes] = useState<Record<
-		string,
-		number
-	> | null>(null);
-	const [likes, setLikes] = useState<Record<string, number>>({});
+	// old context implem for initialLikes was buggy because of unmount when route change
+	const [initialLikes, setInitialLikes] = useRecoilState(initLikesState);
+	const [likes, setLikes] = useRecoilState(likeState);
 	const { data, loading, error } = useFetch(
 		`${getEnv('API_BASE_URL')}/?search=${filter}`
 	);
-
-	const updateLikes = (key: string, value: number) => {
-		setLikes({ ...likes, [key]: value });
-	};
 
 	useEffect(() => {
 		if (!initialLikes) {
@@ -54,9 +49,9 @@ const HomePage: FC = () => {
 				{}
 			);
 			setLikes(init);
-			setInitialLikes(init);
+			setInitialLikes(true);
 		}
-	}, [data, initialLikes]);
+	}, [data, initialLikes, setLikes, setInitialLikes]);
 
 	if (error) return <div>{error}</div>;
 
@@ -68,13 +63,7 @@ const HomePage: FC = () => {
 				<h1 className="title">Hello World</h1>
 				<h2>{t('Count', { likeNb })}</h2>
 				<PeopleFilter value={filter} handleChange={setFilter} />
-				{loading ? (
-					<Loader />
-				) : (
-					<LikeContext.Provider value={{ likes, updateLikes }}>
-						<PeopleTable people={data} />
-					</LikeContext.Provider>
-				)}
+				{loading ? <Loader /> : <PeopleTable people={data} />}
 			</div>
 		</section>
 	);
