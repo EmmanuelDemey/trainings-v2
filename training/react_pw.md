@@ -614,7 +614,7 @@ Dans cette partie théorique, nous allons mettre en place **TanStack Query** afi
 Externaliser la base de l'url de l'API consommée.
 Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `.env.local` surchargeant cette valeur. Utiliser cette variable d'environnement dans vos composants, de sorte que votre code soit portable.
 
-## PW13 - State manager : Recoil
+## PW13 - State manager - Recoil
 
 :::note
 - [Recoil](https://recoiljs.org/fr/docs/introduction/getting-started)

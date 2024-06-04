@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# State Container : Recoil
+# State Container Recoil
 
 ---
 

@@ -81,7 +81,7 @@ title: ${line.toString().replace("## ", "")}
               { label: 'Slides', link: '/guides/slides'},
               ${pws
                 .map((pw, i) => {
-                  return `{ label: '${pwTitles[i]}', link: '/guides/${kebabCase(pwTitles[i])}/' }`;
+                  return `{ label: "${pwTitles[i]}", link: "guides/${kebabCase(pwTitles[i])}/" }`;
                 })
                 .join(",")}
             ],

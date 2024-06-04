@@ -96,3 +96,12 @@ hide: true
 src: ./chapters/react/14_next.md
 hide: true
 ---
+
+---
+src: ./chapters/react/15_env.md
+---
+
+---
+src: ./chapters/react/16_recoil.md
+---
+
