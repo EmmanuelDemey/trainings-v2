@@ -128,6 +128,32 @@ getClusterInfo();
 ```
 
 ---
+
+## Integration with TestContainer
+
+* **TestContainer** is an open-source solution that allows you to programmatically launch a Docker image.
+* This solution is often used to implement integration tests that depend on a service we do not control (such as a database, etc.).
+* **TestContainer** can be used in multiple languages and on different platforms (like Node.js).
+
+```shell
+npm install @testcontainers/elasticsearch --save-dev
+```
+
+```typescript
+import { ElasticsearchContainer } from '@testcontainers/elasticsearch';
+
+it("should create an index", async () => {
+  const container = await new ElasticsearchContainer().start();
+  const client = new Client({ node: container.getHttpUrl() });
+
+  await client.indices.create({ index: "people" });
+
+  expect((await client.indices.exists({ index: "people" })).statusCode).toBe(200);
+  await container.stop();
+});
+```
+
+---
 layout: cover
 ---
 
