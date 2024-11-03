@@ -11,6 +11,10 @@ layout: cover
 * Permet d'ajout des méta données au code HTML
 * Les balises HTML permettent de définir la structure de la page
 * Microdata permet de définir le contenu de la page
+* Plusieurs raisons d'utiliser les Microdatas
+    * **Améliorer le SEO** : Les moteurs de recherche comprennent mieux votre contenu.
+    * **Rich Snippets** : Permet l'affichage de résultats enrichis (étoiles, recettes, événements, etc.).
+    * **Accessibilité** : Facilite la compréhension pour les utilisateurs et les moteurs de recherche.
 * Disponibles via plusieurs librairies
     * Schema.org
 
