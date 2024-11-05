@@ -53,7 +53,7 @@ axe https://google.com
 
 # Axe - Chrome extension
 
-image::../images/axe-screenshot.png[]
+![Lens](/images/a11y/axe-screenshot.png)
 
 ---
 
@@ -96,7 +96,7 @@ beforeEach(() => {
 
 # Axe - Cypress
 
-image::../images/cypress.png[]
+![Lens](/images/a11y/cypress.png)
 
 ---
 
@@ -145,5 +145,7 @@ const puppeteer = require('puppeteer');
 * La dernière étape consiste à faire un audit avec l'aide d'une personne ayant un handicap.
 
 ---
+layout: cover
+---
 
-=== PW
+# PW

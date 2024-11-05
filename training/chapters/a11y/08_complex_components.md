@@ -36,7 +36,7 @@ layout: cover
 
 # Tooltip
 
-```html
+```javascript
 const tooltip = document.querySelector('#tooltip');
 const button = document.querySelector('button')
 
@@ -189,7 +189,9 @@ function openModal(){
     ...
 ```
 
-=== Exemple complet
+---
+
+# Exemple complet
 
 ```javascript
     ...
@@ -326,7 +328,7 @@ function openModal(){
 * Nous devons ajouter le role *alert* à notre élément HTML
 * L'ajout de ce role va le transformer en *aria-live region*
 
-``html
+```html
 <section role="alert"> Voici le message </section>
 ```
 
@@ -450,6 +452,8 @@ WEBVTT
     * Mettre en place des transcriptions
     * Inclure un version en langage des signes
 
+---
+layout: cover
 ---
 
 # PW

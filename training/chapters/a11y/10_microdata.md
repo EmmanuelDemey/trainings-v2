@@ -4,50 +4,47 @@ layout: cover
 
 # Microdata
 
----
+* Permet d'ajouter des méta-données au code HTML, ce qui aide les moteurs de recherche à comprendre le contenu de votre page.
+* Les balises HTML définissent la structure de la page, tandis que les microdatas ajoutent des informations sémantiques.
+* Microdata permet de structurer le contenu de la page, facilitant ainsi l'interprétation par les moteurs de recherche et les technologies d'assistance.
+* Plusieurs raisons d'utiliser les Microdatas :
+    * **Améliorer le SEO** : Les moteurs de recherche comprennent mieux votre contenu, ce qui peut améliorer votre classement.
+    * **Rich Snippets** : Affichage de résultats enrichis (étoiles, recettes, événements, etc.) dans les résultats de recherche, augmentant le taux de clics.
+    * **Accessibilité** : Facilite la compréhension pour les utilisateurs et les moteurs de recherche, rendant le contenu plus accessible.
 
-# Microdata
-
-* Permet d'ajout des méta données au code HTML
-* Les balises HTML permettent de définir la structure de la page
-* Microdata permet de définir le contenu de la page
-* Plusieurs raisons d'utiliser les Microdatas
-    * **Améliorer le SEO** : Les moteurs de recherche comprennent mieux votre contenu.
-    * **Rich Snippets** : Permet l'affichage de résultats enrichis (étoiles, recettes, événements, etc.).
-    * **Accessibilité** : Facilite la compréhension pour les utilisateurs et les moteurs de recherche.
-* Disponibles via plusieurs librairies
-    * Schema.org
+* Disponibles via plusieurs librairies, notamment :
+    * **Schema.org** : La bibliothèque la plus utilisée, offrant une large gamme de vocabulaires pour différents types de contenu.
 
 ---
 
 # Schema.org
 
-* Supporté par Bing, Google, Yahoo
-* Chaque librairie met à disposition des vocabulaires
-    * Person
-    * Restaurant
-    * Event
-    * Product
-    * ...
+* Supporté par Bing, Google, Yahoo, et d'autres moteurs de recherche.
+* Chaque librairie propose des vocabulaires, tels que :
+    * **Person** : Pour décrire des individus.
+    * **Restaurant** : Pour décrire des établissements de restauration.
+    * **Event** : Pour décrire des événements.
+    * **Product** : Pour décrire des produits.
+    * **Review** : Pour décrire des avis sur des produits ou services.
 
 ---
 
 # Vocabulaire
 
-* Chaque vocabulaire propose des propriétés que nous pouvons ajouter à notre code HTML.
+* Chaque vocabulaire propose des propriétés à ajouter à notre code HTML.
 * Par exemple, pour le vocabulaire `Restaurant` :
-    * name
-    * image
-    * geo
-    * events
-    * ...
+    * **name** : Le nom du restaurant.
+    * **image** : Une image du restaurant.
+    * **geo** : Les coordonnées géographiques.
+    * **events** : Les événements spéciaux organisés par le restaurant.
+    * **menu** : Lien vers le menu du restaurant.
 
 ---
 
 # Vocabulaire
 
-* Pour ajouter un vocabulaire, nous devons définir l'élément HTML racine contenant la données que nous souhaitons annoter.
-* Utilisation des attributs `itemscope` et `itemtype`.
+* Pour ajouter un vocabulaire, définissez l'élément HTML racine contenant les données à annoter.
+* Utilisation des attributs `itemscope` et `itemtype` pour indiquer le type de contenu.
 
 ```html
 <section itemscope itemtype="https://schema.org/Restaurant">
@@ -63,8 +60,8 @@ layout: cover
 
 # Vocabulaire
 
-* Nous pouvons à présent ajouter des attributs supplémentaires sur les éléments enfants.
-* Utilisation de la propriété `itemprop`
+* Ajoutez des attributs supplémentaires sur les éléments enfants pour fournir plus de détails.
+* Utilisation de la propriété `itemprop` pour spécifier les propriétés des éléments.
 
 ```html
 <section itemscope itemtype="https://schema.org/Restaurant">
@@ -76,11 +73,13 @@ layout: cover
 </section>
 ```
 
+* **Importance** : Cela aide à structurer les informations de manière à ce qu'elles soient facilement interprétables par les moteurs de recherche.
+
 ---
 
 # Vocabulaire
 
-* Nous pouvons imbriquer les vocabulaires
+* Imbriquer les vocabulaires pour une meilleure structuration et une hiérarchisation des informations.
 
 ```html
 <section itemscope itemtype="https://schema.org/Restaurant">
@@ -88,15 +87,19 @@ layout: cover
     <h2>Menu</h2>
     <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
         <p itemprop="addressLocality">Lille</p>
+        <p itemprop="addressRegion">Hauts-de-France</p>
+        <p itemprop="postalCode">59000</p>
     </div>
 </section>
 ```
+
+* **Avantage** : Cela permet de fournir des informations détaillées sur l'adresse, ce qui peut améliorer la visibilité dans les résultats de recherche locaux.
 
 ---
 
 # Formation LD+JSON
 
-* Nous pouvons également utiliser un format JSON pour définir ces métadonnées
+* Utilisez un format JSON pour définir ces métadonnées, ce qui est souvent plus facile à lire et à maintenir.
 
 ```html
 <script type="application/ld+json">
@@ -104,9 +107,13 @@ layout: cover
   "@context": "http://schema.org/",
   "@type": "Person",
   "name": "Emmanuel Demey",
-  "url": "http://twitter.com/EmmanuelDemey"
+  "url": "http://twitter.com/EmmanuelDemey",
+  "sameAs": [
+    "http://facebook.com/EmmanuelDemey",
+    "http://linkedin.com/in/EmmanuelDemey"
+  ]
 }
-</script>-
+</script>
 ```
 
----
+* **Utilisation de `sameAs`** : Cela permet de lier plusieurs profils sociaux à une même personne, renforçant ainsi la crédibilité et la visibilité en ligne.

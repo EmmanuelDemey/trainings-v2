@@ -192,5 +192,7 @@ button:focus {
 ```
 
 ---
+layout: cover
+---
 
 # PW

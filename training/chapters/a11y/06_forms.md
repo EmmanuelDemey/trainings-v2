@@ -11,6 +11,8 @@ layout: cover
 * Élements permettant à l'utilisateur de saisir de la donnée.
 * Plusieurs élements disponibles : form, input, checkbox, radio, textarea, ...
 
+---
+
 # Formulaires - Types d'input
 
 * Le standard HTML5 propose différents types d'input
@@ -241,6 +243,8 @@ layout: cover
 <p class="hint" id="emailHint">Invalid email address.</p>
 ```
 
+---
+layout: cover
 ---
 
 # PW

@@ -368,5 +368,7 @@ input[aria-invalid='true']{
 ```
 
 ---
+layout: cover
+---
 
 # PW
