@@ -19,8 +19,9 @@ layout: cover
   - Validateur du W3C
   - Les Devtools de Firefox ou Chrome
   - Lighthouse (basé sur Axe-core)
+  - Librairies de Qualité (**testing-library** ou **eslint**)
   - Axe-core
-  - Cypress Axe (basé sur Axe-core)
+  - Playwright
   - Puppeteer
 
 ---
@@ -30,6 +31,59 @@ layout: cover
 - Les Devtools de Chrome propose une solution permettant
   - d'émuler les différentes déficiences aux couleurs.
   - de vérifier le contraste de votre contenu
+
+---
+
+# ESlint
+
+- Dans l'ecosysyème ESlint, le plugin **eslint-plugin-jsx-a11y** permet de détecter des erreurs d'accessibilité dans une application React (ou Preact).
+
+```shell
+npm i eslint-plugin-jsx-a11y
+```
+
+```typescript
+import jsxA11y from "eslint-plugin-jsx-a11y";
+
+export default [
+  jsxA11y.flatConfigs.recommended,
+  {
+    // Your additional configs and overrides
+  },
+];
+```
+
+- Exemple de règles :
+  - **alt-text**
+  - **aria-props**
+  - **aria-role**
+  - **html-has-lang**
+  - **iimg-redundant-alt**
+  - ...
+
+---
+
+# Testing Library
+
+- **Testing Library** est un ensemble de librairie utilisée pour écrire des tests unitaires
+- Supporte plusieurs framework (React, Vue, ...)
+- Met à disposition des méthodes permettant de sélectionne un élémént par sonrôle sémantique.
+- Cette pratique invite à ecrire du code HTML sémantique
+
+```typescript
+it("should show a required field warning for each empty input field", async () => {
+  const { user } = renderApp();
+  await user.click(
+    screen.getByRole("button", {
+      name: "Login",
+    })
+  );
+
+  expect(await screen.findByText("User Name Required")).toBeVisible();
+
+  expect(await screen.findByText("Password Required")).toBeVisible();
+});
+```
 
 ---
 
