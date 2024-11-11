@@ -246,6 +246,20 @@ class SwitchButton extends HTMLElement {
 window.customElements.define('button-switch', SwitchButton)
 ```
 
+* Dans un futur *proche*, nous allons pouvoir utiliser la syntaxe IDL pour mettre à jour ces propriétés
+
+```javascript
+class SwitchButton extends HTMLElement {
+  connectedCallback(){
+    this.role = 'switch';
+    this.ariaChecked = false;
+    this.tabIndex = 0;
+  }
+}
+
+window.customElements.define('button-switch', SwitchButton)
+```
+
 --- 
 
 # Intégration

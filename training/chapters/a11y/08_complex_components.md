@@ -269,6 +269,7 @@ function openModal(){
 * Dans les prochaines versions des navigateurs, nous allons avoir l'attribut `inert`
 * Cet attribut permet de supprimer les événements utilisateur d'un élément
 * Possibilité d'utiliser le `polyfill` *WICG/inert*
+* Nous avons aussi, depuis peu de temps, les éléments **dialog** et **popover** nativement.
 
 ```html
 <div>

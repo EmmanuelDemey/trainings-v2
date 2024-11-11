@@ -65,13 +65,6 @@ layout: cover
 
 ---
 
-
-# Démarches
-
-* Pour faire un site accessible, nous avons besoin d'une roadmap
-
----
-
 # Acronymes
 
 * W3C (World Wide Web Consortium)
@@ -85,9 +78,9 @@ layout: cover
 # Acronymes - W3C
 
 * World Wide Web Consortium
-* Communauté internationale
-* Développe les standards du Web
-* Dirigé par le créateur du Web : Tim Berners-Lee
+    * Communauté internationale
+    * Développe les standards du Web
+    * Dirigé par le créateur du Web : Tim Berners-Lee
 
 ---
 
@@ -98,7 +91,7 @@ layout: cover
 * Web Content Accessibility Guidelines
 * La derniére version publieée est WCAG 2.1
 * Posséde différents niveaux de conformités : A, AA et AAA
-* La prochaine version de WCAG (Silver) en cours d'écriture
+* La prochaine version de WCAG 3 en cours d'écriture
 * *ISO 40500* et standard europeen *EN 301 549*
 
 ---
@@ -135,17 +128,12 @@ criteria. Behind it, in the mist, there is a larger peak, AAA. That one is not a
 
 ---
 
-# Acronymes - WCAG
-
-https://www.w3.org/TR/WCAG21/
-
----
-
 
 # État des lieux
 
 * La plupart des sites web ne sont pas accessibles car :
     * pas la priorité pour un projet
+    * pense que cela n'apporte pas de valeur ajoutée
     * peu de personnes ont la connaissance.
 
 ---

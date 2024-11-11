@@ -5,24 +5,10 @@ layout: cover
 # HTML
 
 ---
-
-# HTML
-
-```html
-<div id="form">
-    <form id="form">
-        <input id="firstName" />
-        <input id="lastName" />
-        <button><img src="validate.svg" /></button>
-    </form>
-</div>
-```
-
+layout: statement
 ---
 
-# HTML
-
-* De manière générale, utilisez toujours la balise HTML qui est dédiée à l'interraction que vous souhaitez implémenter.
+De manière générale, utilisez toujours la balise HTML qui est dédiée à l'interraction que vous souhaitez implémenter.
 
 ---
 
@@ -32,14 +18,15 @@ layout: cover
     * ecrivez tout d'abord le code HTML
     * ajoutez le style ensuite avec du CSS
     * enfin dynamisez avec du Javascript.
+* Pour s'assurer que les fondations de votre page sont bonnes. 
 
 ---
 
 
 # HTML - Les bases
 
-* Nous devons définir un `DOCTYPE` valide pour chaque page
-* Ainsi qu'un `encoding`
+* Nous devons définir un *DOCTYPE* valide pour chaque page
+* Ainsi qu'un *encoding*
 
 ```html
 <!doctype html>
@@ -59,7 +46,7 @@ layout: cover
 
 # Langue
 
-* Nous devons définir la langue du document dans la balise `html`.
+* Nous devons définir la langue du document dans la balise *html*.
 * Ceci aura un impact sur :
     * l'accent utilisé par les synthétiseurs vocaux
     * la traduction
@@ -75,7 +62,7 @@ layout: cover
 
 # Langue
 
-* Cette propriété sera également utilisée pour l'utilisation de l'attribut CSS `hyphens`
+* Cette propriété sera également utilisée pour l'utilisation de l'attribut CSS *hyphens*
 
 ```css
 p {
@@ -101,7 +88,8 @@ p {
 
 # Identifiants
 
-* La propriété `id` d'un élément doit être unique.
+* La propriété *id* d'un élément doit être unique.
+* Quand vous développez des composants avec un framework, éviter de mettre des identifiants dans vos composants, car vous ne savez pas combien de fois votre composant va être utilisé dans la page.
 * À ne pas faire !
 
 ```html
@@ -123,6 +111,7 @@ p {
 
 * Depuis HTML5, de nouvelles balises sont disponibles afin de structure une page
     * header
+    * search (tout nouveau)
     * nav
     * main
     * aside
@@ -136,7 +125,15 @@ p {
 ```html
 <header>
     <h1> Titre de l'application</h1>
-    <nav> ... </nav>
+    <nav> <ul> ... </ul> </nav>
+
+    <search>
+        <label>
+           Search For 
+           <input type="search">
+        </label>
+        <button>Go</button>
+    </search>
 </header>
 <aside> ... </aside>
 <main> ... </main>
@@ -164,6 +161,7 @@ p {
 # Landmarks
 
 * Ces landmarks permettent de définir un squelette à votre application
+* Ces éléments permettent de définir un structure claire pour votre page.
 * Contenu plus facilement accessible via raccourcis par certains utilisateurs
 
 ---
@@ -187,10 +185,6 @@ p {
     * Comme lors de l'écriture d'un document Word
     * Toujours dans un ordre croissant : h1 -> ... -> h6
     * Ne pas oublier un niveau (*INTERDIT* h1 -> h3)
-
----
-
-# Titre
 
 ```javascript
 const headings = document.querySelectorAll('h1,h2,h3,h4,h5,h6');
@@ -288,19 +282,13 @@ for(let i=0; i < headings.length; i++){
 
 ---
 
-# Button
+# L'élément Button
 
 ```html
 <div onclick="" class="btn clickable"></div>
 <a class="btn" onclick=""></a>
-```
-
----
-
-# Button
 
 
-```html
 <div onclick=""
     class="btn"
     tabindex="0"
@@ -354,14 +342,7 @@ La balise button n'est pas stylisable
 
 ```html
 <p> Lorem Ipsum <a href="...">Learn more</a></p>
-```
 
----
-
-# Learn More antipattern
-
-
-```html
 <p>
     Lorem Ipsum
     <a href="..." aria-label="Learn more about Lorem Ipsum">Learn more</a>
@@ -456,13 +437,15 @@ button {
     * liste non-ordonnée
     * liste ordonnée
 * Dès que vous devez afficher une liste de ..., utilisez l'un de ces éléments.
+* Attention: la sémantique d'une liste est perdue sur Safari/VoiceOver si nous ajoutons le style `list-style: none`.
 
 
 ---
 
 
-# Liste non-ordonnée
+# Listes
 
+* Liste  non-ordonnée
 
 ```html
 <ul>
@@ -472,11 +455,7 @@ button {
 </ul>
 ```
 
----
-
-
-# Liste ordonnée
-
+* Liste ordonnée
 
 ```html
 <ol>
@@ -544,9 +523,9 @@ button {
     <caption>Average daily tea and coffee consumption</caption>
     <thead>
         <tr>
-            <th scope="col">Person</th>
-            <th scope="col">Coffee</th>
-            <th scope="col">Tea</th>
+            <th>Person</th>
+            <th>Coffee</th>
+            <th>Tea</th>
         </tr>
     </thead>
     <tbody>
@@ -556,6 +535,9 @@ button {
             <td>0 cups</td>
         </tr>
     </tbody>
+    <tfoot>
+        ...
+    </tfoot>
 </table>
 ```
 
@@ -569,7 +551,7 @@ button {
 ```html
 <thead>
     <tr>
-        <th scope="col" aria-sort="descending">
+        <th aria-sort="descending">
             Person
             <button type="button" aria-label="Tri ascendant"> ^ </button>
         </th>
@@ -591,6 +573,24 @@ button {
     Something small enough to escape casual notice.
 </details>
 ```
+
+* Nous pouvons légèrement styliser cet élément
+
+```css
+summary::-webkit-details-marker {
+    display: none;
+    /* and display the image you want in HTML */
+}
+details > summary {
+  /* closed styles as necessary */
+}
+
+details[open] > summary {
+  /* opened styles as necessary */
+}
+```
+
+* De nouvelles syntaxes CSS vont arrivées prochainement pour avoir plus de controle sur le style de cet élément. 
 
 ---
 
@@ -741,13 +741,18 @@ body {
 
 ---
 
-# Orientation
+# MatchMedia
 
-* Nous pouvons faire un traitement similaire en JavaScript avec la MatchMedia api
+* Nous pouvons manipuler ces media queries en JavaScript avec la MatchMedia api
 
 
 ```javascript
-var mql = window.matchMedia("(orientation: portrait)");
+const mql = window.matchMedia("(orientation: portrait)");
+/**
+ * window.matchMedia("(prefers-reduced-motion: no-preference)");
+ * window.matchMedia("(forced-colors: active)");
+ * window.matchMedia("(prefers-color-scheme: dark)");
+ */
 
 // If there are matches, we're in portrait
 if(mql.matches) {

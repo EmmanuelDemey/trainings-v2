@@ -58,22 +58,15 @@ npx serve
 * Dans le contenu du fichier `index.html`, veuillez coller le contenu suivant dans la valise body (ce contenu sera modifié dans un prochain exercice)
 
 ```html
-<header>
-    <h1> Genea11y </h1>
-    <nav>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/creation.html">Creation</a></li>
-        </ul>
-    </nav>
-</header>
-<main>
-    Main Contenu
-    <button>Action</button>
-</main>
+<h1> Genea11y </h1>
+<a href="/">Home</a>
+<a href="/creation.html">Creation</a>
+Main Contenu
+<button>Action</button>
 ```
 
 * Une fois ce code inséré, veuillez ajouter le système de `SkipLink` permettant d'aller directement au contenu principal du site.
+* Veuillez définir un style particilier (de votre choix) pour le bouton lorsqu'il reçoit le focus.
 
 ## PW 04 - HTML
 
@@ -124,6 +117,7 @@ De plus, ce formulaire doit respecter une contrainte de validité lors du `submi
 * Le nom et le prénom sont obligatoires
 * Si ces données sont invalides, ajoutez un message d'erreur pour votre utilisateur.
 * Modifiez éventuellement la feuille de style afin de définir un look spécifique quand le champ est en erreur.
+* Si il y a des erreurs, veuillez mettre le focus sur le premier élément en erreur.
 
 ## PW 06 - Les Attributs ARIA
 
@@ -155,43 +149,24 @@ le détail de la personne selectionnée.
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * [Lighthouse](https://developers.google.com/web/tools/lighthouse/?utm_campaign=chrome_series_lighthouse_110317&utm_source=chromedev&utm_medium=yt-desc)
-* [Cypress Axe](https://www.npmjs.com/package/cypress-axe)
+* [Playwright](https://playwright.dev/docs/accessibility-testing)
 :::
 
 Nous allons dans cette partie pratique, mettre en place une solution permet d'assurer un niveau d'accessibilité dans notre application.
 Pour cela nous allons utiliser les outils :
 
 * Lighthouse (Chrome)
-* Cypress et son plugin Axe
+* Playwright
 
 ### Lighthouse
 
 * Depuis Chrome, lancez un nouvel audit d'accessibilité afin de s'assurer que votre site est conforme.
 
-### Axe avec Cypress
+### Playwright
 
-Nous allons à présent ajouter Cypress et le plugin Axe à notre projet.
+* Veuillez initialiser un nouveau projet Playwright/
 
-* Installer `cypress-axe`, `cypress` et `axe-core`
-
-```shell
-npm init --yes
-npm i -D cypress axe-core cypress-axe
-```
-
-* Initier le projet Cypress en exécutant la commande suivante
-
-```shell
-./node_modules/.bin/cypress open
-```
-
-Suite à cette dernière commande, un nouveau répertoire a été ajouté à votre projet.
-
-* Dans le fichier `/cypress/support/index.js`, ajouter l'import suivant :
-
-```javascript
-import 'cypress-axe';
-```
+Suite à cette dernière commande, un nouveau répertoire **tests** a été ajouté à votre projet.
 
 * Ecrire un test permettant d'exécuter Axe pour la page d'accueil de votre application.
 

@@ -9,23 +9,25 @@ layout: cover
 # Sélecteurs
 
 * Voici différentes syntaxes permettant de sélectionner un élément HTML
+* Ces sélécteurs peuvent être utilisés :
 
+* en CSS
+```css
+#id { }
+.className { }
+button { }
+[aria-hidden='true'] { }
+img[aria-hidden='true'] { }
 ```
-#id
-.className
-button
-[aria-hidden='true']
-img[aria-hidden='true']
-```
 
-
+* et en JavaScript
 ```javascript
 document.querySelector(selector);
 document.getElementById("nameInput");
 ```
 ---
 
-# Sélection d'éléments HTML
+# Manipulation d'éléments HTML
 
 - Une fois un élément récupéré, nous pouvons manipuler les attributs :
 
@@ -103,15 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 # Rappel CSS
 
-- En CSS, nous pouvons appliquer les même selecteurs que ceux utilisés via les méthodes **querySelector** et **querySelectorAll**.
-
-```css
-[aria-invalid="true"] {
-  border-color: red;
-}
-```
-
-* Pour visuellement cacher un élément,  nous allons retrouver cette classe utilitaire.
+Pour visuellement cacher un élément,  nous allons retrouver cette classe utilitaire.
 
 ```css
 .sr-only {
@@ -119,4 +113,64 @@ document.addEventListener("DOMContentLoaded", () => {
   top: 0;
   left: -1000px;
 }
+```
+
+---
+
+# Et en React
+
+* Bien evidemment en react, ces syntaxe sont légèrement différentes. 
+* Pour écouter un évènement, nous allons utiliser les *props* **onSomething** (*onClick*, *onFocus*, ...)
+* Pour garder une référence vers un élément, nous allons utiliser une *reference* via le hook *useRef*.
+
+```typescript
+import { useRef } from 'react';
+
+function MyComponent() {
+  const inputRef = useRef(null);
+
+  const focusInput = () => {
+    inputRef.current.focus();
+  };
+
+  return (
+    <>
+      <input ref={inputRef} type="text" />
+      <button type="button" onClick={focusInput}>Focus on Input</button>
+    </>
+  );
+}
+
+export default MyComponent;
+```
+
+---
+
+# Pour aller plus loin...
+
+* Pour qu'un composant expose une référence vers un élément HTML à son composant parent, nous allons utiliser la méthode *forwardRef*
+
+```typescript
+import { useRef, forwardRef } from 'react';
+
+const MyInput = forwardRef((props, ref) => {
+  return <input ref={ref} type="text" />
+});
+
+function MyComponent() {
+  const inputRef = useRef(null);
+
+  const focusInput = () => {
+    inputRef.current.focus();
+  };
+
+  return (
+    <>
+      <MyInput ref={inputRef} type="text" />
+      <button type="button" onClick={focusInput}>Focus on Input</button>
+    </>
+  );
+}
+
+export default MyComponent;
 ```

@@ -9,19 +9,21 @@ layout: cover
 # Focus
 
 * Les utilisateurs naviguant avec le clavier vont utiliser
-    * la touche `tab` pour aller à l'élément selectionnable suivant
-    * les touches `Shift` `Tab` pour aller à l'élément précédent.
-    * Attention, sur Safari / MacOS : `Option` + `Tab`.
+    * la touche *tab* pour aller à l'élément selectionnable suivant
+    * les touches *Shift* *Tab* pour aller à l'élément précédent.
+    * Attention, sur Safari / MacOS : *Option* + *Tab*.
     * les touches flèche haut/bas pour naviguer dans un control.
 
 ---
 
 # Éléments focusable
 
-* Par défaut, les éléments HTML suivants sont `focusable` :
+* Par défaut, les éléments HTML suivants sont *focusable* :
     * les boutons
     * les liens
-    * les controles de formulaire
+    * les contrôles de formulaire (input, select, textarea)
+    * la balise *summary*
+    * les éléments éditables (*contenteditable*)
 * Ces éléments doivent être focusable dans le même ordre que celui utilisé pour l'affichage.
 
 ---
@@ -29,8 +31,10 @@ layout: cover
 # Cas d'utilisation
 
 * Seuls les éléments précédent doivent etre focusable
-* Une exception possible pour les `SPA`
+* Car sinon cela va allourdir la navigation au clavier
+* Des exceptions possibles pour les `SPA`
     * Permettre de mettre le focus sur le titre de la page chargée
+    * Mettre le focus sur un nouveau contenu pour que l'utilisateur soit notifié de cette information
 
 ---
 
@@ -64,8 +68,9 @@ section {
 # Tab Order
 
 * Comment gérer les éléments focusables cachés ?
-    * les supprimer du `tab order`
-    * `display:none` ou `visibility:hidden`
+    * les supprimer du *tab order*
+    * *display:none* ou *visibility:hidden*
+    * avec l'attrbut *hidden*
 
 ---
 
@@ -81,14 +86,10 @@ document.activeElement
 
 # Tabindex
 
-* La propriété `tabindex` permet
+* La propriété *tabindex* permet
     * d'ordonner les éléments focusable
     * indiquer qu'un élément peut etre être focusable programmatiquement
-    * Désactiver la propriété `focusable` d'un élémént.
-
----
-
-# Tabindex
+    * Désactiver la propriété *focusable* d'un élémént.
 
 ```html
 <div tabindex="0">DIV focusable</div>
@@ -100,8 +101,8 @@ document.activeElement
 
 # Tabindex
 
-* Nous pouvons également définir des `tabindex` avec une valeur supérieure à 0
-* Les éléments avec le `tabindex` le plus grand seront prioritaire dans le parcours au clavier de la page.
+* Nous pouvons également définir des *tabindex* avec une valeur supérieure à 0
+* Les éléments avec le *tabindex* le plus grand seront prioritaire dans le parcours au clavier de la page.
 
 ```html
 <div tabindex="0">DIV focusable</div>
@@ -116,7 +117,7 @@ document.activeElement
 # Skip Link
 
 * Cette fonctionnalité est à utiliser pour passer une partie de la page qui est présente sur l'ensemble de votre site (menu)
-* Un `Skip Link` est composé
+* Un **Skip Link** est composé
     * d'un bouton/lien caché par défaut, situé juste avant la zone à ignorer
     * une fois que le bouton/lien a le focus, il devient visible
     * Une fois le click sur le bouton/lien, la prochaine zone clickable devient le contenu situé après la zone ignorée.
@@ -131,10 +132,10 @@ document.activeElement
     * https://www2.hm.com/fr_fr/index.html[H&M]
 
 ---
+layout: statement
+---
 
-# Skip Link
-
-* Comment allez vous implémenter un `skip link` ?
+Comment allez vous implémenter un *skip link* en pur HTML/CSS/Javascript?
 
 ---
 
@@ -170,7 +171,7 @@ document.activeElement
 * Il est recommandé de donner un style lorsqu'un élément a le focus.
 
 ```css
-button:focus {
+button:focus-visible {
     outline: thick double #32a1ce;
 }
 ```
@@ -182,11 +183,11 @@ button:focus {
 * Nous pouvons définir un design différent si nécessaire
 
 ```css
-.button:focus {
+.button:focus-visible {
     outline: 0;
     outline-offset: -3px;
 }
-.button:focus::before {
+.button:focus-visible::before {
     ...
 }
 ```

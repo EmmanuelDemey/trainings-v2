@@ -8,13 +8,13 @@ layout: cover
 layout: statement
 ---
 
-Pour vous, que signifie le terme _Accessibilité_ ?
+Pour vous, que signifie le terme *Accessibilité Numérique* ?
 
 ---
 layout: statement
 ---
 
-- Pour vous, qui est concerné par ce sujet ?
+Pour vous, qui est concerné par ce sujet ?
 
 ---
 
@@ -24,6 +24,8 @@ layout: statement
 - Accessibility
 - A11Y
 - E-Accessibily
+- Web Accessibility
+- Accessibilité Numérique
 
 ---
 layout: statement
@@ -62,6 +64,8 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
     * vos clients vont vous l'obliger (gouvernements, éducation, ...)
     * la loi vous l'oblige (active dans plusieurs pays)
     * permet de créer un site web de meilleure qualité
+    * peut avoir un impact positif sur d'autres critères (SEO par exemple)
+        * mais cela n'est pas un objectif en soit.
 
 ---
 
@@ -72,6 +76,9 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
     * Application non utilisable sur mobile
     * Application non disponible dans votre pays
     * Application non utilisable sur votre réseau
+    * Contenu difficile à comprendre
+    * Acte métier difficile à réaliser
+    * ...
 
 ---
 
@@ -80,6 +87,8 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 - À ces problèmes, plusieurs solutions possibles
     * Responsive Web Design
     * Internationalisation
+    * User Research
+    * Performance
     * Service Worker, Cache API,...
 
 ---
@@ -196,48 +205,21 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 ---
 
-# Comment cela fonctionne ?
-
-- Les User-agent (navigateurs) utilisent l'API des systèmes d'exploitation
-    * OSX Accessibility Platform (OSX)
-    * UI Automation (Microsoft)
-    * MS Active Accessibility (Microsoft)
-    * Accessibility Toolkit (ATK)
-    * ...
-
----
-
-# Comment cela fonctionne ?
-
-- Les synthétiseur vocaux s'abonnent à des évenements émis par ces APIs
-
----
-
-# Synthétiseurs Vocaux
-
-- Les utilisateurs navigueront de différentes manières sur desktop / mobile
-    * Le clavier sur desktop
-    * Navigation par Touch et Swipe sur mobile.
-
-
----
 
 # Synthétiseurs Vocaux
 
 - Comment intéragissent un synthétiseur vocal et un navigateur ?
-    * Le navigateur genère : 
-        * DOM Tree
-        * Accessibility Tree
-
----
-
-# Synthétiseurs Vocaux
+    * Le navigateur genère le DOM Tree et l'Accessibility Tree
 
 - Une fois ces arbres créées, nous pouvons intéragir avec grâce aux
     * DOM : Document Object Model
     * CSSOM : CSS Object Model
     * AOM : Accessibility Object Model
-* Le synthétiseur vocal se base sur cet AOM
+
+- La Navigateur expose et met à jour cet AOM auprès d'API du Système d'exploitation
+    * OSX Accessibility Platform (OSX), UI Automation (Microsoft), ...
+
+- Les Synthétiseurs vocaux s'abonnent à ces informations pour retranscrire le contenu du site web visité
 
 ---
 
@@ -294,23 +276,28 @@ id=5 role=Button name="OK"
 
 # Rotor
 
-- Chaque synthétiseur vocal propose un `rotor`
+- Certain synthétiseur vocal propose un **rotor**
 - Mécanisme permettant de
     * visualiser la structure de la page
     * de naviguer plus facilement
 
----
-
-# Raccourcis
-
 - Exemple pour Voice Over
-    * VO+U : Pour ouvrir le `rotor`
+    * VO+U : Pour ouvrir le **rotor**
     * VO+ <-/-> : Pour naviguer
     * VO+Fn+ -> : Fin de la page
     * VO+Fn+ <- : Début de la page
     * VO+Commande+L : Prochain Lien
     * VO+Commande+H : Prochain Titre
     * ...
+
+---
+
+# Synthétiseurs Vocaux
+
+- Les utilisateurs navigueront de différentes manières sur desktop / mobile
+    * Le clavier sur desktop
+    * Navigation par Touch et Swipe sur mobile.
+
 
 ---
 
@@ -325,20 +312,10 @@ id=5 role=Button name="OK"
 - Vitesse
 
 ---
-
-# Affordances
-
-![Lens](/images/a11y/affordance.jpg)
-
+layout: cover
 ---
 
----
-layout: statement
----
-
-<blockquote>
-Quand on voit une theiere, sans manuel d'utilisation, nous savons comment l'utiliser.
-</blockquote>
+# Mise en Pratique 
 
 ---
 layout: cover
