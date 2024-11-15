@@ -12,7 +12,6 @@ layout: cover
 * A cela nous pourrions ajouter :
     * Prettier
     * ESLint
-    * Cypress ou Playwright
     * Husky
     * Storybook
 
@@ -23,11 +22,6 @@ hide: false
 
 ---
 src: ../eslint.md
-hide: false
----
-
----
-src: ../cypress.md
 hide: false
 ---
 

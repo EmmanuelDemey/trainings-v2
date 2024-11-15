@@ -65,7 +65,7 @@ describe('<MyComponent />', () => {
 
 # Vitest - Assertions
 
-- Nous allons ensuite utiliser des **assertions** afin de vérifier le résultat de nos codes.
+- Nous allons ensuite utiliser des **assertions** afin de vérifier le résultat de notre code.
 
 ```typescript
 import { getUser } from './user';
@@ -82,8 +82,8 @@ describe('getUser', () => {
 
 # Vitest - mocks
 
-- Utilisation des mocks pour modifier l'implementation d'une méthode
-- Utilisation des `spies` pour s'assurer qu'une méthode a bien été appelée
+- Utilisation des mocks pour modifier l'implementation d'une méthode (dans le but de créer de vrais tests unitaires)
+- Utilisation des **spies** pour s'assurer qu'une méthode a bien été appelée
 
 ```typescript
 import get from './list';
@@ -147,7 +147,7 @@ exports[`renders correctly 1`] = `
 
 ---
 
-# Jest - Options
+# Vitest - Options
 
 - `vitest`
 - `vitest watch`
@@ -202,7 +202,7 @@ describe("<Comment />", () => {
 
 ---
 
-# Structuration
+# Comment structurer vos tests ?
 
 - Afin de faciliter la maintenance de vos tests, vous pourriez suivre la structure suivante :
 

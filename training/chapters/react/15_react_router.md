@@ -25,7 +25,7 @@ layout: cover
 # React Router
 
 
-```javascript
+```typescript
 import {
   createBrowserRouter,
   RouterProvider,
@@ -46,7 +46,7 @@ export default App;
 
 * Nous allons ensuite définir les routes de notre application
 
-```javascript
+```typescript
 import {
   createBrowserRouter,
   RouterProvider,
@@ -77,7 +77,7 @@ export default App;
 
 * Nous allons créer des liens via le composant *Link*
 
-```javascript
+```typescript
 import { Link } from 'react-router-dom';
 
 const PeopleItem = () => {
@@ -95,18 +95,19 @@ export default PeopleItem;
 
 # React Router - hooks
 
-* Des hooks sont à votre disposition pour faciliter la récupération de données liées au router
-  * `useParams`
-  * `useLocation`
-  * `useMatch`
-  * `useNavigate`
+* Des **hooks** sont à votre disposition pour faciliter la récupération de données liées au router
+  * **useLoaderData**
+  * **useLocation**
+  * **useMatch**
+  * **useNavigate**
+  * **useParams**
   * ...
 
 ---
 
 # React Router - hooks
 
-```javascript
+```typescript
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -128,6 +129,33 @@ export default Contact;
 
 ---
 
+# Chargement de la donnée
+
+* Nous pouvons configurer une fonction permettant de charger la donnée avant la redirection
+
+```typescript
+createBrowserRouter([
+  {
+    element: <Teams />,
+    path: "teams",
+    loader: async () => {
+      return fetch('/api/people').then(response => response.json())
+    }
+  },
+]);
+```
+
+* Ces données seront disponibles et accessibles via le hook **useLoaderData** dans le composant.
+
+```typescript
+export function Teams() {
+  const teams = useLoaderData();
+  // ...
+}
+```
+
+---
+
 # Lazy Loading
 
 * Dès que l'application grossit, utile de faire du *lazy-loading*
@@ -145,15 +173,10 @@ import {
 } from "react-router-dom";
 import {lazy, Suspense} from 'react';
 import Loading from './loading';
-const Contact = lazy(() => import('./contact'));
 
 const router = createBrowserRouter([{
     path: "contact/:id",
-    element: (
-      <Suspense fallback={<Loading />}>
-          <Contact />
-      </Suspense>
-    )
+    lazy: () => import("./contact"),
 }, {
     path: "about",
     element: <div>About</div>
