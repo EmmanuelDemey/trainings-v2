@@ -27,23 +27,46 @@ css: unocss
 
 # React.js
 
+<br />
+<br />
+  
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <div>
+    <img src="/images/authors/Manu.jpeg" alt="Manu" height="150" width="150" />
+    <div>
+      <a href="https://github.com/emmanueldemey" target="_blank" rel="noopener noreferrer">Emmanuel Demey</a>
+    </div>
+  </div>
+  <div>
+    <img src="/images/authors/Nico.jpg" alt="Nico" height="150" width="150" />
+    <div>
+      <a href="https://github.com/NicoLaval" target="_blank" rel="noopener noreferrer">Nicolas Laval</a>
+    </div>
+  </div>
+</div>
+
 ---
-src: ./chapters/typescript/short.md
+src: ./chapters/react/00_intro.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/02_getting_started.md
+src: ./chapters/react/01_getting_started.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/04_unit_test.md
+src: ./chapters/react/02_ts.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/04_tooling.md
+src: ./chapters/react/03_unit_test.md
+hide: false
+---
+
+---
+src: ./chapters/react/04_EcmaScript.md
 hide: false
 ---
 
@@ -58,53 +81,86 @@ hide: false
 ---
 
 ---
-src: ./chapters/react/07_hooks.md
+src: ./chapters/react/07_css.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/08_state_container.md
+src: ./chapters/react/08_hooks.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/15_react_router.md
+src: ./chapters/react/09_data.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/10_i18n.md
+src: ./chapters/react/10_error_boundaries.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/12_formik.md
+src: ./chapters/react/11_custom_hook.md
 hide: false
 ---
 
 ---
-src: ./chapters/react/12_react_hook_form.md
-hide: true
+src: ./chapters/react/12_state_container.md
+hide: false
 ---
 
 ---
-src: ./chapters/react/13_react_query.md
-hide: true
+src: ./chapters/react/13_lazy.md
+hide: false
 ---
 
 ---
-src: ./chapters/react/14_next.md
-hide: true
+src: ./chapters/react/14_react_router.md
+hide: false
 ---
 
 ---
-src: ./chapters/react/15_env.md
+src: ./chapters/react/15_i18n.md
+hide: false
 ---
 
 ---
-src: ./chapters/react/16_recoil.md
+src: ./chapters/react/16_forms.md
+hide: false
 ---
 
 ---
-src: ./chapters/react/22_cypress.md
+src: ./chapters/react/17_react_query.md
+hide: false
+---
+
+---
+src: ./chapters/react/18_lib_ui.md
+hide: false
+---
+
+---
+src: ./chapters/react/19_zustand.md
+hide: false
+---
+
+---
+src: ./chapters/react/20_storybook.md
+hide: false
+---
+
+---
+src: ./chapters/react/21_cypress.md
+hide: false
+---
+
+---
+src: ./chapters/react/22_docker.md
+hide: false
+---
+
+---
+src: ./chapters/react/23_react_news.md
+hide: false
 ---

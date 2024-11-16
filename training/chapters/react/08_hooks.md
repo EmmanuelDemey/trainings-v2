@@ -6,6 +6,12 @@ layout: cover
 
 ---
 
+# Retour dans le passé
+
+React.Component / lifecycle img
+
+---
+
 # Hook
 
 * Un hook est une nouvelle syntaxe permettant de ne plus utiliser les classes pour définir les composants
@@ -230,3 +236,5 @@ layout: cover
 ---
 
 # Travaux Pratiques
+
+## WP 8

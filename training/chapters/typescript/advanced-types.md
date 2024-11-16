@@ -84,5 +84,3 @@ type PartialUser = Readonly<User>;
 }
 */
 ```
-
----

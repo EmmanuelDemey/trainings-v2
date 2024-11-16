@@ -272,12 +272,6 @@ const CustomButton = ({ label, ...props }: CustomButtonProps) => {
 ```
 
 ---
-layout: cover
----
-
-# Travaux Pratiques
-
----
 
 # Higher Order Component
 
@@ -290,7 +284,7 @@ const withTranslation = Component => EnhancedComponent;
 // withTranslation(UserCard)
 ```
 
-* Vous allez retrouver ce pattern dans de nombreuses librairies
+* Ce pattern est de moins en moins utilisé
 
 ```typescript
 // const AppWithPreference = withPreferences(App)
@@ -303,6 +297,9 @@ function withPreferences(WrappedComponent: ComponentType) {
 ```
 
 ---
-src: ./includes/06_css.md
-hide: false
+layout: cover
 ---
+
+# Travaux Pratiques
+
+## WP 6

@@ -17,16 +17,24 @@ layout: cover
 - Plusieurs solutions possibles : Context, Redux, MobX ou encore Recoil
 
 ---
-src: ./includes/10_context.md
+src: ./includes/12_context.md
 hide: false
 ---
 
 ---
-src: ./includes/10_redux.md
+src: ./includes/12_redux.md
 disabled: true
 ---
 
 ---
-src: ./includes/10_saga.md
+src: ./includes/12_saga.md
 disabled: true
 ---
+
+---
+layout: cover
+---
+
+# Travaux Pratiques
+
+## WP 12

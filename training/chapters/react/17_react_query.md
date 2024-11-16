@@ -163,3 +163,11 @@ persistQueryClient({
   persister: localStoragePersister,
 })
 ```
+
+---
+layout: cover
+---
+
+# Travaux Pratiques
+
+## WP 17

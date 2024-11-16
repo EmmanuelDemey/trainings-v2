@@ -5,7 +5,7 @@
   - Si le composant n'est jamais utilisé, la feuille de style ne sera jamais importée.
   - Attention: la feuille de styles ne sera pas scopée.
 - Les syntaxes Less, Sass ou SCSS sont également utilisables.
-  - Le langage CSS fournir de plus en plus de fonctionnalités. Ces préprocesseurs ne sont peut-être utile.
+  - Le langage CSS fournit de plus en plus de fonctionnalités. Ces préprocesseurs ne sont peut-être utile.
 
 ---
 
@@ -178,3 +178,11 @@ export default function App() {
   return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
 }
 ```
+
+---
+layout: cover
+---
+
+# Travaux Pratiques
+
+## WP 7

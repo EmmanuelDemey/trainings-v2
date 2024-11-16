@@ -2,7 +2,11 @@
 layout: cover
 ---
 
-# Génération de la vue
+# Premiers pas avec React
+
+<br />
+
+## Génération de la vue
 
 ---
 
@@ -140,11 +144,14 @@ export default Nav;
 
 # Utilisation de l'attribut key
 
-* Pour des raisons de performance, il est recommandé de définir l'attribut `key` dès que nous itérons sur un tableau.
+* Pour des raisons de performance, il est fortement recommandé de définir l'attribut `key` dès que nous itérons sur un tableau.
 * Nous pouvons utiliser 
     * soit en utilisant l'attribut `index` des fonctions `forEach`et `map`
     * soit via une propriété de l'objet
 
+---
+
+# Utilisation de l'attribut key
 
 ```typescript
 type MenuItem = {
@@ -171,3 +178,5 @@ layout: cover
 ---
 
 # Travaux Pratiques
+
+## WP 5

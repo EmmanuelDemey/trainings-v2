@@ -97,3 +97,9 @@ function CharacterCount() {
 ```
 
 ---
+layout: cover
+---
+
+# Travaux Pratiques
+
+## WP 19

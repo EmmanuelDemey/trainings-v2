@@ -256,9 +256,3 @@ const Example = () => (
   </div>
 );
 ```
-
----
-layout: cover
----
-
-# Travaux Pratiques
