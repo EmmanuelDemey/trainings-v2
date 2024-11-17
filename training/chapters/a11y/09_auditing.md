@@ -206,7 +206,7 @@ const puppeteer = require("puppeteer");
 - La dernière étape consiste à faire un audit avec l'aide d'une personne ayant un handicap.
 
 ---
-
-## layout: cover
+layout: cover
+---
 
 # PW

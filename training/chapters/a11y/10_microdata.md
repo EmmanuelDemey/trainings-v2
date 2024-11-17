@@ -4,6 +4,10 @@ layout: cover
 
 # Microdata
 
+---
+
+# Microdata
+
 * Permet d'ajouter des méta-données au code HTML, ce qui aide les moteurs de recherche à comprendre le contenu de votre page.
 * Les balises HTML définissent la structure de la page, tandis que les microdatas ajoutent des informations sémantiques.
 * Microdata permet de structurer le contenu de la page, facilitant ainsi l'interprétation par les moteurs de recherche et les technologies d'assistance.

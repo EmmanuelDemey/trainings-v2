@@ -6,16 +6,16 @@ Si vous utilisez VSCode, voici des snippets de code que j'utilise souvant. N'hé
 
 ```json
 {
-	"useStateTS": {
-	  "scope": "typescript,typescriptreact",
-	  "prefix": "useState",
-	  "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState<$2>($3)"]
-	},
-	"useStateJS": {
-	  "scope": "javascript,javascriptreact",
-	  "prefix": "useState",
-	  "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState($2)"]
-	}
+  "useStateTS": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "useState",
+    "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState<$2>($3)"]
+  },
+  "useStateJS": {
+    "scope": "javascript,javascriptreact",
+    "prefix": "useState",
+    "body": ["const [${1}, set${1/(.*)/${1:/capitalize}/}] = useState($2)"]
+  }
 }
 ```
 
@@ -27,7 +27,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [React](https://fr.reactjs.org/)
 - [Vite](https://vitejs.dev/guide/)
 - [Bulma](https://bulma.io/)
-  :::
+:::
 
 Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `create-react-app`.
 
@@ -54,16 +54,16 @@ npm install bulma
 Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/main.tsx`.
 
 ```typescript
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import 'bulma/css/bulma.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "bulma/css/bulma.css";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);
 ```
 
 Nous allons ensuite intégrer le _layout_ de base de la librairie Bulma. Modifiez tout d'abord le contenu du fichier `index.html` avec le contenu suivante :
@@ -120,7 +120,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [Vitest](https://vitest.dev/)
 - [Liste de matchers](https://github.com/testing-library/jest-dom)
 - [React testing library](https://testing-library.com/docs/react-testing-library/intro/)
-:::
+  :::
 
 Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
 
@@ -136,14 +136,13 @@ En :
 - étendant la configuration vite dans le fichier `vite.config.ts`
 - ajoutant un fichier `App.test.tsx` dans `src`
 
-
 ## PW3 - Outillage
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [Cypress](https://www.cypress.io/)
-:::
+  :::
 
 Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
 
@@ -205,8 +204,14 @@ Dans ce fichier, déclarez une variable contenant le tableau suivant :
       "http://swapi.dev/api/films/6/"
     ],
     "species": [],
-    "vehicles": ["http://swapi.dev/api/vehicles/14/", "http://swapi.dev/api/vehicles/30/"],
-    "starships": ["http://swapi.dev/api/starships/12/", "http://swapi.dev/api/starships/22/"],
+    "vehicles": [
+      "http://swapi.dev/api/vehicles/14/",
+      "http://swapi.dev/api/vehicles/30/"
+    ],
+    "starships": [
+      "http://swapi.dev/api/starships/12/",
+      "http://swapi.dev/api/starships/22/"
+    ],
     "created": "2014-12-09T13:50:51.644000Z",
     "edited": "2014-12-20T21:17:56.891000Z",
     "url": "http://swapi.dev/api/people/1/"
@@ -386,7 +391,9 @@ Juste avant le JSX de notre composant App, ajoutez le code ci-dessous.
 
 ```javascript
 if (loading) {
-  return <progress className="progress is-small is-primary" max="100"></progress>;
+  return (
+    <progress className="progress is-small is-primary" max="100"></progress>
+  );
 }
 ```
 
@@ -608,6 +615,7 @@ Dans cette partie théorique, nous allons mettre en place **TanStack Query** afi
 ## PW12 - Variables d'environnement
 
 :::note
+
 - [Vite env](https://vitejs.dev/guide/env-and-mode)
   :::
 
@@ -617,6 +625,7 @@ Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `
 ## PW13 - State manager - Recoil
 
 :::note
+
 - [Recoil](https://recoiljs.org/fr/docs/introduction/getting-started)
   :::
 
@@ -649,7 +658,7 @@ Nous pouvons créer un dossier `store` à la racine de src pour définir nos mor
 
 ```typescript
 const likeState = atom({
-  key: 'likeState',
+  key: "likeState",
   default: {} as Record<string, number>,
 });
 ```

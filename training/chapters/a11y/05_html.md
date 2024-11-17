@@ -261,9 +261,9 @@ for(let i=0; i < headings.length; i++){
     <ul>
         <li><a href="/">Home</a></li>
         <li>
-            <a aria-current="true" href="/mail">Messagerie</a>
+            <button aria-current="true">Messagerie</button>
             <ul>
-                <<li><a href="/contact" aria-current="page">Contacts</a></li>
+                <li><a href="/contact" aria-current="page">Contacts</a></li>
                 <li><a href="/sendbox">Sendbox</a></li>
             </ul>
         </li>
@@ -614,8 +614,9 @@ details[open] > summary {
 # Principes généraux
 
 * Préférez les dimensions relatives
-* `%` pour `width`
-* `em` ou `rem` pour les textes
+* **%** pour **width**
+* **em** ou **rem** pour les textes
+* **vw** ou **vh** pour les **width** et **height**
 
 ---
 
@@ -707,40 +708,6 @@ details[open] > summary {
 
 ---
 
-# Orientation
-
-* Ne jamais bloquer l'orientation `landscape` ou `portrait`
-* Ne jamais utiliser par exemple la `Screen Orientation API`
-
-
-```javascript
-screen.orientation.lock('portrait')
-screen.orientation.lock('landscape')
-screen.orientation.unlock()
-```
-
----
-
-# Orientation
-
-* Si vous souhaitez styliser votre application en fonction de l'orientation
-
-
-```css
-body {
-    flex-direction: row;
-}
-
-/* @media (orientation: landscape) { */
-@media (orientation: portrait) {
-  body {
-    flex-direction: column;
-  }
-}
-```
-
----
-
 # MatchMedia
 
 * Nous pouvons manipuler ces media queries en JavaScript avec la MatchMedia api
@@ -776,6 +743,41 @@ mql.addListener(function(m) {
 		// Changed to landscape
 	}
 });
+```
+
+---
+
+
+# Orientation
+
+* Ne jamais bloquer l'orientation `landscape` ou `portrait`
+* Ne jamais utiliser par exemple la `Screen Orientation API`
+
+
+```javascript
+screen.orientation.lock('portrait')
+screen.orientation.lock('landscape')
+screen.orientation.unlock()
+```
+
+---
+
+# Orientation
+
+* Si vous souhaitez styliser votre application en fonction de l'orientation
+
+
+```css
+body {
+    flex-direction: row;
+}
+
+/* @media (orientation: landscape) { */
+@media (orientation: portrait) {
+  body {
+    flex-direction: column;
+  }
+}
 ```
 
 ---
