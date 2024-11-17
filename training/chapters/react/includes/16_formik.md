@@ -33,7 +33,7 @@ npm i formik
 
 - Voici un exemple avec le composant `Formik`;
 
-```typescript
+```typescript {*}{maxHeight:'400px'}
 import { Formik } from 'formik';
 
 const SignupFormComponent = () => {
@@ -69,7 +69,7 @@ const SignupFormComponent = () => {
 
 - Voici un exemple similaire via l'utilisation du hook `useFormik`;
 
-```typescript
+```typescript {*}{maxHeight:'400px'}
 import { useFormik } from 'formik';
 
 const SignupFormComponent = () => {
@@ -103,7 +103,7 @@ const SignupFormComponent = () => {
 
 - Voici un exemple similaire via l'utilisation du HOC `withFormik`;
 
-```typescript
+```typescript {*}{maxHeight:'400px'}
 import { withFormik } from 'formik';
 
 const SignupFormComponent = ({ handleSubmit, handleChange, values}) => {

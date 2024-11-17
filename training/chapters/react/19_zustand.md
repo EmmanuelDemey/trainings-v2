@@ -2,98 +2,75 @@
 layout: cover
 ---
 
-# State Container Recoil
+# 19 - Zustand
 
 ---
 
-* développé par Meta
-* permet d'extraire les états locaux des composants (y compris ceux exploités par les context)
-* implémentation légère et efficiente
+# Présentation générale
+
+- Bibliothèque légère pour la gestion d’état
+- API simple et performante, sans boilerplate
+- Particulièrement adaptée pour des projets où Redux ou d'autres bibliothèques peuvent sembler trop lourdes
 
 ---
 
-# Recoil root
+# Création d'un store Zustand
 
-Wrapper l'application avec le provider recoil :
+```typescript
+import create from 'zustand';
+
+interface CounterState {
+  count: number;
+  increment: () => void;
+  decrement: () => void;
+}
+
+const useCounterStore = create<CounterState>((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+}));
+
+export default useCounterStore;
+```
+
+---
+
+# Utilisation du store Zustand dans un composant
 
 ```typescript
 import React from 'react';
-import {
-  RecoilRoot,
-  atom,
-  selector,
-  useRecoilState,
-  useRecoilValue,
-} from 'recoil';
+import useCounterStore from './store';
 
-function App() {
-  return (
-    <RecoilRoot>
-      <CharacterCounter />
-    </RecoilRoot>
-  );
-}
-```
-
----
-
-# Définir un morceau d'état (atom)
-
-Créer un / des morceau(x) d'état :
-
-```typescript
-const textState = atom({
-  key: 'textState', // unique ID (with respect to other atoms/selectors)
-  default: '', // valeur par défaut (alias valeur initials)
-});
-```
-
----
-
-# Accès aux états depuis les composants
-
-Créer un / des morceau(x) d'état :
-
-```typescript
-function MyComponent() {
-  const [text, setText] = useRecoilState(textState);
-
-  const onChange = (event) => {
-    setText(event.target.value);
-  };
+const Counter = () => {
+  const { count, increment, decrement } = useCounterStore();
 
   return (
     <div>
-      <input type="text" value={text} onChange={onChange} />
-      <br />
-      Echo: {text}
+      <h1>Compteur : {count}</h1>
+      <button onClick={increment}>Incrémenter</button>
+      <button onClick={decrement}>Décrémenter</button>
     </div>
   );
-}
+};
+
+export default Counter;
 ```
 
 ---
 
-# Sélecteurs
-
-Il est possible de définir des états dérivés à mettre à disposition des composants :
+# Tester le comportement des stores Zustand
 
 ```typescript
-const charCountState = selector({
-  key: 'charCountState', // unique ID (with respect to other atoms/selectors)
-  get: ({get}) => {
-    const text = get(textState);
+import useCounterStore from './store';
 
-    return text.length;
-  },
+test('incrémente le compteur', () => {
+  const { count, increment } = useCounterStore.getState();
+
+  expect(count).toBe(0);
+  increment();
+  expect(useCounterStore.getState().count).toBe(1);
 });
-```
-
-```typescript
-function CharacterCount() {
-  const count = useRecoilValue(charCountState);
-  return <>Character Count: {count}</>;
-}
 ```
 
 ---

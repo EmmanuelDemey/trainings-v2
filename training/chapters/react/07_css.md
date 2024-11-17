@@ -1,3 +1,11 @@
+---
+layout: cover
+---
+
+# 7 - Style & (s)css
+
+---
+
 # Gestion du style
 
 - Bonne pratique de définir une feuille de styles par composant
@@ -5,7 +13,12 @@
   - Si le composant n'est jamais utilisé, la feuille de style ne sera jamais importée.
   - Attention: la feuille de styles ne sera pas scopée.
 - Les syntaxes Less, Sass ou SCSS sont également utilisables.
-  - Le langage CSS fournit de plus en plus de fonctionnalités. Ces préprocesseurs ne sont peut-être utile.
+
+```bash
+npm i sass
+```
+
+_NB: Le langage CSS fournit de plus en plus de fonctionnalités. Ces préprocesseurs ne sont peut-être utile._
 
 ---
 

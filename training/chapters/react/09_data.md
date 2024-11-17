@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# Récupération de données
+# 9 - Récupération de données
 
 ---
 src: ./includes/09_fetch.md

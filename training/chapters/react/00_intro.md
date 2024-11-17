@@ -36,12 +36,12 @@ layout: cover
     <td>
         <ul>
             <li>12 - State container - Context</li>
-            <li>13 - Lazy loading - Suspense (o)</li>
+            <li>13 - Lazy loading - Suspense</li>
             <li>14 - Routing - React router</li>
             <li>15 - i18n (o)</li>
             <li>16 - Formulaires
                 <ul>
-                    <li>Composants controlés / non controlés</li>
+                    <li>Composants contrôlés / non-contrôlés</li>
                     <li>"By hand" - FormData</li>
                     <li>Formik (o)</li>
                 </ul>

@@ -160,9 +160,3 @@ export const useTheme = () => {
   return context;
 }
 ```
-
----
-layout: cover
----
-
-# Travaux Pratiques

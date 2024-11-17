@@ -2,10 +2,11 @@
 layout: cover
 ---
 
-# Cypress
+# 21 - Cypress
 
 ---
 src: ../cypress.md
+hide: false
 ---
 
 ---

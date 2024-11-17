@@ -36,14 +36,8 @@ const k: string = import.meta.env.VITE_SOME_KEY
 
 ---
 
-# Variables d'environnement & vite & docker
+# Injection à la compilation
 
-Les variables d'environnement définies dans vos fichiers `.env` sont injectées dans votre livrable une fois l'application buildée.
+- Les variables d'environnement définies dans vos fichiers `.env` sont remplacées par les valeurs lors du `build`
 
-Afin de pouvoir les surcharger facilement, une fois l'application buildée, via Docker, installez et configurez le plugin [`vite-envs`](https://github.com/garronej/vite-envs).
-
----
-layout: cover
----
-
-# Travaux Pratiques
+- Compiler l'application autant de fois que nous souhaitons la livrer dans un environnement.

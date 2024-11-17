@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# EcmaScript "moderne"
+# 4 - EcmaScript "moderne"
 
 ---
 

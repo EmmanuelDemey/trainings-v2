@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# TanStack Query
+# 17 - TanStack Query
 
 --- 
 
@@ -23,7 +23,7 @@ npm i @tanstack/react-query @tanstack/react-query-devtools
 
 * La première étape est d'englober votre application (ou une partie) par le composant QueryClientProvider.
 
-```javascript
+```javascript {*}{maxHeight:'400px'}
 import {
    QueryClient,
    QueryClientProvider,
@@ -119,7 +119,7 @@ function Todos() {
 * Si vous souhaitez exécuter des requetes de création/mise à jour/suppression, nous allons utiliser le hook `useMutation`.
 * Nous allons pouvoir révoquer une partie du cache en cas de succès d'une mutation.
 
-```javascript
+```javascript {*}{maxHeight:'300px'}
 function Todos() {
    const queryClient = useQueryClient()
    const query = useQuery('todos', getTodos)

@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# Getting Started
+# 1 - Getting Started
 
 ---
 
@@ -56,7 +56,6 @@ npm create vite@latest my-react-app -- --template react-ts
 - Voici la liste des outils configurés par `Vite`
   - Les librairies `react` et `react-dom`
   - Vite
-  - Vitest et Testing Library (TODO à vérifier)
   - ESLint
   - Typescript
 
