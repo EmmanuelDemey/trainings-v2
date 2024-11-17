@@ -170,4 +170,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 17
+## PW 17

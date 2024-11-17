@@ -20,4 +20,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 9
+## PW 9

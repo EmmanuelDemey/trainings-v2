@@ -17,6 +17,18 @@ layout: cover
 - Plusieurs solutions possibles : Context, Redux, MobX ou encore Recoil
 
 ---
+
+# State container
+
+<div style="text-align: center;">
+  <img
+   src="/images/state_container.png" 
+   alt="State container" 
+   style="width: 280px; margin: auto; display: flex;"
+  />
+</div>
+
+---
 src: ./includes/12_context.md
 hide: false
 ---
@@ -37,4 +49,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 12
+## PW 12

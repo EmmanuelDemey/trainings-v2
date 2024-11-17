@@ -198,4 +198,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 7
+## PW 7

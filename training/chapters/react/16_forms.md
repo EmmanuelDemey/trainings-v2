@@ -25,4 +25,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 16
+## PW 16

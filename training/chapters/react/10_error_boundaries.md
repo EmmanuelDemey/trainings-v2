@@ -122,4 +122,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 10
+## PW 10

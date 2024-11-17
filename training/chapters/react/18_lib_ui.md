@@ -107,4 +107,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 18
+## PW 18

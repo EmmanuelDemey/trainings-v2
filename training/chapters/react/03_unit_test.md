@@ -245,4 +245,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 3
+## PW 3

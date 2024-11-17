@@ -6,9 +6,9 @@ layout: cover
 
 ---
 
-# Retour dans le passé
+# Retour dans le passé - Cycle de vie React
 
-React.Component / lifecycle img
+![React lifecycle](/images/react_lifecycle.png)
 
 ---
 
@@ -237,4 +237,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 8
+## PW 8

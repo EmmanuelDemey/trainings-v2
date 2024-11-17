@@ -92,4 +92,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 11
+## PW 11

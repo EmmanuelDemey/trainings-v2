@@ -34,4 +34,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 4
+## PW 4

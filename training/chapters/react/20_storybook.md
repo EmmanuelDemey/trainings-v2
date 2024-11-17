@@ -129,4 +129,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 20
+## PW 20

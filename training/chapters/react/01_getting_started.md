@@ -97,4 +97,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 1
+## PW 1

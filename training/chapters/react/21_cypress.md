@@ -15,4 +15,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 21
+## PW 21

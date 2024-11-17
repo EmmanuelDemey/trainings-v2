@@ -163,4 +163,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 22
+## PW 22

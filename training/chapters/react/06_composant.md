@@ -302,4 +302,4 @@ layout: cover
 
 # Travaux Pratiques
 
-## WP 6
+## PW 6
