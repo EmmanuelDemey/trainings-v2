@@ -19,89 +19,31 @@ Si vous utilisez VSCode, voici des snippets de code que j'utilise souvant. N'hé
 }
 ```
 
-## PW1 - Getting Started
+## PW1 - Introduction
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-- [React](https://fr.reactjs.org/)
 - [Vite](https://vitejs.dev/guide/)
-- [Bulma](https://bulma.io/)
-  :::
+- [Prettier](https://prettier.io/docs/en/install)
+:::
 
-Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `create-react-app`.
+### Initialisation d'un projet React via Vite
+
+Dans ce TP, nous allons tout d'abord initialiser un projet React via le module `vite`.
 
 Dans votre terminal, veuillez exécuter les commandes suivantes :
 
 ```shell
-npm create vite@latest react-trainings-v2 -- --template react-ts
+npm create vite@latest react-trainings -- --template react-ts
 ```
 
 Une fois le projet créé, vous pouvez exécuter les commandes suivantes afin de vérifier qu'il est bien fonctionnel.
 
 ```shell
-cd react-trainings-v2
+cd react-trainings
+npm install # or npm i
 npm run dev
-```
-
-Nous allons ensuite installer la librairie CSS `Bulma`, nous permettant de nous aider lors de la création du style de notre application.
-Pour cela, vous devez exécuter la commande suivante :
-
-```shell
-npm install bulma
-```
-
-Une fois installée, vous devez l'importer dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/main.tsx`.
-
-```typescript
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import 'bulma/css/bulma.css';
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
-```
-
-Nous allons ensuite intégrer le _layout_ de base de la librairie Bulma. Modifiez tout d'abord le contenu du fichier `index.html` avec le contenu suivante :
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hello Bulma!</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-```
-
-Nous allons terminer par la modification du fichier `src/App.tsx`.
-
-```typescript
-import "./App.css";
-
-function App() {
-  return (
-    <section className="section">
-      <div className="container">
-        <h1 className="title">Hello World</h1>
-        <p className="subtitle">
-          My first website with <strong>Bulma</strong>!
-        </p>
-      </div>
-    </section>
-  );
-}
-
-export default App;
 ```
 
 Vous pouvez également générer la version de production et émuler le fonctionnement d'un serveur web.
@@ -112,82 +54,19 @@ cd dist
 npx serve
 ```
 
-## PW2 - Tests unitaires
+### Installation / Configuration de Prettier
 
-:::note
-Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+- Installer les extensions VS Code pour `prettier` (et `eslint`)
+- Configurer l'extension Prettier pour formatter les fichiers à la sauvegarde
+- Ajouter une configuration Prettier au sein de votre projet
+- Ajouter un script Prettier dans votre `package.json`
 
-- [Vitest](https://vitest.dev/)
-- [Liste de matchers](https://github.com/testing-library/jest-dom)
-- [React testing library](https://testing-library.com/docs/react-testing-library/intro/)
-:::
+## PW2 - TypeScript
 
-Dans ce TP, nous allons ajouter des tests unitaires dans notre application. Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
+- Créer un fichier `src/fake-data.ts` contenant l'objet suivant :
 
-Vous pouvez par exemple vérifier que le document contient
-
-- un titre `h1` contenant la chaine de caractéres `Hello World`.
-- un paragraphe contenant la chaine de caractéres `Bulma`.
-
-En :
-
-- installant `vitest` et `react-testing-library`
-- créant un script `test` dans le fichier `package.json`
-- étendant la configuration vite dans le fichier `vite.config.ts`
-- ajoutant un fichier `App.test.tsx` dans `src`
-
-
-## PW3 - Outillage
-
-:::note
-Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
-
-- [Cypress](https://www.cypress.io/)
-:::
-
-Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
-
-```shell
-npm install -D cypress
-```
-
-Une fois installée, nous allons ajouter un script dans notre fichier `package.json`.
-
-```json
-{
-  "scripts": {
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
-  }
-}
-```
-
-Si à présent vous exécutez la commande `npm run cypress:open`, l'interface graphique doit étre visible vous permettant de lancer les tests générés par Cypress.
-
-Vous devez à présent supprimer les tests générés et créer vos propres tests afin de tester l'interface graphique de votre application.
-
-- Installer les extensions VS Code pour `prettier` et `eslint`
-
-- Configurer `prettier` dans votre projet
-
-- Ajouter un fichier `.eslintignore` à la racine du projet pour exclure le linting pour le code auto-généré par Cypress
-
-## PW4 - Template
-
-:::note
-Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
-
-- [Array.prototypemap](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array/map)
-  :::
-
-Dans ce TP, nous allons afficher des personnages de Star Wars. Nous n'allons pas créer de nouveaux composants ou encore récupérer les données depuis une API Rest pour le moment.
-
-Tout se fera en mémoire pour le moment et dans le fichier `App.tsx`.
-
-Dans ce fichier, déclarez une variable contenant le tableau suivant :
-
-```json
-[
+```typescript
+export const data = [
   {
     "name": "Luke Skywalker",
     "height": "172",
@@ -287,33 +166,220 @@ Dans ce fichier, déclarez une variable contenant le tableau suivant :
 ]
 ```
 
-Afin de bénéficier de toutes la puissance de TypeScript, vous pouvez typer la variable précédente en utilisant ce type.
+- Créer un fichier `src/model/person.ts` contenant le type suivant :
 
 ```typescript
-type Person = {
+export type Person = {
   name: string;
-  height: string;
-  mass: string;
-  hair_color: string;
-  skin_color: string;
-  eye_color: string;
-  birth_year: string;
-  gender: string;
-  homeworld: string;
-  films: string[];
-  species: any[];
-  vehicles: string[];
-  starships: string[];
-  created: string;
-  edited: string;
   url: string;
+  height?: string;
+  mass?: string;
+  hair_color?: string;
+  skin_color?: string;
+  eye_color?: string;
+  birth_year?: string;
+  gender?: string;
+  homeworld?: string;
+  films?: string[];
+  species?: any[];
+  vehicles?: string[];
+  starships?: string[];
+  created?: string;
+  edited?: string;
 };
-type People = Array<Person>;
 ```
 
-Dans un prochain TP, nous récupérons cette donnée directement depuis l'API swapi.
+- Créer dans ce même fichier le type `Persons`, définit comme un tableau de `Person`
 
-Dans l'implementation du composant `App`, ajoutez ce template HTML
+- Affecter le type `Persons` à l'objet `data`
+
+- Modifier les données / le type (temporairement) pour faire apparaître des erreurs TypeScript
+
+
+## PW3 - Tests unitaires
+
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [Vitest](https://vitest.dev/)
+- [React testing library](https://testing-library.com/docs/react-testing-library/intro/)
+:::
+
+Dans ce TP, nous allons ajouter des tests unitaires dans notre application. 
+
+Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
+
+Vous pouvez par exemple vérifier que le document contient
+
+- un titre `h1` contenant la chaine de caractéres `React`.
+- un paragraphe contenant la chaine de caractéres `HMR`.
+
+En :
+
+- installant `vitest` et `react-testing-library`
+- créant un script `test` dans le fichier `package.json`
+- étendant la configuration vite dans le fichier `vite.config.ts`
+- ajoutant un fichier `App.test.tsx` dans `src`
+
+## PW4 - EcmaScript "moderne"
+
+- Créer un fichier `src/utils/es6.spec.ts` avec le contenu suivant :
+
+```typescript
+import { describe, it, expect } from "vitest";
+import * as ES6 from "./es6";
+import { data } from "../fake-data";
+
+describe("es6", () => {
+  it("test array lenght", () => {
+    expect(ES6.getLength(data)).toEqual(4);
+  });
+  it("test male array lenght", () => {
+    expect(ES6.getMales(data)).toEqual(2);
+  });
+  it("returns names", () => {
+    expect(ES6.getNames(data)).toEqual([
+      "Luke Skywalker",
+      "C-3PO",
+      "R2-D2",
+      "Darth Vader",
+    ]);
+  });
+  it("returns names", () => {
+    expect(ES6.getAttr("name")(data)).toEqual([
+      "Luke Skywalker",
+      "C-3PO",
+      "R2-D2",
+      "Darth Vader",
+    ]);
+  });
+  it("test first element contains name and url keys and not dummy", () => {
+    expect(ES6.checkFirstElementKeys([])).toBeNull();
+    const keys = ES6.checkFirstElementKeys(data);
+    expect(keys).toContain("name");
+    expect(keys).toContain("url");
+    expect(keys).not.toContain("dummy");
+  });
+  it("build an array with `key: value` elements for last person and check `skin_color: white` is in", () => {
+    expect(ES6.buildInfosForLastElement([])).toBeNull();
+    expect(ES6.buildInfosForLastElement(data)).toContain("skin_color: white");
+  });
+  it("returns persons median", () => {
+    expect(ES6.getMassAverage([])).toBe(null);
+    expect(ES6.getMassAverage([...data, { name: "ko", url: "ko_url" }])).toBe(
+      null
+    );
+    expect(ES6.getMassAverage(data)).toBe(80);
+  });
+});
+```
+
+- Créer un fichier `src/utils/es6.ts` avec le contenu suivant :
+
+```typescript
+import { Persons } from "../model/person";
+
+export const getLength = (arr: Persons): number => 0;
+
+export const getMales = (arr: Persons): number => 0;
+
+export const getNames = (arr: Persons): string[] => [];
+
+export const getAttr =
+  (attr: "name" | "url") =>
+  (arr: Persons): string[] =>
+    [];
+
+export const checkFirstElementKeys = (arr: Persons): string[] | null => [];
+
+export const buildInfosForLastElement = (arr: Persons): string[] | null => {
+  return null;
+};
+
+export const getMassAverage = (arr: Persons): number | null => {
+  return null;
+};
+```
+
+- Implémenter les fonctions
+
+## PW5 - Premiers pas avec React
+
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [Bulma](https://bulma.io/)
+:::
+
+### Thème CSS
+
+- Installation :
+
+```shell
+npm install bulma
+```
+
+- Importer la librairie dans votre application. Nous avons l'habitude de faire ce genre d'import au plus haut niveau de l'application. Donc par exemple dans le fichier `src/main.tsx`.
+
+```typescript
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import 'bulma/css/bulma.css';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+```
+
+- Modifier le contenu du fichier `index.html` avec le contenu suivante :
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hello Bulma!</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+```
+
+- Mettre à jour le composant `src/App.tsx` avec les classes Bulma.
+
+```typescript
+import "./App.css";
+
+function App() {
+  return (
+    <section className="section">
+      <div className="container">
+        <h1 className="title">Hello World</h1>
+        <p className="subtitle">
+          My first website with <strong>Bulma</strong>!
+        </p>
+      </div>
+    </section>
+  );
+}
+
+export default App;
+```
+
+### Créer un composant
+
+Dans cette section, nous allons créer un composant permettant d'afficher des personnages de Star Wars. 
+
+
+- Créer un composant dans `src/components/PeopleTable.tsx`
+- Importer la liste des personnages
+- Faire retourner le fragment HTML suivant à votre composant, en générant autant de balise `tr` que de personnages à afficher.
 
 ```html
 <table className="table is-fullwidth">
@@ -334,17 +400,13 @@ Dans l'implementation du composant `App`, ajoutez ce template HTML
 </table>
 ```
 
-Vous devez ensuite générer autant de balise `tr` que de personnages à afficher Pour cela, nous allons utiliser la méthode `map`.
+- Instancier votre composant dans le composant `src/App.tsx`
 
-## PW5 - Composant
+## PW6 - Composants & props
 
-:::note
-Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
-
-- [React Components](https://fr.reactjs.org/docs/react-component.html)
-  :::
-
-Nous allons à présent ajouter un champ de recherche permettant de filtrer les personnages. Juste au dessus du tableau, ajoutez le code HTML ci-dessous :
+- Créer les composants `src/components/Title.tsx`, `src/components/PeopleFilter.tsx`
+- Le composant `Title` prendra en paramètre un `text` à afficher
+- Le composant `PeopleFilter` génèrera un champ input, avec le rendu HTML suivant :
 
 ```html
 <div className="field">
@@ -354,35 +416,65 @@ Nous allons à présent ajouter un champ de recherche permettant de filtrer les 
 </div>
 ```
 
-Nous allons ensuite externaliser le code créé précédemment dans trois composants bien spécifique :
+- Instancier `Title`, `PeopleFilter` et `PeopleTable` dans `App`
+- Retirer l'import de `fake-data` de `PeopleTable` pour l'importer dans `App`
+- Bonus : abstraire le composant d'input sous `src/components/Input.tsx` et le consommer dans `PeopleFilter`
 
-- `PeopleFilter` : Ce composant aura en charge de gérer le champ de formulaire permettant de filtrer les personnages
-- `PeopleTable` : Ce composant aura en charge la génération du tableau.
-- `PeopleItem` : Ce composant aura en charge la génération d'un item du tableau.
+## PW7 - Style & (s)css
 
-Veuillez faire le nécessaire pour que le tableau de personnages soit filtré à chaque lettre insérée dans le champ de formulaire. Pour cela, nous allons devoir utiliser un concept pas encore abordé dans la formation : le hook `useState`. Veuillez demander un conseil au formatteur si besoin.
+- Installer `sass`
+- Remplacer le fichier `App.css` par `App.scss`
+- Ajouter du style
 
-## PW6 - Hook
+## PW8 - Composants & state & hooks
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [https://fr.reactjs.org/docs/hooks-intro.html](Hook)
-- [SWAPI](https://swapi.dev/)
-  :::
+- [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
+:::
 
-Dans les travaux précédents, les données étaient définies en mémoire. Nous allons récupérer dans ce TP les données depuis l'API REST swapi.
+### Filtrer le tableau
 
-Nous allons tout d'abord supprimer le tableau défini précédemment
+- Créer un état pour mémoriser la valeur du champ input de `PeopleFilter`
+- Filtrer le tableau contenu dans `PersonTable` par `name` en fonction de la valeur de l'état du filtre
 
-Une fois cette étape réalisée, définissez un nouvelle variable d'état via le hook `useState`. Nous nommerons
-cette variable `people`. A présent c'est sur cette variable que vous devriez appliquer votre filtre.
+### Créer des pages
 
-Via l'utilisation du hook `useEffect`, faites une requéte `GET` vers le endpoint : `https://swapi.dev/api/people/`. Faites attention à la structure de la réponse HTTP.
+Nous utiliserons un routeur plus tard dans la formation.
 
-Nous allons également ajouter un `loader` dans les cas ou l'API pourrait prendre du temps pour répondre. Ce loader sera affiché en fonction d'une nouvelle donnée disponible dans une variable d'état du composant.
+En attendant, afin de continuer à structurer notre code, tout en s'amusant avec les états, nous pouvons initialiser nos 2 premières pages.
 
-Juste avant le JSX de notre composant App, ajoutez le code ci-dessous.
+- Créer les composants `src/pages/Home.tsx` et `src/pages/People.tsx`
+- Peupler le composant `Home` des composants présent dans `App` jusque là
+- `People` peut à ce stade renvoyer uniquement le titre "Personnage"
+- Créer un nouvel état permettant de stocker la page et la personne courante :
+  - l'attribut page prendra pour valeurs `home` et `people`
+  - l'attribut personne sera un string (l'URL de la personne sélectionnée)
+- Conditionner `App` pour afficher la bonne page courante
+- Ajouter un bouton de retour à l'accueil au composant `People` :
+
+```javascript
+<button
+    type="button"
+    className="button is-warning"
+    onClick={ ... } >
+  Home
+</button>
+```
+
+## PW9 - Récupération de données
+
+:::note
+- [Vite env](https://vitejs.dev/guide/env-and-mode)
+:::
+
+### Fetch
+
+- supprimer le fichier `src/fake-data.ts`
+- récupérer la liste des personnes et les attributs d'une personne via l'API
+- gérer l'état de chargement et les erreurs
 
 ```javascript
 if (loading) {
@@ -390,49 +482,62 @@ if (loading) {
 }
 ```
 
-Vous devez a présent faire le nécessaire pour définir cette variable `loading` au bon moment. Pour tester
-cet ajout, vous devrez peut-être ralentir votre connexion. Pour cela, vous pouvez émuler une connexion lente via les Devtools de votre navigateur.
+Aide :
 
-Pour finaliser cette partie pratique, dès que l'utilisateur modifie la valeur du champ de formulaire, réalisez une nouvelle requête HTTP afin d'exécuter la recherche coté API. Pour cela, vous devez utiliser la route `https://swapi.dev/api/people/?search=r2` ou `r2` est la chaine de caractères que l'utilisateur recherche.
+- Créer un fichier `src/utils/api-utils.ts` pour héberger l'utilitaire suivant :
 
-Comme partie bonus, nous allons gérer la pagination de notre tableau. En effet, l'API que nous utilisons retourne 10 personnages par page. Sur la page dévelopée, ajoutez deux boutons afin de naviguer de page en page, et ainsi visualiser l'ensemble des personnages de Star Wars.
+```typescript
+// http://swapi.dev/api/people/1/
+function getIDFromUrl(url: string): string {
+  const withoutPrefix = url.replace("https://swapi.dev/api/people/", "");
+  return withoutPrefix.replace("/", "");
+}
+```
 
-Comme seconde partie bonus, nous allons créer un `custom hook`. Ce hook, que nous nommerons `useFetch` devra gérer la récupération des données et la gestion de la variable `loading`.
+### Variables d'environnement
+
+Externaliser la base de l'url de l'API consommée.
+Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `.env.local` surchargeant cette valeur. Utiliser cette variable d'environnement dans vos composants, de sorte que votre code soit portable.
+
+## PW10 - Périmètres d'erreur
+
+- Ajouter un `ErrorBoundaries` "protégeant" le tableau de façon à ce que la page d'accueil continue de s'afficher même si le tableau ne peut l'être
+
+- Tester en lançant une erreur dans le composant `PeopleTable`
+
+## PW11 - Custom hook
+
+Comme seconde partie bonus, nous allons créer un `custom hook`. Ce hook, que nous nommerons `useFetch` devra gérer la récupération des données et la gestion des variables `loading` et `error`.
 
 Ce hook s'utilisera de cette façon :
 
 ```typescript
-const [data, loading] = useFetch();
+const { data, loading, error } = useFetch();
 ```
 
-Si vous avez fait la partie bonus précédente, il se peut que ce hook gère plus de choses.
-
-## PW7 - State Container
+## PW12 - State container - Context
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [API Context](https://react.dev/learn/passing-data-deeply-with-context)
-- [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
-  :::
+:::
 
 Dans ce TP, nous allons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
 
 Les actions qui pourront étre exécutées par l'utilisateur sont des actions permettant d'aimer (LIKE) ou ne plus aimer (DISLIKE) un personnage.
 
-Nous allons commencer tout d'abord par définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer
+- Définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer :
+  - un object ayant pour clé l'URL des personnages, comme valeur -1, 0 ou 1
+  - une fonction permettant de mettre à jour la valeur pour un personnage
 
-- un tableau de personnages
-- une fonction permettant d'ajouter un personnage
-- une fonction permettant de supprimer un personnage
-
-Une fois cette étape définie, nous pouvons créer notre context grâce à la méthode `createContext`.
+- Créer notre context grâce à la méthode `createContext`.
 
 Dans l'ensemble de notre application, nous allons avoir besoin de deux informations relatives au `store`
 
-Une fois le context défini, nous somme capable maintenant de l'utiliser dans notre application. Tout d'abord ajouter le composant `Provider` dans le composant principal de l'application et créez un objet respectant le type défini ci-dessus.
+- Ajouter le composant `Provider` dans le composant principal de l'application et créer un objet respectant le type défini ci-dessus.
 
-Dans le composant `Home`, juste en dessous du titre `h1`, nous allons ajouter le code HTML suivant :
+- Dans le composant `Home`, juste en dessous du titre, ajouter le code HTML suivant :
 
 ```html
 <h2>Vous aimez X personnages</h2>
@@ -440,7 +545,7 @@ Dans le composant `Home`, juste en dessous du titre `h1`, nous allons ajouter le
 
 Le X devra être remplacer par le nombre de personnes aimés.
 
-Dans le composant `PeopleItem`, nous allons ajouter une nouvelle colonne permettant d'afficher deux boutons permettant d'aimer ou de ne plus aimer un personnage. Si nous n'aimons pas le personnage, nous devons afficer le bouton **I Like**, dans le cas contraire le bouton **I Dislike**.
+- Ajouter une nouvelles colonne dans le tableau de `PeopleTable`. Cette colonne affichera deux boutons permettant d'aimer ou de ne plus aimer un personnage. Si nous n'aimons pas le personnage, nous devons afficer le bouton **I Like**, dans le cas contraire le bouton **I Dislike**.
 
 ```javascript
 <button
@@ -457,9 +562,14 @@ Dans le composant `PeopleItem`, nous allons ajouter une nouvelle colonne permett
 </button>
 ```
 
-Connectez les composants `Home` et `PeopleItem` au context afin d'implémenter le fonctionnement souhaité.
+- Connecter les composants `Home` et `PeopleTable` au context afin d'implémenter le fonctionnement souhaité.
 
-## PW8 - React Router
+## PW13 - Lazy loading - Suspense
+
+- Créer un composant `Loading` partagé (sous `src/components/common`)
+- Importer de façon "paresseuse" votre page `People`
+
+## PW14 - React Router
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -477,36 +587,24 @@ npm install react-router-dom
 
 Un fois installée, suivez les étapes suivantes afin d'implémenter le fonctionnel souhaité :
 
-- Externalisez le contenu du composant `App` dans un nouveau composant `Home`
-- Créez un composant `Person` qui pour l'instant retournera l'HTML de votre choix
-- Configurez le router dans le composant principal. Nous souhaitons que le composant `Home` soit affiché par défaut, et le composant `Person` si l'url est égale à `/person/:id`.
-- Ajoutez un lien dans le composant `PeopleItem` permettant de faire la redirection
-- Implementez le composant `Person`. Vous devez récupérez l'id passé dans l'URL et faire une nouvelle requête HTTP vers l'API afin de récupérer les informations du personnage selectionné.
-- Vous pouvez éventuellement réutiliser le hook `useFetch` créé précédemment pour récupérer les informations du personnage.
-- Si vous avez ajouté un loader pour le composant `Person`, vous pouvez également externaliser ce loader dans un nouveau composant React.
+- Supprimer l'état permettant de gérer les pages jusque là
+- Configurez le router dans le composant principal. Nous souhaitons que le composant `Home` soit affiché par défaut, et le composant `Person` si l'url est égale à `/person/:id`. La route de `Person` devra être lazy loadée.
+- Ajoutez un lien dans le composant `PeopleTable` permettant de faire la redirection
+- Corrigé le composant `Person`
 
 L'API utilisée ne retourne pas d'identifiant pour les objets.
 Vous pouvez tout de même en calculer un en se basant sur la propriété `url` de l'objet.
 Pour cela, vous pouvez utiliser la fonction suivante :
 
-```typescript
-// http://swapi.dev/api/people/1/
-function getIDFromUrl(url: string): string {
-  const withoutPrefix = url.replace("https://swapi.dev/api/people/", "");
-  return withoutPrefix.replace("/", "");
-}
-```
-
-## PW9 - Internationalisation
+## PW15 - Internationalisation
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [react-i18next](https://react.i18next.com/)
-- [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
-  :::
+:::
 
-Dans cette dernière partie pratique, nous allons internationaliser l'application.
+Dans cette partie, nous allons internationaliser l'application.
 
 Nous allons tout d'abord installer le module `react-i18next` en executant la commande suivante.
 
@@ -537,13 +635,14 @@ export default i18n;
 ```
 
 La dernière étape est d'internationaliser le message indiquant le nombre de personnes que l'utilisateur aime.
-Pour cela, nous allons tout d'abord installer le module `i18next-icu`.
+
+- Pour cela, nous allons tout d'abord installer le module `i18next-icu`.
 
 ```shell
 npm install i18next-icu intl-messageformat
 ```
 
-Une fois installé, nous devons l'ajouter à la configuration du module `react-i18next`.
+- Une fois installé, nous devons l'ajouter à la configuration du module `react-i18next`.
 
 ```typescript
 import ICU from "i18next-icu";
@@ -553,7 +652,7 @@ i18n
   .use(ICU))
 ```
 
-Dans la configuration définie précédemment, nous allons ajouter un message, via la syntaxe ICU, permettant d'internationaliser le dernier message de notre application.
+- Dans la configuration définie précédemment, nous allons ajouter un message, via la syntaxe ICU, permettant d'internationaliser le dernier message de notre application.
 
 ```html
 <h2>Vous aimez X personnages</h2>
@@ -561,9 +660,9 @@ Dans la configuration définie précédemment, nous allons ajouter un message, v
 
 Une fois cette configuration réalisée, nous allons à présent pouvoir intégrer `react-i18next` dans l'application. Dans le fichier `App.js`, importez le module précédemment crée.
 
-Dans les composants `PeopleList`, `DumbPeopleItem` et `DumbHome`, utilisez la méthode `useTranslation` pour récupérer puis ensuite afficher le message souhaité.
+- Dans le composant `Home`, utiliser la méthode `useTranslation` pour récupérer puis ensuite afficher le message souhaité.
 
-Dans le composant `DumbHome`, ajoutez deux boutons permettant de choisir la langue française ou anglaise. Pour cela, vous pouvez utiliser le code HTML suivant :
+- Créer un composant `Header` et y ajouter deux boutons permettant de choisir la langue française ou anglaise. Pour cela, vous pouvez utiliser le code HTML suivant :
 
 ```html
 <div className="is-pulled-right">
@@ -572,28 +671,32 @@ Dans le composant `DumbHome`, ajoutez deux boutons permettant de choisir la lang
 </div>
 ```
 
-## PW10 - Formik
+- Instancier ce composant pour toutes vos pages
+
+## PW16 - Formik
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [Formik](https://formik.org/)
-  :::
+:::
 
 Afin de mettre en place **Formik** sur notre application, un TP a été ajouté permettant de s'initier à ce module.
 
-Dans la page affichant le détail d'un personnage, nous allons à présent mettre un formulaire (rien ne se passera au click sur le bouton submit malheureusement, car nous n'avons pas la main en écriture sur l'API).
-
-Dans le formulaire, vous devez resepectez les contraintes suivantes :
-
-- Le nom est obligatoire
-- La propriété _hair_color_ doit utiliser un composant _select_
-- La propriété _gender_ doit utiliser des _radios_
-- La propriété _height_ doit obligatoirement être supérieur à 0
+- Ajouter une route `/create`
+- Créer une page `src/pages/Create.tsx`
+- Implémenter un formulaire avec les contraintes suivantes :
+  - Le nom est obligatoire
+  - La propriété _hair_color_ doit utiliser un composant _select_
+  - La propriété _gender_ doit utiliser des _radios_
+  - La propriété _height_ doit obligatoirement être supérieur à 0
 
 Afin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates.
 
-## PW11 - TanStack Query
+- Mettre en place une requête `POST` vers le serveur
+- Rediriger vers la page `People` de l'élément nouvellement créé
+
+## PW17 - TanStack Query
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -601,76 +704,73 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [TanStack Query](https://tanstack.com/query/latest/docs/react/overview)
 - [TanStack Query v4](https://www.learnwithjason.dev/tanstack-query-v4)
 - [Le server state facile avec Tanstack Query](https://www.youtube.com/watch?v=kNaBVAdwbR4)
-  :::
+:::
 
 Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)
 
-## PW12 - Variables d'environnement
+## PW18 - Material UI
+
+- Ajouter MUI à votre projet
+- Retirer Bulma de votre projet
+- Intégrer MUI à vos composants UI
+
+## PW19 - Zustand
 
 :::note
-- [Vite env](https://vitejs.dev/guide/env-and-mode)
-  :::
-
-Externaliser la base de l'url de l'API consommée.
-Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `.env.local` surchargeant cette valeur. Utiliser cette variable d'environnement dans vos composants, de sorte que votre code soit portable.
-
-## PW13 - State manager - Recoil
-
-:::note
-- [Recoil](https://recoiljs.org/fr/docs/introduction/getting-started)
-  :::
+- [Zustand](https://github.com/pmndrs/zustand)
+:::
 
 Nous avons utilisé l'API `context` pour gérer les likes jusqu'ici.
-Dans cette partie, nous allons externaliser la gestion des états des likes dans un state manager : recoil.
+Dans cette partie, nous allons externaliser la gestion des états des likes dans un state manager : Zustand.
 
-Pour cela, nous allons tout d'abord installer le module `recoil`.
+- Supprimer tous les objets liés au `context`
+- Installer `zustand`
+- Créer un store pour gérer les likes
+
+## PW20 - Storybook
+
+:::note
+- [Storybook](https://storybook.js.org/tutorials/intro-to-storybook/react/en/get-started/)
+:::
+
+- Instancier `Storybook`
+- Écrire une / des story(ies) pour vos composants UI
+
+# PW21 Cypress
+
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [Cypress](https://www.cypress.io/)
+:::
+
+Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
 
 ```shell
-npm install recoil
+npm install -D cypress
 ```
 
-Une fois installé, nous devons ajouter la provider recoil, `RecoilRoot` au niveau le plus haut de notre application (fichier `main.tsx`). Tous les composants enfants pourront alors communiquer avec les états gérés par recoil.
+Une fois installée, nous allons ajouter un script dans notre fichier `package.json`.
 
-```typescript
-...
-import { RecoilRoot } from "recoil";
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-	<React.StrictMode>
-		<RecoilRoot>
-			<RouterProvider router={router} />
-		</RecoilRoot>
-	</React.StrictMode>
-);
-```
-
-Nous allons ensuite définir un `atom` (morceau d'état).
-Nous pouvons créer un dossier `store` à la racine de src pour définir nos morceaux d'état
-
-```typescript
-const likeState = atom({
-  key: 'likeState',
-  default: {} as Record<string, number>,
-});
-```
-
-A la façon de `useState`, nous pouvons utiliser `useRecoilState` pour accéder à la valeur et au setter de l'atom `likeState`
-
-```typescript
-import { FC } from 'react'
-import { useRecoilState } from 'recoil'
-
-const Component: FC = () => {
-  const [text, setText] = useRecoilState(textState);
-  return ...
+```json
+{
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
+  }
 }
 ```
 
-# PW Bonus
+Si à présent vous exécutez la commande `npm run cypress:open`, l'interface graphique doit étre visible vous permettant de lancer les tests générés par Cypress.
 
-- React 19
-- factoriser les composants UI dans un répertoire `common` : fixer / améliorer un composant nécessitera la modification d'un seul fichier au lieu de X morceaux de jsx
-- dockeriser l'application :
-  - ajouter un fichier `Dockerfile`
-  - ajouter une configuration de CI
-- next.js
+Vous devez à présent supprimer les tests générés et créer vos propres tests afin de tester l'interface graphique de votre application.
+
+- Ajouter un fichier `.eslintignore` à la racine du projet pour exclure le linting pour le code auto-généré par Cypress
+
+# PW 22 Docker & Kubernetes
+
+En utilisant les slides :
+- installer et configurer `vite-envs`
+- créer un fichier `Dockerfile`
+- builder votre image Docker
+- lancer votre image Docker
