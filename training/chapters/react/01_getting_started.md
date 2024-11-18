@@ -54,7 +54,7 @@ npm create vite@latest my-react-app -- --template react-ts
 ```
 
 - Voici la liste des outils configurés par `Vite`
-  - Les librairies `react` et `react-dom`
+  - Les librairies **react** et **react-dom**
   - Vite
   - ESLint
   - Typescript

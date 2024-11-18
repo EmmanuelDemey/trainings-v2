@@ -10,6 +10,7 @@ layout: cover
 
 ![React lifecycle](/images/react_lifecycle.png)
 
+
 ---
 
 # Hook

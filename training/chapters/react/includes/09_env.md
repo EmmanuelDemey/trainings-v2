@@ -8,12 +8,7 @@ layout: cover
 
 * Variabilisation du code
 * Interopérabilité de l'application
-
---- 
-
-# Variables d'environnement & vite
-
-Vous pouvez définir les fichiers listés ci-dessous à la racine de votre projet vite :
+* Vous pouvez définir les fichiers listés ci-dessous à la racine de votre projet vite :
 
 ```shell
 .env                # loaded in all cases
@@ -22,13 +17,7 @@ Vous pouvez définir les fichiers listés ci-dessous à la racine de votre proje
 .env.[mode].local   # only loaded in specified mode, ignored by git
 ```
 
-Les variables d'environnement doivent être définies sous forme de clés / valeur, les clés débutant par `VITE_`
-
----
-
-# Variables d'environnement & vite
-
-Une fois définie, vos variables d'environnement sont mobilisables dans votre code via l'objet suivant :
+* Une fois définie, vos variables d'environnement sont mobilisables dans votre code via l'objet suivant :
 
 ```typescript
 const k: string = import.meta.env.VITE_SOME_KEY

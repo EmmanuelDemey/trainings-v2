@@ -1,8 +1,3 @@
-@cover
-# TypeScript
-
----
-
 # TypeScript
 
 * Typescript est un superset de JavaScript
