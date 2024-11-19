@@ -1,0 +1,12 @@
+.column-name {
+  color: white;
+  &:hover {
+    color: red;
+  }
+}
+
+.table-row {
+  &:hover {
+    background-color: grey;
+  }
+}

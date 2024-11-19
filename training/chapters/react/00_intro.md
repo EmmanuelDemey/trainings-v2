@@ -17,8 +17,8 @@ layout: cover
                 </ul>
             </li>
             <li>2 - Typescript</li>
-            <li>3 - EcmaScript "moderne" (o)</li>
-            <li>4 - Tests unitaires</li>
+            <li>3 - Tests unitaires</li>
+            <li>4 - EcmaScript "moderne" (o)</li>
             <li>5 - Premiers pas avec React</li>
             <li>6 - Composants & props</li>
             <li>7 - Style & (s)css</li>
