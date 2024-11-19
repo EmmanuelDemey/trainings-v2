@@ -1,6 +1,10 @@
-import { data } from "../../fake-data";
+import { Persons } from "../../model/person";
 
-const PeopleTable = () => (
+type PeopleTableType = {
+  data: Persons;
+};
+
+const PeopleTable = ({ data }: PeopleTableType) => (
   <table className="table is-fullwidth">
     <thead>
       <tr>

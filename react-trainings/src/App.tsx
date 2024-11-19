@@ -1,14 +1,15 @@
+import { Title } from "./components/common";
+import PeopleFilter from "./components/people-filter";
 import PeopleTable from "./components/people-table";
+import { data } from "./fake-data";
 
 function App() {
   return (
     <section className="section">
       <div className="container">
-        <h1 className="title">Hello World</h1>
-        <p className="subtitle">
-          My first website with <strong>Bulma</strong>!
-        </p>
-        <PeopleTable />
+        <Title text="Hello Bulma" />
+        <PeopleFilter />
+        <PeopleTable data={data} />
       </div>
     </section>
   );
