@@ -1,4 +1,5 @@
 import { Persons } from "../../model/person";
+import "./table.scss";
 
 type PeopleTableType = {
   data: Persons;
@@ -8,9 +9,9 @@ const PeopleTable = ({ data }: PeopleTableType) => (
   <table className="table is-fullwidth">
     <thead>
       <tr>
-        <th>Nom</th>
-        <th>Genre</th>
-        <th>Année de naissance</th>
+        <th className="column-name">Nom</th>
+        <th className="column-name">Genre</th>
+        <th className="column-name">Année de naissance</th>
       </tr>
     </thead>
     <tbody>
