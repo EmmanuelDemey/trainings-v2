@@ -4,3 +4,9 @@
     color: red;
   }
 }
+
+.table-row {
+  &:hover {
+    background-color: grey;
+  }
+}

@@ -3,9 +3,10 @@ import "./table.scss";
 
 type PeopleTableType = {
   data: Persons;
+  setId: (id: string) => void;
 };
 
-const PeopleTable = ({ data }: PeopleTableType) => (
+const PeopleTable = ({ data, setId }: PeopleTableType) => (
   <table className="table is-fullwidth">
     <thead>
       <tr>
@@ -16,7 +17,13 @@ const PeopleTable = ({ data }: PeopleTableType) => (
     </thead>
     <tbody>
       {data.map(({ name, gender, birth_year, url }) => (
-        <tr key={url}>
+        <tr
+          key={url}
+          onClick={() => {
+            setId(url);
+          }}
+          className="table-row"
+        >
           <td>{name}</td>
           <td>{gender}</td>
           <td>{birth_year}</td>
