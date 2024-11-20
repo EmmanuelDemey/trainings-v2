@@ -273,9 +273,16 @@ describe("es6", () => {
   it("returns persons median", () => {
     expect(ES6.getMassAverage([])).toBe(null);
     expect(ES6.getMassAverage([...data, { name: "ko", url: "ko_url" }])).toBe(
-      null
+      null,
     );
     expect(ES6.getMassAverage(data)).toBe(80);
+  });
+  it("returns partial last person with 1 added", () => {
+    expect(Object.keys(ES6.addOneForLastElement([]))).toHaveLength(0);
+    const result = ES6.addOneForLastElement(data);
+    expect(Object.keys(result)).toHaveLength(2);
+    expect(result.height).toBe("203");
+    expect(result.mass).toBe("137");
   });
 });
 ```
@@ -283,27 +290,38 @@ describe("es6", () => {
 - Créer un fichier `src/utils/es6.ts` avec le contenu suivant :
 
 ```typescript
-import { Persons } from "../model/person";
+import { Person, Persons } from "../model/person";
 
+// Get array of Person length
 export const getLength = (arr: Persons): number => 0;
 
-export const getMales = (arr: Persons): number => 0;
+// Returns only males from array of Person
+export const getMales = (arr: Persons): number => [];
 
+// Return array of names from array of Person
 export const getNames = (arr: Persons): string[] => [];
 
+// Return array of an attribute from array of Person
 export const getAttr =
   (attr: "name" | "url") =>
-  (arr: Persons): string[] =>
-    [];
+  (arr: Persons): string[] => [];
 
-export const checkFirstElementKeys = (arr: Persons): string[] | null => [];
+// Returns array of keys of the first Person in array
+export const checkFirstElementKeys = (arr: Persons): string[] | null => null;
 
+// Returns "key: value" for each elements of the last Person in array
 export const buildInfosForLastElement = (arr: Persons): string[] | null => {
   return null;
 };
 
-export const getMassAverage = (arr: Persons): number | null => {
-  return null;
+// Calculate the mass average from the array of Person
+export const getMassAverage = (arr: Persons) => {
+  return 0;
+};
+
+// For last Person, keep elements where value is assignable to numeric, and add one to each field
+export const addOneForLastElement = (arr: Persons): Partial<Person> => {
+  return {};
 };
 ```
 
