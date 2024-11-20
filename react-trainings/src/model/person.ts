@@ -1,4 +1,4 @@
-export type Person = {
+export interface Person {
   name: string;
   url: string;
   height?: string;
@@ -16,6 +16,4 @@ export type Person = {
   starships?: string[];
   created?: string;
   edited?: string;
-};
-
-export type Persons = Array<Person>;
+}

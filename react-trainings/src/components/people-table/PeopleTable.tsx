@@ -1,8 +1,8 @@
-import { Persons } from "../../model/person";
+import { Person } from "@model/person";
 import "./table.scss";
 
 type PeopleTableType = {
-  data: Persons;
+  data: Person[];
   setId: (id: string) => void;
 };
 

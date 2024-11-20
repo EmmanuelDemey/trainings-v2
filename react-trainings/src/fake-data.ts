@@ -1,6 +1,6 @@
-import { Persons } from "./model/person";
+import { Person } from "./model";
 
-export const data: Persons = [
+export const data: Person[] = [
   {
     name: "Luke Skywalker",
     height: "172",

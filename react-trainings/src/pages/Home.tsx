@@ -1,12 +1,12 @@
-import { Title } from "../components/common";
-import PeopleFilter from "../components/people-filter";
-import PeopleTable from "../components/people-table";
-import { Persons } from "../model/person";
+import { Title } from "@components/common";
+import PeopleFilter from "@components/people-filter";
+import PeopleTable from "@components/people-table";
+import { Person } from "@model/person";
 
 type HomeType = {
   filter: string;
   onChangeFilter: (e: string) => void;
-  data: Persons;
+  data: Person[];
   setId: (id: string) => void;
 };
 

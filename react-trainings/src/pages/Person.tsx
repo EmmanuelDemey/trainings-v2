@@ -1,5 +1,5 @@
-import { Button, Title } from "../components/common";
-import { Person as PersonType } from "../model/person";
+import { Button, Title } from "@components/common";
+import { Person as PersonType } from "@model/person";
 
 type PersonComponentType = {
   person: PersonType | undefined;

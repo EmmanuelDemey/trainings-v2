@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { data } from "./fake-data";
-import { Home, Person } from "./pages";
+import { Home, Person } from "@pages/index";
 
 function App() {
   const [filter, setFilter] = useState("");

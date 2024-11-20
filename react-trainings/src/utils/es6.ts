@@ -1,27 +1,28 @@
-import { Person, Persons } from "../model/person";
+import { Person } from "@model/person";
 
 // Get array of Person length
-export const getLength = (arr: Persons): number => arr.length;
+export const getLength = (arr: Person[]): number => arr.length;
 
 // Returns only males from array of Person
-export const getMales = (arr: Persons): number =>
+export const getMales = (arr: Person[]): number =>
   getLength(arr.filter(({ gender }) => gender === "male"));
 
 // Return array of names from array of Person
-export const getNames = (arr: Persons): string[] => arr.map(({ name }) => name);
+export const getNames = (arr: Person[]): string[] =>
+  arr.map(({ name }) => name);
 
 // Return array of an attribute from array of Person
 export const getAttr =
   (attr: "name" | "url") =>
-  (arr: Persons): string[] =>
+  (arr: Person[]): string[] =>
     arr.map((p) => p[attr]);
 
 // Returns array of keys of the first Person in array
-export const checkFirstElementKeys = (arr: Persons): string[] | null =>
+export const checkFirstElementKeys = (arr: Person[]): string[] | null =>
   getLength(arr) === 0 ? null : Object.keys(arr[0]);
 
 // Returns "key: value" for each elements of the last Person in array
-export const buildInfosForLastElement = (arr: Persons): string[] | null => {
+export const buildInfosForLastElement = (arr: Person[]): string[] | null => {
   const length = getLength(arr);
   if (length === 0) return null;
   const last = arr[length - 1];
@@ -29,7 +30,7 @@ export const buildInfosForLastElement = (arr: Persons): string[] | null => {
 };
 
 // Calculate the mass average from the array of Person
-export const getMassAverage = (arr: Persons) => {
+export const getMassAverage = (arr: Person[]) => {
   const length = getLength(arr);
   if (length === 0) return null;
   const masses = arr.map(({ mass }) => mass);
@@ -38,7 +39,7 @@ export const getMassAverage = (arr: Persons) => {
 };
 
 // For last Person, keep elements where value is assignable to numeric, and add one to each field
-export const addOneForLastElement = (arr: Persons): Partial<Person> => {
+export const addOneForLastElement = (arr: Person[]): Partial<Person> => {
   const length = getLength(arr);
   if (length === 0) return {};
   const last = arr[length - 1];

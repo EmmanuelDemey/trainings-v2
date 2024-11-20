@@ -1,4 +1,4 @@
-import { Input } from "../common";
+import { Input } from "@components/common";
 
 type PeopleFilterProps = {
   filter: string;
