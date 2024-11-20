@@ -225,9 +225,39 @@ export class TypeDirective {
 
 ---
 
----
+# Directive Composition API 
 
-## layout: cover
+* Cet API permet d'activer des **directives** existantes sur le **host** d'un composat
+* Et ainsi bénécier de tout le fonctionnelle de ces **directives**
+
+```typescript
+@Component({
+  selector: 'app-toggle',
+  hostDirectives: [
+    {
+      directive: DisableDirective,
+      inputs: ['disableState: disabled'],
+    },
+    {
+      directive: ColorDirective,
+      inputs: ['color'],
+    },
+  ],
+  template: `<label class="switch">
+    		      <input type="checkbox"/>
+    		      <span class="slider"></span>
+  	        </label> `,
+})
+export class ToggleComponent {}
+```
+
+```html
+<app-toggle [disabled]="false" color="secondary"></app-toggle>
+```
+
+---
+layout: cover
+---
 
 # Forms
 
