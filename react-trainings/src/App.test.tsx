@@ -9,11 +9,11 @@ describe("App", () => {
 
   it("should check title", () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(
-      "Vite",
+      "Hello",
     );
   });
 
   it("check p content", () => {
-    expect(screen.getAllByRole("paragraph")[0].textContent).toContain("Edit");
+    expect(screen.getByRole("table")).toBeDefined();
   });
 });
