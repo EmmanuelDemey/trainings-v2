@@ -17,7 +17,7 @@ layout: cover
 # Création d'un store Zustand
 
 ```typescript
-import create from 'zustand';
+import { create } from 'zustand';
 
 interface CounterState {
   count: number;

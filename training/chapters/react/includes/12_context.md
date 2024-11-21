@@ -23,7 +23,7 @@ export const themes: Record<string, Theme> = {
   },
 };
 
-export const ThemeContext = createContext<Theme | undefined>(/* valeur par défaut */);
+export const ThemeContext = createContext<Theme | undefined>(themes);
 ```
 
 ---
@@ -91,6 +91,7 @@ export default App;
 # Lecture et Ecriture
 
 ```javascript
+import { useContext } from 'react'
 import { DataContext } from './context';
 
 const Form = () => {
@@ -145,7 +146,7 @@ export const themes = {
   },
 };
 
-export const ThemeContext = createContext(
+const ThemeContext = createContext(
   themes.dark // valeur par défaut
 );
 
