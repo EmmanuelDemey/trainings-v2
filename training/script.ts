@@ -1,7 +1,6 @@
-import { exec } from "child_process";
+import { exec, execSync } from "child_process";
 import { existsSync, mkdirSync } from "fs";
 
-const { execSync } = require("child_process");
 const fs = require("fs");
 const { mdToPdf } = require("md-to-pdf");
 const { join } = require("path");
@@ -12,9 +11,12 @@ const fse = require("fs-extra");
 const TRAINING_PLATFORM_HIDDEN_FOLDER = join(__dirname, ".training_platform");
 
 const downloadAstroTemplate = (distFolder: string) => {
-  execSync(`npm create astro@latest -- ${distFolder} --no-install --template starlight --no-git --typescript strict`, {
-    stdio: "inherit",
-  });
+  execSync(
+    `npm create astro@latest -- ${distFolder} --no-install --template starlight --no-git --typescript strict`,
+    {
+      stdio: "inherit",
+    }
+  );
   execSync(`cd ${distFolder}`, { stdio: "inherit" });
   process.chdir(distFolder);
   execSync(`npm i`, { stdio: "inherit" });
@@ -113,7 +115,14 @@ hero:
     fs.writeFileSync(`${distFolder}/src/content/docs/index.mdx`, index);
     for (let i = 0; i < pws.length; i++) {
       const pw = pws[i];
-      fs.writeFileSync(join(distFolder, "src/content/docs/guides", kebabCase(pwTitles[i]) + ".md"), pw.join("\r\n"));
+      fs.writeFileSync(
+        join(
+          distFolder,
+          "src/content/docs/guides",
+          kebabCase(pwTitles[i]) + ".md"
+        ),
+        pw.join("\r\n")
+      );
     }
     fs.writeFileSync(
       join(distFolder, "src/content/docs/guides/slides.md"),
@@ -133,53 +142,54 @@ title: Slides
 
   execSync(`npm --prefix ${join(distFolder)} run build`, { stdio: "inherit" });
 
-  fse.copySync(join(distFolder, "dist"), distFolder.replace("__", ""), { overwrite: true });
+  fse.copySync(join(distFolder, "dist"), distFolder.replace("__", ""), {
+    overwrite: true,
+  });
 
   fs.rmSync(distFolder, { recursive: true, force: true });
   return Promise.resolve();
 };
 
-const generateSlides = (training: string) => {
-  const mds: string[] = fs
-    .readdirSync(".")
-    .filter((p: string) => p.endsWith(training + ".md") && !p.endsWith("_pw.md"))
-    .filter((p: string) => !p.startsWith("README"));
-  return Promise.all(
-    mds.map((md: string) => {
-      return new Promise((resolve) => {
-        const base = md.replace(".md", "");
-        console.log(`building ${md}`);
-        exec(`npm run build -- ${md} --base /${base} --out dist/${base}`, () => {
-          console.log(`exporting ${md}`);
-          exec(`npm run export -- ${md} --with-toc --output dist/${base}.pdf`, () => resolve("done"));
-        });
-      });
-    })
+const generateSlidesWebsite = (trainingRootPath: string) => {
+  const base = trainingRootPath.replace(".md", "");
+  return execSync(
+    `npm run build -- ${trainingRootPath} --base /${base} --out dist/${base}`
   );
 };
-const generatePwWebsite = (training: string) => {
-  const pws: string[] = fs.readdirSync(".").filter((p: string) => p.endsWith(training + "_pw.md"));
-  return Promise.all(
-    pws.map((pw) => {
-      console.log(`building pw ${pw}`);
-      return mdToPdf({ path: pw })
-        .then((pdf: any) => {
-          if (pdf) {
-            fs.writeFileSync(join(targetDist, pw.replace(".md", ".pdf")), pdf.content);
-          }
 
-          return generateAstroWebSite(pw, targetDist);
-        })
-        .catch(console.error);
-    })
+const generateSlidesPdf = (trainingRootPath: string) => {
+  const base = trainingRootPath.replace(".md", "");
+  return execSync(
+    `npm run export -- ${trainingRootPath} --with-toc --output dist/${base}.pdf`
   );
 };
+
+const generatePracticalWorksPdf = (trainingRootPath: string) => {
+  return mdToPdf({ path: trainingRootPath }).then((pdf: any) => {
+    if (pdf) {
+      fs.writeFileSync(
+        join(targetDist, trainingRootPath.replace(".md", ".pdf")),
+        pdf.content
+      );
+    }
+  });
+};
+
+const generatePracticalWorksWebsite = (trainingRootPath: string) => {
+  return generateAstroWebSite(trainingRootPath, targetDist);
+};
+
 (async () => {
   fs.rmSync("dist", { recursive: true, force: true });
   mkdirSync("dist");
 
   const projects = process.argv[2].split(",");
   for (let project of projects) {
-    await Promise.all([generateSlides(project), generatePwWebsite(project)]);
+    await Promise.all([
+      generateSlidesWebsite(`${project}.md`),
+      generateSlidesPdf(`${project}.md`),
+      generatePracticalWorksWebsite(`${project}_pw.md`),
+      generatePracticalWorksPdf(`${project}_pw.md`),
+    ]);
   }
 })();
