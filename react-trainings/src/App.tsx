@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FilterProvider } from "./context";
 import { Home, Person } from "@pages/index";
 
 function App() {
@@ -6,10 +7,6 @@ function App() {
   const [routing, setRouting] = useState({ currentPage: "home", id: "" });
 
   const { currentPage, id } = routing;
-
-  const onChangeFilter = (e: string) => {
-    setFilter(e);
-  };
 
   const setId = (id: string) => {
     setRouting({ currentPage: "person", id });
@@ -19,12 +16,16 @@ function App() {
     setRouting({ currentPage: "home", id: "" });
   };
 
+  const updateFilter = (f: string) => {
+    setFilter(f);
+  };
+
   return (
     <section className="section">
       <div className="container">
-        {currentPage === "home" && (
-          <Home filter={filter} onChangeFilter={onChangeFilter} setId={setId} />
-        )}
+        <FilterProvider value={{ filter, setFilter: updateFilter }}>
+          {currentPage === "home" && <Home setId={setId} />}
+        </FilterProvider>
         {currentPage === "person" && <Person id={id} backHome={backHome} />}
       </div>
     </section>

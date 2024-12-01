@@ -1,14 +1,11 @@
 import { Input } from "@components/common";
+import { useFilter } from "../../context";
 
-type PeopleFilterProps = {
-  filter: string;
-  onChange: (e: string) => void;
-};
-
-const PeopleFilter = ({ filter, onChange }: PeopleFilterProps) => {
+const PeopleFilter = () => {
   // uncomment to fire ErrorBoundary
   // throw new Error("");
-  return <Input value={filter} onChange={onChange} />;
+  const { filter, setFilter } = useFilter();
+  return <Input value={filter} onChange={setFilter} />;
 };
 
 export default PeopleFilter;

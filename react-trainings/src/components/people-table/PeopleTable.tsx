@@ -1,13 +1,15 @@
 import { Person } from "@model/person";
 import "./table.scss";
+import { useFilter } from "../../context";
 
 type PeopleTableType = {
   data: Person[] | null;
   setId: (id: string) => void;
-  filter: string;
 };
 
-const PeopleTable = ({ data, setId, filter }: PeopleTableType) => {
+const PeopleTable = ({ data, setId }: PeopleTableType) => {
+  const { filter } = useFilter();
+
   if (!data) return null;
 
   const filteredData = data.filter(({ name }) =>
