@@ -5,8 +5,10 @@ type PeopleFilterProps = {
   onChange: (e: string) => void;
 };
 
-const PeopleFilter = ({ filter, onChange }: PeopleFilterProps) => (
-  <Input value={filter} onChange={onChange} />
-);
+const PeopleFilter = ({ filter, onChange }: PeopleFilterProps) => {
+  // uncomment to fire ErrorBoundary
+  // throw new Error("");
+  return <Input value={filter} onChange={onChange} />;
+};
 
 export default PeopleFilter;
