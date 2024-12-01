@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { FilterProvider, LikesProvider } from "./context";
-import { Home, Person } from "@pages/index";
+import { Home } from "@pages/index";
+import { Loader } from "@components/common";
+const LazyPerson = lazy(() => import("@pages/Person"));
 
 function App() {
   const [likes, setLikes] = useState({});
@@ -32,7 +34,11 @@ function App() {
           <FilterProvider value={{ filter, setFilter: updateFilter }}>
             {currentPage === "home" && <Home setId={setId} />}
           </FilterProvider>
-          {currentPage === "person" && <Person id={id} backHome={backHome} />}
+          {currentPage === "person" && (
+            <Suspense fallback={<Loader />}>
+              <LazyPerson id={id} backHome={backHome} />
+            </Suspense>
+          )}
         </div>
       </section>
     </LikesProvider>
