@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { data } from "./fake-data";
 import { Home, Person } from "@pages/index";
 
 function App() {
@@ -20,26 +19,13 @@ function App() {
     setRouting({ currentPage: "home", id: "" });
   };
 
-  const filteredData = data.filter(({ name }) =>
-    name.toLowerCase().includes(filter.toLowerCase()),
-  );
-
-  const person = data.find(({ url }) => url === id);
-
   return (
     <section className="section">
       <div className="container">
         {currentPage === "home" && (
-          <Home
-            filter={filter}
-            onChangeFilter={onChangeFilter}
-            data={filteredData}
-            setId={setId}
-          />
+          <Home filter={filter} onChangeFilter={onChangeFilter} setId={setId} />
         )}
-        {currentPage === "person" && (
-          <Person person={person} backHome={backHome} />
-        )}
+        {currentPage === "person" && <Person id={id} backHome={backHome} />}
       </div>
     </section>
   );

@@ -1,24 +1,16 @@
-import { Button, Title } from "@components/common";
-import { Person as PersonType } from "@model/person";
+import { Title } from "@components/common";
+import Person from "@components/person";
 
-type PersonComponentType = {
-  person: PersonType | undefined;
+type PersonPageType = {
+  id: string;
   backHome: () => void;
 };
 
-const Person = ({ person, backHome }: PersonComponentType) => (
+const PersonPage = ({ id, backHome }: PersonPageType) => (
   <>
     <Title text="Personnage" />
-    {person && (
-      <ul>
-        {Object.entries(person).map(([k, v]) => (
-          <li key={k}>{`${k} : ${v}`}</li>
-        ))}
-      </ul>
-    )}
-    {!person && <div>{"Bad id"}</div>}
-    <Button label="Home" onClick={backHome} />
+    <Person id={id} backHome={backHome} />
   </>
 );
 
-export default Person;
+export default PersonPage;
