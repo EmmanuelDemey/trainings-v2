@@ -491,45 +491,77 @@ En attendant, afin de continuer à structurer notre code, tout en s'amusant avec
 ## PW9 - Récupération de données
 
 :::note
+Documentation :
+
 - [Vite env](https://vitejs.dev/guide/env-and-mode)
+
+Attention :
+
+Comparativement aux données fictives, l'API renvoie des attributs en camel case et l'attribut url est remplacée par l'attribut id.
 :::
 
 ### Fetch
 
-- supprimer le fichier `src/fake-data.ts`
 - récupérer la liste des personnes et les attributs d'une personne via l'API
 - gérer l'état de chargement et les erreurs
 
-```javascript
+```typescript
+const [data, setData] = useState(...);
+const [loading, setLoading] = useState(...);
+const [errorMessage, setErrorMessage] = useState(...);
+
+useEffect(() => {...}, [...]);
+
 if (loading) {
   return (
     <progress className="progress is-small is-primary" max="100"></progress>
   );
 }
-```
 
-Aide :
-
-- Créer un fichier `src/utils/api-utils.ts` pour héberger l'utilitaire suivant :
-
-```typescript
-// http://swapi.dev/api/people/1/
-function getIDFromUrl(url: string): string {
-  const withoutPrefix = url.replace("https://swapi.dev/api/people/", "");
-  return withoutPrefix.replace("/", "");
+if (errorMessage) {
+  return (
+    <>
+      <div class="icon-text">
+        <span class="icon has-text-danger">
+          <i class="fas fa-ban"></i>
+        </span>
+        <span>Loading error:</span>
+      </div>
+      <p class="block">
+        {errorMessage}
+      </p>
+    </>
+  )
 }
+
+return (...)
 ```
+
+- supprimer le fichier `src/fake-data.ts`
 
 ### Variables d'environnement
 
 Externaliser la base de l'url de l'API consommée.
-Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `.env.local` surchargeant cette valeur. Utiliser cette variable d'environnement dans vos composants, de sorte que votre code soit portable.
+
+- Créer 2 fichiers, `.env`, `.env.local` à la racine de votre projet
+- Ajouter `VITE_API_BASE_URL=` au fichier `.env`
+- Ajouter `VITE_API_BASE_URL=XXX` au fichier `.env.local`
+- Penser à relancer son serveur à chaque modification de ces fichiers
+- Ajouter l'utilitaire suivant dans `src/utils/env.ts` :
+
+```typescript
+const getEnv = (k: string): string => import.meta.env['VITE_'.concat(k)];
+
+export const API_BASE_URL = getEnv('API_BASE_URL');
+```
+
+- Utiliser cette constante dans vos instanciation de `fetch`
 
 ## PW10 - Périmètres d'erreur
 
-- Ajouter un `ErrorBoundaries` "protégeant" le tableau de façon à ce que la page d'accueil continue de s'afficher même si le tableau ne peut l'être
+- Ajouter un `ErrorBoundaries` "protégeant" le champ de filtrage de façon à ce que la page d'accueil continue de s'afficher même si le composant `PeopleFilter` renvoie une erreur
 
-- Tester en lançant une erreur dans le composant `PeopleTable`
+- Tester en simulant une erreur dans le composant `PeopleFilter`
 
 ## PW11 - Custom hook
 
@@ -538,7 +570,7 @@ Comme seconde partie bonus, nous allons créer un `custom hook`. Ce hook, que no
 Ce hook s'utilisera de cette façon :
 
 ```typescript
-const { data, loading, error } = useFetch();
+const { data, loading, error } = useFetch(`url`);
 ```
 
 ## PW12 - State container - Context
