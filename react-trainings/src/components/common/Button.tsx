@@ -1,10 +1,16 @@
 type ButtonType = {
   label: string;
-  onClick: () => void;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 };
 
-const Button = ({ label, onClick }: ButtonType) => (
-  <button type="button" className="button is-warning" onClick={onClick}>
+const Button = ({ label, onClick, disabled }: ButtonType) => (
+  <button
+    type="button"
+    className="button is-warning"
+    onClick={onClick}
+    disabled={disabled}
+  >
     {label}
   </button>
 );

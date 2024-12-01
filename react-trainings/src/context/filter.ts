@@ -5,7 +5,7 @@ type FilterContextType = {
   setFilter: (e: string) => void;
 };
 
-export const FilterContext = createContext<FilterContextType>({
+const FilterContext = createContext<FilterContextType>({
   filter: "",
   setFilter: () => {},
 });
