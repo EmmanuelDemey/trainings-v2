@@ -5,11 +5,10 @@ import { useFetch } from "../../hooks";
 import { API_BASE_URL } from "../../utils/env";
 
 type PeopleContainerType = {
-  setId: () => void;
-  filter: string;
+  setId: (id: string) => void;
 };
 
-const PeopleTableContainer = ({ setId, filter }: PeopleContainerType) => {
+const PeopleTableContainer = ({ setId }: PeopleContainerType) => {
   const { data, loading, errorMessage } = useFetch<PersonType[]>(API_BASE_URL);
 
   if (loading) {
@@ -20,7 +19,7 @@ const PeopleTableContainer = ({ setId, filter }: PeopleContainerType) => {
     return <ErrorComponent text={errorMessage} />;
   }
 
-  return <PeopleTable data={data} filter={filter} setId={setId} />;
+  return <PeopleTable data={data} setId={setId} />;
 };
 
 export default PeopleTableContainer;

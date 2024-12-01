@@ -13,7 +13,7 @@ export const getNames = (arr: Person[]): string[] =>
 
 // Return array of an attribute from array of Person
 export const getAttr =
-  (attr: "name" | "url") =>
+  (attr: "name" | "id") =>
   (arr: Person[]): string[] =>
     arr.map((p) => p[attr]);
 

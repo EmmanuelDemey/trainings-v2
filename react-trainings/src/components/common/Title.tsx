@@ -1,6 +1,6 @@
 type TitleProps = {
   text: string;
-  level: number;
+  level?: number;
 };
 
 const Title = ({ text, level = 1 }: TitleProps) => {

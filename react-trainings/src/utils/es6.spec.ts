@@ -25,11 +25,11 @@ describe("es6", () => {
       "Darth Vader",
     ]);
   });
-  it("test first element contains name and url keys and not dummy", () => {
+  it("test first element contains name and id keys and not dummy", () => {
     expect(ES6.checkFirstElementKeys([])).toBeNull();
     const keys = ES6.checkFirstElementKeys(data);
     expect(keys).toContain("name");
-    expect(keys).toContain("url");
+    expect(keys).toContain("id");
     expect(keys).not.toContain("dummy");
   });
   it("build an array with `key: value` elements for last person and check `skin_color: white` is in", () => {
@@ -38,7 +38,7 @@ describe("es6", () => {
   });
   it("returns persons median", () => {
     expect(ES6.getMassAverage([])).toBe(null);
-    expect(ES6.getMassAverage([...data, { name: "ko", url: "ko_url" }])).toBe(
+    expect(ES6.getMassAverage([...data, { name: "ko", id: "ko_id" }])).toBe(
       null,
     );
     expect(ES6.getMassAverage(data)).toBe(80);
