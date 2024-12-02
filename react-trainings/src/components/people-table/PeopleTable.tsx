@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Person } from "@model/person";
 import { useFilter, useLikes } from "../../context";
@@ -12,6 +13,8 @@ const PeopleTable = ({ data }: PeopleTableType) => {
   const { filter } = useFilter();
   const { likes, setLikes } = useLikes();
 
+  const { t } = useTranslation("home");
+
   const navigate = useNavigate();
 
   if (!data) return null;
@@ -24,10 +27,10 @@ const PeopleTable = ({ data }: PeopleTableType) => {
     <table className="table is-fullwidth">
       <thead>
         <tr>
-          <th className="column-name">Nom</th>
-          <th className="column-name">Genre</th>
-          <th className="column-name">Année de naissance</th>
-          <th className="column-name">Likes</th>
+          <th className="column-name">{t("name")}</th>
+          <th className="column-name">{t("gender")}</th>
+          <th className="column-name">{t("birthYear")}</th>
+          <th className="column-name">{t("likes")}</th>
         </tr>
       </thead>
       <tbody>
@@ -46,7 +49,7 @@ const PeopleTable = ({ data }: PeopleTableType) => {
               <td>{birthYear}</td>
               <td>
                 <Button
-                  label="Dislike"
+                  label={t("dislike")}
                   onClick={(e) => {
                     e.stopPropagation();
                     setLikes(id, -1);
@@ -54,7 +57,7 @@ const PeopleTable = ({ data }: PeopleTableType) => {
                   disabled={likeValue === -1}
                 />
                 <Button
-                  label="Reset"
+                  label={t("reset")}
                   onClick={(e) => {
                     e.stopPropagation();
                     setLikes(id, 0);
@@ -62,7 +65,7 @@ const PeopleTable = ({ data }: PeopleTableType) => {
                   disabled={![-1, 1].includes(likeValue)}
                 />
                 <Button
-                  label="Like"
+                  label={t("like")}
                   onClick={(e) => {
                     e.stopPropagation();
                     setLikes(id, 1);

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@components/common";
 import { Person as PersonType } from "@model/person";
 
@@ -8,6 +9,8 @@ type PersonComponentType = {
 
 const Person = ({ person }: PersonComponentType) => {
   const navigate = useNavigate();
+
+  const { t } = useTranslation("person");
 
   if (!person) return null;
 
@@ -20,9 +23,9 @@ const Person = ({ person }: PersonComponentType) => {
           ))}
         </ul>
       )}
-      {!person && <div>{"Bad id"}</div>}
+      {!person && <div>{t("badId")}</div>}
       <Button
-        label="Home"
+        label={t("backHome")}
         onClick={() => {
           navigate("/");
         }}
