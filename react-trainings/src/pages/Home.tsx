@@ -5,11 +5,7 @@ import PeopleFilter from "@components/people-filter";
 import PeopleTable from "@components/people-table";
 import { useLikes } from "../context";
 
-type HomeType = {
-  setId: (id: string) => void;
-};
-
-const Home = ({ setId }: HomeType) => {
+const Home = () => {
   const { likes } = useLikes();
 
   const countLikes = useMemo(
@@ -27,7 +23,7 @@ const Home = ({ setId }: HomeType) => {
       >
         <PeopleFilter />
       </ErrorBoundary>
-      <PeopleTable setId={setId} />
+      <PeopleTable />
     </>
   );
 };

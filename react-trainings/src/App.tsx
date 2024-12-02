@@ -1,23 +1,11 @@
-import { useState, lazy, Suspense } from "react";
+import { useState } from "react";
+import { RouterProvider } from "react-router-dom";
 import { FilterProvider, LikesProvider } from "./context";
-import { Home } from "@pages/index";
-import { Loader } from "@components/common";
-const LazyPerson = lazy(() => import("@pages/Person"));
+import { router } from "./router";
 
 function App() {
   const [likes, setLikes] = useState({});
   const [filter, setFilter] = useState("");
-  const [routing, setRouting] = useState({ currentPage: "home", id: "" });
-
-  const { currentPage, id } = routing;
-
-  const setId = (id: string) => {
-    setRouting({ currentPage: "person", id });
-  };
-
-  const backHome = () => {
-    setRouting({ currentPage: "home", id: "" });
-  };
 
   const updateFilter = (f: string) => {
     setFilter(f);
@@ -32,13 +20,8 @@ function App() {
       <section className="section">
         <div className="container">
           <FilterProvider value={{ filter, setFilter: updateFilter }}>
-            {currentPage === "home" && <Home setId={setId} />}
+            <RouterProvider router={router} />
           </FilterProvider>
-          {currentPage === "person" && (
-            <Suspense fallback={<Loader />}>
-              <LazyPerson id={id} backHome={backHome} />
-            </Suspense>
-          )}
         </div>
       </section>
     </LikesProvider>

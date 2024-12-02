@@ -1,15 +1,13 @@
+import { useParams } from "react-router-dom";
 import { Person as PersonType } from "@model/person";
 import { Loader, Error as ErrorComponent } from "@components/common";
 import Person from "./Person";
 import { useFetch } from "../../hooks";
 import { API_BASE_URL } from "../../utils/env";
 
-type PersonContainerType = {
-  id: string;
-  backHome: () => void;
-};
+const PeopleContainer = () => {
+  const { id } = useParams();
 
-const PeopleContainer = ({ id, backHome }: PersonContainerType) => {
   const { data, loading, errorMessage } = useFetch<PersonType>(
     `${API_BASE_URL}/${id}`,
   );
@@ -21,7 +19,7 @@ const PeopleContainer = ({ id, backHome }: PersonContainerType) => {
   if (errorMessage) {
     return <ErrorComponent text={errorMessage} />;
   }
-  return <Person person={data} backHome={backHome} />;
+  return <Person person={data} />;
 };
 
 export default PeopleContainer;

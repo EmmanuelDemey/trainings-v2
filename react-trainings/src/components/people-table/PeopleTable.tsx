@@ -1,16 +1,18 @@
+import { useNavigate } from "react-router-dom";
 import { Person } from "@model/person";
-import "./table.scss";
 import { useFilter, useLikes } from "../../context";
 import { Button } from "../common";
+import "./table.scss";
 
 type PeopleTableType = {
   data: Person[] | null;
-  setId: (id: string) => void;
 };
 
-const PeopleTable = ({ data, setId }: PeopleTableType) => {
+const PeopleTable = ({ data }: PeopleTableType) => {
   const { filter } = useFilter();
   const { likes, setLikes } = useLikes();
+
+  const navigate = useNavigate();
 
   if (!data) return null;
 
@@ -35,7 +37,7 @@ const PeopleTable = ({ data, setId }: PeopleTableType) => {
             <tr
               key={id}
               onClick={() => {
-                setId(id);
+                navigate(`/person/${id}`);
               }}
               className="table-row"
             >

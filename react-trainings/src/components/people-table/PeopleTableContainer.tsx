@@ -4,11 +4,7 @@ import PeopleTable from "./PeopleTable";
 import { useFetch } from "../../hooks";
 import { API_BASE_URL } from "../../utils/env";
 
-type PeopleContainerType = {
-  setId: (id: string) => void;
-};
-
-const PeopleTableContainer = ({ setId }: PeopleContainerType) => {
+const PeopleTableContainer = () => {
   const { data, loading, errorMessage } = useFetch<PersonType[]>(API_BASE_URL);
 
   if (loading) {
@@ -19,7 +15,7 @@ const PeopleTableContainer = ({ setId }: PeopleContainerType) => {
     return <ErrorComponent text={errorMessage} />;
   }
 
-  return <PeopleTable data={data} setId={setId} />;
+  return <PeopleTable data={data} />;
 };
 
 export default PeopleTableContainer;
