@@ -1,18 +1,23 @@
-import { Person as PersonType } from "@model/person";
+import { useQuery } from "@tanstack/react-query";
+import { Person } from "@model/person";
 import { Loader, Error as ErrorComponent } from "@components/common";
 import PeopleTable from "./PeopleTable";
-import { useFetch } from "../../hooks";
 import { API_BASE_URL } from "../../utils/env";
 
 const PeopleTableContainer = () => {
-  const { data, loading, errorMessage } = useFetch<PersonType[]>(API_BASE_URL);
+  const { data, isPending, error } = useQuery<Person[]>({
+    queryKey: ["people"],
+    queryFn: () => fetch(API_BASE_URL).then((r) => r.json()),
+    refetchInterval: 30 * 1000,
+    staleTime: 10 * 1000,
+  });
 
-  if (loading) {
+  if (isPending) {
     return <Loader />;
   }
 
-  if (errorMessage) {
-    return <ErrorComponent text={errorMessage} />;
+  if (error) {
+    return <ErrorComponent text={error?.message} />;
   }
 
   return <PeopleTable data={data} />;

@@ -1,11 +1,27 @@
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { Button } from "@components/common";
 import { API_BASE_URL } from "../../utils/env";
+import { Person } from "@model/person";
 
 const App = () => {
   const navigate = useNavigate();
+
+  const mutation = useMutation({
+    mutationFn: (values: Person) =>
+      fetch(API_BASE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }).then((r) => r.json()),
+    onSuccess: ({ id }) => {
+      navigate(`/person/${id}`);
+    },
+  });
 
   const today = new Date();
 
@@ -32,25 +48,8 @@ const App = () => {
         .required("Birth year is required"),
     }),
     onSubmit: (values) => {
-      fetch(API_BASE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          }
-          alert(`API returns: ${res.status}`);
-        })
-        .then(({ id }) => {
-          navigate(`/person/${id}`);
-        })
-        .catch((e) => {
-          alert(e.message);
-        });
+      // assume to type approx: as Person
+      mutation.mutate(values as Person);
     },
   });
 
