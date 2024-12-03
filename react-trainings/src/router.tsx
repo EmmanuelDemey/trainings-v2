@@ -1,14 +1,14 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import { Home } from "@pages/index";
+import { HomePage, CreatePage } from "@pages/index";
 import NotFound from "./components/not-found";
 import { Loader } from "./components/common";
-const Person = lazy(() => import("@pages/person"));
+const Person = lazy(() => import("@pages/Person"));
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <HomePage />,
     errorElement: <NotFound />,
   },
   {
@@ -18,5 +18,9 @@ export const router = createBrowserRouter([
         <Person />
       </Suspense>
     ),
+  },
+  {
+    path: "/person/create",
+    element: <CreatePage />,
   },
 ]);

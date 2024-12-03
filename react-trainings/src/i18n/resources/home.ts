@@ -1,6 +1,7 @@
 export const home = {
   en: {
     title: "Welcome",
+    create: "Add person",
     count:
       "You like {likeNb, plural, =0 {# person} =1 {# person} other {# persons}}",
     filterErrorMessage: "Something went wrong with search field",
@@ -14,6 +15,7 @@ export const home = {
   },
   fr: {
     title: "Bienvenue",
+    create: "Ajouter un personnage",
     count:
       "Vous aimez {likeNb, plural, =0 {# personne} =1 {# personne} other {# personnes}}",
     filterErrorMessage: "Something went wrong with search field",
