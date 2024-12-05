@@ -502,7 +502,9 @@ Comparativement aux données fictives, l'API renvoie des attributs en camel case
 
 ### Fetch
 
-- récupérer la liste des personnes et les attributs d'une personne via l'API
+- récupérer la liste des personnes et les attributs d'une personne via l'API :
+  - créer un composant `PeopleTableContainer`
+  - créer un composant `PersonContainer`
 - gérer l'état de chargement et les erreurs
 
 ```typescript
@@ -510,7 +512,7 @@ const [data, setData] = useState(...);
 const [loading, setLoading] = useState(...);
 const [errorMessage, setErrorMessage] = useState(...);
 
-useEffect(() => {...}, [...]);
+useEffect(() => {fetch(...)}, [...]);
 
 if (loading) {
   return (
@@ -521,13 +523,13 @@ if (loading) {
 if (errorMessage) {
   return (
     <>
-      <div class="icon-text">
-        <span class="icon has-text-danger">
-          <i class="fas fa-ban"></i>
+      <div className="icon-text">
+        <span className="icon has-text-danger">
+          <i className="fas fa-ban"></i>
         </span>
         <span>Loading error:</span>
       </div>
-      <p class="block">
+      <p className="block">
         {errorMessage}
       </p>
     </>
@@ -537,7 +539,7 @@ if (errorMessage) {
 return (...)
 ```
 
-- supprimer le fichier `src/fake-data.ts`
+- Bonus : créer des composants `Loader` et `Error` dans `src/components/common` afin de factoriser et déporter ces morceaux d'UI de façon réutilisable et facilement testable.
 
 ### Variables d'environnement
 
@@ -575,35 +577,25 @@ const { data, loading, error } = useFetch(`url`);
 
 ## PW12 - State container - Context
 
+### FilterContext
+
+- Conserver l'état `filter` et le setter `setFilter` et supprimer toutes les `props` passées aux composants enfants
+- Créer un context `FilterContext`, le provider `FilterProvider` et le hook `useFilter` dans `src/context/filter`
+- Instancier le provider avec sa `value` et consommer cette valeur dans les composants enfants ayant besoin des informations
+
+### Bonus - LikeContext
+
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [API Context](https://react.dev/learn/passing-data-deeply-with-context)
 :::
 
-Dans ce TP, nous allons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
+Nous pouvons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
 
 Les actions qui pourront étre exécutées par l'utilisateur sont des actions permettant d'aimer (LIKE) ou ne plus aimer (DISLIKE) un personnage.
 
-- Définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer :
-  - un object ayant pour clé l'URL des personnages, comme valeur -1, 0 ou 1
-  - une fonction permettant de mettre à jour la valeur pour un personnage
-
-- Créer notre context grâce à la méthode `createContext`.
-
-Dans l'ensemble de notre application, nous allons avoir besoin de deux informations relatives au `store`
-
-- Ajouter le composant `Provider` dans le composant principal de l'application et créer un objet respectant le type défini ci-dessus.
-
-- Dans le composant `Home`, juste en dessous du titre, ajouter le code HTML suivant :
-
-```html
-<h2>Vous aimez X personnages</h2>
-```
-
-Le X devra être remplacer par le nombre de personnes aimés.
-
-- Ajouter une nouvelles colonne dans le tableau de `PeopleTable`. Cette colonne affichera deux boutons permettant d'aimer ou de ne plus aimer un personnage. Si nous n'aimons pas le personnage, nous devons afficer le bouton **I Like**, dans le cas contraire le bouton **I Dislike**.
+- Ajouter une nouvelles colonne dans le tableau de `PeopleTable`. Cette colonne affichera trois boutons permettant d'aimer, de ne plus aimer un personnage ou de réinitialiser.
 
 ```javascript
 <button
@@ -616,16 +608,39 @@ Le X devra être remplacer par le nombre de personnes aimés.
     type="button"
     className="button is-warning"
     onClick={ ... } >
+  Reset
+</button>
+<button
+    type="button"
+    className="button is-warning"
+    onClick={ ... } >
   I Dislike
 </button>
 ```
 
-- Connecter les composants `Home` et `PeopleTable` au context afin d'implémenter le fonctionnement souhaité.
+- Créer un context `LikesContext` dans `src/context/likes`, contenant :
+  - un object `likes` ayant pour clé l'id des personnages, comme valeur -1, 0 ou 1
+  - une fonction `setLikes` permettant de mettre à jour la valeur pour un personnage
+
+- Créer également le provider `LikesProvider` et le hook `useLikes` 
+
+- Instancier le provider avec sa `value` et consommer cette valeur dans les composants enfants ayant besoin des informations
+
+- Dans le composant `Home`, juste en dessous du titre, ajouter le code HTML suivant :
+
+```html
+<h2>Vous aimez X personnage(s)</h2>
+```
+
+Le X devra être remplacer par le nombre de personnes aimés.
 
 ## PW13 - Lazy loading - Suspense
 
 - Créer un composant `Loading` partagé (sous `src/components/common`)
 - Importer de façon "paresseuse" votre page `People`
+- Vérifiez :
+  - que `npm run build` produise un second fichier `*.js`
+  - en actualisant votre app, en allant dans les networks, en les effaçant, en cliquant sur un personnage dans le tableau, que le fichier contenant le code de la page `Person` est chargé
 
 ## PW14 - React Router
 
@@ -640,19 +655,18 @@ Nous allons à présent ajouter une deuxième page à notre application. Cette p
 Vous devez tout d'abord installer la dépendance `react-router-dom`.
 
 ```shell
-npm install react-router-dom
+npm install react-router-dom@^6.0.0
+# installer la dernière version 6.X.X tant que la v7 est buggée (TS issue)
 ```
 
 Un fois installée, suivez les étapes suivantes afin d'implémenter le fonctionnel souhaité :
 
 - Supprimer l'état permettant de gérer les pages jusque là
-- Configurez le router dans le composant principal. Nous souhaitons que le composant `Home` soit affiché par défaut, et le composant `Person` si l'url est égale à `/person/:id`. La route de `Person` devra être lazy loadée.
+- Créer une configuration de routing dans `src/router`
+- Instancier le `RouterProvider` dans `src/App`. Nous souhaitons que le composant `Home` soit affiché par défaut sur la route `/`, et le composant `Person` lorsque l'url respecte le pattern `/person/:id`. La route de `Person` devra être lazy loadée
+- Ajouter un composant `src/components/common/NotFound` pour les autres routes
 - Ajoutez un lien dans le composant `PeopleTable` permettant de faire la redirection
 - Corrigé le composant `Person`
-
-L'API utilisée ne retourne pas d'identifiant pour les objets.
-Vous pouvez tout de même en calculer un en se basant sur la propriété `url` de l'objet.
-Pour cela, vous pouvez utiliser la fonction suivante :
 
 ## PW15 - Internationalisation
 
@@ -745,9 +759,10 @@ Afin de mettre en place **Formik** sur notre application, un TP a été ajouté 
 - Créer une page `src/pages/Create.tsx`
 - Implémenter un formulaire avec les contraintes suivantes :
   - Le nom est obligatoire
-  - La propriété _hair_color_ doit utiliser un composant _select_
+  - La propriété _height_ est un entier compris entre 0 et 250
+  - La propriété _hairColor_ doit utiliser un composant _select_
   - La propriété _gender_ doit utiliser des _radios_
-  - La propriété _height_ doit obligatoirement être supérieur à 0
+  - La propriété _birthYear_ est un datepicker
 
 Afin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates.
 
@@ -759,12 +774,19 @@ Afin d'améliorer notre formulaire, vous devez également ajouter les messages d
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-- [TanStack Query](https://tanstack.com/query/latest/docs/react/overview)
-- [TanStack Query v4](https://www.learnwithjason.dev/tanstack-query-v4)
+- [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/installation)
 - [Le server state facile avec Tanstack Query](https://www.youtube.com/watch?v=kNaBVAdwbR4)
 :::
 
-Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)
+Nous allons remplacer nos appels API jusque là simplement exécutés via `fetch` par les méthodes de `TanStack`.
+
+- Instancier un `QueryClient`
+- Déclarer un `QueryClientProvider`
+- Remplacer les appels de `useFetch` par `useQuery`, l'appel `POST` par `useMutation`
+- Configurer `TanStack` pour que la liste de la page d'accueil soit :
+  - rafraichie automatiquement toutes les X secondes
+  - chargée une fois au plus toutes les Y secondes
+- Vérifier dans les devtools, onglet network, que cela fonctionne
 
 ## PW18 - Material UI
 
@@ -794,7 +816,7 @@ Dans cette partie, nous allons externaliser la gestion des états des likes dans
 - Instancier `Storybook`
 - Écrire une / des story(ies) pour vos composants UI
 
-# PW21 Cypress
+# PW21 - Cypress
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -825,7 +847,7 @@ Vous devez à présent supprimer les tests générés et créer vos propres test
 
 - Ajouter un fichier `.eslintignore` à la racine du projet pour exclure le linting pour le code auto-généré par Cypress
 
-# PW 22 Docker & Kubernetes
+# PW22 - Docker & Kubernetes
 
 En utilisant les slides :
 - installer et configurer `vite-envs`
