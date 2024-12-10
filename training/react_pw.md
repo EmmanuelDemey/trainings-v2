@@ -745,7 +745,7 @@ Dans cette partie, nous allons externaliser la gestion des états des likes dans
 - Instancier `Storybook`
 - Écrire une / des story(ies) pour vos composants UI
 
-# PW21 Cypress
+## PW21 Cypress
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -776,7 +776,7 @@ Vous devez à présent supprimer les tests générés et créer vos propres test
 
 - Ajouter un fichier `.eslintignore` à la racine du projet pour exclure le linting pour le code auto-généré par Cypress
 
-# PW 22 Docker & Kubernetes
+## PW 22 Docker & Kubernetes
 
 En utilisant les slides :
 
