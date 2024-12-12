@@ -5,6 +5,6 @@ export default ({trainingRootPath}: {trainingRootPath: string}) => {
 
   const base = trainingRootPath.replace(".md", "");
   return execSync(
-    `npm run export -- ${trainingRootPath} --with-toc --output dist/${base}.pdf`
+    `node --run export -- ${trainingRootPath} --with-toc --output dist/${base}.pdf`
   );
 };
