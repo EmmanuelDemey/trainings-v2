@@ -16,6 +16,12 @@
   status = 200
 
 [[redirects]]
+  from = "/a11y/*"
+  to = "/a11y/index.html"
+  status = 200
+
+
+[[redirects]]
   from = "/.well-known/*"
   to = "/.well-known/:splat"
   status = 200

@@ -115,8 +115,33 @@ axe https://google.com
 
 - Solution permettant d'écrire des tests _End-to-end_
 - Possibilité de faire des tests cross-platformes (Chrome, Edge, Firefox)
+- Propose un *matcher* `toMatchAriaSnapshot`
 - Systèmes de plugins disponibles
 - Dont le plugin `@axe-core/playwright`
+
+---
+
+# Axe - toMatchAriaSnapshot
+
+```typescript
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright"; // 1
+
+test.describe("homepage", () => {
+  // 2
+  test("should not have any automatically detectable accessibility issues", async ({
+    page,
+  }) => {
+    await page.goto("https://your-site.com/"); // 3
+
+    await expect(page.getByLabel("Main Navigation")).toMatchAriaSnapshot(`
+      - navigation: "Main Navigation"
+        - link "Home"
+        - link "Login"
+    `)
+  });
+});
+```
 
 ---
 
@@ -127,11 +152,7 @@ npm init playwright@latest
 npm i -D @axe-core/playwright
 ```
 
----
-
-# Axe - Playwright
-
-```javascript
+```typescript
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright"; // 1
 
