@@ -11,15 +11,16 @@
 
 # Prettier
 
+`.prettierrc.json`
+
 ```json
 {
-  "prettier": {
-    "bracketSpacing": true,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "useTabs": true
-  }
+  "bracketSpacing": true,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "useTabs": true,
+  "plugins": ["prettier-plugin-organize-imports"]
 }
 ```
 

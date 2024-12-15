@@ -1,4 +1,4 @@
 export const common = {
-  en: {},
-  fr: {},
+	en: {},
+	fr: {},
 };

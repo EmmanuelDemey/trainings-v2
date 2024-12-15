@@ -1,7 +1,7 @@
-import Person from "@components/person";
+import Person from '@components/person';
 
 const PersonPage = () => {
-  return <Person />;
+	return <Person />;
 };
 
 export default PersonPage;
