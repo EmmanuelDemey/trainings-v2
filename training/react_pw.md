@@ -54,6 +54,45 @@ cd dist
 npx serve
 ```
 
+### Support des path absolus dans vite
+
+Installer le plugin :
+
+```shell
+npm i -D vite-tsconfig-paths
+```
+
+Déclarer le plugin dans la configuration `vite` :
+
+```typescript
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tsconfigPaths()],
+});
+```
+
+Enrichir la configuration du projet dans `tsconfig.app.json` :
+
+```json
+{
+  ...
+  // alias
+  "baseUrl": ".",
+  "paths": {
+    "@components/*": ["src/components/*"],
+    "@pages/*": ["src/pages/*"],
+    "@utils/*": ["src/utils/*"],
+    "@model/*": ["src/model/*"]
+  }
+  ...
+}
+```
+
+
 ### Installation / Configuration de Prettier
 
 - Installer les extensions VS Code pour `prettier` (et `eslint`)
@@ -224,7 +263,7 @@ En :
 
 - installant `vitest` et `react-testing-library`
 - créant un script `test` dans le fichier `package.json`
-- étendant la configuration vite dans le fichier `vite.config.ts`
+- créer une configuration vitest dans le fichier `vitest.config.ts`
 - ajoutant un fichier `App.test.tsx` dans `src`
 
 ## PW4 - EcmaScript "moderne"
@@ -815,8 +854,19 @@ Dans cette partie, nous allons externaliser la gestion des états des likes dans
 - [Storybook](https://storybook.js.org/tutorials/intro-to-storybook/react/en/get-started/)
 :::
 
-- Instancier `Storybook`
-- Écrire une / des story(ies) pour vos composants UI
+- Ajouter `Storybook` à votre projet :
+
+```shell
+npx storybook@latest init
+```
+
+- S'inspirer des éléments du dossier `src/stories` pour créer une story documentant nos composants UI
+
+- Lancer `Storybook` :
+
+```
+npm run storybook
+```
 
 # PW21 - Cypress
 
@@ -851,8 +901,256 @@ Vous devez à présent supprimer les tests générés et créer vos propres test
 
 # PW22 - Docker & Kubernetes
 
-En utilisant les slides :
-- installer et configurer `vite-envs`
-- créer un fichier `Dockerfile`
-- builder votre image Docker
-- lancer votre image Docker
+## Docker
+
+- Installation de `vite-envs` :
+
+```shell
+npm i -D vite-envs
+```
+
+- Supprimer le préfixe `VITE_` dans les fichiers `.env`
+
+- Ajouter un script :
+
+```json
+{
+  ...
+  "postinstall": "vite-envs update-types"
+  ...
+}
+```
+
+- Mettre à jour le fichier `src/utils/env.ts` :
+
+```typescript
+export const API_BASE_URL = import.meta.env['API_BASE_URL'];
+```
+
+- À la racine du projet, ajouter les fichiers suivants avec les contenus associés :
+ - `.dockerignore` :
+
+```bash
+node_modules
+
+dist
+
+.git
+.gitignore
+
+.env.local
+
+# IDE settings
+.idea
+.vscode
+
+yarn-error.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+```
+
+  - `nginx.conf` :
+
+```bash
+server {
+    listen 8080;
+
+    gzip on; 
+    gzip_vary on; 
+    gzip_min_length 1024; 
+    gzip_proxied expired no-cache no-store private auth; 
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/javascript application/xml; 
+    gzip_disable "MSIE [1-6]\.";
+
+    root /usr/share/nginx/html;
+    index index.html;      
+
+    try_files $uri $uri/ /index.html;
+
+    # Vite generates filenames with hashes so we can
+    # tell the browser to keep in cache the resources.
+    location ^~ /static/ {
+        try_files $uri =404;
+        expires 1y;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    location ~* \.(html|json|txt)$ {
+        try_files $uri =404;
+        expires -1;  # No cache for these file types
+    }
+}
+```
+
+ - `Dockerfile` :
+
+```bash
+ # build environment
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY . .
+RUN yarn install --frozen-lockfile
+RUN yarn build
+
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /usr/share/nginx/html
+COPY --from=build /app/dist .
+ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
+```
+
+- Contruisez votre image docker, à la racine exécuter :
+
+```bash
+docker build . -t react-trainings
+```
+
+- Instancier localement votre image docker en définissant avec la variable d'environnement :
+
+```bash
+docker run -p 80:8080 --env API_BASE_URL="URL" react-trainings
+```
+
+- Vous pouvez également mettre en place une action Github pour construire et pousser votre image docker sur dockerhub :
+  - Ajouter `DOCKERHUB_USERNAME` et `DOCKERHUB_TOKEN` dans les secrets de votre repository Github
+  - Dans le fichier `.github/workflows/deploy-app-docker.yml` ajouter :
+
+```bash
+name: Deploy React training app to Docker Hub
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  dockerhub:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies and build
+        run: |
+          cd trainings-v2/react-trainings
+          yarn
+          yarn build
+          cd ..
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./trainings-v2/react-trainings
+          file: ./trainings-v2/react-trainings/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/react-trainings:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/react-trainings:latest
+```
+
+## Kubernetes
+
+- Installer le cli `kubectl`
+
+- Définir les 3 objets suivants dans un dossier `.kubernetes` :
+  - `Deployment.yml` :
+
+```bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-trainings
+  labels:
+    app: react-trainings
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-trainings
+  template:
+    metadata:
+      labels:
+        app: react-trainings
+    spec:
+      containers:
+        - name: react-trainings
+          image: nicolaval/react-trainings:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: API_BASE_URL
+              value: ''
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '50m'
+            limits:
+              memory: '128Mi'
+              cpu: '200m'
+```
+
+  - `Service.yml` :
+
+```bash
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: react-trainings
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: react-trainings.example.com # Replace by your custom URL
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: react-trainings
+                port:
+                  number: 8080
+```
+
+  - `Ingress.yml` :
+
+```bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-trainings
+spec:
+  selector:
+    app: react-trainings
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+```
+
+- Instancier les objets dans un cluster :
+
+```bash
+cd .kubernetes
+kubectl apply -f .
+```
