@@ -18,7 +18,7 @@ jobs:
           node-version: 20
       - name: Install dependencies and build
         run: |
-          cd trainings-v2/react-trainings
+          cd react-trainings
           yarn
           yarn build
           cd ..
@@ -35,8 +35,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./trainings-v2/react-trainings
-          file: ./trainings-v2/react-trainings/Dockerfile
+          context: ./react-trainings
+          file: ./react-trainings/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
