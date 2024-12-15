@@ -26,7 +26,6 @@ const Create = () => {
 
 	const mutation = useMutation({
 		mutationFn: (values: Person) => {
-			console.log(values);
 			return fetch(API_BASE_URL, {
 				method: 'POST',
 				headers: {
