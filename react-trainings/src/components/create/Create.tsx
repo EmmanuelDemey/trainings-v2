@@ -1,23 +1,40 @@
+// TODO: encapsulate
+import { FormControl, Box } from "@mui/material";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import * as Yup from "yup";
-import { Button } from "@components/common";
+import { Input, Button, Select, Radio, Datepicker } from "@components/common";
 import { API_BASE_URL } from "../../utils/env";
 import { Person } from "@model/person";
 
-const App = () => {
+const HAIR_OPTIONS = [
+  { label: "Black", value: "black" },
+  { label: "Brown", value: "brown" },
+  { label: "Blonde", value: "blonde" },
+  { label: "Red", value: "red" },
+];
+
+const SEX_OPTIONS = [
+  { label: "Man", value: "man" },
+  { label: "Female", value: "female" },
+  { label: "Other", value: "other" },
+];
+
+const Create = () => {
   const navigate = useNavigate();
 
   const mutation = useMutation({
-    mutationFn: (values: Person) =>
-      fetch(API_BASE_URL, {
+    mutationFn: (values: Person) => {
+      console.log(values);
+      return fetch(API_BASE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      }).then((r) => r.json()),
+      }).then((r) => r.json());
+    },
     onSuccess: ({ id }) => {
       navigate(`/person/${id}`);
     },
@@ -54,140 +71,83 @@ const App = () => {
   });
 
   return (
-    <form
-      onSubmit={formik.handleSubmit}
-      className="box"
-      style={{ maxWidth: "600px", margin: "0 auto" }}
+    <FormControl
+      variant="outlined"
+      margin="dense"
+      sx={{ width: "40%", minWidth: "100px" }}
     >
-      <div className="field">
-        <label className="label" htmlFor="name">
-          Name:
-        </label>
-        <div className="control">
-          <input
-            type="text"
-            id="name"
-            name="name"
-            className={`input ${formik.touched.name && formik.errors.name ? "is-danger" : ""}`}
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-        </div>
-        {formik.touched.name && formik.errors.name && (
-          <p className="help is-danger">{formik.errors.name}</p>
-        )}
-      </div>
-      <div className="field">
-        <label className="label" htmlFor="height">
-          Height (cm):
-        </label>
-        <div className="control">
-          <input
-            type="number"
-            id="height"
-            name="height"
-            className={`input ${formik.touched.height && formik.errors.height ? "is-danger" : ""}`}
-            value={formik.values.height}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-        </div>
-        {formik.touched.height && formik.errors.height && (
-          <p className="help is-danger">{formik.errors.height}</p>
-        )}
-      </div>
-      <div className="field">
-        <label className="label" htmlFor="hairColor">
-          Hair Color:
-        </label>
-        <div className="control">
-          <div className="select">
-            <select
-              id="hairColor"
-              name="hairColor"
-              value={formik.values.hairColor}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            >
-              <option value="">Select</option>
-              <option value="black">Black</option>
-              <option value="brown">Brown</option>
-              <option value="blonde">Blonde</option>
-              <option value="red">Red</option>
-            </select>
-          </div>
-        </div>
-        {formik.touched.hairColor && formik.errors.hairColor && (
-          <p className="help is-danger">{formik.errors.hairColor}</p>
-        )}
-      </div>
-      <div className="field">
-        <label className="label">Gender:</label>
-        <div className="control">
-          <label className="radio">
-            <input
-              type="radio"
-              id="male"
-              name="gender"
-              value="male"
-              checked={formik.values.gender === "male"}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            Male
-          </label>
-          <label className="radio">
-            <input
-              type="radio"
-              id="female"
-              name="gender"
-              value="female"
-              checked={formik.values.gender === "female"}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            Female
-          </label>
-          <label className="radio">
-            <input
-              type="radio"
-              id="other"
-              name="gender"
-              value="other"
-              checked={formik.values.gender === "other"}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            Other
-          </label>
-        </div>
-        {formik.touched.gender && formik.errors.gender && (
-          <p className="help is-danger">{formik.errors.gender}</p>
-        )}
-      </div>
-      <div className="field">
-        <label className="label" htmlFor="birthYear">
-          Birth Year:
-        </label>
-        <div className="control">
-          <input
-            type="date"
-            id="birthYear"
-            name="birthYear"
-            className={`input ${formik.touched.birthYear && formik.errors.birthYear ? "is-danger" : ""}`}
-            value={formik.values.birthYear}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-        </div>
-        {formik.touched.birthYear && formik.errors.birthYear && (
-          <p className="help is-danger">{formik.errors.birthYear}</p>
-        )}
-      </div>
-      <Button label="Submit" type="submit" disabled={formik.isValidating} />
-    </form>
+      <Box
+        component="form"
+        onSubmit={formik.handleSubmit}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <Input
+          id="name"
+          name="name"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          label={"Name"}
+          onBlur={formik.handleBlur}
+          errorMessage={formik.touched.name ? formik.errors.name : ""}
+        />
+        <Input
+          type="number"
+          id="height"
+          name="height"
+          value={formik.values.height}
+          onChange={formik.handleChange}
+          label={"Height"}
+          onBlur={formik.handleBlur}
+          errorMessage={formik.touched.height ? formik.errors.height : ""}
+        />
+        <Select
+          id="hairColor"
+          name="hairColor"
+          label="Hair color"
+          value={formik.values.hairColor}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          options={HAIR_OPTIONS}
+          errorMessage={formik.touched.hairColor ? formik.errors.hairColor : ""}
+        />
+        <Radio
+          id="gender"
+          name="gender"
+          label="Gender"
+          value={formik.values.gender}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          options={SEX_OPTIONS}
+          errorMessage={formik.touched.gender ? formik.errors.gender : ""}
+        />
+        <Datepicker
+          id="birthYear"
+          name="birthYear"
+          label="Gender"
+          value={formik.values.birthYear}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          errorMessage={formik.touched.birthYear ? formik.errors.birthYear : ""}
+        />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 1,
+            width: "100%",
+            marginTop: "20px",
+          }}
+        >
+          <Button onClick={() => navigate("/")} label={"Back to home"} />
+          <Button type="submit" disabled={!formik.isValid} label={"Submit"} />
+        </Box>
+      </Box>
+    </FormControl>
   );
 };
 
-export default App;
+export default Create;

@@ -1,12 +1,25 @@
+import { Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
 type TitleProps = {
   text: string;
-  level?: number;
+  level?: 1 | 2 | 3 | 4;
 };
 
 const Title = ({ text, level = 1 }: TitleProps) => {
-  if (level === 1) return <h1 className="title">{text}</h1>;
-  if (level === 2) return <h2 className="subtitle">{text}</h2>;
-  throw new Error(`Unknow title level: ${level}`);
+  const theme = useTheme();
+  return (
+    <Typography
+      variant={`h${level}`}
+      style={{
+        color: theme.palette.text.primary,
+        textAlign: "center",
+        marginBottom: "20px",
+      }}
+    >
+      {text}
+    </Typography>
+  );
 };
 
 export default Title;

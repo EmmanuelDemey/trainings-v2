@@ -7,7 +7,7 @@ const CreatePage = () => {
 
   return (
     <>
-      <Title text={t("title")} />
+      <Title text={t("title")} level={3} />
       <Create />
     </>
   );

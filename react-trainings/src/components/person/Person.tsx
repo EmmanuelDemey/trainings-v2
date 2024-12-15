@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Button } from "@components/common";
+import { Button, Title } from "@components/common";
 import { Person as PersonType } from "@model/person";
 
 type PersonComponentType = {
@@ -14,11 +14,14 @@ const Person = ({ person }: PersonComponentType) => {
 
   if (!person) return null;
 
+  const { name, ...rest } = person;
+
   return (
     <>
+      <Title text={name} level={4} />
       {person && (
         <ul>
-          {Object.entries(person).map(([k, v]) => (
+          {Object.entries(rest).map(([k, v]) => (
             <li key={k}>{`${k} : ${v}`}</li>
           ))}
         </ul>

@@ -1,6 +1,11 @@
 export { default as Button } from "./Button";
+export { default as Datepicker } from "./Datepicker";
 export { default as Error } from "./Error";
 export { default as Input } from "./Input";
 export { default as Language } from "./Language";
 export { default as Loader } from "./Loader";
+export { default as Radio } from "./Radio";
+export { default as Select } from "./Select";
+export { default as Table } from "./Table";
+export { default as ThemeSwitcher } from "./ThemeSwitcher";
 export { default as Title } from "./Title";
