@@ -205,7 +205,7 @@ layout: cover
 
 # Informations Complémentaires
 
-* SI nous souhaitons mettre des informatiosn complémentaires, nous allons utiliser l'attribut `aria-describedby`.
+* Si nous souhaitons mettre des informatiosn complémentaires, nous allons utiliser l'attribut `aria-describedby`.
 
 ```html
 <label for="email">Your email</label>
@@ -230,12 +230,10 @@ layout: cover
 # Formulaires - Gestion des erreurs
 
 * Pour l'affichage des erreurs de validation, il est préférable de les mettre au plus prêt de l'input.
-* Vous pouvez utiliser les attributs `aria-describedby` et `aria-invalid` dynamiquement
-* Une fois la validation faite, vous pouvez mettre le `focus` sur le premier champ en erreur.
+* Vous pouvez utiliser les attributs **aria-describedby** et **aria-invalid** dynamiquement.
+* Un attribut **aria-errormessage** existe, mais encore mal supporté.
+* Une fois la validation faite, vous pouvez mettre le **focus** sur le premier champ en erreur.
 
----
-
-# Formulaires - Gestion des erreurs
 
 ```html
 <label for="email">Your email</label>

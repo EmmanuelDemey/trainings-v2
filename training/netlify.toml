@@ -3,7 +3,7 @@
 
 [build]
   publish = "dist"
-  command = "npx ts-node script.ts"
+  command = "npx ts-node script.ts react"
 
 [[redirects]]
   from = "/elasticsearch/*"
@@ -14,6 +14,12 @@
   from = "/react/*"
   to = "/react/index.html"
   status = 200
+
+[[redirects]]
+  from = "/a11y/*"
+  to = "/a11y/index.html"
+  status = 200
+
 
 [[redirects]]
   from = "/.well-known/*"

@@ -26,7 +26,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 
 - [Vite](https://vitejs.dev/guide/)
 - [Prettier](https://prettier.io/docs/en/install)
-:::
+  :::
 
 ### Initialisation d'un projet React via Vite
 
@@ -107,108 +107,108 @@ Enrichir la configuration du projet dans `tsconfig.app.json` :
 ```typescript
 export const data = [
   {
-    "name": "Luke Skywalker",
-    "height": "172",
-    "mass": "77",
-    "hair_color": "blond",
-    "skin_color": "fair",
-    "eye_color": "blue",
-    "birth_year": "19BBY",
-    "gender": "male",
-    "homeworld": "http://swapi.dev/api/planets/1/",
-    "films": [
+    name: "Luke Skywalker",
+    height: "172",
+    mass: "77",
+    hair_color: "blond",
+    skin_color: "fair",
+    eye_color: "blue",
+    birth_year: "19BBY",
+    gender: "male",
+    homeworld: "http://swapi.dev/api/planets/1/",
+    films: [
       "http://swapi.dev/api/films/1/",
       "http://swapi.dev/api/films/2/",
       "http://swapi.dev/api/films/3/",
-      "http://swapi.dev/api/films/6/"
+      "http://swapi.dev/api/films/6/",
     ],
-    "species": [],
-    "vehicles": [
+    species: [],
+    vehicles: [
       "http://swapi.dev/api/vehicles/14/",
-      "http://swapi.dev/api/vehicles/30/"
+      "http://swapi.dev/api/vehicles/30/",
     ],
-    "starships": [
+    starships: [
       "http://swapi.dev/api/starships/12/",
-      "http://swapi.dev/api/starships/22/"
+      "http://swapi.dev/api/starships/22/",
     ],
-    "created": "2014-12-09T13:50:51.644000Z",
-    "edited": "2014-12-20T21:17:56.891000Z",
-    "url": "http://swapi.dev/api/people/1/"
+    created: "2014-12-09T13:50:51.644000Z",
+    edited: "2014-12-20T21:17:56.891000Z",
+    url: "http://swapi.dev/api/people/1/",
   },
   {
-    "name": "C-3PO",
-    "height": "167",
-    "mass": "75",
-    "hair_color": "n/a",
-    "skin_color": "gold",
-    "eye_color": "yellow",
-    "birth_year": "112BBY",
-    "gender": "n/a",
-    "homeworld": "http://swapi.dev/api/planets/1/",
-    "films": [
+    name: "C-3PO",
+    height: "167",
+    mass: "75",
+    hair_color: "n/a",
+    skin_color: "gold",
+    eye_color: "yellow",
+    birth_year: "112BBY",
+    gender: "n/a",
+    homeworld: "http://swapi.dev/api/planets/1/",
+    films: [
       "http://swapi.dev/api/films/1/",
       "http://swapi.dev/api/films/2/",
       "http://swapi.dev/api/films/3/",
       "http://swapi.dev/api/films/4/",
       "http://swapi.dev/api/films/5/",
-      "http://swapi.dev/api/films/6/"
+      "http://swapi.dev/api/films/6/",
     ],
-    "species": ["http://swapi.dev/api/species/2/"],
-    "vehicles": [],
-    "starships": [],
-    "created": "2014-12-10T15:10:51.357000Z",
-    "edited": "2014-12-20T21:17:50.309000Z",
-    "url": "http://swapi.dev/api/people/2/"
+    species: ["http://swapi.dev/api/species/2/"],
+    vehicles: [],
+    starships: [],
+    created: "2014-12-10T15:10:51.357000Z",
+    edited: "2014-12-20T21:17:50.309000Z",
+    url: "http://swapi.dev/api/people/2/",
   },
   {
-    "name": "R2-D2",
-    "height": "96",
-    "mass": "32",
-    "hair_color": "n/a",
-    "skin_color": "white, blue",
-    "eye_color": "red",
-    "birth_year": "33BBY",
-    "gender": "n/a",
-    "homeworld": "http://swapi.dev/api/planets/8/",
-    "films": [
+    name: "R2-D2",
+    height: "96",
+    mass: "32",
+    hair_color: "n/a",
+    skin_color: "white, blue",
+    eye_color: "red",
+    birth_year: "33BBY",
+    gender: "n/a",
+    homeworld: "http://swapi.dev/api/planets/8/",
+    films: [
       "http://swapi.dev/api/films/1/",
       "http://swapi.dev/api/films/2/",
       "http://swapi.dev/api/films/3/",
       "http://swapi.dev/api/films/4/",
       "http://swapi.dev/api/films/5/",
-      "http://swapi.dev/api/films/6/"
+      "http://swapi.dev/api/films/6/",
     ],
-    "species": ["http://swapi.dev/api/species/2/"],
-    "vehicles": [],
-    "starships": [],
-    "created": "2014-12-10T15:11:50.376000Z",
-    "edited": "2014-12-20T21:17:50.311000Z",
-    "url": "http://swapi.dev/api/people/3/"
+    species: ["http://swapi.dev/api/species/2/"],
+    vehicles: [],
+    starships: [],
+    created: "2014-12-10T15:11:50.376000Z",
+    edited: "2014-12-20T21:17:50.311000Z",
+    url: "http://swapi.dev/api/people/3/",
   },
   {
-    "name": "Darth Vader",
-    "height": "202",
-    "mass": "136",
-    "hair_color": "none",
-    "skin_color": "white",
-    "eye_color": "yellow",
-    "birth_year": "41.9BBY",
-    "gender": "male",
-    "homeworld": "http://swapi.dev/api/planets/1/",
-    "films": [
+    name: "Darth Vader",
+    height: "202",
+    mass: "136",
+    hair_color: "none",
+    skin_color: "white",
+    eye_color: "yellow",
+    birth_year: "41.9BBY",
+    gender: "male",
+    homeworld: "http://swapi.dev/api/planets/1/",
+    films: [
       "http://swapi.dev/api/films/1/",
       "http://swapi.dev/api/films/2/",
       "http://swapi.dev/api/films/3/",
-      "http://swapi.dev/api/films/6/"
+      "http://swapi.dev/api/films/6/",
     ],
-    "species": [],
-    "vehicles": [],
-    "starships": ["http://swapi.dev/api/starships/13/"],
-    "created": "2014-12-10T15:18:20.704000Z",
-    "edited": "2014-12-20T21:17:50.313000Z",
-    "url": "http://swapi.dev/api/people/4/"
-  }
-]
+    species: [],
+    vehicles: [],
+    starships: ["http://swapi.dev/api/starships/13/"],
+    created: "2014-12-10T15:18:20.704000Z",
+    edited: "2014-12-20T21:17:50.313000Z",
+    url: "http://swapi.dev/api/people/4/",
+  },
+];
 ```
 
 - Créer un fichier `src/model/person.ts` contenant le type suivant :
@@ -240,7 +240,6 @@ export type Person = {
 
 - Modifier les données / le type (temporairement) pour faire apparaître des erreurs TypeScript
 
-
 ## PW3 - Tests unitaires
 
 :::note
@@ -248,9 +247,9 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 
 - [Vitest](https://vitest.dev/)
 - [React testing library](https://testing-library.com/docs/react-testing-library/intro/)
-:::
+  :::
 
-Dans ce TP, nous allons ajouter des tests unitaires dans notre application. 
+Dans ce TP, nous allons ajouter des tests unitaires dans notre application.
 
 Nous le faisons si tôt dans cette formation, afin de vous laissez l'opportunité d'écrire vos tests au fur et à mesure des travaux pratiques.
 
@@ -266,7 +265,7 @@ En :
 - créer une configuration vitest dans le fichier `vitest.config.ts`
 - ajoutant un fichier `App.test.tsx` dans `src`
 
-## PW4 - EcmaScript "moderne"
+## PW4 - EcmaScript moderne
 
 - Créer un fichier `src/utils/es6.spec.ts` avec le contenu suivant :
 
@@ -372,7 +371,7 @@ export const addOneForLastElement = (arr: Persons): Partial<Person> => {
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [Bulma](https://bulma.io/)
-:::
+  :::
 
 ### Thème CSS
 
@@ -400,7 +399,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 - Modifier le contenu du fichier `index.html` avec le contenu suivante :
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -437,8 +436,7 @@ export default App;
 
 ### Créer un composant
 
-Dans cette section, nous allons créer un composant permettant d'afficher des personnages de Star Wars. 
-
+Dans cette section, nous allons créer un composant permettant d'afficher des personnages de Star Wars.
 
 - Créer un composant dans `src/components/PeopleTable.tsx`
 - Importer la liste des personnages
@@ -496,7 +494,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 
 - [https://fr.reactjs.org/docs/hooks-intro.html](Hook)
 - [Les boutons avec Bulma](https://bulma.io/documentation/elements/button/)
-:::
+  :::
 
 ### Filtrer le tableau
 
@@ -628,7 +626,7 @@ const { data, loading, error } = useFetch(`url`);
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [API Context](https://react.dev/learn/passing-data-deeply-with-context)
-:::
+  :::
 
 Nous pouvons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
 
@@ -713,7 +711,7 @@ Un fois installée, suivez les étapes suivantes afin d'implémenter le fonction
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [react-i18next](https://react.i18next.com/)
-:::
+  :::
 
 Dans cette partie, nous allons internationaliser l'application.
 
@@ -790,7 +788,7 @@ Une fois cette configuration réalisée, nous allons à présent pouvoir intégr
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [Formik](https://formik.org/)
-:::
+  :::
 
 Afin de mettre en place **Formik** sur notre application, un TP a été ajouté permettant de s'initier à ce module.
 
@@ -815,7 +813,7 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 
 - [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/installation)
 - [Le server state facile avec Tanstack Query](https://www.youtube.com/watch?v=kNaBVAdwbR4)
-:::
+  :::
 
 Nous allons remplacer nos appels API jusque là simplement exécutés via `fetch` par les méthodes de `TanStack`.
 
@@ -838,8 +836,9 @@ Nous allons remplacer nos appels API jusque là simplement exécutés via `fetch
 ## PW19 - Zustand
 
 :::note
+
 - [Zustand](https://github.com/pmndrs/zustand)
-:::
+  :::
 
 Nous avons utilisé l'API `context` pour gérer les likes jusqu'ici.
 Dans cette partie, nous allons externaliser la gestion des états des likes dans un state manager : Zustand.
@@ -851,8 +850,9 @@ Dans cette partie, nous allons externaliser la gestion des états des likes dans
 ## PW20 - Storybook
 
 :::note
+
 - [Storybook](https://storybook.js.org/tutorials/intro-to-storybook/react/en/get-started/)
-:::
+  :::
 
 - Ajouter `Storybook` à votre projet :
 
@@ -874,7 +874,7 @@ npm run storybook
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 - [Cypress](https://www.cypress.io/)
-:::
+  :::
 
 Nous allons à présent ajouter des tests Cypress. Pour cela, il est d'abord nécéssaire d'installer la dépendance.
 

@@ -47,17 +47,18 @@ css: unocss
 
 # Control Flow
 
-* Depuis Angular 17, nous avons à notre disposition des nouvelels syntaxes pour dynamiser un template 
-  * **@if** **else**
-  * **for**
+- Depuis Angular 17, nous avons à notre disposition des nouvelels syntaxes pour dynamiser un template
 
-* Ces syntaxes remplacent le système de directives structurelles ngIg, ngFor ou ngSwitch
+  - **@if** **else**
+  - **for**
+
+- Ces syntaxes remplacent le système de directives structurelles ngIg, ngFor ou ngSwitch
 
 ```html
 @if(isAdmin){
-  <admin-dashboard></admin-dashboard>
+<admin-dashboard></admin-dashboard>
 } @else {
-  <public-dashboard></public-dashboard>
+<public-dashboard></public-dashboard>
 }
 ```
 
@@ -66,17 +67,8 @@ css: unocss
 # Switch
 
 ```html
-@switch (condition) {
-  @case (caseA) {
-    Case A.
-  }
-  @case (caseB) {
-    Case B.
-  }
-  @default {
-    Default case.
-  }
-}
+@switch (condition) { @case (caseA) { Case A. } @case (caseB) { Case B. }
+@default { Default case. } }
 ```
 
 ---
@@ -93,8 +85,18 @@ import { Component } from "@angular/core";
   selector: "app-root",
   template: `
     <ul>
-      @for (person of people; let i = $index; let isFirst = $first; let isLast = $last; let isOdd = $odd; let isEven = $even) {
-        <li>{{ person }} {{ i }} {{ isFirst }} {{ isLast }} {{ isOdd }} {{ isEven }}</li>
+      @for (
+        person of people;
+        let i = $index;
+        let isFirst = $first;
+        let isLast = $last;
+        let isOdd = $odd;
+        let isEven = $even
+      ) {
+        <li>
+          {{ person }} {{ i }} {{ isFirst }} {{ isLast }} {{ isOdd }}
+          {{ isEven }}
+        </li>
       }
     </ul>
   `,
@@ -129,7 +131,7 @@ import { Component } from "@angular/core";
   `,
 })
 export class RootComponent {
-  people: string[] = [{id: 0, label: "Joe"}];
+  people: string[] = [{ id: 0, label: "Joe" }];
 }
 ```
 
@@ -224,6 +226,36 @@ export class TypeDirective {
 ```
 
 ---
+
+# Directive Composition API
+
+- Cet API permet d'activer des **directives** existantes sur le **host** d'un composat
+- Et ainsi bénécier de tout le fonctionnelle de ces **directives**
+
+```typescript
+@Component({
+  selector: "app-toggle",
+  hostDirectives: [
+    {
+      directive: DisableDirective,
+      inputs: ["disableState: disabled"],
+    },
+    {
+      directive: ColorDirective,
+      inputs: ["color"],
+    },
+  ],
+  template: `<label class="switch">
+    <input type="checkbox" />
+    <span class="slider"></span>
+  </label> `,
+})
+export class ToggleComponent {}
+```
+
+```html
+<app-toggle [disabled]="false" color="secondary"></app-toggle>
+```
 
 ---
 
@@ -389,7 +421,10 @@ import { API_URL } from "./app.module";
   providedIn: "root",
 })
 export class UserService {
-  constructor(private http: HttpClient, @Inject(API_URL) private apiUrl: string) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(API_URL) private apiUrl: string
+  ) {}
 
   getUsers() {
     return this.http.get(`${this.apiUrl}/users`);
@@ -409,7 +444,8 @@ export function provideFeatureFlags(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {
       provide: APP_INITIALIZER,
-      useFactory: (service: FeatureFlagService) => service.initializeFeatureFlags(),
+      useFactory: (service: FeatureFlagService) =>
+        service.initializeFeatureFlags(),
       deps: [FeatureFlagService],
       multi: true,
     },
@@ -435,7 +471,12 @@ export const appConfig: ApplicationConfig = {
 # Reactivité - Signals
 
 - Depuis Angular 16, l'API des **Signals** est en _Developer Preview_
-
+  - signal
+  - computed
+  - input
+  - viewChild, viewChildren, contentChild, contentChildren,
+  - resource
+  - linkedSignal 
 ---
 
 ---
@@ -509,14 +550,21 @@ export const appConfig: ApplicationConfig = {
 - Nous pouvons définir ds intercepteurs afin de manipuler les requêtes et réponses HTTP
 
 ```typescript
-import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from "@angular/common/http";
+import {
+  HttpHandlerFn,
+  HttpInterceptorFn,
+  HttpRequest,
+} from "@angular/common/http";
 import { retry, RetryConfig } from "rxjs";
 
-export const retryInterceptor = (config: RetryConfig) => (req: HttpRequest<unknown>, next: HttpHandlerFn) =>
-  next(req).pipe(retry(config));
+export const retryInterceptor =
+  (config: RetryConfig) => (req: HttpRequest<unknown>, next: HttpHandlerFn) =>
+    next(req).pipe(retry(config));
 
 bootstrapApplication(AppComponent, {
-  providers: [provideHttpClient(withInterceptors([retryInterceptor({ count: 1 })]))],
+  providers: [
+    provideHttpClient(withInterceptors([retryInterceptor({ count: 1 })])),
+  ],
 }).catch((error) => console.error(err));
 ```
 
@@ -594,7 +642,8 @@ const routes: Routes = [
 const routes: Routes = [
   {
     path: "admin",
-    loadChildren: () => import("./admin/admin.module").then((m) => m.AdminModule),
+    loadChildren: () =>
+      import("./admin/admin.module").then((m) => m.AdminModule),
   },
 ];
 ```
@@ -694,7 +743,10 @@ export const routes: Routes = [
 export class ProductResolver implements Resolve<Observable<Product>> {
   constructor(private service: ProductService) {}
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Product> {
+  resolve(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<Product> {
     const productId = this.route.snapshot.paramMap.get("productId");
 
     return this.service.getProduct(productId);
@@ -754,7 +806,10 @@ export class ProductComponent implements OnInit, OnDestroy {
   public product: Product;
   private productSubscription: Subscription;
 
-  constructor(private productsService: ProductsService, private route: ActivatedRoute) {
+  constructor(
+    private productsService: ProductsService,
+    private route: ActivatedRoute
+  ) {
     this.productSubscription = this.route.data.subscribe((data) => {
       this.product = data.product;
     });
@@ -770,13 +825,13 @@ export class ProductComponent implements OnInit, OnDestroy {
 
 # Guards et Resolvers
 
-* Nous pouvons configurer à quel moment les guards et resolvers doivent s'exécuter. 
-* Plusieurs valeurs sont possibles 
-  * always
-  * paramsChange
-  * paramsOrQueryParamsChange
-  * pathParamsChange
-  * pathParamsOrQueryParamsChange
+- Nous pouvons configurer à quel moment les guards et resolvers doivent s'exécuter.
+- Plusieurs valeurs sont possibles
+  - always
+  - paramsChange
+  - paramsOrQueryParamsChange
+  - pathParamsChange
+  - pathParamsOrQueryParamsChange
 
 ```typescript
 const routes: Routes = [
@@ -789,7 +844,6 @@ const routes: Routes = [
     },
   },
 ];
-
 ```
 
 ---
@@ -837,26 +891,27 @@ const routes: Routes = [
 
 # Tests Unitaires
 
-* Pourquoi Jest et Testing Library ?
+- Pourquoi Jest et Testing Library ?
 
-* Jest :
-  * Framework de test JavaScript populaire.
-  * Prise en charge de l'ensemble du cycle de vie du test.
-  * Simple à configurer et à utiliser.
+- Jest :
 
-* Testing Library :
-  * Met l'accent sur le test de comportement utilisateur.
-  * Facilite la création de tests plus robustes et maintenables.
-  * Encourage les tests orientés utilisateur.
+  - Framework de test JavaScript populaire.
+  - Prise en charge de l'ensemble du cycle de vie du test.
+  - Simple à configurer et à utiliser.
+
+- Testing Library :
+  - Met l'accent sur le test de comportement utilisateur.
+  - Facilite la création de tests plus robustes et maintenables.
+  - Encourage les tests orientés utilisateur.
 
 ```typescript
-import { render } from '@testing-library/angular';
-import { MyComponent } from './my-component.component';
+import { render } from "@testing-library/angular";
+import { MyComponent } from "./my-component.component";
 
-describe('MyComponent', () => {
-  test('renders component with correct text', async () => {
+describe("MyComponent", () => {
+  test("renders component with correct text", async () => {
     const { getByText } = await render(MyComponent);
-    expect(getByText('Hello, World!')).toBeTruthy();
+    expect(getByText("Hello, World!")).toBeTruthy();
   });
 });
 ```

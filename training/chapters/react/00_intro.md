@@ -7,6 +7,7 @@ layout: cover
 ---
 
 <table>
+<tbody>
  <tr style="border: 0; font-size: 0.95em">
     <td>
         <ul>
@@ -56,6 +57,7 @@ layout: cover
         </ul>
     </td>
  </tr>
+ </tbody>
 </table>
 
 <div style="text-align: center"><em>(o) : optionnel</em></div>

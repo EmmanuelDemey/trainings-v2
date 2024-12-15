@@ -133,7 +133,7 @@ Dans cette partie pratique, nous allons implémenter un nouveau composant `radio
 
 Il faudra ajouter tous les attributs ARIA et les accés au clavier nécessaire en fonction des guides proposés par la norme WCAG.
 
-## PW 07 : Les composants complexes
+## PW 07 - Les composants complexes
 
 Dans cette partie pratique, nous allons ouvrir une modale suite au `click` sur un ligne du tableau. La modale affichera
 le détail de la personne selectionnée.
