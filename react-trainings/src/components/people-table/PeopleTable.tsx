@@ -4,7 +4,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useLikes } from '../../context';
+import { useLikes } from 'src/store';
 import './table.scss';
 
 type PeopleTableType = {

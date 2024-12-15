@@ -790,9 +790,11 @@ Nous allons remplacer nos appels API jusque là simplement exécutés via `fetch
 
 ## PW18 - Material UI
 
-- Ajouter MUI à votre projet
 - Retirer Bulma de votre projet
-- Intégrer MUI à vos composants UI
+- Ajouter MUI à votre projet :
+  - Créer un `theme`
+  - Instancier le `Provider`
+  - Modifier un / des / les composants UI en utilisant MUI
 
 ## PW19 - Zustand
 
@@ -803,7 +805,7 @@ Nous allons remplacer nos appels API jusque là simplement exécutés via `fetch
 Nous avons utilisé l'API `context` pour gérer les likes jusqu'ici.
 Dans cette partie, nous allons externaliser la gestion des états des likes dans un state manager : Zustand.
 
-- Supprimer tous les objets liés au `context`
+- Supprimer tous les objets liés au `context` des likes
 - Installer `zustand`
 - Créer un store pour gérer les likes
 

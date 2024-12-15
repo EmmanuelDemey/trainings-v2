@@ -3,7 +3,7 @@ import PeopleTable from '@components/people-table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useLikes } from '../context';
+import { useLikes } from 'src/store';
 
 const Home = () => {
 	const { likes } = useLikes();
