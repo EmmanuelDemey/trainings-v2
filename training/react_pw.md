@@ -54,6 +54,45 @@ cd dist
 npx serve
 ```
 
+### Support des path absolus dans vite
+
+Installer le plugin :
+
+```shell
+npm i -D vite-tsconfig-paths
+```
+
+Déclarer le plugin dans la configuration `vite` :
+
+```typescript
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tsconfigPaths()],
+});
+```
+
+Enrichir la configuration du projet dans `tsconfig.app.json` :
+
+```json
+{
+  ...
+  // alias
+  "baseUrl": ".",
+  "paths": {
+    "@components/*": ["src/components/*"],
+    "@pages/*": ["src/pages/*"],
+    "@utils/*": ["src/utils/*"],
+    "@model/*": ["src/model/*"]
+  }
+  ...
+}
+```
+
+
 ### Installation / Configuration de Prettier
 
 - Installer les extensions VS Code pour `prettier` (et `eslint`)
@@ -223,7 +262,7 @@ En :
 
 - installant `vitest` et `react-testing-library`
 - créant un script `test` dans le fichier `package.json`
-- étendant la configuration vite dans le fichier `vite.config.ts`
+- créer une configuration vitest dans le fichier `vitest.config.ts`
 - ajoutant un fichier `App.test.tsx` dans `src`
 
 ## PW4 - EcmaScript moderne
@@ -272,9 +311,16 @@ describe("es6", () => {
   it("returns persons median", () => {
     expect(ES6.getMassAverage([])).toBe(null);
     expect(ES6.getMassAverage([...data, { name: "ko", url: "ko_url" }])).toBe(
-      null
+      null,
     );
     expect(ES6.getMassAverage(data)).toBe(80);
+  });
+  it("returns partial last person with 1 added", () => {
+    expect(Object.keys(ES6.addOneForLastElement([]))).toHaveLength(0);
+    const result = ES6.addOneForLastElement(data);
+    expect(Object.keys(result)).toHaveLength(2);
+    expect(result.height).toBe("203");
+    expect(result.mass).toBe("137");
   });
 });
 ```
@@ -282,26 +328,38 @@ describe("es6", () => {
 - Créer un fichier `src/utils/es6.ts` avec le contenu suivant :
 
 ```typescript
-import { Persons } from "../model/person";
+import { Person, Persons } from "../model/person";
 
+// Get array of Person length
 export const getLength = (arr: Persons): number => 0;
 
-export const getMales = (arr: Persons): number => 0;
+// Returns only males from array of Person
+export const getMales = (arr: Persons): number => [];
 
+// Return array of names from array of Person
 export const getNames = (arr: Persons): string[] => [];
 
+// Return array of an attribute from array of Person
 export const getAttr =
   (attr: "name" | "url") =>
   (arr: Persons): string[] => [];
 
-export const checkFirstElementKeys = (arr: Persons): string[] | null => [];
+// Returns array of keys of the first Person in array
+export const checkFirstElementKeys = (arr: Persons): string[] | null => null;
 
+// Returns "key: value" for each elements of the last Person in array
 export const buildInfosForLastElement = (arr: Persons): string[] | null => {
   return null;
 };
 
-export const getMassAverage = (arr: Persons): number | null => {
-  return null;
+// Calculate the mass average from the array of Person
+export const getMassAverage = (arr: Persons) => {
+  return 0;
+};
+
+// For last Person, keep elements where value is assignable to numeric, and add one to each field
+export const addOneForLastElement = (arr: Persons): Partial<Person> => {
+  return {};
 };
 ```
 
@@ -470,46 +528,79 @@ En attendant, afin de continuer à structurer notre code, tout en s'amusant avec
 ## PW9 - Récupération de données
 
 :::note
+Documentation :
 
 - [Vite env](https://vitejs.dev/guide/env-and-mode)
-  :::
+
+Attention :
+
+Comparativement aux données fictives, l'API renvoie des attributs en camel case et l'attribut url est remplacée par l'attribut id.
+:::
 
 ### Fetch
 
-- supprimer le fichier `src/fake-data.ts`
-- récupérer la liste des personnes et les attributs d'une personne via l'API
+- récupérer la liste des personnes et les attributs d'une personne via l'API :
+  - créer un composant `PeopleTableContainer`
+  - créer un composant `PersonContainer`
 - gérer l'état de chargement et les erreurs
 
-```javascript
+```typescript
+const [data, setData] = useState(...);
+const [loading, setLoading] = useState(...);
+const [errorMessage, setErrorMessage] = useState(...);
+
+useEffect(() => {fetch(...)}, [...]);
+
 if (loading) {
   return (
     <progress className="progress is-small is-primary" max="100"></progress>
   );
 }
-```
 
-Aide :
-
-- Créer un fichier `src/utils/api-utils.ts` pour héberger l'utilitaire suivant :
-
-```typescript
-// http://swapi.dev/api/people/1/
-function getIDFromUrl(url: string): string {
-  const withoutPrefix = url.replace("https://swapi.dev/api/people/", "");
-  return withoutPrefix.replace("/", "");
+if (errorMessage) {
+  return (
+    <>
+      <div className="icon-text">
+        <span className="icon has-text-danger">
+          <i className="fas fa-ban"></i>
+        </span>
+        <span>Loading error:</span>
+      </div>
+      <p className="block">
+        {errorMessage}
+      </p>
+    </>
+  )
 }
+
+return (...)
 ```
+
+- Bonus : créer des composants `Loader` et `Error` dans `src/components/common` afin de factoriser et déporter ces morceaux d'UI de façon réutilisable et facilement testable.
 
 ### Variables d'environnement
 
 Externaliser la base de l'url de l'API consommée.
-Pour cela, créer un fichier `.env` avec une valeur par défaut, et un fichier `.env.local` surchargeant cette valeur. Utiliser cette variable d'environnement dans vos composants, de sorte que votre code soit portable.
+
+- Créer 2 fichiers, `.env`, `.env.local` à la racine de votre projet
+- Ajouter `VITE_API_BASE_URL=` au fichier `.env`
+- Ajouter `VITE_API_BASE_URL=XXX` au fichier `.env.local`
+- Penser à relancer son serveur à chaque modification de ces fichiers
+- Ajouter l'utilitaire suivant dans `src/utils/env.ts` :
+
+```typescript
+const getEnv = (k: string): string => import.meta.env['VITE_'.concat(k)];
+
+export const API_BASE_URL = getEnv('API_BASE_URL');
+```
+
+- Utiliser cette constante dans vos instanciation de `fetch`
 
 ## PW10 - Périmètres d'erreur
 
-- Ajouter un `ErrorBoundaries` "protégeant" le tableau de façon à ce que la page d'accueil continue de s'afficher même si le tableau ne peut l'être
+- Ajouter un `ErrorBoundaries` "protégeant" le champ de filtrage de façon à ce que la page d'accueil continue de s'afficher même si le composant `PeopleFilter` renvoie une erreur
 
-- Tester en lançant une erreur dans le composant `PeopleTable`
+- Tester en simulant une erreur dans le composant `PeopleFilter`
 
 ## PW11 - Custom hook
 
@@ -518,10 +609,18 @@ Comme seconde partie bonus, nous allons créer un `custom hook`. Ce hook, que no
 Ce hook s'utilisera de cette façon :
 
 ```typescript
-const { data, loading, error } = useFetch();
+const { data, loading, error } = useFetch(`url`);
 ```
 
 ## PW12 - State container - Context
+
+### FilterContext
+
+- Conserver l'état `filter` et le setter `setFilter` et supprimer toutes les `props` passées aux composants enfants
+- Créer un context `FilterContext`, le provider `FilterProvider` et le hook `useFilter` dans `src/context/filter`
+- Instancier le provider avec sa `value` et consommer cette valeur dans les composants enfants ayant besoin des informations
+
+### Bonus - LikeContext
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -529,30 +628,11 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [API Context](https://react.dev/learn/passing-data-deeply-with-context)
   :::
 
-Dans ce TP, nous allons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
+Nous pouvons ajouter la fonctionnalité permettant d'aimer des personnages. Cette information sera centralisée dans un context.
 
 Les actions qui pourront étre exécutées par l'utilisateur sont des actions permettant d'aimer (LIKE) ou ne plus aimer (DISLIKE) un personnage.
 
-- Définir le typage TypeScript des données que nous souhaitons exposer depuis notre context. Nous souhaitons exposer :
-
-  - un object ayant pour clé l'URL des personnages, comme valeur -1, 0 ou 1
-  - une fonction permettant de mettre à jour la valeur pour un personnage
-
-- Créer notre context grâce à la méthode `createContext`.
-
-Dans l'ensemble de notre application, nous allons avoir besoin de deux informations relatives au `store`
-
-- Ajouter le composant `Provider` dans le composant principal de l'application et créer un objet respectant le type défini ci-dessus.
-
-- Dans le composant `Home`, juste en dessous du titre, ajouter le code HTML suivant :
-
-```html
-<h2>Vous aimez X personnages</h2>
-```
-
-Le X devra être remplacer par le nombre de personnes aimés.
-
-- Ajouter une nouvelles colonne dans le tableau de `PeopleTable`. Cette colonne affichera deux boutons permettant d'aimer ou de ne plus aimer un personnage. Si nous n'aimons pas le personnage, nous devons afficer le bouton **I Like**, dans le cas contraire le bouton **I Dislike**.
+- Ajouter une nouvelles colonne dans le tableau de `PeopleTable`. Cette colonne affichera trois boutons permettant d'aimer, de ne plus aimer un personnage ou de réinitialiser.
 
 ```javascript
 <button
@@ -565,16 +645,39 @@ Le X devra être remplacer par le nombre de personnes aimés.
     type="button"
     className="button is-warning"
     onClick={ ... } >
+  Reset
+</button>
+<button
+    type="button"
+    className="button is-warning"
+    onClick={ ... } >
   I Dislike
 </button>
 ```
 
-- Connecter les composants `Home` et `PeopleTable` au context afin d'implémenter le fonctionnement souhaité.
+- Créer un context `LikesContext` dans `src/context/likes`, contenant :
+  - un object `likes` ayant pour clé l'id des personnages, comme valeur -1, 0 ou 1
+  - une fonction `setLikes` permettant de mettre à jour la valeur pour un personnage
+
+- Créer également le provider `LikesProvider` et le hook `useLikes` 
+
+- Instancier le provider avec sa `value` et consommer cette valeur dans les composants enfants ayant besoin des informations
+
+- Dans le composant `Home`, juste en dessous du titre, ajouter le code HTML suivant :
+
+```html
+<h2>Vous aimez X personnage(s)</h2>
+```
+
+Le X devra être remplacer par le nombre de personnes aimés.
 
 ## PW13 - Lazy loading - Suspense
 
 - Créer un composant `Loading` partagé (sous `src/components/common`)
 - Importer de façon "paresseuse" votre page `People`
+- Vérifiez :
+  - que `npm run build` produise un second fichier `*.js`
+  - en actualisant votre app, en allant dans les networks, en les effaçant, en cliquant sur un personnage dans le tableau, que le fichier contenant le code de la page `Person` est chargé
 
 ## PW14 - React Router
 
@@ -589,19 +692,18 @@ Nous allons à présent ajouter une deuxième page à notre application. Cette p
 Vous devez tout d'abord installer la dépendance `react-router-dom`.
 
 ```shell
-npm install react-router-dom
+npm install react-router-dom@^6.0.0
+# installer la dernière version 6.X.X tant que la v7 est buggée (TS issue)
 ```
 
 Un fois installée, suivez les étapes suivantes afin d'implémenter le fonctionnel souhaité :
 
 - Supprimer l'état permettant de gérer les pages jusque là
-- Configurez le router dans le composant principal. Nous souhaitons que le composant `Home` soit affiché par défaut, et le composant `Person` si l'url est égale à `/person/:id`. La route de `Person` devra être lazy loadée.
+- Créer une configuration de routing dans `src/router`
+- Instancier le `RouterProvider` dans `src/App`. Nous souhaitons que le composant `Home` soit affiché par défaut sur la route `/`, et le composant `Person` lorsque l'url respecte le pattern `/person/:id`. La route de `Person` devra être lazy loadée
+- Ajouter un composant `src/components/common/NotFound` pour les autres routes
 - Ajoutez un lien dans le composant `PeopleTable` permettant de faire la redirection
 - Corrigé le composant `Person`
-
-L'API utilisée ne retourne pas d'identifiant pour les objets.
-Vous pouvez tout de même en calculer un en se basant sur la propriété `url` de l'objet.
-Pour cela, vous pouvez utiliser la fonction suivante :
 
 ## PW15 - Internationalisation
 
@@ -694,9 +796,10 @@ Afin de mettre en place **Formik** sur notre application, un TP a été ajouté 
 - Créer une page `src/pages/Create.tsx`
 - Implémenter un formulaire avec les contraintes suivantes :
   - Le nom est obligatoire
-  - La propriété _hair_color_ doit utiliser un composant _select_
+  - La propriété _height_ est un entier compris entre 0 et 250
+  - La propriété _hairColor_ doit utiliser un composant _select_
   - La propriété _gender_ doit utiliser des _radios_
-  - La propriété _height_ doit obligatoirement être supérieur à 0
+  - La propriété _birthYear_ est un datepicker
 
 Afin d'améliorer notre formulaire, vous devez également ajouter les messages d'erreurs adéquates.
 
@@ -708,18 +811,27 @@ Afin d'améliorer notre formulaire, vous devez également ajouter les messages d
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-- [TanStack Query](https://tanstack.com/query/latest/docs/react/overview)
-- [TanStack Query v4](https://www.learnwithjason.dev/tanstack-query-v4)
+- [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/installation)
 - [Le server state facile avec Tanstack Query](https://www.youtube.com/watch?v=kNaBVAdwbR4)
   :::
 
-Dans cette partie théorique, nous allons mettre en place **TanStack Query** afin de s'assurer qu'aucune requête n'est faite en double (requêtes récupérant la liste des personnages et celles récupérant un personnage)
+Nous allons remplacer nos appels API jusque là simplement exécutés via `fetch` par les méthodes de `TanStack`.
+
+- Instancier un `QueryClient`
+- Déclarer un `QueryClientProvider`
+- Remplacer les appels de `useFetch` par `useQuery`, l'appel `POST` par `useMutation`
+- Configurer `TanStack` pour que la liste de la page d'accueil soit :
+  - rafraichie automatiquement toutes les X secondes
+  - chargée une fois au plus toutes les Y secondes
+- Vérifier dans les devtools, onglet network, que cela fonctionne
 
 ## PW18 - Material UI
 
-- Ajouter MUI à votre projet
 - Retirer Bulma de votre projet
-- Intégrer MUI à vos composants UI
+- Ajouter MUI à votre projet :
+  - Créer un `theme`
+  - Instancier le `Provider`
+  - Modifier un / des / les composants UI en utilisant MUI
 
 ## PW19 - Zustand
 
@@ -731,7 +843,7 @@ Dans cette partie théorique, nous allons mettre en place **TanStack Query** afi
 Nous avons utilisé l'API `context` pour gérer les likes jusqu'ici.
 Dans cette partie, nous allons externaliser la gestion des états des likes dans un state manager : Zustand.
 
-- Supprimer tous les objets liés au `context`
+- Supprimer tous les objets liés au `context` des likes
 - Installer `zustand`
 - Créer un store pour gérer les likes
 
@@ -742,10 +854,21 @@ Dans cette partie, nous allons externaliser la gestion des états des likes dans
 - [Storybook](https://storybook.js.org/tutorials/intro-to-storybook/react/en/get-started/)
   :::
 
-- Instancier `Storybook`
-- Écrire une / des story(ies) pour vos composants UI
+- Ajouter `Storybook` à votre projet :
 
-## PW21 Cypress
+```shell
+npx storybook@latest init
+```
+
+- S'inspirer des éléments du dossier `src/stories` pour créer une story documentant nos composants UI
+
+- Lancer `Storybook` :
+
+```
+npm run storybook
+```
+
+# PW21 - Cypress
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -776,11 +899,258 @@ Vous devez à présent supprimer les tests générés et créer vos propres test
 
 - Ajouter un fichier `.eslintignore` à la racine du projet pour exclure le linting pour le code auto-généré par Cypress
 
-## PW 22 Docker & Kubernetes
+# PW22 - Docker & Kubernetes
 
-En utilisant les slides :
+## Docker
 
-- installer et configurer `vite-envs`
-- créer un fichier `Dockerfile`
-- builder votre image Docker
-- lancer votre image Docker
+- Installation de `vite-envs` :
+
+```shell
+npm i -D vite-envs
+```
+
+- Supprimer le préfixe `VITE_` dans les fichiers `.env`
+
+- Ajouter un script :
+
+```json
+{
+  ...
+  "postinstall": "vite-envs update-types"
+  ...
+}
+```
+
+- Mettre à jour le fichier `src/utils/env.ts` :
+
+```typescript
+export const API_BASE_URL = import.meta.env['API_BASE_URL'];
+```
+
+- À la racine du projet, ajouter les fichiers suivants avec les contenus associés :
+ - `.dockerignore` :
+
+```bash
+node_modules
+
+dist
+
+.git
+.gitignore
+
+.env.local
+
+# IDE settings
+.idea
+.vscode
+
+yarn-error.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+```
+
+  - `nginx.conf` :
+
+```bash
+server {
+    listen 8080;
+
+    gzip on; 
+    gzip_vary on; 
+    gzip_min_length 1024; 
+    gzip_proxied expired no-cache no-store private auth; 
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/javascript application/xml; 
+    gzip_disable "MSIE [1-6]\.";
+
+    root /usr/share/nginx/html;
+    index index.html;      
+
+    try_files $uri $uri/ /index.html;
+
+    # Vite generates filenames with hashes so we can
+    # tell the browser to keep in cache the resources.
+    location ^~ /static/ {
+        try_files $uri =404;
+        expires 1y;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    location ~* \.(html|json|txt)$ {
+        try_files $uri =404;
+        expires -1;  # No cache for these file types
+    }
+}
+```
+
+ - `Dockerfile` :
+
+```bash
+ # build environment
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY . .
+RUN yarn install --frozen-lockfile
+RUN yarn build
+
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /usr/share/nginx/html
+COPY --from=build /app/dist .
+ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
+```
+
+- Contruisez votre image docker, à la racine exécuter :
+
+```bash
+docker build . -t react-trainings
+```
+
+- Instancier localement votre image docker en définissant avec la variable d'environnement :
+
+```bash
+docker run -p 80:8080 --env API_BASE_URL="URL" react-trainings
+```
+
+- Vous pouvez également mettre en place une action Github pour construire et pousser votre image docker sur dockerhub :
+  - Ajouter `DOCKERHUB_USERNAME` et `DOCKERHUB_TOKEN` dans les secrets de votre repository Github
+  - Dans le fichier `.github/workflows/deploy-app-docker.yml` ajouter :
+
+```bash
+name: Deploy React training app to Docker Hub
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  dockerhub:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies and build
+        run: |
+          cd trainings-v2/react-trainings
+          yarn
+          yarn build
+          cd ..
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./trainings-v2/react-trainings
+          file: ./trainings-v2/react-trainings/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/react-trainings:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/react-trainings:latest
+```
+
+## Kubernetes
+
+- Installer le cli `kubectl`
+
+- Définir les 3 objets suivants dans un dossier `.kubernetes` :
+  - `Deployment.yml` :
+
+```bash
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-trainings
+  labels:
+    app: react-trainings
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-trainings
+  template:
+    metadata:
+      labels:
+        app: react-trainings
+    spec:
+      containers:
+        - name: react-trainings
+          image: nicolaval/react-trainings:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: API_BASE_URL
+              value: ''
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '50m'
+            limits:
+              memory: '128Mi'
+              cpu: '200m'
+```
+
+  - `Service.yml` :
+
+```bash
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: react-trainings
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: react-trainings.example.com # Replace by your custom URL
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: react-trainings
+                port:
+                  number: 8080
+```
+
+  - `Ingress.yml` :
+
+```bash
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-trainings
+spec:
+  selector:
+    app: react-trainings
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+```
+
+- Instancier les objets dans un cluster :
+
+```bash
+cd .kubernetes
+kubectl apply -f .
+```

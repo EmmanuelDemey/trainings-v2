@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-trainings
+  labels:
+    app: react-trainings
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-trainings
+  template:
+    metadata:
+      labels:
+        app: react-trainings
+    spec:
+      containers:
+        - name: react-trainings
+          image: nicolaval/react-trainings:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: API_BASE_URL
+              value: ''
+          resources:
+            requests:
+              memory: '64Mi'
+              cpu: '50m'
+            limits:
+              memory: '128Mi'
+              cpu: '200m'
