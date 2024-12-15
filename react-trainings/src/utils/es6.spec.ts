@@ -32,9 +32,9 @@ describe("es6", () => {
     expect(keys).toContain("id");
     expect(keys).not.toContain("dummy");
   });
-  it("build an array with `key: value` elements for last person and check `skin_color: white` is in", () => {
+  it("build an array with `key: value` elements for last person and check `skinColor: white` is in", () => {
     expect(ES6.buildInfosForLastElement([])).toBeNull();
-    expect(ES6.buildInfosForLastElement(data)).toContain("skin_color: white");
+    expect(ES6.buildInfosForLastElement(data)).toContain("skinColor: white");
   });
   it("returns persons median", () => {
     expect(ES6.getMassAverage([])).toBe(null);
