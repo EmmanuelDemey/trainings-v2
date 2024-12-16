@@ -45,6 +45,21 @@ const App = () => {
 export default App;
 ```
 
+* Depuis **React 19**, nous pouvons utiliser directement l'élément **ThemeContext** plutôt que **ThemeContext.Provider**
+
+```typescript
+import { ThemeContext, themes } from './context';
+
+const App = () => {
+    return (
+        <ThemeContext value={themes.light}>
+            <Toolbar changeTheme={this.toggleTheme} />
+        </ThemeContext>
+    )
+}
+export default App;
+```
+
 ---
 
 # Abonnement au context
