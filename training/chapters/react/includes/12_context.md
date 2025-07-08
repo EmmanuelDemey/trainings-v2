@@ -1,26 +1,24 @@
 # Context
 
-* Un context un objet natif de React permettant de propager de la donnée sur tous les éléments d'un arbre
-* Cette syntaxe permet d'éviter le passage de `props` de composant en composant
-* Tous les `consumer` seront regénéres si le context change
-* Ce mécanisme se base sur deux concepts :
-    * `Provider` : ou la donnée est centralisée
-    * `Consumer` : client permettant d'intéragir avec cette donnée
+- Un context un objet natif de React permettant de propager de la donnée sur tous les éléments d'un arbre
+- Cette syntaxe permet d'éviter le passage de `props` de composant en composant
+- Tous les `consumer` seront regénéres si le context change
+- Ce mécanisme se base sur deux concepts :
+  - `Provider` : ou la donnée est centralisée
+  - `Consumer` : client permettant d'intéragir avec cette donnée
 
 ---
 
 # Création du context
 
-* Voici comment nous devons créer un **Context** 
+- Voici comment nous devons créer un **Context**
 
 ```typescript
-import { createContext } from 'react';
+import { createContext } from "react";
 
 export const themes: Record<string, Theme> = {
-  light: {
-  },
-  dark: {
-  },
+  light: {},
+  dark: {},
 };
 
 export const ThemeContext = createContext<Theme | undefined>(themes);
@@ -30,53 +28,50 @@ export const ThemeContext = createContext<Theme | undefined>(themes);
 
 # Création du Provider
 
-* Une fois créé, nous pouvons l'utiliser via le **Provider** associé. 
+- Une fois créé, nous pouvons l'utiliser via le **Provider** associé.
 
 ```typescript
 import { ThemeContext, themes } from './context';
 
-const App = () => {
+export const App = () => {
     return (
         <ThemeContext.Provider value={themes.light}>
             <Toolbar changeTheme={this.toggleTheme} />
         </ThemeContext.Provider>
     )
 }
-export default App;
 ```
 
-* Depuis **React 19**, nous pouvons utiliser directement l'élément **ThemeContext** plutôt que **ThemeContext.Provider**
+- Depuis **React 19**, nous pouvons utiliser directement l'élément **ThemeContext** plutôt que **ThemeContext.Provider**
 
 ```typescript
 import { ThemeContext, themes } from './context';
 
-const App = () => {
+export const App = () => {
     return (
         <ThemeContext value={themes.light}>
             <Toolbar changeTheme={this.toggleTheme} />
         </ThemeContext>
     )
 }
-export default App;
 ```
 
 ---
 
 # Abonnement au context
 
-* Nous pouvons consommer cette donnée avec le hook `useContext`
+- Nous pouvons consommer cette donnée avec le hook `useContext`
 
 ```javascript
 const Button = () => {
-    const theme = useContext(ThemeContext);
+  const theme = useContext(ThemeContext);
 
-    return (
-        <button
-            style={{backgroundColor: theme.background}}>
-            Changer le thème
-        </button>
-    );
-}
+  return (
+    <button style={{ backgroundColor: theme.background }}>
+      Changer le thème
+    </button>
+  );
+};
 export default Button;
 ```
 
@@ -84,20 +79,18 @@ export default Button;
 
 # Lecture et Ecriture
 
-* Un context n'est pas limité qu'à de la donnée en lecture seule .
-* Nous pouvons y définir également des fonctions permettant de modifier cette donnée.
+- Un context n'est pas limité qu'à de la donnée en lecture seule .
+- Nous pouvons y définir également des fonctions permettant de modifier cette donnée.
 
 ```javascript
-import { DataContext } from './context';
+import { DataContext } from "./context";
 
 const App = () => {
-    const [data, setData] = useState({ })
-    return (
-        <DataContext.Provider value={ { data, setData } }>
-
-        </DataContext.Provider>
-    )
-}
+  const [data, setData] = useState({});
+  return (
+    <DataContext.Provider value={{ data, setData }}></DataContext.Provider>
+  );
+};
 export default App;
 ```
 
@@ -106,28 +99,27 @@ export default App;
 # Lecture et Ecriture
 
 ```javascript
-import { useContext } from 'react'
-import { DataContext } from './context';
+import { useContext } from "react";
+import { DataContext } from "./context";
 
 const Form = () => {
-    const { data, setData}  = useContext(DataContext)
-    return (
-        <label>
-            Name:
-            <input onChange={e => setData({ ...data, name: e.target.value }) } />
-        </label>
-    )
-}
+  const { data, setData } = useContext(DataContext);
+  return (
+    <label>
+      Name:
+      <input onChange={(e) => setData({ ...data, name: e.target.value })} />
+    </label>
+  );
+};
 export default Form;
 ```
-
 
 ---
 
 # Utilisation d'un context avec useReducer
 
-* Nous pouvons bien evidemment utiliser le hook *useReducer* dans un Context
-    * Nous nous approchons de la syntaxe de *Redux* . 
+- Nous pouvons bien evidemment utiliser le hook _useReducer_ dans un Context
+  - Nous nous approchons de la syntaxe de _Redux_ .
 
 ```typescript
 import { TasksContext, TasksDispatchContext } from './TasksContext.js';
@@ -149,16 +141,14 @@ export default function TaskApp() {
 
 # Bonnes pratiques
 
-* Nous recommandons de créer son propre `Provider` et son propre `hook`.
+- Nous recommandons de créer son propre `Provider` et son propre `hook`.
 
 ```typescript
-import { createContext } from 'react';
+import { createContext } from "react";
 
 export const themes = {
-  light: {
-  },
-  dark: {
-  },
+  light: {},
+  dark: {},
 };
 
 const ThemeContext = createContext(
@@ -170,9 +160,35 @@ export const useTheme = () => {
   const context = useContext(ThemeContext);
 
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
 
   return context;
-}
+};
 ```
+
+# Bonnes pratiques
+
+- Vous pouvez également utiliser le pattern **React Hook Factory**
+
+```typescript
+import type { Context } from "react";
+import { useContext } from "react";
+
+const makeSafeUseContext = <T>(
+  context: Context<T>,
+  name: string
+): (() => T) => {
+  return (): T => {
+    const currContext = useContext(context);
+    if (!currContext) {
+      throw new Error(`${name}.Provider was not found in tree`);
+    }
+    return currContext;
+  };
+};
+
+export const useTheme = makeSafeUseContext(ThemeContext, 'ThemeContext);
+```
+
+---
