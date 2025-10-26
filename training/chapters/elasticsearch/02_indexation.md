@@ -432,13 +432,17 @@ POST /_bulk
 
 ---
 
-# Best Practices 
+# Best Practices
 
-- Best Practices
-  - Splitting bulk requests into manageable sizes to avoid overloading the cluster. 
-  - A common practice is to keep the size of a bulk request under 15MB.
-  - Adjusting the refresh rate temporarily for large ingestions can improve performance.
-  - Monitoring the `thread_pool.bulk.queue` and `thread_pool.bulk.rejected` metrics to tune bulk request sizes and intervals.
+- **Batch Size**: Split bulk requests into manageable sizes to avoid overloading the cluster
+  - A common practice is to keep the size of a bulk request between 5MB and 15MB
+  - Test different batch sizes to find the optimal value for your use case
+
+- **Refresh Interval**: Temporarily disable or increase the refresh interval during large ingestions to improve performance
+  - Set to `-1` to disable during bulk indexing
+  - Reset to a reasonable value (e.g., `30s`) after indexing completes
+
+- **Monitoring**: Monitor the `thread_pool.bulk.queue` and `thread_pool.bulk.rejected` metrics to tune bulk request sizes and intervals
 
 ```http
 PUT products/_settings

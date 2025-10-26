@@ -76,13 +76,13 @@ POST /movies/_search
 
 * Full text searches return results sorted by relevance (`score`).
 * Preserving a good score calculation is essential.
-* The default algorithm used is `BM25`, based on `TF/IDF`.
-    * tfidf(t,d,D) = tf(t,d) × idf(t,D)
-    * tf = how many times the searched term `t` appears in document `d`
-    * idf = how many times the term appears in all documents `D`
-    * normalized by the property's size
-    * optionally boosted
-* `_explain` API
+* The default algorithm used is `BM25`, an evolution of `TF/IDF`.
+    * **Formula**: tfidf(t,d,D) = tf(t,d) × idf(t,D)
+    * **TF (Term Frequency)**: How many times the searched term `t` appears in document `d`
+    * **IDF (Inverse Document Frequency)**: Measures how rare the term is across all documents `D`
+    * The score is normalized by the field's length
+    * Can be optionally boosted to increase relevance
+* Use the `_explain` API to understand how scores are calculated
 
 ---
 
@@ -277,9 +277,13 @@ POST /movies/_search
 
 # Filters
 
-* A search will always impact the score calculation.
-* If the score is not useful, it's better to use filters.
-* More performant than searches, no score calculation and results are cached.
+* **Queries** calculate a relevance score for each document
+* **Filters** answer a simple yes/no question: does this document match?
+* Use filters when you don't need relevance scoring (exact matches, ranges, etc.)
+* **Performance benefits**:
+    * No score calculation overhead
+    * Results are cached automatically
+    * Faster execution for boolean conditions
 
 ---
 

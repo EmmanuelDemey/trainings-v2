@@ -180,8 +180,10 @@ POST logs/_search
   "aggs" : {
     "messages" : {
         "filters" : {
-            "errors" :   { "match" : { "body" : "error"   }},
-            "warnings" : { "match" : { "body" : "warning" }}
+            "filters": {
+                "errors" :   { "match" : { "body" : "error"   }},
+                "warnings" : { "match" : { "body" : "warning" }}
+            }
         }
     }
   }
@@ -293,9 +295,7 @@ POST /museums/_search?size=0
 {
     ...
     "aggregations": {
-        "
-
-rings_around_amsterdam" : {
+        "rings_around_amsterdam" : {
             "buckets": [
                 {
                     "key": "*-100000.0",

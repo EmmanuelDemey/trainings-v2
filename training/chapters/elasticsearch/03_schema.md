@@ -251,7 +251,7 @@ POST /movies/_doc
 ```
 POST movies/_search
 {
-    "query" {
+    "query": {
         "bool":{
             "must": [
                 { "match": {"directors.firstName": "Charlie" }},
@@ -289,8 +289,10 @@ PUT movies
 
 # Dynamic Templates
 
-* There is an API for defining dynamic templates.
-* We do not recommend it because only you know the structure of your data.
+* Dynamic templates allow automatic mapping of new fields based on patterns.
+* While useful for prototyping, it's recommended to define explicit mappings in production.
+* Only you know the exact structure and requirements of your data.
+* Use dynamic templates cautiously and validate the generated mappings.
 
 ```
 PUT movies

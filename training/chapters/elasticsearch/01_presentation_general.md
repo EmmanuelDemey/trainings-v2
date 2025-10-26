@@ -62,7 +62,7 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
 
 # Elastic Stack
 
-* The Elastic Stack is currently in version 8.12.0.
+* The Elastic Stack is currently in version 9.2.0.
 * The suite is composed of several products:
     * Elasticsearch
     * Kibana
@@ -128,7 +128,7 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
     * GCP, AWS, Clevercloud Marketplace, etc.
 
 ```shell
-docker run -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:9.2.0
 ```
 
 ---
@@ -224,14 +224,13 @@ xpack.security.enabled: true
 
 # Nodes
 
-* A node can be of different types
-    * master
-    * data
-    * ingest
-    * machine learning
-    * transformer
-    * cross cluster
-    * ...
+* A node can be of different types:
+    * **master**: Manages cluster state and coordinates cluster-wide operations
+    * **data**: Stores data and executes data-related operations (search, aggregations)
+    * **ingest**: Preprocesses documents before indexing
+    * **machine learning**: Executes machine learning jobs
+    * **transform**: Runs continuous transforms
+    * **coordinating**: Routes requests and merges results (default role)
 
 ---
 
