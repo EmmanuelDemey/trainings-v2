@@ -8,25 +8,26 @@ layout: cover
 layout: statement
 ---
 
-De manière générale, utilisez toujours la balise HTML qui est dédiée à l'interraction que vous souhaitez implémenter.
+De manière générale, utilisez toujours la balise HTML qui est dédiée à l'interaction que vous souhaitez implémenter.
 
 ---
 
 # HTML
 
-* Pour développer un site web :
-    * ecrivez tout d'abord le code HTML
+* Pour développer un site web accessible :
+    * écrivez tout d'abord le code HTML sémantique
     * ajoutez le style ensuite avec du CSS
-    * enfin dynamisez avec du Javascript.
-* Pour s'assurer que les fondations de votre page sont bonnes. 
+    * enfin dynamisez avec du JavaScript
+* Cette approche garantit que les fondations de votre page sont solides
+* **Progressive Enhancement** : le contenu reste accessible même sans CSS/JS 
 
 ---
 
 
 # HTML - Les bases
 
-* Nous devons définir un *DOCTYPE* valide pour chaque page
-* Ainsi qu'un *encoding*
+* Nous devons définir un **DOCTYPE** valide pour chaque page
+* Ainsi qu'un **encoding** (UTF-8 recommandé)
 
 ```html
 <!doctype html>
@@ -46,11 +47,13 @@ De manière générale, utilisez toujours la balise HTML qui est dédiée à l'i
 
 # Langue
 
-* Nous devons définir la langue du document dans la balise *html*.
+* Nous devons définir la langue du document dans la balise `html`
+* **Critère WCAG 3.1.1** (niveau A) : La langue de la page doit être définie
 * Ceci aura un impact sur :
-    * l'accent utilisé par les synthétiseurs vocaux
-    * la traduction
-    * l'auto correction
+    * l'accent et la prononciation utilisés par les lecteurs d'écran
+    * la traduction automatique du navigateur
+    * l'auto-correction et la vérification orthographique
+    * la césure des mots (hyphenation)
 
 ```html
 <html lang="en">
@@ -60,9 +63,9 @@ De manière générale, utilisez toujours la balise HTML qui est dédiée à l'i
 
 ---
 
-# Langue
+# Langue - Césure
 
-* Cette propriété sera également utilisée pour l'utilisation de l'attribut CSS *hyphens*
+* L'attribut `lang` est également utilisé pour la césure automatique avec la propriété CSS `hyphens`
 
 ```css
 p {
@@ -73,9 +76,10 @@ p {
 ---
 
 
-# Langue
+# Langue - Changement de langue
 
-* Si une partie du site utilise une autre langue, vous pouvez utiliser cette même propriété sur l'ensemble des éléments HTML.
+* Si une partie du site utilise une autre langue, vous pouvez utiliser l'attribut `lang` sur n'importe quel élément HTML
+* **Critère WCAG 3.1.2** (niveau AA) : Les changements de langue doivent être indiqués
 
 ```html
 <div lang="en">
@@ -88,9 +92,10 @@ p {
 
 # Identifiants
 
-* La propriété *id* d'un élément doit être unique.
-* Quand vous développez des composants avec un framework, éviter de mettre des identifiants dans vos composants, car vous ne savez pas combien de fois votre composant va être utilisé dans la page.
-* À ne pas faire !
+* L'attribut `id` d'un élément **doit être unique** dans toute la page
+* Quand vous développez des composants avec un framework, évitez de mettre des identifiants statiques dans vos composants, car vous ne savez pas combien de fois votre composant va être instancié dans la page
+* Solution : générez des IDs uniques dynamiquement
+* **⚠️ À ne pas faire :**
 
 ```html
 <input id="name" name="lastName"/>
@@ -109,13 +114,15 @@ p {
 
 # Landmarks
 
-* Depuis HTML5, de nouvelles balises sont disponibles afin de structure une page
-    * header
-    * search (tout nouveau)
-    * nav
-    * main
-    * aside
-    * footer
+* Depuis HTML5, de nouvelles balises sont disponibles afin de structurer une page
+* Ces balises définissent les **régions** de votre page
+* Permettent aux utilisateurs de lecteurs d'écran de naviguer rapidement
+    * `header` : en-tête de la page ou d'une section
+    * `search` : zone de recherche (tout nouveau, HTML 2023)
+    * `nav` : navigation principale ou secondaire
+    * `main` : contenu principal (unique par page)
+    * `aside` : contenu complémentaire ou barre latérale
+    * `footer` : pied de page
 
 ---
 
@@ -142,9 +149,10 @@ p {
 
 ---
 
-# Landmarks
+# Landmarks - Compatibilité
 
-* Pour des raisons de compatibilité navigateur, vous serez peut-être obligé d'ajouter des attributs `role`.
+* Pour des raisons de compatibilité avec d'anciens navigateurs, vous pourriez avoir besoin d'ajouter des attributs `role`
+* **Note** : Dans la plupart des cas modernes, les balises HTML5 suffisent
 
 ```html
 <header role="banner">
@@ -158,33 +166,37 @@ p {
 
 ---
 
-# Landmarks
+# Landmarks - Avantages
 
 * Ces landmarks permettent de définir un squelette à votre application
-* Ces éléments permettent de définir un structure claire pour votre page.
-* Contenu plus facilement accessible via raccourcis par certains utilisateurs
+* Ces éléments permettent de définir une structure claire pour votre page
+* Le contenu est plus facilement accessible via des raccourcis clavier pour les utilisateurs de lecteurs d'écran
+* Améliore la navigation et la compréhension de la structure du site
+* **Critère WCAG 1.3.1** (niveau A) : Information et relations
 
 ---
 
-# Titre
+# Titre de la page
 
-* Le titre de la page peut être défini soit
-    * via l'élément `title`
-    * via l'élément `h1`
-* Il doit être unique à travers les différentes pages,
-* Pratiques :
+* Le titre de la page doit être défini via l'élément `<title>` dans le `<head>`
+* Le titre principal du contenu doit utiliser `<h1>`
+* Chaque page doit avoir un titre unique et descriptif
+* **Critère WCAG 2.4.2** (niveau A) : Page Titled
+* Bonnes pratiques :
     * `[SITE NAME]` pour les page d'accueil
     * `[PAGE NAME] - [SITE NAME]` pour les autres pages
 
 ---
 
-# Titre
+# Hiérarchie des titres
 
-* Le moyen le plus utilisé pour naviguer sur un site se fait via les titres
-* Les titres doivent être dans un ordre logique
-    * Comme lors de l'écriture d'un document Word
-    * Toujours dans un ordre croissant : h1 -> ... -> h6
-    * Ne pas oublier un niveau (*INTERDIT* h1 -> h3)
+* **La navigation par titres** est le moyen le plus utilisé par les utilisateurs de lecteurs d'écran
+* Les titres doivent suivre une hiérarchie logique et séquentielle
+    * Comme lors de l'écriture d'un document Word ou d'un livre
+    * Toujours dans un ordre croissant : `h1` → `h2` → `h3` → ... → `h6`
+    * **❌ Ne pas sauter de niveau** (h1 → h3 est interdit)
+    * **✅ Un seul h1 par page** (le titre principal)
+* **Critère WCAG 1.3.1** (niveau A) et **2.4.6** (niveau AA)
 
 ```javascript
 const headings = document.querySelectorAll('h1,h2,h3,h4,h5,h6');
@@ -196,27 +208,31 @@ for(let i=0; i < headings.length; i++){
 ---
 
 
-# Titre
+# Titres cachés visuellement
 
-* Si vous ne souhaitez pas de titre dans votre design
+* Si vous ne souhaitez pas afficher un titre dans votre design mais qu'il est nécessaire pour la structure
     * ajoutez tout de même la balise HTML
-    * et cachez le en CSS (en le positionnant à l'extérieur du viewport)
+    * cachez-le visuellement en CSS (classe `.sr-only` ou `.visually-hidden`)
+    * **Ne pas utiliser** `display: none` ou `visibility: hidden` (masque pour les lecteurs d'écran aussi)
 
 ---
 
 # Balises sémantiques
 
-* article : contenu pouvant étre utilisé en toute autonomie sur autre page
-* section : regroupement de contenu homogène : `Top 5 articles`, ...
+* `<article>` : contenu autonome qui pourrait être distribué indépendamment (article de blog, commentaire, widget)
+* `<section>` : regroupement thématique de contenu homogène, généralement avec un titre
+    * Exemples : "Top 5 articles", "À propos de nous", "Commentaires"
+* **Règle** : Chaque `<section>` devrait avoir un titre (`h2`, `h3`, etc.)
 
 ---
 
 
 # NAV
 
-* Element permettant de definir une zone de navigation
-* Nous pouvons avoir plusieurs éléments `nav` par page
-* Nécésitté de definir une alternative textuelle pour les différencier
+* Élément permettant de définir une zone de navigation
+* Nous pouvons avoir plusieurs éléments `<nav>` par page (navigation principale, secondaire, fil d'Ariane)
+* **Nécessité** : définir un label distinct pour différencier les navigations multiples
+* Utilisez `aria-label` ou `aria-labelledby`
 
 ```html
 <nav aria-label="main menu">
@@ -229,12 +245,13 @@ for(let i=0; i < headings.length; i++){
 
 ---
 
-# Navigation
+# Navigation - Page active
 
-* Nous devons définir quel item est actif (sur quelle page se trouve l'utilisateur)
-* Deux choses à faire :
-    * Ne pas mettre de lien
-    * Utilisez l'attribut `aria-current`
+* Nous devons indiquer clairement quel item du menu correspond à la page actuelle
+* **Deux approches possibles** :
+    * Garder le lien et ajouter `aria-current="page"`
+    * **Ou** remplacer le lien par un `<span>` avec `aria-current="page"`
+* L'attribut `aria-current` annonce à l'utilisateur qu'il est sur cette page
 
 ---
 
@@ -275,10 +292,13 @@ for(let i=0; i < headings.length; i++){
 
 # Aria-current
 
-* L'attribut `aria-current` peut également s'utiliser
-    * dans un wizard pour définir l'étape en cours `aria-current=step`
-    * dans un datepicker pour définir la date courante `aria-current=date`
-    * dans un timepicker pour définir l'heure courante `aria-current=hour`
+* L'attribut `aria-current` peut prendre différentes valeurs selon le contexte :
+    * `aria-current="page"` : page actuelle dans une navigation
+    * `aria-current="step"` : étape en cours dans un wizard/processus
+    * `aria-current="date"` : date courante dans un datepicker
+    * `aria-current="time"` : heure courante dans un timepicker
+    * `aria-current="location"` : localisation actuelle dans un plan
+    * `aria-current="true"` : élément actuel (usage générique)
 
 ---
 
@@ -301,24 +321,26 @@ layout: statement
 
 <blockquote>
 La balise button n'est pas stylisable
-<p> Un développeur</p>
+<p>Un développeur (qui se trompe)</p>
 </blockquote>
 
 ---
 
-# Button
+# Button - Pourquoi utiliser `<button>` ?
 
-* Nous sommes obligés d'ajouter des attributs supplémentaires
-* Nécésitté d'écrire du code JavaScript pour gérer le `click` via le clavier
-* L'état `disabled` n'est pas géré nativement.
-* Le controle via la touche `espace` n'est pas géré.
+* Si vous utilisez `<div>` ou `<span>` comme bouton, vous devez :
+    * Ajouter `role="button"`
+    * Ajouter `tabindex="0"` pour le rendre focusable
+    * Écrire du JavaScript pour gérer le clic via **Entrée** et **Espace**
+    * Gérer l'état `disabled` manuellement avec `aria-disabled`
+* Avec `<button>` natif : **tout est géré automatiquement** ! 🎉
 
 ---
 
 
-# Lien
+# Lien - Antipatterns
 
-* Antipatterns
+* **❌ À éviter absolument :**
 
 ```html
 <span onclick="goTo(...)"> ... </span>
@@ -330,11 +352,15 @@ La balise button n'est pas stylisable
 ---
 
 
-# Lien
+# Lien - Problèmes des antipatterns
 
-* Ne s'affichera pas dans la liste des liens du `rotor` du synthétiseur vocal
-* Ne fonctionnera pas au clavier
-* Ne pourra être `bookmarkable`
+* **Conséquences** :
+    * Ne s'affichera pas dans la liste des liens du rotor des lecteurs d'écran
+    * Ne fonctionnera pas au clavier (Tab + Entrée)
+    * Ne pourra pas être mis en favori (bookmarkable)
+    * Clic droit → "Ouvrir dans un nouvel onglet" ne fonctionnera pas
+    * Pas d'aperçu de l'URL au survol
+    * Impact négatif sur le SEO
 
 ---
 
@@ -350,18 +376,25 @@ La balise button n'est pas stylisable
 ```
 ---
 
-# Button / Lien
+# Button vs Lien - Quand utiliser quoi ?
 
-* Si le click redirige vers une nouvelle page -> Un lien
-* Si le click exécute une action -> un bouton
+* **Lien (`<a href>`)** :
+    * ✅ Navigation vers une autre page ou une autre section
+    * ✅ Téléchargement d'un fichier
+    * ✅ Ancre vers une section (#section)
+
+* **Bouton (`<button>`)** :
+    * ✅ Exécute une action (soumettre un formulaire, ouvrir une modale)
+    * ✅ Modifie l'état de l'application
+    * ✅ Déclenche une interaction JavaScript
 
 ---
 
-# Styliser un boutton
+# Styliser un bouton
 
-* Sur mobile, s'assurer que la zone clickable est assez grande.
-* Des fois, nous utilisons une `div` afin de styliser plus facilement.
-* Le reset du style d'un boutton se limite à cette déclaration CSS
+* Sur mobile, s'assurer que la zone cliquable est assez grande (**minimum 44×44px**)
+* **Mythe** : "Les `<div>` sont plus faciles à styliser"
+* **Réalité** : Réinitialiser les styles d'un `<button>` est simple :
 
 ```html
 button {
@@ -373,10 +406,11 @@ button {
 
 ---
 
-# Button
+# Button - Type
 
-* Le type par défaut d'un bouton est le type `submit`
-* Nous recommendons de définir le type à chaque fois.
+* ⚠️ **Important** : Le type par défaut d'un `<button>` est `submit`
+* Cela peut causer des soumissions de formulaire involontaires
+* **Bonne pratique** : toujours définir explicitement le type
 
 ```html
 <button type="submit">...</button>
@@ -387,25 +421,26 @@ button {
 
 # Images
 
-* Une image doit absolument avoir une alternative textuelle
+* **Critère WCAG 1.1.1** (niveau A) : Toute image doit avoir une alternative textuelle
+* L'attribut `alt` est **obligatoire** sur toutes les balises `<img>`
 
 ```html
-<img src="" alt="Ceci est le logo de la sociéte" />
+<!-- Image informative : alt descriptif -->
+<img src="logo.png" alt="Logo de l'entreprise Acme" />
+
+<!-- Image décorative : alt vide (pas d'absence d'attribut) -->
+<img src="decoration.png" alt="" />
 ```
 
-* Si c'est une image décorative, utilisez une alternative vide
-
-
-```html
-<img src="" alt="" />
-```
+* **Note** : `alt=""` signale aux lecteurs d'écran d'ignorer l'image
 
 ---
 
 
-# Images
+# Images - Contexte
 
-* Essayez d'etre le plus explicite possible en ajoutant du context
+* Essayez d'être le plus explicite possible en ajoutant du contexte
+* L'alternative doit transmettre la même information que l'image
 
 
 ```html
@@ -417,10 +452,10 @@ button {
 ---
 
 
-# Images
+# Images - Icônes et Emoji
 
-* Ce travail peut etre realise egalement pour les emoji.
-* Ne pas utiliser les balises `<i>` comme certaines librairies
+* Ce travail doit être réalisé également pour les icônes et les emoji
+* Les icônes de fonts (Font Awesome, Bootstrap Icons) doivent avoir un label
 
 
 ```html
@@ -433,11 +468,12 @@ button {
 
 # Listes
 
-* Nous avons deux types de listes
-    * liste non-ordonnée
-    * liste ordonnée
-* Dès que vous devez afficher une liste de ..., utilisez l'un de ces éléments.
-* Attention: la sémantique d'une liste est perdue sur Safari/VoiceOver si nous ajoutons le style `list-style: none`.
+* Deux types principaux de listes :
+    * `<ul>` : liste non-ordonnée (unordered list)
+    * `<ol>` : liste ordonnée (ordered list)
+* Dès que vous devez afficher une liste d'éléments, utilisez l'un de ces éléments
+* ⚠️ **Attention** : La sémantique d'une liste peut être perdue sur Safari/VoiceOver si vous ajoutez `list-style: none`
+    * Solution : ajouter `role="list"` sur `<ul>`/`<ol>` et `role="listitem"` sur les `<li>`
 
 
 ---
@@ -471,12 +507,14 @@ button {
 
 # DL / DD / DT
 
-* Éléments permettant de définir une liste de pairs
-    * `dt`: terme
-    * `dd`: définition
-* Nous pouvons utiliser ces éléments comme :
-    * Glossaire
-    * Metadata
+* **Description List** : élément permettant de définir une liste de paires clé-valeur
+    * `<dl>` : Description List (conteneur)
+    * `<dt>` : Description Term (terme/clé)
+    * `<dd>` : Description Details (définition/valeur)
+* Cas d'usage :
+    * Glossaires
+    * Métadonnées
+    * Paires question-réponse (FAQ)
 
 ---
 
@@ -543,9 +581,10 @@ button {
 
 ---
 
-# Table
+# Table - Tri
 
-* Si vous souhaitez un système d'ordonnancement
+* Si vous souhaitez un système de tri (ordonnancement)
+* Utilisez `aria-sort` pour indiquer l'ordre de tri actuel
 
 
 ```html
@@ -590,15 +629,17 @@ details[open] > summary {
 }
 ```
 
-* De nouvelles syntaxes CSS vont arrivées prochainement pour avoir plus de controle sur le style de cet élément. 
+* De nouvelles syntaxes CSS vont arriver prochainement pour avoir plus de contrôle sur le style de cet élément
+* Notamment avec les pseudo-éléments `::details-content` 
 
 ---
 
 # Time
 
-* Balise permettant de définir dans un format informatique pour une date.
+* Balise permettant de définir une date/heure dans un format lisible par les machines
+* Améliore l'accessibilité et le SEO
 * Nous pouvons définir :
-    * une date
+    * une date (format ISO 8601)
     * une heure
     * une durée
 
@@ -620,27 +661,33 @@ details[open] > summary {
 
 ---
 
-# Principes généraux
+# Principes généraux - Taille des cibles
 
-* S'assurer que les éléments sur mobile `focusable` ont une taille suffisante
-* Recommandation : 48dp.
-* Avoir une marge de 32dp entre deux éléments focusables.
-
----
-
-# Principes généraux
-
-* Prendre en compte le choix de vos utilisateurs
-    * thème sombre ou clair
-    * activation des animations
-* Chrome propose des options pour activer/désactiver ces deux choix
+* S'assurer que les éléments interactifs sur mobile ont une taille suffisante
+* **WCAG 2.5.5** (niveau AAA) : minimum **44×44px** (ou 44dp)
+* **WCAG 2.5.8** (niveau AA, WCAG 2.2) : minimum **24×24px**
+* Avoir une marge d'au moins **8px** entre deux éléments focusables (idéalement 32px)
 
 ---
 
-# Principes généraux
+# Principes généraux - Préférences utilisateur
 
-* thème sombre ou clair
-    * Utile notamment pour les personnes atteintes de photophobie
+* Respecter les préférences système de vos utilisateurs :
+    * thème sombre ou clair (`prefers-color-scheme`)
+    * réduction des animations (`prefers-reduced-motion`)
+    * contraste élevé (`prefers-contrast`)
+* Les navigateurs modernes exposent ces préférences via des media queries CSS
+* Chrome/Edge/Firefox proposent des options pour tester ces préférences
+
+---
+
+# Thème sombre / clair
+
+* Respecter la préférence de thème de l'utilisateur
+* Particulièrement utile pour les personnes atteintes de :
+    * photophobie (sensibilité à la lumière)
+    * migraines déclenchées par la lumière forte
+    * fatigue oculaire
 
 ```css
 :root {
@@ -659,9 +706,11 @@ details[open] > summary {
 
 # Désactivation des animations
 
-* Success Criterion 2.3.1 Three Flashes or Below Threshold
-* Success Criterion 2.3.2: Three Flashes
-* Success Criterion 2.3.3: Animation from Interactions
+* **WCAG 2.3.1** (niveau A) : Three Flashes or Below Threshold
+* **WCAG 2.3.2** (niveau AAA) : Three Flashes
+* **WCAG 2.3.3** (niveau AAA) : Animation from Interactions
+* **WCAG 2.2.2** (niveau A) : Pause, Stop, Hide
+* Les animations peuvent déclencher des crises d'épilepsie ou des vertiges
 
 ---
 
@@ -684,9 +733,10 @@ details[open] > summary {
 
 ---
 
-# Désactivation des animations
+# Désactivation des animations - Approche alternative
 
-* Pour des problématique de support des navigateurs, nous pouvons inverser la logique.
+* Pour des problématiques de support des navigateurs plus anciens, nous pouvons inverser la logique
+* **Mobile-first accessibility** : désactiver par défaut, activer si préférence
 
 ```css
 
@@ -708,9 +758,10 @@ details[open] > summary {
 
 ---
 
-# MatchMedia
+# MatchMedia API
 
-* Nous pouvons manipuler ces media queries en JavaScript avec la MatchMedia api
+* Nous pouvons détecter et réagir aux media queries en JavaScript avec l'API `matchMedia`
+* Permet d'adapter dynamiquement le comportement de l'application
 
 
 ```javascript
@@ -750,8 +801,10 @@ mql.addListener(function(m) {
 
 # Orientation
 
+* **WCAG 1.3.4** (niveau AA) : Ne jamais forcer ou bloquer une orientation
 * Ne jamais bloquer l'orientation `landscape` ou `portrait`
-* Ne jamais utiliser par exemple la `Screen Orientation API`
+* Certains utilisateurs ont leur appareil fixé dans une orientation (support de fauteuil roulant)
+* **⚠️ À éviter** : l'utilisation de `Screen Orientation API` pour verrouiller l'orientation
 
 
 ```javascript
@@ -762,9 +815,10 @@ screen.orientation.unlock()
 
 ---
 
-# Orientation
+# Orientation - CSS
 
-* Si vous souhaitez styliser votre application en fonction de l'orientation
+* Si vous souhaitez adapter le style de votre application en fonction de l'orientation
+* Utilisez les media queries CSS (ne forcez jamais l'orientation)
 
 
 ```css
@@ -782,18 +836,180 @@ body {
 
 ---
 
-# Contrast Ratio
+# Contrast Ratio (Ratio de contraste)
 
-* Un contrast ratio compare la couleur d'un texte par rapport à la couleur du `background`
-* Le calcul se base sur la propriété `Relative luminance` d'une couleur
-    * = 0 pour le noir foncé
-    * = 1 pour le blanc
-* Pour calculer le contrast : `(L1 + 0.05) / (L2 + 0.05)`
-* La valeur retournée aura une forme :
-    * `1:1` : aucun contrase
-    * `21:1` : le plus gros contraste possible
+* Le ratio de contraste compare la couleur d'un texte par rapport à la couleur du fond
+* **Critères WCAG** :
+    * **WCAG 1.4.3** (niveau AA) : minimum **4.5:1** pour le texte normal
+    * **WCAG 1.4.3** (niveau AA) : minimum **3:1** pour le texte large (18pt+ ou 14pt+ gras)
+    * **WCAG 1.4.6** (niveau AAA) : minimum **7:1** pour le texte normal
+* Le calcul se base sur la **luminance relative** d'une couleur
+    * 0 = noir absolu
+    * 1 = blanc absolu
+* Formule : `(L1 + 0.05) / (L2 + 0.05)`
+* Résultat entre `1:1` (aucun contraste) et `21:1` (contraste maximum)
 
-* Chrome Devtools fait le calcul pour nous.
+---
+
+# Table - Accessibilité
+
+* **Bonnes pratiques** pour les tableaux accessibles :
+    * Toujours utiliser `<caption>` pour décrire le tableau
+    * Utiliser `<thead>`, `<tbody>`, `<tfoot>` pour structurer
+    * Utiliser `<th>` pour les en-têtes (avec `scope="col"` ou `scope="row"`)
+    * Pour les tableaux complexes, utiliser `headers` et `id`
+* **Ne jamais utiliser** de tableaux pour la mise en page (layout)
+
+---
+
+# Formulaires - Labels
+
+* **WCAG 1.3.1** et **3.3.2** (niveau A) : Tous les champs doivent avoir un label
+* Utilisez `<label>` associé avec l'attribut `for`
+
+```html
+<label for="email">Adresse email</label>
+<input type="email" id="email" name="email" required />
+```
+
+* Alternatives acceptables :
+    * `aria-label` : label invisible
+    * `aria-labelledby` : référence à un élément existant
+    * `placeholder` seul n'est **PAS** suffisant
+
+---
+
+# Formulaires - Groupes
+
+* Utilisez `<fieldset>` et `<legend>` pour grouper des champs liés
+
+```html
+<fieldset>
+    <legend>Informations personnelles</legend>
+    <label for="firstname">Prénom</label>
+    <input type="text" id="firstname" />
+    <label for="lastname">Nom</label>
+    <input type="text" id="lastname" />
+</fieldset>
+```
+
+* Particulièrement important pour les boutons radio et checkboxes
+
+---
+
+# Formulaires - Messages d'erreur
+
+* Les erreurs doivent être :
+    * **Visibles** et **claires**
+    * Associées au champ concerné (`aria-describedby`)
+    * Annoncées aux lecteurs d'écran (`aria-live`, `aria-invalid`)
+
+```html
+<label for="email">Email</label>
+<input
+    type="email"
+    id="email"
+    aria-invalid="true"
+    aria-describedby="email-error" />
+<span id="email-error" role="alert">
+    Veuillez entrer une adresse email valide
+</span>
+```
+
+---
+
+# Liens - Texte descriptif
+
+* Le texte du lien doit être explicite hors contexte
+* **❌ Éviter** : "Cliquez ici", "En savoir plus", "Lire la suite"
+* **✅ Préférer** : "Télécharger le rapport annuel 2024", "En savoir plus sur l'accessibilité web"
+
+```html
+<!-- Mauvais -->
+<p>Notre rapport annuel est disponible. <a href="...">Cliquez ici</a></p>
+
+<!-- Bon -->
+<p>Notre <a href="...">rapport annuel 2024</a> est disponible.</p>
+```
+
+---
+
+# Liens - Nouvelle fenêtre
+
+* Si un lien ouvre dans une nouvelle fenêtre/onglet, **prévenez l'utilisateur**
+
+```html
+<a href="..." target="_blank" rel="noopener noreferrer">
+    Consulter le site externe
+    <span class="sr-only">(ouvre dans une nouvelle fenêtre)</span>
+</a>
+
+<!-- Ou avec une icône -->
+<a href="..." target="_blank" rel="noopener noreferrer">
+    Consulter le site externe
+    <svg aria-label="(ouvre dans une nouvelle fenêtre)">...</svg>
+</a>
+```
+
+* **Note** : `rel="noopener noreferrer"` est important pour la sécurité
+
+---
+
+# Classe sr-only / visually-hidden
+
+* Pour cacher du contenu visuellement mais le garder pour les lecteurs d'écran
+
+```css
+.sr-only,
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+```
+
+* Cas d'usage : titres cachés, texte de liens, instructions supplémentaires
+
+---
+
+# Contrast Ratio - Outils
+
+* **Chrome DevTools** : onglet "Color Picker" affiche le ratio automatiquement
+* **Extensions navigateur** :
+    * WAVE
+    * axe DevTools
+    * Lighthouse
+* **Outils en ligne** :
+    * WebAIM Contrast Checker
+    * Contrast Ratio de Lea Verou
+* **Tip** : Utilisez ces outils dès la phase de design !
+
+---
+
+# Récapitulatif - Checklist HTML
+
+* ✅ Toujours utiliser la balise HTML sémantique appropriée
+* ✅ Définir l'attribut `lang` sur `<html>`
+* ✅ Utiliser les landmarks (`header`, `nav`, `main`, `aside`, `footer`)
+* ✅ Respecter la hiérarchie des titres (h1 → h2 → h3)
+* ✅ Fournir un `alt` pour toutes les images
+* ✅ Utiliser `<button>` pour les actions, `<a>` pour la navigation
+* ✅ Associer tous les champs de formulaire avec des `<label>`
+* ✅ Assurer un contraste suffisant (minimum 4.5:1)
+* ✅ Respecter les préférences utilisateur (dark mode, animations)
+* ✅ Tester la navigation au clavier
+
+---
+layout: cover
+---
+
+# Mise en Pratique
 
 ---
 layout: cover

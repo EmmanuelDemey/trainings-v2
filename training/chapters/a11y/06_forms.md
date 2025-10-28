@@ -8,8 +8,9 @@ layout: cover
 
 # Formulaire
 
-* Élements permettant à l'utilisateur de saisir de la donnée.
-* Plusieurs élements disponibles : form, input, checkbox, radio, textarea, ...
+* Éléments permettant à l'utilisateur de saisir des données
+* Plusieurs éléments disponibles : `form`, `input`, `checkbox`, `radio`, `textarea`, `select`, etc.
+* Les formulaires sont essentiels pour l'interaction mais aussi une source majeure de problèmes d'accessibilité
 
 ---
 
@@ -47,10 +48,11 @@ layout: cover
 
 ---
 
-# Formulaire - Label
+# Formulaire - Label caché
 
-* Ne jamais utiliser la propriété `hidden` car le label ne sera pas détécté par les synthétiseurs vocaux.
-* Le problème se reproduit si nous utilisons les propriétés CSS `display:none` ou `visibility:hidden`.
+* ⚠️ Ne jamais utiliser l'attribut `hidden` car le label ne sera pas détecté par les lecteurs d'écran
+* Le problème se reproduit si nous utilisons les propriétés CSS `display: none` ou `visibility: hidden`
+* Ces méthodes cachent aussi le contenu aux technologies d'assistance
 
 ```html
 <label for="m" hidden>Label m</label>
@@ -59,9 +61,9 @@ layout: cover
 
 ---
 
-# Formulaire - Label
+# Formulaire - Label caché visuellement
 
-* Si vous souhaitez définir des labels cachés, plutôt utiliser la déclaration CSS suivante.
+* Si vous souhaitez définir des labels cachés visuellement mais accessibles aux lecteurs d'écran, utilisez la classe `.sr-only`
 
 ```css
 .sr-only {
@@ -72,16 +74,18 @@ layout: cover
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
-  border: 0;
+  white-space: nowrap;
+  border-width: 0;
 }
 ```
 
 ---
 
-# Formulaire - Label
+# Formulaire - ARIA Labels
 
-* Vous pouvez également utiliser `aria-label` ou `aria-labelledby`.
-* Ces deux attributs vont surcharger le label défini via la balise `label`.
+* Vous pouvez également utiliser `aria-label` ou `aria-labelledby`
+* ⚠️ **Important** : Ces deux attributs vont **surcharger** le label défini via la balise `<label>`
+* Utilisez-les seulement quand c'est vraiment nécessaire
 
 ```html
 <input aria-label="firstName">
@@ -98,21 +102,25 @@ layout: cover
 
 ---
 
-# Formulaire - Label
+# Formulaire - Label : Quel choix ?
 
-* Comment faire le bon choix ?
-    * Avez-vous besoin de ARIA ? -> `label`
-    * Souhaitez-vous un label caché mais internationalisable ? -> label caché
-    * Le label est défini ailleurs dans la page ? -> `aria-labelledby`
-    * Sinon `aria-label`
+* **Arbre de décision** pour choisir la bonne approche :
+    1. ✅ **Préféré** : Utilisez `<label>` (toujours en premier choix)
+    2. Si label visible mais ailleurs dans la page → `aria-labelledby`
+    3. Si label caché mais internationalisable → `<label>` + classe `.sr-only`
+    4. Si label programmatique uniquement → `aria-label` (non internationalisable)
+
+* **Ordre de priorité** : `<label>` > `aria-labelledby` > `aria-label` > `placeholder`
 
 ---
 
 # Formulaire - Autocomplete
 
-* Nous pouvons activer un mécanisme d'autocompletion
-* Se base sur les données que votre utilisateur à insérer sur d'autres sites
-* Nous utiliserons l'attribute `autocomplete`.
+* Nous pouvons activer un mécanisme d'autocomplétion
+* Se base sur les données que votre utilisateur a insérées précédemment (navigateur)
+* Utilisation de l'attribut `autocomplete`
+* **WCAG 1.3.5** (niveau AA) : aide les utilisateurs à remplir les formulaires plus facilement
+* Particulièrement utile pour les personnes avec déficiences cognitives
 
 ---
 
@@ -134,24 +142,30 @@ layout: cover
 
 ---
 
-# Formulaire - Autocomplete
+# Formulaire - Autocomplete pour mots de passe
 
-* Nous pouvons également demander au navigateur de générer un mot de passe à notre place.
+* Nous pouvons également demander au navigateur de générer un mot de passe sécurisé
+* Améliore la sécurité et l'expérience utilisateur
 
 ```html
-<input type="password" autocomplete="new-password" id="new-password"
+<input type="password" autocomplete="new-password" id="new-password" />
 ```
+
+* Valeurs courantes :
+    * `current-password` : pour la connexion
+    * `new-password` : pour la création/modification
 
 ---
 
 # Fieldset
 
-* La balise `fieldset` permet de regrouper des ensembles de champs de formulaire
-* Nous devons définir un libellé via l'element `legend`.
-* Nous pouvons les utiliser pour :
-    * des radios
-    * des checkbox
-    * des inputs manipulant la meme donnees.
+* La balise `<fieldset>` permet de regrouper des ensembles de champs de formulaire liés
+* **Obligatoire** : définir un libellé via l'élément `<legend>`
+* **WCAG 1.3.1** (niveau A) : Information et relations
+* Cas d'usage :
+    * groupes de boutons radio (obligatoire)
+    * groupes de checkboxes
+    * ensemble de champs liés (adresse, coordonnées bancaires)
 
 ---
 
@@ -185,7 +199,9 @@ layout: cover
 
 # Datalist
 
-* Composant permet de créer nativement un système minimaliste d'autocompletion.
+* Élément HTML natif permettant de créer un système d'autocomplétion
+* Alternative accessible aux plugins JavaScript complexes
+* Bien supporté par les navigateurs modernes
 
 ```html
 <label for="ice-cream-choice">Choose a flavor:</label>
@@ -205,7 +221,9 @@ layout: cover
 
 # Informations Complémentaires
 
-* Si nous souhaitons mettre des informatiosn complémentaires, nous allons utiliser l'attribut `aria-describedby`.
+* Si nous souhaitons ajouter des informations complémentaires (aide, format attendu), utilisez l'attribut `aria-describedby`
+* Différent de `aria-labelledby` : décrit au lieu de nommer
+* Le contenu référencé sera lu après le label par les lecteurs d'écran
 
 ```html
 <label for="email">Your email</label>
@@ -218,21 +236,27 @@ layout: cover
 
 ---
 
-# Formulaires - Champs obligatoire
+# Formulaires - Champs obligatoires
 
-* Pour définir qu'un champ est obligatoire, nous avons deux posibilités :
-    * `required`
-    * `aria-required`
-* La différence se situe dans l'affichage d'un message d'erreur lors de l'utilisation de l'attribut `required`.
+* Pour définir qu'un champ est obligatoire, nous avons deux possibilités :
+    * `required` : validation HTML5 native (recommandé)
+    * `aria-required="true"` : indication sémantique uniquement
+* **Différence** : `required` déclenche la validation native du navigateur avec messages d'erreur
+* **Bonne pratique** : utiliser `required` + indicateur visuel (astérisque, texte "obligatoire")
 
 ---
 
 # Formulaires - Gestion des erreurs
 
-* Pour l'affichage des erreurs de validation, il est préférable de les mettre au plus prêt de l'input.
-* Vous pouvez utiliser les attributs **aria-describedby** et **aria-invalid** dynamiquement.
-* Un attribut **aria-errormessage** existe, mais encore mal supporté.
-* Une fois la validation faite, vous pouvez mettre le **focus** sur le premier champ en erreur.
+* **WCAG 3.3.1** (niveau A) : Identification des erreurs
+* **WCAG 3.3.3** (niveau AA) : Suggestion d'erreurs
+* **Bonnes pratiques** :
+    * Afficher les erreurs au plus près du champ concerné
+    * Utiliser `aria-describedby` pour lier l'erreur au champ
+    * Utiliser `aria-invalid="true"` quand il y a une erreur
+    * Mettre le focus sur le premier champ en erreur après validation
+    * Fournir un résumé des erreurs en haut du formulaire
+* `aria-errormessage` existe mais support limité (préférer `aria-describedby`)
 
 
 ```html
@@ -240,6 +264,36 @@ layout: cover
 <input type="email" id="email" aria-invalid="true" aria-describedby="emailHint">
 <p class="hint" id="emailHint">Invalid email address.</p>
 ```
+
+---
+
+# Formulaires - Types d'input modernes
+
+* **Utilisez les types d'input appropriés** pour améliorer l'expérience mobile :
+    * `type="email"` : affiche @ sur le clavier mobile
+    * `type="tel"` : affiche le pavé numérique
+    * `type="url"` : affiche .com et / sur le clavier
+    * `type="number"` : pour les valeurs numériques
+    * `type="date"`, `type="time"` : sélecteurs natifs
+* Validation native + UX améliorée
+
+---
+
+# Formulaires - Récapitulatif
+
+* ✅ **Tous les champs** doivent avoir un `<label>` associé
+* ✅ Utiliser `<fieldset>` et `<legend>` pour grouper les champs liés
+* ✅ Ajouter `autocomplete` pour faciliter la saisie
+* ✅ Indiquer clairement les champs **obligatoires**
+* ✅ Afficher les **erreurs** clairement avec `aria-invalid` et `aria-describedby`
+* ✅ Utiliser les **types d'input** appropriés
+* ✅ Tester la navigation **au clavier** (Tab, Entrée)
+
+---
+layout: cover
+---
+
+# Mise en Pratique
 
 ---
 layout: cover

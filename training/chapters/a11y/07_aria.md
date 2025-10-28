@@ -6,54 +6,67 @@ layout: cover
 
 ---
 
-# Norme Aria
+# Norme ARIA
 
-* Rappel: Il est recommandé d'utiliser au maximum les éléments HTML
-* Si pour une certaine raison, cela n'est pas possible
-    * vous pouvez créer vos propres éléments HTML
-    * et y ajouter des attributs supplémentaires
-* Ces attributs sont définis dans la spécification *WAI-ARIA*
-
----
-
-# Norme Aria
-
-* **Web Accessibility Initiative – Accessible Rich Interactive Applications**
-* Ajout de marqueur de sémantique aux contenus HTML
-* Cette norme doit être utilisée si et seulement si HTML ne propose pas un élément natif
-* Elle est définie en deux catégories : `Attributes` et `States and Properties`.
+* **Rappel** : Il est recommandé d'utiliser en priorité les éléments HTML natifs
+* Si pour une raison technique cela n'est pas possible :
+    * vous pouvez créer vos propres composants
+    * et y ajouter des attributs ARIA pour l'accessibilité
+* Ces attributs sont définis dans la spécification **WAI-ARIA**
+* **Règle n°1 d'ARIA** : Ne pas utiliser ARIA si un élément HTML natif existe
 
 ---
 
-# Norme Aria
+# Norme ARIA
 
-* Les attributs ARIA permettent
-    * d'ajouter de la sémantique au code HTML
-    * de gérer le support des navigateurs
-    * de copier le fonctionnement HTML existant pour des problématiques de style.
-
----
-
-# Norme Aria
-
-* Les balises n'auront un impact que sur l'Accessibility tree
-* Elles n'auront pas d'impact sur :
-    * l'apparence des éléments
-    * le fonctionnement des éléments
-    * le coté focusable
-    * le support du clavier
+* **WAI-ARIA** : Web Accessibility Initiative – Accessible Rich Interactive Applications
+* Permet d'ajouter de la sémantique aux contenus HTML
+* **⚠️ Important** : À utiliser uniquement si HTML ne propose pas d'élément natif équivalent
+* Trois catégories principales :
+    * **Roles** : définissent le type d'élément
+    * **States** (états) : propriétés qui changent (ex: `aria-checked`)
+    * **Properties** (propriétés) : caractéristiques statiques (ex: `aria-label`)
 
 ---
 
-# Norme Aria
+# Norme ARIA - Cas d'usage
 
-* D'ou la necessite d'utiliser tout d'abord des éléments HTML natifs.
+* Les attributs ARIA permettent :
+    * d'ajouter de la sémantique au code HTML non sémantique
+    * de gérer la compatibilité avec d'anciens navigateurs
+    * de créer des composants personnalisés accessibles (widgets)
+* **Ne jamais utiliser ARIA** pour contourner des problèmes de CSS/style
 
 ---
 
-# Norme Aria
+# Norme ARIA - Limitations
 
-* Aria Design Guide(https://www.w3.org/TR/wai-aria-practices-1.1/)
+* ⚠️ **Très important** : Les attributs ARIA n'ont d'impact **que** sur l'Accessibility Tree
+* Ils **n'auront aucun impact** sur :
+    * l'apparence visuelle des éléments (vous devez ajouter du CSS)
+    * le comportement des éléments (vous devez ajouter du JavaScript)
+    * la focusabilité (vous devez ajouter `tabindex`)
+    * la navigation au clavier (vous devez gérer les événements)
+
+---
+
+# Norme ARIA - Pourquoi préférer HTML natif ?
+
+* D'où la **nécessité absolue** d'utiliser en priorité les éléments HTML natifs
+* HTML natif = fonctionnalités gratuites :
+    * Sémantique native
+    * Navigation au clavier
+    * Focus management
+    * Comportement attendu
+* ARIA = vous devez **tout** coder vous-même
+
+---
+
+# Norme ARIA - Ressources
+
+* **ARIA Authoring Practices Guide (APG)** : https://www.w3.org/WAI/ARIA/apg/
+* Guide officiel du W3C avec patterns et exemples
+* **Indispensable** pour implémenter correctement des composants ARIA
 
 ---
 
@@ -79,15 +92,15 @@ layout: cover
 
 ---
 
-# Rôles
+# Rôles ARIA
 
 * Les rôles sont découpés en six catégories :
-    * Abstract Role
-    * Document Structure Role (toolbar, ...)
-    * Landmark Role
-    * Live Region Role
-    * Widget Role
-    * Window Role
+    * **Abstract Role** : ne jamais utiliser (usage interne)
+    * **Document Structure Role** : structure du document (toolbar, tooltip, etc.)
+    * **Landmark Role** : régions principales (navigation, main, etc.)
+    * **Live Region Role** : contenus dynamiques (alert, status, etc.)
+    * **Widget Role** : composants interactifs (button, slider, tabs, etc.)
+    * **Window Role** : fenêtres (dialog, alertdialog)
 
 ---
 
@@ -125,8 +138,9 @@ layout: cover
 
 # Landmark Role
 
-* La plupart des rôles peuvent être associés à une balise sémantique HTML
-* À utiliser pour gérer la comptabilité navigateur et synthétiseurs vocaux.
+* La plupart des landmark roles ont un équivalent en HTML5
+* À utiliser **uniquement** pour gérer la compatibilité avec d'anciens navigateurs
+* **Aujourd'hui** : les balises HTML5 suffisent dans la plupart des cas
 
 ```html
 <nav role="navigation">
@@ -162,10 +176,11 @@ layout: cover
 
 ---
 
-# State
+# States (États)
 
-* Un `state`  s'ajoute en spécifiant l'attribut `aria-*` à un élément HTML.
-* Un `state` sera/devra être modifié en JavaScript en fonction des intéractions utilisateurs.
+* Un **state** s'ajoute via un attribut `aria-*` sur un élément HTML
+* Un state **doit être mis à jour dynamiquement** en JavaScript selon les interactions utilisateur
+* Exemple : `aria-checked` doit changer entre `true`/`false` au clic
 
 ```html
 <span aria-busy="true">
@@ -175,18 +190,18 @@ layout: cover
 
 ---
 
-# State
+# States - Les plus courants
 
-* Nous pouvons utiliser les `state` suivant :
-    * `aria-busy`
-    * `aria-checked`
-    * `aria-current`
-    * `aria-disabled`
-    * `aria-expanded`
-    * `aria-hidden`
-    * `aria-invalid`
-    * `aria-pressed`
-    * `aria-selected`
+* Liste des states les plus utilisés :
+    * `aria-busy` : élément en cours de chargement
+    * `aria-checked` : état coché/non coché (checkbox, radio)
+    * `aria-current` : élément actuel (page, step, date, etc.)
+    * `aria-disabled` : élément désactivé
+    * `aria-expanded` : élément déplié/replié
+    * `aria-hidden` : masquer un élément aux lecteurs d'écran
+    * `aria-invalid` : valeur invalide dans un formulaire
+    * `aria-pressed` : bouton toggle activé/désactivé
+    * `aria-selected` : élément sélectionné (tab, option)
 
 ---
 
@@ -207,15 +222,17 @@ layout: cover
 
 ---
 
-# Properties
+# Properties (Propriétés)
 
-* La norme *ARIA* propose également des propriétés qui seront rarement modifiées en JavaScript
-    * `aria-controls`
-    * `aria-label`
-    * `aria-labelledby`
-    * `aria-live`
-    * `aria-required`
-    * ...
+* La norme ARIA propose également des **propriétés** généralement statiques
+* Différence avec les states : rarement modifiées après l'initialisation
+    * `aria-controls` : identifie l'élément contrôlé
+    * `aria-describedby` : référence une description
+    * `aria-label` : label textuel invisible
+    * `aria-labelledby` : référence un élément servant de label
+    * `aria-live` : région mise à jour dynamiquement
+    * `aria-required` : champ obligatoire
+    * `aria-haspopup` : indique un menu/dialog qui peut s'ouvrir
 
 ---
 
@@ -229,10 +246,11 @@ layout: cover
 
 ---
 
-# Intégration
+# Intégration - Web Components
 
-* Nous conseillons d'inclure au maximum l'accessibilité dans vos composants.
-* Nous pouvons utiliser cette technique pour des Web Components créés pour votre projet.
+* **Bonne pratique** : inclure l'accessibilité directement dans vos composants
+* Pour les Web Components : ajouter les attributs ARIA dans le `connectedCallback`
+* Ainsi, l'accessibilité est native et ne peut pas être oubliée
 
 ```javascript
 class SwitchButton extends HTMLElement {
@@ -246,7 +264,7 @@ class SwitchButton extends HTMLElement {
 window.customElements.define('button-switch', SwitchButton)
 ```
 
-* Dans un futur *proche*, nous allons pouvoir utiliser la syntaxe IDL pour mettre à jour ces propriétés
+* **Nouvelle API** : L'API Reflection ARIA permet d'utiliser les propriétés JavaScript natives
 
 ```javascript
 class SwitchButton extends HTMLElement {
@@ -260,11 +278,12 @@ class SwitchButton extends HTMLElement {
 window.customElements.define('button-switch', SwitchButton)
 ```
 
---- 
+---
 
-# Intégration
+# Intégration - Frameworks
 
-* Ou encore un exemple dans la librairie `Angular Material`
+* Exemple avec Angular CDK (Component Dev Kit)
+* Les directives `cdkFocusRegion*` gèrent automatiquement le focus
 
 ```html
 <a mat-list-item routerLink cdkFocusRegionStart>
@@ -281,7 +300,10 @@ window.customElements.define('button-switch', SwitchButton)
 
 ---
 
-# Checkbox Custom
+# Checkbox Custom - Exemple complet
+
+* **⚠️ Rappel** : Préférez toujours `<input type="checkbox">` natif
+* Cet exemple montre ce qu'il faut implémenter si vous devez créer une checkbox custom
 
 ```html
 <p id="question">Question</p>
@@ -303,7 +325,10 @@ window.customElements.define('button-switch', SwitchButton)
 
 ---
 
-# Radio Custom
+# Radio Custom - Exemple complet
+
+* **⚠️ Rappel** : Préférez toujours `<input type="radio">` natif
+* Notez la différence de `tabindex` : seul l'élément sélectionné a `tabindex="0"`
 
 ```html
 <p id="question">Question</p>
@@ -325,10 +350,13 @@ window.customElements.define('button-switch', SwitchButton)
 
 ---
 
-# Collapsible Panel
+# Collapsible Panel (Panneau dépliant)
 
-* Lorsque vous devez implémenter un `Collapsible Panel`, vous devez ajoutez les attributs `aria-controls` et `aria-expanded`.
-* Ces attributs doivent être dynamiser en fonction des interactions de l'utilisateur.
+* Pour implémenter un panneau dépliant accessible :
+    * `aria-controls` : relie le bouton au panneau qu'il contrôle
+    * `aria-expanded` : indique l'état ouvert (`true`) ou fermé (`false`)
+* Ces attributs **doivent être mis à jour dynamiquement** en JavaScript
+* Alternative moderne : utilisez `<details>` et `<summary>` HTML natifs !
 
 ```html
 <button aria-controls="list" aria-expanded="true">Open</button>
@@ -341,17 +369,23 @@ window.customElements.define('button-switch', SwitchButton)
 
 # Alternative textuelle
 
-* Quatre solutions pour définir des alternatives textuelles
-    * `aria-label` accepte comme valeur le label que nous souhaitons utiliser
-    * `aria-labelledby` contiendra l'identifiant d'un autre élément HTML
-    * Par une zone visible que par les synthétiseurs vocaux (internationalisable)
-    * par le contenu
+* Quatre solutions pour définir des alternatives textuelles (par ordre de priorité) :
+    1. **Contenu textuel** de l'élément (préféré)
+    2. **`aria-labelledby`** : référence un élément existant (ID)
+    3. **`aria-label`** : texte directement dans l'attribut (non internationalisable)
+    4. **Texte caché** avec `.sr-only` (internationalisable)
+
+* **Règle** : `aria-labelledby` > `aria-label` > label visible > contenu
 
 ---
 
-# Alternative textuelle
+# Description complémentaire
 
-* Nous pouvons également ajouter l'attribut `aria-describedby` pour donner une description complémentaire.
+* `aria-describedby` : fournit une description **en plus** du label
+* Différence avec `aria-labelledby` :
+    * `aria-labelledby` : **nomme** l'élément (essentiel)
+    * `aria-describedby` : **décrit** l'élément (complémentaire)
+* Exemple : label="Email", description="Format: nom@domaine.com"
 
 ---
 
@@ -371,15 +405,45 @@ window.customElements.define('button-switch', SwitchButton)
 
 ---
 
-# CSS
+# CSS - Sélecteurs ARIA
 
-* L'utilisation d'attribut aria peut simplifier les feuilles de styles
+* L'utilisation d'attributs ARIA peut simplifier les feuilles de styles
+* **Avantage** : le style suit automatiquement l'état
 
 ```css
-input[aria-invalid='true']{
-    ...
+/* Style pour les champs invalides */
+input[aria-invalid='true'] {
+    border-color: red;
+}
+
+/* Style pour les boutons toggle actifs */
+button[aria-pressed='true'] {
+    background-color: #007bff;
+}
+
+/* Style pour les éléments étendus */
+[aria-expanded='true'] .icon {
+    transform: rotate(180deg);
 }
 ```
+
+---
+
+# ARIA - Récapitulatif
+
+* ✅ **Règle n°1** : Ne pas utiliser ARIA si HTML natif existe
+* ✅ **Règle n°2** : Ne jamais changer la sémantique native
+* ✅ **Règle n°3** : Les éléments avec role interactif doivent être focusables
+* ✅ **Règle n°4** : Les éléments focusables doivent être accessibles au clavier
+* ✅ **Règle n°5** : Ne pas utiliser `role="presentation"` ou `aria-hidden` sur des éléments focusables
+
+* **Documentation** : https://www.w3.org/WAI/ARIA/apg/
+
+---
+layout: cover
+---
+
+# Mise en Pratique
 
 ---
 layout: cover

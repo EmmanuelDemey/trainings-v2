@@ -23,7 +23,7 @@ Pour vous, qui est concerné par ce sujet ?
 - Accessibilité
 - Accessibility
 - A11Y
-- E-Accessibily
+- E-Accessibility
 - Web Accessibility
 - Accessibilité Numérique
 
@@ -42,7 +42,7 @@ layout: statement
 ---
 
 L'accessibilité web est le fait de mettre à disposition le contenu d'un site web à tout le monde,
-quelque soit son contexte d'utilisation.
+quel que soit son contexte d'utilisation.
 
 
 ---
@@ -58,21 +58,41 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 ---
 
-# Introduction
+# Pourquoi l'accessibilité ?
 
-* Pourquoi une nécessité pour vous ?
-    * vos clients vont vous l'obliger (gouvernements, éducation, ...)
-    * la loi vous l'oblige (active dans plusieurs pays)
-    * permet de créer un site web de meilleure qualité
-    * peut avoir un impact positif sur d'autres critères (SEO par exemple)
-        * mais cela n'est pas un objectif en soit.
+* **Obligations légales**
+    * Loi européenne (European Accessibility Act - EAA) : obligatoire dès juin 2025
+    * France : RGAA (Référentiel Général d'Amélioration de l'Accessibilité)
+    * États-Unis : ADA (Americans with Disabilities Act) et Section 508
+    * Canada : AODA (Accessibility for Ontarians with Disabilities Act)
+
+---
+
+# Pourquoi l'accessibilité ?
+
+* **Raisons économiques**
+    * Élargir votre audience : 15% de la population mondiale
+    * Éviter les poursuites judiciaires (nombreux cas aux États-Unis)
+    * Améliorer l'expérience utilisateur pour tous
+    * Impact positif sur le SEO et les performances
+
+---
+
+# Pourquoi l'accessibilité ?
+
+* **Raisons techniques et qualité**
+    * Code plus maintenable et robuste
+    * Meilleure compatibilité multi-navigateurs
+    * Meilleure structure sémantique
+    * Tests automatisés plus faciles
+    * Amélioration de l'utilisabilité générale
 
 ---
 
 # Introduction
 
 - Cela n'est pas limité qu'aux personnes en situation de handicap.
-- Avez-vous déjà vécu l'une des experiences suivantes :
+- Avez-vous déjà vécu l'une des expériences suivantes :
     * Application non utilisable sur mobile
     * Application non disponible dans votre pays
     * Application non utilisable sur votre réseau
@@ -95,8 +115,8 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 # Introduction
 
-- Mais dans cette formation nous allons nous limiter aux problématiques liées au déficiences :
-    * visuels
+- Mais dans cette formation nous allons nous limiter aux problématiques liées aux déficiences :
+    * visuelles
     * auditives
     * motrices
     * cognitives
@@ -106,9 +126,9 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 # Buts secondaires
 
 - Créer des interfaces
-    * plus simple
-    * plus facile à utiliser
-    * plus facile à maintenir
+    * plus simples
+    * plus faciles à utiliser
+    * plus faciles à maintenir
 
 ---
 
@@ -131,32 +151,77 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 # Déficiences
 
-- Ces déficiences ne sont pas forcément liées que à des handicaps.
+- Ces déficiences ne sont pas forcément liées qu'à des handicaps.
 - L'accessibilité peut être bénéfique pour tout le monde.
-    * lorsque vous êtes dans une zone bruyante (déficience auditive)
-    * lorsque vous êtes en extérieur (déficience visuelle)
+    * lorsque vous êtes dans une zone bruyante (déficience auditive temporaire)
+    * lorsque vous êtes en extérieur avec forte luminosité (déficience visuelle temporaire)
+    * lorsque vous avez un bras cassé (déficience motrice temporaire)
 
 ---
 
-# Déficiences visuels
+# Déficiences visuelles
 
-- `Blurred vision` : Difficultés à se concentrer sur les détails
-- `Protanopia` : Difficultés à voir les lumières rouges
-- `Deuteranopia` : Difficultés à voir les lumières vertes
-- `Tritanopia` : Difficultés à voir les lumières bleues
-- `Achromatopsia`: Difficultés à voir les couleurs sauf les nuances de gris.
+- **Vision floue** (`Blurred vision`) : Difficultés à se concentrer sur les détails
+- **Protanopie** (`Protanopia`) : Difficultés à percevoir les lumières rouges (daltonisme rouge-vert)
+- **Deutéranopie** (`Deuteranopia`) : Difficultés à percevoir les lumières vertes (daltonisme rouge-vert)
+- **Tritanopie** (`Tritanopia`) : Difficultés à percevoir les lumières bleues (daltonisme bleu-jaune)
+- **Achromatopsie** (`Achromatopsia`) : Impossibilité de voir les couleurs, uniquement les nuances de gris
+- **Cécité totale** : Absence complète de vision
+
+---
+
+# Déficiences motrices
+
+- **Paralysie partielle ou totale** : Difficulté ou impossibilité de bouger certaines parties du corps
+- **Tremblements** : Difficulté à effectuer des mouvements précis (clic, sélection)
+- **Arthrite** : Douleurs et raideurs articulaires limitant les mouvements
+- **Troubles neuromusculaires** : Faiblesse musculaire, coordination réduite
+- Ces personnes peuvent utiliser :
+    * le clavier uniquement (sans souris)
+    * des contacteurs (switches)
+    * un dispositif de pointage oculaire (eye tracking)
+    * la reconnaissance vocale
+
+---
+
+# Déficiences auditives
+
+- **Surdité totale** : Absence complète d'audition
+- **Surdité partielle** : Perte auditive partielle
+- **Acouphènes** : Perception de sons parasites
+- Ces personnes ont besoin de :
+    * sous-titres pour les contenus vidéo et audio
+    * transcriptions textuelles
+    * alertes visuelles au lieu de sonores
+    * langue des signes (pour certains contenus)
+
+---
+
+# Déficiences cognitives
+
+- **Dyslexie** : Difficulté de lecture et d'orthographe
+- **TDAH** : Trouble du déficit de l'attention avec ou sans hyperactivité
+- **Troubles de la mémoire** : Difficulté à retenir ou à se rappeler des informations
+- **Troubles du spectre autistique** : Difficultés de communication et d'interaction sociale
+- Ces personnes bénéficient de :
+    * contenu clair et simple
+    * navigation cohérente et prévisible
+    * temps de lecture suffisant
+    * absence d'animations distrayantes
 
 ---
 
 # Statistiques
 
-- 70% des sites Web ne sont pas accessibles.
-- 1 milliard de personnes ayant une déficience visuelle
-- 300 millions de personnes impactées par une déficience visuelle liée aux couleurs.
+- 70% des sites Web ne sont pas accessibles
+- 1,3 milliard de personnes dans le monde vivent avec une forme de déficience visuelle (OMS, 2023)
+- 300 millions de personnes sont impactées par une déficience visuelle liée aux couleurs (daltonisme)
+- 15% de la population mondiale vit avec un handicap (soit environ 1,3 milliard de personnes)
+- Le marché mondial des technologies d'assistance devrait atteindre 26 milliards de dollars d'ici 2024
 
 ---
 
-# Présentation de appareils utilisés
+# Présentation des appareils utilisés
 
 - Eye Tracking
 - MouthStick
@@ -198,9 +263,9 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 # Synthétiseurs Vocaux
 
-- Utilisé principalement par les personnes avec une déficiance visuelle.
-- Il convertit le contenu d'un site web ou d'une application en audio ou en braille.
-- Propose des raccourcis permettant de naviguer à travers une page.
+- Utilisés principalement par les personnes avec une déficience visuelle.
+- Ils convertissent le contenu d'un site web ou d'une application en audio ou en braille.
+- Proposent des raccourcis permettant de naviguer à travers une page.
 - Le contenu est lu plus rapidement (350 mots par minute) que la vitesse de lecture d'une personne (150 mots par minute)
 
 ---
@@ -208,15 +273,15 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 # Synthétiseurs Vocaux
 
-- Comment intéragissent un synthétiseur vocal et un navigateur ?
-    * Le navigateur genère le DOM Tree et l'Accessibility Tree
+- Comment interagissent un synthétiseur vocal et un navigateur ?
+    * Le navigateur génère le DOM Tree et l'Accessibility Tree
 
-- Une fois ces arbres créées, nous pouvons intéragir avec grâce aux
+- Une fois ces arbres créés, nous pouvons interagir avec eux grâce aux
     * DOM : Document Object Model
     * CSSOM : CSS Object Model
     * AOM : Accessibility Object Model
 
-- La Navigateur expose et met à jour cet AOM auprès d'API du Système d'exploitation
+- Le navigateur expose et met à jour cet AOM auprès des API du système d'exploitation
     * OSX Accessibility Platform (OSX), UI Automation (Microsoft), ...
 
 - Les Synthétiseurs vocaux s'abonnent à ces informations pour retranscrire le contenu du site web visité
@@ -261,7 +326,7 @@ id=5 role=Button name="OK"
 - Narrator
 - ChromeVox (plugin Chrome)
 
-(\*) représent 80% du marché.
+(\*) représentent 80% du marché des lecteurs d'écran.
 
 ---
 
@@ -276,7 +341,7 @@ id=5 role=Button name="OK"
 
 # Rotor
 
-- Certain synthétiseur vocal propose un **rotor**
+- Certains synthétiseurs vocaux proposent un **rotor**
 - Mécanisme permettant de
     * visualiser la structure de la page
     * de naviguer plus facilement
