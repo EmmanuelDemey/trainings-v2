@@ -59,6 +59,14 @@ Vous pouvez soit auditer l'une de vos applications, soit utiliser : https://www.
 
 ## PW 03 - Focus
 
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [MDN - :focus-visible](https://developer.mozilla.org/fr/docs/Web/CSS/:focus-visible)
+- [WebAIM - Skip Navigation Links](https://webaim.org/techniques/skipnav/)
+- [WCAG - Focus Visible](https://www.w3.org/WAI/WCAG21/Understanding/focus-visible.html)
+:::
+
 Durant cette partie pratique, nous allons créer des templates HTML permettant de créer une application de gestion d'arbres généalogiques.
 
 **Contexte du projet :** Application "Genea11y" (Genealogy + a11y)
@@ -161,6 +169,14 @@ Implémentez un système de tri pour le tableau. L'utilisateur pourra trier par 
 
 ## PW 05 - Les formulaires
 
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [MDN - Formulaires HTML](https://developer.mozilla.org/fr/docs/Learn/Forms)
+- [WebAIM - Creating Accessible Forms](https://webaim.org/techniques/forms/)
+- [WCAG - Labels or Instructions](https://www.w3.org/WAI/WCAG21/Understanding/labels-or-instructions.html)
+:::
+
 Nous allons à présent créer la seconde page HTML permettant de définir un formulaire pour ajouter une nouvelle personne à notre arbre généalogique.
 
 **Objectifs :**
@@ -231,6 +247,14 @@ Dans cette partie pratique, nous allons implémenter un nouveau composant `radio
 **Référence :** Consultez [WAI ARIA Practices - Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
 
 ## PW 07 - Les composants complexes
+
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [WAI ARIA Practices - Dialog (Modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+- [MDN - The Dialog element](https://developer.mozilla.org/fr/docs/Web/HTML/Element/dialog)
+- [A11ycasts - Dialog](https://www.youtube.com/watch?v=JS68faEUduk)
+:::
 
 Dans cette partie pratique, nous allons ouvrir une modale suite au clic sur une ligne du tableau. La modale affichera
 le détail de la personne sélectionnée.
