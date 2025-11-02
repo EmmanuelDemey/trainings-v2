@@ -119,7 +119,6 @@
 - Checklist d'accessibilité
 - Liste d'outils et extensions
 - Ressources pour approfondir
-- Accès à un repository GitHub avec les TPs
 
 ---
 
