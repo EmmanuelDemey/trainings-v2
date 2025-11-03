@@ -324,7 +324,7 @@ id=5 role=Button name="OK"
 - Voice Over (iOS)
 - TalkBack (Android)
 - Narrator
-- ChromeVox (plugin Chrome)
+- Orca
 
 (\*) représentent 80% du marché des lecteurs d'écran.
 

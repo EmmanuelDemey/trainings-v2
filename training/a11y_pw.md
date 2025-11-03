@@ -26,9 +26,25 @@ En fonction de votre système d'exploitation, vous serez peut-être dans l'oblig
 - **Linux** : Installez Orca (via votre gestionnaire de paquets)
 
 **Premiers pas :**
-- Familiarisez-vous avec les raccourcis de base
-- Naviguez sur quelques sites web pour comprendre l'expérience utilisateur
-- Testez la navigation par titres, liens et formulaires
+
+1. **Raccourcis essentiels à maîtriser :**
+   - **NVDA (Windows)** :
+     - Insert + Down : mode navigation
+     - Insert + Espace : basculer mode formulaire/navigation
+     - H : naviguer entre les titres
+     - K : naviguer entre les liens
+     - F : naviguer entre les champs de formulaire
+   - **VoiceOver (macOS)** :
+     - VO + A : lire tout
+     - VO + Flèches : naviguer
+     - VO + U : menu de navigation (titres, liens, formulaires)
+     - Ctrl : arrêter la lecture
+
+2. **Exercice pratique :**
+   - Naviguez sur quelques sites web pour comprendre l'expérience utilisateur
+   - Testez la navigation par titres, liens et formulaires
+   - Essayez de remplir un formulaire les yeux fermés
+   - Notez les difficultés rencontrées
 
 ## PW 02 - Auditer un site
 

@@ -401,6 +401,7 @@ button {
   background-color: rgba(255,255,255,0);
   padding: 0;
   border: none;
+  border-radius: 0;
 }
 ```
 
@@ -460,7 +461,7 @@ button {
 
 ```html
 <em role="img" aria-label="calendrier">📅</em>
-<button aria-label="Ajouter"><em aria-hidden="true" class="bi bi-bag-plus"></i></button>
+<button aria-label="Ajouter"><i aria-hidden="true" class="bi bi-bag-plus"></i></button>
 ```
 
 ---
@@ -598,6 +599,17 @@ button {
     </tr>
 </thead>
 ```
+
+---
+
+# Table - Accessibilité
+
+* **Bonnes pratiques** pour les tableaux accessibles :
+    * Toujours utiliser `<caption>` pour décrire le tableau
+    * Utiliser `<thead>`, `<tbody>`, `<tfoot>` pour structurer
+    * Utiliser `<th>` pour les en-têtes (avec `scope="col"` ou `scope="row"`)
+    * Pour les tableaux complexes, utiliser `headers` et `id`
+* **Ne jamais utiliser** de tableaux pour la mise en page (layout)
 
 ---
 
@@ -848,133 +860,6 @@ body {
     * 1 = blanc absolu
 * Formule : `(L1 + 0.05) / (L2 + 0.05)`
 * Résultat entre `1:1` (aucun contraste) et `21:1` (contraste maximum)
-
----
-
-# Table - Accessibilité
-
-* **Bonnes pratiques** pour les tableaux accessibles :
-    * Toujours utiliser `<caption>` pour décrire le tableau
-    * Utiliser `<thead>`, `<tbody>`, `<tfoot>` pour structurer
-    * Utiliser `<th>` pour les en-têtes (avec `scope="col"` ou `scope="row"`)
-    * Pour les tableaux complexes, utiliser `headers` et `id`
-* **Ne jamais utiliser** de tableaux pour la mise en page (layout)
-
----
-
-# Formulaires - Labels
-
-* **WCAG 1.3.1** et **3.3.2** (niveau A) : Tous les champs doivent avoir un label
-* Utilisez `<label>` associé avec l'attribut `for`
-
-```html
-<label for="email">Adresse email</label>
-<input type="email" id="email" name="email" required />
-```
-
-* Alternatives acceptables :
-    * `aria-label` : label invisible
-    * `aria-labelledby` : référence à un élément existant
-    * `placeholder` seul n'est **PAS** suffisant
-
----
-
-# Formulaires - Groupes
-
-* Utilisez `<fieldset>` et `<legend>` pour grouper des champs liés
-
-```html
-<fieldset>
-    <legend>Informations personnelles</legend>
-    <label for="firstname">Prénom</label>
-    <input type="text" id="firstname" />
-    <label for="lastname">Nom</label>
-    <input type="text" id="lastname" />
-</fieldset>
-```
-
-* Particulièrement important pour les boutons radio et checkboxes
-
----
-
-# Formulaires - Messages d'erreur
-
-* Les erreurs doivent être :
-    * **Visibles** et **claires**
-    * Associées au champ concerné (`aria-describedby`)
-    * Annoncées aux lecteurs d'écran (`aria-live`, `aria-invalid`)
-
-```html
-<label for="email">Email</label>
-<input
-    type="email"
-    id="email"
-    aria-invalid="true"
-    aria-describedby="email-error" />
-<span id="email-error" role="alert">
-    Veuillez entrer une adresse email valide
-</span>
-```
-
----
-
-# Liens - Texte descriptif
-
-* Le texte du lien doit être explicite hors contexte
-* **❌ Éviter** : "Cliquez ici", "En savoir plus", "Lire la suite"
-* **✅ Préférer** : "Télécharger le rapport annuel 2024", "En savoir plus sur l'accessibilité web"
-
-```html
-<!-- Mauvais -->
-<p>Notre rapport annuel est disponible. <a href="...">Cliquez ici</a></p>
-
-<!-- Bon -->
-<p>Notre <a href="...">rapport annuel 2024</a> est disponible.</p>
-```
-
----
-
-# Liens - Nouvelle fenêtre
-
-* Si un lien ouvre dans une nouvelle fenêtre/onglet, **prévenez l'utilisateur**
-
-```html
-<a href="..." target="_blank" rel="noopener noreferrer">
-    Consulter le site externe
-    <span class="sr-only">(ouvre dans une nouvelle fenêtre)</span>
-</a>
-
-<!-- Ou avec une icône -->
-<a href="..." target="_blank" rel="noopener noreferrer">
-    Consulter le site externe
-    <svg aria-label="(ouvre dans une nouvelle fenêtre)">...</svg>
-</a>
-```
-
-* **Note** : `rel="noopener noreferrer"` est important pour la sécurité
-
----
-
-# Classe sr-only / visually-hidden
-
-* Pour cacher du contenu visuellement mais le garder pour les lecteurs d'écran
-
-```css
-.sr-only,
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-```
-
-* Cas d'usage : titres cachés, texte de liens, instructions supplémentaires
 
 ---
 
