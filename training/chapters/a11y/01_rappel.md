@@ -78,10 +78,17 @@ const buttons = Array.from(document.querySelectorAll("button"));
 // ou
 const buttons2 = [...document.querySelectorAll("button")];
 
-// Utilisation des méthodes Array
-buttons.forEach((button) => console.log(button));
-buttons.map((button) => button.textContent);
-buttons.filter((button) => button.disabled);
+// Utilisation des méthodes Array avec gestion d'erreurs
+if (!buttons.length) {
+  console.log("Aucun bouton trouvé");
+} else {
+  buttons.forEach((button) => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('Bouton cliqué:', button.textContent);
+    });
+  });
+}
 ```
 
 ---
@@ -202,22 +209,29 @@ document.addEventListener("DOMContentLoaded", () => {
 * Pour garder une référence vers un élément, nous allons utiliser une *ref* via le hook *useRef*
 
 ```typescript
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
-function MyComponent() {
-  const inputRef = useRef<HTMLInputElement>(null);
+// Exemple pratique : Auto-focus sur le premier champ d'un formulaire
+function AccessibleForm() {
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
-  const focusInput = () => {
-    inputRef.current?.focus();
-  };
+  useEffect(() => {
+    // Focus automatique au montage - aide les utilisateurs à commencer la saisie
+    nameInputRef.current?.focus();
+  }, []);
 
   return (
-    <>
-      <input ref={inputRef} type="text" />
-      <button type="button" onClick={focusInput}>
-        Focus on Input
-      </button>
-    </>
+    <form>
+      <label htmlFor="name">Nom complet (requis)</label>
+      <input
+        ref={nameInputRef}
+        id="name"
+        type="text"
+        required
+        aria-required="true"
+      />
+      <button type="submit">Envoyer</button>
+    </form>
   );
 }
 

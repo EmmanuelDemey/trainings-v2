@@ -20,7 +20,7 @@ drawings:
 
 Administration et exploitation d'Elasticsearch en production
 
-Par Emmanuel DEMEY - HumanCoders
+Par Emmanuel DEMEY
 
 ---
 layout: intro

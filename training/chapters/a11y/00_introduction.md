@@ -82,9 +82,9 @@
 - Éditeur de code (VS Code recommandé)
 - Node.js installé (pour les exercices React/Playwright)
 - Extensions recommandées :
-  - axe DevTools
-  - WAVE Evaluation Tool
-  - Accessibility Insights
+  - [axe DevTools](https://www.deque.com/axe/devtools/) - Chrome, Firefox, Edge
+  - [WAVE Evaluation Tool](https://wave.webaim.org/extension/) - Chrome, Firefox
+  - [Accessibility Insights](https://accessibilityinsights.io/) - Chrome, Edge
 
 ---
 

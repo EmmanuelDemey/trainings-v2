@@ -217,6 +217,41 @@ for(let i=0; i < headings.length; i++){
 
 ---
 
+# Implémentation .sr-only complète
+
+```css
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Pour les éléments focusables (skip links) */
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+```
+
+**Pourquoi chaque propriété** :
+- `position: absolute; width/height: 1px` - Retirer du flux layout
+- `margin: -1px` - Empêcher l'espace inutile
+- `overflow: hidden` - Assurer aucun overflow visuel
+- `clip: rect(0,0,0,0)` - Masquage visuel additionnel
+- `white-space: nowrap` - Éviter les problèmes de wrapping
+
+---
+
 # Balises sémantiques
 
 * `<article>` : contenu autonome qui pourrait être distribué indépendamment (article de blog, commentaire, widget)

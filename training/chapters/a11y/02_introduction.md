@@ -221,6 +221,22 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 ---
 
+# Handicaps Situationnels & Temporaires
+
+## L'accessibilité profite à tous
+
+De nombreuses fonctionnalités d'accessibilité bénéficient aussi aux situations temporaires :
+
+- **Bras cassé** → Contrôle vocal, navigation à une main
+- **Environnement bruyant** → Sous-titres pour vidéos
+- **Plein soleil** → Mode contraste élevé, thème sombre
+- **Nouveau parent** → Contrôle vocal, raccourcis clavier
+- **Connexion lente** → Animations réduites, layouts simplifiés
+
+**Point clé** : Un design accessible améliore l'expérience de tous, pas seulement des personnes en situation de handicap permanent !
+
+---
+
 # Présentation des appareils utilisés
 
 - Eye Tracking
@@ -317,6 +333,19 @@ id=5 role=Button name="OK"
 
 ---
 
+# Inspecter l'Accessibility Tree
+
+## Chrome/Edge DevTools
+
+1. Ouvrir DevTools (F12)
+2. Aller dans l'onglet "Elements"
+3. Clic droit sur un élément → "Inspect accessibility tree"
+4. Voir comment les lecteurs d'écran perçoivent votre contenu
+
+**Astuce** : Utilisez ceci régulièrement pendant le développement pour détecter les problèmes sémantiques tôt !
+
+---
+
 # Synthétiseurs Vocaux
 
 - NVDA (\*)
@@ -332,10 +361,12 @@ id=5 role=Button name="OK"
 
 # Synthétiseurs Vocaux
 
-- https://youtu.be/5R-6WvAihms[Assistive Tech - VoiceOver]
-- https://youtu.be/bCHpdjvxBws[Assistive Tech - VoiceOver on iOS]
-- https://youtu.be/0Zpzl4EKCco[Assistive Tech - Talkback]
-- https://youtu.be/Jao3s_CwdRU[Assistive Tech - NVDA]
+- [Assistive Tech - VoiceOver](https://youtu.be/5R-6WvAihms) (8 min) - Navigation web avec VoiceOver. Recommandé pour tous les développeurs.
+- [Assistive Tech - VoiceOver on iOS](https://youtu.be/bCHpdjvxBws) (5 min) - Démonstration du lecteur d'écran mobile
+- [Assistive Tech - Talkback](https://youtu.be/0Zpzl4EKCco) (6 min) - Navigation avec le lecteur d'écran Android
+- [Assistive Tech - NVDA](https://youtu.be/Jao3s_CwdRU) (7 min) - Lecteur d'écran Windows (le plus utilisé avec JAWS)
+
+**Pro Tip** : Essayez de tester votre propre site avec ces outils avant de déployer !
 
 ---
 

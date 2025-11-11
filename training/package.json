@@ -5,13 +5,15 @@
     "build": "slidev build",
     "dev": "slidev --open",
     "export": "slidev export",
+    "generate:all": "node ./scripts/generateA11y.js",
+    "generate:elasticsearch": "node ./scripts/generateA11y.js",
     "generate:elasticsearch-ops-pdf": "node generate_elasticsearch_ops_pw_pdf_playwright.js",
     "merge:elasticsearch-ops": "bash merge_elasticsearch_ops_pw.sh"
   },
   "dependencies": {
-    "@slidev/cli": "^0.52.4",
-    "@slidev/theme-default": "^0.27.2",
-    "@slidev/theme-seriph": "^0.27.2",
+    "@slidev/cli": "52.8.0",
+    "@slidev/theme-default": "^0.25.0",
+    "@slidev/theme-seriph": "^0.25.0",
     "piscina": "^5.0.0-alpha.0"
   },
   "devDependencies": {
@@ -20,8 +22,10 @@
     "fs-extra": "^11.2.0",
     "just-kebab-case": "^4.2.0",
     "kebab-case": "^2.0.1",
+    "marked": "^11.1.1",
     "md-to-pdf": "^5.2.4",
     "n-readlines": "^1.0.1",
-    "playwright-chromium": "^1.49.0"
+    "playwright-chromium": "^1.49.0",
+    "puppeteer": "^24.29.1"
   }
 }

@@ -313,7 +313,7 @@ La [topologie réseau](https://www.elastic.co/guide/en/elasticsearch/reference/c
 
 **Petit cluster (1-10 nœuds)**:
 ```
-[Client] → [Node 1] [Node 2] [Node 3]
+\[Client\] → \[Node 1\] \[Node 2\] \[Node 3\]
             (all roles: master + data + ingest)
 ```
 Tous les nœuds partagent tous les rôles, simplicité maximale.
@@ -321,11 +321,11 @@ Tous les nœuds partagent tous les rôles, simplicité maximale.
 
 **Cluster moyen (10-50 nœuds)**:
 ```
-[Client] → [Coordinating] [Coordinating]
+\[Client\] → \[Coordinating\] \[Coordinating\]
                 ↓              ↓
-           [Data 1-10]    [Data 11-20]
+           \[Data 1-10\]    \[Data 11-20\]
                 ↓              ↓
-           [Master 1] [Master 2] [Master 3]
+           \[Master 1\] \[Master 2\] \[Master 3\]
 ```
 Séparation master/data/coordinating pour stabilité.
 
@@ -335,13 +335,13 @@ Séparation master/data/coordinating pour stabilité.
 
 **Grand cluster (50+ nœuds)**:
 ```
-[Client] → [Load Balancer]
+\[Client\] → \[Load Balancer\]
                 ↓
-        [Coordinating 1-N]
+        \[Coordinating 1-N\]
                 ↓
-        [Data Hot] [Data Warm] [Data Cold]
+        \[Data Hot\] \[Data Warm\] \[Data Cold\]
                 ↓
-        [Master 1] [Master 2] [Master 3]
+        \[Master 1\] \[Master 2\] \[Master 3\]
 ```
 Architecture hot-warm-cold pour optimisation coût/performance.
 

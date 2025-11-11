@@ -6,3 +6,8 @@ specs
 .specify
 elasticsearch_ops_pw_complete.md
 .DS_Store
+
+# Generated PDFs and build output
+dist/
+training/dist/
+training/index.html

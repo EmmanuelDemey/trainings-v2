@@ -550,7 +550,7 @@ Savoir interpréter les erreurs courantes accélère le troubleshooting.
 
 **1. CircuitBreakerException**
 ```
-[parent] Data too large, data for [<http_request>] would be [x], which is larger than the limit of [y]
+\[parent\] Data too large, data for [<http_request>] would be [x], which is larger than the limit of [y]
 ```
 → Heap saturé, requête trop gourmande. Actions: Réduire taille requête, augmenter heap, ajouter nœuds.
 

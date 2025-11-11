@@ -705,7 +705,7 @@ Pre-deployment, monitoring, et incident response
 **Workflow général** :
 
 ```
-[Alerte] → [Triage] → [Diagnostic] → [Mitigation] → [Resolution] → [Post-Mortem]
+\[Alerte\] → \[Triage\] → \[Diagnostic\] → \[Mitigation\] → \[Resolution\] → \[Post-Mortem\]
 ```
 
 **Incident 1 : Cluster status RED** :

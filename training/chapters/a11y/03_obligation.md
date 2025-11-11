@@ -158,10 +158,14 @@ En plus des correctifs techniques, 3 documents obligatoires :
 * Web Content Accessibility Guidelines
 * La dernière version publiée est **WCAG 2.2** (octobre 2023)
 * Possède différents niveaux de conformités : A, AA et AAA
-* La prochaine version WCAG 3 en cours d'écriture
+* **WCAG 3.0** est en développement et devrait sortir prochainement
 * *ISO 40500* et standard européen *EN 301 549*
 
-**Source** : [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/)
+**Sources** :
+- [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/)
+- [W3C WAI News](https://www.w3.org/WAI/news/) - Pour rester à jour
+
+**Note** : WCAG 2.2 reste le standard légal actuel ; WCAG 3.0 introduira de nouveaux critères.
 
 ---
 
@@ -388,6 +392,27 @@ and success criteria help ensure we forget nothing.
 **Sources** :
 - [WHO Disability Report](https://www.who.int/teams/noncommunicable-diseases/sensory-functions-disability-and-rehabilitation/world-report-on-disability)
 - [Return on Disability Group](https://www.rod-group.com/)
+
+---
+
+# Calculer le ROI de l'accessibilité
+
+## Investissement
+
+- **Audit initial** : 1-2 semaines
+- **Formation équipe** : 1-2 jours
+- **Implémentation** : 5-10% du temps de développement
+- **Tests continus** : Intégré dans la QA
+
+## Retours
+
+- **Audience** : +15% (1+ milliard de personnes)
+- **SEO** : +30% de visibilité organique
+- **Support** : -40% de réclamations
+- **Protection légale** : Éviter les procès (coût moyen : 50K-500K€)
+- **Réputation** : Relations publiques positives
+
+**Utilisez ces données pour présenter l'accessibilité à votre direction !**
 
 ---
 layout: cover
