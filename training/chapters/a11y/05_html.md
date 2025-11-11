@@ -396,7 +396,7 @@ La balise button n'est pas stylisable
 * **Mythe** : "Les `<div>` sont plus faciles à styliser"
 * **Réalité** : Réinitialiser les styles d'un `<button>` est simple :
 
-```html
+```css
 button {
   background-color: rgba(255,255,255,0);
   padding: 0;

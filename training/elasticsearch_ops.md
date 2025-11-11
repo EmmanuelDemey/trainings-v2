@@ -1,68 +1,107 @@
 ---
-# try also 'default' to start simple
 theme: seriph
-# random image from a curated Unsplash collection by Anthony
-# like them? see https://unsplash.com/collections/94734566/slidev
-background: https://source.unsplash.com/collection/94734566/1920x1080
-# apply any windi css classes to the current slide
-class: 'text-center'
-# https://sli.dev/custom/highlighters.html
 highlighter: shiki
-# show line numbers in code blocks
 lineNumbers: true
-# some information about the slides, markdown enabled
+css: unocss
+download: true
+exportFilename: elasticsearch-ops-slides
 info: |
-  ## Elasticsearch Ops - 2 Day Training
-  Operational training for Elasticsearch administrators and DevOps engineers.
+  ## Elasticsearch Ops - Formation 2 Jours
+  Par Emmanuel DEMEY - HumanCoders
 
-  Learn more at [Sli.dev](https://sli.dev)
-# persist drawings in exports and build
+  Formation opérationnelle complète sur l'administration et l'exploitation d'Elasticsearch.
+  Couvre l'installation, la configuration, les performances, le monitoring, et la sécurité.
 drawings:
   persist: false
-# use UnoCSS
-css: unocss
 ---
 
 # Elasticsearch Ops
+## Formation sur 2 jours
 
-Formation sur 2 jours - Administration et Opérations
+Administration et exploitation d'Elasticsearch en production
+
+Par Emmanuel DEMEY - HumanCoders
 
 ---
-src: ./chapters/elasticsearch/01_presentation_general.md
+layout: intro
+---
+
+# Jour 1
+## Fondamentaux et Mise en Production
+
+**Matin**:
+- Présentation générale et concepts Elasticsearch
+- Installation et configuration
+
+**Après-midi**:
+- Performance et dimensionnement
+- Monitoring et observabilité
+
+---
+src: ./chapters/elasticsearch/01_general_concepts.md
 hide: false
 ---
 
 ---
-src: ./chapters/elasticsearch/07_operating.md
+src: ./chapters/elasticsearch/02_installation_config.md
 hide: false
 ---
 
 ---
-src: ./chapters/elasticsearch/11_dimentionnement.md
+src: ./chapters/elasticsearch/04_monitoring.md
 hide: false
 ---
 
 ---
-src: ./chapters/elasticsearch/13_monitoring.md
+src: ./chapters/elasticsearch/03_performance_capacity.md
+hide: false
+---
+
+
+---
+layout: intro
+---
+
+# Jour 2
+## Opérations Avancées et Sécurisation
+
+**Matin**:
+- Systèmes d'alertes et monitoring proactif
+- Opérations de maintenance et gestion du cycle de vie
+
+**Après-midi**:
+- Implémentation de la sécurité et authentification
+- Bonnes pratiques de production et haute disponibilité
+
+---
+src: ./chapters/elasticsearch/05_alerting.md
 hide: false
 ---
 
 ---
-src: ./chapters/elasticsearch/12_retention.md
+src: ./chapters/elasticsearch/06_maintenance.md
 hide: false
 ---
 
 ---
-src: ./chapters/elasticsearch/14_alerting.md
+src: ./chapters/elasticsearch/07_security.md
 hide: false
 ---
 
 ---
-src: ./chapters/elasticsearch/15_security.md
+src: ./chapters/elasticsearch/08_production_best_practices.md
 hide: false
+---
+layout: end
 ---
 
----
-src: ./chapters/elasticsearch/16_backup.md
-hide: false
----
+# Merci !
+
+## Questions ?
+
+**Ressources**:
+- [Documentation Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+- [Elastic Blog](https://www.elastic.co/blog)
+- [Elastic Community](https://discuss.elastic.co)
+
+**Contact**: demey.emmanuel@gmail.com

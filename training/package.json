@@ -4,7 +4,9 @@
   "scripts": {
     "build": "slidev build",
     "dev": "slidev --open",
-    "export": "slidev export"
+    "export": "slidev export",
+    "generate:elasticsearch-ops-pdf": "node generate_elasticsearch_ops_pw_pdf_playwright.js",
+    "merge:elasticsearch-ops": "bash merge_elasticsearch_ops_pw.sh"
   },
   "dependencies": {
     "@slidev/cli": "^0.52.4",
