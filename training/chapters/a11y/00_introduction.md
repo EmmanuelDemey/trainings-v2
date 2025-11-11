@@ -50,54 +50,6 @@
 
 ---
 
-# Chiffres clés
-
-## L'accessibilité en quelques statistiques
-
-- **15%** de la population mondiale vit avec un handicap
-- **70%** des sites web ne sont pas accessibles
-- **1 milliard** de personnes avec une déficience visuelle
-- **466 millions** de personnes avec une perte auditive
-- **€6.9 trillions** : pouvoir d'achat des personnes handicapées
-
----
-
-# Pourquoi l'accessibilité ?
-
-## Les bénéfices
-
-1. **Légal** : Obligation réglementaire dans de nombreux pays
-2. **Éthique** : Inclusion de tous les utilisateurs
-3. **Économique** : Élargissement du marché potentiel
-4. **Technique** : Amélioration de la qualité du code
-5. **SEO** : Impact positif sur le référencement
-
----
-
-# L'accessibilité n'est pas...
-
-## Idées reçues
-
-- Uniquement pour les personnes aveugles
-- Difficile et coûteuse à implémenter
-- À faire à la fin du projet
-- En conflit avec le design
-- Uniquement une question de conformité légale
-
----
-
-# L'accessibilité c'est...
-
-## La réalité
-
-- Pour tout le monde (handicaps permanents, temporaires, situationnels)
-- Plus facile quand prise en compte dès le début
-- Une amélioration de l'expérience utilisateur globale
-- Compatible avec un design moderne et esthétique
-- Une responsabilité partagée (designers, développeurs, testeurs, PO)
-
----
-
 # Méthodologie de la formation
 
 ## Approche pédagogique
@@ -146,17 +98,6 @@
 - Activez vos caméras si possible (distanciel)
 - Téléphones en silencieux
 - Pauses régulières
-
----
-
-# Les 4 principes POUR
-
-## Les fondements de WCAG
-
-1. **Perceptible** : L'information doit être présentée de manière perceptible
-2. **Operable** : Les composants de l'interface doivent être utilisables
-3. **Understandable** : L'information et l'interface doivent être compréhensibles
-4. **Robust** : Le contenu doit être interprétable par diverses technologies
 
 ---
 

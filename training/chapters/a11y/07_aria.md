@@ -8,20 +8,8 @@ layout: cover
 
 # Norme ARIA
 
-* **Rappel** : Il est recommandé d'utiliser en priorité les éléments HTML natifs
-* Si pour une raison technique cela n'est pas possible :
-    * vous pouvez créer vos propres composants
-    * et y ajouter des attributs ARIA pour l'accessibilité
-* Ces attributs sont définis dans la spécification **WAI-ARIA**
-* **Règle n°1 d'ARIA** : Ne pas utiliser ARIA si un élément HTML natif existe
-
----
-
-# Norme ARIA
-
 * **WAI-ARIA** : Web Accessibility Initiative – Accessible Rich Interactive Applications
 * Permet d'ajouter de la sémantique aux contenus HTML
-* **⚠️ Important** : À utiliser uniquement si HTML ne propose pas d'élément natif équivalent
 * Trois catégories principales :
     * **Roles** : définissent le type d'élément
     * **States** (états) : propriétés qui changent (ex: `aria-checked`)
@@ -29,36 +17,30 @@ layout: cover
 
 ---
 
-# Norme ARIA - Cas d'usage
+# Règle n°1 d'ARIA : Préférer HTML natif
 
-* Les attributs ARIA permettent :
-    * d'ajouter de la sémantique au code HTML non sémantique
-    * de gérer la compatibilité avec d'anciens navigateurs
-    * de créer des composants personnalisés accessibles (widgets)
-* **Ne jamais utiliser ARIA** pour contourner des problèmes de CSS/style
-
----
-
-# Norme ARIA - Limitations
-
-* ⚠️ **Très important** : Les attributs ARIA n'ont d'impact **que** sur l'Accessibility Tree
-* Ils **n'auront aucun impact** sur :
-    * l'apparence visuelle des éléments (vous devez ajouter du CSS)
-    * le comportement des éléments (vous devez ajouter du JavaScript)
-    * la focusabilité (vous devez ajouter `tabindex`)
-    * la navigation au clavier (vous devez gérer les événements)
-
----
-
-# Norme ARIA - Pourquoi préférer HTML natif ?
-
-* D'où la **nécessité absolue** d'utiliser en priorité les éléments HTML natifs
-* HTML natif = fonctionnalités gratuites :
+* **⚠️ Important** : À utiliser uniquement si HTML ne propose pas d'élément natif équivalent
+* **HTML natif** offre gratuitement :
     * Sémantique native
     * Navigation au clavier
     * Focus management
     * Comportement attendu
-* ARIA = vous devez **tout** coder vous-même
+* **ARIA** nécessite de tout coder manuellement :
+    * Apparence visuelle (CSS)
+    * Comportement (JavaScript)
+    * Focusabilité (`tabindex`)
+    * Navigation clavier (événements)
+
+---
+
+# Norme ARIA - Cas d'usage
+
+* Utiliser ARIA seulement si nécessaire pour :
+    * Ajouter de la sémantique au code HTML non sémantique
+    * Gérer la compatibilité avec d'anciens navigateurs
+    * Créer des composants personnalisés accessibles (widgets)
+* **Ne jamais utiliser ARIA** pour contourner des problèmes de CSS/style
+* Les attributs ARIA n'ont d'impact **que** sur l'Accessibility Tree
 
 ---
 

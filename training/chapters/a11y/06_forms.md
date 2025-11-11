@@ -63,21 +63,7 @@ layout: cover
 
 # Formulaire - Label caché visuellement
 
-* Si vous souhaitez définir des labels cachés visuellement mais accessibles aux lecteurs d'écran, utilisez la classe `.sr-only`
-
-```css
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-```
+* Si vous souhaitez définir des labels cachés visuellement mais accessibles aux lecteurs d'écran, utilisez la classe `.sr-only` (vue dans le chapitre Rappels)
 
 ---
 
