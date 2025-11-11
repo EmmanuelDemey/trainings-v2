@@ -1,7 +1,6 @@
 ## Lab 2.1: Formation d'un Cluster Multi-Nœuds
 
 **Topic**: Installation et Configuration - Formation de Cluster
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Un nœud Elasticsearch 8.x déjà démarré
 
 ### Objectif

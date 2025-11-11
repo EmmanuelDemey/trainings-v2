@@ -1,7 +1,6 @@
 ## 🌟 Bonus 1.B: Mappings Nested et Parent-Child
 
 **Niveau**: Avancé
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 1.2 complété
 
 ### Objectif

@@ -1,7 +1,6 @@
 ## 🌟 Bonus 4.A: Création de Dashboards Kibana pour Monitoring
 
 **Niveau**: Avancé
-**Durée Estimée**: 30-40 minutes
 **Prérequis**: Kibana installé et accessible, Stack Monitoring activé
 
 ### Objectif

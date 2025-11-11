@@ -1,7 +1,6 @@
 ## 🌟 Bonus 3.A: Architecture Hot-Warm-Cold avec ILM
 
 **Niveau**: Avancé
-**Durée Estimée**: 30-35 minutes
 **Prérequis**: Labs 2.2 et 3.1 complétés
 
 ### Objectif

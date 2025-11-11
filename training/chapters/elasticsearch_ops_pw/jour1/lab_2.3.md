@@ -1,7 +1,6 @@
 ## Lab 2.3: Inspection du Cluster avec les _cat APIs
 
 **Topic**: Installation et Configuration - APIs de Vérification
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Lab 2.1 complété (cluster à 2+ nœuds)
 
 ### Objectif

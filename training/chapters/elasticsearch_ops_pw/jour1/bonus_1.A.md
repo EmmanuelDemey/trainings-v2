@@ -1,7 +1,6 @@
 ## 🌟 Bonus 1.A: Optimisation du Scoring de Recherche
 
 **Niveau**: Avancé
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Lab 1.1 et 1.2 complétés
 
 ### Objectif

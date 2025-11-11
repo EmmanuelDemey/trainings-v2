@@ -1,7 +1,6 @@
 ## Lab 4.3: Configuration et Analyse des Slow Query Logs
 
 **Topic**: Monitoring - Analyse des Logs
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Cluster Elasticsearch, accès aux fichiers de logs
 
 ### Objectif

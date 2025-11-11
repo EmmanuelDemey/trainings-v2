@@ -1,7 +1,6 @@
 ## Lab 1.3: Agrégations de Données
 
 **Topic**: Concepts Généraux - Agrégations
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 1.2 complété (index `blog_posts` existe)
 
 ### Objectif

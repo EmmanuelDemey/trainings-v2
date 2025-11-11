@@ -1,7 +1,6 @@
 ## Lab 3.3: Analyse des Thread Pools et Rejections
 
 **Topic**: Performance et Dimensionnement - Optimisation des Ressources
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Cluster Elasticsearch avec quelques données
 
 ### Objectif

@@ -1,7 +1,6 @@
 ## Lab 3.1: Dimensionnement de Cluster - Calcul du Nombre de Shards
 
 **Topic**: Performance et Dimensionnement - Planification de Capacité
-**Durée Estimée**: 25-30 minutes
 **Prérequis**: Compréhension des concepts de shards et replicas
 
 ### Objectif

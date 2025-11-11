@@ -1,7 +1,6 @@
 ## Lab 4.1: Utilisation de l'API Cluster Health
 
 **Topic**: Monitoring - APIs de Surveillance
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Cluster Elasticsearch avec au moins 1 nœud actif
 
 ### Objectif

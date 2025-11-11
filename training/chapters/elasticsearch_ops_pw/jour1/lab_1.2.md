@@ -1,7 +1,6 @@
 ## Lab 1.2: Définition de Mappings Explicites
 
 **Topic**: Concepts Généraux - Mappings
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 1.1 complété
 
 ### Objectif

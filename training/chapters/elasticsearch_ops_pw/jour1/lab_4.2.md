@@ -1,7 +1,6 @@
 ## Lab 4.2: Monitoring des Statistiques de Nœuds
 
 **Topic**: Monitoring - Métriques Critiques
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Cluster Elasticsearch actif
 
 ### Objectif

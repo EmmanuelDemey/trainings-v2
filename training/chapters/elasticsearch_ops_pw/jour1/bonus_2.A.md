@@ -1,7 +1,6 @@
 ## 🌟 Bonus 2.A: Shard Allocation Awareness
 
 **Niveau**: Avancé
-**Durée Estimée**: 25-30 minutes
 **Prérequis**: Lab 2.1 et 2.2 complétés
 
 ### Objectif

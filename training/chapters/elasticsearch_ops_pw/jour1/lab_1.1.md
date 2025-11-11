@@ -1,7 +1,6 @@
 ## Lab 1.1: Création et Interrogation d'Index
 
 **Topic**: Concepts Généraux - Indexation et Recherche
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Cluster Elasticsearch 8.x démarré et accessible
 
 ### Objectif

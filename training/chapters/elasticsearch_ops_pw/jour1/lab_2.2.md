@@ -1,7 +1,6 @@
 ## Lab 2.2: Configuration des Rôles de Nœuds
 
 **Topic**: Installation et Configuration - Rôles de Nœuds
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 2.1 complété (cluster à 2 nœuds)
 
 ### Objectif

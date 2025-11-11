@@ -26,7 +26,6 @@ Formation sur 2 jours - Exercices pratiques et ateliers
 ## Lab 1.1: Création et Interrogation d'Index
 
 **Topic**: Concepts Généraux - Indexation et Recherche
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Cluster Elasticsearch 8.x démarré et accessible
 
 ### Objectif
@@ -210,7 +209,6 @@ GET /products/_search
 ## Lab 1.2: Définition de Mappings Explicites
 
 **Topic**: Concepts Généraux - Mappings
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 1.1 complété
 
 ### Objectif
@@ -483,7 +481,6 @@ GET /blog_posts/_search
 ## Lab 1.3: Agrégations de Données
 
 **Topic**: Concepts Généraux - Agrégations
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 1.2 complété (index `blog_posts` existe)
 
 ### Objectif
@@ -747,7 +744,6 @@ GET /blog_posts/_search
 ## 🌟 Bonus 1.A: Optimisation du Scoring de Recherche
 
 **Niveau**: Avancé
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Lab 1.1 et 1.2 complétés
 
 ### Objectif
@@ -905,7 +901,6 @@ GET /blog_posts/_search
 ## 🌟 Bonus 1.B: Mappings Nested et Parent-Child
 
 **Niveau**: Avancé
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 1.2 complété
 
 ### Objectif
@@ -1075,7 +1070,6 @@ GET /blog_flat_comments/_search
 ## Lab 2.1: Formation d'un Cluster Multi-Nœuds
 
 **Topic**: Installation et Configuration - Formation de Cluster
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Un nœud Elasticsearch 8.x déjà démarré
 
 ### Objectif
@@ -1248,7 +1242,6 @@ GET /_cat/shards/test-resilience?v
 ## Lab 2.2: Configuration des Rôles de Nœuds
 
 **Topic**: Installation et Configuration - Rôles de Nœuds
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Lab 2.1 complété (cluster à 2 nœuds)
 
 ### Objectif
@@ -1433,7 +1426,6 @@ POST /_cluster/reroute
 ## Lab 2.3: Inspection du Cluster avec les _cat APIs
 
 **Topic**: Installation et Configuration - APIs de Vérification
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Lab 2.1 complété (cluster à 2+ nœuds)
 
 ### Objectif
@@ -1639,7 +1631,6 @@ index                 | i,idx                          | index name
 ## 🌟 Bonus 2.A: Shard Allocation Awareness
 
 **Niveau**: Avancé
-**Durée Estimée**: 25-30 minutes
 **Prérequis**: Lab 2.1 et 2.2 complétés
 
 ### Objectif
@@ -1831,7 +1822,6 @@ PUT /_cluster/settings
 ## Lab 3.1: Dimensionnement de Cluster - Calcul du Nombre de Shards
 
 **Topic**: Performance et Dimensionnement - Planification de Capacité
-**Durée Estimée**: 25-30 minutes
 **Prérequis**: Compréhension des concepts de shards et replicas
 
 ### Objectif
@@ -2022,7 +2012,6 @@ Watermark FLOOD:     95% (safe)
 ## Lab 3.2: Configuration du Heap JVM
 
 **Topic**: Performance et Dimensionnement - Configuration Système
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Accès au serveur Elasticsearch, droits root/sudo
 
 ### Objectif
@@ -2267,7 +2256,6 @@ GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_used_percent
 ## Lab 3.3: Analyse des Thread Pools et Rejections
 
 **Topic**: Performance et Dimensionnement - Optimisation des Ressources
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Cluster Elasticsearch avec quelques données
 
 ### Objectif
@@ -2521,7 +2509,6 @@ GET /_nodes/stats/thread_pool
 ## 🌟 Bonus 3.A: Architecture Hot-Warm-Cold avec ILM
 
 **Niveau**: Avancé
-**Durée Estimée**: 30-35 minutes
 **Prérequis**: Labs 2.2 et 3.1 complétés
 
 ### Objectif
@@ -2811,7 +2798,6 @@ POST /logs-000001/_ilm/move_to_step
 ## 🌟 Bonus 3.B: Troubleshooting Slow Indexing Performance
 
 **Niveau**: Avancé
-**Durée Estimée**: 25-30 minutes
 **Prérequis**: Lab 3.2 complété, compréhension du Bulk API
 
 ### Objectif
@@ -3008,7 +2994,6 @@ Amélioration totale:          ×83
 ## Lab 4.1: Utilisation de l'API Cluster Health
 
 **Topic**: Monitoring - APIs de Surveillance
-**Durée Estimée**: 15-20 minutes
 **Prérequis**: Cluster Elasticsearch avec au moins 1 nœud actif
 
 ### Objectif
@@ -3254,7 +3239,6 @@ GET /_cluster/allocation/explain
 ## Lab 4.2: Monitoring des Statistiques de Nœuds
 
 **Topic**: Monitoring - Métriques Critiques
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Cluster Elasticsearch actif
 
 ### Objectif
@@ -3567,7 +3551,6 @@ GET /_cat/nodes?v&h=name,cpu,load_1m&s=cpu:desc
 ## Lab 4.3: Configuration et Analyse des Slow Query Logs
 
 **Topic**: Monitoring - Analyse des Logs
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Cluster Elasticsearch, accès aux fichiers de logs
 
 ### Objectif
@@ -3850,7 +3833,6 @@ appender.index_search_slowlog_rolling.policies.time.interval = 1
 ## 🌟 Bonus 4.A: Création de Dashboards Kibana pour Monitoring
 
 **Niveau**: Avancé
-**Durée Estimée**: 30-40 minutes
 **Prérequis**: Kibana installé et accessible, Stack Monitoring activé
 
 ### Objectif

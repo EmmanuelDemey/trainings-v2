@@ -1,7 +1,6 @@
 ## Lab 3.2: Configuration du Heap JVM
 
 **Topic**: Performance et Dimensionnement - Configuration Système
-**Durée Estimée**: 20-25 minutes
 **Prérequis**: Accès au serveur Elasticsearch, droits root/sudo
 
 ### Objectif

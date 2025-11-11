@@ -1,7 +1,6 @@
 ## 🌟 Bonus 3.B: Troubleshooting Slow Indexing Performance
 
 **Niveau**: Avancé
-**Durée Estimée**: 25-30 minutes
 **Prérequis**: Lab 3.2 complété, compréhension du Bulk API
 
 ### Objectif
