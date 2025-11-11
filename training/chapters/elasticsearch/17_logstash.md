@@ -144,7 +144,7 @@ filter {
 ```
 output {
   elasticsearch {
-    index => "%{[some_field][sub_field]}-%{+YYYY.MM.dd}"
+    index => "%{\[some_field\]\[sub_field\]}-%{+YYYY.MM.dd}"
   }
 }
 ```

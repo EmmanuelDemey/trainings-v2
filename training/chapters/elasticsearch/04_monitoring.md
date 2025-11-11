@@ -162,8 +162,8 @@ GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
 ```
 ::: {node-1}{abc123}
    Hot threads at 2023-11-10T10:30:00.000Z, interval=500ms, busiestThreads=5:
-   
-   99.8% (499ms out of 500ms) cpu usage by thread 'elasticsearch[node-1][search][T#5]'
+
+   99.8% (499ms out of 500ms) cpu usage by thread 'elasticsearch\[node-1\]\[search\]\[T#5\]'
      org.elasticsearch.search.SearchService.executeQueryPhase()
      org.elasticsearch.search.query.QueryPhase.execute()
 ```
@@ -533,9 +533,9 @@ PUT /my-index/_settings
 
 **Format du slow log**:
 ```
-[2023-11-10T10:30:15,123][WARN ][i.s.s.query] [node-1] [my-index][0] 
-took[5.2s], took_millis[5234], types[], stats[], search_type[QUERY_THEN_FETCH], 
-total_shards[5], source[{"query":{"match":{"field":"value"}}}]
+\[2023-11-10T10:30:15,123\]\[WARN \]\[i.s.s.query\] \[node-1\] \[my-index\]\[0\]
+took\[5.2s\], took_millis\[5234\], types\[\], stats\[\], search_type\[QUERY_THEN_FETCH\],
+total_shards\[5\], source\[{"query":{"match":{"field":"value"}}}\]
 ```
 
 **Analyse**: Identifier patterns (requêtes similaires, même index), optimiser ou ajouter ressources.
@@ -556,19 +556,19 @@ Savoir interpréter les erreurs courantes accélère le troubleshooting.
 
 **2. EsRejectedExecutionException**
 ```
-rejected execution of org.elasticsearch.transport.TransportService$7@abc on EsThreadPoolExecutor[search, queue capacity = 1000]
+rejected execution of org.elasticsearch.transport.TransportService$7@abc on EsThreadPoolExecutor\[search, queue capacity = 1000\]
 ```
 → Thread pool saturé. Actions: Throttle client-side, optimiser requêtes, scale cluster.
 
 **3. SearchPhaseExecutionException**
 ```
-Shard failures: [failed shard on node [xyz]: query shard failed]
+Shard failures: \[failed shard on node \[xyz\]: query shard failed\]
 ```
 → Échec de recherche sur un shard. Actions: Vérifier logs du nœud concerné, état du shard.
 
 **4. ClusterBlockException**
 ```
-index [my-index] blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];
+index \[my-index\] blocked by: \[FORBIDDEN/12/index read-only / allow delete (api)\];
 ```
 → Index en read-only (souvent disk watermark flood). Actions: Libérer espace disque, augmenter watermark.
 
