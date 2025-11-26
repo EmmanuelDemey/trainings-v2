@@ -70,17 +70,28 @@ Un **realm** est un système d'authentification qui valide les identités des ut
 
 Elasticsearch offre plusieurs types de realms pour s'intégrer dans votre infrastructure existante :
 
+**Realms principaux** :
+
 | Realm Type | Description | Use Case |
 |------------|-------------|----------|
-| **native** | Base de données interne Elasticsearch | Environnements autonomes, petites équipes |
-| **file** | Fichiers locaux (users, users_roles) | Configurations statiques, simple setup |
-| **ldap** | Active Directory / LDAP externe | Entreprises avec annuaire LDAP centralisé |
-| **active_directory** | Microsoft Active Directory | Environnements Windows corporatifs |
-| **saml** | SAML 2.0 SSO (Single Sign-On) | Intégration avec IdP (Okta, Azure AD) |
-| **oidc** | OpenID Connect | SSO moderne (Google, GitHub) |
-| **kerberos** | Kerberos authentication | Environnements hautement sécurisés |
-| **pki** | Certificats X.509 | Authentification mutuelle TLS |
-| **jwt** | JSON Web Tokens | Architectures microservices, API |
+| **native** | Base de données interne ES | Petites équipes |
+| **file** | Fichiers locaux | Configs statiques |
+| **ldap** | LDAP externe | Annuaire LDAP |
+| **active_directory** | Microsoft AD | Environnements Windows |
+| **saml** | SAML 2.0 SSO | IdP (Okta, Azure AD) |
+
+---
+
+# Types de Realms Disponibles (suite)
+
+**Realms avancés** :
+
+| Realm Type | Description | Use Case |
+|------------|-------------|----------|
+| **oidc** | OpenID Connect | SSO moderne (Google) |
+| **kerberos** | Kerberos | Haute sécurité |
+| **pki** | Certificats X.509 | Mutual TLS |
+| **jwt** | JSON Web Tokens | Microservices, API |
 
 **Documentation** : [Realms](https://www.elastic.co/guide/en/elasticsearch/reference/current/realms.html)
 
@@ -564,39 +575,37 @@ Elasticsearch définit des privilèges à **deux niveaux** :
 POST /_security/role/logs_reader
 {
   "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*", "filebeat-*"],
-      "privileges": ["read", "view_index_metadata"]
-    }
-  ]
+  "indices": [{
+    "names": ["logs-*", "filebeat-*"],
+    "privileges": ["read", "view_index_metadata"]
+  }]
 }
 ```
 
 **Explication** :
-- `cluster: ["monitor"]` : Peut voir les stats du cluster
-- `indices.names` : Pattern d'indices ciblés
-- `indices.privileges` : Actions autorisées (lecture uniquement)
+- `cluster: ["monitor"]` : Stats du cluster
+- `indices.names` : Pattern d'indices
+- `indices.privileges` : Lecture uniquement
 
-**Exemple 2 : Rôle "Développeur" avec accès complet à ses indices** :
+---
+
+# Créer un Rôle Personnalisé (exemple avancé)
+
+**Exemple 2 : Rôle "Développeur"** :
 
 ```bash
 POST /_security/role/developer
 {
   "cluster": ["monitor", "manage_index_templates"],
-  "indices": [
-    {
-      "names": ["dev-*", "test-*"],
-      "privileges": ["all"]
-    }
-  ],
-  "applications": [
-    {
-      "application": "kibana-.kibana",
-      "privileges": ["feature_discover.all", "feature_visualize.all"],
-      "resources": ["space:dev"]
-    }
-  ]
+  "indices": [{
+    "names": ["dev-*", "test-*"],
+    "privileges": ["all"]
+  }],
+  "applications": [{
+    "application": "kibana-.kibana",
+    "privileges": ["feature_discover.all"],
+    "resources": ["space:dev"]
+  }]
 }
 ```
 
@@ -1041,42 +1050,41 @@ POST /_security/role/sales_kibana_user
 
 # Audit Logging : Traçabilité des Accès
 
-**Audit logging** enregistre toutes les actions de sécurité (authentifications, accès, modifications).
+**Audit logging** enregistre toutes les actions de sécurité.
 
 **Activer l'audit** :
 
 ```yaml
 # elasticsearch.yml
 xpack.security.audit.enabled: true
-xpack.security.audit.logfile.events.include: 
+xpack.security.audit.logfile.events.include:
   - access_denied
   - access_granted
   - authentication_success
   - authentication_failed
-  - connection_denied
-  - connection_granted
-xpack.security.audit.logfile.events.exclude: []
 ```
 
+---
+
+# Audit Logging : Événements et Logs
+
 **Événements audités** :
-- `authentication_success` / `authentication_failed` : Tentatives de connexion
-- `access_granted` / `access_denied` : Accès aux ressources
-- `run_as_granted` / `run_as_denied` : Utilisation du privilege "run as"
-- `tampered_request` : Requête modifiée/altérée
+- `authentication_success/failed` : Tentatives connexion
+- `access_granted/denied` : Accès aux ressources
+- `run_as_granted/denied` : Privilege "run as"
+- `tampered_request` : Requête modifiée
 
-**Logs d'audit** : Écrits dans `<cluster-name>_audit.json`
+**Logs d'audit** : `<cluster-name>_audit.json`
 
-**Exemple de log** :
+**Exemple** :
 ```json
 {
   "type": "audit",
-  "timestamp": "2024-01-15T10:15:30,123Z",
+  "timestamp": "2024-01-15T10:15:30Z",
   "event.action": "access_denied",
   "user.name": "alice",
   "origin.address": "192.168.1.50",
-  "request.id": "abc-123",
-  "url.path": "/_cat/indices?v",
-  "request.method": "GET"
+  "url.path": "/_cat/indices"
 }
 ```
 

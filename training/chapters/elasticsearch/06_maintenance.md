@@ -61,18 +61,26 @@ Un **snapshot** est une sauvegarde incrémentale du cluster ou d'indices spécif
 
 Un **repository** est l'emplacement de stockage des snapshots.
 
+**Types principaux** :
+
 | Type | Description | Use Case |
 |------|-------------|----------|
-| **fs** (Filesystem) | Système de fichiers partagé (NFS, SMB) | Environnements on-premise avec stockage réseau |
-| **s3** | Amazon S3 bucket | Clusters hébergés sur AWS ou cloud hybride |
-| **gcs** | Google Cloud Storage | Clusters hébergés sur GCP |
-| **azure** | Azure Blob Storage | Clusters hébergés sur Azure |
-| **hdfs** | Hadoop HDFS | Intégration avec écosystème Hadoop |
-| **url** | Repository en lecture seule (HTTP/HTTPS/FTP) | Partage de snapshots entre clusters |
+| **fs** | Filesystem partagé (NFS) | On-premise |
+| **s3** | Amazon S3 | AWS / Cloud |
+| **gcs** | Google Cloud Storage | GCP |
+| **azure** | Azure Blob Storage | Azure |
+
+---
+
+# Repositories: Configuration Avancée
+
+**Types additionnels** :
+- **hdfs** : Hadoop HDFS (intégration écosystème Hadoop)
+- **url** : Lecture seule HTTP/HTTPS (partage entre clusters)
 
 **Prérequis communs** :
-- Tous les nœuds data et master doivent avoir accès au repository
-- Le chemin du repository doit être déclaré dans `path.repo` dans `elasticsearch.yml`
+- ✅ Tous nœuds data/master doivent accéder au repository
+- ✅ Chemin déclaré dans `path.repo` (elasticsearch.yml)
 
 ---
 
@@ -545,33 +553,33 @@ Elasticsearch suit des règles strictes de compatibilité de version.
 
 - Accéder à **Stack Management** → **Upgrade Assistant**
 - Identifier les **breaking changes** et **deprecations**
-- Résoudre les problèmes signalés (mappings obsolètes, settings dépréciés, etc.)
+- Résoudre les problèmes signalés
 
-**Étape 2** : Vérifier les compatibilités
+**Étape 2** : Vérifier les compatibilités via API
 
 ```bash
 GET /_migration/deprecations
 ```
 
-**Résultat** :
+Vérifier les niveaux : `warning`, `critical`
+
+---
+
+# Préparation de la Mise à Jour (exemple de réponse)
+
+**Exemple de résultat** :
 ```json
 {
-  "cluster_settings": [
-    {
-      "level": "warning",
-      "message": "Setting [cluster.routing.allocation.enable] is deprecated",
-      "url": "https://www.elastic.co/guide/..."
-    }
-  ],
-  "node_settings": [],
+  "cluster_settings": [{
+    "level": "warning",
+    "message": "Setting deprecated",
+    "url": "https://www.elastic.co/guide/..."
+  }],
   "index_settings": {
-    "my-old-index": [
-      {
-        "level": "critical",
-        "message": "Index uses deprecated mapping type '_doc'",
-        "url": "https://www.elastic.co/guide/..."
-      }
-    ]
+    "my-old-index": [{
+      "level": "critical",
+      "message": "Index uses deprecated mapping"
+    }]
   }
 }
 ```
@@ -588,23 +596,20 @@ PUT /_snapshot/my_backup/pre_upgrade_snapshot
   "indices": "*",
   "include_global_state": true,
   "metadata": {
-    "taken_by": "ops-team",
     "taken_before": "upgrade-to-8.12"
   }
 }
 ```
 
-**Étape 4** : Tester la mise à jour dans un environnement de test
+**Étape 4** : Tester en environnement de test
+1. Restaurer snapshot dans cluster test
+2. Effectuer upgrade sur cluster test
+3. Valider le fonctionnement
+4. Noter les problèmes
 
-1. Restaurer le snapshot dans un cluster de test
-2. Effectuer la mise à jour sur le cluster de test
-3. Valider le bon fonctionnement (tests applicatifs, requêtes, indexation)
-4. Noter les éventuels problèmes rencontrés
-
-**Étape 5** : Planifier une fenêtre de maintenance
-
-- Pour les **rolling upgrades** : Prévoir 1-2h selon la taille du cluster
-- Pour les **full cluster restarts** : Prévoir un downtime de 15-30 minutes
+**Étape 5** : Planifier fenêtre de maintenance
+- **Rolling upgrades** : 1-2h
+- **Full restart** : 15-30 min downtime
 
 ---
 
@@ -958,30 +963,37 @@ Nous nous concentrerons sur les outils liés à la **maintenance** : Index Manag
 **Exemple de problème critique** :
 
 ```
-Index 'logs-2023' uses deprecated mapping parameter 'include_in_all'
+Index 'logs-2023' uses deprecated mapping parameter
 ```
 
 **Solution via Upgrade Assistant** :
 
-1. Cliquer sur le problème pour afficher les détails
-2. Consulter la documentation liée (lien fourni)
-3. Options de résolution :
-   - **Option A** : Réindexer l'index sans le paramètre obsolète
-   - **Option B** : Supprimer l'index si les données ne sont plus nécessaires
+1. Cliquer sur le problème pour afficher détails
+2. Consulter la documentation liée
+3. Options :
+   - **Option A** : Réindexer sans paramètre obsolète
+   - **Option B** : Supprimer si données non nécessaires
 
-4. **Utiliser le Reindex Helper** :
-   - Cliquer sur **Reindex**
-   - Configuration automatique générée :
+---
+
+# Upgrade Assistant : Reindex Helper
+
+**Utiliser le Reindex Helper** :
+- Cliquer sur **Reindex**
+- Configuration automatique générée :
 
 ```json
 {
   "source": { "index": "logs-2023" },
-  "dest": { "index": "logs-2023-v2" },
-  "script": { /* scripts de transformation si nécessaire */ }
+  "dest": { "index": "logs-2023-v2" }
 }
 ```
 
-5. Lancer la réindexation et surveiller la progression
+**Actions** :
+1. Lancer la réindexation
+2. Surveiller la progression
+3. Valider le nouvel index
+4. Supprimer l'ancien après validation
 
 ---
 

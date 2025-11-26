@@ -43,24 +43,26 @@ Déploiement et paramétrage d'Elasticsearch en production
 
 Après installation, comprendre la structure de fichiers est essentiel pour l'administration.
 
-**Répertoires clés**:
-```
-/usr/share/elasticsearch/          # Installation (binaires, libs)
-├── bin/                            # Exécutables (elasticsearch, elasticsearch-plugin)
-├── lib/                            # Librairies Java
-└── modules/                        # Modules Elasticsearch (x-pack, etc.)
+**Répertoires principaux**:
 
-/etc/elasticsearch/                 # Configuration
-├── elasticsearch.yml               # Configuration principale du nœud
-├── jvm.options                     # Options JVM (heap, GC)
-├── log4j2.properties               # Configuration des logs
-└── certs/                          # Certificats TLS (ES 8.x+)
+| Répertoire | Contenu | Description |
+|------------|---------|-------------|
+| `/usr/share/elasticsearch/` | Binaires & libs | Installation Elasticsearch |
+| `/etc/elasticsearch/` | Configuration | elasticsearch.yml, jvm.options, log4j2.properties |
+| `/var/lib/elasticsearch/` | Données | Indices, snapshots |
+| `/var/log/elasticsearch/` | Logs | Logs applicatifs |
 
-/var/lib/elasticsearch/             # Données (indices, snapshots)
-/var/log/elasticsearch/             # Logs applicatifs
-```
+---
+
+# Structure de Répertoires Elasticsearch (détail)
 
 **Personnalisation**: Chemins configurables via `path.data`, `path.logs` dans elasticsearch.yml
+
+**Sous-répertoires importants**:
+- **bin/** : Exécutables (elasticsearch, elasticsearch-plugin)
+- **lib/** : Librairies Java
+- **modules/** : Modules Elasticsearch (x-pack, etc.)
+- **certs/** : Certificats TLS (ES 8.x+)
 
 ---
 
@@ -217,18 +219,22 @@ Le fichier [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference
 
 # Type de garbage collector (G1GC recommandé)
 -XX:+UseG1GC
+```
 
+---
+
+# Configuration JVM: Monitoring et Dumps
+
+**GC Logging et diagnostics**:
+
+```
 # GC logging pour monitoring
--Xlog:gc*,gc+age=trace,safepoint:file=/var/log/elasticsearch/gc.log:utctime,pid,tags:filecount=32,filesize=64m
+-Xlog:gc*,gc+age=trace,safepoint:file=/var/log/elasticsearch/gc.log
 
 # Dumps mémoire en cas d'OutOfMemoryError
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:HeapDumpPath=/var/lib/elasticsearch
 ```
-
---- 
-
-# Configuration JVM: jvm.options
 
 **Règles de sizing heap**:
 - ✅ Maximum 50% de la RAM physique (le reste pour le cache OS)

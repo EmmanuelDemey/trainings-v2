@@ -97,21 +97,18 @@ discovery.seed_hosts: ["node1:9300", "node2:9300", "node3:9300"]
 
 **Séparer les rôles** pour éviter que les tâches de gestion impactent les performances de recherche.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  3 Dedicated Master Nodes (légers)                       │
-│  ┌────────┐  ┌────────┐  ┌────────┐                     │
-│  │ Master │  │ Master │  │ Master │                     │
-│  │  Only  │  │  Only  │  │  Only  │                     │
-│  └────────┘  └────────┘  └────────┘                     │
-│                                                           │
-│  6+ Data Nodes (lourds en CPU/RAM/Disque)               │
-│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐      │
-│  │Data │ │Data │ │Data │ │Data │ │Data │ │Data │      │
-│  │ 1   │ │  2  │ │  3  │ │  4  │ │  5  │ │  6  │      │
-│  └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘      │
-└─────────────────────────────────────────────────────────┘
-```
+**Architecture** :
+- **3 Dedicated Master Nodes** (légers) : Gestion du cluster
+- **6+ Data Nodes** (lourds) : Stockage et recherche
+
+**Avantages** :
+- ✅ Masters dédiés = stabilité du cluster
+- ✅ Data nodes ajoutés horizontalement
+- ✅ Isolation pannes (data down ≠ perte quorum)
+
+---
+
+# Pattern 2 : Configuration Dedicated Masters
 
 **Configuration Master Node** :
 ```yaml
@@ -130,68 +127,42 @@ node.roles: [data, ingest]
 discovery.seed_hosts: ["master-1:9300", "master-2:9300", "master-3:9300"]
 ```
 
-**Avantages** :
-- ✅ Masters dédiés = stabilité du cluster
-- ✅ Data nodes peuvent être ajoutés horizontalement
-- ✅ Isolation des pannes (data node down ≠ perte de quorum master)
-
 ---
 
 # Pattern 3 : Hot-Warm-Cold Architecture (ILM)
 
-**Séparation des données** par âge et fréquence d'accès pour optimiser coûts et performances.
+**Séparation des données** par âge et fréquence d'accès.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  HOT Tier (SSD rapides, indexation intensive)                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ Hot Data │  │ Hot Data │  │ Hot Data │                   │
-│  │  Node 1  │  │  Node 2  │  │  Node 3  │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
-│  Données actives : logs dernières 24h                        │
-│                                                               │
-│  WARM Tier (HDD, lectures modérées)                          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │Warm Data │  │Warm Data │  │Warm Data │                   │
-│  │  Node 1  │  │  Node 2  │  │  Node 3  │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
-│  Données anciennes : logs 1-30 jours                         │
-│                                                               │
-│  COLD Tier (Stockage économique, lectures rares)             │
-│  ┌──────────┐  ┌──────────┐                                 │
-│  │Cold Data │  │Cold Data │                                 │
-│  │  Node 1  │  │  Node 2  │                                 │
-│  └──────────┘  └──────────┘                                 │
-│  Archives : logs > 30 jours                                  │
-└──────────────────────────────────────────────────────────────┘
-```
+**Architecture** :
+- **HOT Tier** : SSD rapides, indexation intensive (dernières 24h)
+- **WARM Tier** : HDD, lectures modérées (1-30 jours)
+- **COLD Tier** : Stockage économique, lectures rares (>30 jours)
 
 **Configuration** :
 ```yaml
 # Hot node
 node.roles: [data_hot, data_content]
-node.attr.data: hot
 
 # Warm node
 node.roles: [data_warm, data_content]
-node.attr.data: warm
 
 # Cold node
 node.roles: [data_cold]
-node.attr.data: cold
 ```
 
+---
+
+# Pattern 3 : ILM Policy Hot-Warm-Cold
+
 **ILM Policy** pour migration automatique :
+
 ```json
 {
   "policy": {
     "phases": {
       "hot": {
         "actions": {
-          "rollover": {
-            "max_size": "50GB",
-            "max_age": "1d"
-          }
+          "rollover": { "max_size": "50GB", "max_age": "1d" }
         }
       },
       "warm": {
@@ -199,20 +170,6 @@ node.attr.data: cold
         "actions": {
           "shrink": { "number_of_shards": 1 },
           "forcemerge": { "max_num_segments": 1 }
-        }
-      },
-      "cold": {
-        "min_age": "30d",
-        "actions": {
-          "searchable_snapshot": {
-            "snapshot_repository": "my_backup"
-          }
-        }
-      },
-      "delete": {
-        "min_age": "90d",
-        "actions": {
-          "delete": {}
         }
       }
     }
@@ -222,32 +179,42 @@ node.attr.data: cold
 
 ---
 
+# Pattern 3 : ILM Policy (suite)
+
+**Phases Cold et Delete** :
+
+```json
+"cold": {
+  "min_age": "30d",
+  "actions": {
+    "searchable_snapshot": {
+      "snapshot_repository": "my_backup"
+    }
+  }
+},
+"delete": {
+  "min_age": "90d",
+  "actions": { "delete": {} }
+}
+```
+
+---
+
 # Pattern 4 : Coordinating Nodes (Large Clusters)
 
 **Nœuds de coordination** dédiés pour répartir la charge des agrégations complexes.
 
-```
-┌────────────────────────────────────────────────────────┐
-│  Load Balancer                                          │
-│  └────────────────────────────────────────────────────┘│
-│        │         │         │         │                  │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐                  │
-│  │Coordinat│ │Coordinat│ │Coordinat│                  │
-│  │  ing 1  │ │  ing 2  │ │  ing 3  │                  │
-│  └─────────┘ └─────────┘ └─────────┘                  │
-│        │         │         │                            │
-│        └─────────┴─────────┘                            │
-│                  │                                       │
-│         Data Nodes (20+)                                │
-└────────────────────────────────────────────────────────┘
-```
+**Architecture** :
+- **Load Balancer** : Distribue les requêtes
+- **3+ Coordinating Nodes** : Routage uniquement (pas de données)
+- **20+ Data Nodes** : Stockage et exécution des requêtes
 
 **Configuration Coordinating Node** :
 ```yaml
 node.roles: []  # Vide = coordinating only
 ```
 
-**Use Case** : Clusters avec >50 nœuds data où les agrégations consomment beaucoup de mémoire.
+**Use Case** : Clusters >50 nœuds où agrégations consomment beaucoup de mémoire
 
 ---
 
@@ -703,27 +670,26 @@ Pre-deployment, monitoring, et incident response
 # Incident Response Runbook
 
 **Workflow général** :
-
 ```
-\[Alerte\] → \[Triage\] → \[Diagnostic\] → \[Mitigation\] → \[Resolution\] → \[Post-Mortem\]
+[Alerte] → [Triage] → [Diagnostic] → [Mitigation] → [Resolution] → [Post-Mortem]
 ```
 
-**Incident 1 : Cluster status RED** :
+**Incident 1 : Cluster status RED**
 
 **Symptôme** : `GET /_cluster/health` retourne `"status": "red"`
 
 **Triage** :
 ```bash
-# Identifier les indices RED
 GET /_cat/indices?v&health=red
-
-# Identifier shards non assignés
-GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason
+GET /_cat/shards?v&h=index,shard,state,unassigned.reason
 ```
+
+---
+
+# Incident 1 : Cluster RED (diagnostic)
 
 **Diagnostic** :
 ```bash
-# Pourquoi les shards ne sont pas assignés ?
 GET /_cluster/allocation/explain
 {
   "index": "problematic-index",
@@ -733,29 +699,31 @@ GET /_cluster/allocation/explain
 ```
 
 **Causes courantes** :
-- Nœud(s) down → Attendre recovery ou forcer allocation
-- Disk watermark exceeded → Libérer espace ou ajouter nœuds
-- Shard corruption → Restaurer depuis snapshot
+- Nœud(s) down → Attendre recovery
+- Disk full → Libérer espace
+- Corruption → Restaurer snapshot
 
-**Mitigation** :
+---
+
+# Incident 1 : Cluster RED (mitigation)
+
+**Mitigation disk full** :
 ```bash
-# Si disk full : Augmenter watermark temporairement
 PUT /_cluster/settings
 {
   "transient": {
-    "cluster.routing.allocation.disk.watermark.low": "95%",
-    "cluster.routing.allocation.disk.watermark.high": "97%"
+    "cluster.routing.allocation.disk.watermark.low": "95%"
   }
 }
+```
 
-# Si corruption : Forcer allocation d'un replica comme primaire
+**Mitigation corruption** :
+```bash
 POST /_cluster/reroute
 {
   "commands": [{
     "allocate_replica": {
-      "index": "my-index",
-      "shard": 0,
-      "node": "node-2"
+      "index": "my-index", "shard": 0, "node": "node-2"
     }
   }]
 }
@@ -768,39 +736,35 @@ POST /_cluster/reroute
 **Symptôme** : Recherches lentes (p95 > 1s), indexation lente
 
 **Diagnostic** :
-
 ```bash
-# 1. Vérifier les slow logs
-GET /slow-index/_settings?include_defaults=false
-
-# 2. Identifier les hot threads
+GET /slow-index/_settings
 GET /_nodes/hot_threads
-
-# 3. Vérifier les tasks en cours
 GET /_cat/tasks?v&detailed
-
-# 4. Analyser les thread pools
-GET /_cat/thread_pool?v&h=name,active,rejected,queue
+GET /_cat/thread_pool?v&h=name,active,rejected
 ```
 
 **Causes courantes** :
-- **Requêtes lourdes** : Filtres inefficaces, wildcards
-- **Heap pressure** : GC thrashing, circuit breakers
-- **Disk I/O** : Merges intensifs, snapshots en cours
-- **Shard allocation** : Déséquilibre des shards
+- Requêtes lourdes (wildcards)
+- Heap pressure (GC thrashing)
+- Disk I/O (merges)
+- Shard allocation déséquilibré
 
-**Mitigation** :
+---
 
+# Incident 2 : Performance Dégradée (mitigation)
+
+**Mitigation thread pools** :
 ```bash
-# Augmenter les thread pools temporairement
 PUT /_cluster/settings
 {
   "transient": {
     "thread_pool.write.queue_size": 1000
   }
 }
+```
 
-# Désactiver réplication temporairement (si indexation massive)
+**Désactiver réplication temporairement** :
+```bash
 PUT /_cluster/settings
 {
   "transient": {
@@ -809,12 +773,7 @@ PUT /_cluster/settings
 }
 
 # Après indexation, réactiver
-PUT /_cluster/settings
-{
-  "transient": {
-    "cluster.routing.allocation.enable": "all"
-  }
-}
+# ... "enable": "all"
 ```
 
 ---

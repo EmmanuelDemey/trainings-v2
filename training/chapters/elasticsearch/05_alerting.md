@@ -417,7 +417,7 @@ Les [actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/ac
 
 # Exemple Complet: Alerte Heap >85%
 
-**Watch complète** pour surveiller le heap JVM:
+**Watch complète** pour surveiller le heap JVM - **Partie 1: Configuration**
 
 ```json
 PUT _watcher/watch/heap_usage_alert
@@ -427,9 +427,7 @@ PUT _watcher/watch/heap_usage_alert
     "threshold": 85
   },
   "trigger": {
-    "schedule": {
-      "interval": "1m"
-    }
+    "schedule": { "interval": "1m" }
   },
   "input": {
     "search": {
@@ -443,56 +441,64 @@ PUT _watcher/watch/heap_usage_alert
                 { "range": { "node_stats.jvm.mem.heap_used_percent": { "gte": 85 }}}
               ]
             }
-          },
-          "aggs": {
-            "nodes_high_heap": {
-              "terms": {
-                "field": "node_stats.node_id",
-                "size": 10
-              },
-              "aggs": {
-                "avg_heap": {
-                  "avg": { "field": "node_stats.jvm.mem.heap_used_percent" }
-                }
-              }
-            }
           }
         }
-      }
-    }
-  },
-  "condition": {
-    "compare": {
-      "ctx.payload.hits.total": {
-        "gt": 0
-      }
-    }
-  },
-  "actions": {
-    "notify_ops": {
-      "email": {
-        "to": "ops@company.com",
-        "subject": "[CRITICAL] Heap usage >85% on {{ctx.payload.aggregations.nodes_high_heap.buckets.size}} nodes",
-        "body": {
-          "text": "Heap alert triggered at {{ctx.execution_time}}.\n\nAffected nodes:\n{{#ctx.payload.aggregations.nodes_high_heap.buckets}}- Node {{key}}: {{avg_heap.value}}%\n{{/ctx.payload.aggregations.nodes_high_heap.buckets}}"
-        }
-      },
-      "throttle_period": "15m"
-    },
-    "log_to_index": {
-      "index": {
-        "index": "watcher-alerts",
-        "doc_id": "{{ctx.watch_id}}-{{ctx.execution_time}}"
       }
     }
   }
 }
 ```
 
-**Tester la watch**:
-```bash
-POST _watcher/watch/heap_usage_alert/_execute
+---
+
+# Exemple Complet: Alerte Heap >85% (suite)
+
+**Partie 2: Agrégations et Condition**
+
+```json
+"aggs": {
+  "nodes_high_heap": {
+    "terms": { "field": "node_stats.node_id", "size": 10 },
+    "aggs": {
+      "avg_heap": {
+        "avg": { "field": "node_stats.jvm.mem.heap_used_percent" }
+      }
+    }
+  }
+},
+"condition": {
+  "compare": { "ctx.payload.hits.total": { "gt": 0 } }
+}
 ```
+
+---
+
+# Exemple Complet: Alerte Heap >85% (suite)
+
+**Partie 3: Actions**
+
+```json
+"actions": {
+  "notify_ops": {
+    "email": {
+      "to": "ops@company.com",
+      "subject": "[CRITICAL] Heap >85%",
+      "body": {
+        "text": "Heap alert at {{ctx.execution_time}}"
+      }
+    },
+    "throttle_period": "15m"
+  },
+  "log_to_index": {
+    "index": {
+      "index": "watcher-alerts",
+      "doc_id": "{{ctx.watch_id}}-{{ctx.execution_time}}"
+    }
+  }
+}
+```
+
+**Tester**: `POST _watcher/watch/heap_usage_alert/_execute`
 
 ---
 
@@ -666,34 +672,37 @@ GET _watcher/stats
 
 **1. Éviter l'Alert Fatigue**:
 - ⚠️ Trop d'alertes → équipe les ignore
-- ✅ Alertez uniquement sur les métriques critiques
+- ✅ Alertez uniquement sur métriques critiques
 - ✅ Utilisez throttling (15-30min minimum)
-- ✅ Groupez les alertes similaires
 
-**2. Actionnable**:
+**2. Rendre Actionnable**:
 - ❌ "Cluster unhealthy" (trop vague)
-- ✅ "Heap >85% on node-1, consider scaling or optimizing queries"
+- ✅ "Heap >85% on node-1, consider scaling"
 
-**3. Contexte**:
-- ✅ Incluez des liens vers dashboards Kibana
-- ✅ Incluez des commandes de diagnostic
-- ✅ Incluez l'historique (trend)
+**3. Fournir du Contexte**:
+- ✅ Liens vers dashboards Kibana
+- ✅ Commandes de diagnostic
+- ✅ Historique (trend)
 
-**4. Escalation**:
+---
+
+# Best Practices d'Alerting (suite)
+
+**4. Escalation Progressive**:
 ```
-1. Warning (>75%) → Log + Slack
-2. Critical (>85%) → Email ops + PagerDuty
-3. Emergency (>95%) → PagerDuty + Appel téléphonique
+Warning (>75%)   → Log + Slack
+Critical (>85%)  → Email + PagerDuty
+Emergency (>95%) → PagerDuty + Appel
 ```
 
 **5. Testing**:
-- ✅ Testez chaque alerte avec `_execute`
-- ✅ Validez que les connectors fonctionnent
+- ✅ Testez avec `_execute` avant activation
+- ✅ Validez les connectors
 - ✅ Vérifiez les templates de message
 
 **6. Documentation**:
-- ✅ Playbook pour chaque alerte (que faire quand elle se déclenche)
-- ✅ Fréquence attendue (si alerte fréquente = normal ou problème)
+- ✅ Playbook pour chaque alerte
+- ✅ Fréquence attendue documentée
 
 ---
 

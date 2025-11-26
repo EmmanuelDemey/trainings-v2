@@ -101,12 +101,19 @@ RAM totale = Heap JVM + OS Cache
 
 Le stockage doit être dimensionné pour le volume de données ET les performances I/O.
 
-**Capacité disque**:
+**Formule de capacité disque**:
 ```
-Capacité requise = Volume données brutes × (1 + nombre replicas) × 1.15 × 1.2
-                   ├─ Index size        ├─ Réplication         │      │
-                   └─ ~15% overhead     └─ 20% marge croissance └─ OS overhead
+Capacité requise = Volume brut × (1 + replicas) × 1.15 × 1.2
 ```
+
+**Facteurs de multiplication**:
+- **(1 + replicas)** : Nombre de copies (ex: 1 replica = ×2)
+- **1.15** : Overhead Elasticsearch (~15%)
+- **1.20** : Marge de croissance (20%)
+
+---
+
+# Dimensionnement Disque: Types et Performance
 
 **Exemple**: 1 TB données brutes, 1 replica
 ```
@@ -114,12 +121,12 @@ Capacité requise = Volume données brutes × (1 + nombre replicas) × 1.15 × 1
 ```
 
 **Types de disque recommandés**:
-- ✅ **SSD NVMe**: Performance maximale (indexation lourde, recherche intensive)
+- ✅ **SSD NVMe**: Performance maximale (indexation lourde)
 - ✅ **SSD SATA**: Bon compromis performance/coût
-- ⚠️ **HDD**: Acceptable uniquement pour données froides/archives (avec node.attr.temperature: cold)
-- ❌ **Network storage (NFS, SMB)**: Performance insuffisante, forte latence
+- ⚠️ **HDD**: Données froides/archives uniquement
+- ❌ **Network storage (NFS, SMB)**: Éviter (latence élevée)
 
-**I/O monitoring**: `node_stats.fs.io_stats.total.operations`, `node_stats.fs.io_stats.total.read_time`
+**I/O monitoring**: `node_stats.fs.io_stats.total.operations`
 
 ---
 
@@ -309,41 +316,29 @@ GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected
 
 La [topologie réseau](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html) impacte fortement la latence et la disponibilité.
 
-**Architectures recommandées**:
-
 **Petit cluster (1-10 nœuds)**:
-```
-\[Client\] → \[Node 1\] \[Node 2\] \[Node 3\]
-            (all roles: master + data + ingest)
-```
-Tous les nœuds partagent tous les rôles, simplicité maximale.
-
+- Tous les nœuds avec rôles **master + data + ingest**
+- Simplicité maximale, facile à maintenir
+- Clients se connectent directement aux nœuds
 
 **Cluster moyen (10-50 nœuds)**:
-```
-\[Client\] → \[Coordinating\] \[Coordinating\]
-                ↓              ↓
-           \[Data 1-10\]    \[Data 11-20\]
-                ↓              ↓
-           \[Master 1\] \[Master 2\] \[Master 3\]
-```
-Séparation master/data/coordinating pour stabilité.
+- **3 nœuds master dédiés** (gestion cluster)
+- **10-20 nœuds data** (stockage et recherche)
+- **2-3 nœuds coordinating** (routage requêtes)
+- Séparation des responsabilités pour stabilité
 
 ---
 
-# Topologie Réseau: Architecture Cluster
+# Topologie Réseau: Grand Cluster
 
 **Grand cluster (50+ nœuds)**:
-```
-\[Client\] → \[Load Balancer\]
-                ↓
-        \[Coordinating 1-N\]
-                ↓
-        \[Data Hot\] \[Data Warm\] \[Data Cold\]
-                ↓
-        \[Master 1\] \[Master 2\] \[Master 3\]
-```
-Architecture hot-warm-cold pour optimisation coût/performance.
+- **Load Balancer** distribue les requêtes clients
+- **Nœuds coordinating dédiés** (routage uniquement)
+- **Architecture hot-warm-cold** pour optimisation coût/performance
+  - **Hot**: Données actives (SSD rapide)
+  - **Warm**: Données anciennes (HDD)
+  - **Cold**: Archives (stockage économique)
+- **3+ masters dédiés** pour stabilité
 
 ---
 
