@@ -1,27 +1,10 @@
 # Cahier d'Exercices Pratiques - Elasticsearch Ops
 
-Formation sur 2 jours - Exercices pratiques et ateliers
+Formation sur 3 jours - Exercices pratiques et ateliers
 
 ---
 
-# Jour 1 - Exercices Pratiques
-
-## Table des Matières - Jour 1
-
-**Labs Fondamentaux**:
-- [Lab 1.1: Création et Interrogation d'Index](#lab-11-création-et-interrogation-dindex)
-- [Lab 1.2: Définition de Mappings Explicites](#lab-12-définition-de-mappings-explicites)
-- [Lab 1.3: Agrégations de Données](#lab-13-agrégations-de-données)
-- [Lab 2.1: Installation et Configuration](#lab-21-installation-et-démarrage-dun-nœud)
-- [Lab 2.2: Formation de Cluster](#lab-22-formation-dun-cluster-multi-nœuds)
-- [Lab 3.1: Dimensionnement et Configuration Système](#lab-31-dimensionnement-et-configuration-système)
-- [Lab 4.1: Monitoring avec les APIs Natives](#lab-41-monitoring-avec-les-apis-natives)
-
-**Questions Bonus** (avancées):
-- [🌟 Bonus 1.A: Optimisation du Scoring de Recherche](#-bonus-1a-optimisation-du-scoring-de-recherche)
-- [🌟 Bonus 1.B: Mappings Nested et Parent-Child](#-bonus-1b-mappings-nested-et-parent-child)
-
----
+# Jour 1 - Fondamentaux et Architecture
 
 ## Lab 1.1: Création et Interrogation d'Index
 
@@ -1819,6 +1802,11 @@ PUT /_cluster/settings
 
 ---
 
+
+---
+
+# Jour 2 - Performance, Optimisation et Production
+
 ## Lab 3.1: Dimensionnement de Cluster - Calcul du Nombre de Shards
 
 **Topic**: Performance et Dimensionnement - Planification de Capacité
@@ -1852,6 +1840,10 @@ Vous êtes chargé de dimensionner un cluster Elasticsearch pour un système de 
 - CPU par nœud: 16 cores
 - RAM par nœud: 64 GB (31 GB heap, 33 GB OS cache)
 - Disque par nœud: 2 TB SSD
+
+#### Setup (Si Lab 2.x non fait)
+
+Ce lab est un exercice de calcul et de conception (papier/crayon ou tableur). Il ne nécessite pas de cluster actif, mais comprendre l'architecture d'un cluster (Lab 2.1/2.2) aide grandement.
 
 #### Étapes
 
@@ -2990,2411 +2982,6 @@ Amélioration totale:          ×83
 - Mesurer et comparer les performances avant/après
 
 ---
-
-## Lab 4.1: Utilisation de l'API Cluster Health
-
-**Topic**: Monitoring - APIs de Surveillance
-**Prérequis**: Cluster Elasticsearch avec au moins 1 nœud actif
-
-### Objectif
-
-Maîtriser l'API `_cluster/health` pour diagnostiquer l'état du cluster, interpréter les statuts (green/yellow/red), et identifier les shards non alloués.
-
-### Contexte
-
-Vous recevez une alerte indiquant que le cluster est passé en statut `yellow`. Vous devez diagnostiquer la cause et comprendre l'impact sur le service.
-
-### Exercice de Base
-
-#### Setup
-
-**Avant de commencer**:
-1. Vérifiez que votre cluster est accessible: `GET /`
-2. Créez un index de test avec replicas:
-
-```bash
-PUT /health-test
-{
-  "settings": {
-    "number_of_shards": 2,
-    "number_of_replicas": 1
-  }
-}
-```
-
-#### Étapes
-
-**Étape 1**: Consulter le cluster health basique
-
-```bash
-GET /_cluster/health
-```
-
-**Résultat attendu**:
-```json
-{
-  "cluster_name": "elasticsearch",
-  "status": "yellow",
-  "timed_out": false,
-  "number_of_nodes": 1,
-  "number_of_data_nodes": 1,
-  "active_primary_shards": 2,
-  "active_shards": 2,
-  "relocating_shards": 0,
-  "initializing_shards": 0,
-  "unassigned_shards": 2,
-  "delayed_unassigned_shards": 0,
-  "number_of_pending_tasks": 0,
-  "number_of_in_flight_fetch": 0,
-  "task_max_waiting_in_queue_millis": 0,
-  "active_shards_percent_as_number": 50.0
-}
-```
-
-**Interprétation**:
-- 🟡 **status: "yellow"**: Au moins un replica shard non alloué
-- ✅ **active_primary_shards: 2**: Tous les primaires sont actifs (pas de perte de données)
-- ⚠️ **unassigned_shards: 2**: 2 replicas ne peuvent pas être alloués (cluster à 1 nœud)
-- ⚠️ **active_shards_percent: 50%**: Seulement la moitié des shards sont actifs
-
-**Étape 2**: Obtenir des détails par index
-
-```bash
-GET /_cluster/health?level=indices
-```
-
-**Résultat attendu**:
-```json
-{
-  "cluster_name": "elasticsearch",
-  "status": "yellow",
-  "indices": {
-    "health-test": {
-      "status": "yellow",
-      "number_of_shards": 2,
-      "number_of_replicas": 1,
-      "active_primary_shards": 2,
-      "active_shards": 2,
-      "relocating_shards": 0,
-      "initializing_shards": 0,
-      "unassigned_shards": 2
-    }
-  }
-}
-```
-
-**Observation**: L'index `health-test` est responsable du statut yellow.
-
-**Étape 3**: Identifier les shards non alloués
-
-```bash
-GET /_cat/shards/health-test?v&h=index,shard,prirep,state,unassigned.reason
-```
-
-**Résultat attendu**:
-```
-index       shard prirep state      unassigned.reason
-health-test 0     p      STARTED    
-health-test 0     r      UNASSIGNED NODE_LEFT
-health-test 1     p      STARTED    
-health-test 1     r      UNASSIGNED NODE_LEFT
-```
-
-**Explication**:
-- Les 2 shards primaires (p) sont STARTED ✅
-- Les 2 shards replicas (r) sont UNASSIGNED avec raison "NODE_LEFT"
-- **Cause**: Pas assez de nœuds pour allouer les replicas (besoin de 2 nœuds minimum)
-
-**Étape 4**: Comprendre les couleurs de statut
-
-| Statut | Signification | Impact | Action |
-|--------|---------------|--------|--------|
-| 🟢 **GREEN** | Tous les shards (primaires + replicas) alloués | Aucun | Normal |
-| 🟡 **YELLOW** | Tous primaires alloués, certains replicas manquants | Fonctionnel, mais pas de HA | Surveillance, non urgent |
-| 🔴 **RED** | Au moins un primaire manquant | **PERTE DE DONNÉES** | Action immédiate |
-
-**Étape 5**: Simuler un cluster RED (optionnel, avec précaution)
-
-**Attention**: Cette manipulation peut entraîner une perte de données temporaire.
-
-```bash
-# Créer un index
-PUT /red-test
-{
-  "settings": {
-    "number_of_shards": 2,
-    "number_of_replicas": 0
-  }
-}
-
-# Indexer des documents
-POST /red-test/_doc/1
-{"message": "Test document"}
-
-# Fermer l'index (simule un shard primaire indisponible)
-POST /red-test/_close
-
-# Vérifier le cluster health
-GET /_cluster/health
-```
-
-**Résultat attendu**: `"status": "red"` (au moins un shard primaire fermé)
-
-**Reopen pour restaurer**:
-```bash
-POST /red-test/_open
-GET /_cluster/health
-```
-
-**Étape 6**: Utiliser les paramètres de l'API
-
-**Attendre le statut green** (timeout 30s):
-```bash
-GET /_cluster/health?wait_for_status=green&timeout=30s
-```
-
-**Attendre qu'aucun shard ne soit relocating**:
-```bash
-GET /_cluster/health?wait_for_no_relocating_shards=true&timeout=30s
-```
-
-**Filtrer un index spécifique**:
-```bash
-GET /_cluster/health/health-test
-```
-
-#### Validation
-
-**Commandes de vérification**:
-
-1. Résumé cluster avec métriques clés:
-```bash
-GET /_cluster/health?filter_path=status,number_of_nodes,active_shards,unassigned_shards
-```
-
-2. Santé de tous les index:
-```bash
-GET /_cluster/health?level=indices&filter_path=indices.*.status
-```
-
-3. Identifier tous les shards unassigned du cluster:
-```bash
-GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason | grep UNASSIGNED
-```
-
-4. Expliquer pourquoi un shard est unassigned:
-```bash
-GET /_cluster/allocation/explain
-{
-  "index": "health-test",
-  "shard": 0,
-  "primary": false
-}
-```
-
-**Résultat exemple**:
-```json
-{
-  "index": "health-test",
-  "shard": 0,
-  "primary": false,
-  "current_state": "unassigned",
-  "unassigned_info": {
-    "reason": "INDEX_CREATED",
-    "at": "2023-11-10T10:00:00.000Z",
-    "details": "not enough data nodes to allocate shard, allocation would violate shard allocation rules"
-  },
-  "can_allocate": "no",
-  "allocate_explanation": "cannot allocate because allocation is not permitted to any of the nodes"
-}
-```
-
-#### Critères de Succès
-
-- ✅ Comprendre les 3 statuts (green/yellow/red) et leur signification
-- ✅ Identifier les shards unassigned avec `_cat/shards`
-- ✅ Utiliser `_cluster/allocation/explain` pour diagnostiquer
-- ✅ Interpréter `active_shards_percent` (100% = green, <100% = yellow/red)
-- ✅ Savoir quand un statut yellow est acceptable (dev/test avec 1 nœud)
-
-#### Dépannage
-
-**Problème**: Cluster reste yellow même avec 2 nœuds
-→ Vérifiez les règles d'allocation: `GET /_cluster/settings`
-→ Vérifiez que les nœuds ont le rôle `data`: `GET /_cat/nodes?v&h=name,node.role`
-→ Vérifiez l'espace disque: watermark flood peut bloquer l'allocation
-
-**Problème**: Cluster passe en red après suppression d'un index
-→ Normal temporairement, les shards doivent être réalloués
-→ Attendez quelques secondes et revérifiez: `GET /_cluster/health`
-→ Si reste red, vérifiez les logs: `tail -f /var/log/elasticsearch/elasticsearch.log`
-
-**Problème**: `active_shards_percent` bloqué à un pourcentage
-→ Des shards sont INITIALIZING (en cours de copie)
-→ Vérifiez avec: `GET /_cat/recovery?v`
-→ Attendez la fin de la récupération
-
----
-
-## Lab 4.2: Monitoring des Statistiques de Nœuds
-
-**Topic**: Monitoring - Métriques Critiques
-**Prérequis**: Cluster Elasticsearch actif
-
-### Objectif
-
-Utiliser l'API `_nodes/stats` pour extraire les métriques critiques (heap JVM, CPU, disk I/O) et surveiller la santé des nœuds individuellement.
-
-### Contexte
-
-L'équipe infrastructure demande un rapport sur l'utilisation des ressources du cluster. Vous devez extraire les métriques clés pour identifier les nœuds surchargés.
-
-### Exercice de Base
-
-#### Setup
-
-**Avant de commencer**:
-1. Identifiez les nœuds du cluster: `GET /_cat/nodes?v`
-2. Notez les noms des nœuds pour les requêtes filtrant
-
-#### Étapes
-
-**Étape 1**: Obtenir les statistiques JVM (heap usage)
-
-```bash
-GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.mem
-```
-
-**Résultat attendu**:
-```json
-{
-  "nodes": {
-    "abc123": {
-      "name": "node-1",
-      "jvm": {
-        "mem": {
-          "heap_used_in_bytes": 5368709120,
-          "heap_used_percent": 25,
-          "heap_committed_in_bytes": 21474836480,
-          "heap_max_in_bytes": 21474836480,
-          "non_heap_used_in_bytes": 157286400,
-          "non_heap_committed_in_bytes": 164626432
-        }
-      }
-    }
-  }
-}
-```
-
-**Analyse**:
-```
-Heap used:         5,368,709,120 bytes = 5 GB
-Heap max:         21,474,836,480 bytes = 20 GB
-Heap used %:      25%
-```
-
-**Interprétation**:
-- ✅ <75%: Sain
-- ⚠️ 75-85%: Surveiller
-- ❌ >85%: Critique (risque OutOfMemoryError)
-
-**Étape 2**: Vérifier les Garbage Collection stats
-
-```bash
-GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.gc
-```
-
-**Résultat attendu**:
-```json
-{
-  "nodes": {
-    "abc123": {
-      "name": "node-1",
-      "jvm": {
-        "gc": {
-          "collectors": {
-            "young": {
-              "collection_count": 1234,
-              "collection_time_in_millis": 12340
-            },
-            "old": {
-              "collection_count": 5,
-              "collection_time_in_millis": 500
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-**Calculs**:
-```
-Durée moyenne GC young: 12,340 ms / 1,234 = 10 ms par GC
-Durée moyenne GC old:   500 ms / 5 = 100 ms par GC
-```
-
-**Alertes**:
-- ⚠️ GC young > 50 ms: Heap sous pression
-- ❌ GC old > 1000 ms: Heap critiquement plein
-- ❌ GC fréquents (>10/minute): Heap trop petit
-
-**Étape 3**: Monitorer l'utilisation CPU et RAM (OS level)
-
-```bash
-GET /_nodes/stats/os?filter_path=nodes.*.name,nodes.*.os.cpu,nodes.*.os.mem
-```
-
-**Résultat attendu**:
-```json
-{
-  "nodes": {
-    "abc123": {
-      "name": "node-1",
-      "os": {
-        "cpu": {
-          "percent": 45,
-          "load_average": {
-            "1m": 2.5,
-            "5m": 2.0,
-            "15m": 1.8
-          }
-        },
-        "mem": {
-          "total_in_bytes": 68719476736,
-          "free_in_bytes": 20000000000,
-          "used_in_bytes": 48719476736,
-          "free_percent": 29,
-          "used_percent": 71
-        }
-      }
-    }
-  }
-}
-```
-
-**Analyse**:
-```
-CPU usage:        45% (moyenne récente)
-Load average 1m:  2.5 (sur un serveur 16 cores → 2.5/16 = 15.6% load)
-RAM usage:        71% (incluant OS cache)
-RAM free:         29%
-```
-
-**Thresholds**:
-- CPU: <60% ✅, 60-80% ⚠️, >80% ❌
-- Load avg: <cores ✅, cores-2×cores ⚠️, >2×cores ❌
-- RAM: >20% free ✅, 10-20% free ⚠️, <10% free ❌
-
-**Étape 4**: Vérifier l'utilisation disque et I/O
-
-```bash
-GET /_nodes/stats/fs?filter_path=nodes.*.name,nodes.*.fs.total,nodes.*.fs.io_stats
-```
-
-**Résultat attendu**:
-```json
-{
-  "nodes": {
-    "abc123": {
-      "name": "node-1",
-      "fs": {
-        "total": {
-          "total_in_bytes": 2000000000000,
-          "free_in_bytes": 1200000000000,
-          "available_in_bytes": 1200000000000
-        },
-        "io_stats": {
-          "total": {
-            "operations": 123456789,
-            "read_operations": 98765432,
-            "write_operations": 24691357,
-            "read_kilobytes": 5000000,
-            "write_kilobytes": 3000000
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-**Calculs**:
-```
-Disque total:     2,000 GB (2 TB)
-Disque utilisé:   800 GB (40%)
-Disque libre:     1,200 GB (60%)
-
-I/O read:         5,000,000 KB = 4.88 GB
-I/O write:        3,000,000 KB = 2.93 GB
-```
-
-**Thresholds disque** (watermarks):
-- <85%: ✅ Sain
-- 85-90%: ⚠️ LOW watermark (pas de nouveaux shards)
-- 90-95%: ⚠️ HIGH watermark (relocate shards)
-- >95%: ❌ FLOOD (indices en read-only)
-
-**Étape 5**: Surveiller les métriques d'indexation et recherche
-
-```bash
-GET /_nodes/stats/indices?filter_path=nodes.*.name,nodes.*.indices.indexing,nodes.*.indices.search
-```
-
-**Résultat attendu**:
-```json
-{
-  "nodes": {
-    "abc123": {
-      "name": "node-1",
-      "indices": {
-        "indexing": {
-          "index_total": 10000000,
-          "index_time_in_millis": 5000000,
-          "index_current": 5,
-          "index_failed": 10
-        },
-        "search": {
-          "query_total": 500000,
-          "query_time_in_millis": 2000000,
-          "query_current": 2,
-          "fetch_total": 450000,
-          "fetch_time_in_millis": 500000
-        }
-      }
-    }
-  }
-}
-```
-
-**Calculs de performance**:
-```
-Indexing:
-  - Latence moyenne: 5,000,000 ms / 10,000,000 docs = 0.5 ms/doc
-  - Taux d'échec: 10 / 10,000,000 = 0.0001% ✅
-
-Search:
-  - Latence query: 2,000,000 ms / 500,000 = 4 ms/query
-  - Latence fetch: 500,000 ms / 450,000 = 1.1 ms/fetch
-  - Total: ~5.1 ms par recherche ✅
-```
-
-**Étape 6**: Créer un tableau de bord synthétique
-
-Combinez toutes les métriques dans une seule requête:
-
-```bash
-GET /_nodes/stats?filter_path=nodes.*.name,nodes.*.jvm.mem.heap_used_percent,nodes.*.os.cpu.percent,nodes.*.fs.total.available_in_bytes,nodes.*.indices.search.query_time_in_millis
-```
-
-**Créez un tableau manuel**:
-
-| Node | Heap | CPU | Disk Free | Search Latency |
-|------|------|-----|-----------|----------------|
-| node-1 | 25% ✅ | 45% ✅ | 60% ✅ | 4 ms ✅ |
-| node-2 | 78% ⚠️ | 82% ❌ | 12% ⚠️ | 15 ms ⚠️ |
-
-**Observations**: node-2 nécessite une attention (CPU et heap élevés).
-
-#### Validation
-
-**Commandes de vérification**:
-
-1. Résumé rapide de tous les nœuds:
-```bash
-GET /_cat/nodes?v&h=name,heap.percent,ram.percent,cpu,load_1m,disk.used_percent
-```
-
-**Résultat**:
-```
-name   heap.percent ram.percent cpu load_1m disk.used_percent
-node-1 25           71          45  2.5     40
-```
-
-2. Comparer les performances entre nœuds:
-```bash
-GET /_nodes/stats/indices?filter_path=nodes.*.name,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_time_in_millis
-```
-
-3. Identifier le nœud le plus chargé:
-```bash
-GET /_cat/nodes?v&h=name,cpu,load_1m&s=cpu:desc
-```
-
-#### Critères de Succès
-
-- ✅ Extraire heap usage avec `_nodes/stats/jvm`
-- ✅ Interpréter les métriques CPU/RAM/disk
-- ✅ Calculer les latences moyennes (indexing, search)
-- ✅ Identifier les nœuds surchargés (CPU >80%, heap >85%)
-- ✅ Comprendre les watermarks disque (85%, 90%, 95%)
-
-#### Dépannage
-
-**Problème**: Heap usage constamment >85%
-→ Cluster sous-dimensionné, ajouter des nœuds
-→ Ou augmenter le heap (si <32 GB et RAM disponible)
-→ Vérifier les requêtes: certaines peuvent consommer trop de mémoire
-
-**Problème**: CPU élevé mais load average faible
-→ CPU utilisé par des tâches courtes (bursts)
-→ Normal si indexation/recherche intensive par pics
-→ Surveiller les thread pool rejections
-
-**Problème**: Disque plein mais cluster n'utilise pas toute la capacité
-→ Vérifier les watermarks: `GET /_cluster/settings?include_defaults&filter_path=*.cluster.routing.allocation.disk.watermark*`
-→ Augmenter les watermarks si nécessaire (avec prudence)
-
----
-
-## Lab 4.3: Configuration et Analyse des Slow Query Logs
-
-**Topic**: Monitoring - Analyse des Logs
-**Prérequis**: Cluster Elasticsearch, accès aux fichiers de logs
-
-### Objectif
-
-Configurer les slow query logs pour capturer les requêtes lentes, exécuter une requête intentionnellement lente, et analyser les logs pour identifier les optimisations possibles.
-
-### Contexte
-
-Les utilisateurs se plaignent de lenteur sur certaines recherches. Vous devez activer les slow logs pour identifier les requêtes problématiques et leur temps d'exécution.
-
-### Exercice de Base
-
-#### Setup
-
-**Avant de commencer**:
-1. Créez un index de test avec des données:
-
-```bash
-PUT /slowlog-test
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "mappings": {
-    "properties": {
-      "title": { "type": "text" },
-      "content": { "type": "text" },
-      "category": { "type": "keyword" },
-      "views": { "type": "integer" }
-    }
-  }
-}
-
-# Indexer des documents (1000 pour avoir du volume)
-POST /slowlog-test/_bulk
-{"index":{}}
-{"title":"Article 1","content":"Long content here...","category":"tech","views":100}
-{"index":{}}
-{"title":"Article 2","content":"Another long content...","category":"science","views":200}
-... (répéter jusqu'à 1000 docs)
-```
-
-#### Étapes
-
-**Étape 1**: Configurer les seuils de slow query log
-
-```bash
-PUT /slowlog-test/_settings
-{
-  "index.search.slowlog.threshold.query.warn": "500ms",
-  "index.search.slowlog.threshold.query.info": "250ms",
-  "index.search.slowlog.threshold.query.debug": "100ms",
-  "index.search.slowlog.threshold.query.trace": "50ms",
-  "index.search.slowlog.level": "info"
-}
-```
-
-**Explication des niveaux**:
-- **WARN** (500ms): Requêtes très lentes
-- **INFO** (250ms): Requêtes lentes
-- **DEBUG** (100ms): Requêtes moyennement lentes
-- **TRACE** (50ms): Toutes les requêtes un peu lentes
-
-**Note**: Seuls les logs du niveau configuré et au-dessus sont écrits (`level: info` → logs ≥250ms).
-
-**Étape 2**: Configurer les slow indexing logs (optionnel)
-
-```bash
-PUT /slowlog-test/_settings
-{
-  "index.indexing.slowlog.threshold.index.warn": "1s",
-  "index.indexing.slowlog.threshold.index.info": "500ms",
-  "index.indexing.slowlog.threshold.index.debug": "250ms",
-  "index.indexing.slowlog.threshold.index.trace": "100ms",
-  "index.indexing.slowlog.level": "info"
-}
-```
-
-**Étape 3**: Localiser les fichiers de slow logs
-
-**Emplacement par défaut**:
-```
-/var/log/elasticsearch/<cluster_name>_index_search_slowlog.log
-/var/log/elasticsearch/<cluster_name>_index_indexing_slowlog.log
-```
-
-**Vérifier les logs existent**:
-```bash
-ls -lh /var/log/elasticsearch/*slowlog.log
-# ou si installation par archive:
-ls -lh logs/*slowlog.log
-```
-
-**Étape 4**: Exécuter une requête lente
-
-Créez une requête intentionnellement coûteuse (wildcard sur gros volume):
-
-```bash
-GET /slowlog-test/_search
-{
-  "query": {
-    "wildcard": {
-      "content": "*long*content*"
-    }
-  },
-  "size": 100
-}
-```
-
-**Note**: Les requêtes wildcard sont lentes car elles ne peuvent pas utiliser l'index inversé efficacement.
-
-Ou utilisez une agrégation complexe:
-
-```bash
-GET /slowlog-test/_search
-{
-  "size": 0,
-  "aggs": {
-    "categories": {
-      "terms": {
-        "field": "category",
-        "size": 100
-      },
-      "aggs": {
-        "avg_views": {
-          "avg": { "field": "views" }
-        },
-        "top_hits": {
-          "top_hits": {
-            "size": 10,
-            "_source": ["title", "views"]
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-**Étape 5**: Analyser les slow logs
-
-Consultez le fichier de slow log:
-
-```bash
-tail -f /var/log/elasticsearch/elasticsearch_index_search_slowlog.log
-```
-
-**Format d'une entrée slow log**:
-```
-[2023-11-10T10:30:15,123][INFO ][i.s.s.query] [node-1] [slowlog-test][0] 
-took[312ms], took_millis[312], total_hits[100 hits], 
-types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[1], 
-source[{"query":{"wildcard":{"content":"*long*content*"}},"size":100}]
-```
-
-**Analyse**:
-- **took**: 312 ms (au-dessus du seuil INFO de 250ms)
-- **total_hits**: 100 résultats
-- **source**: La requête complète (JSON)
-
-**Étape 6**: Identifier les patterns de requêtes lentes
-
-Recherchez dans les logs les requêtes fréquemment lentes:
-
-```bash
-# Compter les occurrences de wildcard
-grep "wildcard" /var/log/elasticsearch/*_index_search_slowlog.log | wc -l
-
-# Extraire les temps took
-grep -oP 'took\[\K[0-9]+ms' /var/log/elasticsearch/*_index_search_slowlog.log | sort -n
-
-# Identifier les index les plus impactés
-grep "slowlog-test" /var/log/elasticsearch/*_index_search_slowlog.log | wc -l
-```
-
-**Étape 7**: Optimiser la requête identifiée
-
-**Avant** (wildcard lent):
-```bash
-GET /slowlog-test/_search
-{
-  "query": {
-    "wildcard": {
-      "content": "*long*content*"
-    }
-  }
-}
-```
-Temps: ~300ms
-
-**Après** (match query rapide):
-```bash
-GET /slowlog-test/_search
-{
-  "query": {
-    "match": {
-      "content": "long content"
-    }
-  }
-}
-```
-Temps: ~10ms ✅ (×30 plus rapide)
-
-**Étape 8**: Désactiver les slow logs (si nécessaire)
-
-```bash
-PUT /slowlog-test/_settings
-{
-  "index.search.slowlog.threshold.query.warn": "-1",
-  "index.search.slowlog.threshold.query.info": "-1",
-  "index.search.slowlog.threshold.query.debug": "-1",
-  "index.search.slowlog.threshold.query.trace": "-1"
-}
-```
-
-**Note**: `-1` désactive le logging pour ce niveau.
-
-#### Validation
-
-**Commandes de vérification**:
-
-1. Vérifier la configuration slow log d'un index:
-```bash
-GET /slowlog-test/_settings?include_defaults&filter_path=*.index.search.slowlog*,*.index.indexing.slowlog*
-```
-
-2. Forcer une requête lente et vérifier le log immédiatement:
-```bash
-# Exécuter une requête lente
-GET /slowlog-test/_search?scroll=1m
-{
-  "size": 1000,
-  "query": { "match_all": {} }
-}
-
-# Vérifier le slow log (dernières 10 lignes)
-tail -10 /var/log/elasticsearch/elasticsearch_index_search_slowlog.log
-```
-
-3. Statistiques des slow logs (avec script):
-```bash
-# Extraire tous les temps took et calculer la moyenne
-grep -oP 'took\[\K[0-9]+' /var/log/elasticsearch/*_index_search_slowlog.log | \
-  awk '{ sum += $1; n++ } END { if (n > 0) print "Average: " sum/n " ms" }'
-```
-
-#### Critères de Succès
-
-- ✅ Configurer les seuils slowlog avec `PUT /index/_settings`
-- ✅ Localiser les fichiers de logs slowlog
-- ✅ Exécuter une requête lente (>250ms)
-- ✅ Lire et interpréter une entrée de slow log
-- ✅ Identifier le type de requête lente (wildcard, agrégation complexe)
-- ✅ Proposer une optimisation
-
-#### Dépannage
-
-**Problème**: Aucun slow log généré même avec requêtes lentes
-→ Vérifiez le niveau de log: `index.search.slowlog.level` doit être au bon niveau
-→ Vérifiez que la requête dépasse effectivement le seuil (mesurez avec `?profile=true`)
-→ Vérifiez les permissions du fichier de log: `ls -l /var/log/elasticsearch/`
-
-**Problème**: Fichier de slow log devient trop volumineux
-→ Configurez la rotation des logs dans `log4j2.properties`:
-```properties
-appender.index_search_slowlog_rolling.type = RollingFile
-appender.index_search_slowlog_rolling.filePattern = ${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}_index_search_slowlog-%d{yyyy-MM-dd}.log
-appender.index_search_slowlog_rolling.policies.type = Policies
-appender.index_search_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy
-appender.index_search_slowlog_rolling.policies.time.interval = 1
-```
-
-**Problème**: Trop de slow logs, bruit important
-→ Augmentez les seuils: 500ms → 1s, 250ms → 500ms
-→ Activez uniquement le niveau WARN (requêtes très lentes)
-
----
-
-## 🌟 Bonus 4.A: Création de Dashboards Kibana pour Monitoring
-
-**Niveau**: Avancé
-**Prérequis**: Kibana installé et accessible, Stack Monitoring activé
-
-### Objectif
-
-Créer un dashboard Kibana personnalisé pour surveiller les KPIs clés du cluster (cluster health, heap usage, indexing rate, search latency) avec des visualisations en temps réel.
-
-### Contexte
-
-L'équipe DevOps souhaite un dashboard centralisé pour surveiller le cluster Elasticsearch sans avoir à exécuter manuellement des requêtes API. Vous allez créer un dashboard Kibana avec les métriques essentielles.
-
-### Challenge
-
-**Partie 1**: Activer Monitoring (si pas déjà fait)
-
-Activez la collecte de métriques:
-
-```bash
-PUT /_cluster/settings
-{
-  "persistent": {
-    "xpack.monitoring.collection.enabled": true
-  }
-}
-```
-
-Vérifiez dans Kibana: **Stack Monitoring** → **Overview** devrait afficher les métriques.
-
-**Partie 2**: Créer des visualisations dans Kibana
-
-1. **Cluster Health Gauge** (statut vert/jaune/rouge)
-   - Type: **Gauge**
-   - Index pattern: `.monitoring-es-*`
-   - Metric: `cluster_stats.status` (field mapping)
-   - Color ranges: Green (0-1), Yellow (1-2), Red (2-3)
-
-2. **Heap Usage Line Chart** (évolution temporelle)
-   - Type: **Line**
-   - Index pattern: `.monitoring-es-*`
-   - X-axis: `@timestamp` (Date Histogram, interval: 1 minute)
-   - Y-axis: `node_stats.jvm.mem.heap_used_percent` (Average)
-   - Threshold line: 85% (critical)
-
-3. **Indexing Rate Area Chart**
-   - Type: **Area**
-   - Index pattern: `.monitoring-es-*`
-   - X-axis: `@timestamp`
-   - Y-axis: `node_stats.indices.indexing.index_total` (Derivative → docs/sec)
-
-4. **Search Latency Bar Chart**
-   - Type: **Vertical Bar**
-   - Index pattern: `.monitoring-es-*`
-   - X-axis: `node_stats.name` (Terms, size: 10)
-   - Y-axis: `node_stats.indices.search.query_time_in_millis / node_stats.indices.search.query_total` (Scripted field)
-
-5. **Disk Usage Metric**
-   - Type: **Metric**
-   - Index pattern: `.monitoring-es-*`
-   - Metric: `(node_stats.fs.total.total_in_bytes - node_stats.fs.total.available_in_bytes) / node_stats.fs.total.total_in_bytes * 100` (Scripted)
-   - Format: Percentage
-
-**Partie 3**: Assembler le dashboard
-
-1. Créez un nouveau dashboard: **Kibana → Dashboard → Create new dashboard**
-2. Ajoutez toutes les visualisations créées
-3. Organisez en grid:
-   ```
-   +-------------------+-------------------+
-   | Cluster Health    | Heap Usage        |
-   | (Gauge)           | (Line Chart)      |
-   +-------------------+-------------------+
-   | Indexing Rate     | Search Latency    |
-   | (Area Chart)      | (Bar Chart)       |
-   +-------------------+-------------------+
-   | Disk Usage        | Thread Pool       |
-   | (Metric)          | Rejections (Table)|
-   +-------------------+-------------------+
-   ```
-
-**Partie 4**: Configurer les alertes (Watcher)
-
-Créez une alerte pour heap >85%:
-
-```bash
-PUT _watcher/watch/heap_alert
-{
-  "trigger": {
-    "schedule": {
-      "interval": "1m"
-    }
-  },
-  "input": {
-    "search": {
-      "request": {
-        "indices": [".monitoring-es-*"],
-        "body": {
-          "query": {
-            "bool": {
-              "must": [
-                {
-                  "range": {
-                    "@timestamp": {
-                      "gte": "now-2m"
-                    }
-                  }
-                },
-                {
-                  "range": {
-                    "node_stats.jvm.mem.heap_used_percent": {
-                      "gte": 85
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "aggs": {
-            "nodes": {
-              "terms": {
-                "field": "node_stats.node_id"
-              },
-              "aggs": {
-                "avg_heap": {
-                  "avg": {
-                    "field": "node_stats.jvm.mem.heap_used_percent"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "condition": {
-    "compare": {
-      "ctx.payload.hits.total": {
-        "gt": 0
-      }
-    }
-  },
-  "actions": {
-    "log_action": {
-      "logging": {
-        "text": "Heap usage above 85% on nodes: {{ctx.payload.aggregations.nodes.buckets}}"
-      }
-    }
-  }
-}
-```
-
-**Partie 5**: Configurer le refresh automatique
-
-Dans le dashboard Kibana:
-- Cliquez sur l'horloge (en haut à droite)
-- Sélectionnez "Auto refresh: 10 seconds"
-- Time range: "Last 15 minutes"
-
-### Validation
-
-**Checklist dashboard complet**:
-
-- [ ] Cluster health gauge (vert/jaune/rouge)
-- [ ] Heap usage line chart avec threshold 85%
-- [ ] Indexing rate area chart (docs/sec)
-- [ ] Search latency bar chart par nœud
-- [ ] Disk usage metric avec %
-- [ ] Thread pool rejections table
-- [ ] Auto-refresh configuré (10s)
-- [ ] Time picker sur "Last 15 minutes"
-
-**Questions à répondre**:
-
-1. **Pourquoi utiliser `.monitoring-es-*` comme index pattern ?**
-   - Elasticsearch stocke les métriques de monitoring dans ces index
-   - Pattern avec wildcard pour inclure tous les index de monitoring (par jour)
-
-2. **Comment calculer le taux (rate) à partir d'un compteur cumulatif ?**
-   - Utiliser l'agrégation **Derivative** dans Kibana
-   - Exemple: `indexing.index_total` (compteur) → Derivative → docs/sec (taux)
-
-3. **Quelle est la différence entre Average et Sum pour les métriques ?**
-   - **Average**: Moyenne sur tous les nœuds (ex: heap moyen du cluster)
-   - **Sum**: Total cumulé (ex: nombre total de documents indexés)
-
-**Critère de succès**: 
-- Dashboard fonctionnel avec au moins 5 visualisations
-- Métriques en temps réel (auto-refresh)
-- Capable d'identifier un problème visuellement (heap spike, rejections)
-
----
-
-
----
-
-# Jour 2 - Systèmes d'Alertes
-
-## Lab 5.1: Création d'une Alerte Simple avec Kibana Rules
-
-**Objectif**: Créer une alerte de surveillance de la santé du cluster avec Kibana Rules et tester son déclenchement.
-
-**Contexte**: Les Kibana Rules offrent une interface graphique intuitive pour créer des alertes sans manipuler du JSON. Vous allez créer une règle qui surveille la santé du cluster et vous notifie lorsqu'il passe en statut YELLOW ou RED.
-
-### Étape 1: Accéder à l'Interface de Gestion des Règles
-
-1. Ouvrez Kibana dans votre navigateur
-2. Dans le menu latéral, cliquez sur **Stack Management** (icône d'engrenage)
-3. Sous la section **Alerts and Insights**, cliquez sur **Rules**
-
-Vous devriez voir l'interface de gestion des règles avec la liste des règles existantes (si disponible).
-
-### Étape 2: Créer une Nouvelle Règle
-
-1. Cliquez sur le bouton **Create rule** en haut à droite
-2. Sélectionnez le type de règle: **Elasticsearch query**
-   - Ce type permet d'exécuter des requêtes Elasticsearch et de déclencher des alertes selon les résultats
-3. Donnez un nom à votre règle: `cluster-health-monitor`
-4. Ajoutez des tags pour organiser vos alertes: `cluster`, `health`, `ops`
-
-### Étape 3: Configurer la Requête de Surveillance
-
-Dans la section **Define your query**:
-
-1. **Index**: Sélectionnez `.monitoring-es-*` ou créez un index temporaire pour les tests
-2. **Time field**: `@timestamp` ou le champ de temps de votre index
-3. **Query**: Configurez la requête pour surveiller la santé du cluster
-
-```json
-{
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "range": {
-            "@timestamp": {
-              "gte": "now-5m"
-            }
-          }
-        }
-      ],
-      "filter": [
-        {
-          "terms": {
-            "cluster_state.status": ["yellow", "red"]
-          }
-        }
-      ]
-    }
-  }
-}
-```
-
-4. **Size**: Laissez à `100` documents
-5. **Threshold**: Configurez le seuil de déclenchement
-   - **WHEN**: `query matches`
-   - **FOR THE LAST**: `5 minutes`
-   - **GROUPED OVER**: `all documents`
-
-### Étape 4: Alternative - Utiliser l'API Cluster Health
-
-Si vous n'avez pas d'index de monitoring, créez une règle avec un type **ES query** simulé:
-
-1. Créez un index de test pour simuler des états de santé:
-
-```bash
-# Créer un index de test
-PUT /cluster_health_logs
-
-# Indexer un document simulant un état YELLOW
-POST /cluster_health_logs/_doc
-{
-  "@timestamp": "2024-01-15T10:00:00Z",
-  "status": "yellow",
-  "cluster_name": "es-ops-training",
-  "number_of_nodes": 3,
-  "unassigned_shards": 2
-}
-```
-
-2. Configurez la règle pour interroger cet index:
-   - **Index**: `cluster_health_logs`
-   - **Time field**: `@timestamp`
-   - **Query**: Rechercher les documents avec `status: yellow` ou `status: red`
-
-### Étape 5: Configurer la Fréquence de Vérification
-
-Dans la section **Check every**:
-
-1. **Check every**: `1 minute`
-   - La règle sera évaluée toutes les minutes
-2. **Notify**: `Every time alert is active`
-   - Alternative: `On status change` pour ne notifier que lors des changements d'état
-
-### Étape 6: Définir les Actions (Actions Simplifiées pour Tests)
-
-Pour ce premier lab, nous allons utiliser une action simple de journalisation:
-
-1. Dans la section **Actions**, cliquez sur **Add action**
-2. Sélectionnez **Server log** comme type de connecteur
-   - Cette action journalise dans les logs Kibana, pratique pour les tests
-3. Configurez le message:
-
-```
-Alerte: Le cluster {{context.cluster.name}} est en état {{context.status}}!
-
-Détails:
-- Statut: {{context.status}}
-- Nœuds: {{context.number_of_nodes}}
-- Shards non assignés: {{context.unassigned_shards}}
-- Date: {{context.date}}
-
-Action requise: Vérifier l'état du cluster avec GET _cluster/health
-```
-
-4. **Action group**: Sélectionnez `Alert` (déclenchée quand l'alerte est active)
-
-### Étape 7: Sauvegarder et Activer la Règle
-
-1. Cliquez sur **Save** en bas de page
-2. La règle est automatiquement activée après sa création
-3. Vérifiez que le statut est **Enabled** dans la liste des règles
-
-### Étape 8: Tester le Déclenchement de l'Alerte
-
-Maintenant testons que l'alerte se déclenche correctement:
-
-#### Méthode 1: Simuler un État YELLOW (si environnement de test)
-
-```bash
-# Créer un index avec 2 répliques sur un cluster à 1 seul nœud
-PUT /test-yellow-alert
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 2
-  }
-}
-
-# Vérifier que le cluster passe en YELLOW
-GET _cluster/health
-```
-
-**Résultat attendu**:
-```json
-{
-  "cluster_name": "es-ops-training",
-  "status": "yellow",
-  "timed_out": false,
-  "number_of_nodes": 1,
-  "unassigned_shards": 2,
-  ...
-}
-```
-
-#### Méthode 2: Indexer un Document de Test
-
-Si vous utilisez l'index de simulation:
-
-```bash
-# Indexer un nouveau document YELLOW
-POST /cluster_health_logs/_doc
-{
-  "@timestamp": "{{NOW}}",
-  "status": "yellow",
-  "cluster_name": "es-ops-training",
-  "number_of_nodes": 3,
-  "unassigned_shards": 5
-}
-
-# Forcer le refresh
-POST /cluster_health_logs/_refresh
-```
-
-### Étape 9: Vérifier que l'Alerte s'est Déclenchée
-
-1. Retournez dans **Stack Management** → **Rules**
-2. Cliquez sur votre règle `cluster-health-monitor`
-3. Consultez l'onglet **Alert history** ou **History**
-   - Vous devriez voir les déclenchements récents
-4. Vérifiez les logs Kibana pour voir le message journalisé:
-
-```bash
-# Depuis votre terminal, consultez les logs Kibana
-docker logs kibana | grep "cluster-health-monitor"
-# OU si installation locale
-tail -f /var/log/kibana/kibana.log | grep "cluster-health-monitor"
-```
-
-**Résultat attendu dans les logs**:
-```
-[ALERT] cluster-health-monitor: Le cluster es-ops-training est en état yellow!
-```
-
-### Étape 10: Tester la Désactivation et Modification
-
-1. **Désactiver la règle**:
-   - Dans la liste des règles, cliquez sur le switch pour désactiver `cluster-health-monitor`
-   - Le statut passe à **Disabled**
-   - Vérifiez qu'aucune nouvelle alerte n'est déclenchée
-
-2. **Modifier la règle**:
-   - Cliquez sur le nom de la règle
-   - Cliquez sur **Edit rule** en haut à droite
-   - Changez la fréquence de vérification à `5 minutes`
-   - Sauvegardez
-
-3. **Réactiver la règle**:
-   - Réactivez le switch pour remettre la règle en état **Enabled**
-
-### Validation
-
-Vérifiez que vous avez réussi le lab:
-
-```bash
-# 1. Vérifier que la règle existe via l'API Kibana
-curl -X GET "localhost:5601/api/alerting/rules" \
-  -H "kbn-xsrf: true" \
-  -u elastic:votre_password | jq '.data[] | select(.name=="cluster-health-monitor")'
-```
-
-**Résultat attendu**:
-```json
-{
-  "id": "abc123...",
-  "name": "cluster-health-monitor",
-  "tags": ["cluster", "health", "ops"],
-  "enabled": true,
-  "schedule": {
-    "interval": "1m"
-  },
-  ...
-}
-```
-
-```bash
-# 2. Vérifier les alertes actives
-GET _kibana/api/alerting/rule/ABC123/_state
-```
-
-### Points Clés à Retenir
-
-✅ **Kibana Rules** offrent une interface graphique pour créer des alertes sans JSON
-✅ Le type **Elasticsearch query** permet d'interroger n'importe quel index
-✅ La **fréquence de vérification** contrôle combien de fois la règle est évaluée
-✅ Les **actions** définissent ce qui se passe quand l'alerte se déclenche
-✅ L'action **Server log** est idéale pour les tests et le debugging
-✅ Les règles peuvent être **activées/désactivées** sans les supprimer
-✅ L'historique des alertes est accessible via l'interface Kibana
-
----
-
-## Lab 5.2: Configuration d'Actions Avancées (Webhook et Index)
-
-**Objectif**: Configurer des actions sophistiquées pour vos alertes - envoyer des webhooks vers des services externes et indexer les alertes pour analyse historique.
-
-**Contexte**: Les alertes ne sont utiles que si elles déclenchent les bonnes actions. Dans ce lab, vous allez configurer deux types d'actions essentielles en production: les webhooks (pour intégrer avec des outils externes comme Slack, PagerDuty, ou vos propres services) et l'indexation (pour garder une trace de toutes les alertes).
-
-### Partie A: Créer un Connecteur Webhook
-
-Les connecteurs sont des configurations réutilisables qui définissent comment se connecter à des services externes.
-
-#### Étape 1: Créer un Service de Test pour Recevoir les Webhooks
-
-Nous allons utiliser **webhook.site** pour tester nos webhooks:
-
-1. Ouvrez votre navigateur et allez sur https://webhook.site
-2. Notez l'URL unique générée (format: `https://webhook.site/abc-def-123...`)
-   - Cette URL affichera tous les webhooks reçus en temps réel
-3. Gardez cet onglet ouvert pour voir les webhooks arriver
-
-**Alternative locale avec Netcat**:
-```bash
-# Terminal 1: Démarrer un serveur HTTP simple
-while true; do echo -e "HTTP/1.1 200 OK\n\n" | nc -l 8888; done
-
-# Votre webhook URL locale: http://localhost:8888
-```
-
-#### Étape 2: Créer le Connecteur Webhook dans Kibana
-
-1. Dans Kibana, allez dans **Stack Management** → **Connectors**
-2. Cliquez sur **Create connector**
-3. Sélectionnez **Webhook** dans la liste des types
-4. Configurez le connecteur:
-
-**Configuration**:
-- **Connector name**: `ops-webhook-notifier`
-- **URL**: Collez l'URL de webhook.site ou votre URL locale
-- **Method**: `POST`
-- **Headers**: Ajoutez les en-têtes suivants
-
-```json
-{
-  "Content-Type": "application/json",
-  "X-Alert-Source": "elasticsearch-ops"
-}
-```
-
-5. Testez le connecteur:
-   - Cliquez sur **Test** en bas
-   - Vérifiez que webhook.site reçoit bien la requête
-
-6. Cliquez sur **Save**
-
-#### Étape 3: Créer un Connecteur Index Action
-
-Ce connecteur permettra d'indexer les alertes dans Elasticsearch pour analyse historique.
-
-1. Dans **Stack Management** → **Connectors**, cliquez sur **Create connector**
-2. Sélectionnez **Index** dans la liste
-3. Configurez:
-
-**Configuration**:
-- **Connector name**: `alert-history-index`
-- **Index**: `alert-history`
-- **Refresh**: `true` (pour que les documents soient immédiatement disponibles)
-- **Time field**: `@timestamp` (sera ajouté automatiquement)
-
-4. Cliquez sur **Save**
-
-### Partie B: Créer une Alerte avec Actions Multiples
-
-Maintenant créons une alerte qui utilise ces deux connecteurs.
-
-#### Étape 4: Créer l'Alerte de Monitoring de Heap
-
-1. Allez dans **Stack Management** → **Rules**
-2. Cliquez sur **Create rule**
-3. Configurez la règle:
-
-**Informations de base**:
-- **Name**: `heap-usage-critical`
-- **Tags**: `performance`, `heap`, `critical`
-- **Rule type**: **Elasticsearch query**
-
-**Query definition**:
-- **Index**: `.monitoring-es-*` ou créez un index de simulation
-- **Time field**: `@timestamp`
-- **Query**:
-
-```json
-{
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "range": {
-            "@timestamp": {
-              "gte": "now-5m"
-            }
-          }
-        },
-        {
-          "range": {
-            "node_stats.jvm.mem.heap_used_percent": {
-              "gte": 85
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "max_heap": {
-      "max": {
-        "field": "node_stats.jvm.mem.heap_used_percent"
-      }
-    },
-    "avg_heap": {
-      "avg": {
-        "field": "node_stats.jvm.mem.heap_used_percent"
-      }
-    }
-  }
-}
-```
-
-**Threshold**:
-- **WHEN**: `query matches`
-- **FOR THE LAST**: `5 minutes`
-- **GROUPED OVER**: `top 5 'node_stats.node_id'` (pour identifier les nœuds problématiques)
-
-**Schedule**:
-- **Check every**: `1 minute`
-- **Notify**: `On status change` (pour éviter le spam)
-
-#### Étape 5: Créer un Index de Simulation pour Tests
-
-Comme nous n'avons peut-être pas de données de monitoring réelles:
-
-```bash
-# Créer l'index de simulation
-PUT /heap-monitoring
-{
-  "mappings": {
-    "properties": {
-      "@timestamp": { "type": "date" },
-      "node_id": { "type": "keyword" },
-      "node_name": { "type": "keyword" },
-      "heap_used_percent": { "type": "float" }
-    }
-  }
-}
-
-# Indexer des données simulant un heap critique
-POST /heap-monitoring/_bulk
-{"index":{}}
-{"@timestamp":"2024-01-15T10:00:00Z","node_id":"node-1","node_name":"es-ops-node-1","heap_used_percent":87.5}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:01:00Z","node_id":"node-1","node_name":"es-ops-node-1","heap_used_percent":89.2}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:02:00Z","node_id":"node-2","node_name":"es-ops-node-2","heap_used_percent":91.8}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:00:00Z","node_id":"node-3","node_name":"es-ops-node-3","heap_used_percent":75.3}
-```
-
-Modifiez votre règle pour utiliser cet index:
-- **Index**: `heap-monitoring`
-- **Query**: Rechercher `heap_used_percent >= 85`
-
-#### Étape 6: Configurer l'Action Webhook
-
-Dans la section **Actions** de votre règle:
-
-1. Cliquez sur **Add action**
-2. Sélectionnez le connecteur `ops-webhook-notifier`
-3. Configurez le payload JSON:
-
-```json
-{
-  "alert_id": "{{alertId}}",
-  "alert_name": "{{alertName}}",
-  "alert_type": "heap_usage",
-  "severity": "critical",
-  "timestamp": "{{date}}",
-  "context": {
-    "cluster_name": "{{context.cluster.name}}",
-    "condition": "Heap usage exceeded 85%",
-    "details": {
-      "max_heap_percent": "{{context.max_heap}}",
-      "avg_heap_percent": "{{context.avg_heap}}",
-      "affected_nodes": "{{context.groupBy}}"
-    }
-  },
-  "actions_required": [
-    "Check heap usage: GET _nodes/stats/jvm",
-    "Review GC activity: GET _nodes/stats/jvm?filter_path=nodes.*.jvm.gc",
-    "Consider increasing heap or clearing cache"
-  ],
-  "links": {
-    "kibana_dashboard": "https://kibana.example.com/app/monitoring",
-    "runbook": "https://docs.example.com/runbooks/elasticsearch-heap"
-  }
-}
-```
-
-4. **Action group**: `Alert` (quand l'alerte est active)
-5. **Throttle**: `15 minutes` (éviter les alertes répétées)
-
-#### Étape 7: Configurer l'Action Index
-
-1. Dans la même règle, cliquez sur **Add action** à nouveau
-2. Sélectionnez le connecteur `alert-history-index`
-3. Configurez le document à indexer:
-
-```json
-{
-  "@timestamp": "{{date}}",
-  "alert": {
-    "id": "{{alertId}}",
-    "name": "{{alertName}}",
-    "action_group": "{{context.group}}",
-    "instance_id": "{{alertInstanceId}}"
-  },
-  "rule": {
-    "id": "{{rule.id}}",
-    "name": "{{rule.name}}",
-    "type": "{{rule.type}}",
-    "tags": {{#toJson}}rule.tags{{/toJson}}
-  },
-  "metrics": {
-    "heap": {
-      "max_percent": {{context.max_heap}},
-      "avg_percent": {{context.avg_heap}},
-      "threshold": 85
-    }
-  },
-  "nodes": {
-    "affected": "{{context.groupBy}}"
-  },
-  "status": "triggered",
-  "severity": "critical",
-  "message": "Heap usage critical: {{context.max_heap}}% detected on cluster {{context.cluster.name}}"
-}
-```
-
-4. **Action group**: `Alert`
-5. Pas de throttle nécessaire (nous voulons toutes les occurrences dans l'historique)
-
-#### Étape 8: Sauvegarder et Activer
-
-1. Cliquez sur **Save** pour créer la règle avec les deux actions
-2. La règle est automatiquement activée
-
-### Partie C: Déclencher et Vérifier les Actions
-
-#### Étape 9: Déclencher l'Alerte
-
-Indexez des données qui déclencheront l'alerte:
-
-```bash
-# Indexer des données avec heap > 85%
-POST /heap-monitoring/_doc
-{
-  "@timestamp": "{{NOW}}",
-  "node_id": "node-1",
-  "node_name": "es-ops-node-1",
-  "heap_used_percent": 92.5
-}
-
-# Forcer le refresh
-POST /heap-monitoring/_refresh
-```
-
-Attendez 1-2 minutes (la fréquence de vérification de la règle).
-
-#### Étape 10: Vérifier l'Action Webhook
-
-1. Retournez sur webhook.site (ou votre serveur local)
-2. Vous devriez voir une requête POST arriver avec le payload JSON
-3. Vérifiez que les données sont correctes:
-   - `alert_name`: "heap-usage-critical"
-   - `severity`: "critical"
-   - `context.details.max_heap_percent`: valeur > 85
-
-**Exemple de requête reçue**:
-```json
-{
-  "alert_id": "alert-123-abc",
-  "alert_name": "heap-usage-critical",
-  "severity": "critical",
-  "timestamp": "2024-01-15T10:05:30.123Z",
-  "context": {
-    "condition": "Heap usage exceeded 85%",
-    "details": {
-      "max_heap_percent": "92.5",
-      "avg_heap_percent": "88.7",
-      "affected_nodes": "node-1"
-    }
-  }
-}
-```
-
-#### Étape 11: Vérifier l'Action Index
-
-Interrogez l'index d'historique des alertes:
-
-```bash
-# Vérifier que l'index a été créé
-GET alert-history
-
-# Rechercher les alertes récentes
-GET alert-history/_search
-{
-  "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "now-1h"
-      }
-    }
-  },
-  "sort": [
-    { "@timestamp": "desc" }
-  ]
-}
-```
-
-**Résultat attendu**:
-```json
-{
-  "hits": {
-    "total": { "value": 1 },
-    "hits": [
-      {
-        "_source": {
-          "@timestamp": "2024-01-15T10:05:30.123Z",
-          "alert": {
-            "id": "alert-123-abc",
-            "name": "heap-usage-critical"
-          },
-          "metrics": {
-            "heap": {
-              "max_percent": 92.5,
-              "avg_percent": 88.7,
-              "threshold": 85
-            }
-          },
-          "status": "triggered",
-          "severity": "critical",
-          "message": "Heap usage critical: 92.5% detected..."
-        }
-      }
-    ]
-  }
-}
-```
-
-#### Étape 12: Créer des Visualisations de l'Historique d'Alertes
-
-Créons un dashboard Kibana pour visualiser l'historique:
-
-1. Allez dans **Kibana** → **Discover**
-2. Créez un **Data View** pour `alert-history`
-3. Allez dans **Dashboard** → **Create dashboard**
-4. Ajoutez des visualisations:
-
-**Visualisation 1: Timeline des Alertes**
-```
-Visualization type: Line chart
-X-axis: @timestamp (Date histogram)
-Y-axis: Count
-Break down by: alert.name.keyword
-```
-
-**Visualisation 2: Répartition par Sévérité**
-```
-Visualization type: Pie chart
-Slice by: severity.keyword
-```
-
-**Visualisation 3: Top Nœuds Problématiques**
-```
-Visualization type: Table
-Rows: nodes.affected.keyword
-Metrics: Count, Max heap_percent
-```
-
-### Validation
-
-Vérifiez tous les éléments:
-
-```bash
-# 1. Vérifier les connecteurs
-GET _kibana/api/actions/connectors
-
-# 2. Vérifier la règle et ses actions
-GET _kibana/api/alerting/rules
-
-# 3. Compter les alertes dans l'index
-GET alert-history/_count
-
-# 4. Statistiques sur les alertes par sévérité
-GET alert-history/_search
-{
-  "size": 0,
-  "aggs": {
-    "by_severity": {
-      "terms": {
-        "field": "severity.keyword"
-      }
-    },
-    "by_alert_name": {
-      "terms": {
-        "field": "alert.name.keyword"
-      }
-    }
-  }
-}
-```
-
-### Points Clés à Retenir
-
-✅ Les **connecteurs** sont réutilisables entre plusieurs règles
-✅ Les **webhooks** permettent d'intégrer avec n'importe quel service externe
-✅ L'**indexation des alertes** crée une base de données d'historique analysable
-✅ Les **actions multiples** permettent de notifier ET d'archiver simultanément
-✅ Le **throttling** évite les alertes répétées (alert fatigue)
-✅ Les **payloads personnalisés** incluent contexte et actions recommandées
-✅ Les **variables de contexte** (`{{context.*}}`) rendent les alertes dynamiques
-✅ webhook.site est un outil pratique pour tester les webhooks
-✅ L'historique d'alertes permet de créer des dashboards et des rapports
-
----
-
-## 🌟 Bonus Challenge 5.A: Alerte Watcher Avancée avec Agrégations Complexes
-
-**Niveau**: Avancé  
-**Objectif**: Créer une alerte Watcher sophistiquée utilisant des agrégations complexes pour détecter des anomalies dans les patterns d'indexation.
-
-**Contexte**: Watcher offre plus de flexibilité que Kibana Rules grâce à son modèle JSON programmable. Dans ce challenge, vous allez créer une alerte qui détecte des anomalies dans le taux d'indexation en comparant la moyenne actuelle avec la moyenne historique (détection de baisse soudaine qui pourrait indiquer un problème).
-
-### Scénario
-
-Votre cluster indexe normalement ~1000 documents/minute. Vous voulez être alerté si:
-1. Le taux d'indexation chute en dessous de 50% de la moyenne historique
-2. Cette condition persiste pendant au moins 3 minutes
-3. Le problème affecte plusieurs index simultanément
-
-### Étape 1: Créer des Données de Test
-
-Créons un index simulant des métriques d'indexation:
-
-```bash
-# Créer l'index de métriques
-PUT /indexing-metrics
-{
-  "mappings": {
-    "properties": {
-      "@timestamp": { "type": "date" },
-      "index_name": { "type": "keyword" },
-      "docs_indexed": { "type": "long" },
-      "indexing_rate": { "type": "float" },
-      "node_id": { "type": "keyword" }
-    }
-  }
-}
-
-# Générer des données historiques normales (baseline)
-POST /indexing-metrics/_bulk
-{"index":{}}
-{"@timestamp":"2024-01-15T09:00:00Z","index_name":"products","docs_indexed":1000,"indexing_rate":950.5,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:01:00Z","index_name":"products","docs_indexed":980,"indexing_rate":975.2,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:02:00Z","index_name":"products","docs_indexed":1020,"indexing_rate":1010.8,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:03:00Z","index_name":"products","docs_indexed":995,"indexing_rate":990.1,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:00:00Z","index_name":"orders","docs_indexed":500,"indexing_rate":485.3,"node_id":"node-2"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:01:00Z","index_name":"orders","docs_indexed":510,"indexing_rate":505.7,"node_id":"node-2"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:02:00Z","index_name":"orders","docs_indexed":490,"indexing_rate":495.2,"node_id":"node-2"}
-{"index":{}}
-{"@timestamp":"2024-01-15T09:03:00Z","index_name":"orders","docs_indexed":505,"indexing_rate":500.8,"node_id":"node-2"}
-
-# Générer des données récentes montrant une chute (anomalie)
-{"index":{}}
-{"@timestamp":"2024-01-15T10:00:00Z","index_name":"products","docs_indexed":450,"indexing_rate":445.2,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:01:00Z","index_name":"products","docs_indexed":420,"indexing_rate":415.8,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:02:00Z","index_name":"products","docs_indexed":430,"indexing_rate":425.5,"node_id":"node-1"}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:00:00Z","index_name":"orders","docs_indexed":220,"indexing_rate":215.3,"node_id":"node-2"}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:01:00Z","index_name":"orders","docs_indexed":210,"indexing_rate":205.7,"node_id":"node-2"}
-{"index":{}}
-{"@timestamp":"2024-01-15T10:02:00Z","index_name":"orders","docs_indexed":225,"indexing_rate":220.1,"node_id":"node-2"}
-
-# Forcer le refresh
-POST /indexing-metrics/_refresh
-```
-
-### Étape 2: Développer la Requête d'Agrégation
-
-Testons d'abord notre logique de détection:
-
-```bash
-GET /indexing-metrics/_search
-{
-  "size": 0,
-  "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "now-1h"
-      }
-    }
-  },
-  "aggs": {
-    "by_index": {
-      "terms": {
-        "field": "index_name",
-        "size": 20
-      },
-      "aggs": {
-        "recent_rate": {
-          "filter": {
-            "range": {
-              "@timestamp": {
-                "gte": "now-5m"
-              }
-            }
-          },
-          "aggs": {
-            "avg_recent": {
-              "avg": {
-                "field": "indexing_rate"
-              }
-            }
-          }
-        },
-        "baseline_rate": {
-          "filter": {
-            "range": {
-              "@timestamp": {
-                "gte": "now-30m",
-                "lt": "now-5m"
-              }
-            }
-          },
-          "aggs": {
-            "avg_baseline": {
-              "avg": {
-                "field": "indexing_rate"
-              }
-            }
-          }
-        },
-        "rate_comparison": {
-          "bucket_script": {
-            "buckets_path": {
-              "recent": "recent_rate>avg_recent",
-              "baseline": "baseline_rate>avg_baseline"
-            },
-            "script": "params.recent / params.baseline"
-          }
-        }
-      }
-    },
-    "anomalous_indexes": {
-      "filter": {
-        "range": {
-          "rate_comparison": {
-            "lt": 0.5
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-**Logique**:
-- **recent_rate**: Moyenne des 5 dernières minutes
-- **baseline_rate**: Moyenne des 25 minutes précédentes (de -30m à -5m)
-- **rate_comparison**: Ratio recent/baseline (< 0.5 signifie chute de >50%)
-
-### Étape 3: Créer la Watch Watcher
-
-Maintenant créons la watch complète avec conditions et actions multiples:
-
-```bash
-PUT _watcher/watch/indexing-rate-anomaly
-{
-  "metadata": {
-    "name": "Indexing Rate Anomaly Detection",
-    "version": "1.0",
-    "description": "Détecte les chutes soudaines du taux d'indexation (>50%) persistant sur plusieurs minutes",
-    "team": "ops",
-    "severity": "high"
-  },
-  "trigger": {
-    "schedule": {
-      "interval": "2m"
-    }
-  },
-  "input": {
-    "search": {
-      "request": {
-        "indices": ["indexing-metrics"],
-        "body": {
-          "size": 0,
-          "query": {
-            "range": {
-              "@timestamp": {
-                "gte": "now-1h"
-              }
-            }
-          },
-          "aggs": {
-            "by_index": {
-              "terms": {
-                "field": "index_name",
-                "size": 50
-              },
-              "aggs": {
-                "recent_rate": {
-                  "filter": {
-                    "range": {
-                      "@timestamp": {
-                        "gte": "now-5m"
-                      }
-                    }
-                  },
-                  "aggs": {
-                    "avg_recent": {
-                      "avg": {
-                        "field": "indexing_rate"
-                      }
-                    },
-                    "count_recent": {
-                      "value_count": {
-                        "field": "indexing_rate"
-                      }
-                    }
-                  }
-                },
-                "baseline_rate": {
-                  "filter": {
-                    "range": {
-                      "@timestamp": {
-                        "gte": "now-35m",
-                        "lt": "now-5m"
-                      }
-                    }
-                  },
-                  "aggs": {
-                    "avg_baseline": {
-                      "avg": {
-                        "field": "indexing_rate"
-                      }
-                    },
-                    "stddev_baseline": {
-                      "extended_stats": {
-                        "field": "indexing_rate"
-                      }
-                    }
-                  }
-                },
-                "rate_drop_percent": {
-                  "bucket_script": {
-                    "buckets_path": {
-                      "recent": "recent_rate>avg_recent",
-                      "baseline": "baseline_rate>avg_baseline"
-                    },
-                    "script": "((params.baseline - params.recent) / params.baseline) * 100"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "condition": {
-    "script": {
-      "source": """
-        def anomalies = [];
-        def buckets = ctx.payload.aggregations.by_index.buckets;
-        
-        for (bucket in buckets) {
-          def recent = bucket.recent_rate.avg_recent.value;
-          def baseline = bucket.baseline_rate.avg_baseline.value;
-          def count = bucket.recent_rate.count_recent.value;
-          def drop_percent = bucket.rate_drop_percent.value;
-          
-          // Conditions:
-          // 1. Au moins 3 points de données récentes (3 minutes)
-          // 2. Chute >= 50%
-          // 3. Baseline non nulle
-          if (count >= 3 && drop_percent >= 50 && baseline > 0) {
-            anomalies.add([
-              'index': bucket.key,
-              'recent_rate': Math.round(recent * 100) / 100,
-              'baseline_rate': Math.round(baseline * 100) / 100,
-              'drop_percent': Math.round(drop_percent * 100) / 100,
-              'sample_count': count
-            ]);
-          }
-        }
-        
-        // Déclencher si au moins 1 index anomalique
-        ctx.payload.anomalies = anomalies;
-        return anomalies.size() > 0;
-      """,
-      "lang": "painless"
-    }
-  },
-  "transform": {
-    "script": {
-      "source": """
-        def result = [
-          'alert_triggered_at': ctx.execution_time,
-          'affected_indexes': ctx.payload.anomalies,
-          'total_affected': ctx.payload.anomalies.size(),
-          'severity': ctx.payload.anomalies.size() >= 3 ? 'critical' : 'high',
-          'investigation_links': [
-            'cluster_stats': 'GET _cluster/stats',
-            'node_stats': 'GET _nodes/stats/indices',
-            'slow_logs': 'Check slow indexing logs'
-          ]
-        ];
-        return result;
-      """,
-      "lang": "painless"
-    }
-  },
-  "actions": {
-    "log_to_elasticsearch": {
-      "index": {
-        "index": "watcher-alerts",
-        "doc_id": "indexing-anomaly-{{ctx.watch_id}}-{{ctx.execution_time}}",
-        "refresh": true
-      }
-    },
-    "notify_ops_team": {
-      "throttle_period": "15m",
-      "webhook": {
-        "scheme": "https",
-        "host": "webhook.site",
-        "port": 443,
-        "path": "/votre-webhook-id",
-        "method": "post",
-        "headers": {
-          "Content-Type": "application/json",
-          "X-Alert-Type": "indexing-anomaly"
-        },
-        "body": """
-{
-  "alert": "Indexing Rate Anomaly Detected",
-  "severity": "{{ctx.payload.severity}}",
-  "triggered_at": "{{ctx.payload.alert_triggered_at}}",
-  "summary": "{{ctx.payload.total_affected}} index(es) showing >50% drop in indexing rate",
-  "affected_indexes": {{#toJson}}ctx.payload.affected_indexes{{/toJson}},
-  "actions_required": [
-    "Check cluster health: GET _cluster/health",
-    "Check node disk space: GET _cat/nodes?v&h=name,disk.avail,disk.used_percent",
-    "Review indexing queues: GET _cat/thread_pool/write?v",
-    "Check for network issues or slow nodes"
-  ],
-  "investigation": {{#toJson}}ctx.payload.investigation_links{{/toJson}}
-}
-        """
-      }
-    },
-    "send_detailed_email": {
-      "throttle_period": "30m",
-      "email": {
-        "to": ["ops-team@example.com"],
-        "subject": "[{{ctx.payload.severity}}] Indexing Rate Anomaly: {{ctx.payload.total_affected}} Index(es) Affected",
-        "body": {
-          "html": """
-<html>
-<body style="font-family: Arial, sans-serif;">
-  <h2 style="color: #d32f2f;">⚠️ Indexing Rate Anomaly Detected</h2>
-  
-  <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
-    <tr style="background-color: #f5f5f5;">
-      <td style="padding: 10px; border: 1px solid #ddd;"><strong>Severity</strong></td>
-      <td style="padding: 10px; border: 1px solid #ddd;">{{ctx.payload.severity}}</td>
-    </tr>
-    <tr>
-      <td style="padding: 10px; border: 1px solid #ddd;"><strong>Triggered At</strong></td>
-      <td style="padding: 10px; border: 1px solid #ddd;">{{ctx.payload.alert_triggered_at}}</td>
-    </tr>
-    <tr style="background-color: #f5f5f5;">
-      <td style="padding: 10px; border: 1px solid #ddd;"><strong>Affected Indexes</strong></td>
-      <td style="padding: 10px; border: 1px solid #ddd;">{{ctx.payload.total_affected}}</td>
-    </tr>
-  </table>
-  
-  <h3>Affected Indexes Details:</h3>
-  <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
-    <thead>
-      <tr style="background-color: #1976d2; color: white;">
-        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Index</th>
-        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Recent Rate</th>
-        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Baseline Rate</th>
-        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Drop %</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#ctx.payload.affected_indexes}}
-      <tr>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{index}}</td>
-        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{recent_rate}} docs/min</td>
-        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{baseline_rate}} docs/min</td>
-        <td style="padding: 10px; border: 1px solid #ddd; text-align: right; color: #d32f2f;"><strong>↓{{drop_percent}}%</strong></td>
-      </tr>
-      {{/ctx.payload.affected_indexes}}
-    </tbody>
-  </table>
-  
-  <h3>Recommended Actions:</h3>
-  <ol>
-    <li>Check cluster health: <code>GET _cluster/health</code></li>
-    <li>Check node disk space: <code>GET _cat/nodes?v&h=name,disk.avail,disk.used_percent</code></li>
-    <li>Review indexing queues: <code>GET _cat/thread_pool/write?v</code></li>
-    <li>Check for network issues or slow nodes</li>
-    <li>Review application logs for indexing errors</li>
-  </ol>
-  
-  <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
-    <em>This is an automated alert from Elasticsearch Watcher. Do not reply to this email.</em>
-  </p>
-</body>
-</html>
-          """
-        }
-      }
-    }
-  }
-}
-```
-
-### Étape 4: Tester la Watch
-
-#### Test 1: Exécution Manuelle
-
-```bash
-# Exécuter la watch manuellement pour voir le résultat
-POST _watcher/watch/indexing-rate-anomaly/_execute
-{
-  "trigger_data": {
-    "triggered_time": "2024-01-15T10:05:00Z"
-  }
-}
-```
-
-**Résultat attendu**:
-```json
-{
-  "watch_record": {
-    "watch_id": "indexing-rate-anomaly",
-    "state": "executed",
-    "trigger_event": {
-      "type": "manual"
-    },
-    "result": {
-      "condition": {
-        "type": "script",
-        "status": "success",
-        "met": true
-      },
-      "actions": [
-        {
-          "id": "log_to_elasticsearch",
-          "type": "index",
-          "status": "success"
-        },
-        {
-          "id": "notify_ops_team",
-          "type": "webhook",
-          "status": "success"
-        }
-      ]
-    }
-  }
-}
-```
-
-#### Test 2: Vérifier l'Index d'Alertes
-
-```bash
-# Vérifier que l'alerte a été indexée
-GET watcher-alerts/_search
-{
-  "query": {
-    "match": {
-      "watch_id": "indexing-rate-anomaly"
-    }
-  },
-  "sort": [
-    { "alert_triggered_at": "desc" }
-  ]
-}
-```
-
-#### Test 3: Vérifier le Webhook
-
-Consultez webhook.site pour voir le payload JSON envoyé.
-
-### Étape 5: Créer un Dashboard d'Analyse
-
-Créons un dashboard pour visualiser les anomalies détectées:
-
-```bash
-# Créer un index pattern pour les alertes Watcher
-# Dans Kibana: Stack Management → Data Views → Create data view
-# Name: watcher-alerts
-# Index pattern: watcher-alerts
-# Time field: alert_triggered_at
-```
-
-Visualisations recommandées:
-
-**Viz 1: Timeline des Anomalies**
-```
-Type: Line chart
-X-axis: alert_triggered_at (Date histogram, interval: auto)
-Y-axis: Count of alerts
-Break down by: severity
-```
-
-**Viz 2: Indexes les Plus Affectés**
-```
-Type: Table
-Rows: affected_indexes.index.keyword
-Metrics: 
-  - Count (nombre d'occurrences)
-  - Avg affected_indexes.drop_percent
-  - Latest alert_triggered_at
-Sort by: Count (descending)
-```
-
-**Viz 3: Comparaison Rates**
-```
-Type: Bar chart (horizontal)
-Y-axis: affected_indexes.index.keyword
-X-axis: 
-  - affected_indexes.recent_rate (série 1)
-  - affected_indexes.baseline_rate (série 2)
-```
-
-### Étape 6: Amélioration - Ajouter une Action Slack
-
-Si vous avez un workspace Slack, ajoutez une action Slack:
-
-1. Dans Slack, créez une Incoming Webhook: https://api.slack.com/messaging/webhooks
-2. Ajoutez cette action à votre watch:
-
-```json
-"notify_slack": {
-  "throttle_period": "15m",
-  "webhook": {
-    "scheme": "https",
-    "host": "hooks.slack.com",
-    "port": 443,
-    "path": "/services/YOUR/WEBHOOK/PATH",
-    "method": "post",
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": """
-{
-  "text": ":warning: *Indexing Rate Anomaly Detected*",
-  "blocks": [
-    {
-      "type": "header",
-      "text": {
-        "type": "plain_text",
-        "text": ":rotating_light: Indexing Rate Anomaly Alert"
-      }
-    },
-    {
-      "type": "section",
-      "fields": [
-        {
-          "type": "mrkdwn",
-          "text": "*Severity:*\n{{ctx.payload.severity}}"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Affected Indexes:*\n{{ctx.payload.total_affected}}"
-        }
-      ]
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "*Details:*\n{{#ctx.payload.affected_indexes}}- `{{index}}`: ↓{{drop_percent}}% ({{recent_rate}} → {{baseline_rate}} docs/min)\n{{/ctx.payload.affected_indexes}}"
-      }
-    },
-    {
-      "type": "actions",
-      "elements": [
-        {
-          "type": "button",
-          "text": {
-            "type": "plain_text",
-            "text": "View in Kibana"
-          },
-          "url": "https://your-kibana.com/app/watcher"
-        }
-      ]
-    }
-  ]
-}
-    """
-  }
-}
-```
-
-### Validation Finale
-
-Vérifiez tous les composants:
-
-```bash
-# 1. État de la watch
-GET _watcher/watch/indexing-rate-anomaly
-
-# 2. Historique d'exécution
-GET .watcher-history*/_search
-{
-  "query": {
-    "match": {
-      "watch_id": "indexing-rate-anomaly"
-    }
-  },
-  "sort": [
-    { "result.execution_time": "desc" }
-  ],
-  "size": 10
-}
-
-# 3. Statistiques sur les alertes déclenchées
-GET watcher-alerts/_search
-{
-  "size": 0,
-  "aggs": {
-    "by_severity": {
-      "terms": {
-        "field": "severity.keyword"
-      }
-    },
-    "total_affected_indexes": {
-      "sum": {
-        "field": "total_affected"
-      }
-    },
-    "avg_drop_percent": {
-      "nested": {
-        "path": "affected_indexes"
-      },
-      "aggs": {
-        "avg_drop": {
-          "avg": {
-            "field": "affected_indexes.drop_percent"
-          }
-        }
-      }
-    }
-  }
-}
-
-# 4. Désactiver/Activer la watch
-POST _watcher/watch/indexing-rate-anomaly/_deactivate
-POST _watcher/watch/indexing-rate-anomaly/_activate
-
-# 5. Supprimer la watch (si nécessaire)
-DELETE _watcher/watch/indexing-rate-anomaly
-```
-
-### Défis Supplémentaires (Si Temps Disponible)
-
-**Challenge 1**: Ajouter une détection de "surge" (augmentation soudaine du taux d'indexation > 200%)
-
-**Challenge 2**: Implémenter une logique d'auto-résolution qui envoie une notification quand les taux reviennent à la normale
-
-**Challenge 3**: Créer une seconde watch qui surveille le taux de réussite des actions (webhooks, emails) de la première watch
-
-### Points Clés à Retenir
-
-✅ **Watcher** offre une flexibilité maximale avec le scripting Painless
-✅ Les **agrégations complexes** permettent des comparaisons baseline vs recent
-✅ Le **bucket_script** calcule des métriques dérivées (ratios, pourcentages)
-✅ Les **scripts Painless** dans conditions permettent une logique métier sophistiquée
-✅ Les **transforms** reformatent les données avant les actions
-✅ Les **actions multiples** (index + webhook + email) assurent la résilience
-✅ Le **throttling** évite l'alert fatigue avec des périodes différentes par action
-✅ Les **templates HTML** créent des emails riches et actionnables
-✅ L'**indexation des alertes** permet l'analyse historique et les dashboards
-✅ La **validation progressive** (test query → execute watch → monitor) assure la fiabilité
-
-**Félicitations!** Vous maîtrisez maintenant les systèmes d'alertes avancés d'Elasticsearch! 🎉
-
-
----
-
-# Jour 2 - Opérations de Maintenance
 
 ## Lab 6.1: Création et Restauration de Snapshots
 
@@ -6930,1546 +4517,6 @@ PUT /_slm/policy/monthly-archive
 
 ---
 
-# Jour 2 - Implémentation de la Sécurité
-
-## Lab 7.1: Création d'Utilisateurs et de Rôles
-
-**Objectif**: Maîtriser la création et la gestion d'utilisateurs et de rôles avec différents niveaux de privilèges, en implémentant le principe du moindre privilège (least privilege).
-
-**Contexte**: Le contrôle d'accès basé sur les rôles (RBAC) est fondamental pour sécuriser Elasticsearch. Dans ce lab, vous allez créer plusieurs rôles avec des privilèges variés, créer des utilisateurs, et tester les restrictions d'accès.
-
-### Prérequis : Sécurité Activée
-
-Vérifiez que la sécurité est activée sur votre cluster :
-
-```bash
-GET /_xpack
-```
-
-**Résultat attendu** :
-```json
-{
-  "features": {
-    "security": {
-      "available": true,
-      "enabled": true
-    }
-  }
-}
-```
-
-Si la sécurité n'est pas activée (Elasticsearch 7.x), ajoutez dans `elasticsearch.yml` :
-
-```yaml
-xpack.security.enabled: true
-```
-
-Puis redémarrez Elasticsearch.
-
-### Étape 1: Vérifier l'Utilisateur Actuel
-
-Commencez par vérifier avec quel utilisateur vous êtes connecté :
-
-```bash
-GET /_security/_authenticate
-```
-
-**Résultat attendu** :
-```json
-{
-  "username": "elastic",
-  "roles": ["superuser"],
-  "full_name": null,
-  "email": null,
-  "metadata": {
-    "_reserved": true
-  },
-  "enabled": true,
-  "authentication_realm": {
-    "name": "reserved",
-    "type": "reserved"
-  }
-}
-```
-
-Vous devriez être connecté avec l'utilisateur `elastic` (superuser).
-
-### Étape 2: Créer un Rôle "Lecture Seule" (Read-Only)
-
-Créons un rôle qui permet uniquement la lecture des indices de logs :
-
-```bash
-POST /_security/role/logs_readonly
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*", "filebeat-*", "logstash-*"],
-      "privileges": ["read", "view_index_metadata"]
-    }
-  ],
-  "applications": [],
-  "run_as": [],
-  "metadata": {
-    "version": 1,
-    "description": "Read-only access to logs indices"
-  }
-}
-```
-
-**Résultat attendu** :
-```json
-{
-  "role": {
-    "created": true
-  }
-}
-```
-
-**Explication des privilèges** :
-- `cluster: ["monitor"]` : Peut voir les stats du cluster (_cluster/health, _cat/*, etc.)
-- `indices.privileges: ["read"]` : Peut rechercher et lire les documents
-- `view_index_metadata` : Peut voir les mappings et settings
-
-**Vérifier le rôle créé** :
-
-```bash
-GET /_security/role/logs_readonly
-```
-
-### Étape 3: Créer un Rôle "Analyste de Données"
-
-Créons un rôle pour un analyste qui peut lire et créer des visualisations :
-
-```bash
-POST /_security/role/data_analyst
-{
-  "cluster": ["monitor", "manage_index_templates"],
-  "indices": [
-    {
-      "names": ["products", "orders", "customers"],
-      "privileges": ["read", "view_index_metadata"]
-    },
-    {
-      "names": [".kibana*", ".kibana-*"],
-      "privileges": ["read", "write", "manage"]
-    }
-  ],
-  "applications": [
-    {
-      "application": "kibana-.kibana",
-      "privileges": ["feature_discover.all", "feature_visualize.all", "feature_dashboard.read"],
-      "resources": ["*"]
-    }
-  ],
-  "metadata": {
-    "description": "Data analyst with read access to business data and Kibana visualization capabilities"
-  }
-}
-```
-
-**Nouveaux privilèges** :
-- `manage_index_templates` : Peut créer des index patterns dans Kibana
-- Accès aux indices `.kibana*` pour sauvegarder les visualisations
-- Privilèges Kibana : `discover.all`, `visualize.all`, `dashboard.read`
-
-### Étape 4: Créer un Rôle "Développeur"
-
-Créons un rôle pour un développeur avec accès complet à ses indices de test :
-
-```bash
-POST /_security/role/developer
-{
-  "cluster": ["monitor", "manage_index_templates", "manage_ilm", "manage_pipeline"],
-  "indices": [
-    {
-      "names": ["dev-*", "test-*"],
-      "privileges": ["all"]
-    },
-    {
-      "names": ["products", "orders"],
-      "privileges": ["read", "view_index_metadata"]
-    }
-  ],
-  "applications": [
-    {
-      "application": "kibana-.kibana",
-      "privileges": ["all"],
-      "resources": ["space:dev"]
-    }
-  ],
-  "metadata": {
-    "description": "Developer with full access to dev/test indices"
-  }
-}
-```
-
-**Privilèges étendus** :
-- `all` sur indices `dev-*` et `test-*` : Peut tout faire
-- `manage_ilm` : Peut gérer les Index Lifecycle Management policies
-- `manage_pipeline` : Peut gérer les ingest pipelines
-- Accès complet Kibana dans le space "dev"
-
-### Étape 5: Créer des Utilisateurs avec Ces Rôles
-
-**Utilisateur 1 : Lecteur de logs** :
-
-```bash
-POST /_security/user/alice_reader
-{
-  "password": "ReadOnlyPass123!",
-  "roles": ["logs_readonly"],
-  "full_name": "Alice Reader",
-  "email": "alice@example.com",
-  "metadata": {
-    "department": "Operations",
-    "hire_date": "2024-01-15"
-  }
-}
-```
-
-**Utilisateur 2 : Analyste** :
-
-```bash
-POST /_security/user/bob_analyst
-{
-  "password": "AnalystPass456!",
-  "roles": ["data_analyst", "kibana_user"],
-  "full_name": "Bob Analyst",
-  "email": "bob@example.com",
-  "metadata": {
-    "department": "Data Science",
-    "hire_date": "2023-05-10"
-  }
-}
-```
-
-**Utilisateur 3 : Développeur** :
-
-```bash
-POST /_security/user/charlie_dev
-{
-  "password": "DevPass789!",
-  "roles": ["developer"],
-  "full_name": "Charlie Developer",
-  "email": "charlie@example.com",
-  "metadata": {
-    "department": "Engineering",
-    "hire_date": "2023-03-20"
-  }
-}
-```
-
-**Vérifier les utilisateurs créés** :
-
-```bash
-GET /_security/user
-```
-
-Vous devriez voir les trois utilisateurs listés avec leurs rôles.
-
-### Étape 6: Créer des Indices de Test
-
-Créons des indices pour tester les permissions :
-
-```bash
-# Index de logs
-PUT /logs-2024-01
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  }
-}
-
-POST /logs-2024-01/_bulk
-{"index":{"_id":"1"}}
-{"timestamp":"2024-01-15T10:00:00Z","level":"INFO","message":"Application started","service":"api"}
-{"index":{"_id":"2"}}
-{"timestamp":"2024-01-15T10:05:00Z","level":"WARN","message":"High memory usage","service":"api"}
-{"index":{"_id":"3"}}
-{"timestamp":"2024-01-15T10:10:00Z","level":"ERROR","message":"Database connection failed","service":"database"}
-
-# Index products
-PUT /products
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  }
-}
-
-POST /products/_bulk
-{"index":{"_id":"1"}}
-{"name":"Laptop","price":999,"category":"electronics","stock":50}
-{"index":{"_id":"2"}}
-{"name":"Mouse","price":25,"category":"electronics","stock":200}
-{"index":{"_id":"3"}}
-{"name":"Desk","price":299,"category":"furniture","stock":20}
-
-# Index de développement
-PUT /dev-feature-x
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  }
-}
-
-POST /dev-feature-x/_doc/1
-{
-  "feature": "feature-x",
-  "status": "in-development",
-  "tests_passing": false
-}
-```
-
-### Étape 7: Tester les Permissions de alice_reader (Read-Only)
-
-**Test 1 : Lecture autorisée sur logs** :
-
-```bash
-# Se connecter comme alice_reader
-curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/logs-2024-01/_search?pretty"
-```
-
-**Résultat attendu** : Succès (200 OK) avec les 3 documents
-
-**Test 2 : Lecture NON autorisée sur products** :
-
-```bash
-curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/products/_search?pretty"
-```
-
-**Résultat attendu** : Erreur 403 Forbidden
-```json
-{
-  "error": {
-    "type": "security_exception",
-    "reason": "action [indices:data/read/search] is unauthorized for user [alice_reader]"
-  },
-  "status": 403
-}
-```
-
-**Test 3 : Écriture NON autorisée sur logs** :
-
-```bash
-curl -u alice_reader:ReadOnlyPass123! -X POST "https://localhost:9200/logs-2024-01/_doc" \
-  -H 'Content-Type: application/json' \
-  -d '{"timestamp":"2024-01-15T11:00:00Z","level":"INFO","message":"Test"}'
-```
-
-**Résultat attendu** : Erreur 403 Forbidden (pas de privilège `write`)
-
-**Test 4 : Cluster health autorisé** :
-
-```bash
-curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/_cluster/health?pretty"
-```
-
-**Résultat attendu** : Succès (privilège `monitor` permet cela)
-
-### Étape 8: Tester les Permissions de bob_analyst (Analyste)
-
-**Test 1 : Lecture autorisée sur products et orders** :
-
-```bash
-curl -u bob_analyst:AnalystPass456! "https://localhost:9200/products/_search?pretty"
-```
-
-**Résultat attendu** : Succès (200 OK)
-
-**Test 2 : Écriture NON autorisée sur products** :
-
-```bash
-curl -u bob_analyst:AnalystPass456! -X POST "https://localhost:9200/products/_doc" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"New Product","price":100}'
-```
-
-**Résultat attendu** : Erreur 403 Forbidden (rôle `data_analyst` n'a que `read`)
-
-**Test 3 : Lecture NON autorisée sur dev-* (indices de dev)** :
-
-```bash
-curl -u bob_analyst:AnalystPass456! "https://localhost:9200/dev-feature-x/_search?pretty"
-```
-
-**Résultat attendu** : Erreur 403 Forbidden
-
-### Étape 9: Tester les Permissions de charlie_dev (Développeur)
-
-**Test 1 : Accès complet aux indices dev-*** :
-
-```bash
-# Lecture
-curl -u charlie_dev:DevPass789! "https://localhost:9200/dev-feature-x/_search?pretty"
-
-# Écriture
-curl -u charlie_dev:DevPass789! -X POST "https://localhost:9200/dev-feature-x/_doc" \
-  -H 'Content-Type: application/json' \
-  -d '{"feature":"feature-y","status":"planned"}'
-
-# Suppression
-curl -u charlie_dev:DevPass789! -X DELETE "https://localhost:9200/dev-feature-x"
-```
-
-**Résultat attendu** : Tous succès (privilège `all` sur `dev-*`)
-
-**Test 2 : Création d'index de test** :
-
-```bash
-curl -u charlie_dev:DevPass789! -X PUT "https://localhost:9200/test-new-feature"
-```
-
-**Résultat attendu** : Succès (peut créer des indices `test-*`)
-
-**Test 3 : Lecture autorisée mais écriture NON autorisée sur products** :
-
-```bash
-# Lecture : OK
-curl -u charlie_dev:DevPass789! "https://localhost:9200/products/_search?pretty"
-
-# Écriture : FORBIDDEN
-curl -u charlie_dev:DevPass789! -X POST "https://localhost:9200/products/_doc" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Hacked"}'
-```
-
-**Résultat attendu** : 
-- Lecture : Succès
-- Écriture : Erreur 403 (pas de privilège `write` sur `products`)
-
-### Étape 10: Modifier un Utilisateur
-
-Imaginons que Bob devient "Senior Analyst" et a besoin d'accès en écriture :
-
-**Créer un nouveau rôle** :
-
-```bash
-POST /_security/role/senior_analyst
-{
-  "cluster": ["monitor", "manage_index_templates", "manage_ilm"],
-  "indices": [
-    {
-      "names": ["products", "orders", "customers"],
-      "privileges": ["read", "write", "view_index_metadata"]
-    },
-    {
-      "names": [".kibana*"],
-      "privileges": ["all"]
-    }
-  ]
-}
-```
-
-**Mettre à jour Bob avec le nouveau rôle** :
-
-```bash
-PUT /_security/user/bob_analyst
-{
-  "roles": ["senior_analyst", "kibana_admin"],
-  "full_name": "Bob Senior Analyst",
-  "email": "bob@example.com"
-}
-```
-
-**Tester le nouvel accès** :
-
-```bash
-# Maintenant Bob peut écrire
-curl -u bob_analyst:AnalystPass456! -X POST "https://localhost:9200/products/_doc" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"New Product","price":150,"category":"electronics"}'
-```
-
-**Résultat attendu** : Succès (201 Created)
-
-### Étape 11: Désactiver Temporairement un Utilisateur
-
-Désactivons Alice temporairement (ex: congé, investigation sécurité) :
-
-```bash
-PUT /_security/user/alice_reader/_disable
-```
-
-**Résultat attendu** :
-```json
-{
-  "acknowledged": true
-}
-```
-
-**Tester que Alice ne peut plus se connecter** :
-
-```bash
-curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/_cluster/health"
-```
-
-**Résultat attendu** : Erreur 401 Unauthorized
-
-**Réactiver Alice** :
-
-```bash
-PUT /_security/user/alice_reader/_enable
-```
-
-### Étape 12: Changer le Mot de Passe
-
-Changeons le mot de passe de Charlie :
-
-```bash
-POST /_security/user/charlie_dev/_password
-{
-  "password": "NewDevPassword2024!"
-}
-```
-
-**Résultat attendu** :
-```json
-{
-  "acknowledged": true
-}
-```
-
-**Vérifier que l'ancien mot de passe ne fonctionne plus** :
-
-```bash
-# Ancien password : FAIL
-curl -u charlie_dev:DevPass789! "https://localhost:9200/"
-
-# Nouveau password : SUCCESS
-curl -u charlie_dev:NewDevPassword2024! "https://localhost:9200/"
-```
-
-### Validation Finale
-
-Vérifiez que vous avez réussi le lab :
-
-```bash
-# 1. Lister tous les rôles personnalisés
-GET /_security/role/logs_readonly,data_analyst,developer,senior_analyst
-
-# 2. Lister tous les utilisateurs
-GET /_security/user
-
-# 3. Vérifier les privilèges de chaque utilisateur via _authenticate
-# (se connecter avec chaque utilisateur et exécuter GET /_security/_authenticate)
-
-# 4. Tester les accès (matrice de tests)
-```
-
-**Matrice de tests attendus** :
-
-| Utilisateur | Index logs-* | Index products | Index dev-* | Écriture logs-* | Écriture products |
-|-------------|--------------|----------------|-------------|-----------------|-------------------|
-| alice_reader | ✅ Read | ❌ Denied | ❌ Denied | ❌ Denied | ❌ Denied |
-| bob_analyst (après update) | ❌ Denied | ✅ Read/Write | ❌ Denied | ❌ Denied | ✅ Write |
-| charlie_dev | ❌ Denied | ✅ Read | ✅ All | ❌ Denied | ❌ Denied |
-
-### Points Clés à Retenir
-
-✅ **Privilèges cluster** vs **privilèges index** : Bien comprendre la différence  
-✅ **Principe du moindre privilège** : Donner uniquement les accès nécessaires  
-✅ `read` permet `_search`, `_get` mais pas `_index`, `_update`, `_delete`  
-✅ `write` permet `_index`, `_update`, `_delete` mais pas création d'index  
-✅ `all` donne tous les privilèges sur les indices ciblés  
-✅ Les patterns (`logs-*`, `dev-*`) permettent de couvrir plusieurs indices  
-✅ Les utilisateurs peuvent avoir **plusieurs rôles** (cumul des privilèges)  
-✅ `_disable` / `_enable` permettent de désactiver temporairement sans supprimer  
-✅ Tester systématiquement les accès après création de rôles  
-✅ Utiliser `_security/_authenticate` pour vérifier l'utilisateur actuel
-
----
-
-## Lab 7.2: Implémentation de Document-Level Security (DLS)
-
-**Objectif**: Mettre en œuvre la sécurité au niveau des documents pour filtrer les données visibles selon le rôle de l'utilisateur, en utilisant des requêtes Elasticsearch.
-
-**Contexte**: La Document-Level Security (DLS) permet de limiter les documents visibles à un utilisateur selon une query Elasticsearch. C'est essentiel pour implémenter du multi-tenancy, séparer les données par département, région, ou niveau de confidentialité.
-
-### Scénario
-
-Vous gérez un cluster Elasticsearch pour une entreprise multi-régionale avec plusieurs départements :
-- **Département Sales** : Accès uniquement aux commandes de vente
-- **Département HR** : Accès uniquement aux employés
-- **Managers régionaux** : Accès uniquement aux données de leur région
-
-Vous allez implémenter des filtres DLS pour chaque cas d'usage.
-
-### Étape 1: Créer les Indices de Test avec Données Multi-Tenant
-
-**Index 1 : Commandes avec département** :
-
-```bash
-PUT /orders
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "mappings": {
-    "properties": {
-      "order_id": { "type": "keyword" },
-      "customer": { "type": "keyword" },
-      "amount": { "type": "float" },
-      "department": { "type": "keyword" },
-      "region": { "type": "keyword" },
-      "status": { "type": "keyword" },
-      "created_at": { "type": "date" }
-    }
-  }
-}
-
-POST /orders/_bulk
-{"index":{"_id":"1"}}
-{"order_id":"ORD-001","customer":"Alice Corp","amount":5000,"department":"sales","region":"EMEA","status":"completed","created_at":"2024-01-15T10:00:00Z"}
-{"index":{"_id":"2"}}
-{"order_id":"ORD-002","customer":"Bob LLC","amount":3000,"department":"sales","region":"AMER","status":"pending","created_at":"2024-01-16T10:00:00Z"}
-{"index":{"_id":"3"}}
-{"order_id":"ORD-003","customer":"Charlie Inc","amount":7500,"department":"marketing","region":"EMEA","status":"completed","created_at":"2024-01-17T10:00:00Z"}
-{"index":{"_id":"4"}}
-{"order_id":"ORD-004","customer":"David Co","amount":2000,"department":"sales","region":"APAC","status":"completed","created_at":"2024-01-18T10:00:00Z"}
-{"index":{"_id":"5"}}
-{"order_id":"ORD-005","customer":"Eve Enterprises","amount":9000,"department":"marketing","region":"AMER","status":"pending","created_at":"2024-01-19T10:00:00Z"}
-
-# Index 2 : Employés avec région et niveau de confidentialité
-PUT /employees
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "mappings": {
-    "properties": {
-      "employee_id": { "type": "keyword" },
-      "name": { "type": "keyword" },
-      "department": { "type": "keyword" },
-      "region": { "type": "keyword" },
-      "salary": { "type": "float" },
-      "confidentiality": { "type": "keyword" },
-      "hire_date": { "type": "date" }
-    }
-  }
-}
-
-POST /employees/_bulk
-{"index":{"_id":"1"}}
-{"employee_id":"EMP-001","name":"Alice Johnson","department":"sales","region":"EMEA","salary":60000,"confidentiality":"public","hire_date":"2020-01-15"}
-{"index":{"_id":"2"}}
-{"employee_id":"EMP-002","name":"Bob Smith","department":"hr","region":"EMEA","salary":55000,"confidentiality":"restricted","hire_date":"2021-03-20"}
-{"index":{"_id":"3"}}
-{"employee_id":"EMP-003","name":"Charlie Brown","department":"engineering","region":"AMER","salary":85000,"confidentiality":"public","hire_date":"2019-05-10"}
-{"index":{"_id":"4"}}
-{"employee_id":"EMP-004","name":"David Lee","department":"sales","region":"APAC","salary":65000,"confidentiality":"public","hire_date":"2022-07-01"}
-{"index":{"_id":"5"}}
-{"employee_id":"EMP-005","name":"Eve Martinez","department":"hr","region":"AMER","salary":75000,"confidentiality":"confidential","hire_date":"2018-11-15"}
-```
-
-### Étape 2: Créer un Rôle avec DLS pour le Département Sales
-
-Ce rôle permet de voir **uniquement** les commandes du département "sales" :
-
-```bash
-POST /_security/role/sales_team
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["orders"],
-      "privileges": ["read", "view_index_metadata"],
-      "query": {
-        "term": {
-          "department": "sales"
-        }
-      }
-    }
-  ],
-  "metadata": {
-    "description": "Sales team - can only see sales department orders"
-  }
-}
-```
-
-**Explication** :
-- `query.term.department: "sales"` : Filtre qui n'affiche que les documents où `department = "sales"`
-- Les documents avec `department = "marketing"` sont **invisibles** pour ce rôle
-
-### Étape 3: Créer un Rôle avec DLS pour Manager Régional EMEA
-
-Ce rôle permet de voir **uniquement** les données de la région EMEA :
-
-```bash
-POST /_security/role/emea_manager
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["orders", "employees"],
-      "privileges": ["read", "view_index_metadata"],
-      "query": {
-        "term": {
-          "region": "EMEA"
-        }
-      }
-    }
-  ],
-  "metadata": {
-    "description": "EMEA regional manager - can only see EMEA region data"
-  }
-}
-```
-
-### Étape 4: Créer un Rôle avec DLS Complexe (Plusieurs Conditions)
-
-Ce rôle permet de voir les commandes "sales" **ET** statut "completed" :
-
-```bash
-POST /_security/role/sales_completed
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["orders"],
-      "privileges": ["read"],
-      "query": {
-        "bool": {
-          "must": [
-            { "term": { "department": "sales" } },
-            { "term": { "status": "completed" } }
-          ]
-        }
-      }
-    }
-  ],
-  "metadata": {
-    "description": "Sales team - only completed sales orders"
-  }
-}
-```
-
-**Query DLS** : Combine plusieurs conditions avec `bool.must`
-
-### Étape 5: Créer un Rôle pour HR avec Filtrage par Confidentialité
-
-Le département HR peut voir tous les employés **sauf** les "confidential" :
-
-```bash
-POST /_security/role/hr_team
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["employees"],
-      "privileges": ["read", "write", "view_index_metadata"],
-      "query": {
-        "bool": {
-          "must_not": [
-            { "term": { "confidentiality": "confidential" } }
-          ]
-        }
-      }
-    }
-  ],
-  "metadata": {
-    "description": "HR team - cannot see confidential employee records"
-  }
-}
-```
-
-**Query DLS** : Utilise `bool.must_not` pour exclure des documents
-
-### Étape 6: Créer des Utilisateurs avec Rôles DLS
-
-```bash
-# Utilisateur sales team
-POST /_security/user/sarah_sales
-{
-  "password": "SalesPass123!",
-  "roles": ["sales_team"],
-  "full_name": "Sarah Sales",
-  "email": "sarah@example.com"
-}
-
-# Utilisateur EMEA manager
-POST /_security/user/michael_emea
-{
-  "password": "EMEAPass456!",
-  "roles": ["emea_manager"],
-  "full_name": "Michael EMEA Manager",
-  "email": "michael@example.com"
-}
-
-# Utilisateur sales completed
-POST /_security/user/tom_audit
-{
-  "password": "AuditPass789!",
-  "roles": ["sales_completed"],
-  "full_name": "Tom Auditor",
-  "email": "tom@example.com"
-}
-
-# Utilisateur HR
-POST /_security/user/helen_hr
-{
-  "password": "HRPass321!",
-  "roles": ["hr_team"],
-  "full_name": "Helen HR",
-  "email": "helen@example.com"
-}
-```
-
-### Étape 7: Tester le Filtrage DLS pour Sales Team
-
-**Connexion en tant que sarah_sales** :
-
-```bash
-curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_search?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "hits": {
-    "total": { "value": 3 },
-    "hits": [
-      {
-        "_source": {
-          "order_id": "ORD-001",
-          "department": "sales",
-          "region": "EMEA",
-          ...
-        }
-      },
-      {
-        "_source": {
-          "order_id": "ORD-002",
-          "department": "sales",
-          "region": "AMER",
-          ...
-        }
-      },
-      {
-        "_source": {
-          "order_id": "ORD-004",
-          "department": "sales",
-          "region": "APAC",
-          ...
-        }
-      }
-    ]
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit ORD-001, ORD-002, ORD-004 (department = "sales")
-- ❌ Ne voit **PAS** ORD-003, ORD-005 (department = "marketing")
-
-**Compter les documents visibles** :
-
-```bash
-curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_count?pretty"
-```
-
-**Résultat attendu** : `{ "count": 3 }`
-
-### Étape 8: Tester le Filtrage DLS pour EMEA Manager
-
-**Connexion en tant que michael_emea** :
-
-```bash
-curl -u michael_emea:EMEAPass456! "https://localhost:9200/orders/_search?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "hits": {
-    "total": { "value": 2 },
-    "hits": [
-      {
-        "_source": {
-          "order_id": "ORD-001",
-          "region": "EMEA",
-          "department": "sales",
-          ...
-        }
-      },
-      {
-        "_source": {
-          "order_id": "ORD-003",
-          "region": "EMEA",
-          "department": "marketing",
-          ...
-        }
-      }
-    ]
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit ORD-001, ORD-003 (region = "EMEA")
-- ❌ Ne voit **PAS** ORD-002, ORD-004, ORD-005 (autres régions)
-
-**Tester sur l'index employees** :
-
-```bash
-curl -u michael_emea:EMEAPass456! "https://localhost:9200/employees/_search?pretty"
-```
-
-**Résultat attendu** : Employés EMP-001 et EMP-002 uniquement (region = "EMEA")
-
-### Étape 9: Tester le Filtrage DLS avec Conditions Multiples
-
-**Connexion en tant que tom_audit** (sales + completed) :
-
-```bash
-curl -u tom_audit:AuditPass789! "https://localhost:9200/orders/_search?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "hits": {
-    "total": { "value": 2 },
-    "hits": [
-      {
-        "_source": {
-          "order_id": "ORD-001",
-          "department": "sales",
-          "status": "completed",
-          ...
-        }
-      },
-      {
-        "_source": {
-          "order_id": "ORD-004",
-          "department": "sales",
-          "status": "completed",
-          ...
-        }
-      }
-    ]
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit ORD-001, ORD-004 (sales + completed)
-- ❌ Ne voit **PAS** ORD-002 (sales mais pending)
-- ❌ Ne voit **PAS** ORD-003, ORD-005 (marketing)
-
-### Étape 10: Tester le Filtrage DLS avec Exclusion (HR Team)
-
-**Connexion en tant que helen_hr** :
-
-```bash
-curl -u helen_hr:HRPass321! "https://localhost:9200/employees/_search?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "hits": {
-    "total": { "value": 4 },
-    "hits": [
-      { "_source": { "employee_id": "EMP-001", "confidentiality": "public" } },
-      { "_source": { "employee_id": "EMP-002", "confidentiality": "restricted" } },
-      { "_source": { "employee_id": "EMP-003", "confidentiality": "public" } },
-      { "_source": { "employee_id": "EMP-004", "confidentiality": "public" } }
-    ]
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit EMP-001, 002, 003, 004 (public ou restricted)
-- ❌ Ne voit **PAS** EMP-005 (confidentiality = "confidential")
-
-### Étape 11: Vérifier l'Invisibilité Complète (Get par ID)
-
-Même si on connaît l'ID d'un document filtré par DLS, il est inaccessible :
-
-```bash
-# Sarah (sales team) essaie d'accéder à ORD-003 (marketing)
-curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_doc/3?pretty"
-```
-
-**Résultat attendu** : Erreur 404 Not Found
-```json
-{
-  "_index": "orders",
-  "_id": "3",
-  "found": false
-}
-```
-
-Le document existe mais est **invisible** pour sarah_sales (comme s'il n'existait pas).
-
-### Étape 12: Tester les Agrégations avec DLS
-
-Les agrégations respectent également le filtrage DLS :
-
-```bash
-# Agréger par région (vue sarah_sales)
-curl -u sarah_sales:SalesPass123! -X GET "https://localhost:9200/orders/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "size": 0,
-  "aggs": {
-    "by_region": {
-      "terms": {
-        "field": "region"
-      }
-    }
-  }
-}'
-```
-
-**Résultat attendu** :
-```json
-{
-  "aggregations": {
-    "by_region": {
-      "buckets": [
-        { "key": "EMEA", "doc_count": 1 },
-        { "key": "AMER", "doc_count": 1 },
-        { "key": "APAC", "doc_count": 1 }
-      ]
-    }
-  }
-}
-```
-
-**Analyse** : Uniquement les régions des commandes "sales" (3 documents au total).
-
-### Validation Finale
-
-Vérifiez que vous avez réussi le lab :
-
-```bash
-# 1. Vérifier les rôles DLS créés
-GET /_security/role/sales_team,emea_manager,sales_completed,hr_team
-
-# 2. Pour chaque utilisateur, vérifier le count
-curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_count"
-# Attendu: {"count": 3}
-
-curl -u michael_emea:EMEAPass456! "https://localhost:9200/orders/_count"
-# Attendu: {"count": 2}
-
-curl -u tom_audit:AuditPass789! "https://localhost:9200/orders/_count"
-# Attendu: {"count": 2}
-
-curl -u helen_hr:HRPass321! "https://localhost:9200/employees/_count"
-# Attendu: {"count": 4}
-
-# 3. Comparer avec superuser (voit tout)
-curl -u elastic:your_password "https://localhost:9200/orders/_count"
-# Attendu: {"count": 5}
-```
-
-### Points Clés à Retenir
-
-✅ **DLS filtre les documents** visibles selon une query Elasticsearch  
-✅ La query DLS est **transparente** pour l'utilisateur (documents invisibles comme s'ils n'existaient pas)  
-✅ Même avec `GET /_doc/{id}`, un document filtré retourne **404 Not Found**  
-✅ Les **agrégations** et **statistiques** respectent le filtrage DLS  
-✅ `term` query pour filtrage exact, `bool` pour conditions complexes  
-✅ `must`, `must_not`, `should` permettent des filtres sophistiqués  
-✅ DLS fonctionne avec **tous les patterns d'indices** (`orders-*`, etc.)  
-✅ Combiner DLS avec Field-Level Security pour protection maximale  
-✅ Tester systématiquement avec `_count` et `_search` après création de rôles DLS  
-✅ DLS est idéal pour **multi-tenancy**, **séparation départementale**, **filtrage régional**
-
----
-
-## 🌟 Bonus Challenge 7.A: Field-Level Security (FLS) pour Masquer des Champs Sensibles
-
-**Niveau**: Avancé  
-**Objectif**: Implémenter la sécurité au niveau des champs (Field-Level Security) pour cacher des données sensibles selon les rôles, en combinant avec DLS pour une protection multicouche.
-
-**Contexte**: Certaines données dans vos indices sont sensibles (SSN, salaires, emails personnels, données médicales). La Field-Level Security permet de les masquer complètement pour certains rôles, même si l'utilisateur peut voir le document.
-
-### Scénario
-
-Vous gérez un cluster avec des données d'employés contenant :
-- **Données publiques** : Nom, département, date d'embauche
-- **Données sensibles** : SSN, salaire, adresse personnelle, numéro de téléphone
-- **Données confidentielles** : Évaluations de performance, notes disciplinaires
-
-Vous allez créer plusieurs niveaux d'accès :
-1. **Public** : Peut voir uniquement les champs publics
-2. **HR Team** : Peut voir public + certaines données sensibles (pas SSN)
-3. **HR Manager** : Peut voir tout (public + sensible + confidentiel)
-
-### Étape 1: Créer un Index d'Employés Enrichi
-
-```bash
-PUT /employees_full
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "mappings": {
-    "properties": {
-      "employee_id": { "type": "keyword" },
-      "name": { "type": "keyword" },
-      "department": { "type": "keyword" },
-      "position": { "type": "keyword" },
-      "hire_date": { "type": "date" },
-      "email_corporate": { "type": "keyword" },
-      "email_personal": { "type": "keyword" },
-      "phone_work": { "type": "keyword" },
-      "phone_personal": { "type": "keyword" },
-      "address": {
-        "properties": {
-          "street": { "type": "text" },
-          "city": { "type": "keyword" },
-          "country": { "type": "keyword" },
-          "postal_code": { "type": "keyword" }
-        }
-      },
-      "ssn": { "type": "keyword" },
-      "salary": { "type": "float" },
-      "performance_review": {
-        "properties": {
-          "rating": { "type": "keyword" },
-          "comments": { "type": "text" },
-          "reviewer": { "type": "keyword" }
-        }
-      },
-      "disciplinary_notes": { "type": "text" }
-    }
-  }
-}
-```
-
-### Étape 2: Indexer des Données de Test
-
-```bash
-POST /employees_full/_bulk
-{"index":{"_id":"1"}}
-{"employee_id":"EMP-001","name":"Alice Johnson","department":"sales","position":"Sales Manager","hire_date":"2020-01-15","email_corporate":"alice.johnson@company.com","email_personal":"alice.j@gmail.com","phone_work":"+33-1-23-45-67-89","phone_personal":"+33-6-12-34-56-78","address":{"street":"10 Rue de Rivoli","city":"Paris","country":"France","postal_code":"75001"},"ssn":"123-45-6789","salary":75000,"performance_review":{"rating":"excellent","comments":"Top performer","reviewer":"Director Sales"},"disciplinary_notes":null}
-{"index":{"_id":"2"}}
-{"employee_id":"EMP-002","name":"Bob Smith","department":"hr","position":"HR Specialist","hire_date":"2021-03-20","email_corporate":"bob.smith@company.com","email_personal":"bob.smith@yahoo.com","phone_work":"+33-1-98-76-54-32","phone_personal":"+33-6-98-76-54-32","address":{"street":"25 Avenue des Champs","city":"Lyon","country":"France","postal_code":"69001"},"ssn":"987-65-4321","salary":60000,"performance_review":{"rating":"good","comments":"Solid contributor","reviewer":"HR Director"},"disciplinary_notes":"Late arrival incident - 2023-05-10"}
-{"index":{"_id":"3"}}
-{"employee_id":"EMP-003","name":"Charlie Brown","department":"engineering","position":"Senior Engineer","hire_date":"2019-05-10","email_corporate":"charlie.brown@company.com","email_personal":"cbrown@outlook.com","phone_work":"+33-1-11-22-33-44","phone_personal":"+33-6-11-22-33-44","address":{"street":"5 Boulevard Saint-Germain","city":"Paris","country":"France","postal_code":"75005"},"ssn":"555-12-3456","salary":95000,"performance_review":{"rating":"excellent","comments":"Technical leader","reviewer":"CTO"},"disciplinary_notes":null}
-```
-
-### Étape 3: Créer un Rôle "Public" avec FLS Restrictif
-
-Ce rôle ne peut voir que les champs publics :
-
-```bash
-POST /_security/role/employee_public_view
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["employees_full"],
-      "privileges": ["read"],
-      "field_security": {
-        "grant": [
-          "employee_id",
-          "name",
-          "department",
-          "position",
-          "hire_date",
-          "email_corporate",
-          "phone_work"
-        ]
-      }
-    }
-  ],
-  "metadata": {
-    "description": "Public view - only non-sensitive employee data"
-  }
-}
-```
-
-**Champs accordés** : ID, nom, département, poste, date d'embauche, email pro, téléphone pro  
-**Champs cachés** : SSN, salaire, adresse, emails/téléphones persos, évaluations, notes disciplinaires
-
-### Étape 4: Créer un Rôle "HR Team" avec FLS Modéré
-
-Ce rôle peut voir plus de champs mais pas les plus sensibles (SSN, notes disciplinaires) :
-
-```bash
-POST /_security/role/hr_team_view
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["employees_full"],
-      "privileges": ["read", "write"],
-      "field_security": {
-        "grant": [
-          "employee_id",
-          "name",
-          "department",
-          "position",
-          "hire_date",
-          "email_*",
-          "phone_*",
-          "address.*",
-          "salary",
-          "performance_review.*"
-        ],
-        "except": [
-          "ssn",
-          "disciplinary_notes"
-        ]
-      }
-    }
-  ],
-  "metadata": {
-    "description": "HR team - can see most fields except SSN and disciplinary notes"
-  }
-}
-```
-
-**Utilisation de wildcards** :
-- `email_*` : Accorde `email_corporate` ET `email_personal`
-- `phone_*` : Accorde `phone_work` ET `phone_personal`
-- `address.*` : Accorde tous les sous-champs de `address`
-- `performance_review.*` : Tous les sous-champs des évaluations
-
-**Champs explicitement exclus** :
-- `ssn` : Numéro de sécurité sociale
-- `disciplinary_notes` : Notes disciplinaires
-
-### Étape 5: Créer un Rôle "HR Manager" avec Accès Complet
-
-Ce rôle peut voir TOUS les champs sans restriction :
-
-```bash
-POST /_security/role/hr_manager_full
-{
-  "cluster": ["monitor", "manage"],
-  "indices": [
-    {
-      "names": ["employees_full"],
-      "privileges": ["all"],
-      "field_security": {
-        "grant": ["*"]
-      }
-    }
-  ],
-  "metadata": {
-    "description": "HR Manager - full access to all employee data"
-  }
-}
-```
-
-**Grant `["*"]`** : Accorde tous les champs sans exception
-
-### Étape 6: Créer des Utilisateurs avec Ces Rôles
-
-```bash
-# Utilisateur public
-POST /_security/user/intern_view
-{
-  "password": "InternPass123!",
-  "roles": ["employee_public_view"],
-  "full_name": "Intern Viewer"
-}
-
-# Utilisateur HR team
-POST /_security/user/jane_hr
-{
-  "password": "HRPass456!",
-  "roles": ["hr_team_view"],
-  "full_name": "Jane HR Specialist"
-}
-
-# Utilisateur HR manager
-POST /_security/user/susan_hrmanager
-{
-  "password": "ManagerPass789!",
-  "roles": ["hr_manager_full"],
-  "full_name": "Susan HR Manager"
-}
-```
-
-### Étape 7: Tester FLS - Vue Publique (Intern)
-
-```bash
-curl -u intern_view:InternPass123! "https://localhost:9200/employees_full/_search?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "hits": {
-    "hits": [
-      {
-        "_source": {
-          "employee_id": "EMP-001",
-          "name": "Alice Johnson",
-          "department": "sales",
-          "position": "Sales Manager",
-          "hire_date": "2020-01-15",
-          "email_corporate": "alice.johnson@company.com",
-          "phone_work": "+33-1-23-45-67-89"
-        }
-      },
-      ...
-    ]
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit : `employee_id`, `name`, `department`, `position`, `hire_date`, `email_corporate`, `phone_work`
-- ❌ Ne voit **PAS** : `email_personal`, `phone_personal`, `address`, `ssn`, `salary`, `performance_review`, `disciplinary_notes`
-
-### Étape 8: Tester FLS - Vue HR Team
-
-```bash
-curl -u jane_hr:HRPass456! "https://localhost:9200/employees_full/_doc/1?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "_source": {
-    "employee_id": "EMP-001",
-    "name": "Alice Johnson",
-    "department": "sales",
-    "position": "Sales Manager",
-    "hire_date": "2020-01-15",
-    "email_corporate": "alice.johnson@company.com",
-    "email_personal": "alice.j@gmail.com",
-    "phone_work": "+33-1-23-45-67-89",
-    "phone_personal": "+33-6-12-34-56-78",
-    "address": {
-      "street": "10 Rue de Rivoli",
-      "city": "Paris",
-      "country": "France",
-      "postal_code": "75001"
-    },
-    "salary": 75000,
-    "performance_review": {
-      "rating": "excellent",
-      "comments": "Top performer",
-      "reviewer": "Director Sales"
-    }
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit : Tous les champs publics + emails/téléphones persos + adresse + salaire + évaluations
-- ❌ Ne voit **PAS** : `ssn`, `disciplinary_notes` (exclus explicitement)
-
-### Étape 9: Tester FLS - Vue HR Manager (Full Access)
-
-```bash
-curl -u susan_hrmanager:ManagerPass789! "https://localhost:9200/employees_full/_doc/2?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "_source": {
-    "employee_id": "EMP-002",
-    "name": "Bob Smith",
-    "department": "hr",
-    "position": "HR Specialist",
-    "hire_date": "2021-03-20",
-    "email_corporate": "bob.smith@company.com",
-    "email_personal": "bob.smith@yahoo.com",
-    "phone_work": "+33-1-98-76-54-32",
-    "phone_personal": "+33-6-98-76-54-32",
-    "address": {
-      "street": "25 Avenue des Champs",
-      "city": "Lyon",
-      "country": "France",
-      "postal_code": "69001"
-    },
-    "ssn": "987-65-4321",
-    "salary": 60000,
-    "performance_review": {
-      "rating": "good",
-      "comments": "Solid contributor",
-      "reviewer": "HR Director"
-    },
-    "disciplinary_notes": "Late arrival incident - 2023-05-10"
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit **TOUT** : Tous les champs y compris `ssn` et `disciplinary_notes`
-
-### Étape 10: Combiner DLS + FLS
-
-Créons un rôle qui combine filtrage de documents ET de champs :
-
-```bash
-POST /_security/role/sales_dept_restricted
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["employees_full"],
-      "privileges": ["read"],
-      "query": {
-        "term": {
-          "department": "sales"
-        }
-      },
-      "field_security": {
-        "grant": [
-          "employee_id",
-          "name",
-          "department",
-          "position",
-          "email_corporate",
-          "phone_work"
-        ]
-      }
-    }
-  ],
-  "metadata": {
-    "description": "Sales department view - only sales employees, limited fields"
-  }
-}
-```
-
-**Double protection** :
-- **DLS** : Filtre les documents (`department = "sales"` uniquement)
-- **FLS** : Filtre les champs (champs publics uniquement)
-
-### Étape 11: Tester DLS + FLS Combinés
-
-```bash
-# Créer l'utilisateur
-POST /_security/user/sales_viewer
-{
-  "password": "SalesView123!",
-  "roles": ["sales_dept_restricted"]
-}
-
-# Tester la recherche
-curl -u sales_viewer:SalesView123! "https://localhost:9200/employees_full/_search?pretty"
-```
-
-**Résultat attendu** :
-```json
-{
-  "hits": {
-    "total": { "value": 1 },
-    "hits": [
-      {
-        "_source": {
-          "employee_id": "EMP-001",
-          "name": "Alice Johnson",
-          "department": "sales",
-          "position": "Sales Manager",
-          "email_corporate": "alice.johnson@company.com",
-          "phone_work": "+33-1-23-45-67-89"
-        }
-      }
-    ]
-  }
-}
-```
-
-**Analyse** :
-- ✅ Voit uniquement EMP-001 (seul employé "sales")
-- ❌ Ne voit **PAS** EMP-002 (hr) ni EMP-003 (engineering) → DLS
-- ✅ Champs limités aux publics → FLS
-
-### Étape 12: Tester FLS avec Agrégations
-
-Les agrégations respectent également FLS :
-
-```bash
-# Avec intern_view (pas accès à salary)
-curl -u intern_view:InternPass123! -X GET "https://localhost:9200/employees_full/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "size": 0,
-  "aggs": {
-    "avg_salary": {
-      "avg": {
-        "field": "salary"
-      }
-    }
-  }
-}'
-```
-
-**Résultat attendu** : Erreur ou résultat vide (le champ `salary` est invisible)
-
-```bash
-# Avec jane_hr (accès à salary)
-curl -u jane_hr:HRPass456! -X GET "https://localhost:9200/employees_full/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "size": 0,
-  "aggs": {
-    "avg_salary": {
-      "avg": {
-        "field": "salary"
-      }
-    }
-  }
-}'
-```
-
-**Résultat attendu** :
-```json
-{
-  "aggregations": {
-    "avg_salary": {
-      "value": 76666.67
-    }
-  }
-}
-```
-
-### Validation Finale
-
-```bash
-# 1. Vérifier les rôles FLS
-GET /_security/role/employee_public_view,hr_team_view,hr_manager_full,sales_dept_restricted
-
-# 2. Comparer les champs visibles pour chaque utilisateur
-# intern_view : 7 champs
-# jane_hr : ~13 champs (sauf ssn, disciplinary_notes)
-# susan_hrmanager : TOUS les champs
-
-# 3. Vérifier la combinaison DLS + FLS
-curl -u sales_viewer:SalesView123! "https://localhost:9200/employees_full/_count"
-# Attendu: {"count": 1} (seulement Alice de sales)
-```
-
-### Points Clés à Retenir
-
-✅ **FLS cache complètement les champs** (comme s'ils n'existaient pas dans le document)  
-✅ `grant` liste les champs **autorisés**, `except` liste les champs **exclus**  
-✅ **Wildcards** (`email_*`, `address.*`) permettent des patterns flexibles  
-✅ **Nested fields** utilisent la notation point (`performance_review.rating`)  
-✅ **DLS + FLS combinés** offrent une protection multicouche  
-✅ Les **agrégations** sur champs cachés échouent ou retournent vide  
-✅ Même avec `GET /_doc/{id}`, les champs cachés sont **absents du _source**  
-✅ FLS est **appliqué au niveau du shard** pour performance optimale  
-✅ Utiliser `grant: ["*"]` pour accès complet à tous les champs  
-✅ Tester systématiquement avec différents rôles pour valider les restrictions
-
-**Félicitations !** Vous maîtrisez maintenant la sécurité avancée d'Elasticsearch avec RBAC, DLS, et FLS ! 🎉
-
-
----
-
-# Jour 2 - Bonnes Pratiques de Production
 
 ## Lab 8.1: Configuration de Dedicated Master Nodes
 
@@ -10025,4 +6072,3950 @@ Exemple : Croissance anormale de données (3x normal) suite à bug applicatif g�
 ✅ **Culture blameless** encourage partage et amélioration continue
 
 **Félicitations !** Vous maîtrisez maintenant toutes les bonnes pratiques pour gérer un cluster Elasticsearch en production ! 🎉🎉🎉
+
+
+---
+
+# Jour 3 - Monitoring, Sécurité et APM
+
+## Lab 4.1: Utilisation de l'API Cluster Health
+
+**Topic**: Monitoring - APIs de Surveillance
+**Prérequis**: Cluster Elasticsearch avec au moins 1 nœud actif
+
+### Objectif
+
+Maîtriser l'API `_cluster/health` pour diagnostiquer l'état du cluster, interpréter les statuts (green/yellow/red), et identifier les shards non alloués.
+
+### Contexte
+
+Vous recevez une alerte indiquant que le cluster est passé en statut `yellow`. Vous devez diagnostiquer la cause et comprendre l'impact sur le service.
+
+### Exercice de Base
+
+#### Setup
+
+**Avant de commencer**:
+1. Vérifiez que votre cluster est accessible: `GET /`
+2. Créez un index de test avec replicas:
+
+```bash
+PUT /health-test
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 1
+  }
+}
+```
+
+#### Étapes
+
+**Étape 1**: Consulter le cluster health basique
+
+```bash
+GET /_cluster/health
+```
+
+**Résultat attendu**:
+```json
+{
+  "cluster_name": "elasticsearch",
+  "status": "yellow",
+  "timed_out": false,
+  "number_of_nodes": 1,
+  "number_of_data_nodes": 1,
+  "active_primary_shards": 2,
+  "active_shards": 2,
+  "relocating_shards": 0,
+  "initializing_shards": 0,
+  "unassigned_shards": 2,
+  "delayed_unassigned_shards": 0,
+  "number_of_pending_tasks": 0,
+  "number_of_in_flight_fetch": 0,
+  "task_max_waiting_in_queue_millis": 0,
+  "active_shards_percent_as_number": 50.0
+}
+```
+
+**Interprétation**:
+- 🟡 **status: "yellow"**: Au moins un replica shard non alloué
+- ✅ **active_primary_shards: 2**: Tous les primaires sont actifs (pas de perte de données)
+- ⚠️ **unassigned_shards: 2**: 2 replicas ne peuvent pas être alloués (cluster à 1 nœud)
+- ⚠️ **active_shards_percent: 50%**: Seulement la moitié des shards sont actifs
+
+**Étape 2**: Obtenir des détails par index
+
+```bash
+GET /_cluster/health?level=indices
+```
+
+**Résultat attendu**:
+```json
+{
+  "cluster_name": "elasticsearch",
+  "status": "yellow",
+  "indices": {
+    "health-test": {
+      "status": "yellow",
+      "number_of_shards": 2,
+      "number_of_replicas": 1,
+      "active_primary_shards": 2,
+      "active_shards": 2,
+      "relocating_shards": 0,
+      "initializing_shards": 0,
+      "unassigned_shards": 2
+    }
+  }
+}
+```
+
+**Observation**: L'index `health-test` est responsable du statut yellow.
+
+**Étape 3**: Identifier les shards non alloués
+
+```bash
+GET /_cat/shards/health-test?v&h=index,shard,prirep,state,unassigned.reason
+```
+
+**Résultat attendu**:
+```
+index       shard prirep state      unassigned.reason
+health-test 0     p      STARTED    
+health-test 0     r      UNASSIGNED NODE_LEFT
+health-test 1     p      STARTED    
+health-test 1     r      UNASSIGNED NODE_LEFT
+```
+
+**Explication**:
+- Les 2 shards primaires (p) sont STARTED ✅
+- Les 2 shards replicas (r) sont UNASSIGNED avec raison "NODE_LEFT"
+- **Cause**: Pas assez de nœuds pour allouer les replicas (besoin de 2 nœuds minimum)
+
+**Étape 4**: Comprendre les couleurs de statut
+
+| Statut | Signification | Impact | Action |
+|--------|---------------|--------|--------|
+| 🟢 **GREEN** | Tous les shards (primaires + replicas) alloués | Aucun | Normal |
+| 🟡 **YELLOW** | Tous primaires alloués, certains replicas manquants | Fonctionnel, mais pas de HA | Surveillance, non urgent |
+| 🔴 **RED** | Au moins un primaire manquant | **PERTE DE DONNÉES** | Action immédiate |
+
+**Étape 5**: Simuler un cluster RED (optionnel, avec précaution)
+
+**Attention**: Cette manipulation peut entraîner une perte de données temporaire.
+
+```bash
+# Créer un index
+PUT /red-test
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 0
+  }
+}
+
+# Indexer des documents
+POST /red-test/_doc/1
+{"message": "Test document"}
+
+# Fermer l'index (simule un shard primaire indisponible)
+POST /red-test/_close
+
+# Vérifier le cluster health
+GET /_cluster/health
+```
+
+**Résultat attendu**: `"status": "red"` (au moins un shard primaire fermé)
+
+**Reopen pour restaurer**:
+```bash
+POST /red-test/_open
+GET /_cluster/health
+```
+
+**Étape 6**: Utiliser les paramètres de l'API
+
+**Attendre le statut green** (timeout 30s):
+```bash
+GET /_cluster/health?wait_for_status=green&timeout=30s
+```
+
+**Attendre qu'aucun shard ne soit relocating**:
+```bash
+GET /_cluster/health?wait_for_no_relocating_shards=true&timeout=30s
+```
+
+**Filtrer un index spécifique**:
+```bash
+GET /_cluster/health/health-test
+```
+
+#### Validation
+
+**Commandes de vérification**:
+
+1. Résumé cluster avec métriques clés:
+```bash
+GET /_cluster/health?filter_path=status,number_of_nodes,active_shards,unassigned_shards
+```
+
+2. Santé de tous les index:
+```bash
+GET /_cluster/health?level=indices&filter_path=indices.*.status
+```
+
+3. Identifier tous les shards unassigned du cluster:
+```bash
+GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason | grep UNASSIGNED
+```
+
+4. Expliquer pourquoi un shard est unassigned:
+```bash
+GET /_cluster/allocation/explain
+{
+  "index": "health-test",
+  "shard": 0,
+  "primary": false
+}
+```
+
+**Résultat exemple**:
+```json
+{
+  "index": "health-test",
+  "shard": 0,
+  "primary": false,
+  "current_state": "unassigned",
+  "unassigned_info": {
+    "reason": "INDEX_CREATED",
+    "at": "2023-11-10T10:00:00.000Z",
+    "details": "not enough data nodes to allocate shard, allocation would violate shard allocation rules"
+  },
+  "can_allocate": "no",
+  "allocate_explanation": "cannot allocate because allocation is not permitted to any of the nodes"
+}
+```
+
+#### Critères de Succès
+
+- ✅ Comprendre les 3 statuts (green/yellow/red) et leur signification
+- ✅ Identifier les shards unassigned avec `_cat/shards`
+- ✅ Utiliser `_cluster/allocation/explain` pour diagnostiquer
+- ✅ Interpréter `active_shards_percent` (100% = green, <100% = yellow/red)
+- ✅ Savoir quand un statut yellow est acceptable (dev/test avec 1 nœud)
+
+#### Dépannage
+
+**Problème**: Cluster reste yellow même avec 2 nœuds
+→ Vérifiez les règles d'allocation: `GET /_cluster/settings`
+→ Vérifiez que les nœuds ont le rôle `data`: `GET /_cat/nodes?v&h=name,node.role`
+→ Vérifiez l'espace disque: watermark flood peut bloquer l'allocation
+
+**Problème**: Cluster passe en red après suppression d'un index
+→ Normal temporairement, les shards doivent être réalloués
+→ Attendez quelques secondes et revérifiez: `GET /_cluster/health`
+→ Si reste red, vérifiez les logs: `tail -f /var/log/elasticsearch/elasticsearch.log`
+
+**Problème**: `active_shards_percent` bloqué à un pourcentage
+→ Des shards sont INITIALIZING (en cours de copie)
+→ Vérifiez avec: `GET /_cat/recovery?v`
+→ Attendez la fin de la récupération
+
+---
+
+## Lab 4.2: Monitoring des Statistiques de Nœuds
+
+**Topic**: Monitoring - Métriques Critiques
+**Prérequis**: Cluster Elasticsearch actif
+
+### Objectif
+
+Utiliser l'API `_nodes/stats` pour extraire les métriques critiques (heap JVM, CPU, disk I/O) et surveiller la santé des nœuds individuellement.
+
+### Contexte
+
+L'équipe infrastructure demande un rapport sur l'utilisation des ressources du cluster. Vous devez extraire les métriques clés pour identifier les nœuds surchargés.
+
+### Exercice de Base
+
+#### Setup
+
+**Avant de commencer**:
+1. Identifiez les nœuds du cluster: `GET /_cat/nodes?v`
+2. Notez les noms des nœuds pour les requêtes filtrant
+
+#### Étapes
+
+**Étape 1**: Obtenir les statistiques JVM (heap usage)
+
+```bash
+GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.mem
+```
+
+**Résultat attendu**:
+```json
+{
+  "nodes": {
+    "abc123": {
+      "name": "node-1",
+      "jvm": {
+        "mem": {
+          "heap_used_in_bytes": 5368709120,
+          "heap_used_percent": 25,
+          "heap_committed_in_bytes": 21474836480,
+          "heap_max_in_bytes": 21474836480,
+          "non_heap_used_in_bytes": 157286400,
+          "non_heap_committed_in_bytes": 164626432
+        }
+      }
+    }
+  }
+}
+```
+
+**Analyse**:
+```
+Heap used:         5,368,709,120 bytes = 5 GB
+Heap max:         21,474,836,480 bytes = 20 GB
+Heap used %:      25%
+```
+
+**Interprétation**:
+- ✅ <75%: Sain
+- ⚠️ 75-85%: Surveiller
+- ❌ >85%: Critique (risque OutOfMemoryError)
+
+**Étape 2**: Vérifier les Garbage Collection stats
+
+```bash
+GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.gc
+```
+
+**Résultat attendu**:
+```json
+{
+  "nodes": {
+    "abc123": {
+      "name": "node-1",
+      "jvm": {
+        "gc": {
+          "collectors": {
+            "young": {
+              "collection_count": 1234,
+              "collection_time_in_millis": 12340
+            },
+            "old": {
+              "collection_count": 5,
+              "collection_time_in_millis": 500
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Calculs**:
+```
+Durée moyenne GC young: 12,340 ms / 1,234 = 10 ms par GC
+Durée moyenne GC old:   500 ms / 5 = 100 ms par GC
+```
+
+**Alertes**:
+- ⚠️ GC young > 50 ms: Heap sous pression
+- ❌ GC old > 1000 ms: Heap critiquement plein
+- ❌ GC fréquents (>10/minute): Heap trop petit
+
+**Étape 3**: Monitorer l'utilisation CPU et RAM (OS level)
+
+```bash
+GET /_nodes/stats/os?filter_path=nodes.*.name,nodes.*.os.cpu,nodes.*.os.mem
+```
+
+**Résultat attendu**:
+```json
+{
+  "nodes": {
+    "abc123": {
+      "name": "node-1",
+      "os": {
+        "cpu": {
+          "percent": 45,
+          "load_average": {
+            "1m": 2.5,
+            "5m": 2.0,
+            "15m": 1.8
+          }
+        },
+        "mem": {
+          "total_in_bytes": 68719476736,
+          "free_in_bytes": 20000000000,
+          "used_in_bytes": 48719476736,
+          "free_percent": 29,
+          "used_percent": 71
+        }
+      }
+    }
+  }
+}
+```
+
+**Analyse**:
+```
+CPU usage:        45% (moyenne récente)
+Load average 1m:  2.5 (sur un serveur 16 cores → 2.5/16 = 15.6% load)
+RAM usage:        71% (incluant OS cache)
+RAM free:         29%
+```
+
+**Thresholds**:
+- CPU: <60% ✅, 60-80% ⚠️, >80% ❌
+- Load avg: <cores ✅, cores-2×cores ⚠️, >2×cores ❌
+- RAM: >20% free ✅, 10-20% free ⚠️, <10% free ❌
+
+**Étape 4**: Vérifier l'utilisation disque et I/O
+
+```bash
+GET /_nodes/stats/fs?filter_path=nodes.*.name,nodes.*.fs.total,nodes.*.fs.io_stats
+```
+
+**Résultat attendu**:
+```json
+{
+  "nodes": {
+    "abc123": {
+      "name": "node-1",
+      "fs": {
+        "total": {
+          "total_in_bytes": 2000000000000,
+          "free_in_bytes": 1200000000000,
+          "available_in_bytes": 1200000000000
+        },
+        "io_stats": {
+          "total": {
+            "operations": 123456789,
+            "read_operations": 98765432,
+            "write_operations": 24691357,
+            "read_kilobytes": 5000000,
+            "write_kilobytes": 3000000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Calculs**:
+```
+Disque total:     2,000 GB (2 TB)
+Disque utilisé:   800 GB (40%)
+Disque libre:     1,200 GB (60%)
+
+I/O read:         5,000,000 KB = 4.88 GB
+I/O write:        3,000,000 KB = 2.93 GB
+```
+
+**Thresholds disque** (watermarks):
+- <85%: ✅ Sain
+- 85-90%: ⚠️ LOW watermark (pas de nouveaux shards)
+- 90-95%: ⚠️ HIGH watermark (relocate shards)
+- >95%: ❌ FLOOD (indices en read-only)
+
+**Étape 5**: Surveiller les métriques d'indexation et recherche
+
+```bash
+GET /_nodes/stats/indices?filter_path=nodes.*.name,nodes.*.indices.indexing,nodes.*.indices.search
+```
+
+**Résultat attendu**:
+```json
+{
+  "nodes": {
+    "abc123": {
+      "name": "node-1",
+      "indices": {
+        "indexing": {
+          "index_total": 10000000,
+          "index_time_in_millis": 5000000,
+          "index_current": 5,
+          "index_failed": 10
+        },
+        "search": {
+          "query_total": 500000,
+          "query_time_in_millis": 2000000,
+          "query_current": 2,
+          "fetch_total": 450000,
+          "fetch_time_in_millis": 500000
+        }
+      }
+    }
+  }
+}
+```
+
+**Calculs de performance**:
+```
+Indexing:
+  - Latence moyenne: 5,000,000 ms / 10,000,000 docs = 0.5 ms/doc
+  - Taux d'échec: 10 / 10,000,000 = 0.0001% ✅
+
+Search:
+  - Latence query: 2,000,000 ms / 500,000 = 4 ms/query
+  - Latence fetch: 500,000 ms / 450,000 = 1.1 ms/fetch
+  - Total: ~5.1 ms par recherche ✅
+```
+
+**Étape 6**: Créer un tableau de bord synthétique
+
+Combinez toutes les métriques dans une seule requête:
+
+```bash
+GET /_nodes/stats?filter_path=nodes.*.name,nodes.*.jvm.mem.heap_used_percent,nodes.*.os.cpu.percent,nodes.*.fs.total.available_in_bytes,nodes.*.indices.search.query_time_in_millis
+```
+
+**Créez un tableau manuel**:
+
+| Node | Heap | CPU | Disk Free | Search Latency |
+|------|------|-----|-----------|----------------|
+| node-1 | 25% ✅ | 45% ✅ | 60% ✅ | 4 ms ✅ |
+| node-2 | 78% ⚠️ | 82% ❌ | 12% ⚠️ | 15 ms ⚠️ |
+
+**Observations**: node-2 nécessite une attention (CPU et heap élevés).
+
+#### Validation
+
+**Commandes de vérification**:
+
+1. Résumé rapide de tous les nœuds:
+```bash
+GET /_cat/nodes?v&h=name,heap.percent,ram.percent,cpu,load_1m,disk.used_percent
+```
+
+**Résultat**:
+```
+name   heap.percent ram.percent cpu load_1m disk.used_percent
+node-1 25           71          45  2.5     40
+```
+
+2. Comparer les performances entre nœuds:
+```bash
+GET /_nodes/stats/indices?filter_path=nodes.*.name,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_time_in_millis
+```
+
+3. Identifier le nœud le plus chargé:
+```bash
+GET /_cat/nodes?v&h=name,cpu,load_1m&s=cpu:desc
+```
+
+#### Critères de Succès
+
+- ✅ Extraire heap usage avec `_nodes/stats/jvm`
+- ✅ Interpréter les métriques CPU/RAM/disk
+- ✅ Calculer les latences moyennes (indexing, search)
+- ✅ Identifier les nœuds surchargés (CPU >80%, heap >85%)
+- ✅ Comprendre les watermarks disque (85%, 90%, 95%)
+
+#### Dépannage
+
+**Problème**: Heap usage constamment >85%
+→ Cluster sous-dimensionné, ajouter des nœuds
+→ Ou augmenter le heap (si <32 GB et RAM disponible)
+→ Vérifier les requêtes: certaines peuvent consommer trop de mémoire
+
+**Problème**: CPU élevé mais load average faible
+→ CPU utilisé par des tâches courtes (bursts)
+→ Normal si indexation/recherche intensive par pics
+→ Surveiller les thread pool rejections
+
+**Problème**: Disque plein mais cluster n'utilise pas toute la capacité
+→ Vérifier les watermarks: `GET /_cluster/settings?include_defaults&filter_path=*.cluster.routing.allocation.disk.watermark*`
+→ Augmenter les watermarks si nécessaire (avec prudence)
+
+---
+
+## Lab 4.3: Configuration et Analyse des Slow Query Logs
+
+**Topic**: Monitoring - Analyse des Logs
+**Prérequis**: Cluster Elasticsearch, accès aux fichiers de logs
+
+### Objectif
+
+Configurer les slow query logs pour capturer les requêtes lentes, exécuter une requête intentionnellement lente, et analyser les logs pour identifier les optimisations possibles.
+
+### Contexte
+
+Les utilisateurs se plaignent de lenteur sur certaines recherches. Vous devez activer les slow logs pour identifier les requêtes problématiques et leur temps d'exécution.
+
+### Exercice de Base
+
+#### Setup
+
+**Avant de commencer**:
+1. Créez un index de test avec des données:
+
+```bash
+PUT /slowlog-test
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "title": { "type": "text" },
+      "content": { "type": "text" },
+      "category": { "type": "keyword" },
+      "views": { "type": "integer" }
+    }
+  }
+}
+
+# Indexer des documents (1000 pour avoir du volume)
+POST /slowlog-test/_bulk
+{"index":{}}
+{"title":"Article 1","content":"Long content here...","category":"tech","views":100}
+{"index":{}}
+{"title":"Article 2","content":"Another long content...","category":"science","views":200}
+... (répéter jusqu'à 1000 docs)
+```
+
+#### Étapes
+
+**Étape 1**: Configurer les seuils de slow query log
+
+```bash
+PUT /slowlog-test/_settings
+{
+  "index.search.slowlog.threshold.query.warn": "500ms",
+  "index.search.slowlog.threshold.query.info": "250ms",
+  "index.search.slowlog.threshold.query.debug": "100ms",
+  "index.search.slowlog.threshold.query.trace": "50ms",
+  "index.search.slowlog.level": "info"
+}
+```
+
+**Explication des niveaux**:
+- **WARN** (500ms): Requêtes très lentes
+- **INFO** (250ms): Requêtes lentes
+- **DEBUG** (100ms): Requêtes moyennement lentes
+- **TRACE** (50ms): Toutes les requêtes un peu lentes
+
+**Note**: Seuls les logs du niveau configuré et au-dessus sont écrits (`level: info` → logs ≥250ms).
+
+**Étape 2**: Configurer les slow indexing logs (optionnel)
+
+```bash
+PUT /slowlog-test/_settings
+{
+  "index.indexing.slowlog.threshold.index.warn": "1s",
+  "index.indexing.slowlog.threshold.index.info": "500ms",
+  "index.indexing.slowlog.threshold.index.debug": "250ms",
+  "index.indexing.slowlog.threshold.index.trace": "100ms",
+  "index.indexing.slowlog.level": "info"
+}
+```
+
+**Étape 3**: Localiser les fichiers de slow logs
+
+**Emplacement par défaut**:
+```
+/var/log/elasticsearch/<cluster_name>_index_search_slowlog.log
+/var/log/elasticsearch/<cluster_name>_index_indexing_slowlog.log
+```
+
+**Vérifier les logs existent**:
+```bash
+ls -lh /var/log/elasticsearch/*slowlog.log
+# ou si installation par archive:
+ls -lh logs/*slowlog.log
+```
+
+**Étape 4**: Exécuter une requête lente
+
+Créez une requête intentionnellement coûteuse (wildcard sur gros volume):
+
+```bash
+GET /slowlog-test/_search
+{
+  "query": {
+    "wildcard": {
+      "content": "*long*content*"
+    }
+  },
+  "size": 100
+}
+```
+
+**Note**: Les requêtes wildcard sont lentes car elles ne peuvent pas utiliser l'index inversé efficacement.
+
+Ou utilisez une agrégation complexe:
+
+```bash
+GET /slowlog-test/_search
+{
+  "size": 0,
+  "aggs": {
+    "categories": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      },
+      "aggs": {
+        "avg_views": {
+          "avg": { "field": "views" }
+        },
+        "top_hits": {
+          "top_hits": {
+            "size": 10,
+            "_source": ["title", "views"]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Étape 5**: Analyser les slow logs
+
+Consultez le fichier de slow log:
+
+```bash
+tail -f /var/log/elasticsearch/elasticsearch_index_search_slowlog.log
+```
+
+**Format d'une entrée slow log**:
+```
+[2023-11-10T10:30:15,123][INFO ][i.s.s.query] [node-1] [slowlog-test][0] 
+took[312ms], took_millis[312], total_hits[100 hits], 
+types[], stats[], search_type[QUERY_THEN_FETCH], total_shards[1], 
+source[{"query":{"wildcard":{"content":"*long*content*"}},"size":100}]
+```
+
+**Analyse**:
+- **took**: 312 ms (au-dessus du seuil INFO de 250ms)
+- **total_hits**: 100 résultats
+- **source**: La requête complète (JSON)
+
+**Étape 6**: Identifier les patterns de requêtes lentes
+
+Recherchez dans les logs les requêtes fréquemment lentes:
+
+```bash
+# Compter les occurrences de wildcard
+grep "wildcard" /var/log/elasticsearch/*_index_search_slowlog.log | wc -l
+
+# Extraire les temps took
+grep -oP 'took\[\K[0-9]+ms' /var/log/elasticsearch/*_index_search_slowlog.log | sort -n
+
+# Identifier les index les plus impactés
+grep "slowlog-test" /var/log/elasticsearch/*_index_search_slowlog.log | wc -l
+```
+
+**Étape 7**: Optimiser la requête identifiée
+
+**Avant** (wildcard lent):
+```bash
+GET /slowlog-test/_search
+{
+  "query": {
+    "wildcard": {
+      "content": "*long*content*"
+    }
+  }
+}
+```
+Temps: ~300ms
+
+**Après** (match query rapide):
+```bash
+GET /slowlog-test/_search
+{
+  "query": {
+    "match": {
+      "content": "long content"
+    }
+  }
+}
+```
+Temps: ~10ms ✅ (×30 plus rapide)
+
+**Étape 8**: Désactiver les slow logs (si nécessaire)
+
+```bash
+PUT /slowlog-test/_settings
+{
+  "index.search.slowlog.threshold.query.warn": "-1",
+  "index.search.slowlog.threshold.query.info": "-1",
+  "index.search.slowlog.threshold.query.debug": "-1",
+  "index.search.slowlog.threshold.query.trace": "-1"
+}
+```
+
+**Note**: `-1` désactive le logging pour ce niveau.
+
+#### Validation
+
+**Commandes de vérification**:
+
+1. Vérifier la configuration slow log d'un index:
+```bash
+GET /slowlog-test/_settings?include_defaults&filter_path=*.index.search.slowlog*,*.index.indexing.slowlog*
+```
+
+2. Forcer une requête lente et vérifier le log immédiatement:
+```bash
+# Exécuter une requête lente
+GET /slowlog-test/_search?scroll=1m
+{
+  "size": 1000,
+  "query": { "match_all": {} }
+}
+
+# Vérifier le slow log (dernières 10 lignes)
+tail -10 /var/log/elasticsearch/elasticsearch_index_search_slowlog.log
+```
+
+3. Statistiques des slow logs (avec script):
+```bash
+# Extraire tous les temps took et calculer la moyenne
+grep -oP 'took\[\K[0-9]+' /var/log/elasticsearch/*_index_search_slowlog.log | \
+  awk '{ sum += $1; n++ } END { if (n > 0) print "Average: " sum/n " ms" }'
+```
+
+#### Critères de Succès
+
+- ✅ Configurer les seuils slowlog avec `PUT /index/_settings`
+- ✅ Localiser les fichiers de logs slowlog
+- ✅ Exécuter une requête lente (>250ms)
+- ✅ Lire et interpréter une entrée de slow log
+- ✅ Identifier le type de requête lente (wildcard, agrégation complexe)
+- ✅ Proposer une optimisation
+
+#### Dépannage
+
+**Problème**: Aucun slow log généré même avec requêtes lentes
+→ Vérifiez le niveau de log: `index.search.slowlog.level` doit être au bon niveau
+→ Vérifiez que la requête dépasse effectivement le seuil (mesurez avec `?profile=true`)
+→ Vérifiez les permissions du fichier de log: `ls -l /var/log/elasticsearch/`
+
+**Problème**: Fichier de slow log devient trop volumineux
+→ Configurez la rotation des logs dans `log4j2.properties`:
+```properties
+appender.index_search_slowlog_rolling.type = RollingFile
+appender.index_search_slowlog_rolling.filePattern = ${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}_index_search_slowlog-%d{yyyy-MM-dd}.log
+appender.index_search_slowlog_rolling.policies.type = Policies
+appender.index_search_slowlog_rolling.policies.time.type = TimeBasedTriggeringPolicy
+appender.index_search_slowlog_rolling.policies.time.interval = 1
+```
+
+**Problème**: Trop de slow logs, bruit important
+→ Augmentez les seuils: 500ms → 1s, 250ms → 500ms
+→ Activez uniquement le niveau WARN (requêtes très lentes)
+
+---
+
+## 🌟 Bonus 4.A: Création de Dashboards Kibana pour Monitoring
+
+**Niveau**: Avancé
+**Prérequis**: Kibana installé et accessible, Stack Monitoring activé
+
+### Objectif
+
+Créer un dashboard Kibana personnalisé pour surveiller les KPIs clés du cluster (cluster health, heap usage, indexing rate, search latency) avec des visualisations en temps réel.
+
+### Contexte
+
+L'équipe DevOps souhaite un dashboard centralisé pour surveiller le cluster Elasticsearch sans avoir à exécuter manuellement des requêtes API. Vous allez créer un dashboard Kibana avec les métriques essentielles.
+
+### Challenge
+
+**Partie 1**: Activer Monitoring (si pas déjà fait)
+
+Activez la collecte de métriques:
+
+```bash
+PUT /_cluster/settings
+{
+  "persistent": {
+    "xpack.monitoring.collection.enabled": true
+  }
+}
+```
+
+Vérifiez dans Kibana: **Stack Monitoring** → **Overview** devrait afficher les métriques.
+
+**Partie 2**: Créer des visualisations dans Kibana
+
+1. **Cluster Health Gauge** (statut vert/jaune/rouge)
+   - Type: **Gauge**
+   - Index pattern: `.monitoring-es-*`
+   - Metric: `cluster_stats.status` (field mapping)
+   - Color ranges: Green (0-1), Yellow (1-2), Red (2-3)
+
+2. **Heap Usage Line Chart** (évolution temporelle)
+   - Type: **Line**
+   - Index pattern: `.monitoring-es-*`
+   - X-axis: `@timestamp` (Date Histogram, interval: 1 minute)
+   - Y-axis: `node_stats.jvm.mem.heap_used_percent` (Average)
+   - Threshold line: 85% (critical)
+
+3. **Indexing Rate Area Chart**
+   - Type: **Area**
+   - Index pattern: `.monitoring-es-*`
+   - X-axis: `@timestamp`
+   - Y-axis: `node_stats.indices.indexing.index_total` (Derivative → docs/sec)
+
+4. **Search Latency Bar Chart**
+   - Type: **Vertical Bar**
+   - Index pattern: `.monitoring-es-*`
+   - X-axis: `node_stats.name` (Terms, size: 10)
+   - Y-axis: `node_stats.indices.search.query_time_in_millis / node_stats.indices.search.query_total` (Scripted field)
+
+5. **Disk Usage Metric**
+   - Type: **Metric**
+   - Index pattern: `.monitoring-es-*`
+   - Metric: `(node_stats.fs.total.total_in_bytes - node_stats.fs.total.available_in_bytes) / node_stats.fs.total.total_in_bytes * 100` (Scripted)
+   - Format: Percentage
+
+**Partie 3**: Assembler le dashboard
+
+1. Créez un nouveau dashboard: **Kibana → Dashboard → Create new dashboard**
+2. Ajoutez toutes les visualisations créées
+3. Organisez en grid:
+   ```
+   +-------------------+-------------------+
+   | Cluster Health    | Heap Usage        |
+   | (Gauge)           | (Line Chart)      |
+   +-------------------+-------------------+
+   | Indexing Rate     | Search Latency    |
+   | (Area Chart)      | (Bar Chart)       |
+   +-------------------+-------------------+
+   | Disk Usage        | Thread Pool       |
+   | (Metric)          | Rejections (Table)|
+   +-------------------+-------------------+
+   ```
+
+**Partie 4**: Configurer les alertes (Watcher)
+
+Créez une alerte pour heap >85%:
+
+```bash
+PUT _watcher/watch/heap_alert
+{
+  "trigger": {
+    "schedule": {
+      "interval": "1m"
+    }
+  },
+  "input": {
+    "search": {
+      "request": {
+        "indices": [".monitoring-es-*"],
+        "body": {
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "range": {
+                    "@timestamp": {
+                      "gte": "now-2m"
+                    }
+                  }
+                },
+                {
+                  "range": {
+                    "node_stats.jvm.mem.heap_used_percent": {
+                      "gte": 85
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "aggs": {
+            "nodes": {
+              "terms": {
+                "field": "node_stats.node_id"
+              },
+              "aggs": {
+                "avg_heap": {
+                  "avg": {
+                    "field": "node_stats.jvm.mem.heap_used_percent"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "condition": {
+    "compare": {
+      "ctx.payload.hits.total": {
+        "gt": 0
+      }
+    }
+  },
+  "actions": {
+    "log_action": {
+      "logging": {
+        "text": "Heap usage above 85% on nodes: {{ctx.payload.aggregations.nodes.buckets}}"
+      }
+    }
+  }
+}
+```
+
+**Partie 5**: Configurer le refresh automatique
+
+Dans le dashboard Kibana:
+- Cliquez sur l'horloge (en haut à droite)
+- Sélectionnez "Auto refresh: 10 seconds"
+- Time range: "Last 15 minutes"
+
+### Validation
+
+**Checklist dashboard complet**:
+
+- [ ] Cluster health gauge (vert/jaune/rouge)
+- [ ] Heap usage line chart avec threshold 85%
+- [ ] Indexing rate area chart (docs/sec)
+- [ ] Search latency bar chart par nœud
+- [ ] Disk usage metric avec %
+- [ ] Thread pool rejections table
+- [ ] Auto-refresh configuré (10s)
+- [ ] Time picker sur "Last 15 minutes"
+
+**Questions à répondre**:
+
+1. **Pourquoi utiliser `.monitoring-es-*` comme index pattern ?**
+   - Elasticsearch stocke les métriques de monitoring dans ces index
+   - Pattern avec wildcard pour inclure tous les index de monitoring (par jour)
+
+2. **Comment calculer le taux (rate) à partir d'un compteur cumulatif ?**
+   - Utiliser l'agrégation **Derivative** dans Kibana
+   - Exemple: `indexing.index_total` (compteur) → Derivative → docs/sec (taux)
+
+3. **Quelle est la différence entre Average et Sum pour les métriques ?**
+   - **Average**: Moyenne sur tous les nœuds (ex: heap moyen du cluster)
+   - **Sum**: Total cumulé (ex: nombre total de documents indexés)
+
+**Critère de succès**: 
+- Dashboard fonctionnel avec au moins 5 visualisations
+- Métriques en temps réel (auto-refresh)
+- Capable d'identifier un problème visuellement (heap spike, rejections)
+
+---
+
+
+---
+
+
+## Lab 5.1: Création d'une Alerte Simple avec Kibana Rules
+
+**Objectif**: Créer une alerte de surveillance de la santé du cluster avec Kibana Rules et tester son déclenchement.
+
+**Contexte**: Les Kibana Rules offrent une interface graphique intuitive pour créer des alertes sans manipuler du JSON. Vous allez créer une règle qui surveille la santé du cluster et vous notifie lorsqu'il passe en statut YELLOW ou RED.
+
+### Étape 1: Accéder à l'Interface de Gestion des Règles
+
+1. Ouvrez Kibana dans votre navigateur
+2. Dans le menu latéral, cliquez sur **Stack Management** (icône d'engrenage)
+3. Sous la section **Alerts and Insights**, cliquez sur **Rules**
+
+Vous devriez voir l'interface de gestion des règles avec la liste des règles existantes (si disponible).
+
+### Étape 2: Créer une Nouvelle Règle
+
+1. Cliquez sur le bouton **Create rule** en haut à droite
+2. Sélectionnez le type de règle: **Elasticsearch query**
+   - Ce type permet d'exécuter des requêtes Elasticsearch et de déclencher des alertes selon les résultats
+3. Donnez un nom à votre règle: `cluster-health-monitor`
+4. Ajoutez des tags pour organiser vos alertes: `cluster`, `health`, `ops`
+
+### Étape 3: Configurer la Requête de Surveillance
+
+Dans la section **Define your query**:
+
+1. **Index**: Sélectionnez `.monitoring-es-*` ou créez un index temporaire pour les tests
+2. **Time field**: `@timestamp` ou le champ de temps de votre index
+3. **Query**: Configurez la requête pour surveiller la santé du cluster
+
+```json
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-5m"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "terms": {
+            "cluster_state.status": ["yellow", "red"]
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+4. **Size**: Laissez à `100` documents
+5. **Threshold**: Configurez le seuil de déclenchement
+   - **WHEN**: `query matches`
+   - **FOR THE LAST**: `5 minutes`
+   - **GROUPED OVER**: `all documents`
+
+### Étape 4: Alternative - Utiliser l'API Cluster Health
+
+Si vous n'avez pas d'index de monitoring, créez une règle avec un type **ES query** simulé:
+
+1. Créez un index de test pour simuler des états de santé:
+
+```bash
+# Créer un index de test
+PUT /cluster_health_logs
+
+# Indexer un document simulant un état YELLOW
+POST /cluster_health_logs/_doc
+{
+  "@timestamp": "2024-01-15T10:00:00Z",
+  "status": "yellow",
+  "cluster_name": "es-ops-training",
+  "number_of_nodes": 3,
+  "unassigned_shards": 2
+}
+```
+
+2. Configurez la règle pour interroger cet index:
+   - **Index**: `cluster_health_logs`
+   - **Time field**: `@timestamp`
+   - **Query**: Rechercher les documents avec `status: yellow` ou `status: red`
+
+### Étape 5: Configurer la Fréquence de Vérification
+
+Dans la section **Check every**:
+
+1. **Check every**: `1 minute`
+   - La règle sera évaluée toutes les minutes
+2. **Notify**: `Every time alert is active`
+   - Alternative: `On status change` pour ne notifier que lors des changements d'état
+
+### Étape 6: Définir les Actions (Actions Simplifiées pour Tests)
+
+Pour ce premier lab, nous allons utiliser une action simple de journalisation:
+
+1. Dans la section **Actions**, cliquez sur **Add action**
+2. Sélectionnez **Server log** comme type de connecteur
+   - Cette action journalise dans les logs Kibana, pratique pour les tests
+3. Configurez le message:
+
+```
+Alerte: Le cluster {{context.cluster.name}} est en état {{context.status}}!
+
+Détails:
+- Statut: {{context.status}}
+- Nœuds: {{context.number_of_nodes}}
+- Shards non assignés: {{context.unassigned_shards}}
+- Date: {{context.date}}
+
+Action requise: Vérifier l'état du cluster avec GET _cluster/health
+```
+
+4. **Action group**: Sélectionnez `Alert` (déclenchée quand l'alerte est active)
+
+### Étape 7: Sauvegarder et Activer la Règle
+
+1. Cliquez sur **Save** en bas de page
+2. La règle est automatiquement activée après sa création
+3. Vérifiez que le statut est **Enabled** dans la liste des règles
+
+### Étape 8: Tester le Déclenchement de l'Alerte
+
+Maintenant testons que l'alerte se déclenche correctement:
+
+#### Méthode 1: Simuler un État YELLOW (si environnement de test)
+
+```bash
+# Créer un index avec 2 répliques sur un cluster à 1 seul nœud
+PUT /test-yellow-alert
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 2
+  }
+}
+
+# Vérifier que le cluster passe en YELLOW
+GET _cluster/health
+```
+
+**Résultat attendu**:
+```json
+{
+  "cluster_name": "es-ops-training",
+  "status": "yellow",
+  "timed_out": false,
+  "number_of_nodes": 1,
+  "unassigned_shards": 2,
+  ...
+}
+```
+
+#### Méthode 2: Indexer un Document de Test
+
+Si vous utilisez l'index de simulation:
+
+```bash
+# Indexer un nouveau document YELLOW
+POST /cluster_health_logs/_doc
+{
+  "@timestamp": "{{NOW}}",
+  "status": "yellow",
+  "cluster_name": "es-ops-training",
+  "number_of_nodes": 3,
+  "unassigned_shards": 5
+}
+
+# Forcer le refresh
+POST /cluster_health_logs/_refresh
+```
+
+### Étape 9: Vérifier que l'Alerte s'est Déclenchée
+
+1. Retournez dans **Stack Management** → **Rules**
+2. Cliquez sur votre règle `cluster-health-monitor`
+3. Consultez l'onglet **Alert history** ou **History**
+   - Vous devriez voir les déclenchements récents
+4. Vérifiez les logs Kibana pour voir le message journalisé:
+
+```bash
+# Depuis votre terminal, consultez les logs Kibana
+docker logs kibana | grep "cluster-health-monitor"
+# OU si installation locale
+tail -f /var/log/kibana/kibana.log | grep "cluster-health-monitor"
+```
+
+**Résultat attendu dans les logs**:
+```
+[ALERT] cluster-health-monitor: Le cluster es-ops-training est en état yellow!
+```
+
+### Étape 10: Tester la Désactivation et Modification
+
+1. **Désactiver la règle**:
+   - Dans la liste des règles, cliquez sur le switch pour désactiver `cluster-health-monitor`
+   - Le statut passe à **Disabled**
+   - Vérifiez qu'aucune nouvelle alerte n'est déclenchée
+
+2. **Modifier la règle**:
+   - Cliquez sur le nom de la règle
+   - Cliquez sur **Edit rule** en haut à droite
+   - Changez la fréquence de vérification à `5 minutes`
+   - Sauvegardez
+
+3. **Réactiver la règle**:
+   - Réactivez le switch pour remettre la règle en état **Enabled**
+
+### Validation
+
+Vérifiez que vous avez réussi le lab:
+
+```bash
+# 1. Vérifier que la règle existe via l'API Kibana
+curl -X GET "localhost:5601/api/alerting/rules" \
+  -H "kbn-xsrf: true" \
+  -u elastic:votre_password | jq '.data[] | select(.name=="cluster-health-monitor")'
+```
+
+**Résultat attendu**:
+```json
+{
+  "id": "abc123...",
+  "name": "cluster-health-monitor",
+  "tags": ["cluster", "health", "ops"],
+  "enabled": true,
+  "schedule": {
+    "interval": "1m"
+  },
+  ...
+}
+```
+
+```bash
+# 2. Vérifier les alertes actives
+GET _kibana/api/alerting/rule/ABC123/_state
+```
+
+### Points Clés à Retenir
+
+✅ **Kibana Rules** offrent une interface graphique pour créer des alertes sans JSON
+✅ Le type **Elasticsearch query** permet d'interroger n'importe quel index
+✅ La **fréquence de vérification** contrôle combien de fois la règle est évaluée
+✅ Les **actions** définissent ce qui se passe quand l'alerte se déclenche
+✅ L'action **Server log** est idéale pour les tests et le debugging
+✅ Les règles peuvent être **activées/désactivées** sans les supprimer
+✅ L'historique des alertes est accessible via l'interface Kibana
+
+---
+
+## Lab 5.2: Configuration d'Actions Avancées (Webhook et Index)
+
+**Objectif**: Configurer des actions sophistiquées pour vos alertes - envoyer des webhooks vers des services externes et indexer les alertes pour analyse historique.
+
+**Contexte**: Les alertes ne sont utiles que si elles déclenchent les bonnes actions. Dans ce lab, vous allez configurer deux types d'actions essentielles en production: les webhooks (pour intégrer avec des outils externes comme Slack, PagerDuty, ou vos propres services) et l'indexation (pour garder une trace de toutes les alertes).
+
+### Partie A: Créer un Connecteur Webhook
+
+Les connecteurs sont des configurations réutilisables qui définissent comment se connecter à des services externes.
+
+#### Étape 1: Créer un Service de Test pour Recevoir les Webhooks
+
+Nous allons utiliser **webhook.site** pour tester nos webhooks:
+
+1. Ouvrez votre navigateur et allez sur https://webhook.site
+2. Notez l'URL unique générée (format: `https://webhook.site/abc-def-123...`)
+   - Cette URL affichera tous les webhooks reçus en temps réel
+3. Gardez cet onglet ouvert pour voir les webhooks arriver
+
+**Alternative locale avec Netcat**:
+```bash
+# Terminal 1: Démarrer un serveur HTTP simple
+while true; do echo -e "HTTP/1.1 200 OK\n\n" | nc -l 8888; done
+
+# Votre webhook URL locale: http://localhost:8888
+```
+
+#### Étape 2: Créer le Connecteur Webhook dans Kibana
+
+1. Dans Kibana, allez dans **Stack Management** → **Connectors**
+2. Cliquez sur **Create connector**
+3. Sélectionnez **Webhook** dans la liste des types
+4. Configurez le connecteur:
+
+**Configuration**:
+- **Connector name**: `ops-webhook-notifier`
+- **URL**: Collez l'URL de webhook.site ou votre URL locale
+- **Method**: `POST`
+- **Headers**: Ajoutez les en-têtes suivants
+
+```json
+{
+  "Content-Type": "application/json",
+  "X-Alert-Source": "elasticsearch-ops"
+}
+```
+
+5. Testez le connecteur:
+   - Cliquez sur **Test** en bas
+   - Vérifiez que webhook.site reçoit bien la requête
+
+6. Cliquez sur **Save**
+
+#### Étape 3: Créer un Connecteur Index Action
+
+Ce connecteur permettra d'indexer les alertes dans Elasticsearch pour analyse historique.
+
+1. Dans **Stack Management** → **Connectors**, cliquez sur **Create connector**
+2. Sélectionnez **Index** dans la liste
+3. Configurez:
+
+**Configuration**:
+- **Connector name**: `alert-history-index`
+- **Index**: `alert-history`
+- **Refresh**: `true` (pour que les documents soient immédiatement disponibles)
+- **Time field**: `@timestamp` (sera ajouté automatiquement)
+
+4. Cliquez sur **Save**
+
+### Partie B: Créer une Alerte avec Actions Multiples
+
+Maintenant créons une alerte qui utilise ces deux connecteurs.
+
+#### Étape 4: Créer l'Alerte de Monitoring de Heap
+
+1. Allez dans **Stack Management** → **Rules**
+2. Cliquez sur **Create rule**
+3. Configurez la règle:
+
+**Informations de base**:
+- **Name**: `heap-usage-critical`
+- **Tags**: `performance`, `heap`, `critical`
+- **Rule type**: **Elasticsearch query**
+
+**Query definition**:
+- **Index**: `.monitoring-es-*` ou créez un index de simulation
+- **Time field**: `@timestamp`
+- **Query**:
+
+```json
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-5m"
+            }
+          }
+        },
+        {
+          "range": {
+            "node_stats.jvm.mem.heap_used_percent": {
+              "gte": 85
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "max_heap": {
+      "max": {
+        "field": "node_stats.jvm.mem.heap_used_percent"
+      }
+    },
+    "avg_heap": {
+      "avg": {
+        "field": "node_stats.jvm.mem.heap_used_percent"
+      }
+    }
+  }
+}
+```
+
+**Threshold**:
+- **WHEN**: `query matches`
+- **FOR THE LAST**: `5 minutes`
+- **GROUPED OVER**: `top 5 'node_stats.node_id'` (pour identifier les nœuds problématiques)
+
+**Schedule**:
+- **Check every**: `1 minute`
+- **Notify**: `On status change` (pour éviter le spam)
+
+#### Étape 5: Créer un Index de Simulation pour Tests
+
+Comme nous n'avons peut-être pas de données de monitoring réelles:
+
+```bash
+# Créer l'index de simulation
+PUT /heap-monitoring
+{
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "node_id": { "type": "keyword" },
+      "node_name": { "type": "keyword" },
+      "heap_used_percent": { "type": "float" }
+    }
+  }
+}
+
+# Indexer des données simulant un heap critique
+POST /heap-monitoring/_bulk
+{"index":{}}
+{"@timestamp":"2024-01-15T10:00:00Z","node_id":"node-1","node_name":"es-ops-node-1","heap_used_percent":87.5}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:01:00Z","node_id":"node-1","node_name":"es-ops-node-1","heap_used_percent":89.2}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:02:00Z","node_id":"node-2","node_name":"es-ops-node-2","heap_used_percent":91.8}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:00:00Z","node_id":"node-3","node_name":"es-ops-node-3","heap_used_percent":75.3}
+```
+
+Modifiez votre règle pour utiliser cet index:
+- **Index**: `heap-monitoring`
+- **Query**: Rechercher `heap_used_percent >= 85`
+
+#### Étape 6: Configurer l'Action Webhook
+
+Dans la section **Actions** de votre règle:
+
+1. Cliquez sur **Add action**
+2. Sélectionnez le connecteur `ops-webhook-notifier`
+3. Configurez le payload JSON:
+
+```json
+{
+  "alert_id": "{{alertId}}",
+  "alert_name": "{{alertName}}",
+  "alert_type": "heap_usage",
+  "severity": "critical",
+  "timestamp": "{{date}}",
+  "context": {
+    "cluster_name": "{{context.cluster.name}}",
+    "condition": "Heap usage exceeded 85%",
+    "details": {
+      "max_heap_percent": "{{context.max_heap}}",
+      "avg_heap_percent": "{{context.avg_heap}}",
+      "affected_nodes": "{{context.groupBy}}"
+    }
+  },
+  "actions_required": [
+    "Check heap usage: GET _nodes/stats/jvm",
+    "Review GC activity: GET _nodes/stats/jvm?filter_path=nodes.*.jvm.gc",
+    "Consider increasing heap or clearing cache"
+  ],
+  "links": {
+    "kibana_dashboard": "https://kibana.example.com/app/monitoring",
+    "runbook": "https://docs.example.com/runbooks/elasticsearch-heap"
+  }
+}
+```
+
+4. **Action group**: `Alert` (quand l'alerte est active)
+5. **Throttle**: `15 minutes` (éviter les alertes répétées)
+
+#### Étape 7: Configurer l'Action Index
+
+1. Dans la même règle, cliquez sur **Add action** à nouveau
+2. Sélectionnez le connecteur `alert-history-index`
+3. Configurez le document à indexer:
+
+```json
+{
+  "@timestamp": "{{date}}",
+  "alert": {
+    "id": "{{alertId}}",
+    "name": "{{alertName}}",
+    "action_group": "{{context.group}}",
+    "instance_id": "{{alertInstanceId}}"
+  },
+  "rule": {
+    "id": "{{rule.id}}",
+    "name": "{{rule.name}}",
+    "type": "{{rule.type}}",
+    "tags": {{#toJson}}rule.tags{{/toJson}}
+  },
+  "metrics": {
+    "heap": {
+      "max_percent": {{context.max_heap}},
+      "avg_percent": {{context.avg_heap}},
+      "threshold": 85
+    }
+  },
+  "nodes": {
+    "affected": "{{context.groupBy}}"
+  },
+  "status": "triggered",
+  "severity": "critical",
+  "message": "Heap usage critical: {{context.max_heap}}% detected on cluster {{context.cluster.name}}"
+}
+```
+
+4. **Action group**: `Alert`
+5. Pas de throttle nécessaire (nous voulons toutes les occurrences dans l'historique)
+
+#### Étape 8: Sauvegarder et Activer
+
+1. Cliquez sur **Save** pour créer la règle avec les deux actions
+2. La règle est automatiquement activée
+
+### Partie C: Déclencher et Vérifier les Actions
+
+#### Étape 9: Déclencher l'Alerte
+
+Indexez des données qui déclencheront l'alerte:
+
+```bash
+# Indexer des données avec heap > 85%
+POST /heap-monitoring/_doc
+{
+  "@timestamp": "{{NOW}}",
+  "node_id": "node-1",
+  "node_name": "es-ops-node-1",
+  "heap_used_percent": 92.5
+}
+
+# Forcer le refresh
+POST /heap-monitoring/_refresh
+```
+
+Attendez 1-2 minutes (la fréquence de vérification de la règle).
+
+#### Étape 10: Vérifier l'Action Webhook
+
+1. Retournez sur webhook.site (ou votre serveur local)
+2. Vous devriez voir une requête POST arriver avec le payload JSON
+3. Vérifiez que les données sont correctes:
+   - `alert_name`: "heap-usage-critical"
+   - `severity`: "critical"
+   - `context.details.max_heap_percent`: valeur > 85
+
+**Exemple de requête reçue**:
+```json
+{
+  "alert_id": "alert-123-abc",
+  "alert_name": "heap-usage-critical",
+  "severity": "critical",
+  "timestamp": "2024-01-15T10:05:30.123Z",
+  "context": {
+    "condition": "Heap usage exceeded 85%",
+    "details": {
+      "max_heap_percent": "92.5",
+      "avg_heap_percent": "88.7",
+      "affected_nodes": "node-1"
+    }
+  }
+}
+```
+
+#### Étape 11: Vérifier l'Action Index
+
+Interrogez l'index d'historique des alertes:
+
+```bash
+# Vérifier que l'index a été créé
+GET alert-history
+
+# Rechercher les alertes récentes
+GET alert-history/_search
+{
+  "query": {
+    "range": {
+      "@timestamp": {
+        "gte": "now-1h"
+      }
+    }
+  },
+  "sort": [
+    { "@timestamp": "desc" }
+  ]
+}
+```
+
+**Résultat attendu**:
+```json
+{
+  "hits": {
+    "total": { "value": 1 },
+    "hits": [
+      {
+        "_source": {
+          "@timestamp": "2024-01-15T10:05:30.123Z",
+          "alert": {
+            "id": "alert-123-abc",
+            "name": "heap-usage-critical"
+          },
+          "metrics": {
+            "heap": {
+              "max_percent": 92.5,
+              "avg_percent": 88.7,
+              "threshold": 85
+            }
+          },
+          "status": "triggered",
+          "severity": "critical",
+          "message": "Heap usage critical: 92.5% detected..."
+        }
+      }
+    ]
+  }
+}
+```
+
+#### Étape 12: Créer des Visualisations de l'Historique d'Alertes
+
+Créons un dashboard Kibana pour visualiser l'historique:
+
+1. Allez dans **Kibana** → **Discover**
+2. Créez un **Data View** pour `alert-history`
+3. Allez dans **Dashboard** → **Create dashboard**
+4. Ajoutez des visualisations:
+
+**Visualisation 1: Timeline des Alertes**
+```
+Visualization type: Line chart
+X-axis: @timestamp (Date histogram)
+Y-axis: Count
+Break down by: alert.name.keyword
+```
+
+**Visualisation 2: Répartition par Sévérité**
+```
+Visualization type: Pie chart
+Slice by: severity.keyword
+```
+
+**Visualisation 3: Top Nœuds Problématiques**
+```
+Visualization type: Table
+Rows: nodes.affected.keyword
+Metrics: Count, Max heap_percent
+```
+
+### Validation
+
+Vérifiez tous les éléments:
+
+```bash
+# 1. Vérifier les connecteurs
+GET _kibana/api/actions/connectors
+
+# 2. Vérifier la règle et ses actions
+GET _kibana/api/alerting/rules
+
+# 3. Compter les alertes dans l'index
+GET alert-history/_count
+
+# 4. Statistiques sur les alertes par sévérité
+GET alert-history/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_severity": {
+      "terms": {
+        "field": "severity.keyword"
+      }
+    },
+    "by_alert_name": {
+      "terms": {
+        "field": "alert.name.keyword"
+      }
+    }
+  }
+}
+```
+
+### Points Clés à Retenir
+
+✅ Les **connecteurs** sont réutilisables entre plusieurs règles
+✅ Les **webhooks** permettent d'intégrer avec n'importe quel service externe
+✅ L'**indexation des alertes** crée une base de données d'historique analysable
+✅ Les **actions multiples** permettent de notifier ET d'archiver simultanément
+✅ Le **throttling** évite les alertes répétées (alert fatigue)
+✅ Les **payloads personnalisés** incluent contexte et actions recommandées
+✅ Les **variables de contexte** (`{{context.*}}`) rendent les alertes dynamiques
+✅ webhook.site est un outil pratique pour tester les webhooks
+✅ L'historique d'alertes permet de créer des dashboards et des rapports
+
+---
+
+## 🌟 Bonus Challenge 5.A: Alerte Watcher Avancée avec Agrégations Complexes
+
+**Niveau**: Avancé  
+**Objectif**: Créer une alerte Watcher sophistiquée utilisant des agrégations complexes pour détecter des anomalies dans les patterns d'indexation.
+
+**Contexte**: Watcher offre plus de flexibilité que Kibana Rules grâce à son modèle JSON programmable. Dans ce challenge, vous allez créer une alerte qui détecte des anomalies dans le taux d'indexation en comparant la moyenne actuelle avec la moyenne historique (détection de baisse soudaine qui pourrait indiquer un problème).
+
+### Scénario
+
+Votre cluster indexe normalement ~1000 documents/minute. Vous voulez être alerté si:
+1. Le taux d'indexation chute en dessous de 50% de la moyenne historique
+2. Cette condition persiste pendant au moins 3 minutes
+3. Le problème affecte plusieurs index simultanément
+
+### Étape 1: Créer des Données de Test
+
+Créons un index simulant des métriques d'indexation:
+
+```bash
+# Créer l'index de métriques
+PUT /indexing-metrics
+{
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "index_name": { "type": "keyword" },
+      "docs_indexed": { "type": "long" },
+      "indexing_rate": { "type": "float" },
+      "node_id": { "type": "keyword" }
+    }
+  }
+}
+
+# Générer des données historiques normales (baseline)
+POST /indexing-metrics/_bulk
+{"index":{}}
+{"@timestamp":"2024-01-15T09:00:00Z","index_name":"products","docs_indexed":1000,"indexing_rate":950.5,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:01:00Z","index_name":"products","docs_indexed":980,"indexing_rate":975.2,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:02:00Z","index_name":"products","docs_indexed":1020,"indexing_rate":1010.8,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:03:00Z","index_name":"products","docs_indexed":995,"indexing_rate":990.1,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:00:00Z","index_name":"orders","docs_indexed":500,"indexing_rate":485.3,"node_id":"node-2"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:01:00Z","index_name":"orders","docs_indexed":510,"indexing_rate":505.7,"node_id":"node-2"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:02:00Z","index_name":"orders","docs_indexed":490,"indexing_rate":495.2,"node_id":"node-2"}
+{"index":{}}
+{"@timestamp":"2024-01-15T09:03:00Z","index_name":"orders","docs_indexed":505,"indexing_rate":500.8,"node_id":"node-2"}
+
+# Générer des données récentes montrant une chute (anomalie)
+{"index":{}}
+{"@timestamp":"2024-01-15T10:00:00Z","index_name":"products","docs_indexed":450,"indexing_rate":445.2,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:01:00Z","index_name":"products","docs_indexed":420,"indexing_rate":415.8,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:02:00Z","index_name":"products","docs_indexed":430,"indexing_rate":425.5,"node_id":"node-1"}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:00:00Z","index_name":"orders","docs_indexed":220,"indexing_rate":215.3,"node_id":"node-2"}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:01:00Z","index_name":"orders","docs_indexed":210,"indexing_rate":205.7,"node_id":"node-2"}
+{"index":{}}
+{"@timestamp":"2024-01-15T10:02:00Z","index_name":"orders","docs_indexed":225,"indexing_rate":220.1,"node_id":"node-2"}
+
+# Forcer le refresh
+POST /indexing-metrics/_refresh
+```
+
+### Étape 2: Développer la Requête d'Agrégation
+
+Testons d'abord notre logique de détection:
+
+```bash
+GET /indexing-metrics/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "@timestamp": {
+        "gte": "now-1h"
+      }
+    }
+  },
+  "aggs": {
+    "by_index": {
+      "terms": {
+        "field": "index_name",
+        "size": 20
+      },
+      "aggs": {
+        "recent_rate": {
+          "filter": {
+            "range": {
+              "@timestamp": {
+                "gte": "now-5m"
+              }
+            }
+          },
+          "aggs": {
+            "avg_recent": {
+              "avg": {
+                "field": "indexing_rate"
+              }
+            }
+          }
+        },
+        "baseline_rate": {
+          "filter": {
+            "range": {
+              "@timestamp": {
+                "gte": "now-30m",
+                "lt": "now-5m"
+              }
+            }
+          },
+          "aggs": {
+            "avg_baseline": {
+              "avg": {
+                "field": "indexing_rate"
+              }
+            }
+          }
+        },
+        "rate_comparison": {
+          "bucket_script": {
+            "buckets_path": {
+              "recent": "recent_rate>avg_recent",
+              "baseline": "baseline_rate>avg_baseline"
+            },
+            "script": "params.recent / params.baseline"
+          }
+        }
+      }
+    },
+    "anomalous_indexes": {
+      "filter": {
+        "range": {
+          "rate_comparison": {
+            "lt": 0.5
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Logique**:
+- **recent_rate**: Moyenne des 5 dernières minutes
+- **baseline_rate**: Moyenne des 25 minutes précédentes (de -30m à -5m)
+- **rate_comparison**: Ratio recent/baseline (< 0.5 signifie chute de >50%)
+
+### Étape 3: Créer la Watch Watcher
+
+Maintenant créons la watch complète avec conditions et actions multiples:
+
+```bash
+PUT _watcher/watch/indexing-rate-anomaly
+{
+  "metadata": {
+    "name": "Indexing Rate Anomaly Detection",
+    "version": "1.0",
+    "description": "Détecte les chutes soudaines du taux d'indexation (>50%) persistant sur plusieurs minutes",
+    "team": "ops",
+    "severity": "high"
+  },
+  "trigger": {
+    "schedule": {
+      "interval": "2m"
+    }
+  },
+  "input": {
+    "search": {
+      "request": {
+        "indices": ["indexing-metrics"],
+        "body": {
+          "size": 0,
+          "query": {
+            "range": {
+              "@timestamp": {
+                "gte": "now-1h"
+              }
+            }
+          },
+          "aggs": {
+            "by_index": {
+              "terms": {
+                "field": "index_name",
+                "size": 50
+              },
+              "aggs": {
+                "recent_rate": {
+                  "filter": {
+                    "range": {
+                      "@timestamp": {
+                        "gte": "now-5m"
+                      }
+                    }
+                  },
+                  "aggs": {
+                    "avg_recent": {
+                      "avg": {
+                        "field": "indexing_rate"
+                      }
+                    },
+                    "count_recent": {
+                      "value_count": {
+                        "field": "indexing_rate"
+                      }
+                    }
+                  }
+                },
+                "baseline_rate": {
+                  "filter": {
+                    "range": {
+                      "@timestamp": {
+                        "gte": "now-35m",
+                        "lt": "now-5m"
+                      }
+                    }
+                  },
+                  "aggs": {
+                    "avg_baseline": {
+                      "avg": {
+                        "field": "indexing_rate"
+                      }
+                    },
+                    "stddev_baseline": {
+                      "extended_stats": {
+                        "field": "indexing_rate"
+                      }
+                    }
+                  }
+                },
+                "rate_drop_percent": {
+                  "bucket_script": {
+                    "buckets_path": {
+                      "recent": "recent_rate>avg_recent",
+                      "baseline": "baseline_rate>avg_baseline"
+                    },
+                    "script": "((params.baseline - params.recent) / params.baseline) * 100"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "condition": {
+    "script": {
+      "source": """
+        def anomalies = [];
+        def buckets = ctx.payload.aggregations.by_index.buckets;
+        
+        for (bucket in buckets) {
+          def recent = bucket.recent_rate.avg_recent.value;
+          def baseline = bucket.baseline_rate.avg_baseline.value;
+          def count = bucket.recent_rate.count_recent.value;
+          def drop_percent = bucket.rate_drop_percent.value;
+          
+          // Conditions:
+          // 1. Au moins 3 points de données récentes (3 minutes)
+          // 2. Chute >= 50%
+          // 3. Baseline non nulle
+          if (count >= 3 && drop_percent >= 50 && baseline > 0) {
+            anomalies.add([
+              'index': bucket.key,
+              'recent_rate': Math.round(recent * 100) / 100,
+              'baseline_rate': Math.round(baseline * 100) / 100,
+              'drop_percent': Math.round(drop_percent * 100) / 100,
+              'sample_count': count
+            ]);
+          }
+        }
+        
+        // Déclencher si au moins 1 index anomalique
+        ctx.payload.anomalies = anomalies;
+        return anomalies.size() > 0;
+      """,
+      "lang": "painless"
+    }
+  },
+  "transform": {
+    "script": {
+      "source": """
+        def result = [
+          'alert_triggered_at': ctx.execution_time,
+          'affected_indexes': ctx.payload.anomalies,
+          'total_affected': ctx.payload.anomalies.size(),
+          'severity': ctx.payload.anomalies.size() >= 3 ? 'critical' : 'high',
+          'investigation_links': [
+            'cluster_stats': 'GET _cluster/stats',
+            'node_stats': 'GET _nodes/stats/indices',
+            'slow_logs': 'Check slow indexing logs'
+          ]
+        ];
+        return result;
+      """,
+      "lang": "painless"
+    }
+  },
+  "actions": {
+    "log_to_elasticsearch": {
+      "index": {
+        "index": "watcher-alerts",
+        "doc_id": "indexing-anomaly-{{ctx.watch_id}}-{{ctx.execution_time}}",
+        "refresh": true
+      }
+    },
+    "notify_ops_team": {
+      "throttle_period": "15m",
+      "webhook": {
+        "scheme": "https",
+        "host": "webhook.site",
+        "port": 443,
+        "path": "/votre-webhook-id",
+        "method": "post",
+        "headers": {
+          "Content-Type": "application/json",
+          "X-Alert-Type": "indexing-anomaly"
+        },
+        "body": """
+{
+  "alert": "Indexing Rate Anomaly Detected",
+  "severity": "{{ctx.payload.severity}}",
+  "triggered_at": "{{ctx.payload.alert_triggered_at}}",
+  "summary": "{{ctx.payload.total_affected}} index(es) showing >50% drop in indexing rate",
+  "affected_indexes": {{#toJson}}ctx.payload.affected_indexes{{/toJson}},
+  "actions_required": [
+    "Check cluster health: GET _cluster/health",
+    "Check node disk space: GET _cat/nodes?v&h=name,disk.avail,disk.used_percent",
+    "Review indexing queues: GET _cat/thread_pool/write?v",
+    "Check for network issues or slow nodes"
+  ],
+  "investigation": {{#toJson}}ctx.payload.investigation_links{{/toJson}}
+}
+        """
+      }
+    },
+    "send_detailed_email": {
+      "throttle_period": "30m",
+      "email": {
+        "to": ["ops-team@example.com"],
+        "subject": "[{{ctx.payload.severity}}] Indexing Rate Anomaly: {{ctx.payload.total_affected}} Index(es) Affected",
+        "body": {
+          "html": """
+<html>
+<body style="font-family: Arial, sans-serif;">
+  <h2 style="color: #d32f2f;">⚠️ Indexing Rate Anomaly Detected</h2>
+  
+  <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+    <tr style="background-color: #f5f5f5;">
+      <td style="padding: 10px; border: 1px solid #ddd;"><strong>Severity</strong></td>
+      <td style="padding: 10px; border: 1px solid #ddd;">{{ctx.payload.severity}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #ddd;"><strong>Triggered At</strong></td>
+      <td style="padding: 10px; border: 1px solid #ddd;">{{ctx.payload.alert_triggered_at}}</td>
+    </tr>
+    <tr style="background-color: #f5f5f5;">
+      <td style="padding: 10px; border: 1px solid #ddd;"><strong>Affected Indexes</strong></td>
+      <td style="padding: 10px; border: 1px solid #ddd;">{{ctx.payload.total_affected}}</td>
+    </tr>
+  </table>
+  
+  <h3>Affected Indexes Details:</h3>
+  <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+    <thead>
+      <tr style="background-color: #1976d2; color: white;">
+        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Index</th>
+        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Recent Rate</th>
+        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Baseline Rate</th>
+        <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Drop %</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#ctx.payload.affected_indexes}}
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{index}}</td>
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{recent_rate}} docs/min</td>
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{baseline_rate}} docs/min</td>
+        <td style="padding: 10px; border: 1px solid #ddd; text-align: right; color: #d32f2f;"><strong>↓{{drop_percent}}%</strong></td>
+      </tr>
+      {{/ctx.payload.affected_indexes}}
+    </tbody>
+  </table>
+  
+  <h3>Recommended Actions:</h3>
+  <ol>
+    <li>Check cluster health: <code>GET _cluster/health</code></li>
+    <li>Check node disk space: <code>GET _cat/nodes?v&h=name,disk.avail,disk.used_percent</code></li>
+    <li>Review indexing queues: <code>GET _cat/thread_pool/write?v</code></li>
+    <li>Check for network issues or slow nodes</li>
+    <li>Review application logs for indexing errors</li>
+  </ol>
+  
+  <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+    <em>This is an automated alert from Elasticsearch Watcher. Do not reply to this email.</em>
+  </p>
+</body>
+</html>
+          """
+        }
+      }
+    }
+  }
+}
+```
+
+### Étape 4: Tester la Watch
+
+#### Test 1: Exécution Manuelle
+
+```bash
+# Exécuter la watch manuellement pour voir le résultat
+POST _watcher/watch/indexing-rate-anomaly/_execute
+{
+  "trigger_data": {
+    "triggered_time": "2024-01-15T10:05:00Z"
+  }
+}
+```
+
+**Résultat attendu**:
+```json
+{
+  "watch_record": {
+    "watch_id": "indexing-rate-anomaly",
+    "state": "executed",
+    "trigger_event": {
+      "type": "manual"
+    },
+    "result": {
+      "condition": {
+        "type": "script",
+        "status": "success",
+        "met": true
+      },
+      "actions": [
+        {
+          "id": "log_to_elasticsearch",
+          "type": "index",
+          "status": "success"
+        },
+        {
+          "id": "notify_ops_team",
+          "type": "webhook",
+          "status": "success"
+        }
+      ]
+    }
+  }
+}
+```
+
+#### Test 2: Vérifier l'Index d'Alertes
+
+```bash
+# Vérifier que l'alerte a été indexée
+GET watcher-alerts/_search
+{
+  "query": {
+    "match": {
+      "watch_id": "indexing-rate-anomaly"
+    }
+  },
+  "sort": [
+    { "alert_triggered_at": "desc" }
+  ]
+}
+```
+
+#### Test 3: Vérifier le Webhook
+
+Consultez webhook.site pour voir le payload JSON envoyé.
+
+### Étape 5: Créer un Dashboard d'Analyse
+
+Créons un dashboard pour visualiser les anomalies détectées:
+
+```bash
+# Créer un index pattern pour les alertes Watcher
+# Dans Kibana: Stack Management → Data Views → Create data view
+# Name: watcher-alerts
+# Index pattern: watcher-alerts
+# Time field: alert_triggered_at
+```
+
+Visualisations recommandées:
+
+**Viz 1: Timeline des Anomalies**
+```
+Type: Line chart
+X-axis: alert_triggered_at (Date histogram, interval: auto)
+Y-axis: Count of alerts
+Break down by: severity
+```
+
+**Viz 2: Indexes les Plus Affectés**
+```
+Type: Table
+Rows: affected_indexes.index.keyword
+Metrics: 
+  - Count (nombre d'occurrences)
+  - Avg affected_indexes.drop_percent
+  - Latest alert_triggered_at
+Sort by: Count (descending)
+```
+
+**Viz 3: Comparaison Rates**
+```
+Type: Bar chart (horizontal)
+Y-axis: affected_indexes.index.keyword
+X-axis: 
+  - affected_indexes.recent_rate (série 1)
+  - affected_indexes.baseline_rate (série 2)
+```
+
+### Étape 6: Amélioration - Ajouter une Action Slack
+
+Si vous avez un workspace Slack, ajoutez une action Slack:
+
+1. Dans Slack, créez une Incoming Webhook: https://api.slack.com/messaging/webhooks
+2. Ajoutez cette action à votre watch:
+
+```json
+"notify_slack": {
+  "throttle_period": "15m",
+  "webhook": {
+    "scheme": "https",
+    "host": "hooks.slack.com",
+    "port": 443,
+    "path": "/services/YOUR/WEBHOOK/PATH",
+    "method": "post",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": """
+{
+  "text": ":warning: *Indexing Rate Anomaly Detected*",
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "text": ":rotating_light: Indexing Rate Anomaly Alert"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Severity:*\n{{ctx.payload.severity}}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Affected Indexes:*\n{{ctx.payload.total_affected}}"
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "*Details:*\n{{#ctx.payload.affected_indexes}}- `{{index}}`: ↓{{drop_percent}}% ({{recent_rate}} → {{baseline_rate}} docs/min)\n{{/ctx.payload.affected_indexes}}"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {
+            "type": "plain_text",
+            "text": "View in Kibana"
+          },
+          "url": "https://your-kibana.com/app/watcher"
+        }
+      ]
+    }
+  ]
+}
+    """
+  }
+}
+```
+
+### Validation Finale
+
+Vérifiez tous les composants:
+
+```bash
+# 1. État de la watch
+GET _watcher/watch/indexing-rate-anomaly
+
+# 2. Historique d'exécution
+GET .watcher-history*/_search
+{
+  "query": {
+    "match": {
+      "watch_id": "indexing-rate-anomaly"
+    }
+  },
+  "sort": [
+    { "result.execution_time": "desc" }
+  ],
+  "size": 10
+}
+
+# 3. Statistiques sur les alertes déclenchées
+GET watcher-alerts/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_severity": {
+      "terms": {
+        "field": "severity.keyword"
+      }
+    },
+    "total_affected_indexes": {
+      "sum": {
+        "field": "total_affected"
+      }
+    },
+    "avg_drop_percent": {
+      "nested": {
+        "path": "affected_indexes"
+      },
+      "aggs": {
+        "avg_drop": {
+          "avg": {
+            "field": "affected_indexes.drop_percent"
+          }
+        }
+      }
+    }
+  }
+}
+
+# 4. Désactiver/Activer la watch
+POST _watcher/watch/indexing-rate-anomaly/_deactivate
+POST _watcher/watch/indexing-rate-anomaly/_activate
+
+# 5. Supprimer la watch (si nécessaire)
+DELETE _watcher/watch/indexing-rate-anomaly
+```
+
+### Défis Supplémentaires (Si Temps Disponible)
+
+**Challenge 1**: Ajouter une détection de "surge" (augmentation soudaine du taux d'indexation > 200%)
+
+**Challenge 2**: Implémenter une logique d'auto-résolution qui envoie une notification quand les taux reviennent à la normale
+
+**Challenge 3**: Créer une seconde watch qui surveille le taux de réussite des actions (webhooks, emails) de la première watch
+
+### Points Clés à Retenir
+
+✅ **Watcher** offre une flexibilité maximale avec le scripting Painless
+✅ Les **agrégations complexes** permettent des comparaisons baseline vs recent
+✅ Le **bucket_script** calcule des métriques dérivées (ratios, pourcentages)
+✅ Les **scripts Painless** dans conditions permettent une logique métier sophistiquée
+✅ Les **transforms** reformatent les données avant les actions
+✅ Les **actions multiples** (index + webhook + email) assurent la résilience
+✅ Le **throttling** évite l'alert fatigue avec des périodes différentes par action
+✅ Les **templates HTML** créent des emails riches et actionnables
+✅ L'**indexation des alertes** permet l'analyse historique et les dashboards
+✅ La **validation progressive** (test query → execute watch → monitor) assure la fiabilité
+
+**Félicitations!** Vous maîtrisez maintenant les systèmes d'alertes avancés d'Elasticsearch! 🎉
+
+
+---
+
+
+## Lab 7.1: Création d'Utilisateurs et de Rôles
+
+**Objectif**: Maîtriser la création et la gestion d'utilisateurs et de rôles avec différents niveaux de privilèges, en implémentant le principe du moindre privilège (least privilege).
+
+**Contexte**: Le contrôle d'accès basé sur les rôles (RBAC) est fondamental pour sécuriser Elasticsearch. Dans ce lab, vous allez créer plusieurs rôles avec des privilèges variés, créer des utilisateurs, et tester les restrictions d'accès.
+
+### Prérequis : Sécurité Activée
+
+Vérifiez que la sécurité est activée sur votre cluster :
+
+```bash
+GET /_xpack
+```
+
+**Résultat attendu** :
+```json
+{
+  "features": {
+    "security": {
+      "available": true,
+      "enabled": true
+    }
+  }
+}
+```
+
+Si la sécurité n'est pas activée (Elasticsearch 7.x), ajoutez dans `elasticsearch.yml` :
+
+```yaml
+xpack.security.enabled: true
+```
+
+Puis redémarrez Elasticsearch.
+
+### Étape 1: Vérifier l'Utilisateur Actuel
+
+Commencez par vérifier avec quel utilisateur vous êtes connecté :
+
+```bash
+GET /_security/_authenticate
+```
+
+**Résultat attendu** :
+```json
+{
+  "username": "elastic",
+  "roles": ["superuser"],
+  "full_name": null,
+  "email": null,
+  "metadata": {
+    "_reserved": true
+  },
+  "enabled": true,
+  "authentication_realm": {
+    "name": "reserved",
+    "type": "reserved"
+  }
+}
+```
+
+Vous devriez être connecté avec l'utilisateur `elastic` (superuser).
+
+### Étape 2: Créer un Rôle "Lecture Seule" (Read-Only)
+
+Créons un rôle qui permet uniquement la lecture des indices de logs :
+
+```bash
+POST /_security/role/logs_readonly
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["logs-*", "filebeat-*", "logstash-*"],
+      "privileges": ["read", "view_index_metadata"]
+    }
+  ],
+  "applications": [],
+  "run_as": [],
+  "metadata": {
+    "version": 1,
+    "description": "Read-only access to logs indices"
+  }
+}
+```
+
+**Résultat attendu** :
+```json
+{
+  "role": {
+    "created": true
+  }
+}
+```
+
+**Explication des privilèges** :
+- `cluster: ["monitor"]` : Peut voir les stats du cluster (_cluster/health, _cat/*, etc.)
+- `indices.privileges: ["read"]` : Peut rechercher et lire les documents
+- `view_index_metadata` : Peut voir les mappings et settings
+
+**Vérifier le rôle créé** :
+
+```bash
+GET /_security/role/logs_readonly
+```
+
+### Étape 3: Créer un Rôle "Analyste de Données"
+
+Créons un rôle pour un analyste qui peut lire et créer des visualisations :
+
+```bash
+POST /_security/role/data_analyst
+{
+  "cluster": ["monitor", "manage_index_templates"],
+  "indices": [
+    {
+      "names": ["products", "orders", "customers"],
+      "privileges": ["read", "view_index_metadata"]
+    },
+    {
+      "names": [".kibana*", ".kibana-*"],
+      "privileges": ["read", "write", "manage"]
+    }
+  ],
+  "applications": [
+    {
+      "application": "kibana-.kibana",
+      "privileges": ["feature_discover.all", "feature_visualize.all", "feature_dashboard.read"],
+      "resources": ["*"]
+    }
+  ],
+  "metadata": {
+    "description": "Data analyst with read access to business data and Kibana visualization capabilities"
+  }
+}
+```
+
+**Nouveaux privilèges** :
+- `manage_index_templates` : Peut créer des index patterns dans Kibana
+- Accès aux indices `.kibana*` pour sauvegarder les visualisations
+- Privilèges Kibana : `discover.all`, `visualize.all`, `dashboard.read`
+
+### Étape 4: Créer un Rôle "Développeur"
+
+Créons un rôle pour un développeur avec accès complet à ses indices de test :
+
+```bash
+POST /_security/role/developer
+{
+  "cluster": ["monitor", "manage_index_templates", "manage_ilm", "manage_pipeline"],
+  "indices": [
+    {
+      "names": ["dev-*", "test-*"],
+      "privileges": ["all"]
+    },
+    {
+      "names": ["products", "orders"],
+      "privileges": ["read", "view_index_metadata"]
+    }
+  ],
+  "applications": [
+    {
+      "application": "kibana-.kibana",
+      "privileges": ["all"],
+      "resources": ["space:dev"]
+    }
+  ],
+  "metadata": {
+    "description": "Developer with full access to dev/test indices"
+  }
+}
+```
+
+**Privilèges étendus** :
+- `all` sur indices `dev-*` et `test-*` : Peut tout faire
+- `manage_ilm` : Peut gérer les Index Lifecycle Management policies
+- `manage_pipeline` : Peut gérer les ingest pipelines
+- Accès complet Kibana dans le space "dev"
+
+### Étape 5: Créer des Utilisateurs avec Ces Rôles
+
+**Utilisateur 1 : Lecteur de logs** :
+
+```bash
+POST /_security/user/alice_reader
+{
+  "password": "ReadOnlyPass123!",
+  "roles": ["logs_readonly"],
+  "full_name": "Alice Reader",
+  "email": "alice@example.com",
+  "metadata": {
+    "department": "Operations",
+    "hire_date": "2024-01-15"
+  }
+}
+```
+
+**Utilisateur 2 : Analyste** :
+
+```bash
+POST /_security/user/bob_analyst
+{
+  "password": "AnalystPass456!",
+  "roles": ["data_analyst", "kibana_user"],
+  "full_name": "Bob Analyst",
+  "email": "bob@example.com",
+  "metadata": {
+    "department": "Data Science",
+    "hire_date": "2023-05-10"
+  }
+}
+```
+
+**Utilisateur 3 : Développeur** :
+
+```bash
+POST /_security/user/charlie_dev
+{
+  "password": "DevPass789!",
+  "roles": ["developer"],
+  "full_name": "Charlie Developer",
+  "email": "charlie@example.com",
+  "metadata": {
+    "department": "Engineering",
+    "hire_date": "2023-03-20"
+  }
+}
+```
+
+**Vérifier les utilisateurs créés** :
+
+```bash
+GET /_security/user
+```
+
+Vous devriez voir les trois utilisateurs listés avec leurs rôles.
+
+### Étape 6: Créer des Indices de Test
+
+Créons des indices pour tester les permissions :
+
+```bash
+# Index de logs
+PUT /logs-2024-01
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}
+
+POST /logs-2024-01/_bulk
+{"index":{"_id":"1"}}
+{"timestamp":"2024-01-15T10:00:00Z","level":"INFO","message":"Application started","service":"api"}
+{"index":{"_id":"2"}}
+{"timestamp":"2024-01-15T10:05:00Z","level":"WARN","message":"High memory usage","service":"api"}
+{"index":{"_id":"3"}}
+{"timestamp":"2024-01-15T10:10:00Z","level":"ERROR","message":"Database connection failed","service":"database"}
+
+# Index products
+PUT /products
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}
+
+POST /products/_bulk
+{"index":{"_id":"1"}}
+{"name":"Laptop","price":999,"category":"electronics","stock":50}
+{"index":{"_id":"2"}}
+{"name":"Mouse","price":25,"category":"electronics","stock":200}
+{"index":{"_id":"3"}}
+{"name":"Desk","price":299,"category":"furniture","stock":20}
+
+# Index de développement
+PUT /dev-feature-x
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}
+
+POST /dev-feature-x/_doc/1
+{
+  "feature": "feature-x",
+  "status": "in-development",
+  "tests_passing": false
+}
+```
+
+### Étape 7: Tester les Permissions de alice_reader (Read-Only)
+
+**Test 1 : Lecture autorisée sur logs** :
+
+```bash
+# Se connecter comme alice_reader
+curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/logs-2024-01/_search?pretty"
+```
+
+**Résultat attendu** : Succès (200 OK) avec les 3 documents
+
+**Test 2 : Lecture NON autorisée sur products** :
+
+```bash
+curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/products/_search?pretty"
+```
+
+**Résultat attendu** : Erreur 403 Forbidden
+```json
+{
+  "error": {
+    "type": "security_exception",
+    "reason": "action [indices:data/read/search] is unauthorized for user [alice_reader]"
+  },
+  "status": 403
+}
+```
+
+**Test 3 : Écriture NON autorisée sur logs** :
+
+```bash
+curl -u alice_reader:ReadOnlyPass123! -X POST "https://localhost:9200/logs-2024-01/_doc" \
+  -H 'Content-Type: application/json' \
+  -d '{"timestamp":"2024-01-15T11:00:00Z","level":"INFO","message":"Test"}'
+```
+
+**Résultat attendu** : Erreur 403 Forbidden (pas de privilège `write`)
+
+**Test 4 : Cluster health autorisé** :
+
+```bash
+curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/_cluster/health?pretty"
+```
+
+**Résultat attendu** : Succès (privilège `monitor` permet cela)
+
+### Étape 8: Tester les Permissions de bob_analyst (Analyste)
+
+**Test 1 : Lecture autorisée sur products et orders** :
+
+```bash
+curl -u bob_analyst:AnalystPass456! "https://localhost:9200/products/_search?pretty"
+```
+
+**Résultat attendu** : Succès (200 OK)
+
+**Test 2 : Écriture NON autorisée sur products** :
+
+```bash
+curl -u bob_analyst:AnalystPass456! -X POST "https://localhost:9200/products/_doc" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"New Product","price":100}'
+```
+
+**Résultat attendu** : Erreur 403 Forbidden (rôle `data_analyst` n'a que `read`)
+
+**Test 3 : Lecture NON autorisée sur dev-* (indices de dev)** :
+
+```bash
+curl -u bob_analyst:AnalystPass456! "https://localhost:9200/dev-feature-x/_search?pretty"
+```
+
+**Résultat attendu** : Erreur 403 Forbidden
+
+### Étape 9: Tester les Permissions de charlie_dev (Développeur)
+
+**Test 1 : Accès complet aux indices dev-*** :
+
+```bash
+# Lecture
+curl -u charlie_dev:DevPass789! "https://localhost:9200/dev-feature-x/_search?pretty"
+
+# Écriture
+curl -u charlie_dev:DevPass789! -X POST "https://localhost:9200/dev-feature-x/_doc" \
+  -H 'Content-Type: application/json' \
+  -d '{"feature":"feature-y","status":"planned"}'
+
+# Suppression
+curl -u charlie_dev:DevPass789! -X DELETE "https://localhost:9200/dev-feature-x"
+```
+
+**Résultat attendu** : Tous succès (privilège `all` sur `dev-*`)
+
+**Test 2 : Création d'index de test** :
+
+```bash
+curl -u charlie_dev:DevPass789! -X PUT "https://localhost:9200/test-new-feature"
+```
+
+**Résultat attendu** : Succès (peut créer des indices `test-*`)
+
+**Test 3 : Lecture autorisée mais écriture NON autorisée sur products** :
+
+```bash
+# Lecture : OK
+curl -u charlie_dev:DevPass789! "https://localhost:9200/products/_search?pretty"
+
+# Écriture : FORBIDDEN
+curl -u charlie_dev:DevPass789! -X POST "https://localhost:9200/products/_doc" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Hacked"}'
+```
+
+**Résultat attendu** : 
+- Lecture : Succès
+- Écriture : Erreur 403 (pas de privilège `write` sur `products`)
+
+### Étape 10: Modifier un Utilisateur
+
+Imaginons que Bob devient "Senior Analyst" et a besoin d'accès en écriture :
+
+**Créer un nouveau rôle** :
+
+```bash
+POST /_security/role/senior_analyst
+{
+  "cluster": ["monitor", "manage_index_templates", "manage_ilm"],
+  "indices": [
+    {
+      "names": ["products", "orders", "customers"],
+      "privileges": ["read", "write", "view_index_metadata"]
+    },
+    {
+      "names": [".kibana*"],
+      "privileges": ["all"]
+    }
+  ]
+}
+```
+
+**Mettre à jour Bob avec le nouveau rôle** :
+
+```bash
+PUT /_security/user/bob_analyst
+{
+  "roles": ["senior_analyst", "kibana_admin"],
+  "full_name": "Bob Senior Analyst",
+  "email": "bob@example.com"
+}
+```
+
+**Tester le nouvel accès** :
+
+```bash
+# Maintenant Bob peut écrire
+curl -u bob_analyst:AnalystPass456! -X POST "https://localhost:9200/products/_doc" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"New Product","price":150,"category":"electronics"}'
+```
+
+**Résultat attendu** : Succès (201 Created)
+
+### Étape 11: Désactiver Temporairement un Utilisateur
+
+Désactivons Alice temporairement (ex: congé, investigation sécurité) :
+
+```bash
+PUT /_security/user/alice_reader/_disable
+```
+
+**Résultat attendu** :
+```json
+{
+  "acknowledged": true
+}
+```
+
+**Tester que Alice ne peut plus se connecter** :
+
+```bash
+curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/_cluster/health"
+```
+
+**Résultat attendu** : Erreur 401 Unauthorized
+
+**Réactiver Alice** :
+
+```bash
+PUT /_security/user/alice_reader/_enable
+```
+
+### Étape 12: Changer le Mot de Passe
+
+Changeons le mot de passe de Charlie :
+
+```bash
+POST /_security/user/charlie_dev/_password
+{
+  "password": "NewDevPassword2024!"
+}
+```
+
+**Résultat attendu** :
+```json
+{
+  "acknowledged": true
+}
+```
+
+**Vérifier que l'ancien mot de passe ne fonctionne plus** :
+
+```bash
+# Ancien password : FAIL
+curl -u charlie_dev:DevPass789! "https://localhost:9200/"
+
+# Nouveau password : SUCCESS
+curl -u charlie_dev:NewDevPassword2024! "https://localhost:9200/"
+```
+
+### Validation Finale
+
+Vérifiez que vous avez réussi le lab :
+
+```bash
+# 1. Lister tous les rôles personnalisés
+GET /_security/role/logs_readonly,data_analyst,developer,senior_analyst
+
+# 2. Lister tous les utilisateurs
+GET /_security/user
+
+# 3. Vérifier les privilèges de chaque utilisateur via _authenticate
+# (se connecter avec chaque utilisateur et exécuter GET /_security/_authenticate)
+
+# 4. Tester les accès (matrice de tests)
+```
+
+**Matrice de tests attendus** :
+
+| Utilisateur | Index logs-* | Index products | Index dev-* | Écriture logs-* | Écriture products |
+|-------------|--------------|----------------|-------------|-----------------|-------------------|
+| alice_reader | ✅ Read | ❌ Denied | ❌ Denied | ❌ Denied | ❌ Denied |
+| bob_analyst (après update) | ❌ Denied | ✅ Read/Write | ❌ Denied | ❌ Denied | ✅ Write |
+| charlie_dev | ❌ Denied | ✅ Read | ✅ All | ❌ Denied | ❌ Denied |
+
+### Points Clés à Retenir
+
+✅ **Privilèges cluster** vs **privilèges index** : Bien comprendre la différence  
+✅ **Principe du moindre privilège** : Donner uniquement les accès nécessaires  
+✅ `read` permet `_search`, `_get` mais pas `_index`, `_update`, `_delete`  
+✅ `write` permet `_index`, `_update`, `_delete` mais pas création d'index  
+✅ `all` donne tous les privilèges sur les indices ciblés  
+✅ Les patterns (`logs-*`, `dev-*`) permettent de couvrir plusieurs indices  
+✅ Les utilisateurs peuvent avoir **plusieurs rôles** (cumul des privilèges)  
+✅ `_disable` / `_enable` permettent de désactiver temporairement sans supprimer  
+✅ Tester systématiquement les accès après création de rôles  
+✅ Utiliser `_security/_authenticate` pour vérifier l'utilisateur actuel
+
+---
+
+## Lab 7.2: Implémentation de Document-Level Security (DLS)
+
+**Objectif**: Mettre en œuvre la sécurité au niveau des documents pour filtrer les données visibles selon le rôle de l'utilisateur, en utilisant des requêtes Elasticsearch.
+
+**Contexte**: La Document-Level Security (DLS) permet de limiter les documents visibles à un utilisateur selon une query Elasticsearch. C'est essentiel pour implémenter du multi-tenancy, séparer les données par département, région, ou niveau de confidentialité.
+
+### Scénario
+
+Vous gérez un cluster Elasticsearch pour une entreprise multi-régionale avec plusieurs départements :
+- **Département Sales** : Accès uniquement aux commandes de vente
+- **Département HR** : Accès uniquement aux employés
+- **Managers régionaux** : Accès uniquement aux données de leur région
+
+Vous allez implémenter des filtres DLS pour chaque cas d'usage.
+
+### Étape 1: Créer les Indices de Test avec Données Multi-Tenant
+
+**Index 1 : Commandes avec département** :
+
+```bash
+PUT /orders
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "order_id": { "type": "keyword" },
+      "customer": { "type": "keyword" },
+      "amount": { "type": "float" },
+      "department": { "type": "keyword" },
+      "region": { "type": "keyword" },
+      "status": { "type": "keyword" },
+      "created_at": { "type": "date" }
+    }
+  }
+}
+
+POST /orders/_bulk
+{"index":{"_id":"1"}}
+{"order_id":"ORD-001","customer":"Alice Corp","amount":5000,"department":"sales","region":"EMEA","status":"completed","created_at":"2024-01-15T10:00:00Z"}
+{"index":{"_id":"2"}}
+{"order_id":"ORD-002","customer":"Bob LLC","amount":3000,"department":"sales","region":"AMER","status":"pending","created_at":"2024-01-16T10:00:00Z"}
+{"index":{"_id":"3"}}
+{"order_id":"ORD-003","customer":"Charlie Inc","amount":7500,"department":"marketing","region":"EMEA","status":"completed","created_at":"2024-01-17T10:00:00Z"}
+{"index":{"_id":"4"}}
+{"order_id":"ORD-004","customer":"David Co","amount":2000,"department":"sales","region":"APAC","status":"completed","created_at":"2024-01-18T10:00:00Z"}
+{"index":{"_id":"5"}}
+{"order_id":"ORD-005","customer":"Eve Enterprises","amount":9000,"department":"marketing","region":"AMER","status":"pending","created_at":"2024-01-19T10:00:00Z"}
+
+# Index 2 : Employés avec région et niveau de confidentialité
+PUT /employees
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "employee_id": { "type": "keyword" },
+      "name": { "type": "keyword" },
+      "department": { "type": "keyword" },
+      "region": { "type": "keyword" },
+      "salary": { "type": "float" },
+      "confidentiality": { "type": "keyword" },
+      "hire_date": { "type": "date" }
+    }
+  }
+}
+
+POST /employees/_bulk
+{"index":{"_id":"1"}}
+{"employee_id":"EMP-001","name":"Alice Johnson","department":"sales","region":"EMEA","salary":60000,"confidentiality":"public","hire_date":"2020-01-15"}
+{"index":{"_id":"2"}}
+{"employee_id":"EMP-002","name":"Bob Smith","department":"hr","region":"EMEA","salary":55000,"confidentiality":"restricted","hire_date":"2021-03-20"}
+{"index":{"_id":"3"}}
+{"employee_id":"EMP-003","name":"Charlie Brown","department":"engineering","region":"AMER","salary":85000,"confidentiality":"public","hire_date":"2019-05-10"}
+{"index":{"_id":"4"}}
+{"employee_id":"EMP-004","name":"David Lee","department":"sales","region":"APAC","salary":65000,"confidentiality":"public","hire_date":"2022-07-01"}
+{"index":{"_id":"5"}}
+{"employee_id":"EMP-005","name":"Eve Martinez","department":"hr","region":"AMER","salary":75000,"confidentiality":"confidential","hire_date":"2018-11-15"}
+```
+
+### Étape 2: Créer un Rôle avec DLS pour le Département Sales
+
+Ce rôle permet de voir **uniquement** les commandes du département "sales" :
+
+```bash
+POST /_security/role/sales_team
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["orders"],
+      "privileges": ["read", "view_index_metadata"],
+      "query": {
+        "term": {
+          "department": "sales"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Sales team - can only see sales department orders"
+  }
+}
+```
+
+**Explication** :
+- `query.term.department: "sales"` : Filtre qui n'affiche que les documents où `department = "sales"`
+- Les documents avec `department = "marketing"` sont **invisibles** pour ce rôle
+
+### Étape 3: Créer un Rôle avec DLS pour Manager Régional EMEA
+
+Ce rôle permet de voir **uniquement** les données de la région EMEA :
+
+```bash
+POST /_security/role/emea_manager
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["orders", "employees"],
+      "privileges": ["read", "view_index_metadata"],
+      "query": {
+        "term": {
+          "region": "EMEA"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "description": "EMEA regional manager - can only see EMEA region data"
+  }
+}
+```
+
+### Étape 4: Créer un Rôle avec DLS Complexe (Plusieurs Conditions)
+
+Ce rôle permet de voir les commandes "sales" **ET** statut "completed" :
+
+```bash
+POST /_security/role/sales_completed
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["orders"],
+      "privileges": ["read"],
+      "query": {
+        "bool": {
+          "must": [
+            { "term": { "department": "sales" } },
+            { "term": { "status": "completed" } }
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Sales team - only completed sales orders"
+  }
+}
+```
+
+**Query DLS** : Combine plusieurs conditions avec `bool.must`
+
+### Étape 5: Créer un Rôle pour HR avec Filtrage par Confidentialité
+
+Le département HR peut voir tous les employés **sauf** les "confidential" :
+
+```bash
+POST /_security/role/hr_team
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["employees"],
+      "privileges": ["read", "write", "view_index_metadata"],
+      "query": {
+        "bool": {
+          "must_not": [
+            { "term": { "confidentiality": "confidential" } }
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "description": "HR team - cannot see confidential employee records"
+  }
+}
+```
+
+**Query DLS** : Utilise `bool.must_not` pour exclure des documents
+
+### Étape 6: Créer des Utilisateurs avec Rôles DLS
+
+```bash
+# Utilisateur sales team
+POST /_security/user/sarah_sales
+{
+  "password": "SalesPass123!",
+  "roles": ["sales_team"],
+  "full_name": "Sarah Sales",
+  "email": "sarah@example.com"
+}
+
+# Utilisateur EMEA manager
+POST /_security/user/michael_emea
+{
+  "password": "EMEAPass456!",
+  "roles": ["emea_manager"],
+  "full_name": "Michael EMEA Manager",
+  "email": "michael@example.com"
+}
+
+# Utilisateur sales completed
+POST /_security/user/tom_audit
+{
+  "password": "AuditPass789!",
+  "roles": ["sales_completed"],
+  "full_name": "Tom Auditor",
+  "email": "tom@example.com"
+}
+
+# Utilisateur HR
+POST /_security/user/helen_hr
+{
+  "password": "HRPass321!",
+  "roles": ["hr_team"],
+  "full_name": "Helen HR",
+  "email": "helen@example.com"
+}
+```
+
+### Étape 7: Tester le Filtrage DLS pour Sales Team
+
+**Connexion en tant que sarah_sales** :
+
+```bash
+curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_search?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "hits": {
+    "total": { "value": 3 },
+    "hits": [
+      {
+        "_source": {
+          "order_id": "ORD-001",
+          "department": "sales",
+          "region": "EMEA",
+          ...
+        }
+      },
+      {
+        "_source": {
+          "order_id": "ORD-002",
+          "department": "sales",
+          "region": "AMER",
+          ...
+        }
+      },
+      {
+        "_source": {
+          "order_id": "ORD-004",
+          "department": "sales",
+          "region": "APAC",
+          ...
+        }
+      }
+    ]
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit ORD-001, ORD-002, ORD-004 (department = "sales")
+- ❌ Ne voit **PAS** ORD-003, ORD-005 (department = "marketing")
+
+**Compter les documents visibles** :
+
+```bash
+curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_count?pretty"
+```
+
+**Résultat attendu** : `{ "count": 3 }`
+
+### Étape 8: Tester le Filtrage DLS pour EMEA Manager
+
+**Connexion en tant que michael_emea** :
+
+```bash
+curl -u michael_emea:EMEAPass456! "https://localhost:9200/orders/_search?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "hits": {
+    "total": { "value": 2 },
+    "hits": [
+      {
+        "_source": {
+          "order_id": "ORD-001",
+          "region": "EMEA",
+          "department": "sales",
+          ...
+        }
+      },
+      {
+        "_source": {
+          "order_id": "ORD-003",
+          "region": "EMEA",
+          "department": "marketing",
+          ...
+        }
+      }
+    ]
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit ORD-001, ORD-003 (region = "EMEA")
+- ❌ Ne voit **PAS** ORD-002, ORD-004, ORD-005 (autres régions)
+
+**Tester sur l'index employees** :
+
+```bash
+curl -u michael_emea:EMEAPass456! "https://localhost:9200/employees/_search?pretty"
+```
+
+**Résultat attendu** : Employés EMP-001 et EMP-002 uniquement (region = "EMEA")
+
+### Étape 9: Tester le Filtrage DLS avec Conditions Multiples
+
+**Connexion en tant que tom_audit** (sales + completed) :
+
+```bash
+curl -u tom_audit:AuditPass789! "https://localhost:9200/orders/_search?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "hits": {
+    "total": { "value": 2 },
+    "hits": [
+      {
+        "_source": {
+          "order_id": "ORD-001",
+          "department": "sales",
+          "status": "completed",
+          ...
+        }
+      },
+      {
+        "_source": {
+          "order_id": "ORD-004",
+          "department": "sales",
+          "status": "completed",
+          ...
+        }
+      }
+    ]
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit ORD-001, ORD-004 (sales + completed)
+- ❌ Ne voit **PAS** ORD-002 (sales mais pending)
+- ❌ Ne voit **PAS** ORD-003, ORD-005 (marketing)
+
+### Étape 10: Tester le Filtrage DLS avec Exclusion (HR Team)
+
+**Connexion en tant que helen_hr** :
+
+```bash
+curl -u helen_hr:HRPass321! "https://localhost:9200/employees/_search?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "hits": {
+    "total": { "value": 4 },
+    "hits": [
+      { "_source": { "employee_id": "EMP-001", "confidentiality": "public" } },
+      { "_source": { "employee_id": "EMP-002", "confidentiality": "restricted" } },
+      { "_source": { "employee_id": "EMP-003", "confidentiality": "public" } },
+      { "_source": { "employee_id": "EMP-004", "confidentiality": "public" } }
+    ]
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit EMP-001, 002, 003, 004 (public ou restricted)
+- ❌ Ne voit **PAS** EMP-005 (confidentiality = "confidential")
+
+### Étape 11: Vérifier l'Invisibilité Complète (Get par ID)
+
+Même si on connaît l'ID d'un document filtré par DLS, il est inaccessible :
+
+```bash
+# Sarah (sales team) essaie d'accéder à ORD-003 (marketing)
+curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_doc/3?pretty"
+```
+
+**Résultat attendu** : Erreur 404 Not Found
+```json
+{
+  "_index": "orders",
+  "_id": "3",
+  "found": false
+}
+```
+
+Le document existe mais est **invisible** pour sarah_sales (comme s'il n'existait pas).
+
+### Étape 12: Tester les Agrégations avec DLS
+
+Les agrégations respectent également le filtrage DLS :
+
+```bash
+# Agréger par région (vue sarah_sales)
+curl -u sarah_sales:SalesPass123! -X GET "https://localhost:9200/orders/_search?pretty" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "size": 0,
+  "aggs": {
+    "by_region": {
+      "terms": {
+        "field": "region"
+      }
+    }
+  }
+}'
+```
+
+**Résultat attendu** :
+```json
+{
+  "aggregations": {
+    "by_region": {
+      "buckets": [
+        { "key": "EMEA", "doc_count": 1 },
+        { "key": "AMER", "doc_count": 1 },
+        { "key": "APAC", "doc_count": 1 }
+      ]
+    }
+  }
+}
+```
+
+**Analyse** : Uniquement les régions des commandes "sales" (3 documents au total).
+
+### Validation Finale
+
+Vérifiez que vous avez réussi le lab :
+
+```bash
+# 1. Vérifier les rôles DLS créés
+GET /_security/role/sales_team,emea_manager,sales_completed,hr_team
+
+# 2. Pour chaque utilisateur, vérifier le count
+curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_count"
+# Attendu: {"count": 3}
+
+curl -u michael_emea:EMEAPass456! "https://localhost:9200/orders/_count"
+# Attendu: {"count": 2}
+
+curl -u tom_audit:AuditPass789! "https://localhost:9200/orders/_count"
+# Attendu: {"count": 2}
+
+curl -u helen_hr:HRPass321! "https://localhost:9200/employees/_count"
+# Attendu: {"count": 4}
+
+# 3. Comparer avec superuser (voit tout)
+curl -u elastic:your_password "https://localhost:9200/orders/_count"
+# Attendu: {"count": 5}
+```
+
+### Points Clés à Retenir
+
+✅ **DLS filtre les documents** visibles selon une query Elasticsearch  
+✅ La query DLS est **transparente** pour l'utilisateur (documents invisibles comme s'ils n'existaient pas)  
+✅ Même avec `GET /_doc/{id}`, un document filtré retourne **404 Not Found**  
+✅ Les **agrégations** et **statistiques** respectent le filtrage DLS  
+✅ `term` query pour filtrage exact, `bool` pour conditions complexes  
+✅ `must`, `must_not`, `should` permettent des filtres sophistiqués  
+✅ DLS fonctionne avec **tous les patterns d'indices** (`orders-*`, etc.)  
+✅ Combiner DLS avec Field-Level Security pour protection maximale  
+✅ Tester systématiquement avec `_count` et `_search` après création de rôles DLS  
+✅ DLS est idéal pour **multi-tenancy**, **séparation départementale**, **filtrage régional**
+
+---
+
+## 🌟 Bonus Challenge 7.A: Field-Level Security (FLS) pour Masquer des Champs Sensibles
+
+**Niveau**: Avancé  
+**Objectif**: Implémenter la sécurité au niveau des champs (Field-Level Security) pour cacher des données sensibles selon les rôles, en combinant avec DLS pour une protection multicouche.
+
+**Contexte**: Certaines données dans vos indices sont sensibles (SSN, salaires, emails personnels, données médicales). La Field-Level Security permet de les masquer complètement pour certains rôles, même si l'utilisateur peut voir le document.
+
+### Scénario
+
+Vous gérez un cluster avec des données d'employés contenant :
+- **Données publiques** : Nom, département, date d'embauche
+- **Données sensibles** : SSN, salaire, adresse personnelle, numéro de téléphone
+- **Données confidentielles** : Évaluations de performance, notes disciplinaires
+
+Vous allez créer plusieurs niveaux d'accès :
+1. **Public** : Peut voir uniquement les champs publics
+2. **HR Team** : Peut voir public + certaines données sensibles (pas SSN)
+3. **HR Manager** : Peut voir tout (public + sensible + confidentiel)
+
+### Étape 1: Créer un Index d'Employés Enrichi
+
+```bash
+PUT /employees_full
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "employee_id": { "type": "keyword" },
+      "name": { "type": "keyword" },
+      "department": { "type": "keyword" },
+      "position": { "type": "keyword" },
+      "hire_date": { "type": "date" },
+      "email_corporate": { "type": "keyword" },
+      "email_personal": { "type": "keyword" },
+      "phone_work": { "type": "keyword" },
+      "phone_personal": { "type": "keyword" },
+      "address": {
+        "properties": {
+          "street": { "type": "text" },
+          "city": { "type": "keyword" },
+          "country": { "type": "keyword" },
+          "postal_code": { "type": "keyword" }
+        }
+      },
+      "ssn": { "type": "keyword" },
+      "salary": { "type": "float" },
+      "performance_review": {
+        "properties": {
+          "rating": { "type": "keyword" },
+          "comments": { "type": "text" },
+          "reviewer": { "type": "keyword" }
+        }
+      },
+      "disciplinary_notes": { "type": "text" }
+    }
+  }
+}
+```
+
+### Étape 2: Indexer des Données de Test
+
+```bash
+POST /employees_full/_bulk
+{"index":{"_id":"1"}}
+{"employee_id":"EMP-001","name":"Alice Johnson","department":"sales","position":"Sales Manager","hire_date":"2020-01-15","email_corporate":"alice.johnson@company.com","email_personal":"alice.j@gmail.com","phone_work":"+33-1-23-45-67-89","phone_personal":"+33-6-12-34-56-78","address":{"street":"10 Rue de Rivoli","city":"Paris","country":"France","postal_code":"75001"},"ssn":"123-45-6789","salary":75000,"performance_review":{"rating":"excellent","comments":"Top performer","reviewer":"Director Sales"},"disciplinary_notes":null}
+{"index":{"_id":"2"}}
+{"employee_id":"EMP-002","name":"Bob Smith","department":"hr","position":"HR Specialist","hire_date":"2021-03-20","email_corporate":"bob.smith@company.com","email_personal":"bob.smith@yahoo.com","phone_work":"+33-1-98-76-54-32","phone_personal":"+33-6-98-76-54-32","address":{"street":"25 Avenue des Champs","city":"Lyon","country":"France","postal_code":"69001"},"ssn":"987-65-4321","salary":60000,"performance_review":{"rating":"good","comments":"Solid contributor","reviewer":"HR Director"},"disciplinary_notes":"Late arrival incident - 2023-05-10"}
+{"index":{"_id":"3"}}
+{"employee_id":"EMP-003","name":"Charlie Brown","department":"engineering","position":"Senior Engineer","hire_date":"2019-05-10","email_corporate":"charlie.brown@company.com","email_personal":"cbrown@outlook.com","phone_work":"+33-1-11-22-33-44","phone_personal":"+33-6-11-22-33-44","address":{"street":"5 Boulevard Saint-Germain","city":"Paris","country":"France","postal_code":"75005"},"ssn":"555-12-3456","salary":95000,"performance_review":{"rating":"excellent","comments":"Technical leader","reviewer":"CTO"},"disciplinary_notes":null}
+```
+
+### Étape 3: Créer un Rôle "Public" avec FLS Restrictif
+
+Ce rôle ne peut voir que les champs publics :
+
+```bash
+POST /_security/role/employee_public_view
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["employees_full"],
+      "privileges": ["read"],
+      "field_security": {
+        "grant": [
+          "employee_id",
+          "name",
+          "department",
+          "position",
+          "hire_date",
+          "email_corporate",
+          "phone_work"
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Public view - only non-sensitive employee data"
+  }
+}
+```
+
+**Champs accordés** : ID, nom, département, poste, date d'embauche, email pro, téléphone pro  
+**Champs cachés** : SSN, salaire, adresse, emails/téléphones persos, évaluations, notes disciplinaires
+
+### Étape 4: Créer un Rôle "HR Team" avec FLS Modéré
+
+Ce rôle peut voir plus de champs mais pas les plus sensibles (SSN, notes disciplinaires) :
+
+```bash
+POST /_security/role/hr_team_view
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["employees_full"],
+      "privileges": ["read", "write"],
+      "field_security": {
+        "grant": [
+          "employee_id",
+          "name",
+          "department",
+          "position",
+          "hire_date",
+          "email_*",
+          "phone_*",
+          "address.*",
+          "salary",
+          "performance_review.*"
+        ],
+        "except": [
+          "ssn",
+          "disciplinary_notes"
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "description": "HR team - can see most fields except SSN and disciplinary notes"
+  }
+}
+```
+
+**Utilisation de wildcards** :
+- `email_*` : Accorde `email_corporate` ET `email_personal`
+- `phone_*` : Accorde `phone_work` ET `phone_personal`
+- `address.*` : Accorde tous les sous-champs de `address`
+- `performance_review.*` : Tous les sous-champs des évaluations
+
+**Champs explicitement exclus** :
+- `ssn` : Numéro de sécurité sociale
+- `disciplinary_notes` : Notes disciplinaires
+
+### Étape 5: Créer un Rôle "HR Manager" avec Accès Complet
+
+Ce rôle peut voir TOUS les champs sans restriction :
+
+```bash
+POST /_security/role/hr_manager_full
+{
+  "cluster": ["monitor", "manage"],
+  "indices": [
+    {
+      "names": ["employees_full"],
+      "privileges": ["all"],
+      "field_security": {
+        "grant": ["*"]
+      }
+    }
+  ],
+  "metadata": {
+    "description": "HR Manager - full access to all employee data"
+  }
+}
+```
+
+**Grant `["*"]`** : Accorde tous les champs sans exception
+
+### Étape 6: Créer des Utilisateurs avec Ces Rôles
+
+```bash
+# Utilisateur public
+POST /_security/user/intern_view
+{
+  "password": "InternPass123!",
+  "roles": ["employee_public_view"],
+  "full_name": "Intern Viewer"
+}
+
+# Utilisateur HR team
+POST /_security/user/jane_hr
+{
+  "password": "HRPass456!",
+  "roles": ["hr_team_view"],
+  "full_name": "Jane HR Specialist"
+}
+
+# Utilisateur HR manager
+POST /_security/user/susan_hrmanager
+{
+  "password": "ManagerPass789!",
+  "roles": ["hr_manager_full"],
+  "full_name": "Susan HR Manager"
+}
+```
+
+### Étape 7: Tester FLS - Vue Publique (Intern)
+
+```bash
+curl -u intern_view:InternPass123! "https://localhost:9200/employees_full/_search?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "hits": {
+    "hits": [
+      {
+        "_source": {
+          "employee_id": "EMP-001",
+          "name": "Alice Johnson",
+          "department": "sales",
+          "position": "Sales Manager",
+          "hire_date": "2020-01-15",
+          "email_corporate": "alice.johnson@company.com",
+          "phone_work": "+33-1-23-45-67-89"
+        }
+      },
+      ...
+    ]
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit : `employee_id`, `name`, `department`, `position`, `hire_date`, `email_corporate`, `phone_work`
+- ❌ Ne voit **PAS** : `email_personal`, `phone_personal`, `address`, `ssn`, `salary`, `performance_review`, `disciplinary_notes`
+
+### Étape 8: Tester FLS - Vue HR Team
+
+```bash
+curl -u jane_hr:HRPass456! "https://localhost:9200/employees_full/_doc/1?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "_source": {
+    "employee_id": "EMP-001",
+    "name": "Alice Johnson",
+    "department": "sales",
+    "position": "Sales Manager",
+    "hire_date": "2020-01-15",
+    "email_corporate": "alice.johnson@company.com",
+    "email_personal": "alice.j@gmail.com",
+    "phone_work": "+33-1-23-45-67-89",
+    "phone_personal": "+33-6-12-34-56-78",
+    "address": {
+      "street": "10 Rue de Rivoli",
+      "city": "Paris",
+      "country": "France",
+      "postal_code": "75001"
+    },
+    "salary": 75000,
+    "performance_review": {
+      "rating": "excellent",
+      "comments": "Top performer",
+      "reviewer": "Director Sales"
+    }
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit : Tous les champs publics + emails/téléphones persos + adresse + salaire + évaluations
+- ❌ Ne voit **PAS** : `ssn`, `disciplinary_notes` (exclus explicitement)
+
+### Étape 9: Tester FLS - Vue HR Manager (Full Access)
+
+```bash
+curl -u susan_hrmanager:ManagerPass789! "https://localhost:9200/employees_full/_doc/2?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "_source": {
+    "employee_id": "EMP-002",
+    "name": "Bob Smith",
+    "department": "hr",
+    "position": "HR Specialist",
+    "hire_date": "2021-03-20",
+    "email_corporate": "bob.smith@company.com",
+    "email_personal": "bob.smith@yahoo.com",
+    "phone_work": "+33-1-98-76-54-32",
+    "phone_personal": "+33-6-98-76-54-32",
+    "address": {
+      "street": "25 Avenue des Champs",
+      "city": "Lyon",
+      "country": "France",
+      "postal_code": "69001"
+    },
+    "ssn": "987-65-4321",
+    "salary": 60000,
+    "performance_review": {
+      "rating": "good",
+      "comments": "Solid contributor",
+      "reviewer": "HR Director"
+    },
+    "disciplinary_notes": "Late arrival incident - 2023-05-10"
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit **TOUT** : Tous les champs y compris `ssn` et `disciplinary_notes`
+
+### Étape 10: Combiner DLS + FLS
+
+Créons un rôle qui combine filtrage de documents ET de champs :
+
+```bash
+POST /_security/role/sales_dept_restricted
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["employees_full"],
+      "privileges": ["read"],
+      "query": {
+        "term": {
+          "department": "sales"
+        }
+      },
+      "field_security": {
+        "grant": [
+          "employee_id",
+          "name",
+          "department",
+          "position",
+          "email_corporate",
+          "phone_work"
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Sales department view - only sales employees, limited fields"
+  }
+}
+```
+
+**Double protection** :
+- **DLS** : Filtre les documents (`department = "sales"` uniquement)
+- **FLS** : Filtre les champs (champs publics uniquement)
+
+### Étape 11: Tester DLS + FLS Combinés
+
+```bash
+# Créer l'utilisateur
+POST /_security/user/sales_viewer
+{
+  "password": "SalesView123!",
+  "roles": ["sales_dept_restricted"]
+}
+
+# Tester la recherche
+curl -u sales_viewer:SalesView123! "https://localhost:9200/employees_full/_search?pretty"
+```
+
+**Résultat attendu** :
+```json
+{
+  "hits": {
+    "total": { "value": 1 },
+    "hits": [
+      {
+        "_source": {
+          "employee_id": "EMP-001",
+          "name": "Alice Johnson",
+          "department": "sales",
+          "position": "Sales Manager",
+          "email_corporate": "alice.johnson@company.com",
+          "phone_work": "+33-1-23-45-67-89"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Analyse** :
+- ✅ Voit uniquement EMP-001 (seul employé "sales")
+- ❌ Ne voit **PAS** EMP-002 (hr) ni EMP-003 (engineering) → DLS
+- ✅ Champs limités aux publics → FLS
+
+### Étape 12: Tester FLS avec Agrégations
+
+Les agrégations respectent également FLS :
+
+```bash
+# Avec intern_view (pas accès à salary)
+curl -u intern_view:InternPass123! -X GET "https://localhost:9200/employees_full/_search?pretty" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "size": 0,
+  "aggs": {
+    "avg_salary": {
+      "avg": {
+        "field": "salary"
+      }
+    }
+  }
+}'
+```
+
+**Résultat attendu** : Erreur ou résultat vide (le champ `salary` est invisible)
+
+```bash
+# Avec jane_hr (accès à salary)
+curl -u jane_hr:HRPass456! -X GET "https://localhost:9200/employees_full/_search?pretty" \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "size": 0,
+  "aggs": {
+    "avg_salary": {
+      "avg": {
+        "field": "salary"
+      }
+    }
+  }
+}'
+```
+
+**Résultat attendu** :
+```json
+{
+  "aggregations": {
+    "avg_salary": {
+      "value": 76666.67
+    }
+  }
+}
+```
+
+### Validation Finale
+
+```bash
+# 1. Vérifier les rôles FLS
+GET /_security/role/employee_public_view,hr_team_view,hr_manager_full,sales_dept_restricted
+
+# 2. Comparer les champs visibles pour chaque utilisateur
+# intern_view : 7 champs
+# jane_hr : ~13 champs (sauf ssn, disciplinary_notes)
+# susan_hrmanager : TOUS les champs
+
+# 3. Vérifier la combinaison DLS + FLS
+curl -u sales_viewer:SalesView123! "https://localhost:9200/employees_full/_count"
+# Attendu: {"count": 1} (seulement Alice de sales)
+```
+
+### Points Clés à Retenir
+
+✅ **FLS cache complètement les champs** (comme s'ils n'existaient pas dans le document)  
+✅ `grant` liste les champs **autorisés**, `except` liste les champs **exclus**  
+✅ **Wildcards** (`email_*`, `address.*`) permettent des patterns flexibles  
+✅ **Nested fields** utilisent la notation point (`performance_review.rating`)  
+✅ **DLS + FLS combinés** offrent une protection multicouche  
+✅ Les **agrégations** sur champs cachés échouent ou retournent vide  
+✅ Même avec `GET /_doc/{id}`, les champs cachés sont **absents du _source**  
+✅ FLS est **appliqué au niveau du shard** pour performance optimale  
+✅ Utiliser `grant: ["*"]` pour accès complet à tous les champs  
+✅ Tester systématiquement avec différents rôles pour valider les restrictions
+
+**Félicitations !** Vous maîtrisez maintenant la sécurité avancée d'Elasticsearch avec RBAC, DLS, et FLS ! 🎉
+
+
+---
+
 
