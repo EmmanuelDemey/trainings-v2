@@ -11,6 +11,10 @@
  * - Génère le PDF des slides (elasticsearch_ops.md) avec Slidev
  * - Génère le PDF du cahier d'exercices (elasticsearch_ops_pw.md) avec Puppeteer
  * - Génère le PDF du cheatsheet (Elasticsearch_ops_cheatsheet.md) avec Puppeteer
+ *
+ * Formations React:
+ * - Génère le PDF des slides (react.md) avec Slidev
+ * - Génère le PDF du cahier d'exercices (react_pw.md) avec Puppeteer
  */
 
 const fs = require('fs');
@@ -37,6 +41,12 @@ const ES_CHEATSHEET_INPUT = path.join(ROOT_DIR, 'Elasticsearch_ops_cheatsheet.md
 const ES_SLIDES_OUTPUT = path.join(DIST_DIR, 'elasticsearch_ops_slides.pdf');
 const ES_PW_OUTPUT = path.join(DIST_DIR, 'elasticsearch_ops_exercices.pdf');
 const ES_CHEATSHEET_OUTPUT = path.join(DIST_DIR, 'elasticsearch_ops_cheatsheet.pdf');
+
+// React
+const REACT_SLIDES_INPUT = path.join(TRAINING_DIR, 'react.md');
+const REACT_PW_INPUT = path.join(TRAINING_DIR, 'react_pw.md');
+const REACT_SLIDES_OUTPUT = path.join(DIST_DIR, 'react_slides.pdf');
+const REACT_PW_OUTPUT = path.join(DIST_DIR, 'react_exercices.pdf');
 
 console.log('🚀 Génération des PDFs pour les formations\n');
 
@@ -112,6 +122,39 @@ async function generateElasticsearchSlidesPdf() {
     }
   } catch (error) {
     console.error('❌ [ES] Erreur lors de la génération des slides:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Générer le PDF des slides React avec Slidev
+ */
+async function generateReactSlidesPdf() {
+  console.log('📊 [REACT] Génération du PDF des slides avec Slidev...');
+
+  try {
+    const { stdout, stderr } = await execAsync(
+      `cd "${TRAINING_DIR}" && npx slidev export react.md --output ../dist/react_slides.pdf --timeout 180000`,
+      {
+        maxBuffer: 1024 * 1024 * 10,
+        timeout: 600000 // 10 minutes pour le process Node
+      }
+    );
+
+    if (stderr && !stderr.includes('Fetching') && !stderr.includes('warning')) {
+      console.warn('⚠️  Avertissements:', stderr);
+    }
+
+    if (fs.existsSync(REACT_SLIDES_OUTPUT)) {
+      const stats = fs.statSync(REACT_SLIDES_OUTPUT);
+      const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
+      console.log(`✅ [REACT] Slides PDF généré: ${REACT_SLIDES_OUTPUT}`);
+      console.log(`   Taille: ${fileSizeInMB} MB\n`);
+    } else {
+      throw new Error('Le fichier PDF des slides React n\'a pas été créé');
+    }
+  } catch (error) {
+    console.error('❌ [REACT] Erreur lors de la génération des slides:', error.message);
     throw error;
   }
 }
@@ -292,6 +335,66 @@ async function generateElasticsearchCheatsheetPdf() {
     }
   } catch (error) {
     console.error('❌ [ES] Erreur lors de la génération du cheatsheet:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Générer le PDF du cahier d'exercices React avec Puppeteer
+ */
+async function generateReactExercisesPdf() {
+  console.log('📝 [REACT] Génération du PDF du cahier d\'exercices avec Puppeteer...');
+
+  const puppeteer = require('puppeteer');
+  const { marked } = require('marked');
+
+  try {
+    const markdownContent = fs.readFileSync(REACT_PW_INPUT, 'utf-8');
+    const htmlContent = marked.parse(markdownContent);
+    const fullHtml = createHtmlDocument(htmlContent, 'Formation React - Cahier d\'Exercices Pratiques');
+
+    const tempHtml = path.join(DIST_DIR, 'react_pw_temp.html');
+    fs.writeFileSync(tempHtml, fullHtml, 'utf-8');
+
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.goto(`file://${tempHtml}`, { waitUntil: 'networkidle0' });
+
+    await page.pdf({
+      path: REACT_PW_OUTPUT,
+      format: 'A4',
+      margin: { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' },
+      printBackground: true,
+      displayHeaderFooter: true,
+      headerTemplate: `
+        <div style="font-size: 9px; text-align: center; width: 100%; color: #666; margin-top: 10px;">
+          Formation React - Cahier d'Exercices Pratiques
+        </div>
+      `,
+      footerTemplate: `
+        <div style="font-size: 9px; text-align: center; width: 100%; color: #666; margin-bottom: 10px;">
+          Page <span class="pageNumber"></span> / <span class="totalPages"></span>
+        </div>
+      `
+    });
+
+    await browser.close();
+    fs.unlinkSync(tempHtml);
+
+    if (fs.existsSync(REACT_PW_OUTPUT)) {
+      const stats = fs.statSync(REACT_PW_OUTPUT);
+      const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
+      console.log(`✅ [REACT] Cahier d'exercices PDF généré: ${REACT_PW_OUTPUT}`);
+      console.log(`   Taille: ${fileSizeInMB} MB\n`);
+    } else {
+      throw new Error('Le fichier PDF du cahier d\'exercices React n\'a pas été créé');
+    }
+  } catch (error) {
+    console.error('❌ [REACT] Erreur lors de la génération du cahier d\'exercices:', error.message);
     throw error;
   }
 }
@@ -540,13 +643,15 @@ async function main() {
     console.log('🎬 Génération des slides Slidev (séquentiel)...\n');
     await generateA11ySlidesPdf();
     await generateElasticsearchSlidesPdf();
+    await generateReactSlidesPdf();
 
     // Générer les PDFs Puppeteer en parallèle (pas de conflit)
     console.log('📄 Génération des documents Puppeteer (parallèle)...\n');
     await Promise.all([
       generateA11yExercisesPdf(),
       generateElasticsearchExercisesPdf(),
-      generateElasticsearchCheatsheetPdf()
+      generateElasticsearchCheatsheetPdf(),
+      generateReactExercisesPdf()
     ]);
 
     const endTime = Date.now();
@@ -562,7 +667,10 @@ async function main() {
     console.log('\n📙 Formation Elasticsearch Ops:');
     console.log(`   - ${ES_SLIDES_OUTPUT}`);
     console.log(`   - ${ES_PW_OUTPUT}`);
-    console.log(`   - ${ES_CHEATSHEET_OUTPUT}\n`);
+    console.log(`   - ${ES_CHEATSHEET_OUTPUT}`);
+    console.log('\n⚛️  Formation React:');
+    console.log(`   - ${REACT_SLIDES_OUTPUT}`);
+    console.log(`   - ${REACT_PW_OUTPUT}\n`);
 
   } catch (error) {
     console.error('\n❌ Erreur lors de la génération:', error.message);
