@@ -435,16 +435,4 @@ POST /sales/_search
 layout: cover
 ---
 
-# Documentation Presentation
-
----
-layout: cover
----
-
-# Demo with Kibana
-
----
-layout: cover
----
-
 # Practical Part
