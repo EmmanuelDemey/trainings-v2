@@ -2,72 +2,72 @@
 layout: cover
 ---
 
-# Stratégie de Monitoring
+# Monitoring Strategy
 
-Surveillance et observabilité d'Elasticsearch en production
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de cette section, vous serez capable de:
-
-- Utiliser les APIs de monitoring natives pour collecter des métriques cluster
-- Identifier et surveiller les métriques critiques pour la santé du cluster
-- Configurer et exploiter les interfaces de monitoring Kibana (Stack Monitoring)
-- Analyser les logs Elasticsearch pour diagnostiquer les problèmes opérationnels
+Surveillance and observability of Elasticsearch in production
 
 ---
 
-# Pourquoi Monitorer Elasticsearch ?
+# Learning Objectives
 
-Le monitoring proactif est essentiel pour maintenir un cluster Elasticsearch en bonne santé.
+By the end of this section, you will be able to:
 
-**Objectifs du monitoring**:
-- 🎯 **Détection précoce**: Identifier les problèmes avant impact utilisateur
-- 📊 **Planification capacité**: Anticiper les besoins en ressources
-- 🔍 **Troubleshooting**: Diagnostiquer rapidement les incidents
-- 📈 **Optimisation**: Identifier les goulots d'étranglement de performance
-- ✅ **SLA compliance**: Vérifier le respect des objectifs de disponibilité
-
-**Niveaux de monitoring**:
-1. **Infrastructure**: CPU, RAM, disque, réseau (OS-level)
-2. **Cluster**: Santé, nœuds, shards, indices (Elasticsearch APIs)
-3. **Application**: Latence requêtes, taux d'erreur, throughput
-4. **Business**: Métriques métier (volume documents, utilisateurs actifs)
+- Use native monitoring APIs to collect cluster metrics
+- Identify and monitor critical metrics for cluster health
+- Configure and leverage Kibana monitoring interfaces (Stack Monitoring)
+- Analyze Elasticsearch logs to diagnose operational problems
 
 ---
 
-# APIs de Monitoring Natives
+# Why Monitor Elasticsearch?
 
-Elasticsearch fournit plusieurs [APIs de monitoring](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html) pour observer l'état du cluster.
+Proactive monitoring is essential for maintaining a healthy Elasticsearch cluster.
 
-**APIs essentielles**:
+**Monitoring objectives**:
+- **Early detection**: Identify problems before user impact
+- **Capacity planning**: Anticipate resource needs
+- **Troubleshooting**: Quickly diagnose incidents
+- **Optimization**: Identify performance bottlenecks
+- **SLA compliance**: Verify availability objectives are met
 
-| API | Usage | Fréquence recommandée |
+**Monitoring levels**:
+1. **Infrastructure**: CPU, RAM, disk, network (OS-level)
+2. **Cluster**: Health, nodes, shards, indices (Elasticsearch APIs)
+3. **Application**: Request latency, error rate, throughput
+4. **Business**: Business metrics (document volume, active users)
+
+---
+
+# Native Monitoring APIs
+
+Elasticsearch provides several [monitoring APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html) to observe cluster state.
+
+**Essential APIs**:
+
+| API | Usage | Recommended Frequency |
 |-----|-------|-----------------------|
-| `_cluster/health` | Santé globale du cluster | 30s - 1min |
-| `_cluster/stats` | Statistiques agrégées du cluster | 1 - 5min |
-| `_nodes/stats` | Métriques détaillées par nœud | 30s - 1min |
-| `_cat/indices` | État et taille des indices | 1 - 5min |
-| `_cat/shards` | Allocation et état des shards | 1 - 5min |
-| `_nodes/hot_threads` | CPU threads actifs (debug) | À la demande |
-| `_cat/pending_tasks` | Tâches master en attente | 30s - 1min |
+| `_cluster/health` | Overall cluster health | 30s - 1min |
+| `_cluster/stats` | Aggregated cluster statistics | 1 - 5min |
+| `_nodes/stats` | Detailed per-node metrics | 30s - 1min |
+| `_cat/indices` | Index state and size | 1 - 5min |
+| `_cat/shards` | Shard allocation and state | 1 - 5min |
+| `_nodes/hot_threads` | Active CPU threads (debug) | On demand |
+| `_cat/pending_tasks` | Pending master tasks | 30s - 1min |
 
-**Principe général**: Queries légères et fréquentes pour détection rapide, queries lourdes moins fréquentes.
+**General principle**: Lightweight and frequent queries for rapid detection, heavy queries less frequently.
 
 ---
 
-# API Cluster Stats
+# Cluster Stats API
 
-L'API [_cluster/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html) fournit des statistiques agrégées pour tout le cluster.
+The [_cluster/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html) API provides aggregated statistics for the entire cluster.
 
-**Requête**:
+**Request**:
 ```bash
 GET /_cluster/stats
 ```
 
-**Métriques clés retournées**:
+**Key metrics returned**:
 ```json
 {
   "cluster_name": "production",
@@ -85,80 +85,80 @@ GET /_cluster/stats
 }
 ```
 
-**Cas d'usage**: Vue d'ensemble du cluster pour dashboards, calcul de ratios (heap usage rate, storage growth rate).
+**Use case**: Cluster overview for dashboards, ratio calculations (heap usage rate, storage growth rate).
 
 ---
 
-# API Nodes Stats
+# Nodes Stats API
 
-L'API [_nodes/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html) retourne des métriques détaillées par nœud.
+The [_nodes/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html) API returns detailed metrics per node.
 
-**Requête avec filtres**:
+**Request with filters**:
 ```bash
 GET /_nodes/stats/jvm,os,process,indices,fs,thread_pool,breaker
 ```
 
-**Sections importantes**:
+**Important sections**:
 - **jvm**: `mem.heap_used_percent`, `gc.collectors.*.collection_time_in_millis`
 - **os**: `cpu.percent`, `mem.used_percent`, `swap.used_in_bytes`
 - **process**: `cpu.percent`, `open_file_descriptors`
 - **indices**: `indexing.index_total`, `search.query_total`, `search.query_time_in_millis`
 - **fs**: `total.available_in_bytes`, `io_stats.total.operations`
-- **thread_pool**: `*.rejected` (rejections critiques)
-- **breaker**: Circuit breakers déclenchés
+- **thread_pool**: `*.rejected` (critical rejections)
+- **breaker**: Triggered circuit breakers
 
-**Monitoring key**: `indices.indexing.index_time_in_millis / indices.indexing.index_total` = latence moyenne d'indexation
+**Monitoring key**: `indices.indexing.index_time_in_millis / indices.indexing.index_total` = average indexing latency
 
 ---
 
-# API Cat Indices et Shards
+# Cat Indices and Shards API
 
-Les [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) offrent des vues concises pour opérations quotidiennes.
+The [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) offer concise views for daily operations.
 
-**Cat Indices** (état des indices):
+**Cat Indices** (index state):
 ```bash
 GET /_cat/indices?v&h=index,health,status,pri,rep,docs.count,store.size&s=store.size:desc
 ```
 
-Résultat:
+Result:
 ```
 index          health status pri rep docs.count store.size
 logs-2023.11   green  open     5   1   15000000      2.5gb
 products       yellow open     1   1     100000       50mb
 ```
 
-**Cat Shards** (localisation et état):
+**Cat Shards** (location and state):
 ```bash
 GET /_cat/shards?v&h=index,shard,prirep,state,node,store&s=store:desc
 ```
 
-Résultat:
+Result:
 ```
 index     shard prirep state   node    store
 logs-2023 0     p      STARTED node-1  512mb
 logs-2023 0     r      STARTED node-2  512mb
 ```
 
-**Cas d'usage**: Identification rapide de shards unassigned, indices volumineux, distribution déséquilibrée.
+**Use case**: Rapid identification of unassigned shards, large indices, unbalanced distribution.
 
 ---
 
-# API Hot Threads (Troubleshooting)
+# Hot Threads API (Troubleshooting)
 
-L'API [_nodes/hot_threads](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html) identifie les threads consommant le plus de CPU.
+The [_nodes/hot_threads](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html) API identifies threads consuming the most CPU.
 
-**Requête**:
+**Request**:
 ```bash
 GET /_nodes/hot_threads
 GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
 ```
 
-**Paramètres**:
-- `threads`: Nombre de threads à afficher (défaut: 3)
-- `interval`: Période d'échantillonnage (défaut: 500ms)
-- `type`: `cpu` (défaut), `wait`, `block`
+**Parameters**:
+- `threads`: Number of threads to display (default: 3)
+- `interval`: Sampling period (default: 500ms)
+- `type`: `cpu` (default), `wait`, `block`
 
-**Résultat** (extrait):
+**Result** (excerpt):
 ```
 ::: {node-1}{abc123}
    Hot threads at 2023-11-10T10:30:00.000Z, interval=500ms, busiestThreads=5:
@@ -168,92 +168,92 @@ GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
      org.elasticsearch.search.query.QueryPhase.execute()
 ```
 
-**Usage**: Diagnostic de pics CPU, identification de requêtes coûteuses en temps réel.
+**Usage**: Diagnosing CPU spikes, identifying expensive queries in real-time.
 
 ---
 
-# Métriques Critiques: Cluster Health
+# Critical Metrics: Cluster Health
 
-La [santé du cluster](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html) est la métrique la plus importante à surveiller.
+[Cluster health](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html) is the most important metric to monitor.
 
 **Status colors**:
-- 🟢 **GREEN**: Tous les shards (primaires + replicas) alloués ✅
-- 🟡 **YELLOW**: Tous primaires alloués, certains replicas manquants ⚠️
-- 🔴 **RED**: Au moins un shard primaire manquant ❌ PERTE DE DONNÉES
+- GREEN: All shards (primaries + replicas) allocated
+- YELLOW: All primaries allocated, some replicas missing
+- RED: At least one primary shard missing - DATA LOSS
 
-**Requête détaillée**:
+**Detailed request**:
 ```bash
 GET /_cluster/health?level=indices
 ```
 
-**Alertes à configurer**:
+**Alerts to configure**:
 ```yaml
-# Seuils d'alerte recommandés
+# Recommended alert thresholds
 cluster.status:
-  CRITICAL: status == "red"         # Alerte immédiate
-  WARNING: status == "yellow"       # Enquête sous 15min
-  
+  CRITICAL: status == "red"         # Immediate alert
+  WARNING: status == "yellow"       # Investigate within 15min
+
 unassigned_shards:
-  CRITICAL: > 10                    # Action immédiate
-  WARNING: > 0                      # Enquête
-  
+  CRITICAL: > 10                    # Immediate action
+  WARNING: > 0                      # Investigate
+
 active_shards_percent:
-  CRITICAL: < 90%                   # Problème d'allocation grave
-  WARNING: < 98%                    # Surveillance accrue
+  CRITICAL: < 90%                   # Serious allocation problem
+  WARNING: < 98%                    # Increased surveillance
 ```
 
 ---
 
-# Métriques Critiques: CPU et Mémoire
+# Critical Metrics: CPU and Memory
 
-Le monitoring de **CPU** et **mémoire** est critique pour la stabilité.
+**CPU** and **memory** monitoring is critical for stability.
 
 **CPU monitoring**:
 ```bash
 GET /_nodes/stats/os,process?filter_path=nodes.*.os.cpu,nodes.*.process.cpu
 ```
 
-**Seuils CPU**:
-- ✅ **<60%**: Sain
-- ⚠️ **60-80%**: Surveiller, planifier scaling
-- ❌ **>80%**: Critique, risque de dégradation latence
-- 🚨 **>95%**: Cluster surchargé, action immédiate
+**CPU thresholds**:
+- **<60%**: Healthy
+- **60-80%**: Monitor, plan scaling
+- **>80%**: Critical, risk of latency degradation
+- **>95%**: Overloaded cluster, immediate action
 
 **Heap memory monitoring**:
 ```bash
 GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem
 ```
 
-**Seuils Heap**:
-- ✅ **<75%**: Sain
-- ⚠️ **75-85%**: Surveiller GC frequency
-- ❌ **>85%**: Risque de OutOfMemoryError
-- 🚨 **>95%**: GC thrashing probable, circuit breakers activés
+**Heap thresholds**:
+- **<75%**: Healthy
+- **75-85%**: Monitor GC frequency
+- **>85%**: Risk of OutOfMemoryError
+- **>95%**: GC thrashing likely, circuit breakers activated
 
 **Garbage Collection**:
 ```
-gc_collection_time / gc_collection_count = moyenne durée GC
-Si moyenne >100ms → problème heap ou GC tuning nécessaire
+gc_collection_time / gc_collection_count = average GC duration
+If average >100ms -> heap or GC tuning issue
 ```
 
 ---
 
-# Métriques Critiques: Disque et I/O
+# Critical Metrics: Disk and I/O
 
-Le [monitoring disque](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html#disk-based-shard-allocation) prévient les pannes dues au remplissage.
+[Disk monitoring](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html#disk-based-shard-allocation) prevents failures due to disk filling.
 
 **Disk space monitoring**:
 ```bash
 GET /_nodes/stats/fs?filter_path=nodes.*.fs.total
 ```
 
-**Seuils disque** (disk-based shard allocation):
-- ✅ **<85%**: Sain
-- ⚠️ **85-90%**: Watermark LOW - aucune allocation de nouveaux shards sur ce nœud
-- ❌ **90-95%**: Watermark HIGH - relocate shards depuis ce nœud
-- 🚨 **>95%**: Watermark FLOOD - indices en read-only !
+**Disk thresholds** (disk-based shard allocation):
+- **<85%**: Healthy
+- **85-90%**: LOW Watermark - no new shard allocation on this node
+- **90-95%**: HIGH Watermark - relocate shards from this node
+- **>95%**: FLOOD Watermark - indices go read-only!
 
-**Configuration watermarks**:
+**Watermarks configuration**:
 ```json
 PUT /_cluster/settings
 {
@@ -265,25 +265,25 @@ PUT /_cluster/settings
 }
 ```
 
-**I/O stats**: `fs.io_stats.total.operations`, `fs.io_stats.total.read_time` (latence I/O)
+**I/O stats**: `fs.io_stats.total.operations`, `fs.io_stats.total.read_time` (I/O latency)
 
 ---
 
-# Métriques Critiques: Indexation et Recherche
+# Critical Metrics: Indexing and Search
 
-Les métriques d'**indexing** et **search** mesurent la performance applicative.
+**Indexing** and **search** metrics measure application performance.
 
 **Indexing metrics**:
 ```bash
 GET /_nodes/stats/indices?filter_path=nodes.*.indices.indexing
 ```
 
-Métriques clés:
-- `indexing.index_total`: Nombre total de documents indexés
-- `indexing.index_time_in_millis`: Temps total d'indexation
-- `indexing.index_failed`: Documents échoués (❌ doit être proche de 0)
+Key metrics:
+- `indexing.index_total`: Total number of indexed documents
+- `indexing.index_time_in_millis`: Total indexing time
+- `indexing.index_failed`: Failed documents (should be close to 0)
 
-**Calcul latence moyenne**:
+**Average latency calculation**:
 ```
 avg_indexing_latency = index_time_in_millis / index_total
 ```
@@ -293,49 +293,49 @@ avg_indexing_latency = index_time_in_millis / index_total
 GET /_nodes/stats/indices?filter_path=nodes.*.indices.search
 ```
 
-Métriques clés:
-- `search.query_total`: Nombre de requêtes
-- `search.query_time_in_millis`: Temps total de recherche
-- `search.fetch_total`, `search.fetch_time_in_millis`: Phase fetch
+Key metrics:
+- `search.query_total`: Number of queries
+- `search.query_time_in_millis`: Total search time
+- `search.fetch_total`, `search.fetch_time_in_millis`: Fetch phase
 
-**Calcul latence moyenne**:
+**Average latency calculation**:
 ```
 avg_search_latency = query_time_in_millis / query_total
 ```
 
 ---
 
-# Métriques Critiques: Thread Pool Rejections
+# Critical Metrics: Thread Pool Rejections
 
-Les [thread pool rejections](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html) indiquent une surcharge du cluster.
+[Thread pool rejections](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html) indicate cluster overload.
 
-**Monitoring rejections**:
+**Rejections monitoring**:
 ```bash
 GET /_nodes/stats/thread_pool?filter_path=nodes.*.thread_pool.*.rejected
 ```
 
-**Thread pools à surveiller**:
-- **write**: Rejections d'indexation → Cluster surchargé en écriture
-- **search**: Rejections de recherche → Cluster surchargé en lecture
-- **get**: Rejections de GET par ID (rare)
+**Thread pools to monitor**:
+- **write**: Indexing rejections -> Cluster overloaded in writes
+- **search**: Search rejections -> Cluster overloaded in reads
+- **get**: GET by ID rejections (rare)
 
-**Seuils d'alerte**:
+**Alert thresholds**:
 ```yaml
 thread_pool.*.rejected:
-  WARNING: delta > 10/min        # Surcharge ponctuelle
-  CRITICAL: delta > 100/min      # Surcharge sévère
+  WARNING: delta > 10/min        # Temporary overload
+  CRITICAL: delta > 100/min      # Severe overload
 ```
 
-**Actions correctives**:
-- Court terme: Throttle client-side, augmenter queue_size (temporaire)
-- Moyen terme: Optimiser requêtes, ajouter nœuds
-- Long terme: Revoir architecture, sharding strategy
+**Corrective actions**:
+- Short term: Client-side throttle, increase queue_size (temporary)
+- Medium term: Optimize queries, add nodes
+- Long term: Review architecture, sharding strategy
 
 ---
 
-# Kibana Stack Monitoring: Vue d'Ensemble
+# Kibana Stack Monitoring: Overview
 
-[Kibana Stack Monitoring](https://www.elastic.co/guide/en/kibana/current/xpack-monitoring.html) fournit une interface graphique pour surveiller Elasticsearch.
+[Kibana Stack Monitoring](https://www.elastic.co/guide/en/kibana/current/xpack-monitoring.html) provides a graphical interface for monitoring Elasticsearch.
 
 **Activation**:
 ```yaml
@@ -343,122 +343,122 @@ thread_pool.*.rejected:
 xpack.monitoring.collection.enabled: true
 ```
 
-**Pages principales**:
-1. **Overview**: Santé globale, nœuds actifs, utilisation ressources
-2. **Nodes**: Détail par nœud (CPU, memory, disk, JVM)
-3. **Indices**: Liste indices avec métriques (size, docs, search rate)
+**Main pages**:
+1. **Overview**: Global health, active nodes, resource usage
+2. **Nodes**: Detail per node (CPU, memory, disk, JVM)
+3. **Indices**: Index list with metrics (size, docs, search rate)
 4. **Advanced**: Logs, thread pools, CCR, Watcher
 
-**Avantages vs APIs brutes**:
-- ✅ Visualisation graphique avec historique (time-series)
-- ✅ Alertes intégrées (Elasticsearch Watcher)
-- ✅ Corrélation entre métriques (CPU spike + search latency)
-- ✅ Drill-down par nœud/index/shard
+**Advantages vs raw APIs**:
+- Graphical visualization with history (time-series)
+- Integrated alerts (Elasticsearch Watcher)
+- Correlation between metrics (CPU spike + search latency)
+- Drill-down by node/index/shard
 
-**Limite**: Overhead de monitoring (~5-10% resources). Pour clusters critiques, envisager monitoring externe (Prometheus, Datadog).
+**Limitation**: Monitoring overhead (~5-10% resources). For critical clusters, consider external monitoring (Prometheus, Datadog).
 
 ---
 
 # Kibana Stack Monitoring: Cluster Overview
 
-La page **Cluster Overview** affiche les métriques agrégées en temps réel.
+The **Cluster Overview** page displays aggregated metrics in real-time.
 
-**Widgets principaux**:
+**Main widgets**:
 
 **1. Cluster Health**
 - Status color (green/yellow/red)
-- Nombre de nœuds actifs
+- Number of active nodes
 - Shards (total, primaries, replicas, unassigned)
 
 **2. Search & Indexing Rate**
-- Graphique time-series des requêtes/sec
-- Latence moyenne (p50, p95, p99)
-- Taux d'erreur
+- Time-series graph of requests/sec
+- Average latency (p50, p95, p99)
+- Error rate
 
 **3. Resource Usage**
-- CPU usage (moyenne cluster)
+- CPU usage (cluster average)
 - JVM Heap (average across nodes)
-- Disk usage (total et par nœud)
+- Disk usage (total and per node)
 
 **4. Alerts**
-- Liste des alertes actives (disk watermark, heap high, etc.)
+- List of active alerts (disk watermark, heap high, etc.)
 
-**Configuration refresh**: Par défaut 10s, ajustable dans Settings.
+**Refresh configuration**: Default 10s, adjustable in Settings.
 
 ---
 
 # Kibana Stack Monitoring: Nodes View
 
-La page **Nodes** permet de surveiller chaque nœud individuellement.
+The **Nodes** page allows monitoring each node individually.
 
-**Métriques par nœud**:
+**Metrics per node**:
 
-| Métrique | Description | Seuil d'alerte |
-|----------|-------------|----------------|
-| **CPU Usage** | % CPU utilisé | >80% |
-| **JVM Memory** | % heap utilisé | >85% |
-| **Disk Free Space** | Espace disque restant | <15% (85% full) |
-| **Load Average** | Charge système (1m, 5m, 15m) | >cores × 1.5 |
-| **Shards** | Nombre de shards sur ce nœud | >20/GB heap |
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| **CPU Usage** | % CPU used | >80% |
+| **JVM Memory** | % heap used | >85% |
+| **Disk Free Space** | Remaining disk space | <15% (85% full) |
+| **Load Average** | System load (1m, 5m, 15m) | >cores x 1.5 |
+| **Shards** | Number of shards on this node | >20/GB heap |
 
-**Graphiques disponibles**:
+**Available graphs**:
 - CPU usage over time
 - JVM heap usage over time
 - GC duration and frequency
 - Indexing and search latency
 - Disk I/O throughput
 
-**Drill-down**: Cliquer sur un nœud pour voir logs, hot threads, stack traces.
+**Drill-down**: Click on a node to see logs, hot threads, stack traces.
 
 ---
 
 # Kibana Stack Monitoring: Indices View
 
-La page **Indices** surveille la santé et performance de chaque index.
+The **Indices** page monitors the health and performance of each index.
 
-**Métriques par index**:
+**Metrics per index**:
 - **Health**: green/yellow/red
 - **Status**: open/close
-- **Document Count**: Nombre de documents
-- **Size**: Taille totale (primaires + replicas)
-- **Search Rate**: Recherches/sec
+- **Document Count**: Number of documents
+- **Size**: Total size (primaries + replicas)
+- **Search Rate**: Searches/sec
 - **Indexing Rate**: Documents/sec
 
-**Graphiques time-series**:
+**Time-series graphs**:
 - Document count evolution
 - Indexing rate (docs/s)
 - Search rate (queries/s)
 - Search latency (ms)
 
 **Use cases**:
-- Identifier les indices à forte croissance (planification capacité)
-- Détecter les indices non utilisés (candidats à suppression/archivage)
-- Surveiller les index en yellow/red (problèmes d'allocation)
+- Identify high-growth indices (capacity planning)
+- Detect unused indices (candidates for deletion/archiving)
+- Monitor yellow/red indices (allocation problems)
 
 ---
 
-# Analyse des Logs: Emplacements
+# Log Analysis: Locations
 
-Elasticsearch génère plusieurs types de [logs](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html) pour diagnostiquer les problèmes.
+Elasticsearch generates several types of [logs](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html) to diagnose problems.
 
-**Fichiers de logs par défaut**:
+**Default log files**:
 ```
 /var/log/elasticsearch/
-├── <cluster_name>.log              # Log principal
-├── <cluster_name>_deprecation.log  # Avertissements de dépréciation
-├── <cluster_name>_index_search_slowlog.log
-├── <cluster_name>_index_indexing_slowlog.log
-└── gc.log                          # Garbage Collection logs
+|- <cluster_name>.log              # Main log
+|- <cluster_name>_deprecation.log  # Deprecation warnings
+|- <cluster_name>_index_search_slowlog.log
+|- <cluster_name>_index_indexing_slowlog.log
+|- gc.log                          # Garbage Collection logs
 ```
 
-**Niveaux de log**:
-- **ERROR**: Erreurs nécessitant une action
-- **WARN**: Avertissements à surveiller
-- **INFO**: Événements normaux (startup, config changes)
-- **DEBUG**: Détails pour troubleshooting (activer temporairement)
-- **TRACE**: Détails très verbeux (dev uniquement)
+**Log levels**:
+- **ERROR**: Errors requiring action
+- **WARN**: Warnings to monitor
+- **INFO**: Normal events (startup, config changes)
+- **DEBUG**: Details for troubleshooting (enable temporarily)
+- **TRACE**: Very verbose details (dev only)
 
-**Configuration dans log4j2.properties**:
+**Configuration in log4j2.properties**:
 ```properties
 logger.action.name = org.elasticsearch.action
 logger.action.level = info
@@ -466,20 +466,20 @@ logger.action.level = info
 
 ---
 
-# Analyse des Logs: Configuration Log4j2
+# Log Analysis: Log4j2 Configuration
 
-La configuration [Log4j2](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html#configuring-logging-levels) contrôle le niveau de détail des logs.
+The [Log4j2](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html#configuring-logging-levels) configuration controls log detail level.
 
-**Fichier log4j2.properties**:
+**log4j2.properties file**:
 ```properties
-# Niveau global
+# Global level
 rootLogger.level = info
 
-# Logger pour un package spécifique
+# Logger for a specific package
 logger.discovery.name = org.elasticsearch.discovery
 logger.discovery.level = debug
 
-# Appender pour rotation des logs
+# Appender for log rotation
 appender.rolling.type = RollingFile
 appender.rolling.fileName = ${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}.log
 appender.rolling.filePattern = ${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}-%d{yyyy-MM-dd}-%i.log.gz
@@ -492,9 +492,9 @@ appender.rolling.policies.size.size = 256MB
 
 ---
 
-# Analyse des Logs: Configuration Log4j2
+# Log Analysis: Log4j2 Configuration
 
-**Modification dynamique** (sans redémarrage):
+**Dynamic modification** (without restart):
 ```json
 PUT /_cluster/settings
 {
@@ -507,11 +507,11 @@ PUT /_cluster/settings
 
 ---
 
-# Analyse des Logs: Slow Logs
+# Log Analysis: Slow Logs
 
-Les [slow logs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-slowlog.html) enregistrent les requêtes dépassant des seuils de latence.
+[Slow logs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-slowlog.html) record queries exceeding latency thresholds.
 
-**Configuration par index**:
+**Configuration per index**:
 ```json
 PUT /my-index/_settings
 {
@@ -519,7 +519,7 @@ PUT /my-index/_settings
   "index.search.slowlog.threshold.query.info": "5s",
   "index.search.slowlog.threshold.query.debug": "2s",
   "index.search.slowlog.threshold.query.trace": "500ms",
-  
+
   "index.indexing.slowlog.threshold.index.warn": "10s",
   "index.indexing.slowlog.threshold.index.info": "5s",
   "index.indexing.slowlog.threshold.index.debug": "2s",
@@ -529,88 +529,88 @@ PUT /my-index/_settings
 
 ---
 
-# Analyse des Logs: Slow Logs
+# Log Analysis: Slow Logs
 
-**Format du slow log**:
+**Slow log format**:
 ```
 \[2023-11-10T10:30:15,123\]\[WARN \]\[i.s.s.query\] \[node-1\] \[my-index\]\[0\]
 took\[5.2s\], took_millis\[5234\], types\[\], stats\[\], search_type\[QUERY_THEN_FETCH\],
 total_shards\[5\], source\[{"query":{"match":{"field":"value"}}}\]
 ```
 
-**Analyse**: Identifier patterns (requêtes similaires, même index), optimiser ou ajouter ressources.
+**Analysis**: Identify patterns (similar queries, same index), optimize or add resources.
 
 ---
 
-# Analyse des Logs: Messages d'Erreur Courants
+# Log Analysis: Common Error Messages
 
-Savoir interpréter les erreurs courantes accélère le troubleshooting.
+Knowing how to interpret common errors accelerates troubleshooting.
 
-**Erreurs fréquentes**:
+**Frequent errors**:
 
 **1. CircuitBreakerException**
 ```
 \[parent\] Data too large, data for [<http_request>] would be [x], which is larger than the limit of [y]
 ```
-→ Heap saturé, requête trop gourmande. Actions: Réduire taille requête, augmenter heap, ajouter nœuds.
+-> Heap saturated, query too demanding. Actions: Reduce query size, increase heap, add nodes.
 
 **2. EsRejectedExecutionException**
 ```
 rejected execution of org.elasticsearch.transport.TransportService$7@abc on EsThreadPoolExecutor\[search, queue capacity = 1000\]
 ```
-→ Thread pool saturé. Actions: Throttle client-side, optimiser requêtes, scale cluster.
+-> Thread pool saturated. Actions: Client-side throttle, optimize queries, scale cluster.
 
 **3. SearchPhaseExecutionException**
 ```
 Shard failures: \[failed shard on node \[xyz\]: query shard failed\]
 ```
-→ Échec de recherche sur un shard. Actions: Vérifier logs du nœud concerné, état du shard.
+-> Search failure on a shard. Actions: Check logs of concerned node, shard state.
 
 **4. ClusterBlockException**
 ```
 index \[my-index\] blocked by: \[FORBIDDEN/12/index read-only / allow delete (api)\];
 ```
-→ Index en read-only (souvent disk watermark flood). Actions: Libérer espace disque, augmenter watermark.
+-> Index in read-only (often disk watermark flood). Actions: Free disk space, increase watermark.
 
 ---
 
-# Résumé
+# Summary
 
-## Points Clés
+## Key Points
 
-- Les **APIs natives** (_cluster/health, _nodes/stats, _cat APIs) sont essentielles pour le monitoring temps réel
-- Les **métriques critiques** incluent: cluster health, CPU/memory/disk, indexing/search rates, thread pool rejections
-- **Kibana Stack Monitoring** offre une interface graphique complète avec historique et alertes intégrées
-- L'**analyse des logs** (main log, slow logs, GC logs) permet de diagnostiquer les problèmes opérationnels
-- Les **seuils d'alerte** doivent être configurés pour détection précoce: heap >85%, disk >85%, CPU >80%
+- **Native APIs** (_cluster/health, _nodes/stats, _cat APIs) are essential for real-time monitoring
+- **Critical metrics** include: cluster health, CPU/memory/disk, indexing/search rates, thread pool rejections
+- **Kibana Stack Monitoring** offers a complete graphical interface with history and integrated alerts
+- **Log analysis** (main log, slow logs, GC logs) allows diagnosing operational problems
+- **Alert thresholds** must be configured for early detection: heap >85%, disk >85%, CPU >80%
 
 ---
 
-# Résumé
+# Summary
 
-## APIs de Référence Rapide
+## Quick Reference APIs
 
-| API | Métrique clé | Fréquence |
-|-----|--------------|-----------|
+| API | Key Metric | Frequency |
+|-----|------------|-----------|
 | `_cluster/health` | status (green/yellow/red) | 30s |
 | `_nodes/stats/jvm` | heap_used_percent | 1min |
 | `_nodes/stats/os` | cpu.percent | 1min |
 | `_cat/indices` | health, store.size | 5min |
-| `_nodes/hot_threads` | CPU threads actifs | À la demande |
+| `_nodes/hot_threads` | Active CPU threads | On demand |
 
 ---
 
-# Exercices Pratiques
+# Practical Exercises
 
-Passez maintenant au **cahier d'exercices** pour mettre en pratique ces concepts.
+Now proceed to the **exercise workbook** to practice these concepts.
 
-**Labs à réaliser**:
-- Lab 4.1: Utilisation des APIs de monitoring natives
-- Lab 4.2: Configuration des seuils d'alerte critiques
-- Lab 4.3: Exploration de Kibana Stack Monitoring
+**Labs to complete**:
+- Lab 4.1: Using native monitoring APIs
+- Lab 4.2: Configuring critical alert thresholds
+- Lab 4.3: Exploring Kibana Stack Monitoring
 
-**Ces exercices couvrent**:
-- Requêtes sur APIs _cluster/health, _nodes/stats, _cat
-- Configuration de slow logs et watermarks
-- Navigation dans Kibana Stack Monitoring
-- Interprétation de logs et diagnostic de problèmes simulés
+**These exercises cover**:
+- Queries on _cluster/health, _nodes/stats, _cat APIs
+- Slow logs and watermarks configuration
+- Navigation in Kibana Stack Monitoring
+- Log interpretation and simulated problem diagnosis

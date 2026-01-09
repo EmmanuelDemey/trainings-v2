@@ -1,157 +1,156 @@
-+---
+---
 layout: cover
 ---
 
-# Présentation Générale
+# General Presentation
 
-Fondamentaux des moteurs de recherche et concepts Elasticsearch
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de cette section, vous serez capable de:
-
-- Expliquer le fonctionnement d'un moteur de recherche et ses cas d'usage
-- Comprendre les mécanismes d'indexation et la structure de l'index inversé
-- Configurer des mappings pour différents types de données
-- Utiliser les agrégations pour analyser vos données
+Search engine fundamentals and Elasticsearch concepts
 
 ---
 
-# Qu'est-ce qu'un Moteur de Recherche ?
+# Learning Objectives
 
-Un moteur de recherche est un système conçu pour effectuer des recherches rapides et pertinentes sur de grands volumes de données.
+At the end of this section, you will be able to:
 
-**Caractéristiques principales**:
-- Indexation préalable des documents pour des recherches ultra-rapides
-- Analyse du texte pour comprendre la sémantique
-- Scoring de pertinence pour classer les résultats
-- Capacité à gérer des données structurées et non-structurées
-
-**Cas d'usage courants**:
-- Recherche full-text dans des applications
-- Analyse de logs et métriques
-- E-commerce (recherche de produits)
-- Recherche d'entreprise (intranet, documentation)
+- Explain how a search engine works and its use cases
+- Understand indexing mechanisms and inverted index structure
+- Configure mappings for different data types
 
 ---
 
-# Elasticsearch: Un Moteur de Recherche Distribué
+# What is a Search Engine?
 
-Elasticsearch est un moteur de recherche [open-source basé sur Lucene](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html), optimisé pour la scalabilité et la rapidité.
+A search engine is a system designed to perform fast and relevant searches on large volumes of data.
 
-**Avantages d'Elasticsearch**:
-- **Distribué**: Scalabilité horizontale via sharding
-- **RESTful**: API HTTP simple et universelle
-- **JSON natif**: Format de données standard
-- **Temps réel**: Recherche quasi-instantanée après indexation
-- **Analyse avancée**: Agrégations puissantes pour l'analytique
+**Main characteristics**:
+- Pre-indexing of documents for ultra-fast searches
+- Text analysis to understand semantics
+- Relevance scoring to rank results
+- Ability to handle structured and unstructured data
 
-**Écosystème Elastic Stack**:
-- **Elasticsearch**: Moteur de recherche et d'analyse
-- **Kibana**: Interface de visualisation
-- **Beats**: Collecteurs de données légers
-- **Logstash**: Pipeline de traitement de données
-
----
-
-# Recherche vs Requêtes de Base de Données
-
-| Aspect | Base de Données Relationnelle | Moteur de Recherche |
-|--------|------------------------------|---------------------|
-| **Requêtes** | SQL exact (= , >, <) | Recherche floue, full-text |
-| **Performance** | JOIN coûteux sur gros volumes | Recherche très rapide sur texte |
-| **Pertinence** | Pas de notion de score | Scoring de pertinence |
-| **Structure** | Schéma strict (tables, colonnes) | Schéma flexible (JSON) |
-| **Cas d'usage** | Transactions, relations | Recherche, analyse, logs |
+**Common use cases**:
+- Full-text search in applications
+- Log and metrics analysis
+- E-commerce (product search)
+- Enterprise search (intranet, documentation)
 
 ---
 
-# Quand utiliser Elasticsearch ?
+# Elasticsearch: A Distributed Search Engine
 
-- Recherche full-text avec typos, synonymes
-- Analyse de logs et métriques
-- Filtrage complexe + agrégations
-- Recherche géospatiale
+Elasticsearch is an [open-source search engine based on Lucene](https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html), optimized for scalability and speed.
+
+**Elasticsearch advantages**:
+- **Distributed**: Horizontal scalability via sharding
+- **RESTful**: Simple and universal HTTP API
+- **Native JSON**: Standard data format
+- **Real-time**: Near-instant search after indexing
+- **Advanced analysis**: Powerful aggregations for analytics
+
+**Elastic Stack ecosystem**:
+- **Elasticsearch**: Search and analytics engine
+- **Kibana**: Visualization interface
+- **Beats**: Lightweight data collectors
+- **Logstash**: Data processing pipeline
 
 ---
 
-# L'Index Inversé: Cœur d'Elasticsearch
+# Search vs Database Queries
 
-Un [index inversé](https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html) est une structure de données qui mappe les termes aux documents qui les contiennent.
+| Aspect | Relational Database | Search Engine |
+|--------|---------------------|---------------|
+| **Queries** | Exact SQL (= , >, <) | Fuzzy search, full-text |
+| **Performance** | Expensive JOINs on large volumes | Very fast text search |
+| **Relevance** | No notion of score | Relevance scoring |
+| **Structure** | Strict schema (tables, columns) | Flexible schema (JSON) |
+| **Use cases** | Transactions, relations | Search, analysis, logs |
 
-**Exemple avec 3 documents**:
-- Doc 1: "Elasticsearch est rapide"
-- Doc 2: "Kibana visualise Elasticsearch"
-- Doc 3: "Logstash envoie vers Elasticsearch"
+---
 
-**Index inversé résultant**:
+# When to use Elasticsearch?
+
+- Full-text search with typos, synonyms
+- Log and metrics analysis
+- Complex filtering + aggregations
+- Geospatial search
+
+---
+
+# The Inverted Index: Heart of Elasticsearch
+
+An [inverted index](https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html) is a data structure that maps terms to the documents containing them.
+
+**Example with 3 documents**:
+- Doc 1: "Elasticsearch is fast"
+- Doc 2: "Kibana visualizes Elasticsearch"
+- Doc 3: "Logstash sends to Elasticsearch"
+
+**Resulting inverted index**:
 ```
 elasticsearch → [1, 2, 3]
-rapide       → [1]
-kibana       → [2]
-visualise    → [2]
-logstash     → [3]
-envoie       → [3]
+fast          → [1]
+kibana        → [2]
+visualizes    → [2]
+logstash      → [3]
+sends         → [3]
 ```
 
-Chercher "elasticsearch" retourne instantanément docs 1, 2, 3 !
+Searching "elasticsearch" instantly returns docs 1, 2, 3!
 
 ---
 
-# Processus d'Indexation
+# Indexing Process
 
-## 1. Analyse du Texte
+## 1. Text Analysis
 
-Transformation du texte brut en termes indexables via des [analyzers](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html):
+Transformation of raw text into indexable terms via [analyzers](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html):
 
 ```json
-"Elasticsearch est RAPIDE !" 
-  → Tokenization → ["Elasticsearch", "est", "RAPIDE"]
-  → Lowercase    → ["elasticsearch", "est", "rapide"]
-  → Stop words   → ["elasticsearch", "rapide"]
+"Elasticsearch is FAST!"
+  → Tokenization → ["Elasticsearch", "is", "FAST"]
+  → Lowercase    → ["elasticsearch", "is", "fast"]
+  → Stop words   → ["elasticsearch", "fast"]
 ```
 
-## 2. Création de l'Index Inversé
+## 2. Inverted Index Creation
 
-Chaque terme analysé est ajouté à l'index inversé avec:
-- **Position** dans le document
-- **Fréquence** du terme (TF - Term Frequency)
-- **Métadonnées** pour le scoring
-
----
-
-# Cycle de Vie d'un Document
-
-**Étapes clés**:
-1. **Réception**: Document JSON via API REST
-2. **Analysis**: Tokenization et normalisation du texte
-3. **Indexation**: Ajout à l'index inversé
-4. **Écriture en mémoire**: Buffer en RAM
-5. **Refresh**: Disponible pour recherche (défaut: 1s)
-6. **Flush**: Persiste sur disque (fsync)
-
-**Paramètre important**: `index.refresh_interval` (défaut: `1s`)
-
-[Documentation sur l'indexation](https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html)
+Each analyzed term is added to the inverted index with:
+- **Position** in the document
+- **Frequency** of the term (TF - Term Frequency)
+- **Metadata** for scoring
 
 ---
 
-# API d'Indexation de Documents
+# Document Lifecycle
 
-**Indexer un document unique**:
+**Key steps**:
+1. **Reception**: JSON document via REST API
+2. **Analysis**: Tokenization and text normalization
+3. **Indexing**: Addition to inverted index
+4. **Memory write**: Buffer in RAM
+5. **Refresh**: Available for search (default: 1s)
+6. **Flush**: Persists to disk (fsync)
+
+**Important parameter**: `index.refresh_interval` (default: `1s`)
+
+[Indexing documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/near-real-time.html)
+
+---
+
+# Document Indexing API
+
+**Index a single document**:
 ```bash
 POST /my-index/_doc/1
 {
-  "title": "Introduction à Elasticsearch",
+  "title": "Introduction to Elasticsearch",
   "author": "Emmanuel DEMEY",
   "date": "2025-11-10",
   "views": 1250
 }
 ```
 
-**Résultat attendu**:
+**Expected result**:
 ```json
 {
   "_index": "my-index",
@@ -161,13 +160,13 @@ POST /my-index/_doc/1
 }
 ```
 
-Plus d'infos: [Index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html)
+More info: [Index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html)
 
 ---
 
-# Bulk API pour Indexation Massive
+# Bulk API for Massive Indexing
 
-L'[API Bulk](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) permet d'indexer plusieurs documents en une seule requête:
+The [Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) allows indexing multiple documents in a single request:
 
 ```bash
 POST /_bulk
@@ -177,20 +176,20 @@ POST /_bulk
 { "title": "Doc 2", "content": "..." }
 ```
 
-**Avantages**:
-- ✅ Réduction de la latence réseau (une requête au lieu de N)
-- ✅ Meilleure utilisation des ressources
-- ✅ Throughput d'indexation beaucoup plus élevé
+**Advantages**:
+- ✅ Reduced network latency (one request instead of N)
+- ✅ Better resource utilization
+- ✅ Much higher indexing throughput
 
-**Bonne pratique**: Batches de 5-15 MB ou 1000-5000 documents.
+**Best practice**: Batches of 5-15 MB or 1000-5000 documents.
 
 ---
 
-# Mapping: Le Schéma Elasticsearch
+# Mapping: The Elasticsearch Schema
 
-Le [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html) définit la structure des documents et le type de chaque champ.
+The [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html) defines document structure and each field's type.
 
-**Exemple de mapping**:
+**Mapping example**:
 ```json
 {
   "mappings": {
@@ -205,51 +204,52 @@ Le [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/map
 }
 ```
 
-**Pourquoi le mapping est important ?**
-- Détermine comment les données sont indexées et recherchables
-- Optimise le stockage et les performances
-- Permet des fonctionnalités avancées (geo-search, range queries)
+**Why is mapping important?**
+- Determines how data is indexed and searchable
+- Optimizes storage and performance
+- Enables advanced features (geo-search, range queries)
 
 ---
 
-# Types de Champs Principaux
+# Main Field Types
 
-| Type | Usage | Exemple |
+| Type | Usage | Example |
 |------|-------|---------|
-| **text** | Recherche full-text (analysé) | Articles, descriptions |
-| **keyword** | Filtrage exact, agrégations | Statuts, tags, IDs |
-| **date** | Dates et timestamps | `"2025-11-10"`, `1699632000000` |
-| **long/integer** | Nombres entiers | Âges, compteurs |
-| **float/double** | Nombres décimaux | Prix, coordonnées |
-| **boolean** | Vrai/faux | Flags, états |
-| **geo_point** | Coordonnées géographiques | `{"lat": 48.8566, "lon": 2.3522}` |
-| **object** | Objet JSON imbriqué | Adresses, métadonnées |
+| **text** | Full-text search (analyzed) | Articles, descriptions |
+| **keyword** | Exact filtering, aggregations | Statuses, tags, IDs |
+| **date** | Dates and timestamps | `"2025-11-10"`, `1699632000000` |
+| **long/integer** | Integer numbers | Ages, counters |
+| **float/double** | Decimal numbers | Prices, coordinates |
+| **boolean** | True/false | Flags, states |
+| **geo_point** | Geographic coordinates | `{"lat": 48.8566, "lon": 2.3522}` |
+| **object** | Nested JSON object | Addresses, metadata |
 
-Documentation complète: [Field types](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
+Complete documentation: [Field types](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
 
 ---
 
-# Mapping Dynamique vs Explicite
+# Dynamic vs Explicit Mapping
 
-## Mapping Dynamique
+## Dynamic Mapping
 
-Elasticsearch détecte automatiquement le type des champs:
+Elasticsearch automatically detects field types:
 ```json
 POST /auto-index/_doc/1
 { "name": "Test", "count": 42 }
 ```
-Résultat: `name` → `text+keyword`, `count` → `long`
+Result: `name` → `text+keyword`, `count` → `long`
 
-**Avantages**: Rapide pour prototyper
-**Inconvénients**: Peut mal deviner le type (dates en string, etc.)
+**Advantages**: Quick for prototyping
 
---- 
+**Disadvantages**: May guess type incorrectly (dates as strings, etc.)
 
-# Mapping Dynamique vs Explicite
+---
 
-## Mapping Explicite
+# Dynamic vs Explicit Mapping
 
-Définir manuellement les types pour contrôler l'indexation:
+## Explicit Mapping
+
+Manually define types to control indexing:
 ```json
 PUT /my-index
 {
@@ -262,11 +262,11 @@ PUT /my-index
 }
 ```
 
-**Bonne pratique**: Toujours définir le mapping explicitement en production !
+**Best practice**: Always define mapping explicitly in production!
 
 ---
 
-# Paramètres de Mapping Importants
+# Important Mapping Parameters
 
 ```json
 {
@@ -286,23 +286,9 @@ PUT /my-index
 }
 ```
 
-**Paramètres clés**:
-- `analyzer`: Définit comment le texte est analysé
-- `fields`: Multi-fields (même donnée, plusieurs types)
-- `ignore_above`: Ignore les strings trop longues
-- `enabled`: Active/désactive l'indexation d'un champ
+**Key parameters**:
+- `analyzer`: Defines how text is analyzed
+- `fields`: Multi-fields (same data, multiple types)
+- `ignore_above`: Ignores strings that are too long
+- `enabled`: Enables/disables field indexing
 
----
-
-# Exercices Pratiques
-
-Passez maintenant au **cahier d'exercices** pour mettre en pratique ces concepts.
-
-**Labs à réaliser**:
-- Lab 1: Interactions Initiales avec les APIs
-
-**Ces exercices couvrent**:
-- Indexation de documents avec l'API REST
-- Création de mappings personnalisés
-- Requêtes de recherche simples
-- Agrégations de base pour analyser les données

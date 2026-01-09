@@ -2,224 +2,224 @@
 layout: cover
 ---
 
-# Performance et Dimensionnement
+# Performance and Sizing
 
-Optimisation et planification de capacité pour Elasticsearch
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de cette section, vous serez capable de:
-
-- Dimensionner l'infrastructure Elasticsearch selon les besoins (CPU, mémoire, disque, nœuds)
-- Optimiser la configuration système pour des performances maximales
-- Concevoir une topologie réseau adaptée aux exigences de latence et débit
-- Appliquer les techniques d'optimisation pour l'indexation et la recherche
+Optimization and capacity planning for Elasticsearch
 
 ---
 
-# Dimensionnement de l'Infrastructure
+# Learning Objectives
 
-Le [dimensionnement d'un cluster Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/size-your-shards.html) dépend de plusieurs facteurs critiques.
+By the end of this section, you will be able to:
 
-**Facteurs à considérer**:
-- **Volume de données**: Taille totale des index à stocker
-- **Taux d'ingestion**: Documents/seconde à indexer
-- **Taux de requêtes**: Recherches/seconde attendues
-- **Latence cible**: Temps de réponse acceptable (p95, p99)
-- **Rétention**: Durée de conservation des données
-- **Haute disponibilité**: Réplication et tolérance aux pannes
-
-**Règle générale de départ**:
-```
-Nombre de nœuds data = (Volume total / 30 TB) + 1
-```
-30 TB est une limite raisonnable par nœud data pour la gestion opérationnelle.
+- Size Elasticsearch infrastructure according to needs (CPU, memory, disk, nodes)
+- Optimize system configuration for maximum performance
+- Design a network topology adapted to latency and throughput requirements
+- Apply optimization techniques for indexing and search
 
 ---
 
-# Dimensionnement CPU
+# Infrastructure Sizing
 
-Le CPU impacte directement les performances de recherche et d'indexation.
+[Sizing an Elasticsearch cluster](https://www.elastic.co/guide/en/elasticsearch/reference/current/size-your-shards.html) depends on several critical factors.
 
-**Guidelines CPU**:
-- **Minimum recommandé**: 4 cores par nœud
-- **Optimal**: 8-16 cores par nœud data
-- **Nœuds master-only**: 2-4 cores suffisent
-- **Nœuds ingest (pipelines complexes)**: 8+ cores
+**Factors to consider**:
+- **Data volume**: Total size of indexes to store
+- **Ingestion rate**: Documents/second to index
+- **Query rate**: Searches/second expected
+- **Target latency**: Acceptable response time (p95, p99)
+- **Retention**: Data retention duration
+- **High availability**: Replication and fault tolerance
+
+**General starting rule**:
+```
+Number of data nodes = (Total volume / 30 TB) + 1
+```
+30 TB is a reasonable limit per data node for operational management.
 
 ---
 
-# Dimensionnement CPU
+# CPU Sizing
 
-**Cas d'usage par intensité CPU**:
-| Charge de travail | CPU recommandé | Exemple |
-|-------------------|----------------|---------|
-| Recherche intensive | 16+ cores, haute fréquence | Full-text search, agrégations complexes |
-| Indexation intensive | 8-16 cores | Ingestion logs, IoT data |
-| Mixte équilibré | 12-16 cores | E-commerce, monitoring APM |
-| Lecture seule | 4-8 cores | Archives, dashboards statiques |
+CPU directly impacts search and indexing performance.
 
-**Métriques de monitoring CPU**: `node_stats.os.cpu.percent`, `node_stats.process.cpu.percent`
+**CPU Guidelines**:
+- **Minimum recommended**: 4 cores per node
+- **Optimal**: 8-16 cores per data node
+- **Master-only nodes**: 2-4 cores are sufficient
+- **Ingest nodes (complex pipelines)**: 8+ cores
 
 ---
 
-# Dimensionnement Mémoire (RAM)
+# CPU Sizing
 
-La RAM est le facteur le plus critique pour les performances Elasticsearch.
+**Use cases by CPU intensity**:
+| Workload | Recommended CPU | Example |
+|----------|-----------------|---------|
+| Search intensive | 16+ cores, high frequency | Full-text search, complex aggregations |
+| Indexing intensive | 8-16 cores | Log ingestion, IoT data |
+| Mixed balanced | 12-16 cores | E-commerce, APM monitoring |
+| Read only | 4-8 cores | Archives, static dashboards |
 
-**Allocation de la RAM**:
-```
-RAM totale = Heap JVM + OS Cache
-```
-
-**Règles de sizing RAM**:
-- **50/50 split**: 50% heap JVM, 50% OS cache (filesystem cache)
-- **Heap maximum**: 32 GB maximum (limite compressed oops)
-- **Minimum par nœud data**: 8 GB RAM totale (4 GB heap + 4 GB OS cache)
-- **Optimal par nœud data**: 64 GB RAM totale (31 GB heap + 33 GB OS cache)
+**CPU monitoring metrics**: `node_stats.os.cpu.percent`, `node_stats.process.cpu.percent`
 
 ---
 
-# Dimensionnement Mémoire (RAM)
+# Memory (RAM) Sizing
 
+RAM is the most critical factor for Elasticsearch performance.
 
-**Exemples de configurations**:
-| RAM Totale | Heap JVM | OS Cache | Usage |
-|------------|----------|----------|-------|
-| 8 GB       | 4 GB     | 4 GB     | Dev/test |
-| 32 GB      | 16 GB    | 16 GB    | Production petite échelle |
-| 64 GB      | 31 GB    | 33 GB    | Production standard (recommandé) |
-| 128 GB     | 31 GB    | 97 GB    | Production haute performance |
+**RAM Allocation**:
+```
+Total RAM = JVM Heap + OS Cache
+```
 
-**Pourquoi limiter le heap à 32 GB ?** Au-delà, la JVM perd les "compressed oops", augmentant l'empreinte mémoire de ~30-50%.
+**RAM sizing rules**:
+- **50/50 split**: 50% JVM heap, 50% OS cache (filesystem cache)
+- **Maximum heap**: 32 GB maximum (compressed oops limit)
+- **Minimum per data node**: 8 GB total RAM (4 GB heap + 4 GB OS cache)
+- **Optimal per data node**: 64 GB total RAM (31 GB heap + 33 GB OS cache)
 
 ---
 
-# Dimensionnement Disque
+# Memory (RAM) Sizing
 
-Le stockage doit être dimensionné pour le volume de données ET les performances I/O.
 
-**Formule de capacité disque**:
-```
-Capacité requise = Volume brut × (1 + replicas) × 1.15 × 1.2
-```
+**Configuration examples**:
+| Total RAM | JVM Heap | OS Cache | Usage |
+|-----------|----------|----------|-------|
+| 8 GB      | 4 GB     | 4 GB     | Dev/test |
+| 32 GB     | 16 GB    | 16 GB    | Small scale production |
+| 64 GB     | 31 GB    | 33 GB    | Standard production (recommended) |
+| 128 GB    | 31 GB    | 97 GB    | High performance production |
 
-**Facteurs de multiplication**:
-- **(1 + replicas)** : Nombre de copies (ex: 1 replica = ×2)
-- **1.15** : Overhead Elasticsearch (~15%)
-- **1.20** : Marge de croissance (20%)
+**Why limit heap to 32 GB?** Beyond this, the JVM loses "compressed oops", increasing memory footprint by ~30-50%.
 
 ---
 
-# Dimensionnement Disque: Types et Performance
+# Disk Sizing
 
-**Exemple**: 1 TB données brutes, 1 replica
+Storage must be sized for both data volume AND I/O performance.
+
+**Disk capacity formula**:
 ```
-1 TB × 2 (replica) × 1.15 × 1.2 = 2.76 TB minimum
+Required capacity = Raw volume x (1 + replicas) x 1.15 x 1.2
 ```
 
-**Types de disque recommandés**:
-- ✅ **SSD NVMe**: Performance maximale (indexation lourde)
-- ✅ **SSD SATA**: Bon compromis performance/coût
-- ⚠️ **HDD**: Données froides/archives uniquement
-- ❌ **Network storage (NFS, SMB)**: Éviter (latence élevée)
+**Multiplication factors**:
+- **(1 + replicas)**: Number of copies (e.g., 1 replica = x2)
+- **1.15**: Elasticsearch overhead (~15%)
+- **1.20**: Growth margin (20%)
+
+---
+
+# Disk Sizing: Types and Performance
+
+**Example**: 1 TB raw data, 1 replica
+```
+1 TB x 2 (replica) x 1.15 x 1.2 = 2.76 TB minimum
+```
+
+**Recommended disk types**:
+- NVMe SSD: Maximum performance (heavy indexing)
+- SATA SSD: Good performance/cost compromise
+- HDD: Cold/archive data only
+- Network storage (NFS, SMB): Avoid (high latency)
 
 **I/O monitoring**: `node_stats.fs.io_stats.total.operations`
 
 ---
 
-# Dimensionnement du Nombre de Nœuds
+# Node Count Sizing
 
-La taille du cluster dépend du volume, des performances et de la HA.
+Cluster size depends on volume, performance, and HA requirements.
 
-**Estimation du nombre de nœuds data**:
+**Estimating data node count**:
 
-**Méthode 1: Par volume**
+**Method 1: By volume**
 ```
-Nœuds data = (Volume total avec replicas) / 30 TB
+Data nodes = (Total volume with replicas) / 30 TB
 ```
 
-**Méthode 2: Par shards**
+**Method 2: By shards**
 ```
-Nœuds data = (Nombre total de shards) / 20 shards par nœud
+Data nodes = (Total number of shards) / 20 shards per node
 ```
-(Maximum recommandé: 20 shards/GB heap)
+(Maximum recommended: 20 shards/GB heap)
 
 ---
 
-# Dimensionnement du Nombre de Nœuds
+# Node Count Sizing
 
-**Exemple de calcul complet**:
-- Volume brut: 5 TB
+**Complete calculation example**:
+- Raw volume: 5 TB
 - Replicas: 1
-- Volume total: 10 TB
-- Shards primaires: 50 (taille moyenne 100 GB/shard)
-- Shards totaux: 100 (avec replicas)
+- Total volume: 10 TB
+- Primary shards: 50 (average size 100 GB/shard)
+- Total shards: 100 (with replicas)
 
 ```
-Par volume: 10 TB / 30 TB = 1 nœud minimum → 3 nœuds (HA)
-Par shards: 100 shards / 20 = 5 nœuds
-Recommandation finale: 5 nœuds data
+By volume: 10 TB / 30 TB = 1 node minimum -> 3 nodes (HA)
+By shards: 100 shards / 20 = 5 nodes
+Final recommendation: 5 data nodes
 ```
 
-**Nœuds master dédiés**: Recommandé pour clusters >10 nœuds (3 masters minimum)
+**Dedicated master nodes**: Recommended for clusters >10 nodes (3 masters minimum)
 
 ---
 
-# Configuration Système: Heap Size
+# System Configuration: Heap Size
 
-Le [sizing du heap JVM](https://www.elastic.co/guide/en/elasticsearch/reference/current/advanced-configuration.html#set-jvm-heap-size) est l'optimisation la plus critique.
+[JVM heap sizing](https://www.elastic.co/guide/en/elasticsearch/reference/current/advanced-configuration.html#set-jvm-heap-size) is the most critical optimization.
 
-**Configuration dans jvm.options**:
+**Configuration in jvm.options**:
 ```
-# Toujours identique Xms = Xmx
+# Always identical Xms = Xmx
 -Xms16g
 -Xmx16g
 ```
 
-**Règles impératives**:
-1. ✅ **-Xms = -Xmx** (évite le resizing dynamique)
-2. ✅ **Maximum 32 GB** (limite compressed oops)
-3. ✅ **50% de la RAM totale** (le reste pour OS cache)
-4. ✅ **Minimum 4 GB** pour production
+**Imperative rules**:
+1. **-Xms = -Xmx** (avoids dynamic resizing)
+2. **Maximum 32 GB** (compressed oops limit)
+3. **50% of total RAM** (the rest for OS cache)
+4. **Minimum 4 GB** for production
 
 ---
 
-# Configuration Système: Heap Size
+# System Configuration: Heap Size
 
-**Vérification de la configuration**:
+**Verifying configuration**:
 ```bash
 GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_max_in_bytes
 ```
 
-**Symptômes de heap mal dimensionné**:
-- Heap trop petit: `OutOfMemoryError`, GC fréquents
-- Heap trop grand: Pauses GC longues (>1s), latence dégradée
-- Xms ≠ Xmx: Pauses pour resizing, instabilité
+**Symptoms of poorly sized heap**:
+- Heap too small: `OutOfMemoryError`, frequent GC
+- Heap too large: Long GC pauses (>1s), degraded latency
+- Xms != Xmx: Pauses for resizing, instability
 
 ---
 
-# Configuration Système: Swap Disabled
+# System Configuration: Swap Disabled
 
-Le [swap doit être désactivé](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration-memory.html) pour éviter les dégradations de performance catastrophiques.
+[Swap must be disabled](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration-memory.html) to avoid catastrophic performance degradation.
 
-**Pourquoi désactiver le swap ?**
-Lorsque la JVM est swappée sur disque, les performances s'effondrent (latence × 1000).
+**Why disable swap?**
+When the JVM is swapped to disk, performance collapses (latency x 1000).
 
-**Méthode 1: Désactivation complète du swap** (recommandé)
+**Method 1: Complete swap disable** (recommended)
 ```bash
 sudo swapoff -a
 
-# Permanent: commenter les lignes swap dans /etc/fstab
+# Permanent: comment out swap lines in /etc/fstab
 sudo vi /etc/fstab
-# Commenter: # /dev/mapper/swap_1 none swap sw 0 0
+# Comment: # /dev/mapper/swap_1 none swap sw 0 0
 ```
 
-**Méthode 2: Limiter le swappiness** (alternative)
+**Method 2: Limit swappiness** (alternative)
 ```bash
-# Réduire la tendance au swap (0 = seulement en cas d'urgence)
+# Reduce swap tendency (0 = only in emergency)
 sudo sysctl vm.swappiness=1
 
 # Permanent
@@ -228,73 +228,73 @@ echo "vm.swappiness=1" | sudo tee -a /etc/sysctl.conf
 
 ---
 
-# Configuration Système: Swap Disabled
+# System Configuration: Swap Disabled
 
-**Méthode 3: mlockall dans Elasticsearch** (alternative)
+**Method 3: mlockall in Elasticsearch** (alternative)
 ```yaml
 # elasticsearch.yml
 bootstrap.memory_lock: true
 ```
 
-**Vérification**:
+**Verification**:
 ```bash
 GET /_nodes?filter_path=nodes.*.process.mlockall
 ```
 
 ---
 
-# Configuration Système: File Descriptors
+# System Configuration: File Descriptors
 
-Elasticsearch nécessite un [nombre élevé de file descriptors](https://www.elastic.co/guide/en/elasticsearch/reference/current/file-descriptors.html) pour gérer les connexions et fichiers index.
+Elasticsearch requires a [high number of file descriptors](https://www.elastic.co/guide/en/elasticsearch/reference/current/file-descriptors.html) to manage connections and index files.
 
-**Minimum requis**: 65536 file descriptors par processus Elasticsearch
+**Minimum required**: 65536 file descriptors per Elasticsearch process
 
-**Configuration pour utilisateur elasticsearch**:
+**Configuration for elasticsearch user**:
 ```bash
 # /etc/security/limits.conf
 elasticsearch  -  nofile  65536
 elasticsearch  -  nproc   4096
 ```
 
-**Vérification**:
+**Verification**:
 ```bash
-# Avant démarrage Elasticsearch
+# Before starting Elasticsearch
 ulimit -n
-# Doit afficher: 65536
+# Should display: 65536
 
-# Après démarrage
+# After starting
 GET /_nodes/stats/process?filter_path=nodes.*.process.max_file_descriptors
 ```
 
 ---
 
-# Configuration Système: File Descriptors
+# System Configuration: File Descriptors
 
-**Symptômes de limite trop basse**:
-- Erreurs "Too many open files"
-- Impossibilité d'ouvrir de nouveaux segments
-- Échecs de connexion HTTP/transport
-
----
-
-# Configuration Système: Thread Pools
-
-Elasticsearch utilise plusieurs [thread pools](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html) pour différentes opérations.
-
-**Thread pools principaux**:
-| Pool | Usage | Taille par défaut | Quand ajuster |
-|------|-------|-------------------|---------------|
-| **search** | Requêtes de recherche | `(cores × 3/2) + 1` | Recherche intensive |
-| **write** | Indexation de documents | `cores` | Indexation intensive |
-| **get** | Requêtes GET par ID | `cores` | Lookups fréquents |
-| **analyze** | Requêtes _analyze | `1` | Rarement ajusté |
-| **refresh** | Refresh des index | `(cores / 2)` | Rarement ajusté |
+**Symptoms of too low limit**:
+- "Too many open files" errors
+- Inability to open new segments
+- HTTP/transport connection failures
 
 ---
 
-# Configuration Système: Thread Pools
+# System Configuration: Thread Pools
 
-**Exemple d'ajustement** (rarement nécessaire):
+Elasticsearch uses several [thread pools](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html) for different operations.
+
+**Main thread pools**:
+| Pool | Usage | Default Size | When to Adjust |
+|------|-------|--------------|----------------|
+| **search** | Search queries | `(cores x 3/2) + 1` | Intensive search |
+| **write** | Document indexing | `cores` | Intensive indexing |
+| **get** | GET requests by ID | `cores` | Frequent lookups |
+| **analyze** | _analyze requests | `1` | Rarely adjusted |
+| **refresh** | Index refresh | `(cores / 2)` | Rarely adjusted |
+
+---
+
+# System Configuration: Thread Pools
+
+**Adjustment example** (rarely necessary):
 ```yaml
 # elasticsearch.yml
 thread_pool:
@@ -303,184 +303,184 @@ thread_pool:
     queue_size: 1000
 ```
 
-**Monitoring thread pools**:
+**Thread pools monitoring**:
 ```bash
 GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected
 ```
 
-**Attention**: Augmenter les thread pools n'améliore pas toujours les performances. Symptôme souvent d'un problème de dimensionnement CPU/mémoire.
+**Warning**: Increasing thread pools doesn't always improve performance. Often a symptom of CPU/memory under-sizing.
 
 ---
 
-# Topologie Réseau: Architecture Cluster
+# Network Topology: Cluster Architecture
 
-La [topologie réseau](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html) impacte fortement la latence et la disponibilité.
+[Network topology](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html) strongly impacts latency and availability.
 
-**Petit cluster (1-10 nœuds)**:
-- Tous les nœuds avec rôles **master + data + ingest**
-- Simplicité maximale, facile à maintenir
-- Clients se connectent directement aux nœuds
+**Small cluster (1-10 nodes)**:
+- All nodes with **master + data + ingest** roles
+- Maximum simplicity, easy to maintain
+- Clients connect directly to nodes
 
-**Cluster moyen (10-50 nœuds)**:
-- **3 nœuds master dédiés** (gestion cluster)
-- **10-20 nœuds data** (stockage et recherche)
-- **2-3 nœuds coordinating** (routage requêtes)
-- Séparation des responsabilités pour stabilité
-
----
-
-# Topologie Réseau: Grand Cluster
-
-**Grand cluster (50+ nœuds)**:
-- **Load Balancer** distribue les requêtes clients
-- **Nœuds coordinating dédiés** (routage uniquement)
-- **Architecture hot-warm-cold** pour optimisation coût/performance
-  - **Hot**: Données actives (SSD rapide)
-  - **Warm**: Données anciennes (HDD)
-  - **Cold**: Archives (stockage économique)
-- **3+ masters dédiés** pour stabilité
+**Medium cluster (10-50 nodes)**:
+- **3 dedicated master nodes** (cluster management)
+- **10-20 data nodes** (storage and search)
+- **2-3 coordinating nodes** (request routing)
+- Separation of responsibilities for stability
 
 ---
 
-# Topologie Réseau: Latence et Débit
+# Network Topology: Large Cluster
 
-Les performances réseau sont critiques pour un cluster distribué.
+**Large cluster (50+ nodes)**:
+- **Load Balancer** distributes client requests
+- **Dedicated coordinating nodes** (routing only)
+- **Hot-warm-cold architecture** for cost/performance optimization
+  - **Hot**: Active data (fast SSD)
+  - **Warm**: Older data (HDD)
+  - **Cold**: Archives (economical storage)
+- **3+ dedicated masters** for stability
 
-**Exigences réseau**:
-- **Latence intra-cluster**: <1ms (idéalement <0.5ms)
-- **Débit intra-cluster**: ≥10 Gbps (idéalement 40 Gbps)
-- **Latence client-cluster**: <10ms pour expérience utilisateur fluide
-- **Débit client-cluster**: Selon charge (1-10 Gbps)
+---
 
-**Configuration réseau dans elasticsearch.yml**:
+# Network Topology: Latency and Throughput
+
+Network performance is critical for a distributed cluster.
+
+**Network requirements**:
+- **Intra-cluster latency**: <1ms (ideally <0.5ms)
+- **Intra-cluster throughput**: >=10 Gbps (ideally 40 Gbps)
+- **Client-cluster latency**: <10ms for smooth user experience
+- **Client-cluster throughput**: Depending on load (1-10 Gbps)
+
+**Network configuration in elasticsearch.yml**:
 ```yaml
-network.host: 0.0.0.0                    # Écoute sur toutes les interfaces
-http.port: 9200                          # Port API REST
-transport.port: 9300                     # Port communication inter-nœuds
+network.host: 0.0.0.0                    # Listen on all interfaces
+http.port: 9200                          # REST API port
+transport.port: 9300                     # Inter-node communication port
 
 # Performance tuning
-transport.tcp.compress: true             # Compression transport (↓ bande passante)
-http.max_content_length: 100mb           # Taille max requête HTTP
+transport.tcp.compress: true             # Transport compression (lower bandwidth)
+http.max_content_length: 100mb           # Max HTTP request size
 ```
 
 ---
 
-# Topologie Réseau: Nœuds Master Dédiés
+# Network Topology: Dedicated Master Nodes
 
-Les [nœuds master](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html) gèrent l'état du cluster et doivent être stables.
+[Master nodes](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html) manage cluster state and must be stable.
 
-**Quand utiliser des masters dédiés ?**
-- ✅ Clusters >10 nœuds
-- ✅ Charges d'indexation/recherche très élevées
-- ✅ Besoin de stabilité maximale
+**When to use dedicated masters?**
+- Clusters >10 nodes
+- Very high indexing/search loads
+- Need for maximum stability
 
-**Configuration master-only node**:
+**Master-only node configuration**:
 ```yaml
 # elasticsearch.yml
 node.roles: [ master ]
 
-# Ressources minimales
+# Minimal resources
 # CPU: 2-4 cores
 # RAM: 8 GB (4 GB heap)
-# Disque: 50 GB
+# Disk: 50 GB
 ```
 
 ---
 
-# Topologie Réseau: Nœuds Master Dédiés
+# Network Topology: Dedicated Master Nodes
 
-**Nombre de masters**:
-- **3 masters**: Standard (tolère 1 panne)
-- **5 masters**: Grande échelle (tolère 2 pannes)
-- **Toujours impair**: Évite split-brain
+**Number of masters**:
+- **3 masters**: Standard (tolerates 1 failure)
+- **5 masters**: Large scale (tolerates 2 failures)
+- **Always odd**: Avoids split-brain
 
 **Quorum**:
 ```
-Quorum = (nombre_masters / 2) + 1
-3 masters → quorum = 2
-5 masters → quorum = 3
+Quorum = (number_masters / 2) + 1
+3 masters -> quorum = 2
+5 masters -> quorum = 3
 ```
 
 ---
 
-# Architecture Hot-Warm-Cold
+# Hot-Warm-Cold Architecture
 
-L'[architecture hot-warm-cold](https://www.elastic.co/guide/en/elasticsearch/reference/current/data-tiers.html) optimise coût et performance selon l'âge des données.
+[Hot-warm-cold architecture](https://www.elastic.co/guide/en/elasticsearch/reference/current/data-tiers.html) optimizes cost and performance based on data age.
 
-**Tiers de données**:
+**Data tiers**:
 
-**Hot tier** (données récentes, <7 jours):
-- Nœuds haute performance (SSD NVMe, 64 GB RAM, 16 cores)
-- Indexation et recherche intensive
+**Hot tier** (recent data, <7 days):
+- High performance nodes (NVMe SSD, 64 GB RAM, 16 cores)
+- Intensive indexing and search
 - Configuration: `node.roles: [ data_hot ]`
 
-**Warm tier** (données moyennes, 7-90 jours):
-- Nœuds performance moyenne (SSD SATA, 32 GB RAM, 8 cores)
-- Recherche occasionnelle, pas d'indexation
+**Warm tier** (medium-age data, 7-90 days):
+- Medium performance nodes (SATA SSD, 32 GB RAM, 8 cores)
+- Occasional search, no indexing
 - Configuration: `node.roles: [ data_warm ]`
 
 ---
 
-# Architecture Hot-Warm-Cold
+# Hot-Warm-Cold Architecture
 
-**Cold tier** (données anciennes, >90 jours):
-- Nœuds basse performance (HDD, 16 GB RAM, 4 cores)
-- Recherche rare, coût minimum
+**Cold tier** (old data, >90 days):
+- Low performance nodes (HDD, 16 GB RAM, 4 cores)
+- Rare search, minimum cost
 - Configuration: `node.roles: [ data_cold ]`
 
-**Migration automatique**: Index Lifecycle Management (ILM) gère les transitions hot→warm→cold.
+**Automatic migration**: Index Lifecycle Management (ILM) handles hot->warm->cold transitions.
 
 ---
 
-# Optimisation de l'Indexation
+# Indexing Optimization
 
-[L'optimisation de l'indexation](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html) augmente le débit d'ingestion.
+[Indexing optimization](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html) increases ingestion throughput.
 
-**Techniques d'optimisation**:
+**Optimization techniques**:
 
-**1. Augmenter le refresh interval**:
+**1. Increase refresh interval**:
 ```json
 PUT /my-index/_settings
 {
-  "index.refresh_interval": "30s"  // Par défaut: 1s
+  "index.refresh_interval": "30s"  // Default: 1s
 }
 ```
-Moins de refresh = plus de débit (compromis: latence visibility)
+Less refresh = more throughput (tradeoff: visibility latency)
 
-**2. Désactiver les replicas pendant bulk initial**:
+**2. Disable replicas during initial bulk**:
 ```json
 PUT /my-index/_settings
 {
   "index.number_of_replicas": 0
 }
-// Après bulk: remettre replicas
+// After bulk: restore replicas
 ```
 
 ---
 
-# Optimisation de l'Indexation
+# Indexing Optimization
 
-**3. Utiliser Bulk API avec batches optimaux**:
+**3. Use Bulk API with optimal batches**:
 ```bash
-# Taille batch optimale: 5-15 MB ou 1000-5000 docs
+# Optimal batch size: 5-15 MB or 1000-5000 docs
 POST /_bulk
 { "index": { "_index": "my-index" }}
 { "field": "value" }
 ...
 ```
 
-**4. Ajuster thread pool write**:
-Généralement inutile, signe de sous-dimensionnement CPU/RAM.
+**4. Adjust write thread pool**:
+Generally unnecessary, sign of CPU/RAM under-sizing.
 
 ---
 
-# Optimisation de la Recherche
+# Search Optimization
 
-[L'optimisation de la recherche](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html) réduit la latence des requêtes.
+[Search optimization](https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html) reduces query latency.
 
-**Techniques d'optimisation**:
+**Optimization techniques**:
 
-**1. Utiliser filter context (mis en cache)**:
+**1. Use filter context (cached)**:
 ```json
 GET /products/_search
 {
@@ -494,54 +494,54 @@ GET /products/_search
   }
 }
 ```
-Les filtres sont cachés, pas de scoring coûteux.
+Filters are cached, no expensive scoring.
 
 ---
 
-# Optimisation de la Recherche
+# Search Optimization
 
-**2. Optimiser le nombre de shards**:
+**2. Optimize shard count**:
 ```
-Taille shard optimale: 10-50 GB
-Trop de petits shards → overhead de recherche
+Optimal shard size: 10-50 GB
+Too many small shards -> search overhead
 ```
 
-**3. Forcer merge pour segments read-only**:
+**3. Force merge for read-only segments**:
 ```json
 POST /old-index/_forcemerge?max_num_segments=1
 ```
-Réduit le nombre de segments, accélère les recherches.
+Reduces segment count, accelerates searches.
 
 
 ---
 
-# Stratégies de Caching
+# Caching Strategies
 
-Elasticsearch utilise plusieurs [caches](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-indices.html) pour améliorer les performances.
+Elasticsearch uses several [caches](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-indices.html) to improve performance.
 
-**Caches principaux**:
+**Main caches**:
 
-**1. Node Query Cache** (cache de résultats de filtres):
+**1. Node Query Cache** (filter results cache):
 ```yaml
 # elasticsearch.yml
-indices.queries.cache.size: 10%  # % du heap
+indices.queries.cache.size: 10%  # % of heap
 ```
-Stocke les résultats des filter contexts.
+Stores filter context results.
 
-**2. Shard Request Cache** (cache de résultats d'agrégations):
+**2. Shard Request Cache** (aggregation results cache):
 ```yaml
-indices.requests.cache.size: 1%  # % du heap
+indices.requests.cache.size: 1%  # % of heap
 ```
-Cache les résultats pour `size: 0` (agrégations seules).
+Caches results for `size: 0` (aggregations only).
 
 **3. Filesystem Cache** (OS-level):
-Géré automatiquement par l'OS (50% RAM non-heap). Le plus important !
+Automatically managed by the OS (50% non-heap RAM). The most important!
 
 ---
 
-# Stratégies de Caching
+# Caching Strategies
 
-**Invalidation des caches**:
+**Cache invalidation**:
 ```bash
 POST /my-index/_cache/clear
 POST /_cache/clear?query=true&request=true&fielddata=true
@@ -549,11 +549,11 @@ POST /_cache/clear?query=true&request=true&fielddata=true
 
 ---
 
-# Query Tuning et Profiling
+# Query Tuning and Profiling
 
-Le [profiling de requêtes](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-profile.html) identifie les goulots d'étranglement.
+[Query profiling](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-profile.html) identifies bottlenecks.
 
-**Activer le profiling**:
+**Enable profiling**:
 ```json
 GET /products/_search
 {
@@ -571,9 +571,9 @@ GET /products/_search
 
 ---
 
-# Query Tuning et Profiling
+# Query Tuning and Profiling
 
-**Résultat du profile**:
+**Profile result**:
 ```json
 {
   "profile": {
@@ -594,25 +594,25 @@ GET /products/_search
 }
 ```
 
-**Analyse**: Identifier les clauses coûteuses (time_in_nanos élevé), optimiser ou réécrire.
+**Analysis**: Identify expensive clauses (high time_in_nanos), optimize or rewrite.
 
 ---
 
-# Résumé
+# Summary
 
-## Points Clés
+## Key Points
 
-- Le **dimensionnement** doit considérer volume, débit, latence et HA (CPU, RAM, disque, nœuds)
-- La **configuration système** est critique: heap size (50% RAM, max 32 GB), swap disabled, file descriptors (65536)
-- La **topologie réseau** impacte performance et stabilité (masters dédiés, hot-warm-cold, latence <1ms)
-- L'**optimisation d'indexation** passe par refresh interval, bulk API, replicas temporairement désactivés
-- L'**optimisation de recherche** utilise filter context, sizing shards, force merge, routing, caching
+- **Sizing** must consider volume, throughput, latency, and HA (CPU, RAM, disk, nodes)
+- **System configuration** is critical: heap size (50% RAM, max 32 GB), swap disabled, file descriptors (65536)
+- **Network topology** impacts performance and stability (dedicated masters, hot-warm-cold, latency <1ms)
+- **Indexing optimization** involves refresh interval, bulk API, temporarily disabled replicas
+- **Search optimization** uses filter context, shard sizing, force merge, routing, caching
 
-## Formules Importantes
+## Important Formulas
 
-- **Nœuds data**: `(Volume total / 30 TB) + 1`
-- **Heap JVM**: `min(RAM / 2, 32 GB)` et `-Xms = -Xmx`
-- **Capacité disque**: `Volume × (1 + replicas) × 1.15 × 1.2`
-- **Quorum masters**: `(nombre_masters / 2) + 1`
+- **Data nodes**: `(Total volume / 30 TB) + 1`
+- **JVM Heap**: `min(RAM / 2, 32 GB)` and `-Xms = -Xmx`
+- **Disk capacity**: `Volume x (1 + replicas) x 1.15 x 1.2`
+- **Master quorum**: `(number_masters / 2) + 1`
 
 

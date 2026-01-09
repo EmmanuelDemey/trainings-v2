@@ -34,24 +34,10 @@ layout: intro
 - Basic search (1h)
 
 ---
-layout: section
----
-
-# Part 1: General Presentation and Concepts
-*Duration: 1h*
-
----
 src: ./chapters/elasticsearch/01_general_concepts.md
 hide: false
 ---
 
-
----
-layout: section
----
-
-# Part 2: Installation and Configuration
-*Duration: 1h*
 
 ---
 src: ./chapters/elasticsearch/02_installation_config.md
@@ -83,13 +69,6 @@ For an Observability cluster with 15M logs/day:
 </v-click>
 
 ---
-layout: section
----
-
-# Part 3: Indexing and Document Management
-*Duration: 1h30*
-
----
 src: ./chapters/elasticsearch/03_indexation.md
 hide: false
 ---
@@ -116,61 +95,6 @@ POST /_bulk
 
 </v-clicks>
 
----
-
-# Refresh Interval: Impact on JVM
-
-The `refresh_interval` controls document visibility
-
-```json
-PUT /logs-app
-{
-  "settings": {
-    "refresh_interval": "30s"  // Instead of "1s" default
-  }
-}
-```
-
-<v-clicks>
-
-**Impact for you**:
-- Frequent refresh = Overloaded JVM
-- 15M logs/day = lots of refreshes
-- **Recommendation**: 30s or more for logs
-
-> Refresh creates segments → too many segments = JVM under pressure
-
-</v-clicks>
-
----
-
-# Cluster Status: Understanding the Colors
-
-<v-clicks>
-
-| Status | Meaning | Action |
-|--------|---------|--------|
-| **Green** | All shards are assigned | All good |
-| **Yellow** | All primaries OK, but not all replicas | Check allocation |
-| **Red** | At least one primary not assigned | URGENT! |
-
-</v-clicks>
-
-<br>
-
-<v-click>
-
-```bash
-GET /_cluster/health
-
-{
-  "status": "yellow",
-  "number_of_nodes": 3,
-  "unassigned_shards": 5  // ⚠️ To investigate
-}
-```
-
-</v-click>
 
 ---
 layout: center
@@ -182,449 +106,15 @@ layout: center
 Back at 2pm for the most critical part: **Mapping and Schemas**
 
 ---
-layout: section
----
-
-# Part 4: Mapping and Schemas
-*Duration: 2h*
-
----
 src: ./chapters/elasticsearch/04_mapping.md
 hide: false
 ---
-
----
-
-# text vs keyword: The Costly Mistake
-
-For application logs:
-
-<v-clicks>
-
-**text**:
-- Analyzed (tokenization)
-- Full-text search
-- High memory consumption
-- ⚠️ Do not use for filtering/aggregation
-
-**keyword**:
-- Not analyzed
-- Exact match
-- Low memory usage
-- ✅ Perfect for filtering/aggregation
-
-</v-clicks>
-
----
-
-# Example: Optimized Log Mapping
-
-```json {all|3-5|6-9|10-11|12-15|all}
-PUT /logs-app
-{
-  "mappings": {
-    "properties": {
-      "timestamp": { "type": "date" },
-      "level": { "type": "keyword" },          // ✅ For filter (level:ERROR)
-      "message": {
-        "type": "text",                        // ✅ For full-text search
-        "fields": {
-          "keyword": { "type": "keyword" }     // ✅ Optional multi-field
-        }
-      },
-      "user_id": { "type": "keyword" },        // ✅ No analysis needed
-      "response_time": { "type": "long" },
-      "ip": { "type": "ip" }                   // ✅ Specialized type
-    }
-  }
-}
-```
-
----
-
-# Common Mistake: text for Everything
-
-❌ **Non-optimized mapping**:
-
-```json
-{
-  "properties": {
-    "level": { "type": "text" },      // ❌ Wasteful!
-    "user_id": { "type": "text" },    // ❌ Wasteful!
-    "ip": { "type": "text" }          // ❌ Wasteful!
-  }
-}
-```
-
-<v-clicks>
-
-**Consequences**:
-- Overloaded fielddata cache → **JVM spinning out of control**
-- Larger index → **increased costs**
-- Slower searches
-
-> This is probably a cause of your JVM issues!
-
-</v-clicks>
-
----
-
-# Object vs Nested: The Array Trap
-
-Problem with **object arrays**:
-
-```json
-{
-  "users": [
-    { "name": "Alice", "role": "admin" },
-    { "name": "Bob", "role": "user" }
-  ]
-}
-```
-
-<v-clicks>
-
-Elasticsearch flattens internally:
-```json
-{
-  "users.name": ["Alice", "Bob"],
-  "users.role": ["admin", "user"]
-}
-```
-
-**Problem**: Query `name:Alice AND role:user` matches the document!
-
-</v-clicks>
-
----
-
-# Solution: Nested Type
-
-```json {all|4|5-8|all}
-PUT /logs-app
-{
-  "mappings": {
-    "properties": {
-      "users": {
-        "type": "nested",              // ✅ Preserves the relationship
-        "properties": {
-          "name": { "type": "keyword" },
-          "role": { "type": "keyword" }
-        }
-      }
-    }
-  }
-}
-```
-
-<v-clicks>
-
-**Warning**: `nested` consumes more resources
-- Use only when necessary
-- For your APM logs, often useful for spans
-
-</v-clicks>
-
----
-
-# Dynamic Templates: Automate Mapping
-
-For your logs with many fields:
-
-```json {all|4-10|11-17|all}
-PUT /logs-app
-{
-  "mappings": {
-    "dynamic_templates": [
-      {
-        "strings_as_keywords": {
-          "match_mapping_type": "string",
-          "mapping": { "type": "keyword" }    // Default to keyword
-        }
-      },
-      {
-        "message_as_text": {
-          "match": "message",
-          "mapping": { "type": "text" }       // Exception for message
-        }
-      }
-    ]
-  }
-}
-```
-
----
-
-# Index Templates: Centralize Config
-
-For your daily logs:
-
-```json {all|3|4-6|7-16|all}
-PUT /_index_template/logs-app-template
-{
-  "index_patterns": ["logs-app-*"],
-  "data_stream": { },                        // ✅ Enables data streams
-  "priority": 500,
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 1,
-      "refresh_interval": "30s"              // ✅ Optimized for bulk
-    },
-    "mappings": {
-      "properties": {
-        // ... your optimized mapping
-      }
-    }
-  }
-}
-```
-
-<v-click>
-
-> With data streams + template, each day = new index automatically
-
-</v-click>
-
----
-
-# Component Templates: Reusability
-
-Modular and reusable:
-
-```json
-PUT /_component_template/logs-settings
-{
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "refresh_interval": "30s"
-    }
-  }
-}
-
-PUT /_component_template/logs-mappings
-{
-  "template": {
-    "mappings": {
-      "properties": {
-        "timestamp": { "type": "date" },
-        "level": { "type": "keyword" }
-      }
-    }
-  }
-}
-```
-
----
-
-# Combining Component Templates
-
-```json {all|3|4-7|all}
-PUT /_index_template/logs-app-template
-{
-  "index_patterns": ["logs-app-*"],
-  "composed_of": [
-    "logs-settings",
-    "logs-mappings"
-  ],
-  "priority": 500
-}
-```
-
-<v-clicks>
-
-**Benefits**:
-- Reusability across different log types
-- Simplified maintenance
-- Guaranteed consistency
-
-</v-clicks>
-
-
----
-layout: section
----
-
-# Part 5: Basic Search
-*Duration: 1h*
 
 ---
 src: ./chapters/elasticsearch/05_search.md
 hide: false
 ---
 
-# Search API: Basics
-
-```bash
-GET /logs-app-*/_search
-{
-  "query": {
-    "match": {
-      "message": "error"
-    }
-  },
-  "size": 20,
-  "from": 0,
-  "sort": [
-    { "timestamp": "desc" }
-  ]
-}
-```
-
-<v-clicks>
-
-- `size`: number of results (max 10000)
-- `from`: offset for pagination
-- `sort`: custom sorting
-
-</v-clicks>
-
----
-
-# Query DSL: Match vs Term
-
-<v-clicks>
-
-**match**: analyzed search (for text)
-```json
-{
-  "query": {
-    "match": { "message": "connection error" }
-  }
-}
-```
-
-**term**: exact search (for keyword)
-```json
-{
-  "query": {
-    "term": { "level": "ERROR" }
-  }
-}
-```
-
-</v-clicks>
-
----
-
-# Query DSL: Bool Query
-
-Combine multiple conditions:
-
-```json {all|4-6|7-9|10-12|all}
-GET /logs-app-*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "level": "ERROR" } }
-      ],
-      "filter": [
-        { "range": { "timestamp": { "gte": "now-1h" } } }
-      ],
-      "must_not": [
-        { "term": { "user_id": "bot" } }
-      ]
-    }
-  }
-}
-```
-
-<v-clicks>
-
-- `must`: must match (calculates score)
-- `filter`: must match (no score, faster)
-- `must_not`: must not match
-- `should`: may match (score bonus)
-
-</v-clicks>
-
----
-
-# Pagination: Deep Pagination Problem
-
-<v-clicks>
-
-❌ **Avoid deep pagination**:
-```json
-{
-  "from": 10000,
-  "size": 100
-}
-```
-
-**Problem**: Elasticsearch must sort 10100 docs on each shard!
-
-✅ **Solutions**:
-- **Search After**: efficient pagination
-- **Scroll API**: for data export
-- **Point in Time**: for browsing snapshot
-
-</v-clicks>
-
----
-
-# Search After: Efficient Pagination
-
-```json
-// First request
-GET /logs-app-*/_search
-{
-  "size": 100,
-  "sort": [
-    { "timestamp": "desc" },
-    { "_id": "asc" }
-  ]
-}
-
-// Next request with search_after
-GET /logs-app-*/_search
-{
-  "size": 100,
-  "search_after": ["2025-01-15T10:30:00", "doc_123"],
-  "sort": [
-    { "timestamp": "desc" },
-    { "_id": "asc" }
-  ]
-}
-```
-
----
-layout: center
----
-
-# Day 1 Summary
-
----
-
-# What We Covered Today
-
-<v-clicks>
-
-2. **Core concepts**: Cluster, Index, Shard, Document
-3. **Installation**: Node types, configuration
-4. **Indexing**: CRUD, Bulk API, refresh_interval
-5. **Mapping** ⭐: text vs keyword, nested, templates
-6. **Search**: Query DSL, pagination
-
-</v-clicks>
-
----
-
-# Key Points for Parkki
-
-<v-clicks>
-
-| Topic | Impact for you | Action |
-|-------|----------------|--------|
-| **Mapping** | Critical (JVM + costs) | Audit tomorrow |
-| **Refresh interval** | JVM | Increase to 30s |
-| **Bulk API** | Performance | Check sizing |
-| **text vs keyword** | Memory | Use keyword |
-| **Templates** | Consistency | Centralize config |
-
-</v-clicks>
 
 ---
 
@@ -667,7 +157,8 @@ By Emmanuel DEMEY
 ---
 layout: center
 ---
-
+cd ..
+cd ..
 # Day 1 Recap
 
 <v-clicks>
@@ -696,7 +187,7 @@ layout: intro
 
 **Morning (9am-12:30pm)**:
 - Aggregations (1h)
-- Sizing and Capacity Planning (1h30)
+- Ingest Pipelines (1h)
 - Data Retention and ILM (1h)
 
 **Afternoon (2pm-5pm)**:
@@ -704,247 +195,21 @@ layout: intro
 - Audit of your cluster (1h)
 
 ---
-layout: section
----
-
-# Part 6: Aggregations
-*Duration: 1h*
-
----
 src: ./chapters/elasticsearch/05_agregation.md
 hide: false
 ---
 
 ---
-layout: section
+src: ./chapters/elasticsearch/06_ingest.md
+hide: false
 ---
 
-# Part 7: Sizing and Capacity Planning
-*Duration: 1h30*
-
-## ESSENTIAL FOR YOUR 15M LOGS/DAY
-
----
-
-# Why is Sizing Critical?
-
-<v-clicks>
-
-With **15M logs/day**:
-
-| Problem | Consequence |
-|---------|-------------|
-| Too many shards | Overloaded JVM |
-| Shards too large | Slow searches |
-| Bad memory:data ratio | Exploded costs |
-| Poorly configured replicas | Wasted resources |
-
-</v-clicks>
-
-<br>
-
-<v-click>
-
-> Good sizing can **reduce your costs by 50%**!
-
-</v-click>
-
----
-
-# Calculating Number of Shards
-
-Basic rules:
-
-<v-clicks>
-
-| Rule | Value |
-|------|-------|
-| Size per shard | 20-40 GB (max 50 GB) |
-| Shards per GB of heap | ~20 shards max |
-| Shards per node | Avoid > 1000 |
-
-</v-clicks>
-
-<br>
-
-<v-click>
-
-```
-Calculation for Parkki:
-- 15M logs/day x 1 KB = 15 GB/day
-- 15 GB / 30 GB (target) = 0.5 → 1 shard per daily index
-```
-
-</v-click>
-
----
-
-# Your Data Volume
-
-```
-Daily volume = Number of logs x Average size
-
-For Parkki:
-- 15M logs/day
-- Average size: 1 KB/log
-- Daily volume = 15 GB/day
-
-With 10 days retention:
-- Total volume = 150 GB
-- With replicas (x2) = 300 GB
-```
-
-<v-click>
-
-**Recommendation**: 1 primary shard per daily index
-
-</v-click>
-
----
-
-# Memory:Data Ratios
-
-<v-clicks>
-
-| Tier | Ratio | Usage |
-|------|-------|-------|
-| **Hot** | 1:30 | Recent data, active indexing |
-| **Warm** | 1:160 | Less frequently accessed data |
-| **Cold** | 1:500 | Rarely accessed archives |
-| **Frozen** | 1:2000+ | Very rarely accessed archives |
-
-</v-clicks>
-
-<br>
-
-<v-click>
-
-```
-RAM calculation for Parkki (Hot tier):
-- Hot data (2 days) = 30 GB x 2 (replicas) = 60 GB
-- RAM needed = 60 GB / 30 = 2 GB minimum
-```
-
-</v-click>
-
----
-
-# Complete Sizing for Parkki
-
-```
-Recommended architecture:
-
-Hot tier (days 0-2):
-- 45 GB of data (x2 = 90 GB)
-- RAM: 90 GB / 30 = 3 GB
-
-Warm tier (days 3-10):
-- 120 GB of data (x2 = 240 GB)
-- RAM: 240 GB / 160 = 1.5 GB
-
-Total RAM data nodes: 5-8 GB recommended
-```
-
-<v-click>
-
-> With ILM Hot/Warm: **-65% RAM** vs all in Hot!
-
-</v-click>
-
----
-
-# Thread Pools
-
-Thread pools manage operations:
-
-<v-clicks>
-
-| Thread Pool | Usage | Symptom when saturated |
-|-------------|-------|------------------------|
-| `write` | Indexing | Slow/rejected indexing |
-| `search` | Searches | Slow queries/timeout |
-| `get` | Doc retrieval | Slow GETs |
-| `bulk` | Bulk API | Rejected bulks |
-
-</v-clicks>
-
----
-
-# Thread Pools Monitoring
-
-```bash
-GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected
-
-# Example result:
-node_name  name   active queue rejected
-node-1     write  5      0     0         # OK
-node-1     search 2      0     0         # OK
-node-1     bulk   0      50    123       # Problem!
-```
-
-<v-clicks>
-
-**If rejected > 0**:
-- Cluster cannot keep up with load
-- Reduce indexing rate
-- Increase resources
-
-</v-clicks>
-
----
-
-# Disk Watermarks
-
-<v-clicks>
-
-| Watermark | Threshold | Action |
-|-----------|-----------|--------|
-| **Low** | 85% | New shards not allocated |
-| **High** | 90% | Shards moved to other nodes |
-| **Flood stage** | 95% | Index becomes READ-ONLY! |
-
-</v-clicks>
-
-<br>
-
-<v-click>
-
-```bash
-# Check disk usage
-GET /_cat/allocation?v&h=node,shards,disk.used,disk.avail,disk.percent
-```
-
-</v-click>
-
-<br>
-
-<v-click>
-
-> **Warning**: At 95%, indexing stops!
-
-</v-click>
-
----
-
-# Disk Space for Parkki
-
-```
-Calculation:
-- Daily volume: 15 GB
-- Retention: 10 days
-- Total volume: 150 GB
-- With replicas (x2): 300 GB
-- With watermark margin (x1.25): 375 GB
-
-Minimum recommended disk space: 400 GB
-```
 
 ---
 layout: section
 ---
 
 # Part 8: Data Retention and ILM
-*Duration: 1h30*
 
 ## CRITICAL FOR REDUCING YOUR COSTS
 
@@ -1178,9 +443,6 @@ layout: section
 ---
 
 # Part 9: Operating and Troubleshooting
-*Duration: 2h*
-
-## FOR YOUR JVM ISSUES
 
 ---
 
@@ -1394,7 +656,6 @@ layout: section
 ---
 
 # Part 10: Audit of Your Cluster
-*Duration: 1h*
 
 ## HANDS-ON SESSION ON YOUR CLUSTERS
 
@@ -1548,23 +809,6 @@ layout: center
 
 </v-clicks>
 
----
-layout: end
----
-
-# Thank You!
-
-## Questions?
-
-**See you tomorrow at 9am for Day 3**
-
-Contact: demey.emmanuel@gmail.com
-
-## Day 3: Monitoring, Security and APM
-
-Customized 3-day training
-
-By Emmanuel DEMEY
 
 ---
 layout: center
@@ -1611,9 +855,6 @@ layout: section
 ---
 
 # Part 11: Deep Monitoring
-*Duration: 2h*
-
-## TO ANTICIPATE PROBLEMS
 
 ---
 
@@ -1802,33 +1043,12 @@ Key metrics to monitor:
 
 </v-clicks>
 
----
-
-# Dashboard Monitoring
-
-```
-┌─────────────────────────────────────────────────────┐
-│                  Cluster Health                      │
-│  ● GREEN   Nodes: 3   Indices: 45   Shards: 180     │
-├─────────────────────────────────────────────────────┤
-│  JVM Heap          │  CPU Usage        │  Disk      │
-│  ████████░░ 78%    │  ███░░░░░░ 35%    │  ██████░ 60%│
-├─────────────────────────────────────────────────────┤
-│  Indexing Rate: 15,234 docs/s                       │
-│  Search Rate: 245 queries/s                         │
-│  Latency (p99): 450ms                               │
-├─────────────────────────────────────────────────────┤
-│  Thread Pool Rejections: 0                          │
-│  Pending Tasks: 0                                   │
-└─────────────────────────────────────────────────────┘
-```
 
 ---
 layout: section
 ---
 
 # Part 12: Alerting
-*Duration: 1h30*
 
 ---
 
@@ -2057,7 +1277,6 @@ layout: section
 ---
 
 # Part 13: Security
-*Duration: 1h30*
 
 ---
 
@@ -2306,9 +1525,6 @@ layout: section
 ---
 
 # Part 14: APM and Application Logs
-*Duration: 1h*
-
-## FOR YOUR APM USE CASE
 
 ---
 
@@ -2542,7 +1758,6 @@ layout: section
 ---
 
 # Part 15: Summary and Q&A
-*Duration: 30min*
 
 ---
 
@@ -2569,68 +1784,6 @@ layout: section
 
 ---
 
-# Action Plan for Parkki
-
-## Quick Wins (this week)
-
-<v-clicks>
-
-1. **Increase refresh_interval** to 30s
-2. **Configure slowlogs**
-3. **Set up alerts** JVM/Disk
-4. **Audit mappings** (unnecessary text fields)
-
-</v-clicks>
-
----
-
-# Action Plan for Parkki
-
-## Medium term (1-2 weeks)
-
-<v-clicks>
-
-1. **Implement ILM** Hot/Warm/Delete
-2. **Migrate to Data Streams**
-3. **Review mappings** with dynamic templates
-4. **Configure monitoring** Metricbeat
-
-</v-clicks>
-
----
-
-# Action Plan for Parkki
-
-## Long term (1 month+)
-
-<v-clicks>
-
-1. **Hot/Warm architecture** on dedicated nodes
-2. **Complete logs/APM correlation**
-3. **Custom monitoring dashboards**
-4. **Documented maintenance procedures**
-5. **Ongoing team training**
-
-</v-clicks>
-
----
-
-# Expected Impact
-
-<v-clicks>
-
-| Metric | Before | After |
-|--------|--------|-------|
-| RAM used | 5+ GB | 2 GB |
-| JVM issues | Frequent | Rare |
-| Monthly costs | X | X * 0.5 |
-| Debug time | Hours | Minutes |
-| Proactive alerts | 0 | 5+ |
-
-</v-clicks>
-
----
-
 # Resources
 
 <v-clicks>
@@ -2651,31 +1804,11 @@ layout: section
 </v-clicks>
 
 ---
-
-# Questions & Answers
-
-<v-clicks>
-
-**Common topics**:
-- How to migrate to Data Streams?
-- What backup strategy?
-- How to handle Elastic Cloud updates?
-- How to optimize Kibana dashboards?
-
-</v-clicks>
-
----
 layout: end
 ---
 
 # Thank you for these 3 days!
 
-## Elasticsearch Parkki Training
-
-**Next steps**:
-1. Apply the action plan
-2. Post-training follow-up if needed
-3. Contact for questions
-
 **Emmanuel DEMEY**
-demey.emmanuel@gmail.com
+
+edemey@proton.me

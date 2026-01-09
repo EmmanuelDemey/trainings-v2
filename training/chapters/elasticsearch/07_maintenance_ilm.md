@@ -2,99 +2,99 @@
 layout: cover
 ---
 
-# Opérations de Maintenance
+# Maintenance Operations
 
-Gestion des sauvegardes, redémarrages et mises à jour
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de ce module, vous serez capable de :
-
-- **Configurer et gérer** des snapshots (sauvegardes) et restaurations
-- **Planifier et exécuter** des redémarrages de nœuds sans interruption de service
-- **Préparer et réaliser** des mises à jour de version Elasticsearch
-- **Utiliser les outils Kibana** pour faciliter les opérations de maintenance
+Backup management, restarts, and updates
 
 ---
 
-# Pourquoi la Maintenance est Critique
+# Learning Objectives
 
-Les opérations de maintenance garantissent la **disponibilité** et la **durabilité** de votre cluster :
+By the end of this module, you will be able to:
 
-**Scénarios courants nécessitant une maintenance** :
-1. 💾 **Sauvegarde régulière** : Protection contre la perte de données (corruption, suppression accidentelle, disaster recovery)
-2. 🔄 **Redémarrages planifiés** : Mise à jour de configuration, maintenance matérielle, optimisation système
-3. ⬆️ **Mises à jour de version** : Nouvelles fonctionnalités, correctifs de sécurité, améliorations de performance
-4. 🔧 **Maintenance du matériel** : Remplacement de disques, ajout de mémoire, migration vers nouveau serveur
-5. 🚨 **Récupération après incident** : Restauration suite à une panne, corruption de données, attaque
+- **Configure and manage** snapshots (backups) and restorations
+- **Plan and execute** node restarts without service interruption
+- **Prepare and perform** Elasticsearch version upgrades
+- **Use Kibana tools** to facilitate maintenance operations
 
-**Principe clé** : Toute opération de maintenance doit minimiser l'impact sur la disponibilité du service (**Rolling Operations**).
+---
+
+# Why Maintenance is Critical
+
+Maintenance operations ensure the **availability** and **durability** of your cluster:
+
+**Common scenarios requiring maintenance**:
+1. **Regular backup**: Protection against data loss (corruption, accidental deletion, disaster recovery)
+2. **Planned restarts**: Configuration updates, hardware maintenance, system optimization
+3. **Version upgrades**: New features, security fixes, performance improvements
+4. **Hardware maintenance**: Disk replacement, memory addition, server migration
+5. **Incident recovery**: Restoration following failure, data corruption, attack
+
+**Key principle**: Any maintenance operation must minimize impact on service availability (**Rolling Operations**).
 
 ---
 layout: section
 ---
 
-# Partie 1: Procédures de Sauvegarde et Restauration
+# Part 1: Backup and Restore Procedures
 
-Snapshots, repositories, et Snapshot Lifecycle Management
-
----
-
-# Concepts des Snapshots Elasticsearch
-
-Un **snapshot** est une sauvegarde incrémentale du cluster ou d'indices spécifiques.
-
-**Caractéristiques clés** :
-- 📸 **Sauvegarde incrémentale** : Seuls les segments non sauvegardés précédemment sont copiés
-- ⚡ **Performance optimisée** : Les snapshots n'impactent pas significativement les performances du cluster
-- 🎯 **Granularité flexible** : Sauvegarder tout le cluster, des indices spécifiques, ou des data streams
-- 🔄 **Restauration sélective** : Restaurer le cluster complet, des indices individuels, ou même des alias
-- 📦 **Compatibilité de version** : Snapshots créés en version N peuvent être restaurés en version N ou N+1
-
-**Documentation** : [Snapshot and Restore](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html)
+Snapshots, repositories, and Snapshot Lifecycle Management
 
 ---
 
-# Types de Repositories de Snapshots
+# Elasticsearch Snapshot Concepts
 
-Un **repository** est l'emplacement de stockage des snapshots.
+A **snapshot** is an incremental backup of the cluster or specific indices.
 
-**Types principaux** :
+**Key characteristics**:
+- **Incremental backup**: Only segments not previously backed up are copied
+- **Optimized performance**: Snapshots do not significantly impact cluster performance
+- **Flexible granularity**: Back up the entire cluster, specific indices, or data streams
+- **Selective restoration**: Restore the complete cluster, individual indices, or even aliases
+- **Version compatibility**: Snapshots created in version N can be restored in version N or N+1
+
+**Documentation**: [Snapshot and Restore](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html)
+
+---
+
+# Snapshot Repository Types
+
+A **repository** is the storage location for snapshots.
+
+**Main types**:
 
 | Type | Description | Use Case |
 |------|-------------|----------|
-| **fs** | Filesystem partagé (NFS) | On-premise |
+| **fs** | Shared filesystem (NFS) | On-premise |
 | **s3** | Amazon S3 | AWS / Cloud |
 | **gcs** | Google Cloud Storage | GCP |
 | **azure** | Azure Blob Storage | Azure |
 
 ---
 
-# Repositories: Configuration Avancée
+# Repositories: Advanced Configuration
 
-**Types additionnels** :
-- **hdfs** : Hadoop HDFS (intégration écosystème Hadoop)
-- **url** : Lecture seule HTTP/HTTPS (partage entre clusters)
+**Additional types**:
+- **hdfs**: Hadoop HDFS (Hadoop ecosystem integration)
+- **url**: Read-only HTTP/HTTPS (sharing between clusters)
 
-**Prérequis communs** :
-- ✅ Tous nœuds data/master doivent accéder au repository
-- ✅ Chemin déclaré dans `path.repo` (elasticsearch.yml)
+**Common prerequisites**:
+- All data/master nodes must access the repository
+- Path declared in `path.repo` (elasticsearch.yml)
 
 ---
 
-# Configuration d'un Repository Filesystem
+# Configuring a Filesystem Repository
 
-**Étape 1** : Configurer `path.repo` dans `elasticsearch.yml` sur **tous les nœuds** :
+**Step 1**: Configure `path.repo` in `elasticsearch.yml` on **all nodes**:
 
 ```yaml
 path.repo: ["/mnt/elasticsearch/backups"]
 ```
 
-**Étape 2** : Redémarrer les nœuds pour appliquer la configuration
+**Step 2**: Restart nodes to apply the configuration
 
-**Étape 3** : Créer le repository via l'API :
+**Step 3**: Create the repository via API:
 
 ```bash
 PUT /_snapshot/my_backup
@@ -110,7 +110,7 @@ PUT /_snapshot/my_backup
 }
 ```
 
-**Étape 4** : Vérifier le repository :
+**Step 4**: Verify the repository:
 
 ```bash
 GET /_snapshot/my_backup
@@ -118,9 +118,9 @@ GET /_snapshot/my_backup
 
 ---
 
-# Création de Snapshots
+# Creating Snapshots
 
-**Snapshot complet du cluster** :
+**Complete cluster snapshot**:
 
 ```bash
 PUT /_snapshot/my_backup/snapshot_1
@@ -135,7 +135,7 @@ PUT /_snapshot/my_backup/snapshot_1
 }
 ```
 
-**Snapshot d'indices spécifiques** :
+**Snapshot of specific indices**:
 
 ```bash
 PUT /_snapshot/my_backup/snapshot_products_2024_01_15
@@ -147,28 +147,28 @@ PUT /_snapshot/my_backup/snapshot_products_2024_01_15
 }
 ```
 
-**Paramètres importants** :
-- `include_global_state: true` : Inclut les templates, ILM policies, ingest pipelines
-- `partial: false` : Échoue si un shard primaire n'est pas disponible
-- `ignore_unavailable: true` : Ignore les indices qui n'existent pas
+**Important parameters**:
+- `include_global_state: true`: Includes templates, ILM policies, ingest pipelines
+- `partial: false`: Fails if a primary shard is not available
+- `ignore_unavailable: true`: Ignores indices that don't exist
 
 ---
 
-# Surveillance et Gestion des Snapshots
+# Monitoring and Managing Snapshots
 
-**Lister tous les snapshots d'un repository** :
+**List all snapshots from a repository**:
 
 ```bash
 GET /_snapshot/my_backup/_all
 ```
 
-**Obtenir le statut d'un snapshot en cours** :
+**Get status of an in-progress snapshot**:
 
 ```bash
 GET /_snapshot/my_backup/snapshot_1/_status
 ```
 
-**Résultat** :
+**Result**:
 ```json
 {
   "snapshots": [{
@@ -195,9 +195,9 @@ GET /_snapshot/my_backup/snapshot_1/_status
 
 ---
 
-# Restauration depuis un Snapshot
+# Restoring from a Snapshot
 
-**Restaurer tous les indices** :
+**Restore all indices**:
 
 ```bash
 POST /_snapshot/my_backup/snapshot_1/_restore
@@ -208,7 +208,7 @@ POST /_snapshot/my_backup/snapshot_1/_restore
 }
 ```
 
-**Restaurer avec renommage** (pour tester ou comparer) :
+**Restore with renaming** (for testing or comparison):
 
 ```bash
 POST /_snapshot/my_backup/snapshot_1/_restore
@@ -222,9 +222,9 @@ POST /_snapshot/my_backup/snapshot_1/_restore
 
 ---
 
-# Restauration depuis un Snapshot
+# Restoring from a Snapshot
 
-**Restauration partielle** (uniquement certains indices) :
+**Partial restoration** (only certain indices):
 
 ```bash
 POST /_snapshot/my_backup/snapshot_1/_restore
@@ -238,15 +238,15 @@ POST /_snapshot/my_backup/snapshot_1/_restore
 }
 ```
 
-**Note** : La restauration nécessite que les indices ciblés n'existent pas déjà (ou soient fermés).
+**Note**: Restoration requires that target indices don't already exist (or are closed).
 
 ---
 
 # Snapshot Lifecycle Management (SLM)
 
-**SLM** automatise la création et la suppression de snapshots selon des politiques définies.
+**SLM** automates snapshot creation and deletion according to defined policies.
 
-**Créer une politique SLM** :
+**Create an SLM policy**:
 
 ```bash
 PUT /_slm/policy/daily-snapshots
@@ -271,30 +271,30 @@ PUT /_slm/policy/daily-snapshots
 
 # Snapshot Lifecycle Management (SLM)
 
-**Paramètres clés** :
-- `schedule` : Expression cron (ici : 1h30 du matin tous les jours)
-- `name` : Template de nom avec date (génère `daily-snap-2024-01-15`)
-- `retention.expire_after` : Supprimer les snapshots de plus de 30 jours
-- `retention.min_count` : Garder au moins 5 snapshots même si expirés
-- `retention.max_count` : Ne jamais dépasser 50 snapshots
+**Key parameters**:
+- `schedule`: Cron expression (here: 1:30 AM every day)
+- `name`: Name template with date (generates `daily-snap-2024-01-15`)
+- `retention.expire_after`: Delete snapshots older than 30 days
+- `retention.min_count`: Keep at least 5 snapshots even if expired
+- `retention.max_count`: Never exceed 50 snapshots
 
 ---
 
-# Gestion des Politiques SLM
+# Managing SLM Policies
 
-**Exécuter manuellement une politique SLM** :
+**Manually execute an SLM policy**:
 
 ```bash
 POST /_slm/policy/daily-snapshots/_execute
 ```
 
-**Vérifier le statut d'une politique** :
+**Check policy status**:
 
 ```bash
 GET /_slm/policy/daily-snapshots
 ```
 
-**Afficher l'historique des exécutions** :
+**Display execution history**:
 
 ```bash
 GET /_slm/policy/daily-snapshots/_status
@@ -302,9 +302,9 @@ GET /_slm/policy/daily-snapshots/_status
 
 ---
 
-# Gestion des Politiques SLM
+# Managing SLM Policies
 
-**Résultat** :
+**Result**:
 ```json
 {
   "daily-snapshots": {
@@ -328,54 +328,54 @@ GET /_slm/policy/daily-snapshots/_status
 
 ---
 
-# Supprimer des Snapshots
+# Deleting Snapshots
 
-**Supprimer un snapshot spécifique** :
+**Delete a specific snapshot**:
 
 ```bash
 DELETE /_snapshot/my_backup/snapshot_1
 ```
 
-**Attention** : La suppression d'un snapshot :
-- Libère l'espace disque des segments uniques à ce snapshot
-- N'affecte **pas** les segments partagés avec d'autres snapshots (snapshots incrémentaux)
-- Peut prendre du temps pour les gros snapshots
+**Warning**: Deleting a snapshot:
+- Frees disk space for segments unique to that snapshot
+- Does **not** affect segments shared with other snapshots (incremental snapshots)
+- Can take time for large snapshots
 
-**Supprimer un repository** (et tous ses snapshots) :
+**Delete a repository** (and all its snapshots):
 
 ```bash
 DELETE /_snapshot/my_backup
 ```
 
-**Best Practice** : Utilisez SLM avec `retention` pour automatiser le nettoyage et éviter l'accumulation de snapshots obsolètes.
+**Best Practice**: Use SLM with `retention` to automate cleanup and avoid accumulation of obsolete snapshots.
 
 ---
 layout: section
 ---
 
-# Partie 2: Stratégies de Redémarrage de Nœuds
+# Part 2: Node Restart Strategies
 
-Rolling restarts et graceful shutdown
-
----
-
-# Pourquoi un Rolling Restart ?
-
-Un **rolling restart** permet de redémarrer les nœuds un par un sans interruption de service.
-
-**Scénarios courants** :
-- 🔧 **Changement de configuration** : Modification de `elasticsearch.yml` ou `jvm.options`
-- 💾 **Mise à jour du système** : Patches OS, mises à jour de sécurité
-- 🖥️ **Maintenance matérielle** : Ajout de RAM, remplacement de disques
-- 🔄 **Optimisation système** : Changement de paramètres kernel, file descriptors
-
-**Principe clé** : Désactiver temporairement l'allocation des shards pour éviter les déplacements inutiles pendant les redémarrages.
+Rolling restarts and graceful shutdown
 
 ---
 
-# Procédure de Rolling Restart (1/2)
+# Why a Rolling Restart?
 
-**Étape 1** : Désactiver l'allocation des shards
+A **rolling restart** allows restarting nodes one by one without service interruption.
+
+**Common scenarios**:
+- **Configuration change**: Modification of `elasticsearch.yml` or `jvm.options`
+- **System update**: OS patches, security updates
+- **Hardware maintenance**: Adding RAM, replacing disks
+- **System optimization**: Kernel parameter changes, file descriptors
+
+**Key principle**: Temporarily disable shard allocation to avoid unnecessary movements during restarts.
+
+---
+
+# Rolling Restart Procedure (1/2)
+
+**Step 1**: Disable shard allocation
 
 ```bash
 PUT /_cluster/settings
@@ -386,66 +386,66 @@ PUT /_cluster/settings
 }
 ```
 
-**Options** :
-- `"all"` : Allouer tous les shards (primaires et répliques) - **valeur normale**
-- `"primaries"` : Allouer uniquement les shards primaires - **pour rolling restart**
-- `"new_primaries"` : Allouer uniquement les primaires de nouveaux indices
-- `"none"` : N'allouer aucun shard - **utilisation avancée uniquement**
+**Options**:
+- `"all"`: Allocate all shards (primaries and replicas) - **normal value**
+- `"primaries"`: Allocate only primary shards - **for rolling restart**
+- `"new_primaries"`: Allocate only primaries of new indices
+- `"none"`: Allocate no shards - **advanced use only**
 
-**Étape 2** : Arrêter l'indexing syncing (optionnel mais recommandé)
+**Step 2**: Stop index syncing (optional but recommended)
 
 ```bash
 POST /_flush/synced
 ```
 
-Ceci accélère la récupération des shards après le redémarrage.
+This accelerates shard recovery after restart.
 
 ---
 
-# Procédure de Rolling Restart (2/2)
+# Rolling Restart Procedure (2/2)
 
-**Étape 3** : Arrêter un nœud
+**Step 3**: Stop a node
 
 ```bash
-# Méthode 1 : Arrêt gracieux via systemd
+# Method 1: Graceful stop via systemd
 sudo systemctl stop elasticsearch
 
-# Méthode 2 : Arrêt via script
+# Method 2: Stop via script
 sudo /usr/share/elasticsearch/bin/elasticsearch-service-mgmt.sh stop
 
-# Méthode 3 : Kill gracieux (SIGTERM)
+# Method 3: Graceful kill (SIGTERM)
 kill -SIGTERM <pid>
 ```
 
-**Étape 4** : Effectuer la maintenance (changement de config, update OS, etc.)
+**Step 4**: Perform maintenance (config change, OS update, etc.)
 
-**Étape 5** : Redémarrer le nœud
+**Step 5**: Restart the node
 
 ```bash
 sudo systemctl start elasticsearch
 ```
 
-**Étape 6** : Vérifier que le nœud a rejoint le cluster
+**Step 6**: Verify the node has joined the cluster
 
 ```bash
 GET /_cat/nodes?v&h=name,node.role,uptime,heap.percent,cpu,load_1m
 ```
 
-Attendez que le nœud soit **UP** et que l'uptime soit faible (indiquant un redémarrage récent).
+Wait for the node to be **UP** with low uptime (indicating a recent restart).
 
 ---
 
-# Fin de la Procédure de Rolling Restart
+# End of Rolling Restart Procedure
 
-**Étape 7** : Vérifier la santé du cluster avant de passer au nœud suivant
+**Step 7**: Verify cluster health before moving to the next node
 
 ```bash
 GET /_cluster/health?wait_for_status=yellow&timeout=5m
 ```
 
-**Étape 8** : Répéter les étapes 3-7 pour chaque nœud
+**Step 8**: Repeat steps 3-7 for each node
 
-**Étape 9** : Réactiver l'allocation complète des shards
+**Step 9**: Re-enable full shard allocation
 
 ```bash
 PUT /_cluster/settings
@@ -456,56 +456,56 @@ PUT /_cluster/settings
 }
 ```
 
-**Étape 10** : Vérifier le statut final du cluster
+**Step 10**: Verify final cluster status
 
 ```bash
 GET /_cluster/health?wait_for_status=green&timeout=10m
 ```
 
-**Astuce** : Utilisez `wait_for_status` et `timeout` pour bloquer jusqu'à ce que le cluster soit stable.
+**Tip**: Use `wait_for_status` and `timeout` to block until the cluster is stable.
 
 ---
 
-# Graceful Shutdown : Éviter les Interruptions
+# Graceful Shutdown: Avoiding Interruptions
 
-Un **graceful shutdown** arrête proprement Elasticsearch en terminant les opérations en cours.
+A **graceful shutdown** properly stops Elasticsearch by completing in-progress operations.
 
-**Ce qui se passe pendant un graceful shutdown** :
-1. 🛑 Elasticsearch cesse d'accepter de nouvelles requêtes
-2. 💾 Les requêtes en cours sont finalisées (avec timeout)
-3. 🔄 Les shards primaires sont synchronisés avec leurs répliques
-4. 📝 Les translog sont flushés sur disque
-5. ✅ Le processus se termine proprement
+**What happens during a graceful shutdown**:
+1. Elasticsearch stops accepting new requests
+2. In-progress requests are finalized (with timeout)
+3. Primary shards are synchronized with their replicas
+4. Translogs are flushed to disk
+5. The process terminates properly
 
-**Signaux système** :
-- **SIGTERM** : Shutdown gracieux (recommandé)
-- **SIGKILL** : Arrêt brutal (éviter, risque de corruption)
+**System signals**:
+- **SIGTERM**: Graceful shutdown (recommended)
+- **SIGKILL**: Brutal stop (avoid, risk of corruption)
 
 ```bash
-# Bon : Graceful shutdown
+# Good: Graceful shutdown
 kill -SIGTERM $(cat /var/run/elasticsearch/elasticsearch.pid)
 
-# Mauvais : Brutal kill (utiliser seulement si le processus est bloqué)
+# Bad: Brutal kill (use only if process is stuck)
 kill -9 $(cat /var/run/elasticsearch/elasticsearch.pid)
 ```
 
 ---
 
-# Vérification de l'État des Shards Pendant Restart
+# Verifying Shard State During Restart
 
-**Surveiller l'allocation des shards** :
+**Monitor shard allocation**:
 
 ```bash
 GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason&s=state
 ```
 
-**États des shards** :
-- `STARTED` : Shard actif et prêt
-- `INITIALIZING` : Shard en cours de récupération
-- `RELOCATING` : Shard en cours de déplacement vers un autre nœud
-- `UNASSIGNED` : Shard non assigné (normal pendant le restart d'un nœud)
+**Shard states**:
+- `STARTED`: Active and ready shard
+- `INITIALIZING`: Shard being recovered
+- `RELOCATING`: Shard being moved to another node
+- `UNASSIGNED`: Unassigned shard (normal during node restart)
 
-**Identifier les shards non assignés** :
+**Identify unassigned shards**:
 
 ```bash
 GET /_cluster/allocation/explain
@@ -516,58 +516,58 @@ GET /_cluster/allocation/explain
 }
 ```
 
-Ceci fournit une explication détaillée de pourquoi un shard n'est pas assigné.
+This provides a detailed explanation of why a shard is not assigned.
 
 ---
 layout: section
 ---
 
-# Partie 3: Planification de Mise à Jour de Version
+# Part 3: Version Upgrade Planning
 
-Rolling upgrades et compatibilité
-
----
-
-# Chemins de Mise à Jour Supportés
-
-Elasticsearch suit des règles strictes de compatibilité de version.
-
-**Règles de mise à jour** :
-- ✅ **Minor upgrade** : 8.10 → 8.11 → 8.12 (toujours supporté)
-- ✅ **Rolling upgrade** : 8.x → 8.y (un nœud à la fois, sans downtime)
-- ✅ **Major upgrade** : 7.17 → 8.x (dernier minor de 7.x requis)
-- ❌ **Sauter une version majeure** : 7.x → 9.x (NON supporté)
-- ❌ **Downgrade** : 8.5 → 8.4 (NON supporté - restaurer depuis snapshot)
-
-**Version minimale pour upgrade vers 8.x** :
-- Vous devez être en **Elasticsearch 7.17** minimum pour migrer vers 8.x
-- Les snapshots créés en 7.x peuvent être restaurés en 8.x
-
-**Documentation** : [Upgrade Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html)
+Rolling upgrades and compatibility
 
 ---
 
-# Préparation de la Mise à Jour
+# Supported Upgrade Paths
 
-**Étape 1** : Exécuter l'Upgrade Assistant (Kibana)
+Elasticsearch follows strict version compatibility rules.
 
-- Accéder à **Stack Management** → **Upgrade Assistant**
-- Identifier les **breaking changes** et **deprecations**
-- Résoudre les problèmes signalés
+**Upgrade rules**:
+- **Minor upgrade**: 8.10 -> 8.11 -> 8.12 (always supported)
+- **Rolling upgrade**: 8.x -> 8.y (one node at a time, no downtime)
+- **Major upgrade**: 7.17 -> 8.x (last 7.x minor required)
+- **Skip a major version**: 7.x -> 9.x (NOT supported)
+- **Downgrade**: 8.5 -> 8.4 (NOT supported - restore from snapshot)
 
-**Étape 2** : Vérifier les compatibilités via API
+**Minimum version for upgrade to 8.x**:
+- You must be on **Elasticsearch 7.17** minimum to migrate to 8.x
+- Snapshots created in 7.x can be restored in 8.x
+
+**Documentation**: [Upgrade Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html)
+
+---
+
+# Upgrade Preparation
+
+**Step 1**: Run the Upgrade Assistant (Kibana)
+
+- Access **Stack Management** -> **Upgrade Assistant**
+- Identify **breaking changes** and **deprecations**
+- Resolve reported issues
+
+**Step 2**: Check compatibility via API
 
 ```bash
 GET /_migration/deprecations
 ```
 
-Vérifier les niveaux : `warning`, `critical`
+Check levels: `warning`, `critical`
 
 ---
 
-# Préparation de la Mise à Jour (exemple de réponse)
+# Upgrade Preparation (example response)
 
-**Exemple de résultat** :
+**Example result**:
 ```json
 {
   "cluster_settings": [{
@@ -586,9 +586,9 @@ Vérifier les niveaux : `warning`, `critical`
 
 ---
 
-# Préparation de la Mise à Jour (Suite)
+# Upgrade Preparation (Continued)
 
-**Étape 3** : Créer un snapshot complet
+**Step 3**: Create a complete snapshot
 
 ```bash
 PUT /_snapshot/my_backup/pre_upgrade_snapshot
@@ -601,21 +601,21 @@ PUT /_snapshot/my_backup/pre_upgrade_snapshot
 }
 ```
 
-**Étape 4** : Tester en environnement de test
-1. Restaurer snapshot dans cluster test
-2. Effectuer upgrade sur cluster test
-3. Valider le fonctionnement
-4. Noter les problèmes
+**Step 4**: Test in a test environment
+1. Restore snapshot in test cluster
+2. Perform upgrade on test cluster
+3. Validate functionality
+4. Note issues
 
-**Étape 5** : Planifier fenêtre de maintenance
-- **Rolling upgrades** : 1-2h
-- **Full restart** : 15-30 min downtime
+**Step 5**: Plan maintenance window
+- **Rolling upgrades**: 1-2h
+- **Full restart**: 15-30 min downtime
 
 ---
 
-# Procédure de Rolling Upgrade (1/2)
+# Rolling Upgrade Procedure (1/2)
 
-**Étape 1** : Désactiver le shard allocation
+**Step 1**: Disable shard allocation
 
 ```bash
 PUT /_cluster/settings
@@ -626,25 +626,25 @@ PUT /_cluster/settings
 }
 ```
 
-**Étape 2** : Arrêter les tâches de machine learning et monitoring (si applicable)
+**Step 2**: Stop machine learning and monitoring tasks (if applicable)
 
 ```bash
 POST _ml/set_upgrade_mode?enabled=true
 ```
 
-**Étape 3** : Stopper un nœud non-master
+**Step 3**: Stop a non-master node
 
 ```bash
 sudo systemctl stop elasticsearch
 ```
 
-**Ordre recommandé** : data nodes → ingest nodes → coordinating nodes → master nodes
+**Recommended order**: data nodes -> ingest nodes -> coordinating nodes -> master nodes
 
 ---
 
-# Procédure de Rolling Upgrade (2/2)
+# Rolling Upgrade Procedure (2/2)
 
-**Étape 4** : Mettre à jour Elasticsearch sur le nœud arrêté
+**Step 4**: Upgrade Elasticsearch on the stopped node
 
 ```bash
 # Debian/Ubuntu
@@ -655,7 +655,7 @@ sudo apt-get install elasticsearch=8.12.0
 sudo yum update elasticsearch-8.12.0
 ```
 
-**Étape 5** : Mettre à jour les plugins (si installés)
+**Step 5**: Update plugins (if installed)
 
 ```bash
 sudo /usr/share/elasticsearch/bin/elasticsearch-plugin list
@@ -663,7 +663,7 @@ sudo /usr/share/elasticsearch/bin/elasticsearch-plugin remove <plugin-name>
 sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install <plugin-name>
 ```
 
-**Étape 6** : Démarrer le nœud mis à jour
+**Step 6**: Start the updated node
 
 ```bash
 sudo systemctl start elasticsearch
@@ -671,17 +671,17 @@ sudo systemctl start elasticsearch
 
 ---
 
-# Fin de la Procédure de Rolling Upgrade
+# End of Rolling Upgrade Procedure
 
-**Étape 7** : Vérifier que le nœud a rejoint le cluster
+**Step 7**: Verify the node has joined the cluster
 
 ```bash
 GET /_cat/nodes?v&h=name,version,node.role,uptime
 ```
 
-Vous devriez voir la nouvelle version pour le nœud redémarré.
+You should see the new version for the restarted node.
 
-**Étape 8** : Réactiver shard allocation
+**Step 8**: Re-enable shard allocation
 
 ```bash
 PUT /_cluster/settings
@@ -692,15 +692,15 @@ PUT /_cluster/settings
 }
 ```
 
-**Étape 9** : Attendre que le cluster soit GREEN
+**Step 9**: Wait for cluster to be GREEN
 
 ```bash
 GET /_cluster/health?wait_for_status=green&timeout=10m
 ```
 
-**Étape 10** : Répéter les étapes 3-9 pour chaque nœud restant
+**Step 10**: Repeat steps 3-9 for each remaining node
 
-**Étape 11** : Réactiver le machine learning
+**Step 11**: Re-enable machine learning
 
 ```bash
 POST _ml/set_upgrade_mode?enabled=false
@@ -708,52 +708,52 @@ POST _ml/set_upgrade_mode?enabled=false
 
 ---
 
-# Vérification Post-Upgrade
+# Post-Upgrade Verification
 
-**Vérifier les versions de tous les nœuds** :
+**Verify versions of all nodes**:
 
 ```bash
 GET /_cat/nodes?v&h=name,version,build,jdk
 ```
 
-**Vérifier les indices et leurs versions** :
+**Verify indices and their versions**:
 
 ```bash
 GET /_cat/indices?v&h=index,health,status,pri,rep,docs.count,store.size
 ```
 
-**Exécuter des tests de fumée** :
-1. Indexer un document test
-2. Rechercher le document
-3. Exécuter une agrégation simple
-4. Vérifier les dashboards Kibana
+**Run smoke tests**:
+1. Index a test document
+2. Search for the document
+3. Run a simple aggregation
+4. Verify Kibana dashboards
 
 ```bash
-# Test d'indexation
+# Indexing test
 POST /test-post-upgrade/_doc
 {"timestamp": "2024-01-15T10:00:00Z", "message": "Post-upgrade test"}
 
-# Test de recherche
+# Search test
 GET /test-post-upgrade/_search
 ```
 
 ---
 
-# Gestion des Problèmes d'Upgrade
+# Handling Upgrade Problems
 
-**Problème** : Un nœud ne redémarre pas après l'upgrade
+**Problem**: A node doesn't restart after upgrade
 
-**Solutions** :
-1. Consulter les logs : `/var/log/elasticsearch/<cluster-name>.log`
-2. Vérifier la compatibilité JVM (Elasticsearch 8.x requiert Java 17+)
-3. Vérifier les paramètres mémoire (`jvm.options`)
-4. Vérifier les permissions sur les répertoires data et logs
+**Solutions**:
+1. Check logs: `/var/log/elasticsearch/<cluster-name>.log`
+2. Verify JVM compatibility (Elasticsearch 8.x requires Java 17+)
+3. Verify memory parameters (`jvm.options`)
+4. Verify permissions on data and log directories
 
-**Problème** : Les shards restent UNASSIGNED après l'upgrade
+**Problem**: Shards remain UNASSIGNED after upgrade
 
-**Solutions** :
-1. Vérifier l'allocation : `GET /_cluster/allocation/explain`
-2. Forcer l'allocation si nécessaire (dernier recours) :
+**Solutions**:
+1. Check allocation: `GET /_cluster/allocation/explain`
+2. Force allocation if necessary (last resort):
 
 ```bash
 POST /_cluster/reroute
@@ -772,63 +772,63 @@ POST /_cluster/reroute
 layout: section
 ---
 
-# Partie 4: Outils de Gestion Kibana
+# Part 4: Kibana Management Tools
 
-Interfaces graphiques pour faciliter la maintenance
+Graphical interfaces to facilitate maintenance
 
 ---
 
-# Kibana Stack Management : Vue d'Ensemble
+# Kibana Stack Management: Overview
 
-**Stack Management** centralise tous les outils d'administration Elasticsearch et Kibana.
+**Stack Management** centralizes all Elasticsearch and Kibana administration tools.
 
-**Accès** : Menu latéral Kibana → Icône d'engrenage ⚙️ → **Stack Management**
+**Access**: Kibana side menu -> Gear icon -> **Stack Management**
 
-**Sections principales pour les opérations** :
+**Main sections for operations**:
 
-| Section | Outils disponibles |
-|---------|-------------------|
+| Section | Available Tools |
+|---------|-----------------|
 | **Data** | Index Management, Index Lifecycle Policies, Snapshot and Restore, Rollup Jobs, Transforms |
 | **Ingest** | Ingest Pipelines, Logstash Pipelines |
 | **Alerts and Insights** | Rules, Connectors, Cases |
 | **Stack** | License Management, Upgrade Assistant |
 | **Security** | Users, Roles, API Keys |
 
-Nous nous concentrerons sur les outils liés à la **maintenance** : Index Management, Snapshot and Restore, et Upgrade Assistant.
+We will focus on **maintenance**-related tools: Index Management, Snapshot and Restore, and Upgrade Assistant.
 
 ---
 
 # Index Management UI
 
-**Accès** : Stack Management → Data → **Index Management**
+**Access**: Stack Management -> Data -> **Index Management**
 
-**Fonctionnalités** :
+**Features**:
 
-1. **Vue d'ensemble des indices**
-   - Liste tous les indices avec taille, nombre de documents, santé
-   - Filtrage et recherche par nom d'index
-   - Tri par différentes colonnes
+1. **Index overview**
+   - Lists all indices with size, document count, health
+   - Filtering and searching by index name
+   - Sorting by different columns
 
-2. **Actions sur les indices** (bouton Actions) :
-   - 🔒 **Close / Open** : Fermer/ouvrir un index (libère la mémoire sans supprimer)
-   - 🔄 **Force merge** : Optimiser les segments (recommandé pour indices non modifiés)
-   - ❄️ **Freeze / Unfreeze** : Geler un index (minimal memory footprint)
-   - 🗑️ **Delete** : Supprimer définitivement un index
-   - 📝 **Edit settings** : Modifier les settings (replicas, refresh_interval, etc.)
+2. **Actions on indices** (Actions button):
+   - **Close / Open**: Close/open an index (frees memory without deleting)
+   - **Force merge**: Optimize segments (recommended for unchanged indices)
+   - **Freeze / Unfreeze**: Freeze an index (minimal memory footprint)
+   - **Delete**: Permanently delete an index
+   - **Edit settings**: Modify settings (replicas, refresh_interval, etc.)
 
-3. **Gestion des templates et component templates**
-   - Créer, modifier, supprimer des index templates
-   - Visualiser les templates appliqués à un index
+3. **Template and component template management**
+   - Create, modify, delete index templates
+   - View templates applied to an index
 
 ---
 
-# Index Management : Cas d'Usage
+# Index Management: Use Cases
 
-**Cas d'usage 1** : Augmenter le nombre de répliques pour un index critique
+**Use case 1**: Increase replica count for a critical index
 
-1. Sélectionner l'index dans la liste
-2. Cliquer sur **Manage** → **Edit settings**
-3. Modifier `number_of_replicas` :
+1. Select the index in the list
+2. Click **Manage** -> **Edit settings**
+3. Modify `number_of_replicas`:
 
 ```json
 {
@@ -836,151 +836,151 @@ Nous nous concentrerons sur les outils liés à la **maintenance** : Index Manag
 }
 ```
 
-4. Cliquer sur **Save**
+4. Click **Save**
 
-**Cas d'usage 2** : Forcer un merge après une purge importante
+**Use case 2**: Force merge after a major purge
 
-1. Sélectionner l'index
-2. Cliquer sur **Manage** → **Force merge**
-3. Configurer :
-   - **Max number of segments** : 1 (pour optimisation maximale)
-   - ⚠️ Attention : Le force merge est intensif en I/O, à réaliser en heures creuses
+1. Select the index
+2. Click **Manage** -> **Force merge**
+3. Configure:
+   - **Max number of segments**: 1 (for maximum optimization)
+   - Warning: Force merge is I/O intensive, perform during off-peak hours
 
-**Cas d'usage 3** : Fermer temporairement des indices inactifs
+**Use case 3**: Temporarily close inactive indices
 
-1. Sélectionner les indices à fermer
-2. Cliquer sur **Manage** → **Close index**
-3. Les indices fermés n'utilisent plus de mémoire mais restent sur disque
+1. Select indices to close
+2. Click **Manage** -> **Close index**
+3. Closed indices no longer use memory but remain on disk
 
 ---
 
 # Snapshot and Restore UI
 
-**Accès** : Stack Management → Data → **Snapshot and Restore**
+**Access**: Stack Management -> Data -> **Snapshot and Restore**
 
-**Onglet "Repositories"** :
-- Voir tous les repositories configurés
-- Ajouter un nouveau repository (fs, S3, GCS, Azure)
-- Vérifier la connectivité d'un repository
-- Supprimer un repository
+**"Repositories" tab**:
+- View all configured repositories
+- Add a new repository (fs, S3, GCS, Azure)
+- Verify repository connectivity
+- Delete a repository
 
-**Onglet "Snapshots"** :
-- Lister tous les snapshots de tous les repositories
-- Créer un nouveau snapshot (avec sélecteur d'indices graphique)
-- Voir les détails d'un snapshot (indices inclus, taille, durée)
-- Supprimer des snapshots
-- **Restaurer un snapshot** avec options graphiques
+**"Snapshots" tab**:
+- List all snapshots from all repositories
+- Create a new snapshot (with graphical index selector)
+- View snapshot details (included indices, size, duration)
+- Delete snapshots
+- **Restore a snapshot** with graphical options
 
-**Onglet "Policies"** (SLM) :
-- Créer, modifier, supprimer des politiques SLM
-- Voir l'historique des exécutions
-- Exécuter manuellement une politique
-
----
-
-# Snapshot and Restore UI : Créer un Snapshot
-
-**Workflow graphique** :
-
-1. Aller dans **Snapshots** → Cliquer sur **Create a snapshot**
-
-2. **Étape 1 : Repository**
-   - Sélectionner le repository dans le menu déroulant
-
-3. **Étape 2 : Snapshot settings**
-   - **Snapshot name** : Nom du snapshot (supporter les variables de date)
-   - **Indices** : Sélecteur graphique avec autocomplétion
-   - **Include global state** : Cocher pour sauvegarder templates, ILM policies, etc.
-   - **Ignore unavailable indices** : Tolérer les indices manquants
-
-4. **Étape 3 : Review**
-   - Récapitulatif de la configuration
-   - Cliquer sur **Create snapshot**
-
-5. **Monitoring** :
-   - La liste des snapshots se met à jour en temps réel
-   - État : `IN_PROGRESS` → `SUCCESS` ou `FAILED`
+**"Policies" tab** (SLM):
+- Create, modify, delete SLM policies
+- View execution history
+- Manually execute a policy
 
 ---
 
-# Snapshot and Restore UI : Restaurer un Snapshot
+# Snapshot and Restore UI: Creating a Snapshot
 
-**Workflow graphique** :
+**Graphical workflow**:
 
-1. Dans la liste des snapshots, cliquer sur le nom du snapshot
+1. Go to **Snapshots** -> Click **Create a snapshot**
 
-2. Cliquer sur **Restore**
+2. **Step 1: Repository**
+   - Select the repository from the dropdown
 
-3. **Étape 1 : Select indices**
-   - Cocher les indices à restaurer
-   - Option : **Restore all indices**
+3. **Step 2: Snapshot settings**
+   - **Snapshot name**: Snapshot name (supports date variables)
+   - **Indices**: Graphical selector with autocomplete
+   - **Include global state**: Check to save templates, ILM policies, etc.
+   - **Ignore unavailable indices**: Tolerate missing indices
 
-4. **Étape 2 : Customize index settings** (optionnel)
-   - Renommer les indices restaurés : `restored_*`
-   - Modifier les settings (replicas, etc.)
-   - Activer/désactiver la restauration des alias
+4. **Step 3: Review**
+   - Configuration summary
+   - Click **Create snapshot**
 
-5. **Étape 3 : Review and restore**
-   - Vérifier la configuration
-   - Cliquer sur **Restore snapshot**
+5. **Monitoring**:
+   - The snapshot list updates in real-time
+   - Status: `IN_PROGRESS` -> `SUCCESS` or `FAILED`
 
-6. **Monitoring** :
-   - Suivre la progression dans **Index Management**
-   - Les indices restaurés apparaissent avec leur nouveau nom
+---
+
+# Snapshot and Restore UI: Restoring a Snapshot
+
+**Graphical workflow**:
+
+1. In the snapshot list, click on the snapshot name
+
+2. Click **Restore**
+
+3. **Step 1: Select indices**
+   - Check indices to restore
+   - Option: **Restore all indices**
+
+4. **Step 2: Customize index settings** (optional)
+   - Rename restored indices: `restored_*`
+   - Modify settings (replicas, etc.)
+   - Enable/disable alias restoration
+
+5. **Step 3: Review and restore**
+   - Verify configuration
+   - Click **Restore snapshot**
+
+6. **Monitoring**:
+   - Track progress in **Index Management**
+   - Restored indices appear with their new name
 
 ---
 
 # Upgrade Assistant
 
-**Accès** : Stack Management → Stack → **Upgrade Assistant**
+**Access**: Stack Management -> Stack -> **Upgrade Assistant**
 
-**Fonctionnalités** :
+**Features**:
 
-1. **Overview** :
-   - Version actuelle du cluster
-   - Version cible de l'upgrade
-   - Nombre de problèmes critiques, warnings, et info
+1. **Overview**:
+   - Current cluster version
+   - Target upgrade version
+   - Number of critical issues, warnings, and info
 
-2. **Deprecation issues** :
-   - Liste des problèmes organisés par catégorie :
-     - 🔴 **Critical** : Doit être résolu avant l'upgrade
-     - 🟡 **Warning** : Recommandé de résoudre
-     - 🔵 **Info** : Information seulement
+2. **Deprecation issues**:
+   - List of issues organized by category:
+     - **Critical**: Must be resolved before upgrade
+     - **Warning**: Recommended to resolve
+     - **Info**: Information only
 
-3. **Automated fixes** :
-   - Certains problèmes peuvent être résolus automatiquement
-   - Cliquer sur **Fix** pour appliquer la correction
-   - Exemple : Reindex automatique pour mettre à jour des mappings obsolètes
+3. **Automated fixes**:
+   - Some issues can be resolved automatically
+   - Click **Fix** to apply the correction
+   - Example: Automatic reindex to update obsolete mappings
 
-4. **Reindex helper** :
-   - Assistant pour réindexer les indices incompatibles
-   - Génère automatiquement la configuration de reindexation
+4. **Reindex helper**:
+   - Assistant for reindexing incompatible indices
+   - Automatically generates reindexing configuration
 
 ---
 
-# Upgrade Assistant : Résoudre les Deprecations
+# Upgrade Assistant: Resolving Deprecations
 
-**Exemple de problème critique** :
+**Example of critical issue**:
 
 ```
 Index 'logs-2023' uses deprecated mapping parameter
 ```
 
-**Solution via Upgrade Assistant** :
+**Solution via Upgrade Assistant**:
 
-1. Cliquer sur le problème pour afficher détails
-2. Consulter la documentation liée
-3. Options :
-   - **Option A** : Réindexer sans paramètre obsolète
-   - **Option B** : Supprimer si données non nécessaires
+1. Click on the issue to display details
+2. Consult the linked documentation
+3. Options:
+   - **Option A**: Reindex without obsolete parameter
+   - **Option B**: Delete if data not needed
 
 ---
 
-# Upgrade Assistant : Reindex Helper
+# Upgrade Assistant: Reindex Helper
 
-**Utiliser le Reindex Helper** :
-- Cliquer sur **Reindex**
-- Configuration automatique générée :
+**Using the Reindex Helper**:
+- Click **Reindex**
+- Automatically generated configuration:
 
 ```json
 {
@@ -989,103 +989,103 @@ Index 'logs-2023' uses deprecated mapping parameter
 }
 ```
 
-**Actions** :
-1. Lancer la réindexation
-2. Surveiller la progression
-3. Valider le nouvel index
-4. Supprimer l'ancien après validation
+**Actions**:
+1. Launch reindexing
+2. Monitor progress
+3. Validate the new index
+4. Delete the old one after validation
 
 ---
 
-# Data Visualizer et Canvas pour Monitoring
+# Data Visualizer and Canvas for Monitoring
 
-**Data Visualizer** (Machine Learning) :
+**Data Visualizer** (Machine Learning):
 
-- Analyser automatiquement la structure des données d'un index
-- Identifier les champs, types, cardinalités
-- Détecter les anomalies dans les distributions de valeurs
-- Utile pour comprendre un index avant une migration
+- Automatically analyze the data structure of an index
+- Identify fields, types, cardinalities
+- Detect anomalies in value distributions
+- Useful for understanding an index before migration
 
-**Canvas** (Kibana) :
+**Canvas** (Kibana):
 
-- Créer des dashboards de présentation personnalisés
-- Intégrer des données en temps réel et des métriques statiques
-- Utile pour créer des rapports de maintenance pour management
+- Create custom presentation dashboards
+- Integrate real-time data and static metrics
+- Useful for creating maintenance reports for management
 
-**Accès** :
-- Data Visualizer : Menu Kibana → **Machine Learning** → **Data Visualizer**
-- Canvas : Menu Kibana → **Canvas**
-
----
-
-# Résumé : Opérations de Maintenance
-
-| Opération | Outils | Fréquence | Impact |
-|-----------|--------|-----------|--------|
-| **Snapshots** | API `/_snapshot`, SLM, Kibana UI | Quotidien / Hebdomadaire | Minimal (opération asynchrone) |
-| **Rolling Restart** | Scripts, systemctl | Mensuel / Ad-hoc | Aucun (si bien exécuté) |
-| **Rolling Upgrade** | Package manager, Upgrade Assistant | Trimestriel / Annuel | Minimal (Rolling) |
-| **Force Merge** | API `/_forcemerge`, Kibana Index Management | Après bulk delete | Élevé (I/O intensif) |
-| **Reindex** | API `/_reindex`, Upgrade Assistant | Ad-hoc (deprecations) | Élevé (CPU + I/O) |
-
-**Principes clés** :
-1. ✅ **Toujours créer un snapshot** avant toute opération de maintenance majeure
-2. ✅ **Tester en environnement de test** avant la production
-3. ✅ **Planifier en heures creuses** pour minimiser l'impact
-4. ✅ **Surveiller les métriques** pendant et après les opérations
-5. ✅ **Documenter les procédures** et les résultats pour les futures opérations
+**Access**:
+- Data Visualizer: Kibana Menu -> **Machine Learning** -> **Data Visualizer**
+- Canvas: Kibana Menu -> **Canvas**
 
 ---
 
-# Points Clés à Retenir
+# Summary: Maintenance Operations
 
-**Snapshots et Restauration** :
-- Les snapshots sont **incrémentaux** et optimisés pour minimiser l'espace disque
-- **SLM** automatise la création et le nettoyage des snapshots
-- Configurez `path.repo` dans `elasticsearch.yml` pour les repositories filesystem
-- Utilisez `include_global_state: true` pour sauvegarder templates et policies
+| Operation | Tools | Frequency | Impact |
+|-----------|-------|-----------|--------|
+| **Snapshots** | API `/_snapshot`, SLM, Kibana UI | Daily / Weekly | Minimal (asynchronous operation) |
+| **Rolling Restart** | Scripts, systemctl | Monthly / Ad-hoc | None (if properly executed) |
+| **Rolling Upgrade** | Package manager, Upgrade Assistant | Quarterly / Annual | Minimal (Rolling) |
+| **Force Merge** | API `/_forcemerge`, Kibana Index Management | After bulk delete | High (I/O intensive) |
+| **Reindex** | API `/_reindex`, Upgrade Assistant | Ad-hoc (deprecations) | High (CPU + I/O) |
 
-**Rolling Restarts** :
-- Désactiver temporairement l'allocation des shards avec `"primaries"` uniquement
-- Redémarrer les nœuds **un par un** en attendant que le cluster revienne à GREEN
-- Utiliser **SIGTERM** pour un shutdown gracieux, jamais SIGKILL
-
-**Upgrades** :
-- Utiliser **Upgrade Assistant** pour identifier et résoudre les deprecations
-- Toujours créer un **snapshot complet** avant l'upgrade
-- Respecter les **chemins de mise à jour** supportés (pas de saut de version majeure)
-- Tester l'upgrade en environnement de test avant la production
-
-**Outils Kibana** :
-- **Index Management** pour gérer settings, force merge, et open/close
-- **Snapshot and Restore UI** pour interface graphique des snapshots
-- **Upgrade Assistant** pour préparer et valider les mises à jour
+**Key principles**:
+1. **Always create a snapshot** before any major maintenance operation
+2. **Test in test environment** before production
+3. **Schedule during off-peak hours** to minimize impact
+4. **Monitor metrics** during and after operations
+5. **Document procedures** and results for future operations
 
 ---
 
-# Exercices Pratiques
+# Key Takeaways
 
-Rendez-vous dans le workbook pratique pour réaliser les labs suivants :
+**Snapshots and Restoration**:
+- Snapshots are **incremental** and optimized to minimize disk space
+- **SLM** automates snapshot creation and cleanup
+- Configure `path.repo` in `elasticsearch.yml` for filesystem repositories
+- Use `include_global_state: true` to save templates and policies
 
-**Lab 6.1** : Création et Restauration de Snapshots  
-Configurer un repository, créer des snapshots, et restaurer des indices
+**Rolling Restarts**:
+- Temporarily disable shard allocation with `"primaries"` only
+- Restart nodes **one by one** waiting for cluster to return to GREEN
+- Use **SIGTERM** for graceful shutdown, never SIGKILL
 
-**🌟 Bonus Challenge 6.A** : Snapshot Lifecycle Management  
-Configurer des politiques SLM avec rétention automatique
+**Upgrades**:
+- Use **Upgrade Assistant** to identify and resolve deprecations
+- Always create a **complete snapshot** before upgrade
+- Respect **supported upgrade paths** (no major version skipping)
+- Test upgrade in test environment before production
+
+**Kibana Tools**:
+- **Index Management** for managing settings, force merge, and open/close
+- **Snapshot and Restore UI** for graphical snapshot interface
+- **Upgrade Assistant** for preparing and validating updates
 
 ---
 
-# Ressources et Documentation
+# Practical Exercises
 
-**Documentation officielle Elasticsearch** :
+Go to the practical workbook to complete the following labs:
+
+**Lab 6.1**: Snapshot Creation and Restoration
+Configure a repository, create snapshots, and restore indices
+
+**Bonus Challenge 6.A**: Snapshot Lifecycle Management
+Configure SLM policies with automatic retention
+
+---
+
+# Resources and Documentation
+
+**Official Elasticsearch Documentation**:
 - [Snapshot and Restore](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html)
 - [Rolling Upgrades](https://www.elastic.co/guide/en/elasticsearch/reference/current/rolling-upgrades.html)
 - [Cluster-level shard allocation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html)
 
-**Guides pratiques** :
+**Practical Guides**:
 - [Backup and Restore Best Practices](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore-apis.html)
 - [Upgrade Elasticsearch Guide](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html)
 
-**Kibana Documentation** :
+**Kibana Documentation**:
 - [Index Management](https://www.elastic.co/guide/en/kibana/current/index-mgmt.html)
 - [Snapshot and Restore UI](https://www.elastic.co/guide/en/kibana/current/snapshot-repositories.html)

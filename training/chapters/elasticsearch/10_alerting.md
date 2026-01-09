@@ -2,98 +2,98 @@
 layout: cover
 ---
 
-# Systèmes d'Alertes
+# Alerting Systems
 
-Surveillance proactive et notifications automatiques avec Elasticsearch Alerting
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de cette section, vous serez capable de:
-
-- Comprendre les mécanismes d'alerting d'Elasticsearch (Watcher et Kibana Rules)
-- Créer des alertes basées sur des conditions de cluster, métriques, ou requêtes
-- Configurer des actions d'alerte (email, webhook, Slack, index)
-- Utiliser les dashboards de monitoring Kibana pour gérer les alertes actives
+Proactive surveillance and automatic notifications with Elasticsearch Alerting
 
 ---
 
-# Pourquoi l'Alerting est Critique
+# Learning Objectives
 
-L'alerting proactif permet de détecter et réagir aux problèmes avant qu'ils n'impactent les utilisateurs.
+By the end of this section, you will be able to:
 
-**Scénarios d'alerting courants**:
-- 🔴 Cluster passe en statut RED (perte de données)
-- 🟡 Cluster passe en statut YELLOW (perte de HA)
-- 💾 Utilisation disque >85% (watermark LOW)
-- 🧠 Heap JVM >85% (risque OutOfMemoryError)
-- 📊 Taux d'erreur >5% (dégradation service)
-- ⏱️ Latence p95 >1s (expérience utilisateur)
-- 🚫 Thread pool rejections >100/min (surcharge)
+- Understand Elasticsearch alerting mechanisms (Watcher and Kibana Rules)
+- Create alerts based on cluster conditions, metrics, or queries
+- Configure alert actions (email, webhook, Slack, index)
+- Use Kibana monitoring dashboards to manage active alerts
 
 ---
 
-# Pourquoi l'Alerting est Critique
+# Why Alerting is Critical
 
-**Bénéfices**:
-- ✅ Détection précoce des incidents
-- ✅ Réduction du MTTR (Mean Time To Recovery)
-- ✅ Prévention des pannes majeures
-- ✅ Conformité aux SLA
+Proactive alerting allows detecting and responding to problems before they impact users.
+
+**Common alerting scenarios**:
+- Cluster goes to RED status (data loss)
+- Cluster goes to YELLOW status (HA loss)
+- Disk usage >85% (LOW watermark)
+- JVM Heap >85% (OutOfMemoryError risk)
+- Error rate >5% (service degradation)
+- p95 latency >1s (user experience)
+- Thread pool rejections >100/min (overload)
 
 ---
 
-# Elasticsearch Alerting: Deux Solutions
+# Why Alerting is Critical
 
-Elasticsearch propose deux systèmes d'alerting complémentaires.
+**Benefits**:
+- Early incident detection
+- Reduced MTTR (Mean Time To Recovery)
+- Major outage prevention
+- SLA compliance
+
+---
+
+# Elasticsearch Alerting: Two Solutions
+
+Elasticsearch offers two complementary alerting systems.
 
 ## 1. Watcher (Elasticsearch Alerting API)
 
-**Caractéristiques**:
-- Basé sur des requêtes Elasticsearch (DSL JSON)
-- Exécution programmée (schedule)
-- Très flexible et puissant
-- Configuration via API REST
+**Characteristics**:
+- Based on Elasticsearch queries (JSON DSL)
+- Scheduled execution
+- Very flexible and powerful
+- Configuration via REST API
 
-**Cas d'usage**: Alertes complexes basées sur agrégations, transformations de données, logique métier avancée.
+**Use case**: Complex alerts based on aggregations, data transformations, advanced business logic.
 
 ---
 
-# Elasticsearch Alerting: Deux Solutions
+# Elasticsearch Alerting: Two Solutions
 
 ## 2. Kibana Rules & Connectors
 
-**Caractéristiques**:
-- Interface graphique dans Kibana
-- Rule types prédéfinis (Elasticsearch query, index threshold, etc.)
-- Intégration avec Kibana Stack Monitoring
-- Plus simple à configurer
+**Characteristics**:
+- Graphical interface in Kibana
+- Predefined rule types (Elasticsearch query, index threshold, etc.)
+- Integration with Kibana Stack Monitoring
+- Simpler to configure
 
-**Cas d'usage**: Alertes standard sur métriques Elasticsearch, logs, APM.
+**Use case**: Standard alerts on Elasticsearch metrics, logs, APM.
 
-**Recommendation**: Utilisez Kibana Rules pour les cas simples, Watcher pour les cas complexes.
+**Recommendation**: Use Kibana Rules for simple cases, Watcher for complex cases.
 
 ---
 
-# Anatomie d'une Alerte Watcher
+# Anatomy of a Watcher Alert
 
-Une [alerte Watcher](https://www.elastic.co/guide/en/elasticsearch/reference/current/xpack-alerting.html) se compose de 5 éléments principaux.
+A [Watcher alert](https://www.elastic.co/guide/en/elasticsearch/reference/current/xpack-alerting.html) consists of 5 main elements.
 
 ```
 Watch = Trigger + Input + Condition + Transform + Actions
 ```
 
-**1. Trigger** (quand exécuter):
+**1. Trigger** (when to execute):
 ```json
 "trigger": {
   "schedule": {
-    "interval": "1m"  // Toutes les minutes
+    "interval": "1m"  // Every minute
   }
 }
 ```
 
-**2. Input** (collecter données):
+**2. Input** (collect data):
 ```json
 "input": {
   "search": {
@@ -109,20 +109,20 @@ Watch = Trigger + Input + Condition + Transform + Actions
 
 ---
 
-# Anatomie d'une Alerte Watcher
+# Anatomy of a Watcher Alert
 
-**3. Condition** (évaluer si alerte):
+**3. Condition** (evaluate if alert):
 ```json
 "condition": {
   "compare": {
     "ctx.payload.hits.total": {
-      "gte": 100  // Si ≥100 erreurs
+      "gte": 100  // If >=100 errors
     }
   }
 }
 ```
 
-**4. Transform** (optionnel, transformer données):
+**4. Transform** (optional, transform data):
 ```json
 "transform": {
   "script": "return ['error_count': ctx.payload.hits.total]"
@@ -131,15 +131,15 @@ Watch = Trigger + Input + Condition + Transform + Actions
 
 ---
 
-# Anatomie d'une Alerte Watcher
+# Anatomy of a Watcher Alert
 
-**5. Actions** (notifier):
+**5. Actions** (notify):
 ```json
 "actions": {
   "send_email": {
     "email": {
       "to": "ops@company.com",
-      "subject": "Erreurs détectées: {{ctx.payload.hits.total}}"
+      "subject": "Errors detected: {{ctx.payload.hits.total}}"
     }
   }
 }
@@ -147,13 +147,13 @@ Watch = Trigger + Input + Condition + Transform + Actions
 
 ---
 
-# Trigger: Planification d'Exécution
+# Trigger: Execution Scheduling
 
-Le [trigger](https://www.elastic.co/guide/en/elasticsearch/reference/current/trigger.html) définit quand la watch est exécutée.
+The [trigger](https://www.elastic.co/guide/en/elasticsearch/reference/current/trigger.html) defines when the watch is executed.
 
 **Schedule types**:
 
-**1. Interval** (périodique):
+**1. Interval** (periodic):
 ```json
 "trigger": {
   "schedule": {
@@ -162,36 +162,36 @@ Le [trigger](https://www.elastic.co/guide/en/elasticsearch/reference/current/tri
 }
 ```
 
-**2. Cron** (horaires spécifiques):
+**2. Cron** (specific times):
 ```json
 "trigger": {
   "schedule": {
-    "cron": "0 0 12 * * ?"  // Tous les jours à midi
+    "cron": "0 0 12 * * ?"  // Every day at noon
   }
 }
 ```
 
 ---
 
-# Trigger: Planification d'Exécution
+# Trigger: Execution Scheduling
 
-**3. Hourly** (toutes les heures):
+**3. Hourly** (every hour):
 ```json
 "trigger": {
   "schedule": {
     "hourly": {
-      "minute": [0, 30]  // À xx:00 et xx:30
+      "minute": [0, 30]  // At xx:00 and xx:30
     }
   }
 }
 ```
 
-**4. Daily** (tous les jours):
+**4. Daily** (every day):
 ```json
 "trigger": {
   "schedule": {
     "daily": {
-      "at": ["08:00", "20:00"]  // À 8h et 20h
+      "at": ["08:00", "20:00"]  // At 8am and 8pm
     }
   }
 }
@@ -199,13 +199,13 @@ Le [trigger](https://www.elastic.co/guide/en/elasticsearch/reference/current/tri
 
 ---
 
-# Input: Collecte de Données
+# Input: Data Collection
 
-L'[input](https://www.elastic.co/guide/en/elasticsearch/reference/current/input.html) récupère les données à analyser pour l'alerte.
+The [input](https://www.elastic.co/guide/en/elasticsearch/reference/current/input.html) retrieves data to analyze for the alert.
 
-**Types d'input principaux**:
+**Main input types**:
 
-**1. Search Input** (requête Elasticsearch):
+**1. Search Input** (Elasticsearch query):
 ```json
 "input": {
   "search": {
@@ -233,9 +233,9 @@ L'[input](https://www.elastic.co/guide/en/elasticsearch/reference/current/input.
 
 ---
 
-# Input: Collecte de Données
+# Input: Data Collection
 
-**2. HTTP Input** (API externe):
+**2. HTTP Input** (external API):
 ```json
 "input": {
   "http": {
@@ -252,9 +252,9 @@ L'[input](https://www.elastic.co/guide/en/elasticsearch/reference/current/input.
 
 ---
 
-# Input: Collecte de Données
+# Input: Data Collection
 
-**3. Chain Input** (combiner plusieurs inputs):
+**3. Chain Input** (combine multiple inputs):
 ```json
 "input": {
   "chain": {
@@ -268,13 +268,13 @@ L'[input](https://www.elastic.co/guide/en/elasticsearch/reference/current/input.
 
 ---
 
-# Condition: Évaluation de l'Alerte
+# Condition: Alert Evaluation
 
-La [condition](https://www.elastic.co/guide/en/elasticsearch/reference/current/condition.html) détermine si les actions doivent être déclenchées.
+The [condition](https://www.elastic.co/guide/en/elasticsearch/reference/current/condition.html) determines if actions should be triggered.
 
-**Types de conditions**:
+**Condition types**:
 
-**1. Compare** (comparaison simple):
+**1. Compare** (simple comparison):
 ```json
 "condition": {
   "compare": {
@@ -287,9 +287,9 @@ La [condition](https://www.elastic.co/guide/en/elasticsearch/reference/current/c
 
 ---
 
-# Condition: Évaluation de l'Alerte
+# Condition: Alert Evaluation
 
-**2. Array Compare** (tous/au moins un élément):
+**2. Array Compare** (all/at least one element):
 ```json
 "condition": {
   "array_compare": {
@@ -305,9 +305,9 @@ La [condition](https://www.elastic.co/guide/en/elasticsearch/reference/current/c
 
 ---
 
-# Condition: Évaluation de l'Alerte
+# Condition: Alert Evaluation
 
-**3. Script** (logique personnalisée):
+**3. Script** (custom logic):
 ```json
 "condition": {
   "script": {
@@ -316,14 +316,14 @@ La [condition](https://www.elastic.co/guide/en/elasticsearch/reference/current/c
 }
 ```
 
-**4. Always** (toujours déclencher):
+**4. Always** (always trigger):
 ```json
 "condition": {
   "always": {}
 }
 ```
 
-**5. Never** (désactiver temporairement):
+**5. Never** (temporarily disable):
 ```json
 "condition": {
   "never": {}
@@ -332,23 +332,23 @@ La [condition](https://www.elastic.co/guide/en/elasticsearch/reference/current/c
 
 ---
 
-# Condition: Évaluation de l'Alerte
+# Condition: Alert Evaluation
 
 **Context variables**:
-- `ctx.trigger.scheduled_time`: Heure prévue d'exécution
-- `ctx.execution_time`: Heure réelle d'exécution
-- `ctx.payload`: Données de l'input
-- `ctx.metadata`: Métadonnées de la watch
+- `ctx.trigger.scheduled_time`: Scheduled execution time
+- `ctx.execution_time`: Actual execution time
+- `ctx.payload`: Input data
+- `ctx.metadata`: Watch metadata
 
 ---
 
-# Actions: Notifications et Réponses
+# Actions: Notifications and Responses
 
-Les [actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/actions.html) définissent la réponse quand une alerte se déclenche.
+[Actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/actions.html) define the response when an alert triggers.
 
-**Types d'actions**:
+**Action types**:
 
-**1. Email** (notification par email):
+**1. Email** (email notification):
 ```json
 "actions": {
   "send_email": {
@@ -365,9 +365,9 @@ Les [actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/ac
 
 ---
 
-# Actions: Notifications et Réponses
+# Actions: Notifications and Responses
 
-**2. Webhook** (HTTP POST vers API externe):
+**2. Webhook** (HTTP POST to external API):
 ```json
 "actions": {
   "notify_slack": {
@@ -380,7 +380,7 @@ Les [actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/ac
 }
 ```
 
-**3. Index** (indexer l'alerte dans Elasticsearch):
+**3. Index** (index the alert in Elasticsearch):
 ```json
 "actions": {
   "log_alert": {
@@ -394,9 +394,9 @@ Les [actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/ac
 
 ---
 
-# Actions: Notifications et Réponses
+# Actions: Notifications and Responses
 
-**4. Logging** (écrire dans les logs Elasticsearch):
+**4. Logging** (write to Elasticsearch logs):
 ```json
 "actions": {
   "log_action": {
@@ -408,16 +408,16 @@ Les [actions](https://www.elastic.co/guide/en/elasticsearch/reference/current/ac
 }
 ```
 
-**Throttling**: Éviter les alertes en rafale:
+**Throttling**: Avoid alert storms:
 ```json
-"throttle_period": "15m"  // Max 1 alerte toutes les 15min
+"throttle_period": "15m"  // Max 1 alert every 15min
 ```
 
 ---
 
-# Exemple Complet: Alerte Heap >85%
+# Complete Example: Heap >85% Alert
 
-**Watch complète** pour surveiller le heap JVM - **Partie 1: Configuration**
+**Complete watch** to monitor JVM heap - **Part 1: Configuration**
 
 ```json
 PUT _watcher/watch/heap_usage_alert
@@ -451,9 +451,9 @@ PUT _watcher/watch/heap_usage_alert
 
 ---
 
-# Exemple Complet: Alerte Heap >85% (suite)
+# Complete Example: Heap >85% Alert (continued)
 
-**Partie 2: Agrégations et Condition**
+**Part 2: Aggregations and Condition**
 
 ```json
 "aggs": {
@@ -473,9 +473,9 @@ PUT _watcher/watch/heap_usage_alert
 
 ---
 
-# Exemple Complet: Alerte Heap >85% (suite)
+# Complete Example: Heap >85% Alert (continued)
 
-**Partie 3: Actions**
+**Part 3: Actions**
 
 ```json
 "actions": {
@@ -498,74 +498,74 @@ PUT _watcher/watch/heap_usage_alert
 }
 ```
 
-**Tester**: `POST _watcher/watch/heap_usage_alert/_execute`
+**Test**: `POST _watcher/watch/heap_usage_alert/_execute`
 
 ---
 
-# Kibana Rules: Alerting Simplifié
+# Kibana Rules: Simplified Alerting
 
-Les [Kibana Rules](https://www.elastic.co/guide/en/kibana/current/alerting-getting-started.html) offrent une interface graphique pour créer des alertes.
+[Kibana Rules](https://www.elastic.co/guide/en/kibana/current/alerting-getting-started.html) offer a graphical interface for creating alerts.
 
-**Accès**: Kibana → Stack Management → Rules and Connectors
+**Access**: Kibana -> Stack Management -> Rules and Connectors
 
-**Rule types disponibles**:
+**Available rule types**:
 
-| Rule Type | Usage | Exemple |
+| Rule Type | Usage | Example |
 |-----------|-------|---------|
-| **Elasticsearch query** | Alerte basée sur requête ES | Nombre d'erreurs >100 |
-| **Index threshold** | Seuil sur agrégation | Moyenne heap >85% |
-| **ES query** | Requête ES avec condition | Documents manquants |
-| **Metrics threshold** | Seuils sur métriques APM/infra | CPU >80% |
+| **Elasticsearch query** | Alert based on ES query | Error count >100 |
+| **Index threshold** | Threshold on aggregation | Average heap >85% |
+| **ES query** | ES query with condition | Missing documents |
+| **Metrics threshold** | Thresholds on APM/infra metrics | CPU >80% |
 
 ---
 
-# Kibana Rules: Alerting Simplifié
+# Kibana Rules: Simplified Alerting
 
-**Workflow de création**:
-1. **Define rule**: Nom, type, query/condition
+**Creation workflow**:
+1. **Define rule**: Name, type, query/condition
 2. **Add connector**: Slack, email, PagerDuty, webhook
 3. **Configure action**: Message template, variables
-4. **Set schedule**: Interval d'évaluation (1m, 5m, etc.)
-5. **Save and enable**: Activer la rule
+4. **Set schedule**: Evaluation interval (1m, 5m, etc.)
+5. **Save and enable**: Activate the rule
 
-**Avantages vs Watcher**:
-- ✅ Interface graphique (pas de JSON)
-- ✅ Intégration native avec Kibana visualizations
-- ✅ Gestion centralisée des connectors (réutilisables)
-- ⚠️ Moins flexible que Watcher pour logique complexe
+**Advantages vs Watcher**:
+- Graphical interface (no JSON)
+- Native integration with Kibana visualizations
+- Centralized connector management (reusable)
+- Less flexible than Watcher for complex logic
 
 ---
 
-# Connectors: Intégrations Externes
+# Connectors: External Integrations
 
-Les [Connectors](https://www.elastic.co/guide/en/kibana/current/action-types.html) permettent d'envoyer des notifications vers des systèmes externes.
+[Connectors](https://www.elastic.co/guide/en/kibana/current/action-types.html) allow sending notifications to external systems.
 
-**Connectors populaires**:
+**Popular connectors**:
 
 **1. Slack**:
 ```
 - Type: Webhook
 - URL: https://hooks.slack.com/services/YOUR/WEBHOOK
-- Message: Utilise Markdown Slack
+- Message: Uses Slack Markdown
 ```
 
 **2. Email (SMTP)**:
 ```
 - Host: smtp.gmail.com
 - Port: 587
-- Username/Password: Credentials SMTP
+- Username/Password: SMTP Credentials
 - From: alerts@company.com
 ```
 
 **3. PagerDuty**:
 ```
-- Integration Key: Clé API PagerDuty
+- Integration Key: PagerDuty API key
 - Severity: critical, error, warning, info
 ```
 
-**4. Webhook (générique)**:
+**4. Webhook (generic)**:
 ```
-- URL: API externe
+- URL: External API
 - Method: POST, PUT, etc.
 - Headers: Authorization, Content-Type
 - Body: JSON payload
@@ -574,56 +574,56 @@ Les [Connectors](https://www.elastic.co/guide/en/kibana/current/action-types.htm
 **5. Index** (Elasticsearch):
 ```
 - Index: alerts-history-*
-- Document: JSON avec détails alerte
+- Document: JSON with alert details
 ```
 
-**Configuration**: Stack Management → Rules and Connectors → Connectors → Create connector
+**Configuration**: Stack Management -> Rules and Connectors -> Connectors -> Create connector
 
-**Best practice**: Créez un connector par type de notification (1 pour Slack prod, 1 pour Slack dev, etc.)
+**Best practice**: Create one connector per notification type (1 for Slack prod, 1 for Slack dev, etc.)
 
 ---
 
 # Kibana Stack Monitoring Alerts
 
-Kibana propose des [alertes prédéfinies pour Stack Monitoring](https://www.elastic.co/guide/en/kibana/current/kibana-alerts.html).
+Kibana offers [predefined alerts for Stack Monitoring](https://www.elastic.co/guide/en/kibana/current/kibana-alerts.html).
 
-**Alertes disponibles** (prêtes à l'emploi):
+**Available alerts** (ready to use):
 
-| Alerte | Condition | Criticité |
-|--------|-----------|-----------|
-| **Cluster health** | Status = yellow ou red | Critique |
+| Alert | Condition | Criticality |
+|-------|-----------|-------------|
+| **Cluster health** | Status = yellow or red | Critical |
 | **Node disk usage** | Disk >80% | Warning |
-| **CPU usage** | CPU >95% pour 5min | Warning |
-| **Memory usage (JVM)** | Heap >85% pour 5min | Critique |
-| **Missing monitoring data** | Pas de données >15min | Warning |
-| **License expiration** | License expire <30j | Warning |
+| **CPU usage** | CPU >95% for 5min | Warning |
+| **Memory usage (JVM)** | Heap >85% for 5min | Critical |
+| **Missing monitoring data** | No data >15min | Warning |
+| **License expiration** | License expires <30d | Warning |
 | **Large shard size** | Shard >50GB | Info |
 
 **Activation**:
-1. Stack Management → Rules and Connectors
-2. Cliquez sur "Create rule"
-3. Sélectionnez "Elasticsearch health" ou autre rule type
-4. Configurez les seuils et connector
+1. Stack Management -> Rules and Connectors
+2. Click "Create rule"
+3. Select "Elasticsearch health" or other rule type
+4. Configure thresholds and connector
 5. Save and enable
 
-**Alert history**: Kibana → Stack Monitoring → Alerts
+**Alert history**: Kibana -> Stack Monitoring -> Alerts
 
-**Visualisation**:
-- 🔴 Alertes actives (currently firing)
-- 🟢 Alertes récupérées (recovered)
-- ⚪ Alertes en erreur (execution error)
+**Visualization**:
+- Active alerts (currently firing)
+- Recovered alerts
+- Error alerts (execution error)
 
 ---
 
-# Gestion du Cycle de Vie des Alertes
+# Alert Lifecycle Management
 
-**États d'une alerte**:
-1. **Active** (firing): Condition remplie, actions déclenchées
-2. **OK** (recovered): Condition revenue à la normale
-3. **Pending**: En cours d'évaluation
-4. **Error**: Erreur d'exécution (query invalide, connector indisponible)
+**Alert states**:
+1. **Active** (firing): Condition met, actions triggered
+2. **OK** (recovered): Condition returned to normal
+3. **Pending**: Being evaluated
+4. **Error**: Execution error (invalid query, unavailable connector)
 
-**Historique des alertes**:
+**Alert history**:
 ```bash
 GET .watcher-history-*/_search
 {
@@ -637,23 +637,23 @@ GET .watcher-history-*/_search
 }
 ```
 
-**Désactiver temporairement**:
+**Temporarily disable**:
 ```bash
 PUT _watcher/watch/heap_usage_alert/_deactivate
-# Réactiver:
+# Reactivate:
 PUT _watcher/watch/heap_usage_alert/_activate
 ```
 
 ---
 
-# Gestion du Cycle de Vie des Alertes
+# Alert Lifecycle Management
 
-**Supprimer une watch**:
+**Delete a watch**:
 ```bash
 DELETE _watcher/watch/heap_usage_alert
 ```
 
-**Monitoring des watches**:
+**Watch monitoring**:
 ```bash
 GET _watcher/stats
 {
@@ -668,77 +668,77 @@ GET _watcher/stats
 
 ---
 
-# Best Practices d'Alerting
+# Alerting Best Practices
 
-**1. Éviter l'Alert Fatigue**:
-- ⚠️ Trop d'alertes → équipe les ignore
-- ✅ Alertez uniquement sur métriques critiques
-- ✅ Utilisez throttling (15-30min minimum)
+**1. Avoid Alert Fatigue**:
+- Too many alerts -> team ignores them
+- Alert only on critical metrics
+- Use throttling (15-30min minimum)
 
-**2. Rendre Actionnable**:
-- ❌ "Cluster unhealthy" (trop vague)
-- ✅ "Heap >85% on node-1, consider scaling"
+**2. Make Actionable**:
+- "Cluster unhealthy" (too vague)
+- "Heap >85% on node-1, consider scaling"
 
-**3. Fournir du Contexte**:
-- ✅ Liens vers dashboards Kibana
-- ✅ Commandes de diagnostic
-- ✅ Historique (trend)
+**3. Provide Context**:
+- Links to Kibana dashboards
+- Diagnostic commands
+- History (trend)
 
 ---
 
-# Best Practices d'Alerting (suite)
+# Alerting Best Practices (continued)
 
-**4. Escalation Progressive**:
+**4. Progressive Escalation**:
 ```
-Warning (>75%)   → Log + Slack
-Critical (>85%)  → Email + PagerDuty
-Emergency (>95%) → PagerDuty + Appel
+Warning (>75%)   -> Log + Slack
+Critical (>85%)  -> Email + PagerDuty
+Emergency (>95%) -> PagerDuty + Call
 ```
 
 **5. Testing**:
-- ✅ Testez avec `_execute` avant activation
-- ✅ Validez les connectors
-- ✅ Vérifiez les templates de message
+- Test with `_execute` before activation
+- Validate connectors
+- Verify message templates
 
 **6. Documentation**:
-- ✅ Playbook pour chaque alerte
-- ✅ Fréquence attendue documentée
+- Playbook for each alert
+- Expected frequency documented
 
 ---
 
-# Résumé
+# Summary
 
-## Points Clés
+## Key Points
 
-- Les **systèmes d'alerting** (Watcher et Kibana Rules) permettent la surveillance proactive du cluster
-- Une **watch Watcher** se compose de: trigger, input, condition, transform, actions
-- Les **Kibana Rules** offrent une interface graphique pour des alertes simples
-- Les **connectors** (Slack, email, PagerDuty, webhook) permettent des notifications externes
-- Les **Stack Monitoring alerts** fournissent des alertes prédéfinies pour Elasticsearch
-- **Best practices**: éviter alert fatigue, rendre les alertes actionnables, documenter les playbooks
+- **Alerting systems** (Watcher and Kibana Rules) enable proactive cluster surveillance
+- A **Watcher watch** consists of: trigger, input, condition, transform, actions
+- **Kibana Rules** offer a graphical interface for simple alerts
+- **Connectors** (Slack, email, PagerDuty, webhook) enable external notifications
+- **Stack Monitoring alerts** provide predefined alerts for Elasticsearch
+- **Best practices**: avoid alert fatigue, make alerts actionable, document playbooks
 
-## Formules et Exemples
+## Formulas and Examples
 
-**Trigger cron**: `"0 0 12 * * ?"` = Tous les jours à midi
-**Condition seuil**: `"ctx.payload.hits.total": {"gte": 100}` = Si ≥100 résultats
-**Throttling**: `"throttle_period": "15m"` = Max 1 alerte/15min
-**Context variable**: `{{ctx.payload.aggregations.avg_heap.value}}` = Valeur agrégation
+**Trigger cron**: `"0 0 12 * * ?"` = Every day at noon
+**Threshold condition**: `"ctx.payload.hits.total": {"gte": 100}` = If >=100 results
+**Throttling**: `"throttle_period": "15m"` = Max 1 alert/15min
+**Context variable**: `{{ctx.payload.aggregations.avg_heap.value}}` = Aggregation value
 
 ---
 
-# Exercices Pratiques
+# Practical Exercises
 
-Passez maintenant au **cahier d'exercices** pour mettre en pratique ces concepts.
+Now proceed to the **exercise workbook** to practice these concepts.
 
-**Labs à réaliser**:
-- Lab 5.1: Création d'une alerte simple (cluster health)
-- Lab 5.2: Configuration des actions d'alerte (webhook, index)
-- Bonus 5.A: Alerte Watcher avancée avec agrégations complexes
+**Labs to complete**:
+- Lab 5.1: Creating a simple alert (cluster health)
+- Lab 5.2: Configuring alert actions (webhook, index)
+- Bonus 5.A: Advanced Watcher alert with complex aggregations
 
-Temps estimé: **45-60 minutes**
+Estimated time: **45-60 minutes**
 
-**Ces exercices couvrent**:
-- Création de Kibana Rules avec interface graphique
-- Configuration de connectors (Slack, webhook)
-- Création de Watcher avec JSON
-- Test et validation des alertes
+**These exercises cover**:
+- Creating Kibana Rules with graphical interface
+- Configuring connectors (Slack, webhook)
+- Creating Watcher with JSON
+- Testing and validating alerts

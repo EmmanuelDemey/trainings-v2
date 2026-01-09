@@ -2,116 +2,116 @@
 layout: cover
 ---
 
-# Implémentation de la Sécurité
+# Security Implementation
 
-Authentification, autorisation, et protection des données
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de ce module, vous serez capable de :
-
-- **Comprendre et configurer** les différents realms d'authentification (native, LDAP, SAML)
-- **Mettre en place** l'authentification basique et gérer les utilisateurs
-- **Implémenter** le contrôle d'accès basé sur les rôles (RBAC)
-- **Configurer** la sécurité au niveau des documents et des champs
-- **Utiliser** les interfaces administratives Kibana pour la gestion de la sécurité
+Authentication, authorization, and data protection
 
 ---
 
-# Pourquoi la Sécurité est Critique
+# Learning Objectives
 
-La sécurité Elasticsearch protège vos données contre les accès non autorisés et les fuites.
+By the end of this module, you will be able to:
 
-**Risques sans sécurité adéquate** :
-1. 🔓 **Accès non autorisé** : N'importe qui peut lire, modifier, ou supprimer vos données
-2. 💸 **Violation de données** : Exposition de données sensibles (PII, secrets, données financières)
-3. ⚖️ **Non-conformité réglementaire** : Violation de RGPD, HIPAA, PCI-DSS
-4. 🎯 **Attaques ciblées** : Injection de données malveillantes, DoS, exfiltration
-5. 🔍 **Audit impossible** : Pas de traçabilité des accès et modifications
+- **Understand and configure** different authentication realms (native, LDAP, SAML)
+- **Set up** basic authentication and manage users
+- **Implement** Role-Based Access Control (RBAC)
+- **Configure** document and field-level security
+- **Use** Kibana administrative interfaces for security management
 
-**Principe de sécurité Elasticsearch** :
-- 🔐 **Authentification** : Qui êtes-vous ? (Identité)
-- 🔑 **Autorisation** : Que pouvez-vous faire ? (Permissions)
-- 🛡️ **Chiffrement** : Protection des données en transit et au repos
-- 📝 **Audit** : Traçabilité des accès et actions
+---
 
-**Documentation** : [Secure the Elastic Stack](https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html)
+# Why Security is Critical
+
+Elasticsearch security protects your data against unauthorized access and leaks.
+
+**Risks without adequate security**:
+1. **Unauthorized access**: Anyone can read, modify, or delete your data
+2. **Data breach**: Exposure of sensitive data (PII, secrets, financial data)
+3. **Regulatory non-compliance**: Violation of GDPR, HIPAA, PCI-DSS
+4. **Targeted attacks**: Malicious data injection, DoS, exfiltration
+5. **Impossible audit**: No traceability of access and modifications
+
+**Elasticsearch security principles**:
+- **Authentication**: Who are you? (Identity)
+- **Authorization**: What can you do? (Permissions)
+- **Encryption**: Protection of data in transit and at rest
+- **Audit**: Traceability of access and actions
+
+**Documentation**: [Secure the Elastic Stack](https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html)
 
 ---
 layout: section
 ---
 
-# Partie 1: Introduction aux Realms d'Authentification
+# Part 1: Introduction to Authentication Realms
 
-Comprendre les différents systèmes d'authentification
-
----
-
-# Qu'est-ce qu'un Realm ?
-
-Un **realm** est un système d'authentification qui valide les identités des utilisateurs.
-
-**Concept clé** : Elasticsearch supporte plusieurs realms simultanément, formant une **chaîne d'authentification** (authentication chain).
-
-**Workflow d'authentification** :
-1. L'utilisateur envoie des credentials (username/password, token, certificat)
-2. Elasticsearch parcourt les realms configurés dans l'ordre
-3. Le premier realm qui valide les credentials authentifie l'utilisateur
-4. Les rôles de l'utilisateur sont récupérés (du realm ou de mappings)
-5. L'autorisation est vérifiée selon les rôles
-
-**Configuration** : Les realms sont définis dans `elasticsearch.yml` ou via l'API Settings.
+Understanding different authentication systems
 
 ---
 
-# Types de Realms Disponibles
+# What is a Realm?
 
-Elasticsearch offre plusieurs types de realms pour s'intégrer dans votre infrastructure existante :
+A **realm** is an authentication system that validates user identities.
 
-**Realms principaux** :
+**Key concept**: Elasticsearch supports multiple realms simultaneously, forming an **authentication chain**.
+
+**Authentication workflow**:
+1. User sends credentials (username/password, token, certificate)
+2. Elasticsearch traverses configured realms in order
+3. The first realm that validates credentials authenticates the user
+4. User roles are retrieved (from realm or mappings)
+5. Authorization is verified according to roles
+
+**Configuration**: Realms are defined in `elasticsearch.yml` or via the Settings API.
+
+---
+
+# Available Realm Types
+
+Elasticsearch offers several realm types to integrate with your existing infrastructure:
+
+**Main realms**:
 
 | Realm Type | Description | Use Case |
 |------------|-------------|----------|
-| **native** | Base de données interne ES | Petites équipes |
-| **file** | Fichiers locaux | Configs statiques |
-| **ldap** | LDAP externe | Annuaire LDAP |
-| **active_directory** | Microsoft AD | Environnements Windows |
+| **native** | ES internal database | Small teams |
+| **file** | Local files | Static configs |
+| **ldap** | External LDAP | LDAP directory |
+| **active_directory** | Microsoft AD | Windows environments |
 | **saml** | SAML 2.0 SSO | IdP (Okta, Azure AD) |
 
 ---
 
-# Types de Realms Disponibles (suite)
+# Available Realm Types (continued)
 
-**Realms avancés** :
+**Advanced realms**:
 
 | Realm Type | Description | Use Case |
 |------------|-------------|----------|
-| **oidc** | OpenID Connect | SSO moderne (Google) |
-| **kerberos** | Kerberos | Haute sécurité |
-| **pki** | Certificats X.509 | Mutual TLS |
+| **oidc** | OpenID Connect | Modern SSO (Google) |
+| **kerberos** | Kerberos | High security |
+| **pki** | X.509 Certificates | Mutual TLS |
 | **jwt** | JSON Web Tokens | Microservices, API |
 
-**Documentation** : [Realms](https://www.elastic.co/guide/en/elasticsearch/reference/current/realms.html)
+**Documentation**: [Realms](https://www.elastic.co/guide/en/elasticsearch/reference/current/realms.html)
 
 ---
 
-# Realm Native : Base de Données Interne
+# Native Realm: Internal Database
 
-Le **native realm** stocke les utilisateurs dans un index Elasticsearch interne (`.security`).
+The **native realm** stores users in an internal Elasticsearch index (`.security`).
 
-**Avantages** :
-- ✅ Simple à configurer (activé par défaut)
-- ✅ Pas de dépendance externe
-- ✅ Gestion via API ou Kibana UI
-- ✅ Supporte la réinitialisation de mot de passe
+**Advantages**:
+- Simple to configure (enabled by default)
+- No external dependency
+- Management via API or Kibana UI
+- Supports password reset
 
-**Inconvénients** :
-- ❌ Pas de synchronisation avec annuaire d'entreprise
-- ❌ Gestion manuelle des utilisateurs
+**Disadvantages**:
+- No synchronization with enterprise directory
+- Manual user management
 
-**Configuration** (déjà activé par défaut) :
+**Configuration** (already enabled by default):
 
 ```yaml
 # elasticsearch.yml
@@ -119,28 +119,28 @@ xpack.security.authc.realms.native.native1:
   order: 0
 ```
 
-**Ordre** : Détermine la priorité dans la chaîne d'authentification (plus petit = plus prioritaire).
+**Order**: Determines priority in the authentication chain (lower = higher priority).
 
 ---
 
-# Realm File : Fichiers Locaux
+# File Realm: Local Files
 
-Le **file realm** lit les utilisateurs depuis des fichiers locaux sur chaque nœud.
+The **file realm** reads users from local files on each node.
 
-**Fichiers utilisés** :
-- `users` : Liste des utilisateurs et mots de passe hachés (bcrypt)
-- `users_roles` : Mapping utilisateurs → rôles
+**Files used**:
+- `users`: List of users and hashed passwords (bcrypt)
+- `users_roles`: User to role mapping
 
-**Avantages** :
-- ✅ Simple pour configurations statiques
-- ✅ Pas de dépendance réseau
-- ✅ Utile pour compte d'urgence
+**Advantages**:
+- Simple for static configurations
+- No network dependency
+- Useful for emergency account
 
-**Inconvénients** :
-- ❌ Modifications nécessitent redémarrage ou reload
-- ❌ Fichiers doivent être synchronisés manuellement sur tous les nœuds
+**Disadvantages**:
+- Modifications require restart or reload
+- Files must be manually synchronized across all nodes
 
-**Configuration** :
+**Configuration**:
 
 ```yaml
 # elasticsearch.yml
@@ -148,32 +148,32 @@ xpack.security.authc.realms.file.file1:
   order: 1
 ```
 
-**Gestion des utilisateurs** :
+**User management**:
 
 ```bash
-# Créer un utilisateur
+# Create a user
 bin/elasticsearch-users useradd john_doe -p MySecurePassword -r superuser
 
-# Lister les utilisateurs
+# List users
 bin/elasticsearch-users list
 
-# Supprimer un utilisateur
+# Delete a user
 bin/elasticsearch-users userdel john_doe
 ```
 
 ---
 
-# Realm LDAP : Intégration avec Annuaire d'Entreprise
+# LDAP Realm: Enterprise Directory Integration
 
-Le **LDAP realm** authentifie les utilisateurs contre un serveur LDAP externe.
+The **LDAP realm** authenticates users against an external LDAP server.
 
-**Architecture** :
+**Architecture**:
 ```
-User → Elasticsearch → LDAP Server → Validate credentials
-                     ← Return user DN and groups
+User -> Elasticsearch -> LDAP Server -> Validate credentials
+                      <- Return user DN and groups
 ```
 
-**Configuration** :
+**Configuration**:
 
 ```yaml
 # elasticsearch.yml
@@ -191,23 +191,23 @@ xpack.security.authc.realms.ldap.ldap1:
   unmapped_groups_as_roles: false
 ```
 
-**Paramètres clés** :
-- `bind_dn` : Compte de service pour se connecter au LDAP
-- `user_search.filter` : Filtre pour trouver l'utilisateur (`{0}` = username saisi)
-- `group_search` : Récupérer les groupes LDAP de l'utilisateur
+**Key parameters**:
+- `bind_dn`: Service account to connect to LDAP
+- `user_search.filter`: Filter to find user (`{0}` = entered username)
+- `group_search`: Retrieve user's LDAP groups
 
 ---
 
-# Realm Active Directory : Spécialisation Microsoft
+# Active Directory Realm: Microsoft Specialization
 
-Le **Active Directory realm** est optimisé pour Microsoft AD.
+The **Active Directory realm** is optimized for Microsoft AD.
 
-**Différences avec LDAP** :
-- Utilise le protocole LDAP mais avec optimisations AD
-- Support natif des groupes imbriqués (nested groups)
-- Détection automatique des contrôleurs de domaine
+**Differences from LDAP**:
+- Uses LDAP protocol but with AD optimizations
+- Native support for nested groups
+- Automatic detection of domain controllers
 
-**Configuration** :
+**Configuration**:
 
 ```yaml
 # elasticsearch.yml
@@ -223,22 +223,22 @@ xpack.security.authc.realms.active_directory.ad1:
     role_mapping: "/etc/elasticsearch/role_mapping.yml"
 ```
 
-**Astuce** : Utilisez `domain_name` pour laisser Elasticsearch découvrir automatiquement les contrôleurs de domaine via DNS.
+**Tip**: Use `domain_name` to let Elasticsearch automatically discover domain controllers via DNS.
 
 ---
 
-# Realm SAML : Single Sign-On Entreprise
+# SAML Realm: Enterprise Single Sign-On
 
-Le **SAML realm** permet l'authentification SSO via un Identity Provider (IdP) externe.
+The **SAML realm** enables SSO authentication via an external Identity Provider (IdP).
 
-**Flux SAML** :
-1. Utilisateur accède à Kibana
-2. Kibana redirige vers l'IdP (Okta, Azure AD, etc.)
-3. Utilisateur s'authentifie sur l'IdP
-4. IdP renvoie une assertion SAML signée
-5. Elasticsearch valide l'assertion et authentifie l'utilisateur
+**SAML Flow**:
+1. User accesses Kibana
+2. Kibana redirects to IdP (Okta, Azure AD, etc.)
+3. User authenticates on IdP
+4. IdP returns a signed SAML assertion
+5. Elasticsearch validates assertion and authenticates user
 
-**Configuration** :
+**Configuration**:
 
 ```yaml
 # elasticsearch.yml
@@ -253,65 +253,65 @@ xpack.security.authc.realms.saml.saml1:
   attributes.groups: "groups"
 ```
 
-**Documentation** : [SAML authentication](https://www.elastic.co/guide/en/elasticsearch/reference/current/saml-realm.html)
+**Documentation**: [SAML authentication](https://www.elastic.co/guide/en/elasticsearch/reference/current/saml-realm.html)
 
 ---
 
-# Chaîne d'Authentification : Combiner Plusieurs Realms
+# Authentication Chain: Combining Multiple Realms
 
-Vous pouvez configurer **plusieurs realms** qui seront testés dans l'ordre.
+You can configure **multiple realms** that will be tested in order.
 
-**Exemple de configuration multi-realms** :
+**Example multi-realm configuration**:
 
 ```yaml
 # elasticsearch.yml
 xpack.security.authc.realms:
-  
-  # Realm 1 : Native (ordre 0 = priorité max)
+
+  # Realm 1: Native (order 0 = max priority)
   native.native1:
     order: 0
-  
-  # Realm 2 : LDAP (ordre 1)
+
+  # Realm 2: LDAP (order 1)
   ldap.ldap1:
     order: 1
     url: "ldaps://ldap.example.com:636"
-    # ... autres configs
-  
-  # Realm 3 : SAML (ordre 2)
+    # ... other configs
+
+  # Realm 3: SAML (order 2)
   saml.saml1:
     order: 2
-    # ... configs SAML
+    # ... SAML configs
 ```
 
-**Workflow** :
-1. Credentials reçus → Tester `native1`
-2. Si échec → Tester `ldap1`
-3. Si échec → Tester `saml1`
-4. Si tous échouent → Authentification refusée (401 Unauthorized)
+**Workflow**:
+1. Credentials received -> Test `native1`
+2. If failure -> Test `ldap1`
+3. If failure -> Test `saml1`
+4. If all fail -> Authentication refused (401 Unauthorized)
 
-**Best Practice** : Toujours garder un realm `native` ou `file` avec ordre prioritaire pour compte d'urgence admin.
+**Best Practice**: Always keep a `native` or `file` realm with priority order for emergency admin account.
 
 ---
 layout: section
 ---
 
-# Partie 2: Configuration de l'Authentification Basique
+# Part 2: Basic Authentication Configuration
 
-Activer la sécurité et créer des utilisateurs
+Enabling security and creating users
 
 ---
 
-# Activer la Sécurité Elasticsearch
+# Enabling Elasticsearch Security
 
-**Depuis Elasticsearch 8.0**, la sécurité est **activée par défaut**.
+**Since Elasticsearch 8.0**, security is **enabled by default**.
 
-**Vérifier l'état de la sécurité** :
+**Verify security status**:
 
 ```bash
 GET /_xpack
 ```
 
-**Résultat** :
+**Result**:
 ```json
 {
   "features": {
@@ -323,7 +323,7 @@ GET /_xpack
 }
 ```
 
-**Pour Elasticsearch 7.x (si sécurité désactivée)**, activer manuellement :
+**For Elasticsearch 7.x (if security disabled)**, enable manually:
 
 ```yaml
 # elasticsearch.yml
@@ -332,34 +332,34 @@ xpack.security.transport.ssl.enabled: true
 xpack.security.http.ssl.enabled: true
 ```
 
-Puis redémarrer Elasticsearch.
+Then restart Elasticsearch.
 
 ---
 
-# Initialiser les Mots de Passe des Utilisateurs Intégrés
+# Initializing Built-in User Passwords
 
-Elasticsearch crée automatiquement des **utilisateurs intégrés** (built-in users) :
+Elasticsearch automatically creates **built-in users**:
 
-| Utilisateur | Rôle | Usage |
-|-------------|------|-------|
-| `elastic` | `superuser` | Administrateur principal (tout accès) |
-| `kibana_system` | `kibana_system` | Connexion Kibana → Elasticsearch |
-| `logstash_system` | `logstash_system` | Connexion Logstash → Elasticsearch |
-| `beats_system` | `beats_system` | Connexion Beats → Elasticsearch |
-| `apm_system` | `apm_system` | Connexion APM Server → Elasticsearch |
-| `remote_monitoring_user` | `remote_monitoring_agent` | Monitoring cross-cluster |
+| User | Role | Usage |
+|------|------|-------|
+| `elastic` | `superuser` | Main administrator (full access) |
+| `kibana_system` | `kibana_system` | Kibana -> Elasticsearch connection |
+| `logstash_system` | `logstash_system` | Logstash -> Elasticsearch connection |
+| `beats_system` | `beats_system` | Beats -> Elasticsearch connection |
+| `apm_system` | `apm_system` | APM Server -> Elasticsearch connection |
+| `remote_monitoring_user` | `remote_monitoring_agent` | Cross-cluster monitoring |
 
-**Définir les mots de passe** :
+**Set passwords**:
 
 ```bash
-# Méthode automatique : générer des mots de passe aléatoires
+# Automatic method: generate random passwords
 bin/elasticsearch-setup-passwords auto
 
-# Méthode interactive : définir manuellement
+# Interactive method: set manually
 bin/elasticsearch-setup-passwords interactive
 ```
 
-**Exemple de sortie (auto)** :
+**Example output (auto)**:
 ```
 Changed password for user apm_system
 PASSWORD apm_system = xP8mK3nQ7vR2wL5s
@@ -371,13 +371,13 @@ Changed password for user elastic
 PASSWORD elastic = aZ9kL2mN5vB7cX4r
 ```
 
-⚠️ **Conservez ces mots de passe de manière sécurisée !**
+**Store these passwords securely!**
 
 ---
 
-# Créer des Utilisateurs via l'API
+# Creating Users via API
 
-**Créer un utilisateur avec rôle** :
+**Create a user with role**:
 
 ```bash
 POST /_security/user/john_doe
@@ -393,20 +393,20 @@ POST /_security/user/john_doe
 }
 ```
 
-**Résultat** :
+**Result**:
 ```json
 {
   "created": true
 }
 ```
 
-**Lister tous les utilisateurs** :
+**List all users**:
 
 ```bash
 GET /_security/user
 ```
 
-**Obtenir un utilisateur spécifique** :
+**Get a specific user**:
 
 ```bash
 GET /_security/user/john_doe
@@ -414,9 +414,9 @@ GET /_security/user/john_doe
 
 ---
 
-# Modifier et Supprimer des Utilisateurs
+# Modifying and Deleting Users
 
-**Changer le mot de passe d'un utilisateur** :
+**Change a user's password**:
 
 ```bash
 POST /_security/user/john_doe/_password
@@ -425,7 +425,7 @@ POST /_security/user/john_doe/_password
 }
 ```
 
-**Modifier les rôles d'un utilisateur** :
+**Modify a user's roles**:
 
 ```bash
 PUT /_security/user/john_doe
@@ -436,19 +436,19 @@ PUT /_security/user/john_doe
 }
 ```
 
-**Désactiver un utilisateur** (sans le supprimer) :
+**Disable a user** (without deleting):
 
 ```bash
 PUT /_security/user/john_doe/_disable
 ```
 
-**Réactiver un utilisateur** :
+**Re-enable a user**:
 
 ```bash
 PUT /_security/user/john_doe/_enable
 ```
 
-**Supprimer un utilisateur** :
+**Delete a user**:
 
 ```bash
 DELETE /_security/user/john_doe
@@ -456,21 +456,21 @@ DELETE /_security/user/john_doe
 
 ---
 
-# Tester l'Authentification
+# Testing Authentication
 
-**Méthode 1 : Curl avec credentials** :
+**Method 1: Curl with credentials**:
 
 ```bash
 curl -u elastic:password "https://localhost:9200/_cluster/health?pretty"
 ```
 
-**Méthode 2 : API Authenticate** :
+**Method 2: Authenticate API**:
 
 ```bash
 GET /_security/_authenticate
 ```
 
-**Résultat** :
+**Result**:
 ```json
 {
   "username": "elastic",
@@ -493,83 +493,83 @@ GET /_security/_authenticate
 }
 ```
 
-**Méthode 3 : Tester avec mauvais credentials** :
+**Method 3: Test with wrong credentials**:
 
 ```bash
 curl -u elastic:wrong_password "https://localhost:9200/"
 ```
 
-**Résultat attendu** : `401 Unauthorized`
+**Expected result**: `401 Unauthorized`
 
 ---
 layout: section
 ---
 
-# Partie 3: Configuration RBAC (Role-Based Access Control)
+# Part 3: RBAC Configuration (Role-Based Access Control)
 
-Contrôle d'accès basé sur les rôles
+Role-based access control
 
 ---
 
-# Comprendre le Modèle RBAC Elasticsearch
+# Understanding the Elasticsearch RBAC Model
 
-**RBAC** = Définir **qui** peut faire **quoi** et **où**.
+**RBAC** = Define **who** can do **what** and **where**.
 
-**Composants du RBAC** :
-- **User** (Utilisateur) : Identité authentifiée
-- **Role** (Rôle) : Ensemble de permissions
-- **Privileges** (Privilèges) : Actions autorisées
-- **Resources** (Ressources) : Cluster, indices, applications
+**RBAC Components**:
+- **User**: Authenticated identity
+- **Role**: Set of permissions
+- **Privileges**: Authorized actions
+- **Resources**: Cluster, indices, applications
 
-**Workflow** :
-1. Utilisateur s'authentifie → Identité validée
-2. Identité → Rôles assignés
-3. Rôles → Privilèges accordés
-4. Requête → Vérification des privilèges
-5. Accès autorisé ou refusé
+**Workflow**:
+1. User authenticates -> Identity validated
+2. Identity -> Assigned roles
+3. Roles -> Granted privileges
+4. Request -> Privilege verification
+5. Access authorized or denied
 
-**Formule** :
+**Formula**:
 ```
-User + Roles → Privileges → Actions on Resources
+User + Roles -> Privileges -> Actions on Resources
 ```
 
 ---
 
-# Types de Privilèges
+# Privilege Types
 
-Elasticsearch définit des privilèges à **deux niveaux** :
+Elasticsearch defines privileges at **two levels**:
 
-**1. Cluster Privileges** (actions au niveau du cluster) :
+**1. Cluster Privileges** (cluster-level actions):
 
-| Privilège | Description |
+| Privilege | Description |
 |-----------|-------------|
-| `all` | Tous les privilèges cluster |
-| `monitor` | Lecture des métriques et stats (health, stats, etc.) |
-| `manage` | Gestion du cluster (settings, reroute, etc.) |
-| `manage_index_templates` | Créer/modifier des index templates |
-| `manage_ilm` | Gérer les policies ILM |
-| `manage_security` | Gérer utilisateurs, rôles, API keys |
-| `create_snapshot` | Créer des snapshots |
-| `monitor_snapshot` | Voir les snapshots |
+| `all` | All cluster privileges |
+| `monitor` | Read metrics and stats (health, stats, etc.) |
+| `manage` | Cluster management (settings, reroute, etc.) |
+| `manage_index_templates` | Create/modify index templates |
+| `manage_ilm` | Manage ILM policies |
+| `manage_security` | Manage users, roles, API keys |
+| `create_snapshot` | Create snapshots |
+| `monitor_snapshot` | View snapshots |
 
-**2. Index Privileges** (actions sur les indices) :
+**2. Index Privileges** (index-level actions):
 
-| Privilège | Description |
+| Privilege | Description |
 |-----------|-------------|
-| `all` | Tous les privilèges sur les indices |
-| `read` | Rechercher, get documents |
-| `write` | Indexer, update, delete documents |
-| `create` | Créer des indices |
-| `delete` | Supprimer des indices |
-| `create_index` | Créer uniquement (pas supprimer) |
-| `view_index_metadata` | Voir mappings et settings |
-| `manage` | Toutes les opérations de gestion (settings, mappings, etc.) |
+| `all` | All privileges on indices |
+| `read` | Search, get documents |
+| `write` | Index, update, delete documents |
+| `create` | Create indices |
+| `delete` | Delete indices |
+| `create_index` | Create only (not delete) |
+| `view_index_metadata` | View mappings and settings |
+| `manage` | All management operations (settings, mappings, etc.) |
 
 ---
 
-# Créer un Rôle Personnalisé
+# Creating a Custom Role
 
-**Exemple 1 : Rôle "Lecture Seule" sur indices de logs** :
+**Example 1: "Read Only" role on log indices**:
 
 ```bash
 POST /_security/role/logs_reader
@@ -582,16 +582,16 @@ POST /_security/role/logs_reader
 }
 ```
 
-**Explication** :
-- `cluster: ["monitor"]` : Stats du cluster
-- `indices.names` : Pattern d'indices
-- `indices.privileges` : Lecture uniquement
+**Explanation**:
+- `cluster: ["monitor"]`: Cluster stats
+- `indices.names`: Index pattern
+- `indices.privileges`: Read only
 
 ---
 
-# Créer un Rôle Personnalisé (exemple avancé)
+# Creating a Custom Role (advanced example)
 
-**Exemple 2 : Rôle "Développeur"** :
+**Example 2: "Developer" role**:
 
 ```bash
 POST /_security/role/developer
@@ -611,9 +611,9 @@ POST /_security/role/developer
 
 ---
 
-# Privilèges Granulaires : Actions Spécifiques
+# Granular Privileges: Specific Actions
 
-Vous pouvez spécifier des **actions individuelles** pour un contrôle fin :
+You can specify **individual actions** for fine-grained control:
 
 ```bash
 POST /_security/role/index_manager
@@ -637,16 +637,16 @@ POST /_security/role/index_manager
 }
 ```
 
-**Fonctionnalités avancées** :
-- `field_security.grant` : Champs accessibles
-- `field_security.except` : Champs exclus (cachés)
-- `query` : Filtre de documents (Document Level Security)
+**Advanced features**:
+- `field_security.grant`: Accessible fields
+- `field_security.except`: Excluded (hidden) fields
+- `query`: Document filter (Document Level Security)
 
 ---
 
-# Assigner des Rôles aux Utilisateurs
+# Assigning Roles to Users
 
-**Méthode 1 : Lors de la création de l'utilisateur** :
+**Method 1: During user creation**:
 
 ```bash
 POST /_security/user/alice
@@ -656,7 +656,7 @@ POST /_security/user/alice
 }
 ```
 
-**Méthode 2 : Modifier un utilisateur existant** :
+**Method 2: Modify an existing user**:
 
 ```bash
 PUT /_security/user/alice
@@ -665,13 +665,13 @@ PUT /_security/user/alice
 }
 ```
 
-**Vérifier les rôles d'un utilisateur** :
+**Verify a user's roles**:
 
 ```bash
 GET /_security/user/alice
 ```
 
-**Résultat** :
+**Result**:
 ```json
 {
   "alice": {
@@ -686,11 +686,11 @@ GET /_security/user/alice
 
 ---
 
-# Role Mapping : LDAP/SAML → Elasticsearch Roles
+# Role Mapping: LDAP/SAML -> Elasticsearch Roles
 
-Pour les realms externes (LDAP, SAML), utilisez **role mapping** pour convertir groupes externes en rôles Elasticsearch.
+For external realms (LDAP, SAML), use **role mapping** to convert external groups to Elasticsearch roles.
 
-**Fichier role_mapping.yml** :
+**role_mapping.yml file**:
 
 ```yaml
 # config/role-mapping.yml
@@ -705,7 +705,7 @@ readonly:
   - "cn=readonly-users,ou=groups,dc=example,dc=com"
 ```
 
-**Via API** :
+**Via API**:
 
 ```bash
 POST /_security/role_mapping/ldap_admins
@@ -720,7 +720,7 @@ POST /_security/role_mapping/ldap_admins
 }
 ```
 
-**Rules avancées** (avec conditions) :
+**Advanced rules** (with conditions):
 
 ```bash
 POST /_security/role_mapping/conditional_access
@@ -746,23 +746,23 @@ POST /_security/role_mapping/conditional_access
 
 ---
 
-# Rôles Prédéfinis Elasticsearch
+# Predefined Elasticsearch Roles
 
-Elasticsearch fournit des **rôles prédéfinis** pour les cas d'usage courants :
+Elasticsearch provides **predefined roles** for common use cases:
 
-| Rôle | Description |
+| Role | Description |
 |------|-------------|
-| `superuser` | Tous les privilèges (équivalent root) |
-| `kibana_admin` | Gestion complète de Kibana |
-| `kibana_user` | Utilisation de Kibana (découverte, visualisations) |
-| `monitoring_user` | Accès lecture aux métriques de monitoring |
-| `ingest_admin` | Gestion des pipelines d'ingestion |
-| `logstash_admin` | Gestion des pipelines Logstash |
-| `beats_admin` | Configuration des Beats |
-| `watcher_admin` | Gestion des alertes Watcher |
-| `snapshot_user` | Créer et restaurer des snapshots |
+| `superuser` | All privileges (equivalent to root) |
+| `kibana_admin` | Full Kibana management |
+| `kibana_user` | Kibana usage (discover, visualizations) |
+| `monitoring_user` | Read access to monitoring metrics |
+| `ingest_admin` | Ingest pipeline management |
+| `logstash_admin` | Logstash pipeline management |
+| `beats_admin` | Beats configuration |
+| `watcher_admin` | Watcher alert management |
+| `snapshot_user` | Create and restore snapshots |
 
-**Voir tous les rôles prédéfinis** :
+**View all predefined roles**:
 
 ```bash
 GET /_security/role
@@ -772,19 +772,19 @@ GET /_security/role
 layout: section
 ---
 
-# Partie 4: Niveaux de Filtrage et Interfaces Administratives
+# Part 4: Filtering Levels and Administrative Interfaces
 
-Document-Level Security, Field-Level Security, et gestion Kibana
+Document-Level Security, Field-Level Security, and Kibana management
 
 ---
 
 # Document-Level Security (DLS)
 
-**DLS** filtre les documents visibles selon les rôles, en utilisant une **query Elasticsearch**.
+**DLS** filters visible documents based on roles, using an **Elasticsearch query**.
 
-**Use Case** : Limiter l'accès aux documents selon département, région, ou niveau de confidentialité.
+**Use Case**: Limit access to documents by department, region, or confidentiality level.
 
-**Exemple : Accès uniquement aux commandes du département** :
+**Example: Access only to department orders**:
 
 ```bash
 POST /_security/role/sales_team
@@ -804,11 +804,11 @@ POST /_security/role/sales_team
 }
 ```
 
-**Résultat** :
-- Utilisateurs avec ce rôle voient **uniquement** les documents où `department = "sales"`
-- Autres documents sont invisibles (comme s'ils n'existaient pas)
+**Result**:
+- Users with this role see **only** documents where `department = "sales"`
+- Other documents are invisible (as if they don't exist)
 
-**Requête complexe avec bool** :
+**Complex query with bool**:
 
 ```bash
 "query": {
@@ -829,11 +829,11 @@ POST /_security/role/sales_team
 
 # Field-Level Security (FLS)
 
-**FLS** cache certains champs selon les rôles, pour protéger les données sensibles.
+**FLS** hides certain fields based on roles, to protect sensitive data.
 
-**Use Case** : Masquer SSN, salaires, emails personnels, données médicales.
+**Use Case**: Mask SSN, salaries, personal emails, medical data.
 
-**Exemple : Cacher les informations sensibles** :
+**Example: Hide sensitive information**:
 
 ```bash
 POST /_security/role/hr_analyst
@@ -852,11 +852,11 @@ POST /_security/role/hr_analyst
 }
 ```
 
-**Résultat** :
-- Utilisateurs voient : `name`, `department`, `hire_date`
-- Utilisateurs **ne voient pas** : `ssn`, `salary`, `personal_email`
+**Result**:
+- Users see: `name`, `department`, `hire_date`
+- Users **don't see**: `ssn`, `salary`, `personal_email`
 
-**Grant avec wildcards** :
+**Grant with wildcards**:
 
 ```bash
 "field_security": {
@@ -867,9 +867,9 @@ POST /_security/role/hr_analyst
 
 ---
 
-# Combiner DLS et FLS
+# Combining DLS and FLS
 
-Vous pouvez combiner **DLS** (filtrage de documents) et **FLS** (filtrage de champs) :
+You can combine **DLS** (document filtering) and **FLS** (field filtering):
 
 ```bash
 POST /_security/role/regional_manager
@@ -893,18 +893,18 @@ POST /_security/role/regional_manager
 }
 ```
 
-**Résultat** :
-- Documents filtrés : uniquement `region = "EMEA"`
-- Champs visibles : `name`, `department`, `position`, `email`
-- Champs cachés : `ssn`, `salary`, `performance_review`
+**Result**:
+- Filtered documents: only `region = "EMEA"`
+- Visible fields: `name`, `department`, `position`, `email`
+- Hidden fields: `ssn`, `salary`, `performance_review`
 
 ---
 
-# API Keys : Authentification Programmatique
+# API Keys: Programmatic Authentication
 
-Les **API keys** permettent l'authentification sans username/password (idéal pour applications).
+**API keys** enable authentication without username/password (ideal for applications).
 
-**Créer une API key** :
+**Create an API key**:
 
 ```bash
 POST /_security/api_key
@@ -929,7 +929,7 @@ POST /_security/api_key
 }
 ```
 
-**Résultat** :
+**Result**:
 ```json
 {
   "id": "abc123xyz",
@@ -939,7 +939,7 @@ POST /_security/api_key
 }
 ```
 
-**Utiliser l'API key** :
+**Use the API key**:
 
 ```bash
 curl -H "Authorization: ApiKey YWJjMTIzeHl6OmJONmpIOW1QNHRZOHFXM3hhWjlrTDJtTjV2QjdjWDRy" \
@@ -948,21 +948,21 @@ curl -H "Authorization: ApiKey YWJjMTIzeHl6OmJONmpIOW1QNHRZOHFXM3hhWjlrTDJtTjV2Q
 
 ---
 
-# Gestion des API Keys
+# Managing API Keys
 
-**Lister toutes les API keys** :
+**List all API keys**:
 
 ```bash
 GET /_security/api_key
 ```
 
-**Obtenir une API key spécifique** :
+**Get a specific API key**:
 
 ```bash
 GET /_security/api_key?id=abc123xyz
 ```
 
-**Invalider une API key** :
+**Invalidate an API key**:
 
 ```bash
 DELETE /_security/api_key
@@ -971,7 +971,7 @@ DELETE /_security/api_key
 }
 ```
 
-**Invalider toutes les API keys d'un utilisateur** :
+**Invalidate all API keys for a user**:
 
 ```bash
 DELETE /_security/api_key
@@ -980,7 +980,7 @@ DELETE /_security/api_key
 }
 ```
 
-**Invalider les API keys expirées** :
+**Invalidate expired API keys**:
 
 ```bash
 DELETE /_security/api_key
@@ -991,24 +991,24 @@ DELETE /_security/api_key
 
 ---
 
-# Kibana Spaces : Isolation Multi-Tenant
+# Kibana Spaces: Multi-Tenant Isolation
 
-**Kibana Spaces** créent des environnements isolés au sein de Kibana.
+**Kibana Spaces** create isolated environments within Kibana.
 
-**Use Case** : Séparer les équipes (Sales, Marketing, Engineering) avec leurs propres dashboards et index patterns.
+**Use Case**: Separate teams (Sales, Marketing, Engineering) with their own dashboards and index patterns.
 
-**Créer un Space via Kibana UI** :
-1. Stack Management → Kibana → **Spaces**
-2. Cliquer sur **Create a space**
-3. Configurer :
-   - **Name** : `sales-space`
-   - **Identifier** : `sales` (utilisé dans l'URL)
-   - **Color** : Choisir une couleur
-   - **Description** : "Sales team dashboards and visualizations"
+**Create a Space via Kibana UI**:
+1. Stack Management -> Kibana -> **Spaces**
+2. Click **Create a space**
+3. Configure:
+   - **Name**: `sales-space`
+   - **Identifier**: `sales` (used in URL)
+   - **Color**: Choose a color
+   - **Description**: "Sales team dashboards and visualizations"
 
-**Résultat** : URL du space : `https://kibana.example.com/s/sales/app/dashboards`
+**Result**: Space URL: `https://kibana.example.com/s/sales/app/dashboards`
 
-**Configurer les Feature Privileges par Space** :
+**Configure Feature Privileges per Space**:
 
 ```bash
 POST /_security/role/sales_kibana_user
@@ -1025,34 +1025,34 @@ POST /_security/role/sales_kibana_user
 
 ---
 
-# Interfaces Administratives Kibana pour la Sécurité
+# Kibana Administrative Interfaces for Security
 
-**Stack Management → Security** centralise la gestion de la sécurité.
+**Stack Management -> Security** centralizes security management.
 
-**Sections disponibles** :
+**Available sections**:
 
-| Section | Fonctionnalités |
-|---------|-----------------|
-| **Users** | Créer, modifier, désactiver utilisateurs |
-| **Roles** | Définir rôles avec privilèges cluster et index |
-| **Role Mappings** | Mapper groupes LDAP/SAML vers rôles Elasticsearch |
-| **API Keys** | Créer et gérer API keys |
-| **Spaces** | Créer des espaces isolés pour équipes |
+| Section | Features |
+|---------|----------|
+| **Users** | Create, modify, disable users |
+| **Roles** | Define roles with cluster and index privileges |
+| **Role Mappings** | Map LDAP/SAML groups to Elasticsearch roles |
+| **API Keys** | Create and manage API keys |
+| **Spaces** | Create isolated spaces for teams |
 
-**Workflow typique** :
-1. Créer des **Roles** avec privilèges appropriés
-2. Créer des **Users** et assigner les rôles
-3. (Optionnel) Configurer **Role Mappings** pour LDAP/SAML
-4. Créer des **Spaces** pour isolation multi-équipe
-5. Générer des **API Keys** pour applications
+**Typical workflow**:
+1. Create **Roles** with appropriate privileges
+2. Create **Users** and assign roles
+3. (Optional) Configure **Role Mappings** for LDAP/SAML
+4. Create **Spaces** for multi-team isolation
+5. Generate **API Keys** for applications
 
 ---
 
-# Audit Logging : Traçabilité des Accès
+# Audit Logging: Access Traceability
 
-**Audit logging** enregistre toutes les actions de sécurité.
+**Audit logging** records all security actions.
 
-**Activer l'audit** :
+**Enable audit**:
 
 ```yaml
 # elasticsearch.yml
@@ -1066,17 +1066,17 @@ xpack.security.audit.logfile.events.include:
 
 ---
 
-# Audit Logging : Événements et Logs
+# Audit Logging: Events and Logs
 
-**Événements audités** :
-- `authentication_success/failed` : Tentatives connexion
-- `access_granted/denied` : Accès aux ressources
-- `run_as_granted/denied` : Privilege "run as"
-- `tampered_request` : Requête modifiée
+**Audited events**:
+- `authentication_success/failed`: Login attempts
+- `access_granted/denied`: Resource access
+- `run_as_granted/denied`: "Run as" privilege
+- `tampered_request`: Modified request
 
-**Logs d'audit** : `<cluster-name>_audit.json`
+**Audit logs**: `<cluster-name>_audit.json`
 
-**Exemple** :
+**Example**:
 ```json
 {
   "type": "audit",
@@ -1090,81 +1090,81 @@ xpack.security.audit.logfile.events.include:
 
 ---
 
-# Résumé : Implémentation de la Sécurité
+# Summary: Security Implementation
 
-| Composant | Outil | Fonction |
-|-----------|-------|----------|
-| **Authentification** | Realms (native, LDAP, SAML) | Valider l'identité |
-| **Autorisation** | RBAC (Roles, Privileges) | Contrôler les accès |
-| **Filtrage Documents** | Document-Level Security (DLS) | Limiter visibilité des documents |
-| **Filtrage Champs** | Field-Level Security (FLS) | Masquer champs sensibles |
-| **API Keys** | API Keys | Authentification programmatique |
-| **Isolation** | Kibana Spaces | Séparer environnements par équipe |
-| **Traçabilité** | Audit Logging | Enregistrer toutes les actions |
+| Component | Tool | Function |
+|-----------|------|----------|
+| **Authentication** | Realms (native, LDAP, SAML) | Validate identity |
+| **Authorization** | RBAC (Roles, Privileges) | Control access |
+| **Document Filtering** | Document-Level Security (DLS) | Limit document visibility |
+| **Field Filtering** | Field-Level Security (FLS) | Mask sensitive fields |
+| **API Keys** | API Keys | Programmatic authentication |
+| **Isolation** | Kibana Spaces | Separate environments by team |
+| **Traceability** | Audit Logging | Record all actions |
 
-**Best Practices** :
-1. ✅ Activer la sécurité dès la mise en production
-2. ✅ Utiliser des mots de passe forts (min 12 caractères)
-3. ✅ Appliquer le **principe du moindre privilège** (least privilege)
-4. ✅ Utiliser DLS/FLS pour données sensibles
-5. ✅ Activer l'audit logging pour conformité
-6. ✅ Régulièrement auditer et réviser les rôles et accès
-7. ✅ Utiliser API keys avec expiration pour applications
-
----
-
-# Points Clés à Retenir
-
-**Realms** :
-- Les **realms** définissent comment les utilisateurs s'authentifient
-- Chaîne d'authentification : plusieurs realms testés dans l'ordre
-- Native realm = base de données interne, LDAP/SAML = intégration entreprise
-
-**RBAC** :
-- **Rôles** = ensemble de privilèges (cluster + indices)
-- **Privilèges** = actions autorisées (read, write, manage, etc.)
-- Combiner plusieurs rôles pour un utilisateur
-
-**Filtrage Avancé** :
-- **DLS** = filtrer les documents visibles avec une query
-- **FLS** = cacher des champs sensibles (grant/except)
-- Les deux peuvent être combinés
-
-**Outils** :
-- **API Keys** = authentification sans password (apps, scripts)
-- **Kibana Spaces** = isolation multi-tenant
-- **Audit Logging** = traçabilité pour conformité et sécurité
+**Best Practices**:
+1. Enable security from production deployment
+2. Use strong passwords (min 12 characters)
+3. Apply the **principle of least privilege**
+4. Use DLS/FLS for sensitive data
+5. Enable audit logging for compliance
+6. Regularly audit and review roles and access
+7. Use API keys with expiration for applications
 
 ---
 
-# Exercices Pratiques
+# Key Takeaways
 
-Rendez-vous dans le workbook pratique pour réaliser les labs suivants :
+**Realms**:
+- **Realms** define how users authenticate
+- Authentication chain: multiple realms tested in order
+- Native realm = internal database, LDAP/SAML = enterprise integration
 
-**Lab 7.1** : Créer des Utilisateurs et des Rôles  
-Configurer RBAC avec différents niveaux d'accès
+**RBAC**:
+- **Roles** = set of privileges (cluster + indices)
+- **Privileges** = authorized actions (read, write, manage, etc.)
+- Combine multiple roles for a user
 
-**Lab 7.2** : Implémenter Document-Level Security  
-Filtrer les documents selon le rôle de l'utilisateur
+**Advanced Filtering**:
+- **DLS** = filter visible documents with a query
+- **FLS** = hide sensitive fields (grant/except)
+- Both can be combined
 
-**🌟 Bonus Challenge 7.A** : Field-Level Security  
-Masquer des champs sensibles pour certains rôles
+**Tools**:
+- **API Keys** = passwordless authentication (apps, scripts)
+- **Kibana Spaces** = multi-tenant isolation
+- **Audit Logging** = traceability for compliance and security
 
 ---
 
-# Ressources et Documentation
+# Practical Exercises
 
-**Documentation officielle Elasticsearch** :
+Go to the practical workbook to complete the following labs:
+
+**Lab 7.1**: Create Users and Roles
+Configure RBAC with different access levels
+
+**Lab 7.2**: Implement Document-Level Security
+Filter documents based on user role
+
+**Bonus Challenge 7.A**: Field-Level Security
+Mask sensitive fields for certain roles
+
+---
+
+# Resources and Documentation
+
+**Official Elasticsearch Documentation**:
 - [Secure the Elastic Stack](https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html)
 - [Realms](https://www.elastic.co/guide/en/elasticsearch/reference/current/realms.html)
 - [User authorization](https://www.elastic.co/guide/en/elasticsearch/reference/current/authorization.html)
 - [Document and field level security](https://www.elastic.co/guide/en/elasticsearch/reference/current/field-and-document-access-control.html)
 
-**Guides de sécurité** :
+**Security Guides**:
 - [Security settings](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html)
 - [API Keys](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html)
 - [Audit logging](https://www.elastic.co/guide/en/elasticsearch/reference/current/enable-audit-logging.html)
 
-**Kibana Security** :
+**Kibana Security**:
 - [Kibana Spaces](https://www.elastic.co/guide/en/kibana/current/xpack-spaces.html)
 - [Kibana privileges](https://www.elastic.co/guide/en/kibana/current/kibana-privileges.html)

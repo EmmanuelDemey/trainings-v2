@@ -2,138 +2,138 @@
 layout: cover
 ---
 
-# Installation et Configuration
+# Installation and Configuration
 
-Déploiement et paramétrage d'Elasticsearch en production
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de cette section, vous serez capable de:
-
-- Installer et initialiser des nœuds Elasticsearch avec la configuration de base
-- Configurer et former un cluster multi-nœuds avec les mécanismes de découverte
-- Gérer les fichiers de configuration (elasticsearch.yml, jvm.options, log4j2.properties)
-- Utiliser les APIs de vérification pour diagnostiquer l'état du cluster
+Elasticsearch deployment and configuration for production
 
 ---
 
-# Installation d'Elasticsearch
+# Learning Objectives
 
-[Elasticsearch peut être installé](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html) de plusieurs manières selon l'environnement cible.
+At the end of this section, you will be able to:
 
-**Méthodes d'installation principales**:
+- Install and initialize Elasticsearch nodes with basic configuration
+- Configure and form a multi-node cluster with discovery mechanisms
+- Manage configuration files (elasticsearch.yml, jvm.options, log4j2.properties)
+- Use verification APIs to diagnose cluster status
+
+---
+
+# Elasticsearch Installation
+
+[Elasticsearch can be installed](https://www.elastic.co/guide/en/elasticsearch/reference/current/install-elasticsearch.html) in several ways depending on the target environment.
+
+**Main installation methods**:
 - **Package managers**: APT (Debian/Ubuntu), YUM (RHEL/CentOS), Homebrew (macOS)
 - **Archives**: TAR.GZ (Linux/macOS), ZIP (Windows)
-- **Docker**: Image officielle `docker.elastic.co/elasticsearch/elasticsearch`
-- **Cloud**: Elastic Cloud (SaaS managed)
+- **Docker**: Official image `docker.elastic.co/elasticsearch/elasticsearch`
+- **Cloud**: Elastic Cloud (managed SaaS)
 
-**Avantages par méthode**:
-- Package managers: Intégration système (systemd), mises à jour automatiques
-- Archives: Contrôle total, environnements sans privilèges root
-- Docker: Isolation, reproductibilité, orchestration (Kubernetes)
-- Cloud: Zéro maintenance infrastructure, scaling automatique
+**Advantages by method**:
+- Package managers: System integration (systemd), automatic updates
+- Archives: Full control, environments without root privileges
+- Docker: Isolation, reproducibility, orchestration (Kubernetes)
+- Cloud: Zero infrastructure maintenance, automatic scaling
 
-**Prérequis communs**: Java 17+ (inclus dans les packages officiels depuis ES 7.x)
+**Common prerequisites**: Java 17+ (included in official packages since ES 7.x)
 
 ---
 
-# Structure de Répertoires Elasticsearch
+# Elasticsearch Directory Structure
 
-Après installation, comprendre la structure de fichiers est essentiel pour l'administration.
+After installation, understanding the file structure is essential for administration.
 
-**Répertoires principaux**:
+**Main directories**:
 
-| Répertoire | Contenu | Description |
-|------------|---------|-------------|
-| `/usr/share/elasticsearch/` | Binaires & libs | Installation Elasticsearch |
+| Directory | Content | Description |
+|-----------|---------|-------------|
+| `/usr/share/elasticsearch/` | Binaries & libs | Elasticsearch installation |
 | `/etc/elasticsearch/` | Configuration | elasticsearch.yml, jvm.options, log4j2.properties |
-| `/var/lib/elasticsearch/` | Données | Indices, snapshots |
-| `/var/log/elasticsearch/` | Logs | Logs applicatifs |
+| `/var/lib/elasticsearch/` | Data | Indices, snapshots |
+| `/var/log/elasticsearch/` | Logs | Application logs |
 
 ---
 
-# Structure de Répertoires Elasticsearch (détail)
+# Elasticsearch Directory Structure (detail)
 
-**Personnalisation**: Chemins configurables via `path.data`, `path.logs` dans elasticsearch.yml
+**Customization**: Paths configurable via `path.data`, `path.logs` in elasticsearch.yml
 
-**Sous-répertoires importants**:
-- **bin/** : Exécutables (elasticsearch, elasticsearch-plugin)
-- **lib/** : Librairies Java
-- **modules/** : Modules Elasticsearch (x-pack, etc.)
-- **certs/** : Certificats TLS (ES 8.x+)
+**Important subdirectories**:
+- **bin/**: Executables (elasticsearch, elasticsearch-plugin)
+- **lib/**: Java libraries
+- **modules/**: Elasticsearch modules (x-pack, etc.)
+- **certs/**: TLS certificates (ES 8.x+)
 
 ---
 
-# Configuration de Base: elasticsearch.yml
+# Basic Configuration: elasticsearch.yml
 
-Le fichier [elasticsearch.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html) contient la configuration principale du nœud.
+The [elasticsearch.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html) file contains the main node configuration.
 
-**Paramètres essentiels**:
+**Essential parameters**:
 ```yaml
 cluster.name: production-cluster
 node.name: node-1
 
-# Rôles du nœud (ES 7.9+)
+# Node roles (ES 7.9+)
 node.roles: [ master, data, ingest ]
 
-# Réseau
+# Network
 network.host: 0.0.0.0
 http.port: 9200
 transport.port: 9300
 
-# Chemins
+# Paths
 path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
 
-# Sécurité (ES 8.x+ activée par défaut)
+# Security (ES 8.x+ enabled by default)
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
 ```
 
-**Important**: Redémarrage requis après modification de elasticsearch.yml
+**Important**: Restart required after modifying elasticsearch.yml
 
 ---
 
-# Démarrage d'un Nœud Elasticsearch
+# Starting an Elasticsearch Node
 
-**Avec systemd (installation par package)**:
+**With systemd (package installation)**:
 ```bash
-# Démarrer le service
+# Start the service
 sudo systemctl start elasticsearch
 
-# Vérifier le statut
+# Check status
 sudo systemctl status elasticsearch
 
-# Activer au démarrage
+# Enable at startup
 sudo systemctl enable elasticsearch
 
-# Consulter les logs en temps réel
+# View logs in real-time
 sudo journalctl -u elasticsearch -f
 ```
 
-**Avec archive (démarrage manuel)**:
+**With archive (manual startup)**:
 ```bash
-# Démarrage en avant-plan (pour debug)
+# Start in foreground (for debugging)
 ./bin/elasticsearch
 
-# Démarrage en arrière-plan (daemon)
+# Start in background (daemon)
 ./bin/elasticsearch -d -p pid
 
-# Arrêt propre
+# Clean shutdown
 kill -SIGTERM $(cat pid)
 ```
 
-**Premier démarrage ES 8.x**: Note les credentials auto-générés et l'enrollment token dans les logs !
+**First ES 8.x startup**: Note the auto-generated credentials and enrollment token in the logs!
 
 ---
 
-# Cluster Setup: Mécanismes de Découverte
+# Cluster Setup: Discovery Mechanisms
 
-Elasticsearch utilise la [découverte automatique](https://www.elastic.co/guide/en/elasticsearch/reference/current/discovery-hosts-providers.html) pour former un cluster à partir de nœuds individuels.
+Elasticsearch uses [automatic discovery](https://www.elastic.co/guide/en/elasticsearch/reference/current/discovery-hosts-providers.html) to form a cluster from individual nodes.
 
-**Mécanismes de découverte**:
+**Discovery mechanisms**:
 
 1. **discovery.seed_hosts** (ES 7.x+):
 ```yaml
@@ -142,132 +142,133 @@ discovery.seed_hosts:
   - 192.168.1.11:9300
   - 192.168.1.12:9300
 ```
-Liste des nœuds à contacter pour joindre le cluster.
+List of nodes to contact to join the cluster.
 
-2. **cluster.initial_master_nodes** (première initialisation):
+2. **cluster.initial_master_nodes** (first initialization):
 ```yaml
 cluster.initial_master_nodes:
   - node-1
   - node-2
   - node-3
 ```
-**Critique**: Obligatoire au premier démarrage, évite le "split-brain". **Retirer après formation du cluster !**
+
+**Critical** : Required at first startup, prevents "split-brain". 
 
 ---
 
-# Formation de Cluster avec Enrollment Tokens
+# Cluster Formation with Enrollment Tokens
 
-Elasticsearch 8.x introduit les [enrollment tokens](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html) pour sécuriser l'ajout de nœuds.
+Elasticsearch 8.x introduces [enrollment tokens](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-stack-security.html) to secure node addition.
 
-**Workflow de formation de cluster**:
+**Cluster formation workflow**:
 
-1. **Démarrer le premier nœud (master)**:
+1. **Start the first node (master)**:
 ```bash
 ./bin/elasticsearch
-# Note l'enrollment token dans les logs de démarrage
+# Note the enrollment token in the startup logs
 ```
 
-2. **Générer un enrollment token (si expiré)**:
+2. **Generate an enrollment token (if expired)**:
 ```bash
 ./bin/elasticsearch-create-enrollment-token -s node
 ```
 
-3. **Rejoindre le cluster depuis un nouveau nœud**:
+3. **Join the cluster from a new node**:
 ```bash
 ./bin/elasticsearch --enrollment-token <TOKEN>
 ```
 
-**Avantages**: 
-- ✅ TLS auto-configuré entre nœuds
-- ✅ Pas de configuration manuelle de certificats
-- ✅ Sécurité par défaut (zero-config security)
+**Advantages**:
+- ✅ Auto-configured TLS between nodes
+- ✅ No manual certificate configuration
+- ✅ Security by default (zero-config security)
 
 ---
 
-# Rôles de Nœuds
+# Node Roles
 
-Chaque nœud peut avoir un ou plusieurs [rôles](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html) définissant ses responsabilités.
+Each node can have one or more [roles](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html) defining its responsibilities.
 
-**Rôles principaux**:
+**Main roles**:
 ```yaml
 node.roles: [ master, data, ingest, ml, transform ]
 ```
 
-| Rôle | Responsabilité | Cas d'usage |
-|------|---------------|-------------|
-| **master** | Gestion du cluster (création d'index, allocation de shards) | Nœuds dédiés master-only pour clusters >10 nœuds |
-| **data** | Stockage et recherche de données | Nœuds data-only pour stockage intensif |
-| **ingest** | Preprocessing de documents (pipelines) | Transformation avant indexation |
-| **ml** | Machine Learning jobs | Détection d'anomalies, forecasting |
-| **transform** | Transformations de données | Agrégations continues |
+| Role | Responsibility | Use case |
+|------|----------------|----------|
+| **master** | Cluster management (index creation, shard allocation) | Dedicated master-only nodes for clusters >10 nodes |
+| **data** | Data storage and search | Data-only nodes for intensive storage |
+| **ingest** | Document preprocessing (pipelines) | Transformation before indexing |
+| **ml** | Machine Learning jobs | Anomaly detection, forecasting |
+| **transform** | Data transformations | Continuous aggregations |
 
-**Architectures recommandées**:
-- **Petit cluster (<10 nœuds)**: Tous les rôles sur tous les nœuds
-- **Grand cluster**: Séparation master-only / data-only / coordinating-only
+**Recommended architectures**:
+- **Small cluster (<10 nodes)**: All roles on all nodes
+- **Large cluster**: Separate master-only / data-only / coordinating-only
 
 ---
 
-# Configuration JVM: jvm.options
+# JVM Configuration: jvm.options
 
-Le fichier [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/current/advanced-configuration.html#set-jvm-options) contrôle les paramètres de la JVM.
+The [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/current/advanced-configuration.html#set-jvm-options) file controls JVM parameters.
 
-**Paramètres critiques**:
+**Critical parameters**:
 ```
-# Heap size (TOUJOURS identique pour Xms et Xmx)
+# Heap size (ALWAYS identical for Xms and Xmx)
 -Xms4g
 -Xmx4g
 
-# Type de garbage collector (G1GC recommandé)
+# Garbage collector type (G1GC recommended)
 -XX:+UseG1GC
 ```
 
 ---
 
-# Configuration JVM: Monitoring et Dumps
+# JVM Configuration: Monitoring and Dumps
 
-**GC Logging et diagnostics**:
+**GC Logging and diagnostics**:
 
 ```
-# GC logging pour monitoring
+# GC logging for monitoring
 -Xlog:gc*,gc+age=trace,safepoint:file=/var/log/elasticsearch/gc.log
 
-# Dumps mémoire en cas d'OutOfMemoryError
+# Memory dumps on OutOfMemoryError
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:HeapDumpPath=/var/lib/elasticsearch
 ```
 
-**Règles de sizing heap**:
-- ✅ Maximum 50% de la RAM physique (le reste pour le cache OS)
-- ✅ Ne jamais dépasser 32GB (perte de compressed oops)
-- ✅ -Xms = -Xmx (évite le resizing dynamique)
+**Heap sizing rules**:
+- ✅ Maximum 50% of physical RAM (the rest for OS cache)
+- ✅ Never exceed 32GB (loss of compressed oops)
+- ✅ -Xms = -Xmx (avoids dynamic resizing)
 
 ---
 
-# Configuration des Logs: log4j2.properties
+# Log Configuration: log4j2.properties
 
-Elasticsearch utilise [Log4j2](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html) pour la journalisation.
+Elasticsearch uses [Log4j2](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html) for logging.
 
-**Configuration par défaut**:
+**Default configuration**:
 ```properties
-# Niveau de log global
+# Global log level
 logger.action.name = org.elasticsearch.action
 logger.action.level = info
 
-# Logs de recherche lente (slow logs)
+# Slow search logs
 index.search.slowlog.threshold.query.warn: 10s
 index.search.slowlog.threshold.query.info: 5s
 index.search.slowlog.threshold.query.debug: 2s
 
-# Logs d'indexation lente
+# Slow indexing logs
 index.indexing.slowlog.threshold.index.warn: 10s
 index.indexing.slowlog.threshold.index.info: 5s
 ```
 
 ---
 
-# Configuration des Logs: log4j2.properties
+# Log Configuration: log4j2.properties
 
-**Ajustement dynamique** (sans redémarrage):
+**Dynamic adjustment** (without restart):
 ```bash
 PUT /_cluster/settings
 {
@@ -277,80 +278,80 @@ PUT /_cluster/settings
 }
 ```
 
-**Types de logs**: elasticsearch.log (général), elasticsearch_deprecation.log, gc.log, elasticsearch_index_indexing_slowlog.log
+**Log types**: elasticsearch.log (general), elasticsearch_deprecation.log, gc.log, elasticsearch_index_indexing_slowlog.log
 
 ---
 
-# Variables d'Environnement
+# Environment Variables
 
-Elasticsearch supporte la configuration via [variables d'environnement](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html#_environment_variable_substitution) dans elasticsearch.yml.
+Elasticsearch supports configuration via [environment variables](https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html#_environment_variable_substitution) in elasticsearch.yml.
 
-**Syntaxe**:
+**Syntax**:
 ```yaml
 node.name: ${HOSTNAME}
 network.host: ${ES_NETWORK_HOST}
-cluster.name: ${ES_CLUSTER_NAME:my-cluster}  # Valeur par défaut: my-cluster
+cluster.name: ${ES_CLUSTER_NAME:my-cluster}  # Default value: my-cluster
 ```
 
-**Variables système importantes**:
+**Important system variables**:
 ```bash
-# Heap JVM (alternative à jvm.options)
+# JVM Heap (alternative to jvm.options)
 export ES_JAVA_OPTS="-Xms4g -Xmx4g"
 
-# Chemin de configuration
+# Configuration path
 export ES_PATH_CONF=/etc/elasticsearch
 
-# Nom du cluster
+# Cluster name
 export ES_CLUSTER_NAME=production
 
-# Utilisateur Elasticsearch (démarrage)
+# Elasticsearch user (startup)
 export ES_USER=elasticsearch
 ```
 
-**Cas d'usage**: Déploiements conteneurisés (Docker, Kubernetes), CI/CD, multi-environnements
+**Use cases**: Containerized deployments (Docker, Kubernetes), CI/CD, multi-environments
 
 ---
 
-# APIs de Vérification: _cat APIs
+# Verification APIs: _cat APIs
 
-Les [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) fournissent des informations lisibles sur l'état du cluster.
+The [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) provide readable information about cluster status.
 
-**Commandes essentielles**:
+**Essential commands**:
 ```bash
-# Santé du cluster (statut global)
+# Cluster health (global status)
 GET /_cat/health?v
 
-# Liste des nœuds
+# Node list
 GET /_cat/nodes?v
 
-# Liste des indices
+# Index list
 GET /_cat/indices?v
 
-# Liste des shards et leur allocation
+# Shard list and allocation
 GET /_cat/shards?v
 
-# Master actuel
+# Current master
 GET /_cat/master?v
 ```
 
-**Paramètres utiles**:
+**Useful parameters**:
 - `?v`: Headers (column names)
-- `?h=column1,column2`: Sélection de colonnes
-- `?s=column:asc`: Tri par colonne
-- `?format=json`: Output JSON au lieu de texte
+- `?h=column1,column2`: Column selection
+- `?s=column:asc`: Sort by column
+- `?format=json`: JSON output instead of text
 
 ---
 
-# API Cluster Health
+# Cluster Health API
 
-L'API [_cluster/health](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html) retourne l'état détaillé du cluster.
+The [_cluster/health](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html) API returns detailed cluster status.
 
-**Requête**:
+**Request**:
 ```bash
 GET /_cluster/health
 ```
 
-**Réponse**:
+**Response**:
 ```json
 {
   "cluster_name": "production-cluster",
@@ -368,53 +369,53 @@ GET /_cluster/health
 
 ---
 
-# API Cluster Health
+# Cluster Health API
 
-**Interprétation des statuts**:
-- 🟢 **green**: Tous les shards (primaires + replicas) sont alloués
-- 🟡 **yellow**: Tous les primaires alloués, certains replicas manquants
-- 🔴 **red**: Au moins un shard primaire manquant (perte de données potentielle)
+**Status interpretation**:
+- 🟢 **green**: All shards (primaries + replicas) are allocated
+- 🟡 **yellow**: All primaries allocated, some replicas missing
+- 🔴 **red**: At least one primary shard missing (potential data loss)
 
 ---
 
-# API Nodes Info et Stats
+# Nodes Info and Stats API
 
-**_nodes API** retourne les informations et statistiques des nœuds.
+**_nodes API** returns node information and statistics.
 
-**Informations statiques** (_nodes):
+**Static information** (_nodes):
 ```bash
 GET /_nodes
-GET /_nodes/node-1,node-2  # Nœuds spécifiques
-GET /_nodes/_master        # Nœud master actuel
+GET /_nodes/node-1,node-2  # Specific nodes
+GET /_nodes/_master        # Current master node
 ```
 
-Retourne: version, rôles, OS, JVM, plugins installés
+Returns: version, roles, OS, JVM, installed plugins
 
-**Statistiques dynamiques** (_nodes/stats):
+**Dynamic statistics** (_nodes/stats):
 ```bash
 GET /_nodes/stats
 GET /_nodes/stats/jvm,os,process
 ```
 
-Retourne:
+Returns:
 - **JVM**: Heap usage, GC stats, thread count
 - **OS**: CPU, memory, swap usage
 - **Process**: File descriptors, CPU time
 - **Indices**: Indexing/search rates, doc count
-- **HTTP**: Requêtes HTTP en cours
+- **HTTP**: HTTP requests in progress
 
 ---
 
-# API Cat Indices
+# Cat Indices API
 
-L'API [_cat/indices](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html) liste tous les indices avec leurs métriques.
+The [_cat/indices](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html) API lists all indices with their metrics.
 
-**Requête**:
+**Request**:
 ```bash
 GET /_cat/indices?v&s=store.size:desc&h=index,health,status,pri,rep,docs.count,store.size
 ```
 
-**Résultat typique**:
+**Typical result**:
 ```
 index          health status pri rep docs.count store.size
 logs-2023.11   green  open     5   1   15000000      2.5gb
@@ -422,53 +423,41 @@ products       green  open     1   1     100000       50mb
 users          yellow open     1   1      50000       10mb
 ```
 
-**Colonnes utiles**:
+**Useful columns**:
 - **health**: green/yellow/red
-- **pri**: Nombre de shards primaires
-- **rep**: Nombre de replicas
-- **docs.count**: Nombre de documents
-- **store.size**: Taille totale (primaires + replicas)
+- **pri**: Number of primary shards
+- **rep**: Number of replicas
+- **docs.count**: Number of documents
+- **store.size**: Total size (primaries + replicas)
 
-**Cas d'usage**: Monitoring de la croissance des indices, identification des indices volumineux
-
----
-
-# Résumé
-
-## Points Clés
-
-- L'**installation** d'Elasticsearch supporte plusieurs méthodes (packages, archives, Docker, cloud)
-- La **structure de répertoires** sépare binaires (/usr/share), config (/etc), données (/var/lib), logs (/var/log)
-- Le fichier **elasticsearch.yml** contient la configuration principale (cluster.name, node.roles, network, sécurité)
-- Les **mécanismes de découverte** permettent la formation automatique de clusters (discovery.seed_hosts, enrollment tokens)
-- Les **rôles de nœuds** définissent les responsabilités (master, data, ingest, ml, transform)
-- Les **APIs de vérification** (_cat, _cluster/health, _nodes) permettent de diagnostiquer l'état du cluster
+**Use case**: Monitoring index growth, identifying large indices
 
 ---
 
-# Résumé
+# Summary
 
-## Concepts Importants
+## Key Points
 
-- **cluster.initial_master_nodes**: Obligatoire au premier démarrage, à retirer ensuite
-- **Enrollment tokens** (ES 8.x+): Sécurisation automatique de l'ajout de nœuds
-- **Heap sizing**: Maximum 50% RAM, ne jamais dépasser 32GB, -Xms = -Xmx
-- **Cluster health**: green (parfait), yellow (replicas manquants), red (primaires manquants)
+- Elasticsearch **installation** supports multiple methods (packages, archives, Docker, cloud)
+- The **directory structure** separates binaries (/usr/share), config (/etc), data (/var/lib), logs (/var/log)
+- The **elasticsearch.yml** file contains the main configuration (cluster.name, node.roles, network, security)
+- **Discovery mechanisms** enable automatic cluster formation (discovery.seed_hosts, enrollment tokens)
+- **Node roles** define responsibilities (master, data, ingest, ml, transform)
+- **Verification APIs** (_cat, _cluster/health, _nodes) allow cluster status diagnosis
 
 ---
 
-# Exercices Pratiques
+# Summary
 
-Passez maintenant au **cahier d'exercices** pour mettre en pratique ces concepts.
+## Important Concepts
 
-**Labs à réaliser**:
-- Lab 2.1: Installation et démarrage d'un nœud Elasticsearch
-- Lab 2.2: Formation d'un cluster multi-nœuds
-- Lab 2.3: Configuration et paramétrage avancé
-- Lab 2.4: Utilisation des APIs de vérification et diagnostic
+- **cluster.initial_master_nodes**: Required at first startup, remove afterwards
+- **Enrollment tokens** (ES 8.x+): Automatic security for adding nodes
+- **Heap sizing**: Maximum 50% RAM, never exceed 32GB, -Xms = -Xmx
+- **Cluster health**: green (perfect), yellow (missing replicas), red (missing primaries)
 
-**Ces exercices couvrent**:
-- Installation via différentes méthodes (package manager, Docker)
-- Configuration de elasticsearch.yml et jvm.options
-- Formation de cluster avec enrollment tokens
-- Diagnostic avec _cat APIs et _cluster/health
+---
+layout: section
+---
+
+# Practical Exercises

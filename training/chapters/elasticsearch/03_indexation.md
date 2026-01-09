@@ -444,6 +444,10 @@ POST /_bulk
 
 - **Monitoring**: Monitor the `thread_pool.bulk.queue` and `thread_pool.bulk.rejected` metrics to tune bulk request sizes and intervals
 
+---
+
+# Best Practices
+
 ```http
 PUT products/_settings
 {

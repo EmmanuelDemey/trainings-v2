@@ -1,1581 +1,1183 @@
-# Cahier d'Exercices Pratiques - Elasticsearch Parkki
-## Jour 1 - Installation, Configuration et Indexation
+# Elasticsearch Parkki Training - Practical Exercises
 
-Formation personnalisée pour Parkki
+## Overview
+
+Each exercise is **autonomous** - you can complete them in any order without dependencies on other exercises.
+
+All exercises use the Kibana Dev Tools console. Access it at: `http://localhost:5601/app/dev_tools#/console`
 
 ---
 
-# Lab 1.1: Démarrage et Vérification du Cluster
+# Part 2: Installation and Configuration
 
-**Topic**: Installation et Configuration
-**Durée**: 15 minutes
+## Exercise 2.1: Starting Elasticsearch and First Health Check
 
-## Objectif
+**Objective**: Install, start Elasticsearch and verify it's running correctly.
 
-Démarrer un cluster Elasticsearch et vérifier son bon fonctionnement.
+### Step 1: Start Elasticsearch
 
-## Exercice
-
-### Étape 1: Démarrer Elasticsearch avec Docker
-
+**Option A: Using Docker (recommended for training)**
 ```bash
+# Create a network
 docker network create elastic
 
-docker run -d \
-  --name elasticsearch \
+# Start Elasticsearch
+docker run -d --name elasticsearch \
   --net elastic \
   -p 9200:9200 \
   -e "discovery.type=single-node" \
   -e "xpack.security.enabled=false" \
-  -e "ES_JAVA_OPTS=-Xms2g -Xmx2g" \
-  docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-```
+  -e "xpack.security.enrollment.enabled=false" \
+  docker.elastic.co/elasticsearch/elasticsearch:9.0.0
 
-### Étape 2: Vérifier l'accès au cluster
-
-```bash
-GET /
-```
-
-**Résultat attendu**: Informations du cluster avec `"tagline": "You Know, for Search"`
-
-### Étape 3: Vérifier la santé du cluster
-
-```bash
-GET /_cluster/health
-```
-
-**Résultat attendu**: `"status": "green"` ou `"yellow"`
-
-### Étape 4: Démarrer Kibana
-
-```bash
-docker run -d \
-  --name kibana \
+# Start Kibana
+docker run -d --name kibana \
   --net elastic \
   -p 5601:5601 \
   -e "ELASTICSEARCH_HOSTS=http://elasticsearch:9200" \
-  docker.elastic.co/kibana/kibana:8.11.0
+  docker.elastic.co/kibana/kibana:9.0.0
 ```
 
-Accédez à http://localhost:5601 → Dev Tools
+**Option B: Using Docker Compose**
 
-### Validation
+Create a `docker-compose.yml` file:
+```yaml
+version: '3.8'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ports:
+      - 9200:9200
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.0.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+volumes:
+  esdata:
+```
+
+Then run:
+```bash
+docker-compose up -d
+```
+
+**Option C: Local Installation**
+```bash
+# Download and extract Elasticsearch
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-9.0.0-linux-x86_64.tar.gz
+tar -xzf elasticsearch-9.0.0-linux-x86_64.tar.gz
+cd elasticsearch-9.0.0
+
+# Start Elasticsearch
+./bin/elasticsearch
+```
+
+### Step 2: Verify Installation
+
+Wait 30-60 seconds for startup, then open Kibana Dev Tools: `http://localhost:5601/app/dev_tools#/console`
 
 ```bash
+# Check Elasticsearch is responding
+GET /
+
+# Check cluster health
+GET /_cluster/health
+
+# List all nodes
 GET /_cat/nodes?v
 ```
 
-✅ 1 nœud affiché avec ses métriques
+**Expected Results**:
+- Cluster status should be `green` or `yellow`
+- At least one node should be listed
+- Version should be 9.x
+
+### Step 3: Explore Cluster Information
+
+```bash
+# Get detailed cluster info
+GET /_cluster/health?level=indices
+
+# Check cluster UUID and name
+GET /_cluster/state?filter_path=cluster_name,cluster_uuid
+
+# View cluster settings
+GET /_cluster/settings?include_defaults=true&flat_settings=true&filter_path=defaults.cluster.name
+```
+
+**Challenge**: What is your cluster's UUID? What is the default cluster name?
 
 ---
 
-# Lab 1.2: Inspection du Cluster avec les _cat APIs
+## Exercise 2.2: Node Configuration Analysis
 
-**Topic**: Installation et Configuration
-**Durée**: 15 minutes
+**Objective**: Understand your node configuration and identify potential issues.
 
-## Objectif
+**Instructions**:
 
-Maîtriser les commandes de diagnostic essentielles.
-
-## Exercice
-
-### Étape 1: Lister les nœuds
-
+1. Get detailed node information:
 ```bash
-GET /_cat/nodes?v
+GET /_nodes?filter_path=nodes.*.name,nodes.*.roles,nodes.*.jvm.mem,nodes.*.os.name
 ```
 
-### Étape 2: Voir les rôles du nœud
-
+2. Check current settings:
 ```bash
-GET /_cat/nodes?v&h=name,node.role,heap.percent,ram.percent,cpu
+GET /_cluster/settings?include_defaults=true&filter_path=defaults.cluster.routing
 ```
 
-### Étape 3: Lister les indices
-
+3. Analyze JVM configuration:
 ```bash
-GET /_cat/indices?v
+GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_used_percent,nodes.*.jvm.mem.heap_max_in_bytes
 ```
 
-### Étape 4: Vérifier l'utilisation disque
-
+4. Check thread pools:
 ```bash
-GET /_cat/allocation?v
+GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected,completed
 ```
-
-### Étape 5: Voir les shards
-
-```bash
-GET /_cat/shards?v
-```
-
-### Validation
-
-✅ Capable d'utiliser les _cat APIs pour diagnostiquer le cluster
 
 ---
 
-# Lab 1.3: Configuration via elasticsearch.yml
+# Part 3: Indexing
 
-**Topic**: Installation et Configuration
-**Durée**: 10 minutes
+## Exercise 3.1: Create and Index Documents with Validation
 
-## Objectif
+**Objective**: Practice document indexing with error handling and validation.
 
-Comprendre les paramètres de configuration principaux.
+**Instructions**:
 
-## Exercice
-
-### Étape 1: Voir la configuration actuelle
-
+1. Create an index with specific settings:
 ```bash
-GET /_nodes/settings?filter_path=nodes.*.settings.cluster,nodes.*.settings.node
-```
-
-### Étape 2: Paramètres importants à connaître
-
-| Paramètre | Description |
-|-----------|-------------|
-| `cluster.name` | Nom du cluster |
-| `node.name` | Nom du nœud |
-| `node.roles` | Rôles du nœud (master, data, ingest...) |
-| `network.host` | Adresse d'écoute |
-| `discovery.seed_hosts` | Liste des nœuds pour la découverte |
-
-### Étape 3: Voir les settings modifiables dynamiquement
-
-```bash
-GET /_cluster/settings?include_defaults=true&flat_settings=true
-```
-
-### Validation
-
-✅ Comprendre où se trouvent les paramètres de configuration
-
----
-
-# Lab 2.1: Opérations CRUD sur les Documents
-
-**Topic**: Indexation et Gestion des Documents
-**Durée**: 20 minutes
-
-## Objectif
-
-Maîtriser les opérations de base : Create, Read, Update, Delete.
-
-## Exercice
-
-### Setup: Créer un index de test
-
-```bash
-PUT /logs-test
+PUT /products
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0
+    "number_of_replicas": 0,
+    "refresh_interval": "5s"
   }
 }
 ```
 
-### Étape 1: Créer un document (POST - ID auto)
-
+2. Index documents with explicit IDs:
 ```bash
-POST /logs-test/_doc
+POST /products/_doc/1
 {
-  "@timestamp": "2025-01-15T10:30:00.000Z",
-  "level": "INFO",
-  "service": "parkki-api",
-  "message": "User login successful",
-  "user_id": "user_12345"
+  "name": "Parking Sensor",
+  "category": "electronics",
+  "price": 29.99,
+  "in_stock": true,
+  "tags": ["sensor", "iot", "parking"],
+  "created_at": "2025-01-15T10:00:00Z"
+}
+
+POST /products/_doc/2
+{
+  "name": "Parking Barrier",
+  "category": "hardware",
+  "price": 199.99,
+  "in_stock": true,
+  "tags": ["barrier", "access-control"],
+  "created_at": "2025-01-15T11:00:00Z"
+}
+
+POST /products/_doc/3
+{
+  "name": "Access Card Reader",
+  "category": "electronics",
+  "price": 89.99,
+  "in_stock": false,
+  "tags": ["rfid", "access-control"],
+  "created_at": "2025-01-14T09:00:00Z"
 }
 ```
 
-### Étape 2: Créer un document avec ID spécifique (PUT)
-
+3. Verify document count and check auto-generated mapping:
 ```bash
-PUT /logs-test/_doc/log-001
+GET /products/_count
+
+GET /products/_mapping
+```
+
+4. Retrieve a specific document:
+```bash
+GET /products/_doc/1
+```
+
+5. Check if a document exists (without fetching it):
+```bash
+HEAD /products/_doc/1
+```
+
+**Challenge**:
+- What type did Elasticsearch assign to the `price` field?
+- What type was assigned to `tags`?
+- Try indexing a document with `price: "not a number"` - what happens?
+
+---
+
+## Exercise 3.2: Bulk Indexing with Error Analysis
+
+**Objective**: Practice efficient bulk indexing and understand error handling.
+
+**Instructions**:
+
+1. Use the Bulk API to index multiple documents:
+```bash
+POST /_bulk
+{"index":{"_index":"logs-parkki","_id":"1"}}
+{"@timestamp":"2025-01-15T10:00:00Z","level":"INFO","service":"parking-api","message":"User logged in","user_id":"user123","response_time_ms":45}
+{"index":{"_index":"logs-parkki","_id":"2"}}
+{"@timestamp":"2025-01-15T10:00:05Z","level":"INFO","service":"parking-api","message":"Parking spot reserved","user_id":"user123","spot_id":"A15","response_time_ms":120}
+{"index":{"_index":"logs-parkki","_id":"3"}}
+{"@timestamp":"2025-01-15T10:00:10Z","level":"ERROR","service":"payment-service","message":"Payment failed","user_id":"user456","error_code":"CARD_DECLINED","response_time_ms":2500}
+{"index":{"_index":"logs-parkki","_id":"4"}}
+{"@timestamp":"2025-01-15T10:00:15Z","level":"WARN","service":"parking-api","message":"Spot almost full","parking_id":"parking-central","occupancy_percent":95}
+{"index":{"_index":"logs-parkki","_id":"5"}}
+{"@timestamp":"2025-01-15T10:00:20Z","level":"INFO","service":"notification-service","message":"Email sent","user_id":"user123","response_time_ms":350}
+{"index":{"_index":"logs-parkki","_id":"6"}}
+{"@timestamp":"2025-01-15T10:00:25Z","level":"DEBUG","service":"parking-api","message":"Cache hit for parking status","cache_key":"parking-central-status"}
+{"index":{"_index":"logs-parkki","_id":"7"}}
+{"@timestamp":"2025-01-15T10:00:30Z","level":"ERROR","service":"parking-api","message":"Database connection timeout","error_code":"DB_TIMEOUT","response_time_ms":30000}
+```
+
+2. Analyze the bulk response - check for errors:
+```bash
+GET /logs-parkki/_count
+
+GET /logs-parkki/_search
 {
-  "@timestamp": "2025-01-15T10:31:00.000Z",
-  "level": "ERROR",
-  "service": "parkki-api",
-  "message": "Database connection timeout",
-  "response_time_ms": 5000
+  "size": 0,
+  "aggs": {
+    "by_level": {
+      "terms": { "field": "level.keyword" }
+    },
+    "by_service": {
+      "terms": { "field": "service.keyword" }
+    }
+  }
 }
 ```
 
-### Étape 3: Lire un document (GET)
-
+3. Test bulk with intentional errors:
 ```bash
-GET /logs-test/_doc/log-001
+POST /_bulk
+{"index":{"_index":"logs-parkki","_id":"100"}}
+{"@timestamp":"invalid-date","level":"INFO","message":"This should fail"}
+{"index":{"_index":"logs-parkki","_id":"101"}}
+{"@timestamp":"2025-01-15T10:00:00Z","level":"INFO","message":"This should succeed"}
 ```
 
-### Étape 4: Mettre à jour un document
+**Challenge**:
+- How many documents were indexed successfully?
+- Did the invalid date cause the entire bulk to fail, or just that document?
+- What is the average `response_time_ms` for ERROR level logs?
 
+---
+
+## Exercise 3.3: Document Operations (CRUD) with Concurrency
+
+**Objective**: Practice update, delete, and optimistic concurrency control.
+
+**Instructions**:
+
+1. Create a reservation document:
 ```bash
-POST /logs-test/_update/log-001
+PUT /reservations/_doc/res001
+{
+  "user_id": "user123",
+  "parking_id": "parking-central",
+  "spot_id": "A15",
+  "start_time": "2025-01-15T14:00:00Z",
+  "end_time": "2025-01-15T18:00:00Z",
+  "status": "pending",
+  "price": 12.50,
+  "version": 1
+}
+```
+
+2. Get the document with sequence numbers (for optimistic locking):
+```bash
+GET /reservations/_doc/res001
+```
+
+3. Update using optimistic concurrency control:
+```bash
+# First, note the _seq_no and _primary_term from the GET response
+# Then update with those values:
+POST /reservations/_update/res001?if_seq_no=0&if_primary_term=1
 {
   "doc": {
-    "resolved": true,
-    "resolved_by": "ops-team"
+    "status": "confirmed",
+    "confirmed_at": "2025-01-15T10:30:00Z",
+    "version": 2
   }
 }
 ```
 
-**Vérification**:
+
+4. Update with script (atomic increment):
 ```bash
-GET /logs-test/_doc/log-001
-```
-
-### Étape 5: Supprimer un document
-
-```bash
-DELETE /logs-test/_doc/log-001
-```
-
-**Vérification** (retourne `"found": false`):
-```bash
-GET /logs-test/_doc/log-001
-```
-
-### Validation
-
-```bash
-GET /logs-test/_count
-```
-
-✅ Capable de créer, lire, modifier et supprimer des documents
-
----
-
-# Lab 2.2: Bulk API - Indexation en Masse
-
-**Topic**: Indexation et Gestion des Documents
-**Durée**: 20 minutes
-
-## Objectif
-
-Indexer efficacement de grandes quantités de documents.
-
-## Contexte Parkki
-
-Avec 15M logs/jour, la Bulk API est essentielle pour les performances.
-
-## Exercice
-
-### Étape 1: Indexation bulk basique
-
-```bash
-POST /_bulk
-{"index":{"_index":"logs-test"}}
-{"@timestamp":"2025-01-15T11:00:00.000Z","level":"INFO","service":"parkki-api","message":"Request received"}
-{"index":{"_index":"logs-test"}}
-{"@timestamp":"2025-01-15T11:00:01.000Z","level":"INFO","service":"parkki-api","message":"Request processed"}
-{"index":{"_index":"logs-test"}}
-{"@timestamp":"2025-01-15T11:00:02.000Z","level":"WARN","service":"parkki-api","message":"Slow query detected"}
-{"index":{"_index":"logs-test"}}
-{"@timestamp":"2025-01-15T11:00:03.000Z","level":"ERROR","service":"parkki-api","message":"Connection refused"}
-```
-
-**Important**: Chaque ligne JSON sur une seule ligne.
-
-### Étape 2: Vérifier le résultat
-
-```bash
-GET /logs-test/_count
-```
-
-### Étape 3: Bulk avec différentes opérations
-
-```bash
-POST /_bulk
-{"index":{"_index":"logs-test","_id":"bulk-001"}}
-{"@timestamp":"2025-01-15T12:00:00.000Z","level":"INFO","message":"Index operation"}
-{"create":{"_index":"logs-test","_id":"bulk-002"}}
-{"@timestamp":"2025-01-15T12:00:01.000Z","level":"INFO","message":"Create operation"}
-{"update":{"_index":"logs-test","_id":"bulk-001"}}
-{"doc":{"updated":true}}
-{"delete":{"_index":"logs-test","_id":"bulk-002"}}
-```
-
-**Opérations**:
-- `index`: Crée ou remplace
-- `create`: Crée uniquement (erreur si existe)
-- `update`: Met à jour partiellement
-- `delete`: Supprime
-
-### Étape 4: Analyser une erreur partielle
-
-```bash
-POST /_bulk
-{"index":{"_index":"logs-test"}}
-{"@timestamp":"invalid-date","level":"INFO"}
-{"index":{"_index":"logs-test"}}
-{"@timestamp":"2025-01-15T14:00:00.000Z","level":"INFO","message":"Valid log"}
-```
-
-**Observer**: `"errors": true` mais le 2ème document est quand même indexé.
-
-### Bonnes pratiques Bulk
-
-| Paramètre | Recommandation |
-|-----------|----------------|
-| Taille batch | 5-15 MB |
-| Nombre de docs | 1000-5000 par batch |
-
-### Validation
-
-```bash
-GET /logs-test/_search
+POST /reservations/_update/res001
 {
-  "query": { "match_all": {} },
-  "size": 20
+  "script": {
+    "source": "ctx._source.version += 1; ctx._source.price *= params.multiplier",
+    "params": {
+      "multiplier": 1.1
+    }
+  }
 }
 ```
 
-✅ Documents indexés en masse avec succès
+5. Upsert (update or insert):
+```bash
+POST /reservations/_update/res002
+{
+  "doc": {
+    "user_id": "user456",
+    "status": "pending"
+  },
+  "doc_as_upsert": true
+}
+```
+
+6. Delete with refresh:
+```bash
+DELETE /reservations/_doc/res002?refresh=true
+
+# Verify deletion
+GET /reservations/_doc/res002
+```
+
+**Challenge**:
+- What HTTP status code do you get for a version conflict?
+- What is the new price after the script update (with 1.1 multiplier)?
+- Create a script that only updates if status is "pending"
 
 ---
 
-# Lab 2.3: Gestion des Index
+# Part 4: Mapping
 
-**Topic**: Indexation et Gestion des Documents
-**Durée**: 15 minutes
+## Exercise 4.1: Explicit Mapping with Analyzers
 
-## Objectif
+**Objective**: Create an optimized mapping for parking logs with custom analysis.
 
-Créer et gérer des index avec les bons settings.
+**Instructions**:
 
-## Exercice
-
-### Étape 1: Créer un index avec settings
-
+1. First, test the analyzer behavior:
 ```bash
-PUT /logs-parkki-2025.01.15
+POST /_analyze
+{
+  "analyzer": "standard",
+  "text": "The user user-123 parked at PARKING-CENTRAL spot A15"
+}
+
+POST /_analyze
+{
+  "analyzer": "simple",
+  "text": "The user user-123 parked at PARKING-CENTRAL spot A15"
+}
+```
+
+2. Create an index with explicit mapping and custom settings:
+```bash
+PUT /parking-events
 {
   "settings": {
     "number_of_shards": 1,
     "number_of_replicas": 0,
-    "refresh_interval": "30s"
-  }
-}
-```
-
-**Explication**:
-- `number_of_shards`: Nombre de partitions (non modifiable après)
-- `number_of_replicas`: Copies pour la haute dispo
-- `refresh_interval`: Fréquence de visibilité des nouveaux docs
-
-### Étape 2: Vérifier les settings
-
-```bash
-GET /logs-parkki-2025.01.15/_settings
-```
-
-### Étape 3: Modifier les settings
-
-```bash
-PUT /logs-parkki-2025.01.15/_settings
-{
-  "index": {
-    "refresh_interval": "60s",
-    "number_of_replicas": 1
-  }
-}
-```
-
-**Note**: `number_of_shards` ne peut PAS être modifié !
-
-### Étape 4: Vérifier les shards
-
-```bash
-GET /_cat/shards/logs-parkki-2025.01.15?v
-```
-
-### Étape 5: Comprendre le cluster status
-
-```bash
-GET /_cluster/health
-```
-
-| Status | Signification |
-|--------|---------------|
-| `green` | Tout OK |
-| `yellow` | Replicas manquants |
-| `red` | Primaires manquants - URGENT |
-
-### Étape 6: Fermer et rouvrir un index
-
-```bash
-# Fermer (libère les ressources)
-POST /logs-parkki-2025.01.15/_close
-
-# Vérifier
-GET /_cat/indices/logs-parkki-2025.01.15?v
-
-# Rouvrir
-POST /logs-parkki-2025.01.15/_open
-```
-
-### Étape 7: Supprimer un index
-
-```bash
-DELETE /logs-parkki-2025.01.15
-```
-
-### Validation
-
-```bash
-GET /_cat/indices?v
-```
-
-✅ Capable de créer, modifier et supprimer des index
-
----
-
-# Lab 2.4: Refresh Interval et Performance
-
-**Topic**: Indexation et Gestion des Documents
-**Durée**: 10 minutes
-
-## Objectif
-
-Comprendre l'impact du `refresh_interval` sur les performances.
-
-## Contexte Parkki
-
-Un `refresh_interval` trop court (1s par défaut) peut surcharger la JVM avec 15M logs/jour.
-
-## Exercice
-
-### Étape 1: Créer un index avec refresh par défaut (1s)
-
-```bash
-PUT /test-refresh-default
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  }
-}
-```
-
-### Étape 2: Indexer et rechercher immédiatement
-
-```bash
-POST /test-refresh-default/_doc
-{
-  "message": "Test document"
-}
-
-# Recherche immédiate (peut ne pas trouver le doc)
-GET /test-refresh-default/_search
-{
-  "query": { "match_all": {} }
-}
-```
-
-### Étape 3: Forcer un refresh manuel
-
-```bash
-POST /test-refresh-default/_refresh
-
-GET /test-refresh-default/_search
-{
-  "query": { "match_all": {} }
-}
-```
-
-### Étape 4: Créer un index avec refresh optimisé
-
-```bash
-PUT /test-refresh-optimized
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "refresh_interval": "30s"
-  }
-}
-```
-
-### Impact pour Parkki
-
-| Refresh Interval | Impact |
-|------------------|--------|
-| 1s (défaut) | Données visibles vite, mais JVM surchargée |
-| 30s | Bon compromis pour les logs |
-| -1 | Désactivé (bulk massif uniquement) |
-
-**Recommandation**: `30s` pour vos index de logs.
-
-### Validation
-
-✅ Comprendre l'impact du refresh_interval sur les performances
-
----
-
-# Lab 3.1: Comprendre le Mapping
-
-**Topic**: Mapping et Schémas
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre ce qu'est un mapping et comment Elasticsearch le génère automatiquement.
-
-## Contexte Parkki
-
-Un mapping mal configuré est souvent la cause de problèmes JVM et de coûts élevés. Cette partie est CRITIQUE pour votre cas.
-
-## Exercice
-
-### Étape 1: Créer un index sans mapping explicite
-
-```bash
-PUT /logs-mapping-test
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  }
-}
-```
-
-### Étape 2: Indexer un document (mapping dynamique)
-
-```bash
-POST /logs-mapping-test/_doc
-{
-  "@timestamp": "2025-01-15T10:30:00.000Z",
-  "level": "ERROR",
-  "service": "parkki-api",
-  "message": "Database connection failed",
-  "user_id": "user_12345",
-  "response_time_ms": 5000,
-  "success": false
-}
-```
-
-### Étape 3: Voir le mapping généré automatiquement
-
-```bash
-GET /logs-mapping-test/_mapping
-```
-
-**Observer** : Elasticsearch a deviné les types :
-- `@timestamp` → `date`
-- `level` → `text` + `keyword` (multi-field)
-- `response_time_ms` → `long`
-- `success` → `boolean`
-
-### Étape 4: Problème du mapping dynamique
-
-Le mapping dynamique crée des champs `text` par défaut pour les strings. C'est souvent inutile et coûteux !
-
-```bash
-GET /logs-mapping-test/_mapping?filter_path=**.level
-```
-
-**Résultat** :
-```json
-{
-  "logs-mapping-test": {
-    "mappings": {
-      "properties": {
-        "level": {
-          "type": "text",
-          "fields": {
-            "keyword": { "type": "keyword" }
-          }
+    "analysis": {
+      "analyzer": {
+        "parking_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding"]
         }
       }
     }
-  }
-}
-```
-
-**Problème** : `level` n'a pas besoin d'être analysé en full-text !
-
-### Validation
-
-✅ Comprendre que le mapping dynamique peut créer des types inefficaces
-
----
-
-# Lab 3.2: text vs keyword
-
-**Topic**: Mapping et Schémas
-**Durée**: 25 minutes
-
-## Objectif
-
-Comprendre la différence entre `text` et `keyword` et choisir le bon type.
-
-## Contexte Parkki
-
-Utiliser `text` au lieu de `keyword` pour des champs comme `level`, `user_id`, `service` surcharge la JVM inutilement.
-
-## Exercice
-
-### Étape 1: Créer un index avec mapping explicite
-
-```bash
-PUT /logs-optimized
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
   },
   "mappings": {
+    "dynamic": "strict",
     "properties": {
       "@timestamp": { "type": "date" },
-      "level": { "type": "keyword" },
-      "service": { "type": "keyword" },
-      "message": { "type": "text" },
+      "event_type": { "type": "keyword" },
+      "parking_id": { "type": "keyword" },
+      "spot_id": { "type": "keyword" },
       "user_id": { "type": "keyword" },
-      "response_time_ms": { "type": "long" },
-      "success": { "type": "boolean" },
-      "ip": { "type": "ip" }
-    }
-  }
-}
-```
-
-### Étape 2: Indexer des documents
-
-```bash
-POST /_bulk
-{"index":{"_index":"logs-optimized"}}
-{"@timestamp":"2025-01-15T10:00:00.000Z","level":"INFO","service":"parkki-api","message":"User logged in successfully","user_id":"user_001","response_time_ms":45,"success":true,"ip":"192.168.1.100"}
-{"index":{"_index":"logs-optimized"}}
-{"@timestamp":"2025-01-15T10:01:00.000Z","level":"ERROR","service":"parkki-api","message":"Database connection timeout","user_id":"user_002","response_time_ms":5000,"success":false,"ip":"192.168.1.101"}
-{"index":{"_index":"logs-optimized"}}
-{"@timestamp":"2025-01-15T10:02:00.000Z","level":"WARN","service":"parkki-worker","message":"Slow query detected in payment module","user_id":"user_001","response_time_ms":1200,"success":true,"ip":"192.168.1.100"}
-```
-
-### Étape 3: Recherche sur keyword (exact match)
-
-```bash
-GET /logs-optimized/_search
-{
-  "query": {
-    "term": {
-      "level": "ERROR"
-    }
-  }
-}
-```
-
-### Étape 4: Recherche sur text (full-text)
-
-```bash
-GET /logs-optimized/_search
-{
-  "query": {
-    "match": {
-      "message": "connection timeout"
-    }
-  }
-}
-```
-
-### Étape 5: Aggregation sur keyword
-
-```bash
-GET /logs-optimized/_search
-{
-  "size": 0,
-  "aggs": {
-    "logs_par_level": {
-      "terms": {
-        "field": "level"
+      "vehicle_plate": {
+        "type": "keyword",
+        "normalizer": "lowercase"
+      },
+      "duration_minutes": { "type": "integer" },
+      "amount": {
+        "type": "scaled_float",
+        "scaling_factor": 100
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "parking_analyzer",
+        "fields": {
+          "keyword": { "type": "keyword", "ignore_above": 256 }
+        }
+      },
+      "location": { "type": "geo_point" },
+      "metadata": {
+        "type": "object",
+        "enabled": false
       }
     }
   }
 }
 ```
 
-### Étape 6: Erreur courante - aggregation sur text
-
+3. Verify the mapping:
 ```bash
-GET /logs-optimized/_search
+GET /parking-events/_mapping
+```
+
+4. Index valid documents:
+```bash
+POST /parking-events/_doc
 {
-  "size": 0,
-  "aggs": {
-    "logs_par_message": {
-      "terms": {
-        "field": "message"
-      }
-    }
-  }
+  "@timestamp": "2025-01-15T14:30:00Z",
+  "event_type": "ENTRY",
+  "parking_id": "parking-central",
+  "spot_id": "B22",
+  "user_id": "user789",
+  "vehicle_plate": "AB-123-CD",
+  "duration_minutes": 120,
+  "amount": 8.50,
+  "description": "Standard parking entry via mobile app with préférence",
+  "location": { "lat": 48.8566, "lon": 2.3522 },
+  "metadata": { "app_version": "2.1.0", "device": "iPhone" }
 }
 ```
 
-**Résultat** : Erreur ! On ne peut pas faire d'aggregation sur un champ `text`.
+5. Test strict mapping - try to add an unknown field:
+```bash
+POST /parking-events/_doc
+{
+  "@timestamp": "2025-01-15T15:00:00Z",
+  "event_type": "EXIT",
+  "unknown_field": "this should fail"
+}
+```
 
-### Quand utiliser quoi ?
-
-| Type | Utilisation | Exemples |
-|------|-------------|----------|
-| `keyword` | Valeurs exactes, filtres, aggregations | level, service, user_id, status |
-| `text` | Recherche full-text | message, description, body |
-
-### Validation
-
-✅ Savoir choisir entre `text` et `keyword` selon le use case
+**Challenge**:
+- What happens when you try to index a document with an unknown field?
+- Search for "preference" (without accent) - does it find the document with "préférence"?
+- What is the advantage of `scaled_float` over `float` for monetary amounts?
 
 ---
 
-# Lab 3.3: Multi-fields et Propriétés
+## Exercise 4.2: Multi-fields and Aggregation Optimization
 
-**Topic**: Mapping et Schémas
-**Durée**: 20 minutes
+**Objective**: Use multi-fields for flexible searching and efficient aggregations.
 
-## Objectif
+**Instructions**:
 
-Utiliser les multi-fields et les propriétés de mapping avancées.
-
-## Exercice
-
-### Étape 1: Créer un index avec multi-fields
-
+1. Create an index with optimized multi-fields:
 ```bash
-PUT /logs-multifield
+PUT /parking-lots
 {
   "mappings": {
     "properties": {
-      "message": {
+      "name": {
         "type": "text",
         "fields": {
           "keyword": {
             "type": "keyword",
-            "ignore_above": 256
+            "normalizer": "lowercase"
+          },
+          "autocomplete": {
+            "type": "search_as_you_type"
           }
         }
       },
-      "user_agent": {
+      "address": {
         "type": "text",
         "fields": {
           "keyword": { "type": "keyword" }
         }
-      }
+      },
+      "city": { "type": "keyword" },
+      "country": { "type": "keyword" },
+      "capacity": { "type": "integer" },
+      "available_spots": { "type": "integer" },
+      "hourly_rate": { "type": "float" },
+      "features": { "type": "keyword" },
+      "location": { "type": "geo_point" },
+      "rating": { "type": "half_float" }
     }
   }
 }
 ```
 
-### Étape 2: Indexer un document
-
+2. Index sample data:
 ```bash
-POST /logs-multifield/_doc
+POST /_bulk
+{"index":{"_index":"parking-lots"}}
+{"name":"Parking Central Paris","address":"15 Rue de Rivoli","city":"Paris","country":"France","capacity":500,"available_spots":123,"hourly_rate":4.50,"features":["ev_charging","handicap","covered"],"location":{"lat":48.8606,"lon":2.3376},"rating":4.2}
+{"index":{"_index":"parking-lots"}}
+{"name":"Parking Gare du Nord","address":"18 Rue de Dunkerque","city":"Paris","country":"France","capacity":300,"available_spots":45,"hourly_rate":5.00,"features":["covered","24h"],"location":{"lat":48.8809,"lon":2.3553},"rating":3.8}
+{"index":{"_index":"parking-lots"}}
+{"name":"Parking Place Bellecour","address":"Place Bellecour","city":"Lyon","country":"France","capacity":400,"available_spots":200,"hourly_rate":3.50,"features":["ev_charging","covered"],"location":{"lat":45.7578,"lon":4.8320},"rating":4.5}
+{"index":{"_index":"parking-lots"}}
+{"name":"Parking Centre Commercial","address":"Avenue des Champs","city":"Nice","country":"France","capacity":800,"available_spots":500,"hourly_rate":3.00,"features":["covered","free_first_hour"],"location":{"lat":43.7102,"lon":7.2620},"rating":4.0}
+{"index":{"_index":"parking-lots"}}
+{"name":"PARKING GARE LYON","address":"Place Louis Armand","city":"Paris","country":"France","capacity":600,"available_spots":89,"hourly_rate":6.00,"features":["ev_charging","24h","valet"],"location":{"lat":48.8448,"lon":2.3735},"rating":4.1}
+```
+
+3. Test autocomplete (search-as-you-type):
+```bash
+GET /parking-lots/_search
 {
-  "message": "Connection timeout after 30 seconds",
-  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0"
+  "query": {
+    "multi_match": {
+      "query": "park cen",
+      "type": "bool_prefix",
+      "fields": ["name.autocomplete", "name.autocomplete._2gram", "name.autocomplete._3gram"]
+    }
+  }
 }
 ```
 
-### Étape 3: Recherche full-text sur message
 
+4. Compare text vs keyword search:
 ```bash
-GET /logs-multifield/_search
+# Full-text search (matches partial words)
+GET /parking-lots/_search
 {
   "query": {
     "match": {
-      "message": "timeout"
+      "name": "parking gare"
     }
   }
 }
-```
 
-### Étape 4: Aggregation sur message.keyword
-
-```bash
-GET /logs-multifield/_search
+# Exact match on normalized keyword
+GET /parking-lots/_search
 {
-  "size": 0,
-  "aggs": {
-    "top_messages": {
-      "terms": {
-        "field": "message.keyword",
-        "size": 10
-      }
+  "query": {
+    "term": {
+      "name.keyword": "parking gare lyon"
     }
   }
 }
 ```
 
-### Étape 5: Propriété index:false (économiser de l'espace)
-
-```bash
-PUT /logs-no-index
-{
-  "mappings": {
-    "properties": {
-      "@timestamp": { "type": "date" },
-      "level": { "type": "keyword" },
-      "raw_payload": {
-        "type": "keyword",
-        "index": false
-      }
-    }
-  }
-}
-```
-
-Le champ `raw_payload` est stocké mais pas indexé → économie d'espace.
-
-### Validation
-
-✅ Savoir utiliser les multi-fields pour combiner text et keyword
+**Challenge**:
+- Why does "parking gare lyon" (lowercase) match "PARKING GARE LYON"?
+- How many parking lots have EV charging?
 
 ---
 
-# Lab 3.4: Object vs Nested
+## Exercise 4.3: Nested Objects vs Flattened
 
-**Topic**: Mapping et Schémas
-**Durée**: 20 minutes
+**Objective**: Understand when to use nested types and their performance implications.
 
-## Objectif
+**Instructions**:
 
-Comprendre la différence entre `object` et `nested` pour les tableaux d'objets.
-
-## Exercice
-
-### Étape 1: Problème avec object (type par défaut)
-
+1. First, create an index WITHOUT nested (to see the problem):
 ```bash
-PUT /logs-object
+PUT /parking-flat
 {
   "mappings": {
     "properties": {
-      "request": {
+      "name": { "type": "keyword" },
+      "spots": {
         "properties": {
-          "headers": {
-            "properties": {
-              "name": { "type": "keyword" },
-              "value": { "type": "keyword" }
-            }
-          }
+          "spot_id": { "type": "keyword" },
+          "floor": { "type": "integer" },
+          "type": { "type": "keyword" },
+          "available": { "type": "boolean" }
         }
       }
     }
   }
 }
 
-POST /logs-object/_doc
+POST /parking-flat/_doc
 {
-  "request": {
-    "headers": [
-      { "name": "Content-Type", "value": "application/json" },
-      { "name": "Authorization", "value": "Bearer xxx" }
-    ]
-  }
+  "name": "Parking Central",
+  "spots": [
+    { "spot_id": "A01", "floor": 1, "type": "standard", "available": true },
+    { "spot_id": "A02", "floor": 1, "type": "handicap", "available": false },
+    { "spot_id": "B01", "floor": 2, "type": "standard", "available": false }
+  ]
 }
 ```
 
-### Étape 2: Recherche qui donne un faux positif
-
+2. Search for "available standard spot on floor 1" (THIS IS THE PROBLEM):
 ```bash
-GET /logs-object/_search
+GET /parking-flat/_search
 {
   "query": {
     "bool": {
       "must": [
-        { "term": { "request.headers.name": "Content-Type" } },
-        { "term": { "request.headers.value": "Bearer xxx" } }
+        { "term": { "spots.floor": 1 } },
+        { "term": { "spots.type": "standard" } },
+        { "term": { "spots.available": true } }
       ]
     }
   }
 }
 ```
 
-**Problème** : Le document est trouvé alors que "Content-Type" n'a pas la valeur "Bearer xxx" !
-
-### Étape 3: Solution avec nested
-
+3. Now create with NESTED type:
 ```bash
-PUT /logs-nested
+PUT /parking-nested
 {
   "mappings": {
     "properties": {
-      "request": {
+      "name": { "type": "keyword" },
+      "spots": {
+        "type": "nested",
         "properties": {
-          "headers": {
-            "type": "nested",
-            "properties": {
-              "name": { "type": "keyword" },
-              "value": { "type": "keyword" }
-            }
-          }
+          "spot_id": { "type": "keyword" },
+          "floor": { "type": "integer" },
+          "type": { "type": "keyword" },
+          "available": { "type": "boolean" },
+          "price_per_hour": { "type": "float" }
         }
       }
     }
   }
 }
 
-POST /logs-nested/_doc
+POST /parking-nested/_doc/1
 {
-  "request": {
-    "headers": [
-      { "name": "Content-Type", "value": "application/json" },
-      { "name": "Authorization", "value": "Bearer xxx" }
-    ]
-  }
+  "name": "Parking Central",
+  "spots": [
+    { "spot_id": "A01", "floor": 1, "type": "standard", "available": true, "price_per_hour": 3.0 },
+    { "spot_id": "A02", "floor": 1, "type": "handicap", "available": false, "price_per_hour": 2.0 },
+    { "spot_id": "B01", "floor": 2, "type": "standard", "available": false, "price_per_hour": 2.5 }
+  ]
 }
-```
 
-### Étape 4: Recherche correcte avec nested query
-
-```bash
-GET /logs-nested/_search
+POST /parking-nested/_doc/2
 {
-  "query": {
-    "nested": {
-      "path": "request.headers",
-      "query": {
-        "bool": {
-          "must": [
-            { "term": { "request.headers.name": "Content-Type" } },
-            { "term": { "request.headers.value": "Bearer xxx" } }
-          ]
-        }
-      }
-    }
-  }
-}
-```
-
-**Résultat** : Aucun document trouvé (correct !).
-
-### Attention
-
-`nested` consomme plus de ressources. À utiliser uniquement si nécessaire.
-
-### Validation
-
-✅ Comprendre quand utiliser `nested` au lieu de `object`
-
----
-
-# Lab 3.5: Dynamic Templates
-
-**Topic**: Mapping et Schémas
-**Durée**: 15 minutes
-
-## Objectif
-
-Configurer des règles automatiques pour le mapping dynamique.
-
-## Contexte Parkki
-
-Avec 15M logs/jour, vous ne pouvez pas définir manuellement chaque champ. Les dynamic templates permettent de contrôler le mapping automatique.
-
-## Exercice
-
-### Étape 1: Créer un index avec dynamic templates
-
-```bash
-PUT /logs-dynamic
-{
-  "mappings": {
-    "dynamic_templates": [
-      {
-        "strings_as_keywords": {
-          "match_mapping_type": "string",
-          "mapping": {
-            "type": "keyword"
-          }
-        }
-      },
-      {
-        "message_as_text": {
-          "match": "message",
-          "mapping": {
-            "type": "text"
-          }
-        }
-      },
-      {
-        "ids_as_keyword": {
-          "match": "*_id",
-          "mapping": {
-            "type": "keyword"
-          }
-        }
-      }
-    ]
-  }
-}
-```
-
-### Étape 2: Indexer un document avec nouveaux champs
-
-```bash
-POST /logs-dynamic/_doc
-{
-  "@timestamp": "2025-01-15T10:00:00.000Z",
-  "level": "INFO",
-  "message": "User authenticated successfully",
-  "user_id": "user_123",
-  "session_id": "sess_456",
-  "new_field": "some value"
-}
-```
-
-### Étape 3: Vérifier le mapping généré
-
-```bash
-GET /logs-dynamic/_mapping
-```
-
-**Observer** :
-- `level` → `keyword` (règle strings_as_keywords)
-- `message` → `text` (règle message_as_text)
-- `user_id`, `session_id` → `keyword` (règle ids_as_keyword)
-- `new_field` → `keyword` (règle strings_as_keywords)
-
-### Validation
-
-✅ Savoir configurer des dynamic templates pour contrôler le mapping automatique
-
----
-
-# Lab 3.6: Index Templates
-
-**Topic**: Mapping et Schémas
-**Durée**: 20 minutes
-
-## Objectif
-
-Créer des templates pour appliquer automatiquement des settings et mappings.
-
-## Contexte Parkki
-
-Vos logs quotidiens (logs-YYYY.MM.DD) doivent tous avoir la même configuration.
-
-## Exercice
-
-### Étape 1: Créer un index template
-
-```bash
-PUT /_index_template/logs-parkki-template
-{
-  "index_patterns": ["logs-parkki-*"],
-  "priority": 500,
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 0,
-      "refresh_interval": "30s"
-    },
-    "mappings": {
-      "dynamic_templates": [
-        {
-          "strings_as_keywords": {
-            "match_mapping_type": "string",
-            "mapping": { "type": "keyword" }
-          }
-        }
-      ],
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "level": { "type": "keyword" },
-        "service": { "type": "keyword" },
-        "message": { "type": "text" },
-        "user_id": { "type": "keyword" },
-        "response_time_ms": { "type": "long" },
-        "trace_id": { "type": "keyword" },
-        "span_id": { "type": "keyword" }
-      }
-    }
-  }
-}
-```
-
-### Étape 2: Créer un index qui matche le pattern
-
-```bash
-PUT /logs-parkki-2025.01.15
-```
-
-### Étape 3: Vérifier que le template a été appliqué
-
-```bash
-GET /logs-parkki-2025.01.15/_settings
-GET /logs-parkki-2025.01.15/_mapping
-```
-
-### Étape 4: Indexer un document
-
-```bash
-POST /logs-parkki-2025.01.15/_doc
-{
-  "@timestamp": "2025-01-15T10:00:00.000Z",
-  "level": "INFO",
-  "service": "parkki-api",
-  "message": "Request processed",
-  "user_id": "user_001",
-  "response_time_ms": 45,
-  "trace_id": "abc123",
-  "custom_field": "test"
-}
-```
-
-### Étape 5: Vérifier le mapping du nouveau champ
-
-```bash
-GET /logs-parkki-2025.01.15/_mapping?filter_path=**.custom_field
-```
-
-**Observer** : `custom_field` est de type `keyword` grâce au dynamic template.
-
-### Étape 6: Lister les templates
-
-```bash
-GET /_index_template/logs-parkki-template
-```
-
-### Validation
-
-✅ Savoir créer un index template pour standardiser la configuration
-
----
-
-# Lab 3.7: Component Templates (Bonus)
-
-**Topic**: Mapping et Schémas
-**Durée**: 15 minutes
-
-## Objectif
-
-Créer des templates modulaires et réutilisables.
-
-## Exercice
-
-### Étape 1: Créer un component template pour les settings
-
-```bash
-PUT /_component_template/logs-settings
-{
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 0,
-      "refresh_interval": "30s"
-    }
-  }
-}
-```
-
-### Étape 2: Créer un component template pour le mapping de base
-
-```bash
-PUT /_component_template/logs-mappings-base
-{
-  "template": {
-    "mappings": {
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "level": { "type": "keyword" },
-        "service": { "type": "keyword" },
-        "message": { "type": "text" }
-      }
-    }
-  }
-}
-```
-
-### Étape 3: Combiner les component templates
-
-```bash
-PUT /_index_template/logs-combined-template
-{
-  "index_patterns": ["logs-combined-*"],
-  "priority": 600,
-  "composed_of": [
-    "logs-settings",
-    "logs-mappings-base"
+  "name": "Parking Nord",
+  "spots": [
+    { "spot_id": "N01", "floor": 1, "type": "ev_charging", "available": true, "price_per_hour": 4.0 },
+    { "spot_id": "N02", "floor": 1, "type": "standard", "available": true, "price_per_hour": 3.0 }
   ]
 }
 ```
 
-### Étape 4: Tester
-
+4. Correct nested query:
 ```bash
-PUT /logs-combined-2025.01.15
-
-GET /logs-combined-2025.01.15/_settings
-GET /logs-combined-2025.01.15/_mapping
+GET /parking-nested/_search
+{
+  "query": {
+    "nested": {
+      "path": "spots",
+      "query": {
+        "bool": {
+          "must": [
+            { "term": { "spots.floor": 1 } },
+            { "term": { "spots.type": "standard" } },
+            { "term": { "spots.available": true } }
+          ]
+        }
+      },
+      "inner_hits": {}
+    }
+  }
+}
 ```
 
-### Validation
 
-✅ Savoir créer des component templates modulaires
+**Challenge**:
+- Why did the flat structure query return a result even though there's no available standard spot on floor 1?
+- What does `inner_hits` show in the nested query response?
 
 ---
 
-# Lab 4.1: API _search et Recherche Simple
+## Exercise 4.4: Index Templates with Priority
 
-**Topic**: Recherche de base
-**Durée**: 20 minutes
+**Objective**: Create reusable index templates with component composition.
 
-## Objectif
+**Instructions**:
 
-Maîtriser les bases de l'API _search et les différentes façons de rechercher.
-
-## Setup
-
-Créons un index avec des données de test :
-
+1. Create component templates:
 ```bash
-PUT /logs-search
+# Base settings component
+PUT /_component_template/base-settings
 {
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "refresh_interval": "30s"
+    }
+  }
+}
+
+# Logs mappings component
+PUT /_component_template/logs-mappings
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "level": { "type": "keyword" },
+        "message": {
+          "type": "text",
+          "fields": {
+            "keyword": { "type": "keyword", "ignore_above": 512 }
+          }
+        },
+        "service": { "type": "keyword" },
+        "host": { "type": "keyword" },
+        "trace_id": { "type": "keyword" }
+      }
+    }
+  }
+}
+
+# Parkki-specific mappings component
+PUT /_component_template/parkki-mappings
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "parking_id": { "type": "keyword" },
+        "user_id": { "type": "keyword" },
+        "spot_id": { "type": "keyword" },
+        "transaction_id": { "type": "keyword" }
+      }
+    }
+  }
+}
+```
+
+2. Create index templates with different priorities:
+```bash
+# General logs template (low priority)
+PUT /_index_template/logs-template
+{
+  "index_patterns": ["logs-*"],
+  "priority": 100,
+  "composed_of": ["base-settings", "logs-mappings"],
+  "template": {
+    "aliases": {
+      "logs": {}
+    }
+  }
+}
+
+# Parkki-specific logs template (higher priority)
+PUT /_index_template/logs-parkki-template
+{
+  "index_patterns": ["logs-parkki-*"],
+  "priority": 200,
+  "composed_of": ["base-settings", "logs-mappings", "parkki-mappings"],
+  "template": {
+    "settings": {
+      "index.lifecycle.name": "logs-lifecycle"
+    },
+    "aliases": {
+      "logs": {},
+      "parkki-logs": {}
+    }
+  }
+}
+```
+
+3. Create indices and verify templates are applied:
+```bash
+# Create a general log index
+PUT /logs-nginx-2025.01.15
+
+# Create a Parkki log index
+PUT /logs-parkki-api-2025.01.15
+
+# Verify mappings
+GET /logs-nginx-2025.01.15/_mapping
+GET /logs-parkki-api-2025.01.15/_mapping
+```
+
+4. Check which template was applied:
+```bash
+GET /_index_template/logs-*
+
+# Simulate which template would match
+POST /_index_template/_simulate_index/logs-parkki-test
+```
+
+5. Index documents and verify aliases:
+```bash
+POST /logs-parkki-api-2025.01.15/_doc
+{
+  "@timestamp": "2025-01-15T10:00:00Z",
+  "level": "INFO",
+  "message": "User reservation completed",
+  "service": "parking-api",
+  "parking_id": "central",
+  "user_id": "user123"
+}
+
+# Search via alias
+GET /parkki-logs/_search
+```
+
+**Challenge**:
+- Which template is applied to `logs-parkki-api-2025.01.15`? How do you know?
+- Does `logs-nginx-2025.01.15` have the `parking_id` field in its mapping?
+- What happens if you create `logs-other-2025.01.15`?
+
+---
+
+# Part 5: Search
+
+## Exercise 5.1: Full-Text Search with Relevance Tuning
+
+**Objective**: Practice full-text search queries and understand scoring.
+
+**Setup**: Create and populate a test index:
+```bash
+PUT /articles
+{
   "mappings": {
     "properties": {
-      "@timestamp": { "type": "date" },
-      "level": { "type": "keyword" },
-      "service": { "type": "keyword" },
-      "message": { "type": "text" },
-      "user_id": { "type": "keyword" },
-      "response_time_ms": { "type": "long" },
-      "status_code": { "type": "integer" }
+      "title": {
+        "type": "text",
+        "fields": { "keyword": { "type": "keyword" } }
+      },
+      "content": { "type": "text" },
+      "summary": { "type": "text" },
+      "author": { "type": "keyword" },
+      "category": { "type": "keyword" },
+      "tags": { "type": "keyword" },
+      "published_at": { "type": "date" },
+      "views": { "type": "integer" }
     }
   }
 }
 
 POST /_bulk
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:00:00.000Z","level":"INFO","service":"parkki-api","message":"User login successful","user_id":"user_001","response_time_ms":45,"status_code":200}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:01:00.000Z","level":"ERROR","service":"parkki-api","message":"Database connection timeout after 30 seconds","user_id":"user_002","response_time_ms":30000,"status_code":500}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:02:00.000Z","level":"WARN","service":"parkki-worker","message":"Slow query detected in payment module","user_id":"user_001","response_time_ms":1200,"status_code":200}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:03:00.000Z","level":"INFO","service":"parkki-api","message":"Payment processed successfully","user_id":"user_003","response_time_ms":89,"status_code":200}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:04:00.000Z","level":"ERROR","service":"parkki-worker","message":"Connection refused to external API","user_id":"user_002","response_time_ms":5000,"status_code":503}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:05:00.000Z","level":"INFO","service":"parkki-api","message":"User logout","user_id":"user_001","response_time_ms":12,"status_code":200}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:06:00.000Z","level":"DEBUG","service":"parkki-api","message":"Cache hit for user session","user_id":"user_003","response_time_ms":2,"status_code":200}
-{"index":{"_index":"logs-search"}}
-{"@timestamp":"2025-01-15T10:07:00.000Z","level":"ERROR","service":"parkki-api","message":"Authentication failed invalid token","user_id":"user_004","response_time_ms":15,"status_code":401}
+{"index":{"_index":"articles","_id":"1"}}
+{"title":"Smart Parking Solutions for Modern Cities","content":"Urban parking management is evolving with IoT sensors and mobile applications. Smart parking reduces congestion and emissions by helping drivers find available spots quickly. The technology uses real-time data to optimize parking space utilization.","summary":"How IoT is transforming urban parking","author":"John Smith","category":"technology","tags":["iot","smart-city","parking"],"published_at":"2025-01-10","views":1520}
+{"index":{"_index":"articles","_id":"2"}}
+{"title":"The Future of Electric Vehicle Charging","content":"Electric vehicles need dedicated parking spots with charging stations. Smart cities are adapting their parking infrastructure to accommodate the growing EV market. Parking operators are investing in fast-charging technology.","summary":"EV charging infrastructure in parking facilities","author":"Jane Doe","category":"sustainability","tags":["ev","charging","parking"],"published_at":"2025-01-12","views":2340}
+{"index":{"_index":"articles","_id":"3"}}
+{"title":"Parking Revenue Optimization Strategies","content":"Dynamic pricing and real-time availability can increase parking revenue by 30%. Mobile payment integration is key for modern parking operations. Data analytics helps identify peak hours and optimize pricing.","summary":"Maximize parking business revenue","author":"John Smith","category":"business","tags":["revenue","pricing","analytics"],"published_at":"2025-01-14","views":890}
+{"index":{"_index":"articles","_id":"4"}}
+{"title":"Autonomous Vehicles and Parking Design","content":"Self-driving cars will revolutionize parking lot design. Autonomous vehicles can park themselves more efficiently, requiring less space. Future parking structures may look very different from today.","summary":"How AVs will change parking architecture","author":"Alex Johnson","category":"technology","tags":["autonomous","future","design"],"published_at":"2025-01-15","views":3100}
 ```
 
-## Exercice
+**Instructions**:
 
-### Étape 1: Recherche simple avec match_all
-
+1. Simple match query with score explanation:
 ```bash
-GET /logs-search/_search
+GET /articles/_search
 {
+  "explain": true,
   "query": {
-    "match_all": {}
+    "match": {
+      "content": "parking mobile"
+    }
   }
 }
 ```
 
-### Étape 2: Recherche avec query parameter q
-
+2. Match with operator control:
 ```bash
-GET /logs-search/_search?q=error
-```
-
-Équivalent à une recherche sur tous les champs.
-
-### Étape 3: Recherche sur un champ spécifique
-
-```bash
-GET /logs-search/_search?q=level:ERROR
-```
-
-### Étape 4: Limiter les champs retournés
-
-```bash
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "_source": ["@timestamp", "level", "message"]
-}
-```
-
-### Étape 5: Exclure des champs
-
-```bash
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "_source": {
-    "excludes": ["user_id", "response_time_ms"]
-  }
-}
-```
-
-### Validation
-
-✅ Savoir utiliser l'API _search de base
-
----
-
-# Lab 4.2: Pagination et Tri
-
-**Topic**: Recherche de base
-**Durée**: 15 minutes
-
-## Objectif
-
-Paginer et trier les résultats de recherche.
-
-## Exercice
-
-### Étape 1: Pagination avec size et from
-
-```bash
-# Première page (docs 0-2)
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "size": 3,
-  "from": 0
-}
-
-# Deuxième page (docs 3-5)
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "size": 3,
-  "from": 3
-}
-```
-
-### Étape 2: Tri simple
-
-```bash
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "sort": [
-    { "@timestamp": "desc" }
-  ]
-}
-```
-
-### Étape 3: Tri multiple
-
-```bash
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "sort": [
-    { "level": "asc" },
-    { "@timestamp": "desc" }
-  ]
-}
-```
-
-### Étape 4: Tri sur champ numérique
-
-```bash
-GET /logs-search/_search
-{
-  "query": { "match_all": {} },
-  "sort": [
-    { "response_time_ms": "desc" }
-  ],
-  "_source": ["@timestamp", "message", "response_time_ms"]
-}
-```
-
-### Attention : Deep Pagination
-
-```bash
-# ⚠️ À éviter en production !
-GET /logs-search/_search
-{
-  "from": 10000,
-  "size": 10
-}
-```
-
-Pour paginer au-delà de 10000 résultats, utilisez `search_after` (Lab bonus).
-
-### Validation
-
-✅ Savoir paginer et trier les résultats
-
----
-
-# Lab 4.3: Query DSL - Requêtes de base
-
-**Topic**: Recherche de base
-**Durée**: 25 minutes
-
-## Objectif
-
-Maîtriser les requêtes Query DSL essentielles.
-
-## Exercice
-
-### Étape 1: match - Recherche full-text
-
-```bash
-GET /logs-search/_search
+# Must match ALL terms
+GET /articles/_search
 {
   "query": {
     "match": {
-      "message": "connection timeout"
+      "content": {
+        "query": "parking mobile",
+        "operator": "and"
+      }
+    }
+  }
+}
+
+# Must match at least 2 terms
+GET /articles/_search
+{
+  "query": {
+    "match": {
+      "content": {
+        "query": "parking mobile charging",
+        "minimum_should_match": 2
+      }
     }
   }
 }
 ```
 
-Retourne les documents contenant "connection" OU "timeout".
-
-### Étape 2: match_phrase - Phrase exacte
-
+3. Multi-match with field boosting:
 ```bash
-GET /logs-search/_search
+GET /articles/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "smart parking",
+      "fields": ["title^3", "summary^2", "content"],
+      "type": "best_fields",
+      "tie_breaker": 0.3
+    }
+  }
+}
+```
+
+4. Phrase matching with slop:
+```bash
+# Exact phrase
+GET /articles/_search
 {
   "query": {
     "match_phrase": {
-      "message": "connection timeout"
-    }
-  }
-}
-```
-
-Retourne uniquement les documents avec "connection timeout" dans cet ordre.
-
-### Étape 3: term - Valeur exacte (keyword)
-
-```bash
-GET /logs-search/_search
-{
-  "query": {
-    "term": {
-      "level": "ERROR"
-    }
-  }
-}
-```
-
-### Étape 4: terms - Plusieurs valeurs
-
-```bash
-GET /logs-search/_search
-{
-  "query": {
-    "terms": {
-      "level": ["ERROR", "WARN"]
-    }
-  }
-}
-```
-
-### Étape 5: range - Plage de valeurs
-
-```bash
-# Logs avec response_time > 1000ms
-GET /logs-search/_search
-{
-  "query": {
-    "range": {
-      "response_time_ms": {
-        "gt": 1000
-      }
+      "content": "parking management"
     }
   }
 }
 
-# Logs de la dernière heure
-GET /logs-search/_search
+# Allow words between
+GET /articles/_search
 {
   "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "now-1h",
-        "lte": "now"
+    "match_phrase": {
+      "content": {
+        "query": "parking technology",
+        "slop": 5
       }
     }
   }
 }
 ```
 
-### Étape 6: exists - Champ présent
-
+5. Function score to boost by popularity:
 ```bash
-GET /logs-search/_search
+GET /articles/_search
 {
   "query": {
-    "exists": {
-      "field": "user_id"
+    "function_score": {
+      "query": {
+        "match": { "content": "parking" }
+      },
+      "functions": [
+        {
+          "field_value_factor": {
+            "field": "views",
+            "factor": 0.0001,
+            "modifier": "log1p"
+          }
+        }
+      ],
+      "boost_mode": "multiply"
     }
   }
 }
 ```
 
-### Étape 7: wildcard - Pattern matching
-
-```bash
-GET /logs-search/_search
-{
-  "query": {
-    "wildcard": {
-      "service": "parkki-*"
-    }
-  }
-}
-```
-
-### Validation
-
-✅ Connaître les requêtes Query DSL de base
+**Challenge**:
+- Which article has the highest score for "parking mobile"? Why?
+- How does the `tie_breaker` affect multi_match results?
+- Boost articles from "John Smith" by 2x using a function score
 
 ---
 
-# Lab 4.4: Query DSL - Bool Query
+## Exercise 5.2: Term-Level and Range Queries
 
-**Topic**: Recherche de base
-**Durée**: 20 minutes
+**Objective**: Practice exact matching, ranges, and existence queries.
 
-## Objectif
+**Setup**: Use the `articles` index from Exercise 5.1.
 
-Combiner plusieurs conditions avec bool query.
+**Instructions**:
 
-## Exercice
-
-### Étape 1: must - Toutes les conditions requises
-
+1. Term query with case sensitivity awareness:
 ```bash
-GET /logs-search/_search
+# This works (keyword field)
+GET /articles/_search
+{
+  "query": {
+    "term": {
+      "author": "John Smith"
+    }
+  }
+}
+
+# This might not work as expected on text field
+GET /articles/_search
+{
+  "query": {
+    "term": {
+      "title": "Smart"
+    }
+  }
+}
+
+# Use keyword sub-field for exact match
+GET /articles/_search
+{
+  "query": {
+    "term": {
+      "title.keyword": "Smart Parking Solutions for Modern Cities"
+    }
+  }
+}
+```
+
+2. Terms query with minimum match:
+```bash
+GET /articles/_search
+{
+  "query": {
+    "terms": {
+      "tags": ["parking", "iot", "ev"]
+    }
+  }
+}
+
+# With terms_set for minimum matching
+GET /articles/_search
+{
+  "query": {
+    "terms_set": {
+      "tags": {
+        "terms": ["parking", "iot", "ev"],
+        "minimum_should_match_script": {
+          "source": "2"
+        }
+      }
+    }
+  }
+}
+```
+
+3. Range queries with different bounds:
+```bash
+# Date range
+GET /articles/_search
+{
+  "query": {
+    "range": {
+      "published_at": {
+        "gte": "2025-01-11",
+        "lt": "2025-01-15",
+        "format": "yyyy-MM-dd"
+      }
+    }
+  }
+}
+
+# Numeric range with boost
+GET /articles/_search
+{
+  "query": {
+    "range": {
+      "views": {
+        "gte": 1000,
+        "boost": 2.0
+      }
+    }
+  }
+}
+```
+
+4. Exists and missing:
+```bash
+# Documents with tags
+GET /articles/_search
+{
+  "query": {
+    "exists": {
+      "field": "tags"
+    }
+  }
+}
+
+# Documents without a specific field (must_not exists)
+GET /articles/_search
+{
+  "query": {
+    "bool": {
+      "must_not": {
+        "exists": {
+          "field": "deleted_at"
+        }
+      }
+    }
+  }
+}
+```
+
+5. Prefix and wildcard:
+```bash
+# Prefix query
+GET /articles/_search
+{
+  "query": {
+    "prefix": {
+      "category": "tech"
+    }
+  }
+}
+
+# Wildcard (use sparingly!)
+GET /articles/_search
+{
+  "query": {
+    "wildcard": {
+      "author": "*Smith"
+    }
+  }
+}
+```
+
+**Challenge**:
+- Why does `term` on the `title` field not find "Smart" but works on `author`?
+- Find all articles with more than 1500 views published after January 12th
+- Which articles have at least 2 of these tags: parking, iot, ev?
+
+---
+
+## Exercise 5.3: Boolean Queries with Scoring Control
+
+**Objective**: Master complex boolean queries and understand scoring contexts.
+
+**Setup**: Use the `articles` index.
+
+**Instructions**:
+
+1. Bool query with all clauses:
+```bash
+GET /articles/_search
 {
   "query": {
     "bool": {
       "must": [
-        { "term": { "level": "ERROR" } },
-        { "term": { "service": "parkki-api" } }
-      ]
-    }
-  }
-}
-```
-
-### Étape 2: should - Au moins une condition
-
-```bash
-GET /logs-search/_search
-{
-  "query": {
-    "bool": {
+        { "match": { "content": "parking" } }
+      ],
       "should": [
-        { "term": { "level": "ERROR" } },
-        { "term": { "level": "WARN" } }
+        { "term": { "category": "technology" } },
+        { "term": { "category": "sustainability" } },
+        { "range": { "views": { "gte": 2000 } } }
+      ],
+      "must_not": [
+        { "term": { "author": "Alex Johnson" } }
+      ],
+      "filter": [
+        { "range": { "published_at": { "gte": "2025-01-01" } } },
+        { "exists": { "field": "tags" } }
       ],
       "minimum_should_match": 1
     }
@@ -1583,1205 +1185,1242 @@ GET /logs-search/_search
 }
 ```
 
-### Étape 3: must_not - Exclure des résultats
-
+2. Understand filter vs query context:
 ```bash
-GET /logs-search/_search
+# This query scores based on views
+GET /articles/_search
 {
   "query": {
     "bool": {
       "must": [
-        { "match": { "message": "connection" } }
-      ],
-      "must_not": [
-        { "term": { "level": "DEBUG" } }
+        { "range": { "views": { "gte": 1000 } } }
+      ]
+    }
+  }
+}
+
+# This filter does NOT affect score
+GET /articles/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        { "range": { "views": { "gte": 1000 } } }
       ]
     }
   }
 }
 ```
 
-### Étape 4: filter - Filtrage sans scoring
-
+3. Nested bool queries:
 ```bash
-GET /logs-search/_search
+GET /articles/_search
 {
   "query": {
     "bool": {
       "must": [
-        { "match": { "message": "error" } }
+        { "match": { "content": "parking" } }
       ],
-      "filter": [
-        { "term": { "service": "parkki-api" } },
-        { "range": { "response_time_ms": { "gt": 100 } } }
-      ]
+      "should": [
+        {
+          "bool": {
+            "must": [
+              { "term": { "category": "technology" } },
+              { "range": { "views": { "gte": 1500 } } }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "must": [
+              { "term": { "category": "sustainability" } },
+              { "term": { "author": "Jane Doe" } }
+            ]
+          }
+        }
+      ],
+      "minimum_should_match": 1
     }
   }
 }
 ```
 
-**Important** : `filter` est plus performant car il ne calcule pas de score et peut être mis en cache.
-
-### Étape 5: Combinaison complète
-
+4. Boosting query (positive and negative):
 ```bash
-# Logs d'erreur de parkki-api avec response_time > 1s, excluant user_004
-GET /logs-search/_search
+GET /articles/_search
+{
+  "query": {
+    "boosting": {
+      "positive": {
+        "match": { "content": "parking" }
+      },
+      "negative": {
+        "term": { "category": "business" }
+      },
+      "negative_boost": 0.5
+    }
+  }
+}
+```
+
+
+**Challenge**:
+- What's the score difference between filter and query context for the same range query?
+- Build a query: articles about parking, preferably technology OR sustainability category, excluding business, from 2025
+- How would you give technology articles double the score of sustainability articles?
+
+---
+
+## Exercise 5.4: Geo Queries and Distance Calculations
+
+**Objective**: Practice geographical searches with complex constraints.
+
+**Setup**: Create a geo-enabled index:
+```bash
+PUT /parking-locations
+{
+  "mappings": {
+    "properties": {
+      "name": { "type": "keyword" },
+      "location": { "type": "geo_point" },
+      "coverage_area": { "type": "geo_shape" },
+      "capacity": { "type": "integer" },
+      "available": { "type": "integer" },
+      "hourly_rate": { "type": "float" },
+      "features": { "type": "keyword" }
+    }
+  }
+}
+
+POST /_bulk
+{"index":{"_index":"parking-locations"}}
+{"name":"Parking Opera","location":{"lat":48.8719,"lon":2.3316},"capacity":200,"available":45,"hourly_rate":5.50,"features":["covered","ev_charging"]}
+{"index":{"_index":"parking-locations"}}
+{"name":"Parking Louvre","location":{"lat":48.8606,"lon":2.3376},"capacity":500,"available":120,"hourly_rate":6.00,"features":["covered","24h","valet"]}
+{"index":{"_index":"parking-locations"}}
+{"name":"Parking Bastille","location":{"lat":48.8534,"lon":2.3691},"capacity":300,"available":80,"hourly_rate":4.00,"features":["outdoor","motorcycle"]}
+{"index":{"_index":"parking-locations"}}
+{"name":"Parking Montmartre","location":{"lat":48.8867,"lon":2.3431},"capacity":150,"available":10,"hourly_rate":4.50,"features":["covered"]}
+{"index":{"_index":"parking-locations"}}
+{"name":"Parking Nation","location":{"lat":48.8483,"lon":2.3959},"capacity":400,"available":200,"hourly_rate":3.50,"features":["outdoor","large_vehicles"]}
+```
+
+**Instructions**:
+
+1. Find parking within distance:
+```bash
+GET /parking-locations/_search
+{
+  "query": {
+    "geo_distance": {
+      "distance": "2km",
+      "location": {
+        "lat": 48.8566,
+        "lon": 2.3522
+      }
+    }
+  }
+}
+```
+
+2. Sort by distance with calculated distance in results:
+```bash
+GET /parking-locations/_search
+{
+  "query": {
+    "bool": {
+      "must": { "match_all": {} },
+      "filter": {
+        "geo_distance": {
+          "distance": "5km",
+          "location": { "lat": 48.8566, "lon": 2.3522 }
+        }
+      }
+    }
+  },
+  "sort": [
+    {
+      "_geo_distance": {
+        "location": { "lat": 48.8566, "lon": 2.3522 },
+        "order": "asc",
+        "unit": "m"
+      }
+    }
+  ],
+  "script_fields": {
+    "distance_km": {
+      "script": {
+        "source": "doc['location'].arcDistance(params.lat, params.lon) / 1000",
+        "params": { "lat": 48.8566, "lon": 2.3522 }
+      }
+    }
+  }
+}
+```
+
+3. Geo bounding box:
+```bash
+GET /parking-locations/_search
+{
+  "query": {
+    "geo_bounding_box": {
+      "location": {
+        "top_left": { "lat": 48.88, "lon": 2.32 },
+        "bottom_right": { "lat": 48.85, "lon": 2.38 }
+      }
+    }
+  }
+}
+```
+
+4. Combine geo with other filters:
+```bash
+GET /parking-locations/_search
 {
   "query": {
     "bool": {
       "must": [
-        { "terms": { "level": ["ERROR", "WARN"] } }
+        {
+          "geo_distance": {
+            "distance": "3km",
+            "location": { "lat": 48.8566, "lon": 2.3522 }
+          }
+        }
       ],
       "filter": [
-        { "term": { "service": "parkki-api" } },
-        { "range": { "response_time_ms": { "gte": 1000 } } }
-      ],
-      "must_not": [
-        { "term": { "user_id": "user_004" } }
+        { "range": { "available": { "gte": 20 } } },
+        { "range": { "hourly_rate": { "lte": 5.0 } } },
+        { "term": { "features": "covered" } }
       ]
     }
   },
   "sort": [
-    { "@timestamp": "desc" }
+    { "hourly_rate": "asc" },
+    {
+      "_geo_distance": {
+        "location": { "lat": 48.8566, "lon": 2.3522 },
+        "order": "asc"
+      }
+    }
   ]
 }
 ```
 
-### Quand utiliser quoi ?
+5. Geo aggregation:
+```bash
+GET /parking-locations/_search
+{
+  "size": 0,
+  "aggs": {
+    "distance_rings": {
+      "geo_distance": {
+        "field": "location",
+        "origin": { "lat": 48.8566, "lon": 2.3522 },
+        "unit": "km",
+        "ranges": [
+          { "key": "nearby", "to": 1 },
+          { "key": "walking", "from": 1, "to": 2 },
+          { "key": "driving", "from": 2, "to": 5 }
+        ]
+      },
+      "aggs": {
+        "total_capacity": { "sum": { "field": "capacity" } },
+        "total_available": { "sum": { "field": "available" } }
+      }
+    }
+  }
+}
+```
 
-| Clause | Calcule le score | Mise en cache | Usage |
-|--------|------------------|---------------|-------|
-| `must` | Oui | Non | Recherche full-text |
-| `should` | Oui | Non | Boost optionnel |
-| `filter` | Non | Oui | Filtres stricts |
-| `must_not` | Non | Oui | Exclusions |
-
-### Validation
-
-✅ Savoir combiner des conditions avec bool query
+**Challenge**:
+- Find the closest covered parking with EV charging to the Louvre (48.8606, 2.3376)
+- What's the total available capacity within 2km of city center?
+- Find parking that's cheap (<4€), has spots available (>50), and is within 3km
 
 ---
 
-# Lab 4.5: Recherche dans les logs (Cas pratiques Parkki)
+## Exercise 5.5: Sorting, Pagination, and Source Filtering
 
-**Topic**: Recherche de base
-**Durée**: 15 minutes
+**Objective**: Master result ordering and efficient pagination.
 
-## Objectif
+**Setup**: Use the `articles` and `parking-locations` indices.
 
-Appliquer les recherches aux cas d'usage Parkki.
+**Instructions**:
 
-## Exercice
-
-### Cas 1: Trouver toutes les erreurs de la dernière heure
-
+1. Multi-field sorting:
 ```bash
-GET /logs-search/_search
+GET /articles/_search
 {
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "level": "ERROR" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "desc" }]
+  "query": { "match_all": {} },
+  "sort": [
+    { "category": { "order": "asc" } },
+    { "views": { "order": "desc" } },
+    { "published_at": { "order": "desc" } }
+  ]
 }
 ```
 
-### Cas 2: Logs lents (> 1 seconde)
-
+2. Sorting with missing values:
 ```bash
-GET /logs-search/_search
+GET /articles/_search
 {
-  "query": {
-    "bool": {
-      "filter": [
-        { "range": { "response_time_ms": { "gt": 1000 } } }
-      ]
+  "query": { "match_all": {} },
+  "sort": [
+    {
+      "views": {
+        "order": "desc",
+        "missing": "_last"
+      }
     }
-  },
-  "sort": [{ "response_time_ms": "desc" }],
-  "_source": ["@timestamp", "service", "message", "response_time_ms"]
+  ]
 }
 ```
 
-### Cas 3: Erreurs 5xx
-
+3. Source filtering:
 ```bash
-GET /logs-search/_search
+# Include only specific fields
+GET /articles/_search
 {
-  "query": {
-    "bool": {
-      "filter": [
-        { "range": { "status_code": { "gte": 500, "lt": 600 } } }
-      ]
-    }
+  "query": { "match_all": {} },
+  "_source": ["title", "author", "published_at"]
+}
+
+# Exclude fields
+GET /articles/_search
+{
+  "query": { "match_all": {} },
+  "_source": {
+    "excludes": ["content"]
+  }
+}
+
+# Pattern matching
+GET /articles/_search
+{
+  "query": { "match_all": {} },
+  "_source": {
+    "includes": ["title", "published_*"],
+    "excludes": ["content"]
   }
 }
 ```
 
-### Cas 4: Activité d'un utilisateur spécifique
-
+4. Pagination with from/size:
 ```bash
-GET /logs-search/_search
+# Page 1
+GET /articles/_search
 {
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "user_id": "user_001" } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "asc" }]
+  "from": 0,
+  "size": 2,
+  "query": { "match_all": {} },
+  "sort": [{ "published_at": "desc" }]
+}
+
+# Page 2
+GET /articles/_search
+{
+  "from": 2,
+  "size": 2,
+  "query": { "match_all": {} },
+  "sort": [{ "published_at": "desc" }]
 }
 ```
 
-### Cas 5: Recherche dans les messages d'erreur
-
+5. Search After (for deep pagination):
 ```bash
-GET /logs-search/_search
+# First page
+GET /articles/_search
 {
-  "query": {
-    "bool": {
-      "must": [
-        { "match": { "message": "connection refused timeout" } }
-      ],
-      "filter": [
-        { "terms": { "level": ["ERROR", "WARN"] } }
-      ]
-    }
-  },
-  "highlight": {
-    "fields": {
-      "message": {}
-    }
-  }
+  "size": 2,
+  "query": { "match_all": {} },
+  "sort": [
+    { "published_at": "desc" },
+    { "_id": "asc" }
+  ]
+}
+
+# Use the sort values from the last hit for next page
+GET /articles/_search
+{
+  "size": 2,
+  "query": { "match_all": {} },
+  "sort": [
+    { "published_at": "desc" },
+    { "_id": "asc" }
+  ],
+  "search_after": ["2025-01-14", "3"]
 }
 ```
 
-### Validation
+6. Track total hits:
+```bash
+GET /articles/_search
+{
+  "track_total_hits": true,
+  "query": { "match_all": {} }
+}
 
-✅ Savoir appliquer les recherches aux cas d'usage réels
+# Or set a threshold
+GET /articles/_search
+{
+  "track_total_hits": 100,
+  "query": { "match_all": {} }
+}
+```
+
+**Challenge**:
+- Get page 2 of articles (2 per page), sorted by views descending, showing only title and views
+- Why is `search_after` better than `from/size` for deep pagination?
+- Implement cursor-based pagination for the parking-locations index
 
 ---
 
-# Lab 4.6: Count et Aggregations simples (Bonus)
+# Part 6: Aggregations
 
-**Topic**: Recherche de base
-**Durée**: 15 minutes
+## Exercise 6.1: Metric Aggregations with Pipeline
 
-## Objectif
+**Objective**: Calculate statistics and derived metrics.
 
-Compter et agréger les résultats.
-
-## Exercice
-
-### Étape 1: Compter les documents
-
+**Setup**: Create a comprehensive transactions index:
 ```bash
-GET /logs-search/_count
+PUT /transactions
 {
-  "query": {
-    "term": { "level": "ERROR" }
-  }
-}
-```
-
-### Étape 2: Aggregation terms - Répartition par level
-
-```bash
-GET /logs-search/_search
-{
-  "size": 0,
-  "aggs": {
-    "par_level": {
-      "terms": {
-        "field": "level"
-      }
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "parking_id": { "type": "keyword" },
+      "spot_type": { "type": "keyword" },
+      "amount": { "type": "float" },
+      "duration_minutes": { "type": "integer" },
+      "payment_method": { "type": "keyword" },
+      "user_type": { "type": "keyword" },
+      "day_of_week": { "type": "keyword" }
     }
   }
 }
+
+POST /_bulk
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T08:00:00Z","parking_id":"central","spot_type":"standard","amount":12.50,"duration_minutes":120,"payment_method":"card","user_type":"regular","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T09:00:00Z","parking_id":"central","spot_type":"ev_charging","amount":18.00,"duration_minutes":90,"payment_method":"mobile","user_type":"premium","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T10:00:00Z","parking_id":"north","spot_type":"standard","amount":8.00,"duration_minutes":60,"payment_method":"card","user_type":"regular","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T11:00:00Z","parking_id":"central","spot_type":"handicap","amount":6.50,"duration_minutes":45,"payment_method":"cash","user_type":"regular","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T14:00:00Z","parking_id":"north","spot_type":"standard","amount":20.00,"duration_minutes":240,"payment_method":"mobile","user_type":"premium","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T15:00:00Z","parking_id":"south","spot_type":"ev_charging","amount":25.00,"duration_minutes":180,"payment_method":"card","user_type":"premium","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-15T16:00:00Z","parking_id":"central","spot_type":"standard","amount":10.00,"duration_minutes":90,"payment_method":"mobile","user_type":"regular","day_of_week":"wednesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-14T10:00:00Z","parking_id":"central","spot_type":"standard","amount":15.00,"duration_minutes":150,"payment_method":"card","user_type":"regular","day_of_week":"tuesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-14T12:00:00Z","parking_id":"north","spot_type":"standard","amount":12.00,"duration_minutes":120,"payment_method":"cash","user_type":"regular","day_of_week":"tuesday"}
+{"index":{"_index":"transactions"}}
+{"@timestamp":"2025-01-14T15:00:00Z","parking_id":"south","spot_type":"standard","amount":8.50,"duration_minutes":60,"payment_method":"mobile","user_type":"premium","day_of_week":"tuesday"}
 ```
 
-### Étape 3: Aggregation avec filtre
+**Instructions**:
 
+1. Extended stats with percentiles:
 ```bash
-GET /logs-search/_search
-{
-  "size": 0,
-  "query": {
-    "range": {
-      "@timestamp": { "gte": "now-1d" }
-    }
-  },
-  "aggs": {
-    "erreurs_par_service": {
-      "terms": {
-        "field": "service"
-      }
-    }
-  }
-}
-```
-
-### Étape 4: Stats sur les temps de réponse
-
-```bash
-GET /logs-search/_search
-{
-  "size": 0,
-  "aggs": {
-    "response_time_stats": {
-      "stats": {
-        "field": "response_time_ms"
-      }
-    }
-  }
-}
-```
-
-### Étape 5: Percentiles
-
-```bash
-GET /logs-search/_search
+GET /transactions/_search
 {
   "size": 0,
   "aggs": {
-    "response_time_percentiles": {
+    "amount_stats": { "extended_stats": { "field": "amount" } },
+    "amount_percentiles": {
       "percentiles": {
-        "field": "response_time_ms",
-        "percents": [50, 90, 95, 99]
+        "field": "amount",
+        "percents": [25, 50, 75, 90, 99]
       }
-    }
-  }
-}
-```
-
-### Validation
-
-✅ Savoir utiliser count et les aggregations simples
-
----
-
-# Lab 5.1: Calcul du Nombre de Shards
-
-**Topic**: Dimensionnement et Sizing
-**Durée**: 25 minutes
-
-## Objectif
-
-Comprendre comment calculer le bon nombre de shards pour vos index.
-
-## Contexte Parkki
-
-Avec 15M logs/jour, un mauvais dimensionnement des shards peut :
-- Surcharger la JVM (trop de shards)
-- Créer des goulots d'étranglement (shards trop gros)
-- Augmenter vos coûts (ressources mal utilisées)
-
-## Exercice
-
-### Règles de base
-
-| Règle | Recommandation |
-|-------|----------------|
-| Taille par shard | 20-40 GB (max 50 GB) |
-| Shards par GB de heap | ~20 shards max par GB de heap |
-| Shards par nœud | Éviter > 1000 shards par nœud |
-
-### Étape 1: Calculer votre volume de données
-
-```
-Volume quotidien = Nombre de logs × Taille moyenne par log
-
-Pour Parkki:
-- 15M logs/jour
-- Taille moyenne estimée: 1 KB/log
-- Volume quotidien = 15M × 1 KB = 15 GB/jour
-```
-
-### Étape 2: Calculer le nombre de shards par index quotidien
-
-```
-Nombre de shards = Volume / Taille cible par shard
-
-Pour un index quotidien de 15 GB:
-- Taille cible par shard: 30 GB
-- Nombre de shards = 15 GB / 30 GB = 0.5 → 1 shard
-
-Recommandation: 1 shard primaire par index quotidien
-```
-
-### Étape 3: Voir les shards actuels
-
-```bash
-GET /_cat/shards?v&s=store:desc
-```
-
-### Étape 4: Voir le nombre de shards par index
-
-```bash
-GET /_cat/indices?v&h=index,pri,rep,docs.count,store.size&s=store.size:desc
-```
-
-### Étape 5: Calculer le total de shards
-
-```bash
-GET /_cluster/health?filter_path=active_primary_shards,active_shards
-```
-
-### Étape 6: Vérifier la heap utilisée par les shards
-
-```bash
-GET /_cat/nodes?v&h=name,heap.percent,heap.current,heap.max,shards
-```
-
-**Règle**: ~20 shards max par GB de heap
-
-```
-Exemple:
-- Heap: 4 GB
-- Max shards recommandés: 4 × 20 = 80 shards
-```
-
-### Calcul pour Parkki (10 jours de rétention)
-
-```
-Volume total = 15 GB/jour × 10 jours = 150 GB
-Avec replicas (×2) = 300 GB
-
-Si 1 shard par jour × 10 jours = 10 index × 1 shard = 10 shards primaires
-Avec 1 replica = 20 shards total
-
-C'est très raisonnable !
-```
-
-### Validation
-
-✅ Savoir calculer le nombre optimal de shards
-
----
-
-# Lab 5.2: Sizing des Nœuds et Ratios Memory:Data
-
-**Topic**: Dimensionnement et Sizing
-**Durée**: 25 minutes
-
-## Objectif
-
-Comprendre les ratios Memory:Data pour dimensionner correctement vos nœuds.
-
-## Contexte Parkki
-
-Le ratio Memory:Data détermine combien de données un nœud peut gérer par GB de RAM.
-
-## Exercice
-
-### Ratios recommandés par Elastic
-
-| Tier | Ratio Memory:Data | Usage |
-|------|-------------------|-------|
-| Hot | 1:30 | Données récentes, indexation active |
-| Warm | 1:160 | Données moins consultées |
-| Cold | 1:500 | Archives rarement consultées |
-| Frozen | 1:2000+ | Archives très rarement consultées |
-
-### Étape 1: Voir les ressources actuelles
-
-```bash
-GET /_cat/nodes?v&h=name,heap.max,ram.max,disk.total,disk.used,disk.avail
-```
-
-### Étape 2: Calculer la capacité d'un nœud Hot
-
-```
-Formule:
-Capacité data = RAM × Ratio
-
-Exemple pour un nœud Hot avec 8 GB RAM:
-- Ratio Hot = 1:30
-- Capacité = 8 GB × 30 = 240 GB de données
-```
-
-### Étape 3: Dimensionner pour Parkki
-
-```
-Données Hot (2 derniers jours):
-- 15 GB/jour × 2 jours = 30 GB
-- Avec replicas = 60 GB
-
-RAM nécessaire (Hot):
-- 60 GB / 30 (ratio) = 2 GB de RAM minimum
-
-Données Warm (jours 3-10):
-- 15 GB/jour × 8 jours = 120 GB
-- Avec replicas = 240 GB
-
-RAM nécessaire (Warm):
-- 240 GB / 160 (ratio) = 1.5 GB de RAM minimum
-```
-
-### Étape 4: Vérifier l'utilisation actuelle de la heap
-
-```bash
-GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_used_percent,nodes.*.name
-```
-
-**Seuils critiques**:
-- < 75%: OK
-- 75-85%: Attention
-- \> 85%: Problème imminent
-
-### Étape 5: Voir les statistiques détaillées
-
-```bash
-GET /_nodes/stats?filter_path=nodes.*.name,nodes.*.jvm.mem,nodes.*.fs.total
-```
-
-### Formule complète de dimensionnement
-
-```
-Total storage = Raw data × (1 + replicas) × (1 + 0.15 watermark + 0.1 marge)
-
-Pour Parkki (10 jours):
-- Raw data = 150 GB
-- Avec 1 replica = 300 GB
-- Avec marges = 300 × 1.25 = 375 GB de stockage nécessaire
-
-Nombre de nœuds data:
-- Si nœuds avec 500 GB disque et 8 GB RAM
-- Capacité par nœud (Hot ratio) = 8 × 30 = 240 GB
-- Nœuds nécessaires = 375 / 240 = 1.6 → 2 nœuds minimum
-```
-
-### Validation
-
-✅ Savoir calculer les ressources nécessaires pour un cluster
-
----
-
-# Lab 5.3: Thread Pools et Rejections
-
-**Topic**: Dimensionnement et Sizing
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre les thread pools et détecter les problèmes de saturation.
-
-## Contexte Parkki
-
-Les "rejections" dans les thread pools indiquent que le cluster est surchargé. C'est souvent lié à vos problèmes de JVM.
-
-## Exercice
-
-### Thread pools principaux
-
-| Thread Pool | Usage | Symptôme si saturé |
-|-------------|-------|---------------------|
-| `write` | Indexation | Indexation lente/rejetée |
-| `search` | Recherches | Requêtes lentes/timeout |
-| `get` | Récupération doc | GET lents |
-| `bulk` | Bulk API | Bulk rejetés |
-
-### Étape 1: Voir l'état des thread pools
-
-```bash
-GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected
-```
-
-### Étape 2: Filtrer sur les pools critiques
-
-```bash
-GET /_cat/thread_pool/write,search,bulk?v&h=node_name,name,active,queue,rejected
-```
-
-### Étape 3: Voir les détails d'un thread pool
-
-```bash
-GET /_nodes/stats/thread_pool?filter_path=nodes.*.thread_pool.write,nodes.*.thread_pool.search
-```
-
-### Étape 4: Interpréter les résultats
-
-```
-Exemple de sortie:
-node_name  name   active queue rejected
-node-1     write  5      0     0         ✅ OK
-node-1     search 2      0     0         ✅ OK
-node-1     bulk   0      50    123       ⚠️ Rejections !
-```
-
-**Si rejected > 0**:
-- Le cluster n'arrive pas à suivre la charge
-- Réduire le débit d'indexation
-- Augmenter les ressources
-
-### Étape 5: Voir la configuration des thread pools
-
-```bash
-GET /_nodes?filter_path=nodes.*.thread_pool
-```
-
-### Étape 6: Surveiller en temps réel
-
-```bash
-# Répéter cette commande pour voir l'évolution
-GET /_cat/thread_pool/write?v&h=node_name,active,queue,rejected
-```
-
-### Actions correctives
-
-| Symptôme | Cause probable | Solution |
-|----------|----------------|----------|
-| write rejections | Trop d'indexation | Réduire bulk size, augmenter refresh_interval |
-| search rejections | Trop de requêtes | Optimiser requêtes, ajouter nœuds |
-| queue élevée | Charge temporaire | Attendre ou augmenter ressources |
-
-### Validation
-
-✅ Savoir détecter les problèmes de thread pool
-
----
-
-# Lab 5.4: Disk Watermarks
-
-**Topic**: Dimensionnement et Sizing
-**Durée**: 15 minutes
-
-## Objectif
-
-Comprendre les watermarks disque et éviter les blocages.
-
-## Contexte Parkki
-
-Les watermarks peuvent bloquer l'indexation si le disque est trop plein. C'est critique pour vos 15M logs/jour.
-
-## Exercice
-
-### Watermarks par défaut
-
-| Watermark | Seuil | Action |
-|-----------|-------|--------|
-| Low | 85% | Nouveaux shards non alloués sur ce nœud |
-| High | 90% | Elasticsearch déplace les shards vers d'autres nœuds |
-| Flood stage | 95% | Index passent en READ-ONLY ! |
-
-### Étape 1: Voir l'utilisation disque actuelle
-
-```bash
-GET /_cat/allocation?v&h=node,shards,disk.used,disk.avail,disk.percent
-```
-
-### Étape 2: Voir les watermarks configurés
-
-```bash
-GET /_cluster/settings?include_defaults=true&filter_path=*.cluster.routing.allocation.disk
-```
-
-### Étape 3: Simuler un dépassement (NE PAS FAIRE EN PROD)
-
-```bash
-# Voir la configuration actuelle
-GET /_cluster/settings?flat_settings=true&filter_path=*.cluster.routing.allocation.disk.watermark
-```
-
-### Étape 4: Vérifier si un index est en read-only
-
-```bash
-GET /_all/_settings?filter_path=**.blocks.read_only_allow_delete
-```
-
-### Étape 5: Débloquer un index en read-only (si nécessaire)
-
-```bash
-# Après avoir libéré de l'espace disque !
-PUT /_all/_settings
-{
-  "index.blocks.read_only_allow_delete": null
-}
-```
-
-### Calcul de l'espace nécessaire pour Parkki
-
-```
-Volume quotidien: 15 GB
-Rétention: 10 jours
-Volume total: 150 GB
-
-Avec replicas (×2): 300 GB
-Avec marge watermark (×1.25): 375 GB
-
-Espace disque minimum recommandé: 400 GB
-```
-
-### Validation
-
-✅ Comprendre les watermarks et savoir réagir
-
----
-
-# Lab 5.5: Calcul Complet pour Parkki
-
-**Topic**: Dimensionnement et Sizing
-**Durée**: 20 minutes
-
-## Objectif
-
-Appliquer toutes les formules pour dimensionner le cluster Parkki.
-
-## Exercice
-
-### Données du problème
-
-```
-- 15M logs/jour
-- Taille moyenne: 1 KB/log
-- Rétention: 10 jours
-- Usage: Observability (logs + APM)
-```
-
-### Étape 1: Calculer le volume de données
-
-```
-Volume quotidien = 15M × 1 KB = 15 GB/jour
-Volume total (10 jours) = 150 GB
-
-Avec 1 replica = 300 GB
-Avec marges (watermark + overhead) = 375 GB
-```
-
-### Étape 2: Calculer le nombre de shards
-
-```
-Shards par index quotidien:
-- 15 GB / 30 GB (taille cible) = 1 shard primaire
-
-Total shards (10 jours):
-- 10 index × 1 shard × 2 (replica) = 20 shards
-
-C'est très gérable !
-```
-
-### Étape 3: Calculer la RAM nécessaire
-
-```
-Architecture recommandée:
-- Hot tier (jours 0-2): 45 GB de données (×2 = 90 GB)
-- Warm tier (jours 3-10): 120 GB de données (×2 = 240 GB)
-
-RAM Hot tier:
-- 90 GB / 30 (ratio) = 3 GB RAM
-
-RAM Warm tier:
-- 240 GB / 160 (ratio) = 1.5 GB RAM
-
-Total RAM data nodes: 5-8 GB recommandé
-```
-
-### Étape 4: Configuration recommandée
-
-```
-Option 1 - Elastic Cloud (recommandé):
-- Hot tier: 4 GB RAM (120 GB stockage)
-- Warm tier: 2 GB RAM (320 GB stockage)
-- Coût estimé: ~$150-200/mois
-
-Option 2 - Self-hosted (3 nœuds):
-- 3 nœuds × 8 GB RAM × 500 GB disque
-- Heap: 4 GB par nœud (50% de RAM)
-- Capacité: 3 × 4 GB × 30 = 360 GB Hot
-```
-
-### Étape 5: Vérifier votre configuration actuelle
-
-```bash
-# Résumé du cluster
-GET /_cluster/stats?human&filter_path=nodes.count,nodes.jvm.mem,indices.count,indices.store
-
-# Détail par nœud
-GET /_cat/nodes?v&h=name,heap.max,ram.max,disk.total,node.role
-```
-
-### Étape 6: Créer un template optimisé
-
-```bash
-PUT /_index_template/logs-parkki-optimized
-{
-  "index_patterns": ["logs-parkki-*"],
-  "priority": 500,
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 1,
-      "refresh_interval": "30s",
-      "codec": "best_compression"
-    }
-  }
-}
-```
-
-### Résumé pour Parkki
-
-| Paramètre | Valeur recommandée |
-|-----------|-------------------|
-| Shards par index | 1 primaire + 1 replica |
-| Refresh interval | 30s |
-| Stockage total | 400 GB minimum |
-| RAM (Hot) | 4-8 GB |
-| Rétention | 10 jours avec ILM |
-
-### Validation
-
-✅ Savoir dimensionner un cluster pour un use case concret
-
----
-
-# Lab 6.1: Stratégies de Rétention
-
-**Topic**: Data Retention et ILM
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre les différentes stratégies de rétention et leur impact sur les coûts.
-
-## Contexte Parkki
-
-Avec 15M logs/jour et une rétention de 10 jours, optimiser la rétention peut **réduire significativement vos coûts**.
-
-## Stratégies disponibles
-
-| Stratégie | Ressources | Accès | Use Case |
-|-----------|------------|-------|----------|
-| Index ouvert | CPU + RAM + Disk | Temps réel | Données actives |
-| Index closed | Disk uniquement | Rouvrir nécessaire | Archives court terme |
-| Index shrinked | Moins de shards | Temps réel (lecture) | Réduire overhead |
-| Snapshot | Stockage externe | Restauration nécessaire | Backup/archives |
-| Suppression | Aucune | Aucun | Données expirées |
-
-## Exercice
-
-### Étape 1: Voir l'état des index
-
-```bash
-GET /_cat/indices?v&h=index,status,pri,rep,docs.count,store.size&s=index
-```
-
-### Étape 2: Fermer un index (libérer RAM/CPU)
-
-```bash
-# Créer un index de test
-PUT /logs-old-2025.01.01
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  }
-}
-
-POST /logs-old-2025.01.01/_doc
-{
-  "@timestamp": "2025-01-01T10:00:00.000Z",
-  "message": "Old log entry"
-}
-
-# Fermer l'index
-POST /logs-old-2025.01.01/_close
-
-# Vérifier le status
-GET /_cat/indices/logs-old-*?v
-```
-
-**Observer**: L'index est maintenant `close` - il ne consomme plus de RAM.
-
-### Étape 3: Rouvrir un index
-
-```bash
-POST /logs-old-2025.01.01/_open
-
-# Vérifier que les données sont accessibles
-GET /logs-old-2025.01.01/_search
-```
-
-### Étape 4: Comparer les ressources
-
-```bash
-# Index ouvert - consomme de la heap
-GET /_cat/segments/logs-old-2025.01.01?v
-
-# Index fermé - pas de segments en mémoire
-POST /logs-old-2025.01.01/_close
-GET /_cat/segments/logs-old-2025.01.01?v
-```
-
-### Validation
-
-✅ Comprendre la différence entre index ouvert et fermé
-
----
-
-# Lab 6.2: Open/Close et Delete APIs
-
-**Topic**: Data Retention et ILM
-**Durée**: 15 minutes
-
-## Objectif
-
-Maîtriser les APIs de gestion du cycle de vie des index.
-
-## Exercice
-
-### Étape 1: Créer plusieurs index de test
-
-```bash
-PUT /logs-retention-2025.01.01
-PUT /logs-retention-2025.01.02
-PUT /logs-retention-2025.01.03
-PUT /logs-retention-2025.01.04
-PUT /logs-retention-2025.01.05
-```
-
-### Étape 2: Fermer plusieurs index avec pattern
-
-```bash
-# Fermer les index des 3 premiers jours
-POST /logs-retention-2025.01.01,logs-retention-2025.01.02,logs-retention-2025.01.03/_close
-
-# Vérifier
-GET /_cat/indices/logs-retention-*?v&h=index,status
-```
-
-### Étape 3: Delete by Query (supprimer des documents)
-
-```bash
-# Rouvrir un index
-POST /logs-retention-2025.01.01/_open
-
-# Ajouter des documents
-POST /_bulk
-{"index":{"_index":"logs-retention-2025.01.01"}}
-{"level":"INFO","message":"Keep this"}
-{"index":{"_index":"logs-retention-2025.01.01"}}
-{"level":"DEBUG","message":"Delete this"}
-{"index":{"_index":"logs-retention-2025.01.01"}}
-{"level":"DEBUG","message":"Delete this too"}
-
-# Supprimer les logs DEBUG
-POST /logs-retention-2025.01.01/_delete_by_query
-{
-  "query": {
-    "term": {
-      "level": "DEBUG"
-    }
-  }
-}
-
-# Vérifier
-GET /logs-retention-2025.01.01/_search
-```
-
-### Étape 4: Supprimer un index complet
-
-```bash
-DELETE /logs-retention-2025.01.05
-
-# Vérifier
-GET /_cat/indices/logs-retention-*?v
-```
-
-### Étape 5: Supprimer plusieurs index
-
-```bash
-DELETE /logs-retention-2025.01.01,logs-retention-2025.01.02
-
-# Ou avec pattern (⚠️ dangereux en prod !)
-DELETE /logs-retention-*
-```
-
-### Validation
-
-✅ Savoir gérer le cycle de vie des index manuellement
-
----
-
-# Lab 6.3: Shrink API
-
-**Topic**: Data Retention et ILM
-**Durée**: 20 minutes
-
-## Objectif
-
-Réduire le nombre de shards d'un index pour économiser des ressources.
-
-## Contexte Parkki
-
-Un index avec trop de shards consomme plus de heap. Shrink permet de réduire ce coût pour les anciens index.
-
-## Exercice
-
-### Étape 1: Créer un index avec plusieurs shards
-
-```bash
-PUT /logs-to-shrink
-{
-  "settings": {
-    "number_of_shards": 4,
-    "number_of_replicas": 0
-  }
-}
-
-# Ajouter des documents
-POST /_bulk
-{"index":{"_index":"logs-to-shrink"}}
-{"@timestamp":"2025-01-15T10:00:00.000Z","message":"Log 1"}
-{"index":{"_index":"logs-to-shrink"}}
-{"@timestamp":"2025-01-15T10:01:00.000Z","message":"Log 2"}
-{"index":{"_index":"logs-to-shrink"}}
-{"@timestamp":"2025-01-15T10:02:00.000Z","message":"Log 3"}
-{"index":{"_index":"logs-to-shrink"}}
-{"@timestamp":"2025-01-15T10:03:00.000Z","message":"Log 4"}
-```
-
-### Étape 2: Vérifier les shards actuels
-
-```bash
-GET /_cat/shards/logs-to-shrink?v
-```
-
-**Observer**: 4 shards primaires.
-
-### Étape 3: Préparer l'index pour le shrink
-
-```bash
-# L'index doit être read-only et tous les shards sur un seul nœud
-PUT /logs-to-shrink/_settings
-{
-  "settings": {
-    "index.blocks.write": true
-  }
-}
-```
-
-### Étape 4: Exécuter le shrink
-
-```bash
-POST /logs-to-shrink/_shrink/logs-shrunk
-{
-  "settings": {
-    "index.number_of_shards": 1,
-    "index.number_of_replicas": 0,
-    "index.blocks.write": null
-  }
-}
-```
-
-### Étape 5: Vérifier le résultat
-
-```bash
-# Comparer les deux index
-GET /_cat/indices/logs-to-shrink,logs-shrunk?v&h=index,pri,rep,docs.count,store.size
-
-# Vérifier les shards
-GET /_cat/shards/logs-shrunk?v
-```
-
-**Observer**: L'index shrunk n'a qu'1 shard au lieu de 4.
-
-### Étape 6: Supprimer l'ancien index
-
-```bash
-DELETE /logs-to-shrink
-```
-
-### Règles du Shrink
-
-- Le nouveau nombre de shards doit être un diviseur de l'ancien (4→2, 4→1, 6→3, 6→2, 6→1)
-- L'index doit être en read-only
-- Tous les shards doivent être sur le même nœud (pour single-node c'est automatique)
-
-### Validation
-
-✅ Savoir utiliser shrink pour réduire le nombre de shards
-
----
-
-# Lab 6.4: Data Streams
-
-**Topic**: Data Retention et ILM
-**Durée**: 25 minutes
-
-## Objectif
-
-Comprendre les Data Streams pour gérer automatiquement les time series data.
-
-## Contexte Parkki
-
-Les Data Streams sont **parfaits pour vos logs** : ils gèrent automatiquement le rollover et simplifient la rétention.
-
-## Concepts clés
-
-```
-Data Stream: logs-parkki
-├── .ds-logs-parkki-2025.01.13-000001 (backing index - read)
-├── .ds-logs-parkki-2025.01.14-000002 (backing index - read)
-└── .ds-logs-parkki-2025.01.15-000003 (write index - read/write)
-```
-
-## Exercice
-
-### Étape 1: Créer un index template pour data stream
-
-```bash
-PUT /_index_template/logs-stream-template
-{
-  "index_patterns": ["logs-stream-*"],
-  "data_stream": {},
-  "priority": 500,
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 0
     },
-    "mappings": {
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "level": { "type": "keyword" },
-        "service": { "type": "keyword" },
-        "message": { "type": "text" }
+    "duration_percentile_ranks": {
+      "percentile_ranks": {
+        "field": "duration_minutes",
+        "values": [60, 120, 180]
       }
     }
   }
 }
 ```
 
-**Important**: `"data_stream": {}` active le mode data stream.
-
-### Étape 2: Créer le data stream (implicite via indexation)
-
+2. Weighted average:
 ```bash
-POST /logs-stream-parkki/_doc
+GET /transactions/_search
 {
-  "@timestamp": "2025-01-15T10:00:00.000Z",
-  "level": "INFO",
-  "service": "parkki-api",
-  "message": "First log in data stream"
-}
-```
-
-### Étape 3: Voir le data stream
-
-```bash
-GET /_data_stream/logs-stream-parkki
-```
-
-**Observer**:
-- `name`: nom du data stream
-- `indices`: liste des backing indices
-- `generation`: numéro de génération
-
-### Étape 4: Indexer plus de documents
-
-```bash
-POST /logs-stream-parkki/_doc
-{
-  "@timestamp": "2025-01-15T10:01:00.000Z",
-  "level": "ERROR",
-  "service": "parkki-api",
-  "message": "Error in data stream"
-}
-
-POST /logs-stream-parkki/_doc
-{
-  "@timestamp": "2025-01-15T10:02:00.000Z",
-  "level": "WARN",
-  "service": "parkki-worker",
-  "message": "Warning in data stream"
-}
-```
-
-### Étape 5: Rechercher dans le data stream
-
-```bash
-GET /logs-stream-parkki/_search
-{
-  "query": {
-    "term": { "level": "ERROR" }
+  "size": 0,
+  "aggs": {
+    "weighted_avg_rate": {
+      "weighted_avg": {
+        "value": {
+          "script": "doc['amount'].value / doc['duration_minutes'].value * 60"
+        },
+        "weight": { "field": "duration_minutes" }
+      }
+    }
   }
 }
 ```
 
-### Étape 6: Voir les backing indices
-
+3. Pipeline aggregations:
 ```bash
-GET /_cat/indices/.ds-logs-stream-parkki-*?v
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "daily_revenue": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "calendar_interval": "day"
+      },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } },
+        "avg_transaction": { "avg": { "field": "amount" } }
+      }
+    },
+    "total_revenue": {
+      "sum_bucket": {
+        "buckets_path": "daily_revenue>revenue"
+      }
+    },
+    "avg_daily_revenue": {
+      "avg_bucket": {
+        "buckets_path": "daily_revenue>revenue"
+      }
+    },
+    "max_day_revenue": {
+      "max_bucket": {
+        "buckets_path": "daily_revenue>revenue"
+      }
+    }
+  }
+}
 ```
 
-### Étape 7: Rollover manuel
-
+4. Derivative (rate of change):
 ```bash
-POST /logs-stream-parkki/_rollover
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "hourly": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "calendar_interval": "hour",
+        "min_doc_count": 0
+      },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } },
+        "revenue_change": {
+          "derivative": {
+            "buckets_path": "revenue"
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
-Vérifier:
-```bash
-GET /_data_stream/logs-stream-parkki
-```
-
-**Observer**: Un nouveau backing index a été créé (generation +1).
-
-### Avantages des Data Streams
-
-| Avantage | Description |
-|----------|-------------|
-| Rollover automatique | Avec ILM |
-| Nom unique | Plus besoin de gérer les noms d'index |
-| Suppression facile | Supprimer les anciens backing indices |
-| Recherche transparente | Query sur le data stream = tous les indices |
-
-### Validation
-
-✅ Comprendre les Data Streams et leur utilité pour les logs
+**Challenge**:
+- What is the 90th percentile for transaction amounts?
+- What percentage of transactions are under 2 hours?
+- Calculate the revenue per minute rate for each parking
 
 ---
 
-# Lab 6.5: Index Lifecycle Management (ILM) - Bases
+## Exercise 6.2: Bucket Aggregations with Filters
 
-**Topic**: Data Retention et ILM
-**Durée**: 30 minutes
+**Objective**: Group data into meaningful buckets.
 
-## Objectif
+**Setup**: Use the `transactions` index.
 
-Créer une policy ILM pour automatiser le cycle de vie des index.
+**Instructions**:
 
-## Contexte Parkki
-
-ILM peut **automatiquement**:
-- Faire un rollover quand l'index est trop gros/vieux
-- Déplacer les données vers des tiers moins chers
-- Supprimer les données après 10 jours
-
-## Phases ILM
-
-```
-Hot → Warm → Cold → Frozen → Delete 
- │      │      │       │        │
- │      │      │       │        └─ Suppression définitive
- │      │      │       └─ Snapshot + minimal resources
- │      │      └─ Read-only, moins de replicas
- │      └─ Read-only, shrink, force merge
- └─ Indexation active, recherches fréquentes
-```
-
-## Exercice
-
-### Étape 1: Créer une policy ILM simple
-
+1. Terms with order and size:
 ```bash
-PUT /_ilm/policy/logs-parkki-policy
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "top_parkings_by_revenue": {
+      "terms": {
+        "field": "parking_id",
+        "size": 10,
+        "order": { "total_revenue": "desc" }
+      },
+      "aggs": {
+        "total_revenue": { "sum": { "field": "amount" } },
+        "transaction_count": { "value_count": { "field": "amount" } }
+      }
+    }
+  }
+}
+```
+
+2. Histogram and date histogram:
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution": {
+      "histogram": {
+        "field": "amount",
+        "interval": 5,
+        "min_doc_count": 0,
+        "extended_bounds": { "min": 0, "max": 30 }
+      }
+    },
+    "hourly_distribution": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "calendar_interval": "hour",
+        "format": "HH:mm",
+        "time_zone": "Europe/Paris"
+      },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } }
+      }
+    }
+  }
+}
+```
+
+3. Filters aggregation:
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "transaction_categories": {
+      "filters": {
+        "filters": {
+          "small": { "range": { "amount": { "lt": 10 } } },
+          "medium": { "range": { "amount": { "gte": 10, "lt": 20 } } },
+          "large": { "range": { "amount": { "gte": 20 } } }
+        }
+      },
+      "aggs": {
+        "avg_duration": { "avg": { "field": "duration_minutes" } },
+        "revenue": { "sum": { "field": "amount" } }
+      }
+    }
+  }
+}
+```
+
+4. Composite aggregation (for pagination):
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "parking_payment_combos": {
+      "composite": {
+        "size": 5,
+        "sources": [
+          { "parking": { "terms": { "field": "parking_id" } } },
+          { "payment": { "terms": { "field": "payment_method" } } }
+        ]
+      },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } }
+      }
+    }
+  }
+}
+
+# Next page using after_key from response
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "parking_payment_combos": {
+      "composite": {
+        "size": 5,
+        "sources": [
+          { "parking": { "terms": { "field": "parking_id" } } },
+          { "payment": { "terms": { "field": "payment_method" } } }
+        ],
+        "after": { "parking": "central", "payment": "mobile" }
+      },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } }
+      }
+    }
+  }
+}
+```
+
+5. Significant terms (find unusual patterns):
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "query": {
+    "term": { "user_type": "premium" }
+  },
+  "aggs": {
+    "significant_spot_types": {
+      "significant_terms": {
+        "field": "spot_type"
+      }
+    },
+    "significant_payment": {
+      "significant_terms": {
+        "field": "payment_method"
+      }
+    }
+  }
+}
+```
+
+**Challenge**:
+- Which payment method is most significant for premium users?
+- Create an hourly revenue chart for January 15th
+- Find the top 3 parking-payment combinations by revenue
+
+---
+
+## Exercise 6.3: Nested Aggregations and Post-Filters
+
+**Objective**: Build complex multi-level aggregations.
+
+**Setup**: Use the `transactions` index.
+
+**Instructions**:
+
+1. Multi-level aggregation:
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_parking": {
+      "terms": { "field": "parking_id" },
+      "aggs": {
+        "by_spot_type": {
+          "terms": { "field": "spot_type" },
+          "aggs": {
+            "revenue": { "sum": { "field": "amount" } },
+            "avg_duration": { "avg": { "field": "duration_minutes" } },
+            "by_payment": {
+              "terms": { "field": "payment_method" },
+              "aggs": {
+                "count": { "value_count": { "field": "amount" } }
+              }
+            }
+          }
+        },
+        "total_revenue": { "sum": { "field": "amount" } },
+        "revenue_share": {
+          "bucket_script": {
+            "buckets_path": {
+              "spot_revenue": "by_spot_type>revenue"
+            },
+            "script": "params.spot_revenue"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+2. Post-filter (filter results, not aggregations):
+```bash
+GET /transactions/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "post_filter": {
+    "term": { "payment_method": "card" }
+  },
+  "aggs": {
+    "all_payment_methods": {
+      "terms": { "field": "payment_method" }
+    }
+  }
+}
+```
+
+3. Bucket selector (filter buckets):
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_parking": {
+      "terms": { "field": "parking_id" },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } },
+        "transaction_count": { "value_count": { "field": "amount" } },
+        "high_revenue_filter": {
+          "bucket_selector": {
+            "buckets_path": {
+              "rev": "revenue"
+            },
+            "script": "params.rev > 30"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+4. Bucket sort:
+```bash
+GET /transactions/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_payment": {
+      "terms": {
+        "field": "payment_method",
+        "size": 10
+      },
+      "aggs": {
+        "revenue": { "sum": { "field": "amount" } },
+        "avg_amount": { "avg": { "field": "amount" } },
+        "sort_by_revenue": {
+          "bucket_sort": {
+            "sort": [{ "revenue": { "order": "desc" } }],
+            "size": 3
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Challenge**:
+- Calculate each parking's percentage of total revenue
+- Find parking lots with more than 3 transactions AND revenue > 30€
+- Show all payment method counts, but only return documents with "card" payment
+
+---
+
+# Part 7: Ingest Pipelines
+
+## Exercise 7.1: Multi-Processor Pipeline
+
+**Objective**: Create a comprehensive data transformation pipeline.
+
+**Instructions**:
+
+1. Create a complex pipeline:
+```bash
+PUT /_ingest/pipeline/parking-logs-pipeline
+{
+  "description": "Comprehensive parking log processing",
+  "processors": [
+    {
+      "set": {
+        "field": "ingested_at",
+        "value": "{{_ingest.timestamp}}"
+      }
+    },
+    {
+      "lowercase": {
+        "field": "level",
+        "ignore_missing": true
+      }
+    },
+    {
+      "trim": {
+        "field": "message",
+        "ignore_missing": true
+      }
+    },
+    {
+      "gsub": {
+        "field": "user_id",
+        "pattern": "^user[-_]?",
+        "replacement": "",
+        "ignore_missing": true
+      }
+    },
+    {
+      "split": {
+        "field": "tags",
+        "separator": ",",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "severity_score",
+        "value": 1,
+        "if": "ctx.level == 'debug'"
+      }
+    },
+    {
+      "set": {
+        "field": "severity_score",
+        "value": 2,
+        "if": "ctx.level == 'info'"
+      }
+    },
+    {
+      "set": {
+        "field": "severity_score",
+        "value": 3,
+        "if": "ctx.level == 'warn' || ctx.level == 'warning'"
+      }
+    },
+    {
+      "set": {
+        "field": "severity_score",
+        "value": 4,
+        "if": "ctx.level == 'error'"
+      }
+    },
+    {
+      "remove": {
+        "field": ["temp", "debug_info"],
+        "ignore_missing": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "_index",
+        "value": "failed-logs"
+      }
+    },
+    {
+      "set": {
+        "field": "error.message",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    },
+    {
+      "set": {
+        "field": "error.processor",
+        "value": "{{ _ingest.on_failure_processor_type }}"
+      }
+    }
+  ]
+}
+```
+
+2. Test with various documents:
+```bash
+POST /_ingest/pipeline/parking-logs-pipeline/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "level": "ERROR",
+        "message": "  Connection timeout  ",
+        "user_id": "user-123",
+        "tags": "parking,api,timeout",
+        "temp": "temporary_data"
+      }
+    },
+    {
+      "_source": {
+        "level": "INFO",
+        "message": "Normal operation",
+        "user_id": "user_456"
+      }
+    },
+    {
+      "_source": {
+        "level": "DEBUG",
+        "message": "Debug info"
+      }
+    }
+  ]
+}
+```
+
+3. Index documents using the pipeline:
+```bash
+POST /processed-logs/_doc?pipeline=parking-logs-pipeline
+{
+  "level": "WARN",
+  "message": "  High latency detected  ",
+  "user_id": "user-789",
+  "tags": "performance,warning",
+  "temp": "should_be_removed"
+}
+
+GET /processed-logs/_search
+```
+
+**Challenge**:
+- Add a processor that extracts the first word from the message as a new field `action`
+- Add a processor that sets `is_critical` to true if severity_score >= 4
+- What happens if `level` is an unexpected value?
+
+---
+
+## Exercise 7.2: Grok and Dissect Processors
+
+**Objective**: Parse complex unstructured logs.
+
+**Instructions**:
+
+1. Create a Grok pipeline for application logs:
+```bash
+PUT /_ingest/pipeline/app-logs-parser
+{
+  "description": "Parse structured application logs",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "\\[%{TIMESTAMP_ISO8601:log_timestamp}\\] \\[%{LOGLEVEL:level}\\] \\[%{DATA:service}\\] \\[%{DATA:trace_id}\\] %{GREEDYDATA:log_message}"
+        ],
+        "pattern_definitions": {
+          "LOGLEVEL": "DEBUG|INFO|WARN|ERROR|FATAL"
+        }
+      }
+    },
+    {
+      "date": {
+        "field": "log_timestamp",
+        "formats": ["ISO8601"],
+        "target_field": "@timestamp"
+      }
+    },
+    {
+      "remove": {
+        "field": ["log_timestamp", "message"]
+      }
+    }
+  ]
+}
+```
+
+2. Test the Grok pipeline:
+```bash
+POST /_ingest/pipeline/app-logs-parser/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "message": "[2025-01-15T10:30:45.123Z] [ERROR] [parking-api] [abc123-def456] User authentication failed for user_id=789"
+      }
+    },
+    {
+      "_source": {
+        "message": "[2025-01-15T10:30:46.456Z] [INFO] [payment-service] [xyz789-uvw012] Payment processed successfully amount=25.50"
+      }
+    }
+  ]
+}
+```
+
+3. Create a Dissect pipeline (faster, simpler):
+```bash
+PUT /_ingest/pipeline/access-logs-parser
+{
+  "description": "Parse access logs with dissect",
+  "processors": [
+    {
+      "dissect": {
+        "field": "message",
+        "pattern": "%{client_ip} - %{user} [%{timestamp}] \"%{method} %{path} %{protocol}\" %{status} %{bytes}"
+      }
+    },
+    {
+      "convert": {
+        "field": "status",
+        "type": "integer"
+      }
+    },
+    {
+      "convert": {
+        "field": "bytes",
+        "type": "integer"
+      }
+    },
+    {
+      "geoip": {
+        "field": "client_ip",
+        "target_field": "geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "user_agent": {
+        "field": "user_agent",
+        "target_field": "ua",
+        "ignore_missing": true
+      }
+    }
+  ]
+}
+```
+
+4. Test Dissect:
+```bash
+POST /_ingest/pipeline/access-logs-parser/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "message": "192.168.1.100 - john [15/Jan/2025:10:30:00 +0000] \"GET /api/parking/status HTTP/1.1\" 200 1234",
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)"
+      }
+    }
+  ]
+}
+```
+
+5. Test Grok patterns online:
+```bash
+GET /_ingest/processor/grok
+```
+
+**Challenge**:
+- Create a pattern that extracts key=value pairs from the log_message
+- Add a processor that categorizes status codes (2xx=success, 4xx=client_error, 5xx=server_error)
+- Handle logs that don't match the expected format gracefully
+
+---
+
+## Exercise 7.3: Enrichment and Lookup
+
+**Objective**: Enrich documents with external data.
+
+**Instructions**:
+
+1. Create a lookup index:
+```bash
+PUT /parking-info
+{
+  "mappings": {
+    "properties": {
+      "parking_id": { "type": "keyword" },
+      "name": { "type": "text" },
+      "address": { "type": "text" },
+      "city": { "type": "keyword" },
+      "capacity": { "type": "integer" },
+      "manager_email": { "type": "keyword" }
+    }
+  }
+}
+
+POST /_bulk
+{"index":{"_index":"parking-info","_id":"central"}}
+{"parking_id":"central","name":"Parking Central Paris","address":"15 Rue de Rivoli","city":"Paris","capacity":500,"manager_email":"central@parkki.com"}
+{"index":{"_index":"parking-info","_id":"north"}}
+{"parking_id":"north","name":"Parking Gare du Nord","address":"18 Rue de Dunkerque","city":"Paris","capacity":300,"manager_email":"north@parkki.com"}
+{"index":{"_index":"parking-info","_id":"south"}}
+{"parking_id":"south","name":"Parking Montparnasse","address":"Place Raoul Dautry","city":"Paris","capacity":400,"manager_email":"south@parkki.com"}
+```
+
+2. Create an enrich policy:
+```bash
+PUT /_enrich/policy/parking-lookup
+{
+  "match": {
+    "indices": "parking-info",
+    "match_field": "parking_id",
+    "enrich_fields": ["name", "city", "capacity", "manager_email"]
+  }
+}
+
+# Execute the policy to create the enrich index
+POST /_enrich/policy/parking-lookup/_execute
+```
+
+3. Create a pipeline using the enrich policy:
+```bash
+PUT /_ingest/pipeline/enrich-parking-events
+{
+  "description": "Enrich parking events with parking info",
+  "processors": [
+    {
+      "enrich": {
+        "policy_name": "parking-lookup",
+        "field": "parking_id",
+        "target_field": "parking_info",
+        "max_matches": 1
+      }
+    },
+    {
+      "set": {
+        "field": "enriched",
+        "value": true,
+        "if": "ctx.parking_info != null"
+      }
+    },
+    {
+      "script": {
+        "source": """
+          if (ctx.parking_info != null) {
+            ctx.parking_name = ctx.parking_info.name;
+            ctx.parking_city = ctx.parking_info.city;
+          }
+        """,
+        "if": "ctx.parking_info != null"
+      }
+    }
+  ]
+}
+```
+
+4. Test the enrichment:
+```bash
+POST /_ingest/pipeline/enrich-parking-events/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "event_type": "ENTRY",
+        "parking_id": "central",
+        "user_id": "user123",
+        "timestamp": "2025-01-15T10:00:00Z"
+      }
+    },
+    {
+      "_source": {
+        "event_type": "EXIT",
+        "parking_id": "unknown",
+        "user_id": "user456"
+      }
+    }
+  ]
+}
+```
+
+5. Check enrich policy status:
+```bash
+GET /_enrich/policy/parking-lookup
+GET /_enrich/_stats
+```
+
+**Challenge**:
+- Add a processor that sends an alert if capacity > 400
+- Handle the case when parking_id is not found in the lookup
+- Create a pipeline that combines Grok parsing AND enrichment
+
+---
+
+# Part 8: Data Retention and ILM
+
+## Exercise 8.1: Complete ILM Policy
+
+**Objective**: Create a production-ready ILM policy.
+
+**Instructions**:
+
+1. Create a comprehensive ILM policy:
+```bash
+PUT /_ilm/policy/parkki-logs-policy
 {
   "policy": {
     "phases": {
@@ -2790,16 +2429,54 @@ PUT /_ilm/policy/logs-parkki-policy
         "actions": {
           "rollover": {
             "max_age": "1d",
-            "max_primary_shard_size": "10gb"
+            "max_primary_shard_size": "25gb",
+            "max_docs": 10000000
           },
           "set_priority": {
             "priority": 100
           }
         }
       },
-      "delete": {
-        "min_age": "10d",
+      "warm": {
+        "min_age": "2d",
         "actions": {
+          "readonly": {},
+          "shrink": {
+            "number_of_shards": 1
+          },
+          "forcemerge": {
+            "max_num_segments": 1
+          },
+          "set_priority": {
+            "priority": 50
+          },
+          "allocate": {
+            "require": {
+              "data": "warm"
+            }
+          }
+        }
+      },
+      "cold": {
+        "min_age": "7d",
+        "actions": {
+          "set_priority": {
+            "priority": 0
+          },
+          "allocate": {
+            "require": {
+              "data": "cold"
+            },
+            "number_of_replicas": 0
+          }
+        }
+      },
+      "delete": {
+        "min_age": "30d",
+        "actions": {
+          "wait_for_snapshot": {
+            "policy": "daily-snapshots"
+          },
           "delete": {}
         }
       }
@@ -2808,329 +2485,166 @@ PUT /_ilm/policy/logs-parkki-policy
 }
 ```
 
-**Explication**:
-- **Hot phase**: Rollover après 1 jour OU si shard > 10GB
-- **Delete phase**: Suppression après 10 jours (depuis le rollover)
-
-### Étape 2: Voir la policy
-
+2. Check ILM status:
 ```bash
-GET /_ilm/policy/logs-parkki-policy
+GET /_ilm/policy/parkki-logs-policy
+GET /_ilm/status
 ```
 
-### Étape 3: Créer un template avec ILM
-
+3. Create template with ILM:
 ```bash
-PUT /_index_template/logs-ilm-template
+PUT /_index_template/logs-with-ilm
 {
   "index_patterns": ["logs-ilm-*"],
+  "data_stream": {},
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "index.lifecycle.name": "parkki-logs-policy"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "message": { "type": "text" },
+        "level": { "type": "keyword" },
+        "service": { "type": "keyword" }
+      }
+    }
+  }
+}
+```
+
+4. Create and populate the data stream:
+```bash
+POST /logs-ilm-parkki/_doc
+{
+  "@timestamp": "2025-01-15T10:00:00Z",
+  "message": "Application started",
+  "level": "INFO",
+  "service": "parking-api"
+}
+
+POST /logs-ilm-parkki/_doc
+{
+  "@timestamp": "2025-01-15T10:01:00Z",
+  "message": "User login successful",
+  "level": "INFO",
+  "service": "auth-service"
+}
+```
+
+5. Monitor ILM progress:
+```bash
+GET /logs-ilm-parkki/_ilm/explain
+GET /_cat/indices/.*logs-ilm*?v&h=index,health,status,pri,rep,docs.count,store.size
+```
+
+**Challenge**:
+- Add a frozen phase before delete
+- Modify the policy to keep 90 days in cold instead of deleting at 30 days
+- How would you force an index to move to the next phase?
+
+---
+
+## Exercise 8.2: Data Streams with Rollover
+
+**Objective**: Manage time-series data efficiently.
+
+**Instructions**:
+
+1. Create a data stream template:
+```bash
+PUT /_index_template/metrics-template
+{
+  "index_patterns": ["metrics-*"],
   "data_stream": {},
   "priority": 500,
   "template": {
     "settings": {
       "number_of_shards": 1,
       "number_of_replicas": 0,
-      "index.lifecycle.name": "logs-parkki-policy"
+      "index.lifecycle.name": "parkki-logs-policy"
     },
     "mappings": {
       "properties": {
         "@timestamp": { "type": "date" },
-        "level": { "type": "keyword" },
-        "message": { "type": "text" }
+        "parking_id": { "type": "keyword" },
+        "metric_name": { "type": "keyword" },
+        "value": { "type": "double" },
+        "unit": { "type": "keyword" }
       }
     }
   }
 }
 ```
 
-### Étape 4: Créer le data stream et indexer
-
+2. Index metrics into the data stream:
 ```bash
-POST /logs-ilm-parkki/_doc
+POST /metrics-parkki/_doc
 {
-  "@timestamp": "2025-01-15T10:00:00.000Z",
-  "level": "INFO",
-  "message": "Log with ILM"
+  "@timestamp": "2025-01-15T10:00:00Z",
+  "parking_id": "central",
+  "metric_name": "occupancy_percent",
+  "value": 78.5,
+  "unit": "percent"
+}
+
+POST /metrics-parkki/_doc
+{
+  "@timestamp": "2025-01-15T10:00:00Z",
+  "parking_id": "central",
+  "metric_name": "revenue_hourly",
+  "value": 245.50,
+  "unit": "euros"
+}
+
+POST /metrics-parkki/_doc
+{
+  "@timestamp": "2025-01-15T10:01:00Z",
+  "parking_id": "north",
+  "metric_name": "occupancy_percent",
+  "value": 45.2,
+  "unit": "percent"
 }
 ```
 
-### Étape 5: Vérifier l'association ILM
-
+3. View data stream info:
 ```bash
-GET /logs-ilm-parkki/_ilm/explain
+GET /_data_stream/metrics-parkki
+
+GET /_cat/indices/.ds-metrics-parkki-*?v
 ```
 
-**Observer**:
-- `managed`: true (géré par ILM)
-- `policy`: logs-parkki-policy
-- `phase`: hot
-- `age`: temps depuis la création
-
-### Étape 6: Voir toutes les policies
-
+4. Manual rollover:
 ```bash
-GET /_ilm/policy
-```
-
-### Validation
-
-✅ Savoir créer et associer une policy ILM de base
-
----
-
-# Lab 6.6: ILM Avancé - Hot/Warm/Delete
-
-**Topic**: Data Retention et ILM
-**Durée**: 30 minutes
-
-## Objectif
-
-Créer une policy ILM complète avec Hot, Warm et Delete phases.
-
-## Contexte Parkki
-
-Pour optimiser vos coûts avec 15M logs/jour :
-- **Hot** (jours 0-2): Accès fréquent, indexation
-- **Warm** (jours 3-10): Accès occasionnel, read-only
-- **Delete** (après 10 jours): Suppression
-
-## Exercice
-
-### Étape 1: Créer une policy Hot/Warm/Delete
-
-```bash
-PUT /_ilm/policy/logs-parkki-optimized
+POST /metrics-parkki/_rollover
 {
-  "policy": {
-    "phases": {
-      "hot": {
-        "min_age": "0ms",
-        "actions": {
-          "rollover": {
-            "max_age": "1d",
-            "max_primary_shard_size": "15gb"
-          },
-          "set_priority": {
-            "priority": 100
-          }
-        }
-      },
-      "warm": {
-        "min_age": "2d",
-        "actions": {
-          "set_priority": {
-            "priority": 50
-          },
-          "readonly": {},
-          "forcemerge": {
-            "max_num_segments": 1
-          },
-          "shrink": {
-            "number_of_shards": 1
-          }
-        }
-      },
-      "delete": {
-        "min_age": "10d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
+  "conditions": {
+    "max_docs": 1
   }
 }
 ```
 
-**Explication des actions Warm**:
-- `readonly`: Bloque l'écriture
-- `forcemerge`: Fusionne les segments (meilleure perf lecture)
-- `shrink`: Réduit le nombre de shards
-
-### Étape 2: Voir la policy détaillée
-
+5. Search across all backing indices:
 ```bash
-GET /_ilm/policy/logs-parkki-optimized
-```
-
-### Étape 3: Créer un template avec cette policy
-
-```bash
-PUT /_index_template/logs-optimized-template
+GET /metrics-parkki/_search
 {
-  "index_patterns": ["logs-opt-*"],
-  "data_stream": {},
-  "priority": 600,
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 1,
-      "refresh_interval": "30s",
-      "index.lifecycle.name": "logs-parkki-optimized"
-    },
-    "mappings": {
-      "dynamic_templates": [
-        {
-          "strings_as_keywords": {
-            "match_mapping_type": "string",
-            "mapping": { "type": "keyword" }
-          }
-        }
-      ],
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "level": { "type": "keyword" },
-        "service": { "type": "keyword" },
-        "message": { "type": "text" }
+  "query": {
+    "range": {
+      "@timestamp": {
+        "gte": "now-1h"
       }
     }
-  }
-}
-```
-
-### Étape 4: Tester avec des données
-
-```bash
-POST /logs-opt-parkki/_doc
-{
-  "@timestamp": "2025-01-15T10:00:00.000Z",
-  "level": "INFO",
-  "service": "parkki-api",
-  "message": "Optimized log entry"
-}
-```
-
-### Étape 5: Voir le statut ILM
-
-```bash
-GET /logs-opt-parkki/_ilm/explain
-```
-
-### Étape 6: Forcer une transition (pour test)
-
-```bash
-# Forcer le passage à la phase suivante (⚠️ test uniquement)
-POST /_ilm/move/logs-opt-parkki
-{
-  "current_step": {
-    "phase": "hot",
-    "action": "complete",
-    "name": "complete"
   },
-  "next_step": {
-    "phase": "warm",
-    "action": "readonly",
-    "name": "readonly"
-  }
-}
-```
-
-### Timeline pour Parkki
-
-| Jour | Phase | Actions |
-|------|-------|---------|
-| 0-1 | Hot | Indexation active |
-| 1 | Hot | Rollover (nouveau backing index) |
-| 2 | Warm | readonly, forcemerge, shrink |
-| 10 | Delete | Suppression automatique |
-
-### Validation
-
-✅ Savoir créer une policy ILM Hot/Warm/Delete
-
----
-
-# Lab 6.7: Monitoring et Troubleshooting ILM
-
-**Topic**: Data Retention et ILM
-**Durée**: 20 minutes
-
-## Objectif
-
-Surveiller et débugger les policies ILM.
-
-## Exercice
-
-### Étape 1: Voir le statut ILM global
-
-```bash
-GET /_ilm/status
-```
-
-**Résultat attendu**: `"operation_mode": "RUNNING"`
-
-### Étape 2: Voir tous les index gérés par ILM
-
-```bash
-GET /*/_ilm/explain?only_managed=true
-```
-
-### Étape 3: Voir les index en erreur
-
-```bash
-GET /*/_ilm/explain?only_errors=true
-```
-
-### Étape 4: Détail d'un index spécifique
-
-```bash
-GET /logs-opt-parkki/_ilm/explain
-```
-
-**Champs importants**:
-- `phase`: Phase actuelle (hot, warm, delete)
-- `action`: Action en cours
-- `step`: Étape dans l'action
-- `age`: Âge depuis le rollover
-- `failed_step`: Étape qui a échoué (si erreur)
-
-### Étape 5: Retry après une erreur
-
-```bash
-# Si une policy est bloquée sur une erreur
-POST /logs-opt-parkki/_ilm/retry
-```
-
-### Étape 6: Arrêter/Démarrer ILM
-
-```bash
-# Arrêter ILM (maintenance)
-POST /_ilm/stop
-
-# Vérifier
-GET /_ilm/status
-
-# Redémarrer ILM
-POST /_ilm/start
-```
-
-### Étape 7: Supprimer une policy d'un index
-
-```bash
-# Retirer la gestion ILM d'un index
-POST /logs-opt-parkki/_ilm/remove
-```
-
-### Étape 8: Modifier une policy existante
-
-```bash
-# Mettre à jour la policy (nouveaux index seulement)
-PUT /_ilm/policy/logs-parkki-optimized
-{
-  "policy": {
-    "phases": {
-      "hot": {
-        "min_age": "0ms",
-        "actions": {
-          "rollover": {
-            "max_age": "12h",
-            "max_primary_shard_size": "10gb"
+  "aggs": {
+    "by_parking": {
+      "terms": { "field": "parking_id" },
+      "aggs": {
+        "avg_occupancy": {
+          "avg": {
+            "field": "value"
           }
-        }
-      },
-      "delete": {
-        "min_age": "7d",
-        "actions": {
-          "delete": {}
         }
       }
     }
@@ -3138,339 +2652,256 @@ PUT /_ilm/policy/logs-parkki-optimized
 }
 ```
 
-**Note**: Les index existants gardent l'ancienne version de la policy.
-
-### Problèmes courants
-
-| Problème | Cause | Solution |
-|----------|-------|----------|
-| Index bloqué en Hot | Rollover conditions non atteintes | Attendre ou rollover manuel |
-| Erreur shrink | Shards pas sur même nœud | Vérifier allocation |
-| Delete ne se fait pas | min_age pas atteint | Vérifier l'âge depuis rollover |
-
-### Validation
-
-✅ Savoir monitorer et débugger ILM
+**Challenge**:
+- What's the naming convention for backing indices?
+- How do you delete old data from a data stream?
+- Create a query that searches only the current write index
 
 ---
 
-# Lab 6.8: Configuration Recommandée pour Parkki
+## Exercise 8.3: Index Optimization Operations
 
-**Topic**: Data Retention et ILM
-**Durée**: 25 minutes
+**Objective**: Practice shrink, force merge, and clone operations.
 
-## Objectif
+**Instructions**:
 
-Mettre en place la configuration ILM optimale pour Parkki.
-
-## Exercice
-
-### Étape 1: Créer la policy de production
-
+1. Create and populate a test index:
 ```bash
-PUT /_ilm/policy/parkki-logs-production
-{
-  "policy": {
-    "_meta": {
-      "description": "Policy pour logs Parkki - 15M logs/jour, rétention 10 jours"
-    },
-    "phases": {
-      "hot": {
-        "min_age": "0ms",
-        "actions": {
-          "rollover": {
-            "max_age": "1d",
-            "max_primary_shard_size": "20gb"
-          },
-          "set_priority": {
-            "priority": 100
-          }
-        }
-      },
-      "warm": {
-        "min_age": "2d",
-        "actions": {
-          "set_priority": {
-            "priority": 50
-          },
-          "readonly": {},
-          "forcemerge": {
-            "max_num_segments": 1
-          }
-        }
-      },
-      "delete": {
-        "min_age": "10d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
-  }
-}
-```
-
-### Étape 2: Créer le component template pour settings
-
-```bash
-PUT /_component_template/parkki-settings
-{
-  "template": {
-    "settings": {
-      "number_of_shards": 1,
-      "number_of_replicas": 1,
-      "refresh_interval": "30s",
-      "index.lifecycle.name": "parkki-logs-production",
-      "codec": "best_compression"
-    }
-  }
-}
-```
-
-### Étape 3: Créer le component template pour mappings
-
-```bash
-PUT /_component_template/parkki-mappings
-{
-  "template": {
-    "mappings": {
-      "dynamic_templates": [
-        {
-          "strings_as_keywords": {
-            "match_mapping_type": "string",
-            "mapping": { "type": "keyword" }
-          }
-        },
-        {
-          "message_as_text": {
-            "match": "message",
-            "mapping": { "type": "text" }
-          }
-        }
-      ],
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "level": { "type": "keyword" },
-        "service": { "type": "keyword" },
-        "message": { "type": "text" },
-        "user_id": { "type": "keyword" },
-        "trace_id": { "type": "keyword" },
-        "span_id": { "type": "keyword" },
-        "response_time_ms": { "type": "long" },
-        "status_code": { "type": "integer" }
-      }
-    }
-  }
-}
-```
-
-### Étape 4: Créer l'index template final
-
-```bash
-PUT /_index_template/parkki-logs-template
-{
-  "index_patterns": ["logs-parkki-*"],
-  "data_stream": {},
-  "priority": 500,
-  "composed_of": [
-    "parkki-settings",
-    "parkki-mappings"
-  ],
-  "_meta": {
-    "description": "Template pour logs Parkki avec ILM"
-  }
-}
-```
-
-### Étape 5: Tester la configuration complète
-
-```bash
-# Indexer un document (crée le data stream)
-POST /logs-parkki-prod/_doc
-{
-  "@timestamp": "2025-01-15T10:00:00.000Z",
-  "level": "INFO",
-  "service": "parkki-api",
-  "message": "Production log with ILM",
-  "user_id": "user_001",
-  "trace_id": "abc123",
-  "response_time_ms": 45,
-  "status_code": 200
-}
-
-# Vérifier le data stream
-GET /_data_stream/logs-parkki-prod
-
-# Vérifier ILM
-GET /logs-parkki-prod/_ilm/explain
-
-# Vérifier le mapping
-GET /.ds-logs-parkki-prod-*/_mapping
-```
-
-### Étape 6: Rollover manuel pour test
-
-```bash
-POST /logs-parkki-prod/_rollover
-
-# Vérifier les backing indices
-GET /_cat/indices/.ds-logs-parkki-prod-*?v
-```
-
-### Résumé de la configuration
-
-| Composant | Valeur |
-|-----------|--------|
-| Rollover | 1 jour OU 20GB |
-| Hot phase | Jours 0-2 |
-| Warm phase | Jours 2-10 (readonly, forcemerge) |
-| Delete | Après 10 jours |
-| Shards | 1 primaire + 1 replica |
-| Refresh | 30 secondes |
-| Compression | best_compression |
-
-### Économies estimées
-
-```
-Sans ILM (10 jours d'index ouverts):
-- 10 × 15 GB = 150 GB hot
-- RAM nécessaire (ratio 1:30) = 5 GB
-
-Avec ILM (2 jours hot, 8 jours warm):
-- 2 × 15 GB = 30 GB hot → RAM 1 GB
-- 8 × 15 GB = 120 GB warm → RAM 0.75 GB
-- Total RAM: 1.75 GB vs 5 GB = -65% !
-```
-
-### Validation
-
-✅ Avoir une configuration ILM de production prête pour Parkki
-
----
-
-# Lab 7.1: Comprendre les Segments et le Merge
-
-**Topic**: Operating et Troubleshooting
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre le processus d'indexation interne et l'impact des segments sur les performances.
-
-## Contexte Parkki
-
-Avec 15M logs/jour, comprendre les segments est essentiel pour diagnostiquer les problèmes de performance.
-
-## Concepts clés
-
-```
-Document → Index Buffer → Segment (refresh) → Merge → Segment final
-                              │
-                              └─ Chaque refresh crée un nouveau segment
-                                 Trop de segments = overhead JVM
-```
-
-## Exercice
-
-### Étape 1: Créer un index de test
-
-```bash
-PUT /logs-segments-test
+PUT /test-optimization
 {
   "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "refresh_interval": "1s"
+    "number_of_shards": 2,
+    "number_of_replicas": 0
+  }
+}
+
+POST /_bulk
+{"index":{"_index":"test-optimization"}}
+{"message":"test 1","value":1}
+{"index":{"_index":"test-optimization"}}
+{"message":"test 2","value":2}
+{"index":{"_index":"test-optimization"}}
+{"message":"test 3","value":3}
+{"index":{"_index":"test-optimization"}}
+{"message":"test 4","value":4}
+{"index":{"_index":"test-optimization"}}
+{"message":"test 5","value":5}
+
+# Force refresh
+POST /test-optimization/_refresh
+```
+
+2. Check segment info:
+```bash
+GET /_cat/segments/test-optimization?v&h=index,shard,segment,docs.count,size
+
+GET /test-optimization/_stats/segments
+```
+
+3. Force merge:
+```bash
+POST /test-optimization/_forcemerge?max_num_segments=1
+
+# Check segments again
+GET /_cat/segments/test-optimization?v
+```
+
+4. Clone an index:
+```bash
+# Make source read-only
+PUT /test-optimization/_settings
+{
+  "settings": {
+    "index.blocks.write": true
+  }
+}
+
+# Clone
+POST /test-optimization/_clone/test-optimization-clone
+
+# Verify
+GET /_cat/indices/test-optimization*?v
+```
+
+5. Reindex with transformation:
+```bash
+POST /_reindex
+{
+  "source": {
+    "index": "test-optimization"
+  },
+  "dest": {
+    "index": "test-optimization-v2"
+  },
+  "script": {
+    "source": "ctx._source.value_doubled = ctx._source.value * 2"
+  }
+}
+
+GET /test-optimization-v2/_search
+```
+
+6. Clean up write block:
+```bash
+PUT /test-optimization/_settings
+{
+  "settings": {
+    "index.blocks.write": false
   }
 }
 ```
 
-### Étape 2: Indexer quelques documents
-
-```bash
-POST /_bulk
-{"index":{"_index":"logs-segments-test"}}
-{"@timestamp":"2025-01-15T10:00:00.000Z","message":"Log 1"}
-{"index":{"_index":"logs-segments-test"}}
-{"@timestamp":"2025-01-15T10:00:01.000Z","message":"Log 2"}
-{"index":{"_index":"logs-segments-test"}}
-{"@timestamp":"2025-01-15T10:00:02.000Z","message":"Log 3"}
-```
-
-### Étape 3: Voir les segments
-
-```bash
-GET /_cat/segments/logs-segments-test?v
-```
-
-**Observer** :
-- `segment` : nom du segment
-- `generation` : numéro de génération
-- `docs.count` : nombre de documents
-- `size` : taille du segment
-
-### Étape 4: Forcer un refresh et voir les nouveaux segments
-
-```bash
-# Indexer plus de documents
-POST /logs-segments-test/_doc
-{"@timestamp":"2025-01-15T10:01:00.000Z","message":"Log 4"}
-
-# Forcer un refresh
-POST /logs-segments-test/_refresh
-
-# Voir les segments
-GET /_cat/segments/logs-segments-test?v
-```
-
-### Étape 5: Force merge
-
-```bash
-# Fusionner tous les segments en 1 seul
-POST /logs-segments-test/_forcemerge?max_num_segments=1
-
-# Vérifier le résultat
-GET /_cat/segments/logs-segments-test?v
-```
-
-### Impact des segments
-
-| Nombre de segments | Impact |
-|-------------------|--------|
-| Peu (1-5) | Recherches rapides |
-| Beaucoup (>50) | Overhead mémoire, recherches lentes |
-| Après force merge | Optimal pour lecture |
-
-### Validation
-
-✅ Comprendre le cycle de vie des segments
+**Challenge**:
+- What's the difference between clone and reindex?
+- When would you use force merge? When should you avoid it?
+- Create a reindex that only copies documents where value > 2
 
 ---
 
-# Lab 7.2: Configuration des Slowlogs
+# Part 9: Operating and Troubleshooting
 
-**Topic**: Operating et Troubleshooting
-**Durée**: 20 minutes
+## Exercise 9.1: Comprehensive Cluster Diagnostics
 
-## Objectif
+**Objective**: Master cluster health monitoring.
 
-Configurer les slowlogs pour identifier les requêtes lentes.
+**Instructions**:
 
-## Contexte Parkki
-
-Les slowlogs sont essentiels pour identifier pourquoi certaines requêtes prennent du temps.
-
-## Exercice
-
-### Étape 1: Configurer les slowlogs sur un index
-
+1. Full cluster health check:
 ```bash
-PUT /logs-search/_settings
+# Basic health
+GET /_cluster/health
+
+# Detailed health with shard info
+GET /_cluster/health?level=shards
+
+# Wait for status
+GET /_cluster/health?wait_for_status=green&timeout=30s
+```
+
+2. Node diagnostics:
+```bash
+# All nodes with key metrics
+GET /_cat/nodes?v&h=name,ip,heap.percent,ram.percent,cpu,load_1m,load_5m,disk.used_percent,node.role,master
+
+# Node stats
+GET /_nodes/stats?filter_path=nodes.*.name,nodes.*.indices.indexing,nodes.*.indices.search,nodes.*.jvm.mem
+
+# Hot threads
+GET /_nodes/hot_threads
+```
+
+3. Index diagnostics:
+```bash
+# All indices sorted by size
+GET /_cat/indices?v&s=store.size:desc&h=index,health,status,pri,rep,docs.count,docs.deleted,store.size,pri.store.size
+
+# Index stats
+GET /_stats?filter_path=_all.primaries
+```
+
+4. Shard analysis:
+```bash
+# All shards with details
+GET /_cat/shards?v&h=index,shard,prirep,state,docs,store,ip,node,unassigned.reason&s=state
+
+# Unassigned shards only
+GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason&s=state:desc
+
+# Allocation explanation
+GET /_cluster/allocation/explain
+```
+
+5. Task and pending operations:
+```bash
+# Current tasks
+GET /_tasks
+
+# Pending cluster tasks
+GET /_cluster/pending_tasks
+
+# Cancellable tasks
+GET /_tasks?actions=*search*
+```
+
+**Challenge**:
+- Identify any nodes with high CPU or memory usage
+- Check if there are any unassigned shards and explain why
+- Monitor the indexing rate across all indices
+
+---
+
+## Exercise 9.2: JVM and Memory Deep Dive
+
+**Objective**: Diagnose and understand JVM behavior.
+
+**Instructions**:
+
+1. Heap analysis:
+```bash
+# Current heap usage
+GET /_cat/nodes?v&h=name,heap.percent,heap.current,heap.max,ram.percent,ram.current,ram.max
+
+# Detailed JVM stats
+GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.mem,nodes.*.jvm.gc.collectors
+```
+
+2. GC analysis:
+```bash
+# GC statistics
+GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.gc
+
+# Calculate GC time percentage (look at collection_time_in_millis)
+GET /_nodes/stats?filter_path=nodes.*.jvm.gc.collectors,nodes.*.jvm.uptime_in_millis
+```
+
+3. Circuit breakers:
+```bash
+# Circuit breaker status
+GET /_nodes/stats/breaker
+
+# Current limits
+GET /_cluster/settings?include_defaults=true&filter_path=defaults.indices.breaker
+```
+
+4. Cache analysis:
+```bash
+# Fielddata cache
+GET /_cat/fielddata?v&h=node,field,size
+
+# All caches
+GET /_nodes/stats/indices?filter_path=nodes.*.indices.fielddata,nodes.*.indices.query_cache,nodes.*.indices.request_cache
+
+# Clear caches (use carefully!)
+# POST /_cache/clear
+```
+
+5. Memory pools:
+```bash
+# Detailed memory breakdown
+GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.pools
+```
+
+**Challenge**:
+- What percentage of heap is used for fielddata?
+- Which circuit breaker is closest to its limit?
+- Calculate the cache hit ratio for the query cache
+
+---
+
+## Exercise 9.3: Query Performance Analysis
+
+**Objective**: Identify and fix slow queries.
+
+**Instructions**:
+
+1. Configure slow logs:
+```bash
+PUT /articles/_settings
 {
   "index.search.slowlog.threshold.query.warn": "5s",
   "index.search.slowlog.threshold.query.info": "2s",
-  "index.search.slowlog.threshold.query.debug": "1s",
-  "index.search.slowlog.threshold.query.trace": "500ms",
+  "index.search.slowlog.threshold.query.debug": "500ms",
+  "index.search.slowlog.threshold.query.trace": "200ms",
   "index.search.slowlog.threshold.fetch.warn": "1s",
   "index.search.slowlog.threshold.fetch.info": "500ms",
   "index.indexing.slowlog.threshold.index.warn": "10s",
@@ -3478,1036 +2909,554 @@ PUT /logs-search/_settings
 }
 ```
 
-### Étape 2: Vérifier la configuration
-
+2. Profile a complex query:
 ```bash
-GET /logs-search/_settings?filter_path=**.slowlog
-```
-
-### Étape 3: Exécuter une requête complexe
-
-```bash
-GET /logs-search/_search
+GET /articles/_search
 {
+  "profile": true,
   "query": {
     "bool": {
       "must": [
-        { "match": { "message": "error connection timeout" } }
+        { "match": { "content": "parking management technology" } }
+      ],
+      "should": [
+        { "term": { "category": "technology" } },
+        { "range": { "views": { "gte": 1000 } } }
       ],
       "filter": [
-        { "range": { "@timestamp": { "gte": "now-1d" } } }
+        { "range": { "published_at": { "gte": "2025-01-01" } } }
       ]
     }
   },
   "aggs": {
-    "par_level": {
-      "terms": { "field": "level" }
-    },
-    "par_service": {
-      "terms": { "field": "service" }
+    "by_category": {
+      "terms": { "field": "category" }
     }
   }
 }
 ```
 
-### Étape 4: Où trouver les slowlogs
-
-**Elastic Cloud** :
-- Stack Monitoring > Logs
-- Ou via l'API logs
-
-**Self-hosted** :
+3. Analyze the profile output:
 ```bash
-# Emplacement typique
-/var/log/elasticsearch/<cluster_name>_index_search_slowlog.json
-/var/log/elasticsearch/<cluster_name>_index_indexing_slowlog.json
+# The profile response shows:
+# - Time spent in each query component
+# - Breakdown of rewrite, score, build_scorer, etc.
+# - Which parts are slowest
 ```
 
-### Étape 5: Configurer via template pour tous les index
-
+4. Explain query scoring:
 ```bash
-PUT /_index_template/logs-slowlog-template
+GET /articles/_explain/1
 {
-  "index_patterns": ["logs-*"],
-  "priority": 100,
-  "template": {
-    "settings": {
-      "index.search.slowlog.threshold.query.warn": "5s",
-      "index.search.slowlog.threshold.query.info": "2s",
-      "index.indexing.slowlog.threshold.index.warn": "10s"
+  "query": {
+    "match": {
+      "content": "parking management"
     }
   }
 }
 ```
 
-### Seuils recommandés pour Parkki
-
-| Type | Warn | Info |
-|------|------|------|
-| Query | 5s | 2s |
-| Fetch | 1s | 500ms |
-| Indexing | 10s | 5s |
-
-### Validation
-
-✅ Savoir configurer et utiliser les slowlogs
-
----
-
-# Lab 7.3: Debug des Shards Non Assignés
-
-**Topic**: Operating et Troubleshooting
-**Durée**: 25 minutes
-
-## Objectif
-
-Diagnostiquer et résoudre les problèmes de shards non assignés.
-
-## Contexte Parkki
-
-Un cluster "yellow" ou "red" indique des shards non assignés. Savoir les diagnostiquer est critique.
-
-## Exercice
-
-### Étape 1: Voir l'état du cluster
-
+5. Search templates for optimization:
 ```bash
-GET /_cluster/health
-```
-
-### Étape 2: Identifier les shards non assignés
-
-```bash
-GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason&s=state
-```
-
-**États possibles** :
-- `STARTED` : OK
-- `INITIALIZING` : En cours d'initialisation
-- `RELOCATING` : En cours de déplacement
-- `UNASSIGNED` : Non assigné (problème !)
-
-### Étape 3: Comprendre pourquoi un shard n'est pas assigné
-
-```bash
-GET /_cluster/allocation/explain
+# Create a search template
+PUT /_scripts/parking-search
 {
-  "index": "logs-search",
-  "shard": 0,
-  "primary": false
-}
-```
-
-**Ou automatiquement pour le premier shard non assigné** :
-```bash
-GET /_cluster/allocation/explain
-```
-
-### Étape 4: Causes courantes et solutions
-
-| Raison | Cause | Solution |
-|--------|-------|----------|
-| `CLUSTER_RECOVERED` | Cluster en recovery | Attendre |
-| `INDEX_CREATED` | Index vient d'être créé | Attendre |
-| `NODE_LEFT` | Nœud parti | Attendre le retour ou réassigner |
-| `ALLOCATION_FAILED` | Échec d'allocation | Vérifier les logs |
-| `NO_VALID_SHARD_COPY` | Pas de copie valide | Données potentiellement perdues |
-| `DISK_THRESHOLD` | Watermark atteint | Libérer de l'espace |
-
-### Étape 5: Simuler un problème de replica (single-node)
-
-```bash
-# Créer un index avec replica
-PUT /test-unassigned
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 1
-  }
-}
-
-# Vérifier - le replica sera UNASSIGNED car on n'a qu'un nœud
-GET /_cat/shards/test-unassigned?v
-```
-
-### Étape 6: Résoudre en ajustant les replicas
-
-```bash
-PUT /test-unassigned/_settings
-{
-  "number_of_replicas": 0
-}
-
-# Vérifier
-GET /_cat/shards/test-unassigned?v
-GET /_cluster/health
-```
-
-### Étape 7: Forcer une réallocation (cas extrême)
-
-```bash
-# Réassigner un shard manuellement (à utiliser avec précaution !)
-POST /_cluster/reroute
-{
-  "commands": [
-    {
-      "allocate_replica": {
-        "index": "logs-search",
-        "shard": 0,
-        "node": "node-1"
-      }
-    }
-  ]
-}
-```
-
-### Validation
-
-✅ Savoir diagnostiquer et résoudre les problèmes de shards
-
----
-
-# Lab 7.4: Gestion de la Mémoire JVM
-
-**Topic**: Operating et Troubleshooting
-**Durée**: 25 minutes
-
-## Objectif
-
-Comprendre et diagnostiquer les problèmes de mémoire JVM.
-
-## Contexte Parkki
-
-Les problèmes JVM sont votre principal souci. Ce lab est critique.
-
-## Exercice
-
-### Étape 1: Voir l'utilisation de la heap
-
-```bash
-GET /_cat/nodes?v&h=name,heap.percent,heap.current,heap.max,ram.percent
-```
-
-### Étape 2: Stats JVM détaillées
-
-```bash
-GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem
-```
-
-**Champs importants** :
-- `heap_used_percent` : % de heap utilisée
-- `heap_used_in_bytes` : Heap utilisée
-- `heap_max_in_bytes` : Heap max
-
-### Étape 3: Voir le Garbage Collection
-
-```bash
-GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.gc
-```
-
-**Observer** :
-- `collection_count` : Nombre de GC
-- `collection_time_in_millis` : Temps passé en GC
-
-### Étape 4: Seuils critiques
-
-| Métrique | OK | Attention | Critique |
-|----------|----|-----------||----------|
-| Heap % | < 75% | 75-85% | > 85% |
-| GC time | < 5% | 5-10% | > 10% |
-
-### Étape 5: Voir la configuration JVM
-
-```bash
-GET /_nodes?filter_path=nodes.*.jvm.mem.heap_max_in_bytes,nodes.*.jvm.mem.heap_init_in_bytes
-```
-
-### Étape 6: Recommandations JVM
-
-```
-Configuration recommandée :
-- Heap = 50% de la RAM disponible
-- Max heap = 31 GB (compressed oops)
-- Min heap = Max heap (éviter resize)
-
-Pour un nœud avec 16 GB RAM :
-- Heap : 8 GB
-- ES_JAVA_OPTS="-Xms8g -Xmx8g"
-```
-
-### Étape 7: Hot threads (debug performance)
-
-```bash
-GET /_nodes/hot_threads
-```
-
-Cette API montre les threads les plus actifs - utile pour diagnostiquer les pics CPU.
-
-### Symptômes et solutions JVM
-
-| Symptôme | Cause probable | Solution |
-|----------|----------------|----------|
-| Heap > 85% constant | Trop de données | Réduire shards, augmenter refresh_interval |
-| GC fréquents | Fielddata, trop de shards | Utiliser keyword, réduire shards |
-| OOM (Out of Memory) | Heap insuffisante | Augmenter heap (max 31GB) |
-| Latence variable | GC stop-the-world | Optimiser mapping, réduire fielddata |
-
-### Validation
-
-✅ Savoir diagnostiquer les problèmes JVM
-
----
-
-# Lab 7.5: Field Data Cache
-
-**Topic**: Operating et Troubleshooting
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre et surveiller le Field Data Cache.
-
-## Contexte Parkki
-
-Le fielddata est souvent la cause cachée des problèmes JVM.
-
-## Concepts
-
-```
-Fielddata = Cache mémoire pour :
-- Aggregations sur champs text (à éviter !)
-- Scripts sur champs text
-- Tri sur champs text
-
-Problème : Le fielddata peut exploser la heap !
-```
-
-## Exercice
-
-### Étape 1: Voir l'utilisation du fielddata
-
-```bash
-GET /_cat/fielddata?v
-```
-
-### Étape 2: Fielddata par champ
-
-```bash
-GET /_cat/fielddata?v&fields=*
-```
-
-### Étape 3: Stats détaillées du fielddata
-
-```bash
-GET /_nodes/stats/indices/fielddata?fields=*
-```
-
-### Étape 4: Simuler un problème de fielddata
-
-```bash
-# Créer un index avec un champ text
-PUT /test-fielddata
-{
-  "mappings": {
-    "properties": {
-      "description": { "type": "text" }
-    }
-  }
-}
-
-# Indexer des documents
-POST /_bulk
-{"index":{"_index":"test-fielddata"}}
-{"description":"This is a test description for fielddata"}
-{"index":{"_index":"test-fielddata"}}
-{"description":"Another description to test fielddata cache"}
-```
-
-### Étape 5: Essayer une aggregation sur text (génère une erreur)
-
-```bash
-GET /test-fielddata/_search
-{
-  "size": 0,
-  "aggs": {
-    "descriptions": {
-      "terms": { "field": "description" }
-    }
-  }
-}
-```
-
-**Résultat** : Erreur ! Fielddata désactivé par défaut sur les champs text.
-
-### Étape 6: Solution correcte - utiliser keyword
-
-```bash
-PUT /test-fielddata-fixed
-{
-  "mappings": {
-    "properties": {
-      "description": {
-        "type": "text",
-        "fields": {
-          "keyword": { "type": "keyword" }
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "must": [
+            { "match": { "content": "{{query_text}}" } }
+          ],
+          "filter": [
+            { "range": { "published_at": { "gte": "{{from_date}}" } } }
+          ]
         }
       }
     }
   }
 }
 
-POST /test-fielddata-fixed/_doc
-{"description":"Test description"}
+# Use the template
+GET /articles/_search/template
+{
+  "id": "parking-search",
+  "params": {
+    "query_text": "parking",
+    "from_date": "2025-01-01"
+  }
+}
+```
 
-# Aggregation correcte sur le sous-champ keyword
-GET /test-fielddata-fixed/_search
+**Challenge**:
+- Which part of the profiled query takes the longest?
+- How would you optimize a query that's slow due to wildcards?
+- Create a search template for the most common search pattern
+
+---
+
+# Part 10: Cluster Audit
+
+## Exercise 10.1: Production Readiness Audit
+
+**Objective**: Perform a comprehensive cluster audit.
+
+**Instructions**:
+
+Create a complete audit by running these queries and documenting findings:
+
+1. **Cluster Configuration Audit**:
+```bash
+# Cluster settings
+GET /_cluster/settings?include_defaults=true&flat_settings=true
+
+# Check critical settings
+GET /_cluster/settings?include_defaults=true&filter_path=defaults.cluster.routing.allocation,defaults.indices.recovery
+
+# Node roles
+GET /_nodes?filter_path=nodes.*.roles,nodes.*.name
+```
+
+2. **Capacity Audit**:
+```bash
+# Disk usage
+GET /_cat/allocation?v
+
+# Shard count per node
+GET /_cat/nodes?v&h=name,node.role,shards,disk.used_percent
+
+# Index sizes
+GET /_cat/indices?v&s=store.size:desc&format=json
+```
+
+3. **Performance Audit**:
+```bash
+# Thread pool rejections
+GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected,completed&s=rejected:desc
+
+# Search and indexing stats
+GET /_stats/search,indexing?filter_path=_all.primaries
+
+# Segment memory
+GET /_cat/segments?v&h=index,shard,segment,size.memory&s=size.memory:desc
+```
+
+4. **Mapping Audit**:
+```bash
+# All mappings (check for text fields that should be keyword)
+GET /_all/_mapping
+
+# Field data usage (expensive text aggregations)
+GET /_cat/fielddata?v&format=json&s=size:desc
+```
+
+5. **Create Audit Report**:
+```bash
+# Summary query
+GET /_cluster/stats?filter_path=status,indices.count,indices.shards,indices.docs,nodes.count,nodes.os.mem
+```
+
+**Challenge**:
+- Document any findings that indicate potential issues
+- Calculate the documents per shard ratio (should be 200k-500k ideally)
+- Identify any indices that might need more/fewer shards
+
+---
+
+## Exercise 10.2: Security and Best Practices Audit
+
+**Objective**: Verify security configuration and best practices.
+
+**Instructions**:
+
+1. **Security Status**:
+```bash
+# Check if security is enabled
+GET /_xpack/security
+
+# List users (if security is enabled)
+GET /_security/user
+
+# List roles
+GET /_security/role
+```
+
+2. **Template Audit**:
+```bash
+# List all templates
+GET /_index_template
+
+# Check for conflicting patterns
+GET /_index_template/*?filter_path=index_templates.*.index_patterns
+```
+
+3. **ILM Audit**:
+```bash
+# All ILM policies
+GET /_ilm/policy
+
+# Indices with ILM issues
+GET /*/_ilm/explain?only_errors=true
+
+# ILM status
+GET /_ilm/status
+```
+
+4. **Snapshot Audit**:
+```bash
+# List repositories
+GET /_snapshot
+
+# Check snapshot status (if configured)
+# GET /_snapshot/my_repository/_status
+```
+
+5. **Best Practices Checklist**:
+```bash
+# Check refresh interval (should be 30s for logs)
+GET /_all/_settings?filter_path=*.settings.index.refresh_interval
+
+# Check replica count
+GET /_cat/indices?v&h=index,rep
+
+# Check for very large documents
+GET /_stats/store?filter_path=indices.*.primaries.store
+```
+
+**Challenge**:
+- Are all indices using appropriate refresh intervals?
+- Do all log indices have ILM policies attached?
+- Are there any templates without explicit mappings?
+
+---
+
+# Part 11: Monitoring with Elastic Stack
+
+## Exercise 11.1: Metricbeat Setup and Configuration
+
+**Objective**: Install and configure Metricbeat to monitor Elasticsearch.
+
+**Instructions**:
+
+1. Start Metricbeat with Docker:
+```bash
+docker run -d \
+  --name metricbeat \
+  --net elastic \
+  --user=root \
+  -e "ELASTICSEARCH_HOSTS=http://elasticsearch:9200" \
+  -e "KIBANA_HOST=http://kibana:5601" \
+  docker.elastic.co/beats/metricbeat:9.0.0 \
+  metricbeat -e -E setup.kibana.host=kibana:5601
+```
+
+2. Verify Metricbeat is sending data:
+```bash
+GET /metricbeat-*/_search
+{
+  "size": 5,
+  "sort": [{ "@timestamp": "desc" }]
+}
+
+GET /_cat/indices/metricbeat-*?v
+```
+
+3. Check Elasticsearch module metrics:
+```bash
+GET /metricbeat-*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "metricset.name": "node_stats" } }
+      ]
+    }
+  },
+  "size": 1,
+  "_source": ["elasticsearch.node.stats.*", "@timestamp"]
+}
+```
+
+4. Query system metrics:
+```bash
+GET /metricbeat-*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "metricset.name": "cpu" } }
+      ]
+    }
+  },
+  "size": 5,
+  "sort": [{ "@timestamp": "desc" }],
+  "_source": ["system.cpu.*", "@timestamp", "host.name"]
+}
+```
+
+5. Create a monitoring dashboard query:
+```bash
+GET /metricbeat-*/_search
 {
   "size": 0,
+  "query": {
+    "range": {
+      "@timestamp": { "gte": "now-1h" }
+    }
+  },
   "aggs": {
-    "descriptions": {
-      "terms": { "field": "description.keyword" }
+    "over_time": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "fixed_interval": "5m"
+      },
+      "aggs": {
+        "avg_cpu": {
+          "avg": { "field": "system.cpu.total.pct" }
+        },
+        "avg_memory": {
+          "avg": { "field": "system.memory.used.pct" }
+        }
+      }
     }
   }
 }
 ```
 
-### Étape 7: Limiter le fielddata cache
+**Challenge**:
+- Find the peak CPU usage in the last hour
+- Calculate the average heap usage percentage for Elasticsearch nodes
+- Create an aggregation showing disk I/O over time
 
+---
+
+## Exercise 11.2: Stack Monitoring with Self-Monitoring
+
+**Objective**: Enable and use Elasticsearch self-monitoring.
+
+**Instructions**:
+
+1. Check monitoring settings:
 ```bash
-# Configuration cluster (à faire avec précaution)
-PUT /_cluster/settings
+GET /_cluster/settings?include_defaults=true&filter_path=*.xpack.monitoring
+
+GET /_xpack/usage?filter_path=monitoring
+```
+
+2. View monitoring indices:
+```bash
+GET /_cat/indices/.monitoring-*?v&s=index
+
+GET /.monitoring-es-*/_search
 {
-  "transient": {
-    "indices.fielddata.cache.size": "20%"
+  "size": 1,
+  "sort": [{ "timestamp": "desc" }]
+}
+```
+
+3. Query node statistics from monitoring:
+```bash
+GET /.monitoring-es-*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "type": "node_stats" } },
+        { "range": { "timestamp": { "gte": "now-15m" } } }
+      ]
+    }
+  },
+  "size": 1,
+  "_source": ["node_stats.jvm.*", "node_stats.os.*", "timestamp"]
+}
+```
+
+4. Query index statistics:
+```bash
+GET /.monitoring-es-*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "type": "index_stats" } }
+      ]
+    }
+  },
+  "size": 5,
+  "sort": [{ "timestamp": "desc" }],
+  "_source": ["index_stats.index", "index_stats.primaries.*"]
+}
+```
+
+5. Create a health overview:
+```bash
+GET /.monitoring-es-*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "type": "cluster_stats" } },
+        { "range": { "timestamp": { "gte": "now-1h" } } }
+      ]
+    }
+  },
+  "aggs": {
+    "health_over_time": {
+      "date_histogram": {
+        "field": "timestamp",
+        "fixed_interval": "5m"
+      },
+      "aggs": {
+        "status": {
+          "terms": { "field": "cluster_stats.status" }
+        }
+      }
+    }
   }
 }
 ```
 
-### Points clés pour Parkki
-
-| Problème | Solution |
-|----------|----------|
-| Aggregation sur text | Utiliser keyword |
-| Fielddata élevé | Vérifier les mappings |
-| Heap surchargée | Limiter fielddata cache |
-
-### Validation
-
-✅ Comprendre et éviter les problèmes de fielddata
+**Challenge**:
+- How often has the cluster status changed in the last 24 hours?
+- Find the index with the highest document count from monitoring data
+- Calculate the total indexing rate across all nodes
 
 ---
 
-# Lab 7.6: CAT APIs pour le Troubleshooting
+## Exercise 11.3: Custom Monitoring Queries
 
-**Topic**: Operating et Troubleshooting
-**Durée**: 15 minutes
+**Objective**: Build custom monitoring and alerting queries.
 
-## Objectif
+**Instructions**:
 
-Maîtriser les CAT APIs pour le diagnostic rapide.
-
-## Exercice
-
-### Étape 1: Santé du cluster
-
+1. Create a monitoring index for custom metrics:
 ```bash
-GET /_cat/health?v
-```
-
-### Étape 2: Nœuds avec métriques clés
-
-```bash
-GET /_cat/nodes?v&h=name,ip,heap.percent,ram.percent,cpu,load_1m,node.role
-```
-
-### Étape 3: Indices triés par taille
-
-```bash
-GET /_cat/indices?v&h=index,health,pri,rep,docs.count,store.size&s=store.size:desc
-```
-
-### Étape 4: Shards avec leur état
-
-```bash
-GET /_cat/shards?v&h=index,shard,prirep,state,docs,store,node&s=state
-```
-
-### Étape 5: Allocation disque
-
-```bash
-GET /_cat/allocation?v&h=node,shards,disk.indices,disk.used,disk.avail,disk.percent
-```
-
-### Étape 6: Thread pools
-
-```bash
-GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected&s=rejected:desc
-```
-
-### Étape 7: Pending tasks
-
-```bash
-GET /_cat/pending_tasks?v
-```
-
-### Étape 8: Recovery en cours
-
-```bash
-GET /_cat/recovery?v&active_only=true
-```
-
-### Cheatsheet CAT APIs
-
-| Commande | Usage |
-|----------|-------|
-| `_cat/health` | État général du cluster |
-| `_cat/nodes` | Ressources des nœuds |
-| `_cat/indices` | Liste et taille des index |
-| `_cat/shards` | Allocation des shards |
-| `_cat/allocation` | Espace disque |
-| `_cat/thread_pool` | Rejections |
-| `_cat/pending_tasks` | Tâches en attente |
-| `_cat/recovery` | Recoveries en cours |
-| `_cat/segments` | Segments par shard |
-| `_cat/fielddata` | Utilisation fielddata |
-
-### Validation
-
-✅ Connaître les CAT APIs essentielles pour le troubleshooting
-
----
-
-# Lab 8.1: Cluster Health API en Détail
-
-**Topic**: Monitoring approfondi
-**Durée**: 20 minutes
-
-## Objectif
-
-Maîtriser l'API Cluster Health pour le monitoring.
-
-## Exercice
-
-### Étape 1: Santé globale du cluster
-
-```bash
-GET /_cluster/health
-```
-
-**Champs importants** :
-- `status` : green/yellow/red
-- `number_of_nodes` : Nombre de nœuds
-- `active_primary_shards` : Shards primaires actifs
-- `active_shards` : Total shards actifs
-- `unassigned_shards` : Shards non assignés
-
-### Étape 2: Santé par index
-
-```bash
-GET /_cluster/health?level=indices
-```
-
-### Étape 3: Santé par shard
-
-```bash
-GET /_cluster/health?level=shards
-```
-
-### Étape 4: Attendre un état spécifique
-
-```bash
-# Attendre que le cluster soit green (timeout 30s)
-GET /_cluster/health?wait_for_status=green&timeout=30s
-
-# Attendre qu'il n'y ait plus de relocating shards
-GET /_cluster/health?wait_for_no_relocating_shards=true&timeout=30s
-```
-
-### Étape 5: Cluster stats complets
-
-```bash
-GET /_cluster/stats?human
-```
-
-### Étape 6: Filtrer les informations
-
-```bash
-GET /_cluster/stats?filter_path=indices.count,indices.shards,nodes.count
-```
-
-### Interprétation des états
-
-| Status | Signification | Action |
-|--------|---------------|--------|
-| **green** | Tous les shards assignés | RAS |
-| **yellow** | Primaires OK, replicas manquants | Vérifier replicas |
-| **red** | Primaires manquants | URGENT ! |
-
-### Validation
-
-✅ Savoir interpréter l'état de santé du cluster
-
----
-
-# Lab 8.2: Node Stats API
-
-**Topic**: Monitoring approfondi
-**Durée**: 25 minutes
-
-## Objectif
-
-Utiliser l'API Node Stats pour le monitoring détaillé.
-
-## Exercice
-
-### Étape 1: Stats complètes d'un nœud
-
-```bash
-GET /_nodes/stats
-```
-
-### Étape 2: Filtrer par catégorie
-
-```bash
-# JVM uniquement
-GET /_nodes/stats/jvm
-
-# Indices uniquement
-GET /_nodes/stats/indices
-
-# OS uniquement
-GET /_nodes/stats/os
-
-# Thread pools
-GET /_nodes/stats/thread_pool
-```
-
-### Étape 3: Stats JVM détaillées
-
-```bash
-GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem,nodes.*.jvm.gc
-```
-
-### Étape 4: Stats d'indexation
-
-```bash
-GET /_nodes/stats/indices/indexing
-```
-
-**Métriques clés** :
-- `index_total` : Documents indexés
-- `index_time_in_millis` : Temps d'indexation
-- `index_failed` : Échecs d'indexation
-
-### Étape 5: Stats de recherche
-
-```bash
-GET /_nodes/stats/indices/search
-```
-
-**Métriques clés** :
-- `query_total` : Nombre de requêtes
-- `query_time_in_millis` : Temps total de recherche
-- `fetch_total` : Nombre de fetch
-
-### Étape 6: Stats disque et FS
-
-```bash
-GET /_nodes/stats/fs
-```
-
-### Étape 7: Calculer les ratios de performance
-
-```bash
-# Voir toutes les stats d'indices
-GET /_nodes/stats/indices?filter_path=nodes.*.indices.indexing,nodes.*.indices.search,nodes.*.indices.merges
-```
-
-**Calculs utiles** :
-```
-Latence moyenne indexation = index_time_in_millis / index_total
-Latence moyenne recherche = query_time_in_millis / query_total
-Temps de merge = merges.total_time_in_millis
-```
-
-### Métriques à surveiller
-
-| Métrique | Seuil d'alerte | Action |
-|----------|----------------|--------|
-| `jvm.mem.heap_used_percent` | > 85% | Optimiser ou scale |
-| `thread_pool.*.rejected` | > 0 | Réduire charge |
-| `fs.total.available_in_bytes` | < 15% | Libérer espace |
-| `indices.indexing.index_failed` | > 0 | Investiguer erreurs |
-
-### Validation
-
-✅ Savoir extraire et interpréter les métriques des nœuds
-
----
-
-# Lab 8.3: Index Stats API
-
-**Topic**: Monitoring approfondi
-**Durée**: 20 minutes
-
-## Objectif
-
-Surveiller les performances au niveau des index.
-
-## Exercice
-
-### Étape 1: Stats d'un index spécifique
-
-```bash
-GET /logs-search/_stats
-```
-
-### Étape 2: Stats pour tous les index
-
-```bash
-GET /_stats
-```
-
-### Étape 3: Filtrer par type de stats
-
-```bash
-# Stats d'indexation
-GET /logs-search/_stats/indexing
-
-# Stats de recherche
-GET /logs-search/_stats/search
-
-# Stats de merge
-GET /logs-search/_stats/merge
-
-# Stats de refresh
-GET /logs-search/_stats/refresh
-
-# Stats de flush
-GET /logs-search/_stats/flush
-```
-
-### Étape 4: Stats combinées
-
-```bash
-GET /logs-search/_stats/indexing,search,merge
-```
-
-### Étape 5: Voir les segments d'un index
-
-```bash
-GET /logs-search/_segments
-```
-
-### Étape 6: Voir le mapping et settings
-
-```bash
-# Mapping
-GET /logs-search/_mapping
-
-# Settings
-GET /logs-search/_settings
-
-# Les deux
-GET /logs-search
-```
-
-### Métriques index à surveiller
-
-| Métrique | Description | Action si élevé |
-|----------|-------------|-----------------|
-| `primaries.indexing.index_time` | Temps d'indexation | Optimiser bulk |
-| `primaries.search.query_time` | Temps de recherche | Optimiser requêtes |
-| `primaries.merges.total_time` | Temps de merge | Augmenter refresh_interval |
-| `primaries.refresh.total_time` | Temps de refresh | Augmenter refresh_interval |
-
-### Validation
-
-✅ Savoir surveiller les performances d'un index
-
----
-
-# Lab 8.4: Cluster Allocation Explain
-
-**Topic**: Monitoring approfondi
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre en détail pourquoi les shards sont (ou ne sont pas) alloués.
-
-## Exercice
-
-### Étape 1: Explication automatique (premier shard non assigné)
-
-```bash
-GET /_cluster/allocation/explain
-```
-
-### Étape 2: Explication pour un shard spécifique
-
-```bash
-GET /_cluster/allocation/explain
+PUT /parkki-metrics
 {
-  "index": "logs-search",
-  "shard": 0,
-  "primary": true
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "metric_type": { "type": "keyword" },
+      "parking_id": { "type": "keyword" },
+      "value": { "type": "double" },
+      "unit": { "type": "keyword" },
+      "tags": { "type": "keyword" }
+    }
+  }
 }
 ```
 
-### Étape 3: Comprendre la réponse
-
-**Champs importants** :
-- `current_state` : État actuel du shard
-- `unassigned_info.reason` : Raison du non-assignement
-- `can_allocate` : Si le shard peut être alloué
-- `allocate_explanation` : Explication détaillée
-- `node_allocation_decisions` : Décisions par nœud
-
-### Étape 4: Voir l'allocation sur un nœud spécifique
-
+2. Index sample monitoring data:
 ```bash
-GET /_cluster/allocation/explain
+POST /_bulk
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:00:00Z","metric_type":"occupancy","parking_id":"central","value":78.5,"unit":"percent","tags":["production","paris"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:05:00Z","metric_type":"occupancy","parking_id":"central","value":82.3,"unit":"percent","tags":["production","paris"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:10:00Z","metric_type":"occupancy","parking_id":"central","value":95.1,"unit":"percent","tags":["production","paris"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:00:00Z","metric_type":"response_time","parking_id":"central","value":45,"unit":"ms","tags":["api","production"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:05:00Z","metric_type":"response_time","parking_id":"central","value":120,"unit":"ms","tags":["api","production"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:10:00Z","metric_type":"response_time","parking_id":"central","value":2500,"unit":"ms","tags":["api","production"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:00:00Z","metric_type":"error_rate","parking_id":"central","value":0.5,"unit":"percent","tags":["api","production"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:05:00Z","metric_type":"error_rate","parking_id":"central","value":1.2,"unit":"percent","tags":["api","production"]}
+{"index":{"_index":"parkki-metrics"}}
+{"@timestamp":"2025-01-15T10:10:00Z","metric_type":"error_rate","parking_id":"central","value":15.8,"unit":"percent","tags":["api","production"]}
+```
+
+3. Detect anomalies (high values):
+```bash
+GET /parkki-metrics/_search
 {
-  "index": "logs-search",
-  "shard": 0,
-  "primary": false,
-  "current_node": "node-1"
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "metric_type": "response_time" } },
+        { "range": { "value": { "gte": 1000 } } }
+      ]
+    }
+  }
 }
 ```
 
-### Étape 5: Raisons courantes de non-allocation
-
-| Raison | Description | Solution |
-|--------|-------------|----------|
-| `INDEX_CREATED` | Index créé récemment | Attendre |
-| `CLUSTER_RECOVERED` | Cluster en recovery | Attendre |
-| `DANGLING_INDEX_IMPORTED` | Index dangling importé | Vérifier |
-| `NEW_INDEX_RESTORED` | Restore en cours | Attendre |
-| `REPLICA_ADDED` | Replica ajouté | Attendre |
-| `ALLOCATION_FAILED` | Échec d'allocation | Investiguer |
-| `NODE_LEFT` | Nœud parti | Attendre retour |
-| `REROUTE_CANCELLED` | Reroute annulé | Réessayer |
-
-### Étape 6: Comprendre les décisions par nœud
-
+4. Calculate percentiles for SLA monitoring:
 ```bash
-GET /_cluster/allocation/explain?include_disk_info=true
+GET /parkki-metrics/_search
 {
-  "index": "logs-search",
-  "shard": 0,
-  "primary": false
+  "size": 0,
+  "query": {
+    "term": { "metric_type": "response_time" }
+  },
+  "aggs": {
+    "response_percentiles": {
+      "percentiles": {
+        "field": "value",
+        "percents": [50, 90, 95, 99]
+      }
+    },
+    "over_threshold": {
+      "filter": {
+        "range": { "value": { "gte": 500 } }
+      }
+    }
+  }
 }
 ```
 
-### Validation
+5. Create a health score aggregation:
+```bash
+GET /parkki-metrics/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_parking": {
+      "terms": { "field": "parking_id" },
+      "aggs": {
+        "by_metric": {
+          "terms": { "field": "metric_type" },
+          "aggs": {
+            "latest": {
+              "top_hits": {
+                "size": 1,
+                "sort": [{ "@timestamp": "desc" }],
+                "_source": ["value", "@timestamp"]
+              }
+            },
+            "avg_value": { "avg": { "field": "value" } },
+            "max_value": { "max": { "field": "value" } }
+          }
+        }
+      }
+    }
+  }
+}
+```
 
-✅ Savoir diagnostiquer les problèmes d'allocation de shards
+**Challenge**:
+- Create a query that detects when error_rate exceeds 5%
+- Build an aggregation that shows the trend (increasing/decreasing) for each metric
+- Calculate the percentage of time response_time was above SLA (500ms)
 
 ---
 
-# Lab 8.5: Surveillance des Thread Pools
+# Part 12: Alerting with Watcher
 
-**Topic**: Monitoring approfondi
-**Durée**: 20 minutes
+## Exercise 12.1: Basic Watcher Alert
 
-## Objectif
+**Objective**: Create alerts for cluster and application issues.
 
-Surveiller les thread pools pour détecter les problèmes de saturation.
+**Instructions**:
 
-## Contexte Parkki
-
-Les rejections dans les thread pools indiquent une surcharge du cluster.
-
-## Exercice
-
-### Étape 1: Vue d'ensemble des thread pools
-
+1. Create a simple error rate alert:
 ```bash
-GET /_cat/thread_pool?v
-```
-
-### Étape 2: Filtrer les thread pools critiques
-
-```bash
-GET /_cat/thread_pool/write,search,bulk,get?v&h=node_name,name,active,queue,rejected,completed
-```
-
-### Étape 3: Stats détaillées des thread pools
-
-```bash
-GET /_nodes/stats/thread_pool?filter_path=nodes.*.thread_pool.write,nodes.*.thread_pool.search
-```
-
-### Étape 4: Configuration des thread pools
-
-```bash
-GET /_nodes?filter_path=nodes.*.thread_pool
-```
-
-### Étape 5: Surveiller en continu
-
-```bash
-# Exécuter plusieurs fois pour voir l'évolution
-GET /_cat/thread_pool/write,search?v&h=node_name,name,active,queue,rejected
-```
-
-### Thread pools importants
-
-| Pool | Usage | À surveiller |
-|------|-------|--------------|
-| `write` | Indexation | rejected > 0 |
-| `search` | Recherches | rejected > 0, queue élevée |
-| `bulk` | Bulk API | rejected > 0 |
-| `get` | Get documents | queue élevée |
-| `refresh` | Refresh | queue élevée |
-| `flush` | Flush to disk | queue élevée |
-
-### Étape 6: Que faire en cas de rejections
-
-| Thread Pool | Cause probable | Solution |
-|-------------|----------------|----------|
-| `write` | Trop d'indexation | Réduire bulk size, augmenter refresh_interval |
-| `search` | Trop de requêtes | Optimiser requêtes, ajouter nœuds |
-| `bulk` | Bulk trop fréquents | Augmenter intervalle entre bulks |
-| `get` | Trop de gets | Utiliser mget, cache applicatif |
-
-### Validation
-
-✅ Savoir surveiller et interpréter l'état des thread pools
-
----
-
-# Lab 8.6: Métriques Clés pour Dashboard
-
-**Topic**: Monitoring approfondi
-**Durée**: 25 minutes
-
-## Objectif
-
-Identifier et collecter les métriques essentielles pour un dashboard de monitoring.
-
-## Contexte Parkki
-
-Ces métriques permettent d'anticiper les problèmes avant qu'ils ne deviennent critiques.
-
-## Exercice
-
-### Étape 1: Script de collecte des métriques clés
-
-```bash
-# Santé du cluster
-GET /_cluster/health?filter_path=status,number_of_nodes,active_shards,unassigned_shards
-
-# JVM
-GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_used_percent
-
-# Disque
-GET /_cat/allocation?format=json&h=node,disk.percent
-
-# Thread pools
-GET /_cat/thread_pool/write,search?format=json&h=node_name,name,rejected
-
-# Indexing rate
-GET /_nodes/stats/indices/indexing?filter_path=nodes.*.indices.indexing.index_total
-
-# Search rate
-GET /_nodes/stats/indices/search?filter_path=nodes.*.indices.search.query_total
-```
-
-### Étape 2: Métriques avec seuils d'alerte
-
-| Métrique | Source | Seuil Warning | Seuil Critical |
-|----------|--------|---------------|----------------|
-| Cluster status | `_cluster/health` | yellow | red |
-| JVM Heap % | `_nodes/stats/jvm` | > 75% | > 85% |
-| Disk % | `_cat/allocation` | > 75% | > 85% |
-| Rejections | `_cat/thread_pool` | > 0 (alerte) | > 100 |
-| Unassigned shards | `_cluster/health` | > 0 | > 0 (primaires) |
-
-### Étape 3: Créer un endpoint de health check
-
-```bash
-# Check complet en une requête
-GET /_cluster/health?wait_for_status=yellow&timeout=5s
-```
-
-### Étape 4: Surveiller les latences
-
-```bash
-# Latence moyenne de recherche
-GET /_nodes/stats/indices/search?filter_path=nodes.*.indices.search.query_time_in_millis,nodes.*.indices.search.query_total
-
-# Latence moyenne d'indexation
-GET /_nodes/stats/indices/indexing?filter_path=nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.indexing.index_total
-```
-
-### Étape 5: Vérification rapide de l'état
-
-```bash
-# One-liner pour état rapide
-GET /_cat/nodes?v&h=name,heap.percent,cpu,disk.used_percent,node.role
-```
-
-### Dashboard recommandé pour Parkki
-
-```
-┌─────────────────────────────────────────────────────┐
-│  Cluster: parkki-prod    Status: ● GREEN            │
-├─────────────────────────────────────────────────────┤
-│  Nodes: 3    Indices: 45    Shards: 180            │
-├─────────────────────────────────────────────────────┤
-│  JVM Heap        │  Disk Usage      │  CPU          │
-│  ████████░░ 78%  │  ██████░░░░ 60%  │  ███░░░ 30%   │
-├─────────────────────────────────────────────────────┤
-│  Indexing: 15,234 docs/s    Search: 245 req/s      │
-│  Latency (p99): 450ms       Rejections: 0          │
-├─────────────────────────────────────────────────────┤
-│  Alertes actives: 0                                 │
-└─────────────────────────────────────────────────────┘
-```
-
-### Validation
-
-✅ Connaître les métriques essentielles pour le monitoring
-
----
-
-# Lab 9.1: Introduction au Watcher API
-
-**Topic**: Alerting
-**Durée**: 25 minutes
-
-## Objectif
-
-Comprendre la structure d'une watch et créer des alertes basiques.
-
-## Contexte Parkki
-
-L'alerting est critique pour anticiper les problèmes avant qu'ils n'impactent vos utilisateurs (JVM, disk, erreurs).
-
-## Structure d'une Watch
-
-```
-Watch
-├── trigger    → Quand exécuter ? (schedule)
-├── input      → Quelles données récupérer ? (search, http)
-├── condition  → Faut-il alerter ? (compare, script)
-└── actions    → Que faire ? (email, webhook, slack)
-```
-
-## Exercice
-
-### Étape 1: Vérifier que Watcher est disponible
-
-```bash
-GET /_watcher/stats
-```
-
-### Étape 2: Créer une watch simple (erreurs applicatives)
-
-```bash
-PUT /_watcher/watch/parkki-errors-watch
+PUT /_watcher/watch/high_error_rate
 {
   "trigger": {
     "schedule": {
@@ -4517,15 +3466,20 @@ PUT /_watcher/watch/parkki-errors-watch
   "input": {
     "search": {
       "request": {
-        "indices": ["logs-*"],
+        "indices": ["logs-parkki-*"],
         "body": {
           "size": 0,
           "query": {
             "bool": {
-              "filter": [
+              "must": [
                 { "term": { "level": "ERROR" } },
                 { "range": { "@timestamp": { "gte": "now-5m" } } }
               ]
+            }
+          },
+          "aggs": {
+            "error_count": {
+              "value_count": { "field": "level.keyword" }
             }
           }
         }
@@ -4534,64 +3488,24 @@ PUT /_watcher/watch/parkki-errors-watch
   },
   "condition": {
     "compare": {
-      "ctx.payload.hits.total.value": {
-        "gt": 10
+      "ctx.payload.aggregations.error_count.value": {
+        "gte": 10
       }
     }
   },
   "actions": {
-    "log_error": {
+    "log_alert": {
       "logging": {
-        "text": "ALERTE: {{ctx.payload.hits.total.value}} erreurs détectées dans les 5 dernières minutes!"
+        "text": "High error rate detected: {{ctx.payload.aggregations.error_count.value}} errors in last 5 minutes"
       }
     }
   }
 }
 ```
 
-### Étape 3: Voir la watch créée
-
+2. Create a cluster health alert:
 ```bash
-GET /_watcher/watch/parkki-errors-watch
-```
-
-### Étape 4: Exécuter la watch manuellement (test)
-
-```bash
-POST /_watcher/watch/parkki-errors-watch/_execute
-```
-
-### Étape 5: Voir le résultat d'exécution
-
-**Observer** :
-- `watch_record.result.condition.met` : true/false
-- `watch_record.result.actions` : actions exécutées
-
-### Validation
-
-✅ Comprendre la structure d'une watch
-
----
-
-# Lab 9.2: Watch pour Monitoring JVM
-
-**Topic**: Alerting
-**Durée**: 25 minutes
-
-## Objectif
-
-Créer une alerte sur l'utilisation de la heap JVM.
-
-## Contexte Parkki
-
-Les problèmes JVM sont votre souci principal. Cette alerte vous préviendra avant que ça ne devienne critique.
-
-## Exercice
-
-### Étape 1: Créer une watch JVM heap
-
-```bash
-PUT /_watcher/watch/parkki-jvm-heap-watch
+PUT /_watcher/watch/cluster_health_alert
 {
   "trigger": {
     "schedule": {
@@ -4603,168 +3517,73 @@ PUT /_watcher/watch/parkki-jvm-heap-watch
       "request": {
         "host": "localhost",
         "port": 9200,
-        "path": "/_nodes/stats/jvm",
-        "params": {
-          "filter_path": "nodes.*.jvm.mem.heap_used_percent,nodes.*.name"
-        }
+        "path": "/_cluster/health",
+        "scheme": "http"
       }
     }
   },
   "condition": {
-    "script": {
-      "source": """
-        for (node in ctx.payload.nodes.values()) {
-          if (node.jvm.mem.heap_used_percent > 85) {
-            return true;
-          }
-        }
-        return false;
-      """
+    "compare": {
+      "ctx.payload.status": {
+        "not_eq": "green"
+      }
     }
   },
   "actions": {
-    "log_jvm_alert": {
+    "log_alert": {
       "logging": {
-        "text": "ALERTE JVM: Heap > 85% détectée!"
+        "text": "Cluster health is {{ctx.payload.status}}! Unassigned shards: {{ctx.payload.unassigned_shards}}"
       }
     }
   }
 }
 ```
 
-### Étape 2: Tester la watch
-
+3. Check watcher status:
 ```bash
-POST /_watcher/watch/parkki-jvm-heap-watch/_execute
+GET /_watcher/stats
+
+GET /_watcher/watch/high_error_rate
+
+GET /_watcher/watch/cluster_health_alert
 ```
 
-### Étape 3: Voir l'historique des exécutions
+4. Execute a watch manually:
+```bash
+POST /_watcher/watch/high_error_rate/_execute
+{
+  "ignore_condition": true
+}
+```
 
+5. View watch history:
 ```bash
 GET /.watcher-history-*/_search
 {
   "query": {
-    "term": { "watch_id": "parkki-jvm-heap-watch" }
+    "term": { "watch_id": "high_error_rate" }
   },
   "sort": [{ "trigger_event.triggered_time": "desc" }],
   "size": 5
 }
 ```
 
-### Seuils JVM recommandés
-
-| Seuil | Action |
-|-------|--------|
-| > 75% | Warning - surveiller |
-| > 85% | Critical - intervenir |
-| > 95% | Emergency - action immédiate |
-
-### Validation
-
-✅ Savoir créer une alerte sur les métriques JVM
+**Challenge**:
+- Modify the error rate alert to also check for specific error codes
+- Create an alert that triggers when disk usage exceeds 80%
+- Add a throttle to prevent alert fatigue (max 1 alert per hour)
 
 ---
 
-# Lab 9.3: Watch pour Disk Watermarks
+## Exercise 12.2: Advanced Alerting with Conditions
 
-**Topic**: Alerting
-**Durée**: 20 minutes
+**Objective**: Create complex multi-condition alerts.
 
-## Objectif
+**Instructions**:
 
-Créer une alerte sur l'utilisation disque.
-
-## Contexte Parkki
-
-Les watermarks peuvent bloquer l'indexation. Il faut être alerté avant d'atteindre les seuils.
-
-## Exercice
-
-### Étape 1: Créer une watch disk
-
+1. Create an alert with multiple conditions:
 ```bash
-PUT /_watcher/watch/parkki-disk-watch
-{
-  "trigger": {
-    "schedule": {
-      "interval": "5m"
-    }
-  },
-  "input": {
-    "http": {
-      "request": {
-        "host": "localhost",
-        "port": 9200,
-        "path": "/_cat/allocation",
-        "params": {
-          "format": "json",
-          "h": "node,disk.percent"
-        }
-      }
-    }
-  },
-  "condition": {
-    "script": {
-      "source": """
-        for (node in ctx.payload) {
-          def diskPercent = Integer.parseInt(node['disk.percent'].replace('%', '').trim());
-          if (diskPercent > 80) {
-            return true;
-          }
-        }
-        return false;
-      """
-    }
-  },
-  "actions": {
-    "log_disk_alert": {
-      "logging": {
-        "text": "ALERTE DISK: Utilisation disque > 80%!"
-      }
-    }
-  }
-}
-```
-
-### Étape 2: Tester
-
-```bash
-POST /_watcher/watch/parkki-disk-watch/_execute
-```
-
-### Rappel des watermarks
-
-| Watermark | Seuil | Impact |
-|-----------|-------|--------|
-| Low | 85% | Nouveaux shards bloqués |
-| High | 90% | Shards relocalisés |
-| Flood | 95% | Index en READ-ONLY |
-
-### Validation
-
-✅ Savoir créer une alerte sur l'espace disque
-
----
-
-# Lab 9.4: Watch pour Thread Pool Rejections
-
-**Topic**: Alerting
-**Durée**: 20 minutes
-
-## Objectif
-
-Créer une alerte sur les rejections des thread pools.
-
-## Contexte Parkki
-
-Les rejections indiquent une surcharge. Il faut être alerté immédiatement.
-
-## Exercice
-
-### Étape 1: Créer une watch thread pool
-
-```bash
-PUT /_watcher/watch/parkki-threadpool-watch
+PUT /_watcher/watch/parking_capacity_alert
 {
   "trigger": {
     "schedule": {
@@ -4772,14 +3591,28 @@ PUT /_watcher/watch/parkki-threadpool-watch
     }
   },
   "input": {
-    "http": {
+    "search": {
       "request": {
-        "host": "localhost",
-        "port": 9200,
-        "path": "/_cat/thread_pool/write,search,bulk",
-        "params": {
-          "format": "json",
-          "h": "node_name,name,rejected"
+        "indices": ["parkki-metrics"],
+        "body": {
+          "size": 0,
+          "query": {
+            "bool": {
+              "must": [
+                { "term": { "metric_type": "occupancy" } },
+                { "range": { "@timestamp": { "gte": "now-10m" } } }
+              ]
+            }
+          },
+          "aggs": {
+            "by_parking": {
+              "terms": { "field": "parking_id" },
+              "aggs": {
+                "avg_occupancy": { "avg": { "field": "value" } },
+                "max_occupancy": { "max": { "field": "value" } }
+              }
+            }
+          }
         }
       }
     }
@@ -4787,8 +3620,9 @@ PUT /_watcher/watch/parkki-threadpool-watch
   "condition": {
     "script": {
       "source": """
-        for (pool in ctx.payload) {
-          if (pool.rejected != null && Integer.parseInt(pool.rejected) > 0) {
+        def buckets = ctx.payload.aggregations.by_parking.buckets;
+        for (bucket in buckets) {
+          if (bucket.max_occupancy.value >= 95) {
             return true;
           }
         }
@@ -4796,47 +3630,36 @@ PUT /_watcher/watch/parkki-threadpool-watch
       """
     }
   },
+  "transform": {
+    "script": {
+      "source": """
+        def alerts = [];
+        def buckets = ctx.payload.aggregations.by_parking.buckets;
+        for (bucket in buckets) {
+          if (bucket.max_occupancy.value >= 95) {
+            alerts.add([
+              'parking': bucket.key,
+              'occupancy': bucket.max_occupancy.value
+            ]);
+          }
+        }
+        return ['alerts': alerts, 'count': alerts.size()];
+      """
+    }
+  },
   "actions": {
-    "log_rejection_alert": {
+    "log_alert": {
       "logging": {
-        "text": "ALERTE THREADPOOL: Rejections détectées! Vérifier la charge du cluster."
+        "text": "Parking capacity critical! {{ctx.payload.count}} parking(s) at >95%: {{ctx.payload.alerts}}"
       }
     }
   }
 }
 ```
 
-### Étape 2: Tester
-
+2. Create a response time degradation alert:
 ```bash
-POST /_watcher/watch/parkki-threadpool-watch/_execute
-```
-
-### Validation
-
-✅ Savoir alerter sur les rejections thread pool
-
----
-
-# Lab 9.5: Watch avec Action Webhook
-
-**Topic**: Alerting
-**Durée**: 20 minutes
-
-## Objectif
-
-Configurer une action webhook pour envoyer des alertes vers un système externe.
-
-## Contexte Parkki
-
-En production, vous voudrez envoyer les alertes vers Slack, Teams, PagerDuty, etc.
-
-## Exercice
-
-### Étape 1: Créer une watch avec webhook (exemple Slack)
-
-```bash
-PUT /_watcher/watch/parkki-slack-alert
+PUT /_watcher/watch/response_time_degradation
 {
   "trigger": {
     "schedule": {
@@ -4844,16 +3667,126 @@ PUT /_watcher/watch/parkki-slack-alert
     }
   },
   "input": {
+    "chain": {
+      "inputs": [
+        {
+          "current": {
+            "search": {
+              "request": {
+                "indices": ["parkki-metrics"],
+                "body": {
+                  "size": 0,
+                  "query": {
+                    "bool": {
+                      "must": [
+                        { "term": { "metric_type": "response_time" } },
+                        { "range": { "@timestamp": { "gte": "now-5m" } } }
+                      ]
+                    }
+                  },
+                  "aggs": {
+                    "p95": { "percentiles": { "field": "value", "percents": [95] } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "baseline": {
+            "search": {
+              "request": {
+                "indices": ["parkki-metrics"],
+                "body": {
+                  "size": 0,
+                  "query": {
+                    "bool": {
+                      "must": [
+                        { "term": { "metric_type": "response_time" } },
+                        { "range": { "@timestamp": { "gte": "now-1h", "lte": "now-5m" } } }
+                      ]
+                    }
+                  },
+                  "aggs": {
+                    "p95": { "percentiles": { "field": "value", "percents": [95] } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "condition": {
+    "script": {
+      "source": """
+        def current_p95 = ctx.payload.current.aggregations.p95.values['95.0'];
+        def baseline_p95 = ctx.payload.baseline.aggregations.p95.values['95.0'];
+        return current_p95 > baseline_p95 * 2;
+      """
+    }
+  },
+  "actions": {
+    "log_alert": {
+      "logging": {
+        "text": "Response time degradation detected! Current P95 is more than 2x baseline."
+      }
+    }
+  }
+}
+```
+
+3. Activate/deactivate watches:
+```bash
+# Deactivate a watch
+PUT /_watcher/watch/high_error_rate/_deactivate
+
+# Activate a watch
+PUT /_watcher/watch/high_error_rate/_activate
+
+# Check status
+GET /_watcher/watch/high_error_rate
+```
+
+4. Delete a watch:
+```bash
+DELETE /_watcher/watch/response_time_degradation
+```
+
+**Challenge**:
+- Create an alert that detects sudden spikes (3x normal) in any metric
+- Build a watch that correlates high error rates with high response times
+- Add email action to send alerts (configure with your SMTP settings)
+
+---
+
+## Exercise 12.3: Alerting Best Practices
+
+**Objective**: Implement production-ready alerting patterns.
+
+**Instructions**:
+
+1. Create an alert with throttling:
+```bash
+PUT /_watcher/watch/throttled_error_alert
+{
+  "trigger": {
+    "schedule": {
+      "interval": "1m"
+    }
+  },
+  "input": {
     "search": {
       "request": {
-        "indices": ["logs-*"],
+        "indices": ["logs-parkki-*"],
         "body": {
           "size": 0,
           "query": {
             "bool": {
-              "filter": [
+              "must": [
                 { "term": { "level": "ERROR" } },
-                { "range": { "@timestamp": { "gte": "now-5m" } } }
+                { "range": { "@timestamp": { "gte": "now-1m" } } }
               ]
             }
           }
@@ -4863,1359 +3796,688 @@ PUT /_watcher/watch/parkki-slack-alert
   },
   "condition": {
     "compare": {
-      "ctx.payload.hits.total.value": {
-        "gt": 5
-      }
+      "ctx.payload.hits.total.value": { "gte": 5 }
     }
   },
+  "throttle_period": "30m",
   "actions": {
-    "notify_slack": {
-      "webhook": {
-        "scheme": "https",
-        "host": "hooks.slack.com",
-        "port": 443,
-        "method": "post",
-        "path": "/services/YOUR/SLACK/WEBHOOK",
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": """{"text": "🚨 Parkki Alert: {{ctx.payload.hits.total.value}} erreurs détectées dans les 5 dernières minutes!"}"""
-      }
-    },
-    "log_action": {
+    "log_alert": {
       "logging": {
-        "text": "Alerte envoyée: {{ctx.payload.hits.total.value}} erreurs"
+        "text": "Error threshold exceeded: {{ctx.payload.hits.total.value}} errors"
       }
     }
   }
 }
 ```
 
-**Note**: Remplacer `YOUR/SLACK/WEBHOOK` par votre vrai webhook.
-
-### Étape 2: Structure d'un webhook générique
-
+2. Create a watch with acknowledgement:
 ```bash
-PUT /_watcher/watch/parkki-generic-webhook
+PUT /_watcher/watch/critical_system_alert
 {
   "trigger": {
-    "schedule": { "interval": "5m" }
+    "schedule": {
+      "interval": "1m"
+    }
   },
   "input": {
-    "simple": {
-      "message": "Test webhook"
+    "http": {
+      "request": {
+        "host": "localhost",
+        "port": 9200,
+        "path": "/_cat/nodes?format=json&h=name,heap.percent"
+      }
     }
   },
   "condition": {
-    "always": {}
+    "script": {
+      "source": """
+        for (node in ctx.payload) {
+          if (node['heap.percent'] != null && Integer.parseInt(node['heap.percent']) > 90) {
+            return true;
+          }
+        }
+        return false;
+      """
+    }
   },
   "actions": {
-    "call_api": {
-      "webhook": {
-        "scheme": "https",
-        "host": "your-api.example.com",
-        "port": 443,
-        "method": "post",
-        "path": "/alerts",
-        "headers": {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_TOKEN"
-        },
-        "body": """{"alert": "parkki", "message": "{{ctx.payload.message}}"}"""
+    "log_critical": {
+      "logging": {
+        "text": "CRITICAL: Node heap usage above 90%!"
       }
     }
   }
 }
 ```
 
-### Validation
+3. Acknowledge an alert:
+```bash
+PUT /_watcher/watch/critical_system_alert/_ack
+```
 
-✅ Savoir configurer des webhooks pour les alertes
+4. View acknowledgement status:
+```bash
+GET /_watcher/watch/critical_system_alert?filter_path=status.actions
+```
+
+**Challenge**:
+- Implement an escalation pattern (warn -> critical -> page)
+- Create a maintenance window by deactivating watches on schedule
+- Build a watch that auto-resolves when the condition clears
 
 ---
 
-# Lab 9.6: Stack Beats - Metricbeat et Filebeat
+# Part 13: Security
 
-**Topic**: Alerting et Monitoring
-**Durée**: 30 minutes
+## Exercise 13.1: User and Role Management
 
-## Objectif
+**Objective**: Configure users, roles, and permissions.
 
-Comprendre et configurer Metricbeat et Filebeat pour collecter métriques et logs.
+**Note**: Security must be enabled for these exercises. If using the training Docker setup without security, these are simulation exercises.
 
-## Contexte Parkki
+**Instructions**:
 
-Les Beats sont essentiels pour :
-- **Metricbeat** : Collecter les métriques système et Elasticsearch
-- **Filebeat** : Collecter les logs applicatifs et Elasticsearch
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Serveurs Parkki                           │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │ Metricbeat  │  │  Filebeat   │  │  Filebeat   │          │
-│  │ (métriques) │  │   (logs)    │  │ (logs app)  │          │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘          │
-└─────────┼────────────────┼────────────────┼─────────────────┘
-          │                │                │
-          └────────────────┼────────────────┘
-                           ▼
-                  ┌─────────────────┐
-                  │  Elasticsearch  │
-                  └────────┬────────┘
-                           │
-                           ▼
-                  ┌─────────────────┐
-                  │     Kibana      │
-                  │ Stack Monitoring│
-                  └─────────────────┘
-```
-
-## Exercice
-
-### Partie 1: Metricbeat
-
-#### Étape 1: Lancer Metricbeat avec Docker
-
-```bash
-docker run -d \
-  --name metricbeat \
-  --net elastic \
-  --user root \
-  -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  -v /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro \
-  -v /proc:/hostfs/proc:ro \
-  -v /:/hostfs:ro \
-  -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 \
-  docker.elastic.co/beats/metricbeat:8.11.0 \
-  metricbeat -e -system.hostfs=/hostfs
-```
-
-#### Étape 2: Vérifier les index Metricbeat
-
-```bash
-GET /_cat/indices/metricbeat-*?v&s=index
-```
-
-#### Étape 3: Voir les métriques système
-
-```bash
-GET /metricbeat-*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "metricset.name": "cpu" } },
-        { "range": { "@timestamp": { "gte": "now-5m" } } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "desc" }],
-  "size": 5,
-  "_source": ["@timestamp", "system.cpu.user.pct", "system.cpu.system.pct", "host.name"]
-}
-```
-
-#### Étape 4: Voir les métriques mémoire
-
-```bash
-GET /metricbeat-*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "metricset.name": "memory" } },
-        { "range": { "@timestamp": { "gte": "now-5m" } } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "desc" }],
-  "size": 5,
-  "_source": ["@timestamp", "system.memory.used.pct", "system.memory.actual.used.bytes", "host.name"]
-}
-```
-
-#### Étape 5: Configuration Metricbeat pour Elasticsearch monitoring
-
-```yaml
-# metricbeat.yml - extrait pour monitoring Elasticsearch
-metricbeat.modules:
-- module: elasticsearch
-  xpack.enabled: true
-  period: 10s
-  hosts: ["http://elasticsearch:9200"]
-  scope: cluster
-
-- module: system
-  period: 30s
-  metricsets:
-    - cpu
-    - memory
-    - network
-    - process
-    - filesystem
-    - diskio
-```
-
-### Partie 2: Filebeat
-
-#### Étape 6: Lancer Filebeat avec Docker
-
-```bash
-docker run -d \
-  --name filebeat \
-  --net elastic \
-  --user root \
-  -v /var/log:/var/log:ro \
-  -v /var/lib/docker/containers:/var/lib/docker/containers:ro \
-  -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 \
-  docker.elastic.co/beats/filebeat:8.11.0
-```
-
-#### Étape 7: Vérifier les index Filebeat
-
-```bash
-GET /_cat/indices/filebeat-*?v&s=index
-```
-
-#### Étape 8: Voir les logs collectés
-
-```bash
-GET /filebeat-*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "range": { "@timestamp": { "gte": "now-10m" } } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "desc" }],
-  "size": 10,
-  "_source": ["@timestamp", "message", "log.file.path", "host.name"]
-}
-```
-
-#### Étape 9: Configuration Filebeat pour logs applicatifs Parkki
-
-```yaml
-# filebeat.yml - extrait pour logs Parkki
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - /var/log/parkki-api/*.log
-  fields:
-    service: parkki-api
-  fields_under_root: true
-  multiline:
-    pattern: '^\d{4}-\d{2}-\d{2}'
-    negate: true
-    match: after
-
-- type: log
-  enabled: true
-  paths:
-    - /var/log/parkki-worker/*.log
-  fields:
-    service: parkki-worker
-  fields_under_root: true
-
-processors:
-  - add_host_metadata: ~
-  - add_docker_metadata: ~
-  - decode_json_fields:
-      fields: ["message"]
-      target: ""
-      overwrite_keys: true
-```
-
-### Partie 3: Monitoring Elasticsearch avec Beats
-
-#### Étape 10: Voir les métriques Elasticsearch (si Metricbeat configuré)
-
-```bash
-GET /metricbeat-*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "metricset.module": "elasticsearch" } },
-        { "range": { "@timestamp": { "gte": "now-5m" } } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "desc" }],
-  "size": 5
-}
-```
-
-### Comparaison Metricbeat vs Filebeat
-
-| Aspect | Metricbeat | Filebeat |
-|--------|------------|----------|
-| **Type de données** | Métriques (CPU, RAM, disk) | Logs (fichiers texte) |
-| **Format** | Structuré (JSON) | Texte ou JSON |
-| **Modules** | system, docker, elasticsearch, etc. | system, nginx, elasticsearch, etc. |
-| **Fréquence** | Périodique (10s, 30s) | Temps réel (tail) |
-| **Use case Parkki** | Monitoring infra | Logs applicatifs |
-
-### Index patterns pour Parkki
-
-| Beat | Index Pattern | Usage |
-|------|---------------|-------|
-| Metricbeat | `metricbeat-*` | Dashboard infrastructure |
-| Filebeat | `filebeat-*` | Analyse logs |
-| APM | `traces-apm-*` | Traces application |
-
-### Validation
-
-✅ Comprendre le rôle de Metricbeat et Filebeat dans l'observabilité
-
----
-
-# Lab 9.7: Gestion des Watchers
-
-**Topic**: Alerting
-**Durée**: 15 minutes
-
-## Objectif
-
-Gérer le cycle de vie des watchers.
-
-## Exercice
-
-### Étape 1: Lister toutes les watches
-
-```bash
-GET /_watcher/_query/watches
-{
-  "query": {
-    "match_all": {}
-  }
-}
-```
-
-### Étape 2: Désactiver une watch
-
-```bash
-PUT /_watcher/watch/parkki-errors-watch/_deactivate
-```
-
-### Étape 3: Réactiver une watch
-
-```bash
-PUT /_watcher/watch/parkki-errors-watch/_activate
-```
-
-### Étape 4: Voir l'état d'une watch
-
-```bash
-GET /_watcher/watch/parkki-errors-watch
-```
-
-**Observer** : `status.state.active` = true/false
-
-### Étape 5: Supprimer une watch
-
-```bash
-DELETE /_watcher/watch/parkki-generic-webhook
-```
-
-### Étape 6: Voir l'historique des exécutions
-
-```bash
-GET /.watcher-history-*/_search
-{
-  "query": {
-    "range": {
-      "trigger_event.triggered_time": {
-        "gte": "now-1d"
-      }
-    }
-  },
-  "sort": [{ "trigger_event.triggered_time": "desc" }],
-  "size": 20
-}
-```
-
-### États des watches
-
-| État | Signification |
-|------|---------------|
-| `active` | Watch active et exécutée |
-| `not_active` | Watch désactivée |
-
-### Validation
-
-✅ Savoir gérer le cycle de vie des watchers
-
----
-
-# Lab 10.1: Activation de la Sécurité
-
-**Topic**: Sécurité
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre l'activation et la configuration de base de la sécurité.
-
-## Contexte Parkki
-
-La sécurité est essentielle pour protéger vos données de logs et d'APM.
-
-## Exercice
-
-### Étape 1: Vérifier si la sécurité est activée
-
-```bash
-GET /_xpack
-```
-
-**Observer** : `features.security.enabled`
-
-### Étape 2: Voir les informations de sécurité
-
+1. Check security status:
 ```bash
 GET /_security/_authenticate
+
+GET /_xpack/security
 ```
 
-**Résultat** : Informations sur l'utilisateur courant.
-
-### Étape 3: Configuration Docker avec sécurité
-
+2. Create a role for parking operators:
 ```bash
-# Arrêter les containers actuels
-docker stop elasticsearch kibana
-
-# Redémarrer avec sécurité
-docker run -d \
-  --name elasticsearch-secure \
-  --net elastic \
-  -p 9200:9200 \
-  -e "discovery.type=single-node" \
-  -e "xpack.security.enabled=true" \
-  -e "ELASTIC_PASSWORD=changeme" \
-  -e "ES_JAVA_OPTS=-Xms2g -Xmx2g" \
-  docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-```
-
-### Étape 4: Tester l'authentification
-
-```bash
-# Sans auth (erreur 401)
-curl http://localhost:9200
-
-# Avec auth
-curl -u elastic:changeme http://localhost:9200
-```
-
-### Note importante
-
-Pour les labs suivants, nous travaillerons en mode **sans sécurité** pour simplifier les exercices. En production, la sécurité doit TOUJOURS être activée.
-
-### Validation
-
-✅ Comprendre l'activation de la sécurité
-
----
-
-# Lab 10.2: Gestion des Utilisateurs
-
-**Topic**: Sécurité
-**Durée**: 25 minutes
-
-## Objectif
-
-Créer et gérer des utilisateurs Elasticsearch.
-
-## Exercice
-
-### Étape 1: Créer un utilisateur
-
-```bash
-POST /_security/user/parkki_reader
+PUT /_security/role/parking_operator
 {
-  "password": "reader_password_123",
-  "roles": ["viewer"],
-  "full_name": "Parkki Reader",
-  "email": "reader@parkki.com",
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["parking-*", "logs-parkki-*"],
+      "privileges": ["read", "view_index_metadata"],
+      "field_security": {
+        "grant": ["*"],
+        "except": ["user_id", "payment_details"]
+      }
+    },
+    {
+      "names": ["reservations"],
+      "privileges": ["read", "write", "delete"],
+      "query": {
+        "term": { "parking_id": "{{_user.metadata.parking_id}}" }
+      }
+    }
+  ]
+}
+```
+
+3. Create a role for data analysts:
+```bash
+PUT /_security/role/data_analyst
+{
+  "cluster": ["monitor"],
+  "indices": [
+    {
+      "names": ["transactions", "parkki-metrics"],
+      "privileges": ["read"],
+      "field_security": {
+        "grant": ["@timestamp", "parking_id", "amount", "duration_minutes", "spot_type"]
+      }
+    }
+  ],
+  "applications": [
+    {
+      "application": "kibana-.kibana",
+      "privileges": ["feature_dashboard.read", "feature_discover.read"],
+      "resources": ["*"]
+    }
+  ]
+}
+```
+
+4. Create users:
+```bash
+PUT /_security/user/operator_paris
+{
+  "password": "operator123!",
+  "roles": ["parking_operator"],
+  "full_name": "Paris Parking Operator",
+  "email": "operator@parkki-paris.com",
   "metadata": {
-    "team": "ops"
+    "parking_id": "central"
   }
 }
-```
 
-### Étape 2: Voir l'utilisateur créé
-
-```bash
-GET /_security/user/parkki_reader
-```
-
-### Étape 3: Créer un utilisateur pour l'indexation
-
-```bash
-POST /_security/user/parkki_indexer
+PUT /_security/user/analyst_john
 {
-  "password": "indexer_password_123",
-  "roles": ["editor"],
-  "full_name": "Parkki Indexer",
-  "email": "indexer@parkki.com"
+  "password": "analyst123!",
+  "roles": ["data_analyst"],
+  "full_name": "John Analyst",
+  "email": "john@parkki.com"
 }
 ```
 
-### Étape 4: Lister tous les utilisateurs
-
+5. Test user permissions:
 ```bash
-GET /_security/user
-```
-
-### Étape 5: Modifier un utilisateur
-
-```bash
-PUT /_security/user/parkki_reader/_password
+# Run as a specific user
+POST /_security/user/_has_privileges
 {
-  "password": "new_secure_password_456"
+  "cluster": ["manage", "monitor"],
+  "index": [
+    {
+      "names": ["transactions"],
+      "privileges": ["read", "write"]
+    }
+  ]
 }
 ```
 
-### Étape 6: Désactiver un utilisateur
-
-```bash
-PUT /_security/user/parkki_reader/_disable
-```
-
-### Étape 7: Réactiver un utilisateur
-
-```bash
-PUT /_security/user/parkki_reader/_enable
-```
-
-### Étape 8: Supprimer un utilisateur
-
-```bash
-DELETE /_security/user/parkki_reader
-```
-
-### Rôles built-in
-
-| Rôle | Permissions |
-|------|-------------|
-| `superuser` | Tous les privilèges |
-| `kibana_admin` | Admin Kibana |
-| `editor` | Lecture/écriture indices |
-| `viewer` | Lecture seule |
-| `monitoring_user` | Accès monitoring |
-
-### Validation
-
-✅ Savoir créer et gérer des utilisateurs
+**Challenge**:
+- Create a role that can only read documents from the last 7 days
+- Implement a role that allows write access only during business hours (using a script)
+- Create an API key with limited permissions for a microservice
 
 ---
 
-# Lab 10.3: Création de Rôles Personnalisés
+## Exercise 13.2: API Keys and Service Accounts
 
-**Topic**: Sécurité
-**Durée**: 30 minutes
+**Objective**: Manage programmatic access to Elasticsearch.
 
-## Objectif
+**Instructions**:
 
-Créer des rôles avec des permissions granulaires.
-
-## Contexte Parkki
-
-Vous voulez que vos développeurs puissent lire les logs mais pas les modifier.
-
-## Exercice
-
-### Étape 1: Créer un rôle lecture seule sur les logs
-
-```bash
-POST /_security/role/parkki_logs_reader
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*", ".ds-logs-*"],
-      "privileges": ["read", "view_index_metadata"]
-    }
-  ]
-}
-```
-
-### Étape 2: Créer un rôle pour l'indexation des logs
-
-```bash
-POST /_security/role/parkki_logs_writer
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*", ".ds-logs-*"],
-      "privileges": ["read", "write", "create_index", "view_index_metadata"]
-    }
-  ]
-}
-```
-
-### Étape 3: Créer un rôle admin pour Parkki
-
-```bash
-POST /_security/role/parkki_admin
-{
-  "cluster": ["monitor", "manage_index_templates", "manage_ilm"],
-  "indices": [
-    {
-      "names": ["logs-parkki-*", "apm-*"],
-      "privileges": ["all"]
-    }
-  ]
-}
-```
-
-### Étape 4: Voir un rôle
-
-```bash
-GET /_security/role/parkki_logs_reader
-```
-
-### Étape 5: Lister tous les rôles
-
-```bash
-GET /_security/role
-```
-
-### Étape 6: Créer un utilisateur avec le rôle personnalisé
-
-```bash
-POST /_security/user/dev_parkki
-{
-  "password": "dev_password_123",
-  "roles": ["parkki_logs_reader"],
-  "full_name": "Développeur Parkki"
-}
-```
-
-### Privilèges index courants
-
-| Privilège | Description |
-|-----------|-------------|
-| `read` | Lire les documents |
-| `write` | Écrire des documents |
-| `create_index` | Créer des index |
-| `delete_index` | Supprimer des index |
-| `manage` | Gérer l'index (settings, mappings) |
-| `all` | Tous les privilèges |
-
-### Privilèges cluster courants
-
-| Privilège | Description |
-|-----------|-------------|
-| `monitor` | Voir l'état du cluster |
-| `manage` | Gérer le cluster |
-| `manage_index_templates` | Gérer les templates |
-| `manage_ilm` | Gérer ILM |
-
-### Validation
-
-✅ Savoir créer des rôles personnalisés
-
----
-
-# Lab 10.4: API Keys
-
-**Topic**: Sécurité
-**Durée**: 20 minutes
-
-## Objectif
-
-Créer et gérer des API Keys pour l'authentification programmatique.
-
-## Contexte Parkki
-
-Les API Keys sont idéales pour vos scripts d'indexation et applications.
-
-## Exercice
-
-### Étape 1: Créer une API Key
-
+1. Create an API key:
 ```bash
 POST /_security/api_key
 {
-  "name": "parkki-indexer-key",
+  "name": "parking-api-key",
   "expiration": "30d",
   "role_descriptors": {
-    "parkki_indexer": {
+    "parking_read": {
       "cluster": ["monitor"],
-      "index": [
+      "indices": [
         {
-          "names": ["logs-parkki-*"],
-          "privileges": ["write", "create_index"]
+          "names": ["parking-*"],
+          "privileges": ["read"]
         }
       ]
     }
   },
   "metadata": {
-    "application": "parkki-log-shipper",
+    "application": "parking-api",
     "environment": "production"
   }
 }
 ```
 
-**Résultat** :
-```json
+2. Create a more restricted API key:
+```bash
+POST /_security/api_key
 {
-  "id": "abc123...",
-  "name": "parkki-indexer-key",
-  "api_key": "xyz789...",
-  "encoded": "base64_encoded_key..."
+  "name": "metrics-writer",
+  "role_descriptors": {
+    "metrics_write": {
+      "indices": [
+        {
+          "names": ["parkki-metrics"],
+          "privileges": ["create_index", "write"]
+        }
+      ]
+    }
+  }
 }
 ```
 
-**Important** : Sauvegarder `encoded` ! Il ne sera plus accessible.
-
-### Étape 2: Utiliser l'API Key
-
-```bash
-# Header Authorization avec la clé encodée
-curl -H "Authorization: ApiKey <encoded_key>" http://localhost:9200/logs-parkki-test/_doc -d '{"message":"test"}' -H "Content-Type: application/json"
-```
-
-### Étape 3: Voir les API Keys existantes
-
+3. List API keys:
 ```bash
 GET /_security/api_key?owner=true
+
+GET /_security/api_key?name=parking-*
 ```
 
-### Étape 4: Voir une API Key spécifique
-
+4. Get API key info:
 ```bash
 GET /_security/api_key?id=<api_key_id>
 ```
 
-### Étape 5: Invalider une API Key
-
+5. Invalidate an API key:
 ```bash
 DELETE /_security/api_key
 {
-  "ids": ["<api_key_id>"]
+  "name": "metrics-writer"
 }
 ```
 
-### Bonnes pratiques API Keys
+6. Create a service account token:
+```bash
+POST /_security/service/elastic/fleet-server/credential/token/my-token
+```
 
-| Pratique | Description |
-|----------|-------------|
-| Expiration | Toujours définir une expiration |
-| Rotation | Renouveler régulièrement |
-| Minimal privileges | Donner le minimum de droits nécessaires |
-| Nommage | Nommer clairement (application, env) |
-
-### Validation
-
-✅ Savoir créer et gérer des API Keys
+**Challenge**:
+- Create an API key that expires in 1 hour for temporary access
+- Implement API key rotation (create new, migrate, invalidate old)
+- Create different API keys for read and write operations
 
 ---
 
-# Lab 10.5: Document-Level Security
+## Exercise 13.3: Audit Logging
 
-**Topic**: Sécurité
-**Durée**: 25 minutes
+**Objective**: Configure and analyze security audit logs.
 
-## Objectif
+**Instructions**:
 
-Restreindre l'accès aux documents selon des critères.
-
-## Contexte Parkki
-
-Vous pouvez vouloir que certains utilisateurs ne voient que les logs de certains services.
-
-## Exercice
-
-### Étape 1: Créer un rôle avec filtre de documents
-
+1. Check audit settings:
 ```bash
-POST /_security/role/parkki_api_only
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*"],
-      "privileges": ["read"],
-      "query": {
-        "term": {
-          "service": "parkki-api"
-        }
-      }
-    }
-  ]
-}
+GET /_cluster/settings?include_defaults=true&filter_path=*.xpack.security.audit
 ```
 
-### Étape 2: Créer un utilisateur avec ce rôle
-
+2. Query audit logs (if enabled):
 ```bash
-POST /_security/user/api_team_member
-{
-  "password": "api_team_password_123",
-  "roles": ["parkki_api_only"],
-  "full_name": "API Team Member"
-}
-```
-
-### Étape 3: Tester - cet utilisateur ne verra que les logs de parkki-api
-
-```bash
-# En tant que api_team_member
-GET /logs-search/_search
-{
-  "query": { "match_all": {} }
-}
-```
-
-**Résultat** : Seuls les documents avec `service: parkki-api` sont retournés.
-
-### Étape 4: Rôle avec filtre sur level
-
-```bash
-POST /_security/role/parkki_errors_only
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*"],
-      "privileges": ["read"],
-      "query": {
-        "terms": {
-          "level": ["ERROR", "WARN"]
-        }
-      }
-    }
-  ]
-}
-```
-
-### Validation
-
-✅ Comprendre le Document-Level Security
-
----
-
-# Lab 10.6: Field-Level Security
-
-**Topic**: Sécurité
-**Durée**: 20 minutes
-
-## Objectif
-
-Masquer certains champs selon les rôles.
-
-## Contexte Parkki
-
-Masquer les champs sensibles (user_id, ip) pour certains utilisateurs.
-
-## Exercice
-
-### Étape 1: Créer un rôle avec restriction de champs
-
-```bash
-POST /_security/role/parkki_limited_fields
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*"],
-      "privileges": ["read"],
-      "field_security": {
-        "grant": ["@timestamp", "level", "service", "message"]
-      }
-    }
-  ]
-}
-```
-
-### Étape 2: Alternative - exclure des champs
-
-```bash
-POST /_security/role/parkki_no_pii
-{
-  "cluster": ["monitor"],
-  "indices": [
-    {
-      "names": ["logs-*"],
-      "privileges": ["read"],
-      "field_security": {
-        "grant": ["*"],
-        "except": ["user_id", "ip", "email"]
-      }
-    }
-  ]
-}
-```
-
-### Étape 3: Créer un utilisateur
-
-```bash
-POST /_security/user/limited_viewer
-{
-  "password": "limited_password_123",
-  "roles": ["parkki_no_pii"],
-  "full_name": "Limited Viewer"
-}
-```
-
-### Cas d'usage
-
-| Scénario | Configuration |
-|----------|---------------|
-| Masquer PII | `except: [user_id, email, ip]` |
-| Logs minimal | `grant: [@timestamp, level, message]` |
-| Debug complet | `grant: [*]` |
-
-### Validation
-
-✅ Comprendre le Field-Level Security
-
----
-
-# Lab 11.1: Architecture APM
-
-**Topic**: APM et Logs Applicatifs
-**Durée**: 20 minutes
-
-## Objectif
-
-Comprendre l'architecture APM et ses composants.
-
-## Contexte Parkki
-
-Vous utilisez déjà APM. Comprendre l'architecture vous aidera à l'optimiser.
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Applications Parkki                        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │ parkki-api  │  │parkki-worker│  │parkki-front │          │
-│  │ (Java Agent)│  │(Node Agent) │  │ (RUM Agent) │          │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘          │
-└─────────┼────────────────┼────────────────┼─────────────────┘
-          │                │                │
-          └────────────────┼────────────────┘
-                           ▼
-                  ┌─────────────────┐
-                  │   APM Server    │
-                  └────────┬────────┘
-                           │
-                           ▼
-                  ┌─────────────────┐
-                  │  Elasticsearch  │
-                  │   (apm-*)       │
-                  └────────┬────────┘
-                           │
-                           ▼
-                  ┌─────────────────┐
-                  │  Kibana APM UI  │
-                  └─────────────────┘
-```
-
-## Exercice
-
-### Étape 1: Voir les index APM
-
-```bash
-GET /_cat/indices/apm-*?v&s=index
-```
-
-### Étape 2: Voir les data streams APM
-
-```bash
-GET /_data_stream/traces-apm*
-GET /_data_stream/metrics-apm*
-GET /_data_stream/logs-apm*
-```
-
-### Étape 3: Comprendre les types de données APM
-
-| Type | Index Pattern | Description |
-|------|---------------|-------------|
-| Traces | `traces-apm-*` | Transactions et spans |
-| Metrics | `metrics-apm-*` | Métriques applications |
-| Logs | `logs-apm-*` | Logs APM (erreurs, events) |
-
-### Étape 4: Voir le mapping des traces
-
-```bash
-GET /traces-apm-default/_mapping?filter_path=**.properties.trace,**.properties.transaction,**.properties.span
-```
-
-### Validation
-
-✅ Comprendre l'architecture APM
-
----
-
-# Lab 11.2: Exploration des Données APM
-
-**Topic**: APM et Logs Applicatifs
-**Durée**: 25 minutes
-
-## Objectif
-
-Explorer et rechercher dans les données APM.
-
-## Exercice
-
-### Étape 1: Rechercher les transactions récentes
-
-```bash
-GET /traces-apm-*/_search
+GET /.security-audit-*/_search
 {
   "query": {
     "bool": {
-      "filter": [
-        { "exists": { "field": "transaction.id" } },
+      "must": [
         { "range": { "@timestamp": { "gte": "now-1h" } } }
       ]
     }
   },
   "sort": [{ "@timestamp": "desc" }],
-  "size": 10,
-  "_source": ["@timestamp", "service.name", "transaction.name", "transaction.duration.us", "transaction.result"]
+  "size": 20
 }
 ```
 
-### Étape 2: Rechercher les transactions lentes (> 1s)
-
+3. Find failed authentication attempts:
 ```bash
-GET /traces-apm-*/_search
+GET /.security-audit-*/_search
 {
   "query": {
     "bool": {
-      "filter": [
-        { "exists": { "field": "transaction.id" } },
-        { "range": { "transaction.duration.us": { "gt": 1000000 } } }
+      "must": [
+        { "term": { "event.action": "authentication_failed" } }
+      ]
+    }
+  },
+  "aggs": {
+    "by_user": {
+      "terms": { "field": "user.name" }
+    },
+    "by_ip": {
+      "terms": { "field": "source.ip" }
+    }
+  }
+}
+```
+
+4. Detect suspicious activity patterns:
+```bash
+GET /.security-audit-*/_search
+{
+  "size": 0,
+  "query": {
+    "range": { "@timestamp": { "gte": "now-24h" } }
+  },
+  "aggs": {
+    "by_action": {
+      "terms": { "field": "event.action" },
+      "aggs": {
+        "by_user": {
+          "terms": { "field": "user.name", "size": 5 }
+        }
+      }
+    }
+  }
+}
+```
+
+5. Create a security dashboard query:
+```bash
+GET /.security-audit-*/_search
+{
+  "size": 0,
+  "query": {
+    "range": { "@timestamp": { "gte": "now-7d" } }
+  },
+  "aggs": {
+    "auth_over_time": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "calendar_interval": "day"
+      },
+      "aggs": {
+        "success": {
+          "filter": { "term": { "event.action": "authentication_success" } }
+        },
+        "failed": {
+          "filter": { "term": { "event.action": "authentication_failed" } }
+        }
+      }
+    }
+  }
+}
+```
+
+**Challenge**:
+- Find all privilege escalation attempts
+- Detect brute force attacks (multiple failed logins from same IP)
+- Create a query that identifies off-hours access
+
+---
+
+# Part 14: APM (Application Performance Monitoring)
+
+## Exercise 14.1: APM Data Exploration
+
+**Objective**: Query and analyze APM data.
+
+**Note**: APM must be configured with the APM Server and agents. These exercises work with APM indices if available.
+
+**Instructions**:
+
+1. Check APM indices:
+```bash
+GET /_cat/indices/apm-*?v&s=index
+
+GET /_cat/indices/traces-*?v&s=index
+```
+
+2. Query transaction data:
+```bash
+GET /traces-apm*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "transaction" } },
+        { "range": { "@timestamp": { "gte": "now-1h" } } }
+      ]
+    }
+  },
+  "size": 5,
+  "_source": ["transaction.name", "transaction.duration.us", "service.name", "@timestamp"]
+}
+```
+
+3. Calculate service latency:
+```bash
+GET /traces-apm*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "transaction" } },
+        { "range": { "@timestamp": { "gte": "now-1h" } } }
+      ]
+    }
+  },
+  "aggs": {
+    "by_service": {
+      "terms": { "field": "service.name" },
+      "aggs": {
+        "avg_duration": {
+          "avg": { "field": "transaction.duration.us" }
+        },
+        "percentiles": {
+          "percentiles": {
+            "field": "transaction.duration.us",
+            "percents": [50, 95, 99]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+4. Find slow transactions:
+```bash
+GET /traces-apm*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "transaction" } },
+        { "range": { "transaction.duration.us": { "gte": 5000000 } } }
       ]
     }
   },
   "sort": [{ "transaction.duration.us": "desc" }],
   "size": 10,
-  "_source": ["@timestamp", "service.name", "transaction.name", "transaction.duration.us"]
+  "_source": ["transaction.name", "transaction.duration.us", "service.name", "trace.id"]
 }
 ```
 
-### Étape 3: Rechercher les erreurs APM
-
+5. Analyze error rates:
 ```bash
-GET /logs-apm*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "exists": { "field": "error.exception" } },
-        { "range": { "@timestamp": { "gte": "now-1d" } } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "desc" }],
-  "size": 10,
-  "_source": ["@timestamp", "service.name", "error.exception.message", "error.exception.type"]
-}
-```
-
-### Étape 4: Aggregation par service
-
-```bash
-GET /traces-apm-*/_search
+GET /traces-apm*/_search
 {
   "size": 0,
   "query": {
+    "range": { "@timestamp": { "gte": "now-1h" } }
+  },
+  "aggs": {
+    "by_service": {
+      "terms": { "field": "service.name" },
+      "aggs": {
+        "total": {
+          "filter": { "term": { "processor.event": "transaction" } }
+        },
+        "errors": {
+          "filter": {
+            "bool": {
+              "must": [
+                { "term": { "processor.event": "transaction" } },
+                { "exists": { "field": "transaction.result" } },
+                { "term": { "transaction.result": "HTTP 5xx" } }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Challenge**:
+- Calculate the error rate percentage for each service
+- Find transactions that have associated spans taking more than 1 second
+- Build a service dependency map by analyzing span data
+
+---
+
+## Exercise 14.2: Distributed Tracing Analysis
+
+**Objective**: Analyze traces across services.
+
+**Instructions**:
+
+1. Get a complete trace:
+```bash
+GET /traces-apm*/_search
+{
+  "query": {
+    "term": { "trace.id": "<trace_id>" }
+  },
+  "sort": [{ "timestamp.us": "asc" }],
+  "size": 100,
+  "_source": ["transaction.name", "span.name", "parent.id", "timestamp.us", "transaction.duration.us", "span.duration.us", "service.name"]
+}
+```
+
+2. Find traces with errors:
+```bash
+GET /traces-apm*/_search
+{
+  "query": {
     "bool": {
-      "filter": [
-        { "exists": { "field": "transaction.id" } },
-        { "range": { "@timestamp": { "gte": "now-1d" } } }
+      "must": [
+        { "term": { "processor.event": "error" } },
+        { "range": { "@timestamp": { "gte": "now-1h" } } }
       ]
     }
   },
   "aggs": {
-    "par_service": {
-      "terms": {
-        "field": "service.name",
-        "size": 20
+    "error_traces": {
+      "terms": { "field": "trace.id", "size": 10 }
+    }
+  }
+}
+```
+
+3. Analyze span breakdown:
+```bash
+GET /traces-apm*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "span" } },
+        { "range": { "@timestamp": { "gte": "now-1h" } } }
+      ]
+    }
+  },
+  "aggs": {
+    "by_type": {
+      "terms": { "field": "span.type" },
+      "aggs": {
+        "by_subtype": {
+          "terms": { "field": "span.subtype" },
+          "aggs": {
+            "avg_duration": { "avg": { "field": "span.duration.us" } },
+            "count": { "value_count": { "field": "span.id" } }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+4. Find database query bottlenecks:
+```bash
+GET /traces-apm*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "span.type": "db" } },
+        { "range": { "span.duration.us": { "gte": 100000 } } }
+      ]
+    }
+  },
+  "sort": [{ "span.duration.us": "desc" }],
+  "size": 10,
+  "_source": ["span.name", "span.duration.us", "span.db.statement", "service.name"]
+}
+```
+
+5. Calculate service throughput:
+```bash
+GET /traces-apm*/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "transaction" } },
+        { "range": { "@timestamp": { "gte": "now-1h" } } }
+      ]
+    }
+  },
+  "aggs": {
+    "throughput": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "fixed_interval": "1m"
       },
       "aggs": {
-        "avg_duration": {
+        "by_service": {
+          "terms": { "field": "service.name" }
+        }
+      }
+    }
+  }
+}
+```
+
+**Challenge**:
+- Build a query to find the slowest database queries per service
+- Identify external HTTP calls that are causing latency
+- Create a service level objective (SLO) query for 99th percentile latency
+
+---
+
+## Exercise 14.3: Custom APM Metrics and Analysis
+
+**Objective**: Create custom APM dashboards and analyses.
+
+**Instructions**:
+
+1. Create a simulated APM metrics index:
+```bash
+PUT /apm-custom-metrics
+{
+  "mappings": {
+    "properties": {
+      "@timestamp": { "type": "date" },
+      "service.name": { "type": "keyword" },
+      "transaction.name": { "type": "keyword" },
+      "transaction.duration.us": { "type": "long" },
+      "transaction.result": { "type": "keyword" },
+      "labels": { "type": "object" },
+      "user.id": { "type": "keyword" }
+    }
+  }
+}
+```
+
+2. Index sample APM data:
+```bash
+POST /_bulk
+{"index":{"_index":"apm-custom-metrics"}}
+{"@timestamp":"2025-01-15T10:00:00Z","service.name":"parking-api","transaction.name":"GET /api/parking/status","transaction.duration.us":45000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user123"}
+{"index":{"_index":"apm-custom-metrics"}}
+{"@timestamp":"2025-01-15T10:00:01Z","service.name":"parking-api","transaction.name":"POST /api/reservations","transaction.duration.us":120000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user456"}
+{"index":{"_index":"apm-custom-metrics"}}
+{"@timestamp":"2025-01-15T10:00:02Z","service.name":"payment-service","transaction.name":"POST /api/payment/process","transaction.duration.us":2500000,"transaction.result":"HTTP 5xx","labels":{"environment":"production"},"user.id":"user456"}
+{"index":{"_index":"apm-custom-metrics"}}
+{"@timestamp":"2025-01-15T10:00:03Z","service.name":"parking-api","transaction.name":"GET /api/parking/status","transaction.duration.us":35000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user789"}
+{"index":{"_index":"apm-custom-metrics"}}
+{"@timestamp":"2025-01-15T10:00:04Z","service.name":"notification-service","transaction.name":"POST /api/notify","transaction.duration.us":350000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user123"}
+{"index":{"_index":"apm-custom-metrics"}}
+{"@timestamp":"2025-01-15T10:00:05Z","service.name":"parking-api","transaction.name":"GET /api/parking/status","transaction.duration.us":5500000,"transaction.result":"HTTP 5xx","labels":{"environment":"production"},"user.id":"user999"}
+```
+
+3. Service health dashboard:
+```bash
+GET /apm-custom-metrics/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_service": {
+      "terms": { "field": "service.name" },
+      "aggs": {
+        "avg_latency_ms": {
           "avg": {
-            "field": "transaction.duration.us"
+            "script": { "source": "doc['transaction.duration.us'].value / 1000" }
           }
         },
-        "p99_duration": {
+        "p99_latency": {
           "percentiles": {
             "field": "transaction.duration.us",
             "percents": [99]
           }
-        }
-      }
-    }
-  }
-}
-```
-
-### Étape 5: Latence par endpoint
-
-```bash
-GET /traces-apm-*/_search
-{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "service.name": "parkki-api" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
-  "aggs": {
-    "par_transaction": {
-      "terms": {
-        "field": "transaction.name",
-        "size": 20
-      },
-      "aggs": {
-        "avg_duration_ms": {
-          "avg": {
-            "field": "transaction.duration.us"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-### Validation
-
-✅ Savoir explorer les données APM
-
----
-
-# Lab 11.3: Corrélation Logs et APM
-
-**Topic**: APM et Logs Applicatifs
-**Durée**: 30 minutes
-
-## Objectif
-
-Corréler les logs applicatifs avec les traces APM.
-
-## Contexte Parkki
-
-La corrélation logs/APM permet de debugger plus efficacement les problèmes de performance.
-
-## Concepts clés
-
-```
-Transaction
-├── trace.id: "abc123"      ← Identifiant de la trace complète
-├── transaction.id: "def456" ← Identifiant de la transaction
-└── span.id: "ghi789"       ← Identifiant du span (optionnel)
-
-Log corrélé
-├── trace.id: "abc123"      ← Même identifiant
-├── message: "Processing..."
-└── @timestamp: "..."
-```
-
-## Exercice
-
-### Étape 1: Trouver une transaction lente
-
-```bash
-GET /traces-apm-*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "exists": { "field": "transaction.id" } },
-        { "range": { "transaction.duration.us": { "gt": 500000 } } }
-      ]
-    }
-  },
-  "sort": [{ "transaction.duration.us": "desc" }],
-  "size": 1,
-  "_source": ["trace.id", "transaction.id", "transaction.name", "transaction.duration.us", "service.name"]
-}
-```
-
-### Étape 2: Récupérer le trace.id
-
-**Résultat exemple** : `trace.id: "abc123def456..."`
-
-### Étape 3: Rechercher les logs associés
-
-```bash
-GET /logs-*/_search
-{
-  "query": {
-    "term": {
-      "trace.id": "abc123def456..."
-    }
-  },
-  "sort": [{ "@timestamp": "asc" }],
-  "_source": ["@timestamp", "message", "level", "service"]
-}
-```
-
-### Étape 4: Rechercher tous les spans de la trace
-
-```bash
-GET /traces-apm-*/_search
-{
-  "query": {
-    "term": {
-      "trace.id": "abc123def456..."
-    }
-  },
-  "sort": [{ "@timestamp": "asc" }],
-  "_source": ["@timestamp", "span.name", "span.duration.us", "span.type", "transaction.name"]
-}
-```
-
-### Étape 5: Vue complète d'une transaction
-
-```bash
-# 1. Transaction principale
-GET /traces-apm-*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "trace.id": "abc123def456..." } },
-        { "exists": { "field": "transaction.id" } }
-      ]
-    }
-  }
-}
-
-# 2. Spans associés
-GET /traces-apm-*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "trace.id": "abc123def456..." } },
-        { "exists": { "field": "span.id" } }
-      ]
-    }
-  },
-  "sort": [{ "@timestamp": "asc" }]
-}
-
-# 3. Logs associés
-GET /logs-*/_search
-{
-  "query": {
-    "term": { "trace.id": "abc123def456..." }
-  },
-  "sort": [{ "@timestamp": "asc" }]
-}
-```
-
-### Configuration de l'injection trace.id dans les logs
-
-**Java (Log4j2)** :
-```xml
-<PatternLayout pattern="%d{ISO8601} [%t] %-5level %logger{36} - trace.id=%X{trace.id} span.id=%X{span.id} - %msg%n"/>
-```
-
-**Node.js (Winston)** :
-```javascript
-const apm = require('elastic-apm-node');
-logger.info('Message', { trace_id: apm.currentTraceIds['trace.id'] });
-```
-
-### Validation
-
-✅ Savoir corréler les logs et les traces APM
-
----
-
-# Lab 11.4: Métriques APM et Dashboards
-
-**Topic**: APM et Logs Applicatifs
-**Durée**: 25 minutes
-
-## Objectif
-
-Créer des aggregations pour construire des dashboards APM.
-
-## Exercice
-
-### Étape 1: Throughput par service (requests/min)
-
-```bash
-GET /traces-apm-*/_search
-{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        { "exists": { "field": "transaction.id" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
-  "aggs": {
-    "par_service": {
-      "terms": {
-        "field": "service.name"
-      },
-      "aggs": {
-        "throughput": {
-          "date_histogram": {
-            "field": "@timestamp",
-            "fixed_interval": "1m"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-### Étape 2: Taux d'erreur par service
-
-```bash
-GET /traces-apm-*/_search
-{
-  "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        { "exists": { "field": "transaction.id" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
-  "aggs": {
-    "par_service": {
-      "terms": {
-        "field": "service.name"
-      },
-      "aggs": {
-        "total": {
-          "value_count": {
-            "field": "transaction.id"
+        },
+        "error_rate": {
+          "filters": {
+            "filters": {
+              "success": { "prefix": { "transaction.result": "HTTP 2" } },
+              "error": { "prefix": { "transaction.result": "HTTP 5" } }
+            }
           }
         },
-        "errors": {
-          "filter": {
-            "term": { "transaction.result": "HTTP 5xx" }
-          }
+        "throughput": {
+          "value_count": { "field": "transaction.name" }
         }
       }
     }
@@ -6223,56 +4485,63 @@ GET /traces-apm-*/_search
 }
 ```
 
-### Étape 3: Distribution des latences (histogramme)
-
+4. User experience analysis:
 ```bash
-GET /traces-apm-*/_search
+GET /apm-custom-metrics/_search
 {
   "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "service.name": "parkki-api" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
   "aggs": {
-    "latency_distribution": {
-      "histogram": {
+    "user_experience": {
+      "range": {
         "field": "transaction.duration.us",
-        "interval": 100000
+        "ranges": [
+          { "key": "fast", "to": 100000 },
+          { "key": "normal", "from": 100000, "to": 500000 },
+          { "key": "slow", "from": 500000, "to": 2000000 },
+          { "key": "frustrated", "from": 2000000 }
+        ]
+      }
+    },
+    "apdex": {
+      "scripted_metric": {
+        "init_script": "state.satisfied = 0; state.tolerating = 0; state.frustrated = 0;",
+        "map_script": """
+          def duration = doc['transaction.duration.us'].value;
+          if (duration < 100000) { state.satisfied++ }
+          else if (duration < 400000) { state.tolerating++ }
+          else { state.frustrated++ }
+        """,
+        "combine_script": "return state",
+        "reduce_script": """
+          def satisfied = 0; def tolerating = 0; def frustrated = 0;
+          for (s in states) {
+            satisfied += s.satisfied;
+            tolerating += s.tolerating;
+            frustrated += s.frustrated;
+          }
+          def total = satisfied + tolerating + frustrated;
+          return (satisfied + (tolerating / 2.0)) / total;
+        """
       }
     }
   }
 }
 ```
 
-### Étape 4: Top erreurs
-
+5. Transaction breakdown:
 ```bash
-GET /logs-apm*/_search
+GET /apm-custom-metrics/_search
 {
   "size": 0,
-  "query": {
-    "bool": {
-      "filter": [
-        { "exists": { "field": "error.exception" } },
-        { "range": { "@timestamp": { "gte": "now-1d" } } }
-      ]
-    }
-  },
   "aggs": {
-    "top_errors": {
-      "terms": {
-        "field": "error.exception.type",
-        "size": 10
-      },
+    "by_transaction": {
+      "terms": { "field": "transaction.name" },
       "aggs": {
-        "par_service": {
-          "terms": {
-            "field": "service.name"
-          }
+        "stats": {
+          "extended_stats": { "field": "transaction.duration.us" }
+        },
+        "by_result": {
+          "terms": { "field": "transaction.result" }
         }
       }
     }
@@ -6280,265 +4549,114 @@ GET /logs-apm*/_search
 }
 ```
 
-### Métriques clés APM pour Parkki
-
-| Métrique | Description | Seuil d'alerte |
-|----------|-------------|----------------|
-| Throughput | Requests/min | Anomalie |
-| Latency p99 | 99e percentile | > 1s |
-| Error rate | % erreurs | > 1% |
-| Saturation | Queue depth | > 100 |
-
-### Validation
-
-✅ Savoir créer des métriques pour dashboards APM
+**Challenge**:
+- Calculate the Apdex score for each service
+- Find users experiencing the worst performance
+- Create a query to detect transaction duration anomalies (>3 standard deviations)
 
 ---
 
-# Lab 11.5: ILM pour les Données APM
+# Cleanup
 
-**Topic**: APM et Logs Applicatifs
-**Durée**: 20 minutes
-
-## Objectif
-
-Configurer la rétention des données APM.
-
-## Contexte Parkki
-
-Les données APM peuvent vite consommer beaucoup d'espace. Une bonne stratégie ILM est essentielle.
-
-## Exercice
-
-### Étape 1: Voir les policies ILM actuelles pour APM
+## Remove All Test Indices and Resources
 
 ```bash
-GET /_ilm/policy/traces-apm*
-GET /_ilm/policy/metrics-apm*
-```
-
-### Étape 2: Créer une policy optimisée pour APM Parkki
-
-```bash
-PUT /_ilm/policy/parkki-apm-policy
-{
-  "policy": {
-    "_meta": {
-      "description": "Policy pour données APM Parkki"
-    },
-    "phases": {
-      "hot": {
-        "min_age": "0ms",
-        "actions": {
-          "rollover": {
-            "max_age": "1d",
-            "max_primary_shard_size": "30gb"
-          },
-          "set_priority": {
-            "priority": 100
-          }
-        }
-      },
-      "warm": {
-        "min_age": "3d",
-        "actions": {
-          "set_priority": {
-            "priority": 50
-          },
-          "readonly": {},
-          "forcemerge": {
-            "max_num_segments": 1
-          }
-        }
-      },
-      "delete": {
-        "min_age": "7d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
-  }
-}
-```
-
-### Étape 3: Rétention différenciée par type de données
-
-```bash
-# Traces (7 jours) - données volumineuses
-PUT /_ilm/policy/parkki-apm-traces
-{
-  "policy": {
-    "phases": {
-      "hot": {
-        "actions": {
-          "rollover": {
-            "max_age": "1d",
-            "max_primary_shard_size": "30gb"
-          }
-        }
-      },
-      "delete": {
-        "min_age": "7d",
-        "actions": { "delete": {} }
-      }
-    }
-  }
-}
-
-# Métriques (14 jours) - moins volumineuses
-PUT /_ilm/policy/parkki-apm-metrics
-{
-  "policy": {
-    "phases": {
-      "hot": {
-        "actions": {
-          "rollover": {
-            "max_age": "1d",
-            "max_primary_shard_size": "50gb"
-          }
-        }
-      },
-      "delete": {
-        "min_age": "14d",
-        "actions": { "delete": {} }
-      }
-    }
-  }
-}
-```
-
-### Recommandations rétention APM
-
-| Type | Rétention recommandée | Justification |
-|------|----------------------|---------------|
-| Traces | 7 jours | Volumineuses, debug récent |
-| Métriques | 14-30 jours | Moins volumineuses, trending |
-| Erreurs | 30 jours | Analyse incidents |
-
-### Validation
-
-✅ Savoir configurer ILM pour les données APM
-
----
-
-# Récapitulatif
-
-## Ce que vous avez appris
-
-1. **Installation**: Démarrer Elasticsearch et Kibana avec Docker
-2. **Diagnostic**: Utiliser les _cat APIs (_cat/nodes, _cat/indices, _cat/shards)
-3. **CRUD**: POST, GET, PUT, DELETE sur les documents
-4. **Bulk API**: Indexation en masse efficace
-5. **Gestion index**: Settings, refresh_interval, open/close
-6. **Mapping**: text vs keyword, multi-fields, nested
-7. **Templates**: Dynamic templates, index templates, component templates
-8. **Recherche**: Query DSL, bool query, pagination, tri, aggregations
-9. **Dimensionnement**: Calcul des shards, ratios memory:data, thread pools, watermarks
-10. **Data Retention**: Stratégies de rétention, open/close, shrink, delete
-11. **Data Streams**: Gestion automatique des time series avec rollover
-12. **ILM**: Automatisation du cycle de vie Hot → Warm → Delete
-13. **Operating**: Segments, slowlogs, debug shards, JVM, fielddata
-14. **Monitoring**: Cluster Health, Node Stats, Index Stats, Thread Pools
-15. **Alerting**: Watcher API, conditions, actions, webhooks
-16. **Sécurité**: Utilisateurs, rôles, API Keys, DLS, FLS
-17. **APM**: Architecture, exploration données, corrélation logs/traces, ILM APM
-
-## Points clés pour Parkki
-
-| Problème | Solution |
-|----------|----------|
-| JVM surchargée | `refresh_interval: 30s` + `keyword` au lieu de `text` |
-| Indexation lente | Bulk API avec batches 5-15 MB |
-| Cluster yellow | Vérifier avec `_cat/shards` |
-| Mapping non optimisé | Dynamic templates + index templates |
-| Champs inutilement analysés | Utiliser `keyword` pour level, service, user_id |
-| Recherches lentes | Utiliser `filter` au lieu de `must` pour les filtres stricts |
-| Coûts croissants | ILM Hot/Warm/Delete avec rétention 10 jours |
-| Trop de shards | 1 shard par index quotidien (15 GB/jour) |
-| Données anciennes trop actives | Data Streams + ILM pour automatiser warm/delete |
-| Disk watermarks | Prévoir 400 GB minimum (150 GB × 2 replicas + marges) |
-| Pas d'alerting | Watcher API pour JVM, disk, thread pools |
-| Accès non contrôlé | Rôles personnalisés + API Keys avec expiration |
-| Debug difficile | Corrélation logs/APM via trace.id |
-| Données APM volumineuses | ILM différencié traces (7j) / métriques (14j) |
-
-## Nettoyage
-
-```bash
-# Index de test
+# Delete test indices
+DELETE /products
+DELETE /logs-parkki
+DELETE /reservations
+DELETE /parking-events
+DELETE /parking-lots
+DELETE /parking-with-spots
+DELETE /parking-flat
+DELETE /parking-nested
+DELETE /logs-parkki-*
+DELETE /logs-nginx-*
+DELETE /articles
+DELETE /parking-locations
+DELETE /transactions
 DELETE /logs-test
-DELETE /test-refresh-default
-DELETE /test-refresh-optimized
-DELETE /logs-mapping-test
-DELETE /logs-optimized
-DELETE /logs-multifield
-DELETE /logs-no-index
-DELETE /logs-object
-DELETE /logs-nested
-DELETE /logs-dynamic
-DELETE /logs-parkki-2025.01.15
-DELETE /logs-combined-2025.01.15
-DELETE /logs-search
-DELETE /logs-segments-test
-DELETE /test-fielddata
-DELETE /test-fielddata-fixed
-DELETE /test-unassigned
+DELETE /test-shrink
+DELETE /test-optimization*
+DELETE /logs-ilm-*
+DELETE /logs-ds-*
+DELETE /metrics-*
+DELETE /processed-logs
+DELETE /parking-info
+DELETE /failed-logs
+DELETE /parkki-metrics
+DELETE /apm-custom-metrics
 
-# Index de rétention et ILM
-DELETE /logs-old-2025.01.01
-DELETE /logs-retention-*
-DELETE /logs-to-shrink
-DELETE /logs-shrunk
-
-# Data streams
-DELETE /_data_stream/logs-stream-parkki
-DELETE /_data_stream/logs-ilm-parkki
-DELETE /_data_stream/logs-opt-parkki
-DELETE /_data_stream/logs-parkki-prod
-
-# Templates
+# Delete templates
+DELETE /_index_template/logs-template
 DELETE /_index_template/logs-parkki-template
-DELETE /_index_template/logs-combined-template
-DELETE /_index_template/logs-stream-template
-DELETE /_index_template/logs-ilm-template
-DELETE /_index_template/logs-optimized-template
-DELETE /_index_template/parkki-logs-template
-DELETE /_index_template/logs-slowlog-template
+DELETE /_index_template/logs-with-ilm
+DELETE /_index_template/logs-ds-template
+DELETE /_index_template/metrics-template
 
-# Component templates
-DELETE /_component_template/logs-settings
-DELETE /_component_template/logs-mappings-base
-DELETE /_component_template/parkki-settings
+DELETE /_component_template/base-settings
+DELETE /_component_template/logs-mappings
 DELETE /_component_template/parkki-mappings
+DELETE /_component_template/logs-common
 
-# ILM Policies
-DELETE /_ilm/policy/logs-parkki-policy
-DELETE /_ilm/policy/logs-parkki-optimized
-DELETE /_ilm/policy/parkki-logs-production
-DELETE /_ilm/policy/parkki-apm-policy
-DELETE /_ilm/policy/parkki-apm-traces
-DELETE /_ilm/policy/parkki-apm-metrics
+# Delete pipelines
+DELETE /_ingest/pipeline/parking-logs-pipeline
+DELETE /_ingest/pipeline/app-logs-parser
+DELETE /_ingest/pipeline/access-logs-parser
+DELETE /_ingest/pipeline/enrich-parking-events
+DELETE /_ingest/pipeline/logs-pipeline
+DELETE /_ingest/pipeline/apache-logs
+DELETE /_ingest/pipeline/parking-enrichment
 
-# Watchers
-DELETE /_watcher/watch/parkki-errors-watch
-DELETE /_watcher/watch/parkki-jvm-heap-watch
-DELETE /_watcher/watch/parkki-disk-watch
-DELETE /_watcher/watch/parkki-threadpool-watch
-DELETE /_watcher/watch/parkki-slack-alert
-DELETE /_watcher/watch/parkki-generic-webhook
+# Delete enrich policies
+DELETE /_enrich/policy/parking-lookup
 
-# Sécurité (si activée)
-DELETE /_security/user/parkki_reader
-DELETE /_security/user/parkki_indexer
-DELETE /_security/user/dev_parkki
-DELETE /_security/user/api_team_member
-DELETE /_security/user/limited_viewer
-DELETE /_security/role/parkki_logs_reader
-DELETE /_security/role/parkki_logs_writer
-DELETE /_security/role/parkki_admin
-DELETE /_security/role/parkki_api_only
-DELETE /_security/role/parkki_errors_only
-DELETE /_security/role/parkki_limited_fields
-DELETE /_security/role/parkki_no_pii
+# Delete ILM policies
+DELETE /_ilm/policy/parkki-logs-policy
+DELETE /_ilm/policy/logs-lifecycle
+
+# Delete search templates
+DELETE /_scripts/parking-search
+
+# Delete watchers
+DELETE /_watcher/watch/high_error_rate
+DELETE /_watcher/watch/cluster_health_alert
+DELETE /_watcher/watch/parking_capacity_alert
+DELETE /_watcher/watch/response_time_degradation
+DELETE /_watcher/watch/throttled_error_alert
+DELETE /_watcher/watch/critical_system_alert
+
+# Delete security resources (if security is enabled)
+DELETE /_security/role/parking_operator
+DELETE /_security/role/data_analyst
+DELETE /_security/user/operator_paris
+DELETE /_security/user/analyst_john
 ```
+
+---
+
+# Summary
+
+| Part | Topic | Key Skills | Challenge Level |
+|------|-------|------------|-----------------|
+| 2 | Installation | Docker setup, cluster health, node analysis | Basic |
+| 3 | Indexing | CRUD, Bulk API, optimistic locking | Intermediate |
+| 4 | Mapping | Analyzers, multi-fields, nested, templates | Intermediate |
+| 5 | Search | Full-text, bool, geo, scoring | Advanced |
+| 6 | Aggregations | Metrics, buckets, pipelines, nested | Advanced |
+| 7 | Ingest | Multi-processor, grok, enrichment | Intermediate |
+| 8 | ILM | Policies, data streams, optimization | Intermediate |
+| 9 | Troubleshooting | Diagnostics, JVM, profiling | Advanced |
+| 10 | Audit | Full cluster analysis | Advanced |
+| 11 | Monitoring | Metricbeat, self-monitoring, custom metrics | Advanced |
+| 12 | Alerting | Watcher, conditions, throttling | Advanced |
+| 13 | Security | Roles, users, API keys, audit logs | Advanced |
+| 14 | APM | Transactions, traces, latency analysis | Advanced |
+
+**Next Steps**:
+- Apply these techniques to your production cluster
+- Set up monitoring dashboards in Kibana
+- Configure alerting for critical metrics
+- Review and optimize your mappings regularly
+- Implement proper security with role-based access control
+- Configure APM agents for your application services

@@ -2,115 +2,115 @@
 layout: cover
 ---
 
-# Bonnes Pratiques de Production
+# Production Best Practices
 
-Architecture, haute disponibilité, et gestion opérationnelle
-
----
-
-# Objectifs d'Apprentissage
-
-À la fin de ce module, vous serez capable de :
-
-- **Concevoir** une architecture de cluster Elasticsearch pour la production
-- **Configurer** la haute disponibilité avec réplication et rack awareness
-- **Planifier** la disaster recovery avec RPO/RTO appropriés
-- **Appliquer** les checklists opérationnelles pour déploiements et incidents
+Architecture, high availability, and operational management
 
 ---
 
-# Pourquoi les Bonnes Pratiques sont Essentielles
+# Learning Objectives
 
-Un cluster mal configuré en production peut entraîner des **pertes de données** et des **interruptions de service**.
+By the end of this module, you will be able to:
 
-**Risques sans bonnes pratiques** :
-1. 💥 **Split-brain** : Cluster se divise en deux parties indépendantes (corruption de données)
-2. 📉 **Performance dégradée** : Nœuds surchargés, recherches lentes, indexations bloquées
-3. 🔥 **Perte de données** : Pas de répliques, pas de snapshots, défaillance matérielle
-4. ⏱️ **Recovery lent** : Pas de plan de disaster recovery, RTO/RPO non respectés
-5. 🤷 **Incidents non résolus** : Pas de runbooks, équipes ops perdues
+- **Design** an Elasticsearch cluster architecture for production
+- **Configure** high availability with replication and rack awareness
+- **Plan** disaster recovery with appropriate RPO/RTO
+- **Apply** operational checklists for deployments and incidents
 
-**Objectif** : Construire un cluster **résilient**, **performant**, et **maintenable**.
+---
+
+# Why Best Practices are Essential
+
+A poorly configured production cluster can lead to **data loss** and **service interruptions**.
+
+**Risks without best practices**:
+1. **Split-brain**: Cluster divides into two independent parts (data corruption)
+2. **Degraded performance**: Overloaded nodes, slow searches, blocked indexing
+3. **Data loss**: No replicas, no snapshots, hardware failure
+4. **Slow recovery**: No disaster recovery plan, RTO/RPO not met
+5. **Unresolved incidents**: No runbooks, lost ops teams
+
+**Objective**: Build a **resilient**, **performant**, and **maintainable** cluster.
 
 ---
 layout: section
 ---
 
-# Partie 1: Patterns d'Architecture de Cluster
+# Part 1: Cluster Architecture Patterns
 
-Séparation des rôles et dimensionnement
-
----
-
-# Rôles de Nœuds Elasticsearch
-
-Elasticsearch permet de spécialiser les nœuds avec des **rôles** pour optimiser performance et stabilité.
-
-| Rôle | Description | Ressources | Charge de travail |
-|------|-------------|------------|-------------------|
-| **master** | Gestion du cluster (état, shards, indices) | CPU moyen, RAM faible | Faible (métadonnées) |
-| **data** | Stockage et recherche de données | CPU élevé, RAM élevée, Disque rapide | Très élevée |
-| **data_hot** | Données actives (écritures fréquentes) | CPU très élevé, SSD rapide | Indexation intensive |
-| **data_warm** | Données anciennes (lectures occasionnelles) | CPU moyen, HDD acceptable | Recherches modérées |
-| **data_cold** | Données archivées (lectures rares) | CPU faible, HDD lent | Minimal |
-| **ingest** | Transformation de données (pipelines) | CPU élevé, RAM modérée | Traitement de données |
-| **ml** | Machine Learning (détection d'anomalies) | CPU très élevé, RAM très élevée | ML tasks |
-| **coordinating** | Routage de requêtes (pas de données) | CPU moyen, RAM modérée | Agrégations distribuées |
-
-**Configuration** : Dans `elasticsearch.yml`, définir `node.roles: [master, data]`
+Role separation and sizing
 
 ---
 
-# Pattern 1 : Cluster de Production Basique (3-5 Nœuds)
+# Elasticsearch Node Roles
 
-**Architecture simple** pour petites à moyennes charges.
+Elasticsearch allows specializing nodes with **roles** to optimize performance and stability.
+
+| Role | Description | Resources | Workload |
+|------|-------------|-----------|----------|
+| **master** | Cluster management (state, shards, indices) | Medium CPU, low RAM | Low (metadata) |
+| **data** | Data storage and search | High CPU, high RAM, fast disk | Very high |
+| **data_hot** | Active data (frequent writes) | Very high CPU, fast SSD | Intensive indexing |
+| **data_warm** | Older data (occasional reads) | Medium CPU, HDD acceptable | Moderate searches |
+| **data_cold** | Archived data (rare reads) | Low CPU, slow HDD | Minimal |
+| **ingest** | Data transformation (pipelines) | High CPU, moderate RAM | Data processing |
+| **ml** | Machine Learning (anomaly detection) | Very high CPU, very high RAM | ML tasks |
+| **coordinating** | Request routing (no data) | Medium CPU, moderate RAM | Distributed aggregations |
+
+**Configuration**: In `elasticsearch.yml`, define `node.roles: [master, data]`
+
+---
+
+# Pattern 1: Basic Production Cluster (3-5 Nodes)
+
+**Simple architecture** for small to medium workloads.
 
 ```
-┌─────────────────────────────────────────┐
-│  3 Nœuds Master-eligible + Data         │
-│  ┌──────┐  ┌──────┐  ┌──────┐          │
-│  │ M+D  │  │ M+D  │  │ M+D  │          │
-│  │ Node1│  │ Node2│  │ Node3│          │
-│  └──────┘  └──────┘  └──────┘          │
-└─────────────────────────────────────────┘
++---------------------------------------------+
+|  3 Master-eligible + Data Nodes             |
+|  +--------+  +--------+  +--------+         |
+|  |  M+D   |  |  M+D   |  |  M+D   |         |
+|  | Node1  |  | Node2  |  | Node3  |         |
+|  +--------+  +--------+  +--------+         |
++---------------------------------------------+
 ```
 
-**Configuration par nœud** :
+**Configuration per node**:
 ```yaml
-# elasticsearch.yml (sur chaque nœud)
+# elasticsearch.yml (on each node)
 node.roles: [master, data, ingest]
 cluster.initial_master_nodes: ["node1", "node2", "node3"]
 discovery.seed_hosts: ["node1:9300", "node2:9300", "node3:9300"]
 ```
 
-**Avantages** :
-- ✅ Simple à configurer et maintenir
-- ✅ Haute disponibilité avec quorum de 3 masters
+**Advantages**:
+- Simple to configure and maintain
+- High availability with 3-master quorum
 
-**Inconvénients** :
-- ❌ Pas de séparation des responsabilités (master et data partagent ressources)
-- ❌ Scalabilité limitée (scaling vertical uniquement)
-
----
-
-# Pattern 2 : Dedicated Master Nodes (Production Recommandé)
-
-**Séparer les rôles** pour éviter que les tâches de gestion impactent les performances de recherche.
-
-**Architecture** :
-- **3 Dedicated Master Nodes** (légers) : Gestion du cluster
-- **6+ Data Nodes** (lourds) : Stockage et recherche
-
-**Avantages** :
-- ✅ Masters dédiés = stabilité du cluster
-- ✅ Data nodes ajoutés horizontalement
-- ✅ Isolation pannes (data down ≠ perte quorum)
+**Disadvantages**:
+- No separation of responsibilities (master and data share resources)
+- Limited scalability (vertical scaling only)
 
 ---
 
-# Pattern 2 : Configuration Dedicated Masters
+# Pattern 2: Dedicated Master Nodes (Recommended for Production)
 
-**Configuration Master Node** :
+**Separate roles** to prevent management tasks from impacting search performance.
+
+**Architecture**:
+- **3 Dedicated Master Nodes** (lightweight): Cluster management
+- **6+ Data Nodes** (heavy): Storage and search
+
+**Advantages**:
+- Dedicated masters = cluster stability
+- Data nodes added horizontally
+- Failure isolation (data down != quorum loss)
+
+---
+
+# Pattern 2: Dedicated Masters Configuration
+
+**Master Node Configuration**:
 ```yaml
 # elasticsearch.yml (master nodes)
 node.name: master-1
@@ -119,7 +119,7 @@ cluster.initial_master_nodes: ["master-1", "master-2", "master-3"]
 discovery.seed_hosts: ["master-1:9300", "master-2:9300", "master-3:9300"]
 ```
 
-**Configuration Data Node** :
+**Data Node Configuration**:
 ```yaml
 # elasticsearch.yml (data nodes)
 node.name: data-1
@@ -129,16 +129,16 @@ discovery.seed_hosts: ["master-1:9300", "master-2:9300", "master-3:9300"]
 
 ---
 
-# Pattern 3 : Hot-Warm-Cold Architecture (ILM)
+# Pattern 3: Hot-Warm-Cold Architecture (ILM)
 
-**Séparation des données** par âge et fréquence d'accès.
+**Data separation** by age and access frequency.
 
-**Architecture** :
-- **HOT Tier** : SSD rapides, indexation intensive (dernières 24h)
-- **WARM Tier** : HDD, lectures modérées (1-30 jours)
-- **COLD Tier** : Stockage économique, lectures rares (>30 jours)
+**Architecture**:
+- **HOT Tier**: Fast SSDs, intensive indexing (last 24h)
+- **WARM Tier**: HDD, moderate reads (1-30 days)
+- **COLD Tier**: Economical storage, rare reads (>30 days)
 
-**Configuration** :
+**Configuration**:
 ```yaml
 # Hot node
 node.roles: [data_hot, data_content]
@@ -152,9 +152,9 @@ node.roles: [data_cold]
 
 ---
 
-# Pattern 3 : ILM Policy Hot-Warm-Cold
+# Pattern 3: ILM Policy Hot-Warm-Cold
 
-**ILM Policy** pour migration automatique :
+**ILM Policy** for automatic migration:
 
 ```json
 {
@@ -179,9 +179,9 @@ node.roles: [data_cold]
 
 ---
 
-# Pattern 3 : ILM Policy (suite)
+# Pattern 3: ILM Policy (continued)
 
-**Phases Cold et Delete** :
+**Cold and Delete Phases**:
 
 ```json
 "cold": {
@@ -200,79 +200,79 @@ node.roles: [data_cold]
 
 ---
 
-# Pattern 4 : Coordinating Nodes (Large Clusters)
+# Pattern 4: Coordinating Nodes (Large Clusters)
 
-**Nœuds de coordination** dédiés pour répartir la charge des agrégations complexes.
+**Dedicated coordinating nodes** to distribute the load of complex aggregations.
 
-**Architecture** :
-- **Load Balancer** : Distribue les requêtes
-- **3+ Coordinating Nodes** : Routage uniquement (pas de données)
-- **20+ Data Nodes** : Stockage et exécution des requêtes
+**Architecture**:
+- **Load Balancer**: Distributes requests
+- **3+ Coordinating Nodes**: Routing only (no data)
+- **20+ Data Nodes**: Storage and query execution
 
-**Configuration Coordinating Node** :
+**Coordinating Node Configuration**:
 ```yaml
-node.roles: []  # Vide = coordinating only
+node.roles: []  # Empty = coordinating only
 ```
 
-**Use Case** : Clusters >50 nœuds où agrégations consomment beaucoup de mémoire
+**Use Case**: Clusters >50 nodes where aggregations consume a lot of memory
 
 ---
 
-# Dimensionnement : Règles de Thumb
+# Sizing: Rules of Thumb
 
-**Combien de nœuds et quelle taille ?**
+**How many nodes and what size?**
 
-| Ressource | Recommandation | Justification |
-|-----------|----------------|---------------|
-| **Heap JVM** | 50% de RAM, max 31 GB | Au-delà de 32GB, perte de compressed oops |
-| **RAM totale** | 2x Heap (reste pour OS cache) | OS cache accélère les lectures disque |
-| **CPU** | 8+ cores pour data nodes | Recherches et indexations parallèles |
-| **Disque** | SSD pour hot, HDD pour warm/cold | Latence critique pour indexation |
-| **Shards** | 20-50 GB par shard | Trop petits = overhead, trop gros = recovery lent |
-| **Shards par nœud** | < 3000 shards | Au-delà, dégradation performance master |
+| Resource | Recommendation | Justification |
+|----------|----------------|---------------|
+| **JVM Heap** | 50% of RAM, max 31 GB | Beyond 32GB, loss of compressed oops |
+| **Total RAM** | 2x Heap (rest for OS cache) | OS cache accelerates disk reads |
+| **CPU** | 8+ cores for data nodes | Parallel searches and indexing |
+| **Disk** | SSD for hot, HDD for warm/cold | Critical latency for indexing |
+| **Shards** | 20-50 GB per shard | Too small = overhead, too large = slow recovery |
+| **Shards per node** | < 3000 shards | Beyond this, master performance degradation |
 
-**Exemple de dimensionnement** :
-- 500 GB de données actives
-- Shards de 30 GB → 17 shards primaires
-- Réplication factor 1 → 17 répliques
-- Total : 34 shards
-- Recommandation : 4-6 data nodes
+**Sizing example**:
+- 500 GB active data
+- 30 GB shards -> 17 primary shards
+- Replication factor 1 -> 17 replicas
+- Total: 34 shards
+- Recommendation: 4-6 data nodes
 
 ---
 layout: section
 ---
 
-# Partie 2: Configuration de Haute Disponibilité
+# Part 2: High Availability Configuration
 
-Réplication, rack awareness, et cross-cluster replication
-
----
-
-# Haute Disponibilité : Principes
-
-**Haute disponibilité** = Le cluster continue de fonctionner malgré des pannes.
-
-**Composants de HA** :
-1. **Quorum de masters** : 3+ master-eligible nodes (éviter split-brain)
-2. **Répliques de shards** : 1+ répliques par shard primaire
-3. **Rack Awareness** : Distribuer répliques sur différentes zones de disponibilité
-4. **Load Balancing** : Distribuer requêtes sur plusieurs nœuds
-5. **Monitoring et Alerting** : Détecter pannes rapidement
-
-**Formule de quorum** : `(nombre_masters / 2) + 1`
-- 3 masters → quorum = 2 (tolérance : 1 panne)
-- 5 masters → quorum = 3 (tolérance : 2 pannes)
+Replication, rack awareness, and cross-cluster replication
 
 ---
 
-# Configuration des Répliques
+# High Availability: Principles
 
-**Répliques** = Copies des shards primaires pour tolérer pannes et répartir charge de lecture.
+**High availability** = The cluster continues to function despite failures.
 
-**Configurer le nombre de répliques** :
+**HA Components**:
+1. **Master quorum**: 3+ master-eligible nodes (avoid split-brain)
+2. **Shard replicas**: 1+ replicas per primary shard
+3. **Rack Awareness**: Distribute replicas across different availability zones
+4. **Load Balancing**: Distribute requests across multiple nodes
+5. **Monitoring and Alerting**: Detect failures quickly
+
+**Quorum formula**: `(number_masters / 2) + 1`
+- 3 masters -> quorum = 2 (tolerance: 1 failure)
+- 5 masters -> quorum = 3 (tolerance: 2 failures)
+
+---
+
+# Replica Configuration
+
+**Replicas** = Copies of primary shards to tolerate failures and distribute read load.
+
+**Configure replica count**:
 
 ```bash
-# Au niveau index
+# At index level
 PUT /my-index
 {
   "settings": {
@@ -281,78 +281,78 @@ PUT /my-index
   }
 }
 
-# Modifier un index existant
+# Modify an existing index
 PUT /my-index/_settings
 {
   "number_of_replicas": 2
 }
 ```
 
-**Stratégie de réplication** :
+**Replication strategy**:
 
-| Environnement | Répliques | Justification |
-|---------------|-----------|---------------|
-| **Dev/Test** | 0 | Performance max, pas de HA requis |
-| **Staging** | 1 | Balance entre HA et coût |
-| **Production** | 1-2 | HA standard (2 = tolérance 2 pannes) |
-| **Critique** | 2+ | Mission-critical (finance, santé) |
+| Environment | Replicas | Justification |
+|-------------|----------|---------------|
+| **Dev/Test** | 0 | Max performance, no HA required |
+| **Staging** | 1 | Balance between HA and cost |
+| **Production** | 1-2 | Standard HA (2 = tolerates 2 failures) |
+| **Critical** | 2+ | Mission-critical (finance, healthcare) |
 
-**Note** : `number_of_replicas = 2` signifie **3 copies totales** (1 primaire + 2 répliques)
+**Note**: `number_of_replicas = 2` means **3 total copies** (1 primary + 2 replicas)
 
 ---
 
 # Rack Awareness (Shard Allocation Awareness)
 
-**Problème** : Si tous les shards primaires et répliques sont sur le même rack/zone → panne du rack = perte de données.
+**Problem**: If all primary and replica shards are on the same rack/zone -> rack failure = data loss.
 
-**Solution** : **Rack Awareness** distribue répliques sur différentes zones de disponibilité.
+**Solution**: **Rack Awareness** distributes replicas across different availability zones.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  Zone A (Datacenter 1)    Zone B (Datacenter 2)         │
-│  ┌────────────┐            ┌────────────┐               │
-│  │ Primary 0  │            │ Replica 0  │               │
-│  │ Replica 1  │            │ Primary 1  │               │
-│  └────────────┘            └────────────┘               │
-│                                                          │
-│  Si Zone A down → Zone B a toutes les données           │
-└─────────────────────────────────────────────────────────┘
++-----------------------------------------------------------+
+|  Zone A (Datacenter 1)    Zone B (Datacenter 2)           |
+|  +--------------+          +--------------+               |
+|  | Primary 0    |          | Replica 0    |               |
+|  | Replica 1    |          | Primary 1    |               |
+|  +--------------+          +--------------+               |
+|                                                           |
+|  If Zone A down -> Zone B has all the data                |
++-----------------------------------------------------------+
 ```
 
-**Configuration** :
+**Configuration**:
 
-1. **Déclarer l'attribut d'awareness** dans `elasticsearch.yml` :
+1. **Declare the awareness attribute** in `elasticsearch.yml`:
 
 ```yaml
-# Node dans Zone A
+# Node in Zone A
 node.attr.zone: zone_a
 cluster.routing.allocation.awareness.attributes: zone
 
-# Node dans Zone B
+# Node in Zone B
 node.attr.zone: zone_b
 cluster.routing.allocation.awareness.attributes: zone
 ```
 
-2. **Forcer la distribution** (optionnel mais recommandé) :
+2. **Force distribution** (optional but recommended):
 
 ```yaml
 cluster.routing.allocation.awareness.force.zone.values: zone_a,zone_b
 ```
 
-Cela force Elasticsearch à **ne jamais allouer** primaire et réplique sur la même zone.
+This forces Elasticsearch to **never allocate** primary and replica on the same zone.
 
 ---
 
 # Shard Allocation Filtering
 
-**Contrôler** où les shards sont alloués selon des attributs personnalisés.
+**Control** where shards are allocated according to custom attributes.
 
-**Use Cases** :
-- Migrer indices vers nouveaux nœuds
-- Réserver certains nœuds pour indices critiques
-- Évacuer un nœud avant maintenance
+**Use Cases**:
+- Migrate indices to new nodes
+- Reserve certain nodes for critical indices
+- Evacuate a node before maintenance
 
-**Attributs personnalisés** :
+**Custom attributes**:
 
 ```yaml
 # elasticsearch.yml
@@ -360,29 +360,29 @@ node.attr.type: hot
 node.attr.environment: production
 ```
 
-**Filtrer allocation par index** :
+**Filter allocation by index**:
 
 ```bash
-# Allouer uniquement sur nœuds "hot"
+# Allocate only on "hot" nodes
 PUT /logs-2024-01/_settings
 {
   "index.routing.allocation.require.type": "hot"
 }
 
-# Exclure certains nœuds
+# Exclude certain nodes
 PUT /logs-2024-01/_settings
 {
   "index.routing.allocation.exclude._name": "node-3,node-4"
 }
 
-# Inclure uniquement certains nœuds
+# Include only certain nodes
 PUT /logs-2024-01/_settings
 {
   "index.routing.allocation.include.environment": "production"
 }
 ```
 
-**Filtrer au niveau cluster** :
+**Filter at cluster level**:
 
 ```bash
 PUT /_cluster/settings
@@ -397,23 +397,23 @@ PUT /_cluster/settings
 
 # Cross-Cluster Replication (CCR)
 
-**CCR** réplique des indices d'un cluster (leader) vers un autre cluster (follower) pour disaster recovery ou géo-distribution.
+**CCR** replicates indices from one cluster (leader) to another cluster (follower) for disaster recovery or geo-distribution.
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Cluster Primary (Paris)       Cluster DR (Londres) │
-│  ┌──────────────┐              ┌──────────────┐     │
-│  │ Leader Index │  ─────────>  │Follower Index│     │
-│  │  orders      │   Réplication│  orders      │     │
-│  └──────────────┘              └──────────────┘     │
-│                                                      │
-│  Si Paris down → Basculer vers Londres              │
-└─────────────────────────────────────────────────────┘
++-----------------------------------------------------+
+|  Primary Cluster (Paris)       DR Cluster (London)  |
+|  +--------------+              +--------------+     |
+|  | Leader Index |  ----------> |Follower Index|     |
+|  |  orders      |   Replication|  orders      |     |
+|  +--------------+              +--------------+     |
+|                                                     |
+|  If Paris down -> Switch to London                  |
++-----------------------------------------------------+
 ```
 
-**Configuration CCR** :
+**CCR Configuration**:
 
-1. **Configurer le remote cluster** (sur follower) :
+1. **Configure the remote cluster** (on follower):
 
 ```bash
 PUT /_cluster/settings
@@ -427,7 +427,7 @@ PUT /_cluster/settings
 }
 ```
 
-2. **Créer un follower index** :
+2. **Create a follower index**:
 
 ```bash
 PUT /orders/_ccr/follow
@@ -437,71 +437,71 @@ PUT /orders/_ccr/follow
 }
 ```
 
-3. **Surveiller la réplication** :
+3. **Monitor replication**:
 
 ```bash
 GET /orders/_ccr/stats
 ```
 
-**Use Cases** :
-- **Disaster Recovery** : Cluster de secours dans une autre région
-- **Géo-distribution** : Données répliquées près des utilisateurs
-- **Reporting** : Cluster de reporting séparé du cluster de production
+**Use Cases**:
+- **Disaster Recovery**: Standby cluster in another region
+- **Geo-distribution**: Data replicated near users
+- **Reporting**: Separate reporting cluster from production cluster
 
 ---
 layout: section
 ---
 
-# Partie 3: Planification de Disaster Recovery
+# Part 3: Disaster Recovery Planning
 
-RPO, RTO, et stratégies de sauvegarde
-
----
-
-# RPO et RTO : Définitions
-
-**RPO (Recovery Point Objective)** : Perte de données maximale acceptable
-
-- RPO = 1 heure → Snapshots toutes les heures
-- RPO = 5 minutes → Réplication synchrone (CCR)
-
-**RTO (Recovery Time Objective)** : Temps maximum pour restaurer le service
-
-- RTO = 4 heures → Restauration manuelle acceptable
-- RTO = 15 minutes → Cluster de standby requis
-
-```
-┌────────────────────────────────────────────────────┐
-│  Timeline d'incident                                │
-│                                                     │
-│  [Incident] ←─ RPO ─→ [Last Backup]                │
-│      │                                              │
-│      ↓                                              │
-│  [Recovery Starts] ←─ RTO ─→ [Service Restored]    │
-└────────────────────────────────────────────────────┘
-```
-
-**Exemples par criticité** :
-
-| Type de données | RPO | RTO | Stratégie |
-|-----------------|-----|-----|-----------|
-| Logs applicatifs | 24h | 8h | Snapshots quotidiens |
-| Données transactionnelles | 1h | 2h | Snapshots horaires + répliques |
-| Données financières | 5 min | 15 min | CCR + répliques multiples |
-| Données critiques santé | 0 (sync) | 5 min | CCR synchrone + standby cluster |
+RPO, RTO, and backup strategies
 
 ---
 
-# Stratégies de Sauvegarde
+# RPO and RTO: Definitions
 
-**3-2-1 Rule** : 3 copies, 2 supports différents, 1 copie off-site
+**RPO (Recovery Point Objective)**: Maximum acceptable data loss
 
-**Stratégie 1 : Snapshots réguliers** :
-- **RPO** : Dépend de la fréquence (1h, 6h, 24h)
-- **RTO** : Temps de restauration (15 min - 2h selon taille)
+- RPO = 1 hour -> Snapshots every hour
+- RPO = 5 minutes -> Synchronous replication (CCR)
+
+**RTO (Recovery Time Objective)**: Maximum time to restore service
+
+- RTO = 4 hours -> Manual restoration acceptable
+- RTO = 15 minutes -> Standby cluster required
+
+```
++----------------------------------------------------+
+|  Incident Timeline                                 |
+|                                                    |
+|  [Incident] <-- RPO --> [Last Backup]              |
+|      |                                             |
+|      v                                             |
+|  [Recovery Starts] <-- RTO --> [Service Restored]  |
++----------------------------------------------------+
+```
+
+**Examples by criticality**:
+
+| Data Type | RPO | RTO | Strategy |
+|-----------|-----|-----|----------|
+| Application logs | 24h | 8h | Daily snapshots |
+| Transactional data | 1h | 2h | Hourly snapshots + replicas |
+| Financial data | 5 min | 15 min | CCR + multiple replicas |
+| Critical health data | 0 (sync) | 5 min | Synchronous CCR + standby cluster |
+
+---
+
+# Backup Strategies
+
+**3-2-1 Rule**: 3 copies, 2 different media, 1 copy off-site
+
+**Strategy 1: Regular snapshots**:
+- **RPO**: Depends on frequency (1h, 6h, 24h)
+- **RTO**: Restoration time (15 min - 2h depending on size)
 
 ```bash
-# SLM policy pour snapshots horaires
+# SLM policy for hourly snapshots
 PUT /_slm/policy/hourly-snapshots
 {
   "schedule": "0 * * * *",
@@ -517,148 +517,148 @@ PUT /_slm/policy/hourly-snapshots
 }
 ```
 
-**Stratégie 2 : CCR pour DR** :
-- **RPO** : Quasi-temps réel (< 1 minute)
-- **RTO** : Basculement manuel (5-15 minutes)
+**Strategy 2: CCR for DR**:
+- **RPO**: Near real-time (< 1 minute)
+- **RTO**: Manual failover (5-15 minutes)
 
-**Stratégie 3 : Hybrid (Snapshots + CCR)** :
-- **CCR** pour recovery rapide
-- **Snapshots** pour protection contre corruption logique et conformité
-
----
-
-# Tester le Disaster Recovery
-
-**Règle d'or** : Un plan DR non testé = pas de plan DR
-
-**Tests réguliers** :
-
-1. **Test de restauration de snapshot** (mensuel) :
-   - Restaurer snapshot dans cluster de test
-   - Vérifier intégrité des données
-   - Mesurer le temps de restauration (RTO réel)
-
-2. **Test de basculement CCR** (trimestriel) :
-   - Promouvoir follower index en leader
-   - Rediriger applications vers cluster DR
-   - Mesurer le temps de basculement
-
-3. **Simulation de panne complète** (annuel) :
-   - Arrêter le cluster primaire
-   - Activer cluster DR
-   - Valider que les applications fonctionnent
-
-**Documenter les résultats** :
-- RPO/RTO atteints vs objectifs
-- Points de blocage rencontrés
-- Actions correctives
+**Strategy 3: Hybrid (Snapshots + CCR)**:
+- **CCR** for fast recovery
+- **Snapshots** for protection against logical corruption and compliance
 
 ---
 
-# Checklist de Disaster Recovery
+# Testing Disaster Recovery
 
-**Avant incident** :
-- ✅ Snapshots automatisés (SLM) configurés et testés
-- ✅ CCR configuré si RPO < 1h requis
-- ✅ Runbook de disaster recovery documenté et accessible
-- ✅ Équipe formée aux procédures de DR
-- ✅ Contacts d'escalation définis
-- ✅ Accès aux credentials de secours disponibles
+**Golden rule**: An untested DR plan = no DR plan
 
-**Pendant incident** :
-1. Évaluer l'ampleur (quels indices/nœuds affectés ?)
-2. Décider : Restauration locale ou basculement DR ?
-3. Exécuter le runbook approprié
-4. Communiquer status aux stakeholders
-5. Logger toutes les actions
+**Regular tests**:
 
-**Après incident** :
-1. Post-mortem : Cause root, timeline, impact
-2. Vérifier intégrité des données restaurées
-3. Mettre à jour le runbook si nécessaire
-4. Planifier actions préventives
+1. **Snapshot restoration test** (monthly):
+   - Restore snapshot in test cluster
+   - Verify data integrity
+   - Measure restoration time (actual RTO)
+
+2. **CCR failover test** (quarterly):
+   - Promote follower index to leader
+   - Redirect applications to DR cluster
+   - Measure failover time
+
+3. **Complete failure simulation** (annual):
+   - Stop primary cluster
+   - Activate DR cluster
+   - Validate that applications work
+
+**Document results**:
+- Achieved RPO/RTO vs objectives
+- Blockers encountered
+- Corrective actions
+
+---
+
+# Disaster Recovery Checklist
+
+**Before incident**:
+- Automated snapshots (SLM) configured and tested
+- CCR configured if RPO < 1h required
+- Disaster recovery runbook documented and accessible
+- Team trained on DR procedures
+- Escalation contacts defined
+- Access to emergency credentials available
+
+**During incident**:
+1. Assess scope (which indices/nodes affected?)
+2. Decide: Local restoration or DR failover?
+3. Execute appropriate runbook
+4. Communicate status to stakeholders
+5. Log all actions
+
+**After incident**:
+1. Post-mortem: Root cause, timeline, impact
+2. Verify integrity of restored data
+3. Update runbook if necessary
+4. Plan preventive actions
 
 ---
 layout: section
 ---
 
-# Partie 4: Checklists Opérationnelles
+# Part 4: Operational Checklists
 
-Pre-deployment, monitoring, et incident response
+Pre-deployment, monitoring, and incident response
 
 ---
 
 # Pre-Deployment Checklist
 
-**Avant de déployer en production** :
+**Before deploying to production**:
 
-**Infrastructure** :
-- ✅ Sizing approprié (CPU, RAM, disque selon charges attendues)
-- ✅ Dedicated master nodes (3+ pour quorum)
-- ✅ Rack awareness configuré (multi-AZ)
-- ✅ Network optimisé (latence < 10ms entre nœuds)
-- ✅ Firewall configuré (port 9200, 9300)
+**Infrastructure**:
+- Appropriate sizing (CPU, RAM, disk based on expected loads)
+- Dedicated master nodes (3+ for quorum)
+- Rack awareness configured (multi-AZ)
+- Optimized network (latency < 10ms between nodes)
+- Firewall configured (port 9200, 9300)
 
-**Configuration Elasticsearch** :
-- ✅ Heap size = 50% RAM, max 31 GB
-- ✅ Swap désactivé (`bootstrap.memory_lock: true`)
-- ✅ File descriptors ≥ 65535
-- ✅ Virtual memory `vm.max_map_count` ≥ 262144
-- ✅ Cluster name unique et meaningful
+**Elasticsearch Configuration**:
+- Heap size = 50% RAM, max 31 GB
+- Swap disabled (`bootstrap.memory_lock: true`)
+- File descriptors >= 65535
+- Virtual memory `vm.max_map_count` >= 262144
+- Unique and meaningful cluster name
 
-**Sécurité** :
-- ✅ Sécurité activée (`xpack.security.enabled: true`)
-- ✅ TLS/SSL configuré (transport et HTTP)
-- ✅ Utilisateurs et rôles créés selon principe du moindre privilège
-- ✅ Audit logging activé
-- ✅ Passwords complexes pour utilisateurs intégrés
+**Security**:
+- Security enabled (`xpack.security.enabled: true`)
+- TLS/SSL configured (transport and HTTP)
+- Users and roles created according to least privilege principle
+- Audit logging enabled
+- Complex passwords for built-in users
 
-**Haute Disponibilité** :
-- ✅ Répliques configurées (1-2 selon criticité)
-- ✅ SLM policies pour snapshots automatiques
-- ✅ Repository de snapshots testé
-- ✅ CCR configuré si RPO < 1h
+**High Availability**:
+- Replicas configured (1-2 based on criticality)
+- SLM policies for automatic snapshots
+- Snapshot repository tested
+- CCR configured if RPO < 1h
 
-**Monitoring** :
-- ✅ Stack Monitoring activé
-- ✅ Alertes configurées (cluster health, disk, heap)
-- ✅ Dashboards Kibana créés pour métriques clés
-- ✅ Intégration avec système de monitoring externe (Prometheus, Datadog)
+**Monitoring**:
+- Stack Monitoring enabled
+- Alerts configured (cluster health, disk, heap)
+- Kibana dashboards created for key metrics
+- Integration with external monitoring system (Prometheus, Datadog)
 
 ---
 
 # Monitoring Checklist
 
-**Métriques à surveiller en continu** :
+**Metrics to monitor continuously**:
 
-**Santé du Cluster** :
-- ✅ Cluster status (GREEN / YELLOW / RED)
-- ✅ Nombre de nœuds actifs
-- ✅ Shards non assignés
-- ✅ Tasks en attente (pending tasks)
+**Cluster Health**:
+- Cluster status (GREEN / YELLOW / RED)
+- Number of active nodes
+- Unassigned shards
+- Pending tasks
 
-**Performance** :
-- ✅ Indexing rate (docs/sec)
-- ✅ Search rate (queries/sec)
-- ✅ Search latency (p95, p99)
-- ✅ Indexing latency
+**Performance**:
+- Indexing rate (docs/sec)
+- Search rate (queries/sec)
+- Search latency (p95, p99)
+- Indexing latency
 
-**Ressources** :
-- ✅ Heap usage (alerte si > 85%)
-- ✅ GC frequency et duration (alerte si GC > 5s)
-- ✅ Disk usage (alerte si > 85%)
-- ✅ CPU usage
-- ✅ Network I/O
+**Resources**:
+- Heap usage (alert if > 85%)
+- GC frequency and duration (alert if GC > 5s)
+- Disk usage (alert if > 85%)
+- CPU usage
+- Network I/O
 
-**Disponibilité** :
-- ✅ Uptime des nœuds
-- ✅ Rejected requests (thread pools)
-- ✅ Circuit breakers trips
+**Availability**:
+- Node uptime
+- Rejected requests (thread pools)
+- Circuit breakers trips
 
-**Seuils d'alerte recommandés** :
+**Recommended alert thresholds**:
 
-| Métrique | Warning | Critical |
-|----------|---------|----------|
+| Metric | Warning | Critical |
+|--------|---------|----------|
 | Heap usage | > 75% | > 85% |
 | Disk usage | > 75% | > 85% |
 | GC duration | > 1s | > 5s |
@@ -669,16 +669,16 @@ Pre-deployment, monitoring, et incident response
 
 # Incident Response Runbook
 
-**Workflow général** :
+**General workflow**:
 ```
-[Alerte] → [Triage] → [Diagnostic] → [Mitigation] → [Resolution] → [Post-Mortem]
+[Alert] -> [Triage] -> [Diagnosis] -> [Mitigation] -> [Resolution] -> [Post-Mortem]
 ```
 
-**Incident 1 : Cluster status RED**
+**Incident 1: Cluster status RED**
 
-**Symptôme** : `GET /_cluster/health` retourne `"status": "red"`
+**Symptom**: `GET /_cluster/health` returns `"status": "red"`
 
-**Triage** :
+**Triage**:
 ```bash
 GET /_cat/indices?v&health=red
 GET /_cat/shards?v&h=index,shard,state,unassigned.reason
@@ -686,9 +686,9 @@ GET /_cat/shards?v&h=index,shard,state,unassigned.reason
 
 ---
 
-# Incident 1 : Cluster RED (diagnostic)
+# Incident 1: Cluster RED (diagnosis)
 
-**Diagnostic** :
+**Diagnosis**:
 ```bash
 GET /_cluster/allocation/explain
 {
@@ -698,16 +698,16 @@ GET /_cluster/allocation/explain
 }
 ```
 
-**Causes courantes** :
-- Nœud(s) down → Attendre recovery
-- Disk full → Libérer espace
-- Corruption → Restaurer snapshot
+**Common causes**:
+- Node(s) down -> Wait for recovery
+- Disk full -> Free up space
+- Corruption -> Restore from snapshot
 
 ---
 
-# Incident 1 : Cluster RED (mitigation)
+# Incident 1: Cluster RED (mitigation)
 
-**Mitigation disk full** :
+**Disk full mitigation**:
 ```bash
 PUT /_cluster/settings
 {
@@ -717,7 +717,7 @@ PUT /_cluster/settings
 }
 ```
 
-**Mitigation corruption** :
+**Corruption mitigation**:
 ```bash
 POST /_cluster/reroute
 {
@@ -731,11 +731,11 @@ POST /_cluster/reroute
 
 ---
 
-# Incident 2 : Performance Dégradée
+# Incident 2: Degraded Performance
 
-**Symptôme** : Recherches lentes (p95 > 1s), indexation lente
+**Symptom**: Slow searches (p95 > 1s), slow indexing
 
-**Diagnostic** :
+**Diagnosis**:
 ```bash
 GET /slow-index/_settings
 GET /_nodes/hot_threads
@@ -743,17 +743,17 @@ GET /_cat/tasks?v&detailed
 GET /_cat/thread_pool?v&h=name,active,rejected
 ```
 
-**Causes courantes** :
-- Requêtes lourdes (wildcards)
+**Common causes**:
+- Heavy queries (wildcards)
 - Heap pressure (GC thrashing)
 - Disk I/O (merges)
-- Shard allocation déséquilibré
+- Unbalanced shard allocation
 
 ---
 
-# Incident 2 : Performance Dégradée (mitigation)
+# Incident 2: Degraded Performance (mitigation)
 
-**Mitigation thread pools** :
+**Thread pools mitigation**:
 ```bash
 PUT /_cluster/settings
 {
@@ -763,7 +763,7 @@ PUT /_cluster/settings
 }
 ```
 
-**Désactiver réplication temporairement** :
+**Temporarily disable replication**:
 ```bash
 PUT /_cluster/settings
 {
@@ -772,133 +772,133 @@ PUT /_cluster/settings
   }
 }
 
-# Après indexation, réactiver
+# After indexing, re-enable
 # ... "enable": "all"
 ```
 
 ---
 
-# Incident 3 : Split-Brain Detection
+# Incident 3: Split-Brain Detection
 
-**Symptôme** : Deux clusters indépendants se forment (duplication de données, conflits)
+**Symptom**: Two independent clusters form (data duplication, conflicts)
 
-**Prévention** :
+**Prevention**:
 ```yaml
 # elasticsearch.yml
-discovery.zen.minimum_master_nodes: 2  # Pour 3 masters (quorum)
+discovery.zen.minimum_master_nodes: 2  # For 3 masters (quorum)
 ```
 
-**Diagnostic** :
+**Diagnosis**:
 ```bash
-# Vérifier les masters élus
+# Check elected masters
 GET /_cat/master?v
 
-# Comparer cluster state sur différents nœuds
+# Compare cluster state on different nodes
 GET /_cluster/state/master_node
 ```
 
-**Résolution** :
-1. **Arrêter l'écriture** sur les deux clusters
-2. **Identifier le cluster authoritative** (le plus récent/complet)
-3. **Arrêter le cluster non-authoritative**
-4. **Fusionner les données** si nécessaire via restauration
-5. **Reconfigurer discovery.seed_hosts** pour éviter récurrence
+**Resolution**:
+1. **Stop writing** on both clusters
+2. **Identify the authoritative cluster** (most recent/complete)
+3. **Stop the non-authoritative cluster**
+4. **Merge data** if necessary via restoration
+5. **Reconfigure discovery.seed_hosts** to avoid recurrence
 
 ---
 
 # Post-Incident Actions
 
-**Post-Mortem Template** :
+**Post-Mortem Template**:
 
 ```markdown
-# Incident Post-Mortem: [Titre]
+# Incident Post-Mortem: [Title]
 
 **Date**: 2024-01-15
-**Durée**: 2h 30min
-**Impact**: Recherches indisponibles pour 10% utilisateurs
+**Duration**: 2h 30min
+**Impact**: Searches unavailable for 10% of users
 
 ## Timeline
-- 10:00 : Alerte Cluster RED
-- 10:05 : Équipe Ops notifiée
-- 10:15 : Diagnostic identifie disk full
-- 10:45 : Ajout de nœuds data, réallocation shards
-- 12:30 : Cluster GREEN, service restauré
+- 10:00: Cluster RED alert
+- 10:05: Ops team notified
+- 10:15: Diagnosis identifies disk full
+- 10:45: Adding data nodes, shard reallocation
+- 12:30: Cluster GREEN, service restored
 
 ## Root Cause
-Croissance de données imprévue (3x normal) suite à bug applicatif
+Unexpected data growth (3x normal) due to application bug
 
 ## Impact
-- 2000 requêtes échouées
-- 0 perte de données (répliques OK)
+- 2000 failed requests
+- 0 data loss (replicas OK)
 
-## Actions Correctives
-1. Implémenter alerte sur croissance anormale de données
-2. Automatiser ajout de nœuds (scaling horizontal)
-3. Fixer le bug applicatif
-4. Augmenter disk watermark thresholds
+## Corrective Actions
+1. Implement alert on abnormal data growth
+2. Automate node addition (horizontal scaling)
+3. Fix the application bug
+4. Increase disk watermark thresholds
 
 ## Lessons Learned
-- Besoin de capacity planning plus proactif
-- Runbook disk full à mettre à jour
+- Need for more proactive capacity planning
+- Disk full runbook needs updating
 ```
 
 ---
 
-# Résumé : Bonnes Pratiques de Production
+# Summary: Production Best Practices
 
-| Domaine | Best Practice | Bénéfice |
-|---------|---------------|----------|
-| **Architecture** | Dedicated master nodes (3+) | Stabilité du cluster |
-| **Architecture** | Hot-Warm-Cold tiers | Optimisation coûts |
-| **Sizing** | Heap ≤ 31 GB, 50% RAM | Performance optimale |
-| **HA** | Répliques + Rack Awareness | Tolérance aux pannes |
-| **HA** | CCR pour DR (RPO < 1h) | Recovery rapide |
-| **Backup** | SLM automatisé + tests mensuels | Protection données |
-| **Monitoring** | Alertes sur heap, disk, status | Détection précoce |
-| **Sécurité** | TLS + RBAC + Audit logging | Conformité et protection |
-| **Opérations** | Runbooks documentés et testés | Résolution rapide incidents |
+| Domain | Best Practice | Benefit |
+|--------|---------------|---------|
+| **Architecture** | Dedicated master nodes (3+) | Cluster stability |
+| **Architecture** | Hot-Warm-Cold tiers | Cost optimization |
+| **Sizing** | Heap <= 31 GB, 50% RAM | Optimal performance |
+| **HA** | Replicas + Rack Awareness | Fault tolerance |
+| **HA** | CCR for DR (RPO < 1h) | Fast recovery |
+| **Backup** | Automated SLM + monthly tests | Data protection |
+| **Monitoring** | Alerts on heap, disk, status | Early detection |
+| **Security** | TLS + RBAC + Audit logging | Compliance and protection |
+| **Operations** | Documented and tested runbooks | Fast incident resolution |
 
-**Principe fondamental** : **Concevoir pour la panne** (Design for Failure)
-
----
-
-# Points Clés à Retenir
-
-**Architecture** :
-- Séparer les rôles (dedicated masters, data tiers)
-- Dimensionner selon charges réelles (load testing)
-- Hot-Warm-Cold pour optimiser coûts
-
-**Haute Disponibilité** :
-- Quorum de masters (3+), répliques (1-2)
-- Rack awareness pour distribution géographique
-- CCR pour disaster recovery multi-région
-
-**Disaster Recovery** :
-- Définir RPO/RTO selon criticité métier
-- Snapshots automatisés (SLM) + tests réguliers
-- Runbooks de DR documentés et pratiqués
-
-**Opérations** :
-- Checklists pre-deployment rigoureuses
-- Monitoring proactif avec alertes
-- Incident response runbooks pour scénarios courants
-- Post-mortems après chaque incident
+**Fundamental principle**: **Design for Failure**
 
 ---
 
-# Ressources et Documentation
+# Key Takeaways
 
-**Documentation officielle Elasticsearch** :
+**Architecture**:
+- Separate roles (dedicated masters, data tiers)
+- Size according to actual loads (load testing)
+- Hot-Warm-Cold to optimize costs
+
+**High Availability**:
+- Master quorum (3+), replicas (1-2)
+- Rack awareness for geographic distribution
+- CCR for multi-region disaster recovery
+
+**Disaster Recovery**:
+- Define RPO/RTO according to business criticality
+- Automated snapshots (SLM) + regular tests
+- Documented and practiced DR runbooks
+
+**Operations**:
+- Rigorous pre-deployment checklists
+- Proactive monitoring with alerts
+- Incident response runbooks for common scenarios
+- Post-mortems after each incident
+
+---
+
+# Resources and Documentation
+
+**Official Elasticsearch Documentation**:
 - [Cluster design](https://www.elastic.co/guide/en/elasticsearch/reference/current/scalability.html)
 - [High availability](https://www.elastic.co/guide/en/elasticsearch/reference/current/high-availability.html)
 - [Shard allocation awareness](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html#shard-allocation-awareness)
 
-**Guides de production** :
+**Production Guides**:
 - [Production deployment](https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
 - [Disaster recovery](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html)
 - [Monitoring best practices](https://www.elastic.co/guide/en/elasticsearch/reference/current/monitor-elasticsearch-cluster.html)
 
-**Blogs et whitepapers** :
+**Blogs and whitepapers**:
 - [Elasticsearch Best Practices](https://www.elastic.co/blog/found-elasticsearch-in-production)
 - [Sizing Elasticsearch](https://www.elastic.co/elasticon/conf/2016/sf/quantitative-cluster-sizing)
