@@ -25,13 +25,13 @@ layout: intro
 ## Fundamentals and Architecture (9am-5pm)
 
 **Morning (9am-12:30pm)**:
-- General presentation and concepts (1h)
-- Installation and configuration (1h)
-- Indexing and document management (1h30)
+- General presentation and concepts
+- Installation and configuration
+- Indexing and document management
 
 **Afternoon (2pm-5pm)**:
-- Mapping and Schemas - Critical for your use case (2h)
-- Basic search (1h)
+- Mapping and Schemas - Critical for your use case
+- Basic search
 
 ---
 src: ./chapters/elasticsearch/01_general_concepts.md
@@ -111,6 +111,11 @@ hide: false
 ---
 
 ---
+src: ./chapters/elasticsearch/04_analyzers.md
+hide: false
+---
+
+---
 src: ./chapters/elasticsearch/05_search.md
 hide: false
 ---
@@ -157,8 +162,7 @@ By Emmanuel DEMEY
 ---
 layout: center
 ---
-cd ..
-cd ..
+
 # Day 1 Recap
 
 <v-clicks>
@@ -186,13 +190,13 @@ layout: intro
 ## Performance, Optimization and Production (9am-5pm)
 
 **Morning (9am-12:30pm)**:
-- Aggregations (1h)
-- Ingest Pipelines (1h)
-- Data Retention and ILM (1h)
+- Aggregations
+- Ingest Pipelines
+- Data Retention and ILM
 
 **Afternoon (2pm-5pm)**:
-- Operating and Troubleshooting (2h)
-- Audit of your cluster (1h)
+- Operating and Troubleshooting
+- Audit of your cluster
 
 ---
 src: ./chapters/elasticsearch/05_agregation.md
@@ -210,8 +214,6 @@ layout: section
 ---
 
 # Part 8: Data Retention and ILM
-
-## CRITICAL FOR REDUCING YOUR COSTS
 
 ---
 
@@ -842,13 +844,13 @@ layout: intro
 ## Monitoring, Security and APM (9am-5pm)
 
 **Morning (9am-12:30pm)**:
-- Deep monitoring (2h)
-- Alerting (1h30)
+- Deep monitoring
+- Alerting
 
 **Afternoon (2pm-5pm)**:
-- Security (1h30)
-- APM and Application Logs (1h)
-- Summary and Q&A (30min)
+- Security
+- APM and Application Logs
+- Summary and Q&A
 
 ---
 layout: section

@@ -10,86 +10,69 @@ All exercises use the Kibana Dev Tools console. Access it at: `http://localhost:
 
 # Part 2: Installation and Configuration
 
-## Exercise 2.1: Starting Elasticsearch and First Health Check
+## Exercise 2.1: Starting Elasticsearch and Kibana - Local Installation
 
-**Objective**: Install, start Elasticsearch and verify it's running correctly.
+**Objective**: Install and start Elasticsearch and Kibana locally, then verify they're running correctly.
 
-### Step 1: Start Elasticsearch
+### Step 1: Install and Start Elasticsearch
 
-**Option A: Using Docker (recommended for training)**
-```bash
-# Create a network
-docker network create elastic
-
-# Start Elasticsearch
-docker run -d --name elasticsearch \
-  --net elastic \
-  -p 9200:9200 \
-  -e "discovery.type=single-node" \
-  -e "xpack.security.enabled=false" \
-  -e "xpack.security.enrollment.enabled=false" \
-  docker.elastic.co/elasticsearch/elasticsearch:9.0.0
-
-# Start Kibana
-docker run -d --name kibana \
-  --net elastic \
-  -p 5601:5601 \
-  -e "ELASTICSEARCH_HOSTS=http://elasticsearch:9200" \
-  docker.elastic.co/kibana/kibana:9.0.0
-```
-
-**Option B: Using Docker Compose**
-
-Create a `docker-compose.yml` file:
-```yaml
-version: '3.8'
-services:
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    ports:
-      - 9200:9200
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.0.0
-    container_name: kibana
-    ports:
-      - 5601:5601
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-
-volumes:
-  esdata:
-```
-
-Then run:
-```bash
-docker-compose up -d
-```
-
-**Option C: Local Installation**
 ```bash
 # Download and extract Elasticsearch
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-9.0.0-linux-x86_64.tar.gz
 tar -xzf elasticsearch-9.0.0-linux-x86_64.tar.gz
 cd elasticsearch-9.0.0
 
-# Start Elasticsearch
+# Configure Elasticsearch for single-node (edit config/elasticsearch.yml)
+echo "discovery.type: single-node" >> config/elasticsearch.yml
+echo "xpack.security.enabled: false" >> config/elasticsearch.yml
+
+# Start Elasticsearch (in the background or in a separate terminal)
 ./bin/elasticsearch
 ```
 
-### Step 2: Verify Installation
+**Note**: Keep this terminal open or run in background. Elasticsearch will start on port 9200.
 
-Wait 30-60 seconds for startup, then open Kibana Dev Tools: `http://localhost:5601/app/dev_tools#/console`
+### Step 2: Install and Start Kibana
 
+Open a **new terminal** window:
+
+```bash
+# Download and extract Kibana
+wget https://artifacts.elastic.co/downloads/kibana/kibana-9.0.0-linux-x86_64.tar.gz
+tar -xzf kibana-9.0.0-linux-x86_64.tar.gz
+cd kibana-9.0.0
+
+# Configure Kibana to connect to Elasticsearch (edit config/kibana.yml)
+echo "elasticsearch.hosts: ['http://localhost:9200']" >> config/kibana.yml
+
+# Start Kibana
+./bin/kibana
+```
+
+**Note**: Kibana will start on port 5601. Wait 1-2 minutes for full startup.
+
+### Step 3: Verify Installation
+
+**Check Elasticsearch is running:**
+```bash
+# In a new terminal, check Elasticsearch
+curl http://localhost:9200
+
+# You should see JSON output with cluster info and version 9.0.0
+```
+
+**Check Kibana is running:**
+```bash
+# Check Kibana status
+curl http://localhost:5601/api/status
+
+# Or simply open in browser
+# http://localhost:5601
+```
+
+Wait 30-60 seconds for full startup, then open Kibana Dev Tools: `http://localhost:5601/app/dev_tools#/console`
+
+**In Kibana Dev Tools, run:**
 ```bash
 # Check Elasticsearch is responding
 GET /
@@ -102,11 +85,13 @@ GET /_cat/nodes?v
 ```
 
 **Expected Results**:
+- Elasticsearch responds on port 9200
+- Kibana interface is accessible on port 5601
 - Cluster status should be `green` or `yellow`
 - At least one node should be listed
 - Version should be 9.x
 
-### Step 3: Explore Cluster Information
+### Step 4: Explore Cluster Information
 
 ```bash
 # Get detailed cluster info
@@ -259,15 +244,7 @@ GET /logs-parkki/_count
 
 GET /logs-parkki/_search
 {
-  "size": 0,
-  "aggs": {
-    "by_level": {
-      "terms": { "field": "level.keyword" }
-    },
-    "by_service": {
-      "terms": { "field": "service.keyword" }
-    }
-  }
+  "size": 0
 }
 ```
 
@@ -283,7 +260,6 @@ POST /_bulk
 **Challenge**:
 - How many documents were indexed successfully?
 - Did the invalid date cause the entire bulk to fail, or just that document?
-- What is the average `response_time_ms` for ERROR level logs?
 
 ---
 
@@ -321,8 +297,7 @@ POST /reservations/_update/res001?if_seq_no=0&if_primary_term=1
 {
   "doc": {
     "status": "confirmed",
-    "confirmed_at": "2025-01-15T10:30:00Z",
-    "version": 2
+    "confirmed_at": "2025-01-15T10:30:00Z"
   }
 }
 ```
@@ -364,7 +339,7 @@ GET /reservations/_doc/res002
 **Challenge**:
 - What HTTP status code do you get for a version conflict?
 - What is the new price after the script update (with 1.1 multiplier)?
-- Create a script that only updates if status is "pending"
+- Create a script that only updates if status is "pendingx"
 
 ---
 
@@ -629,7 +604,7 @@ GET /parking-flat/_search
       "must": [
         { "term": { "spots.floor": 1 } },
         { "term": { "spots.type": "standard" } },
-        { "term": { "spots.available": true } }
+        { "term": { "spots.available": false } }
       ]
     }
   }
@@ -769,7 +744,7 @@ PUT /_component_template/parkki-mappings
 # General logs template (low priority)
 PUT /_index_template/logs-template
 {
-  "index_patterns": ["logs-*"],
+  "index_patterns": ["parkki-logs-*"],
   "priority": 100,
   "composed_of": ["base-settings", "logs-mappings"],
   "template": {
