@@ -17,7 +17,34 @@ drawings:
 
 # Elasticsearch
 
---- 
+---
+layout: two-cols
+---
+
+# Table of Contents
+
+## Day 1 - Fundamentals
+- General concepts
+- Installation and configuration
+- Indexing and documents
+- Mapping and schemas
+- Basic search
+
+::right::
+
+## Day 2 - Performance
+- Aggregations
+- Ingest Pipelines
+- Retention and ILM
+- Troubleshooting
+
+## Day 3 - Production
+- Monitoring and Fleet
+- Alerting
+- Security
+- APM
+
+---
 layout: intro
 ---
 
