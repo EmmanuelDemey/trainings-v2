@@ -1502,6 +1502,16 @@ GET /articles/_search
 ```
 
 5. Search After (for deep pagination):
+
+```bash
+PUT _cluster/settings
+{
+  "transient": {
+    "indices.id_field_data.enabled": true
+  }
+}
+```bash
+
 ```bash
 # First page
 GET /articles/_search
@@ -1888,18 +1898,16 @@ GET /transactions/_search
               "aggs": {
                 "count": { "value_count": { "field": "amount" } }
               }
+            },
+            "revenue_share": {
+              "normalize": {
+                "buckets_path": "revenue",
+                "method": "percent_of_sum"
+              }
             }
           }
         },
-        "total_revenue": { "sum": { "field": "amount" } },
-        "revenue_share": {
-          "bucket_script": {
-            "buckets_path": {
-              "spot_revenue": "by_spot_type>revenue"
-            },
-            "script": "params.spot_revenue"
-          }
-        }
+        "total_revenue": { "sum": { "field": "amount" } }
       }
     }
   }
@@ -2449,9 +2457,6 @@ PUT /_ilm/policy/parkki-logs-policy
       "delete": {
         "min_age": "30d",
         "actions": {
-          "wait_for_snapshot": {
-            "policy": "daily-snapshots"
-          },
           "delete": {}
         }
       }
@@ -3110,23 +3115,169 @@ GET /_stats/store?filter_path=indices.*.primaries.store
 
 ## Exercise 11.1: Metricbeat Setup and Configuration
 
-**Objective**: Install and configure Metricbeat to monitor Elasticsearch.
+**Objective**: Install and configure Metricbeat to monitor Elasticsearch and system metrics.
 
 **Instructions**:
 
-1. Start Metricbeat with Docker:
+1. Download and extract Metricbeat:
 ```bash
-docker run -d \
-  --name metricbeat \
-  --net elastic \
-  --user=root \
-  -e "ELASTICSEARCH_HOSTS=http://elasticsearch:9200" \
-  -e "KIBANA_HOST=http://kibana:5601" \
-  docker.elastic.co/beats/metricbeat:9.0.0 \
-  metricbeat -e -E setup.kibana.host=kibana:5601
+# Download Metricbeat
+wget https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-9.0.0-linux-x86_64.tar.gz
+tar -xzf metricbeat-9.0.0-linux-x86_64.tar.gz
+cd metricbeat-9.0.0-linux-x86_64
 ```
 
-2. Verify Metricbeat is sending data:
+2. Configure authentication for Beats (if cluster is secured):
+
+```bash
+# Go back to Elasticsearch directory
+cd /path/to/elasticsearch-9.0.0
+
+# Reset password for beats_system user
+./bin/elasticsearch-reset-password -u beats_system
+
+# The command will display the new password, write it down
+# Example output: New value: AbC123dEf456GhI789
+```
+
+3. Configure Metricbeat to collect system and Elasticsearch metrics:
+```bash
+# Backup original config
+# System module - collect CPU, memory, disk, network metrics
+metricbeat.modules:
+- module: system
+  period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - process
+    - process_summary
+    - socket_summary
+    - filesystem
+    - fsstat
+  processes: ['.*']
+  process.include_top_n:
+    by_cpu: 5
+    by_memory: 5
+  cpu.metrics: ["percentages", "normalized_percentages"]
+  core.metrics: ["percentages"]
+
+- module: system
+  period: 1m
+  metricsets:
+    - diskio
+    - uptime
+
+  
+  metricsets:
+    - node
+    - node_stats
+    - cluster_stats
+    - index
+    - index_recovery
+    - index_summary
+    - shard
+    - ml_job
+  
+  xpack.enabled: true
+
+```
+
+4. Enable specific modules and verify configuration:
+```bash
+# List available modules
+./metricbeat modules list
+
+# The system and elasticsearch modules should already be enabled in the config
+# Test the configuration
+./metricbeat test config
+
+# Test output connection
+./metricbeat test output
+```
+
+5. Setup Metricbeat assets (dashboards, index templates):
+```bash
+# This will create index templates and load Kibana dashboards
+./metricbeat setup -e
+
+# If you see errors, add verbose logging
+./metricbeat setup -e -d "*"
+```
+
+6. Fix file permissions (if needed):
+
+**Common Error**: `Error initializing beat: error loading config file: config file ("metricbeat.yml") must be owned by the user identifier (uid=0) or root`
+
+This error occurs because Metricbeat checks config file ownership for security reasons.
+
+```bash
+# Solution 1: Change ownership to current user (recommended for development)
+sudo chown $(whoami):$(id -gn) metricbeat.yml
+
+# Solution 2: Change ownership to root (if running as root)
+sudo chown root:root metricbeat.yml
+sudo chown root:root metrics.d/system.yml
+
+# Ensure config file has proper permissions (not world-writable)
+chmod 600 metricbeat.yml
+
+# Or use less restrictive permissions
+chmod 644 metricbeat.yml
+
+# Verify permissions
+ls -la metricbeat.yml
+# Should show: -rw------- or -rw-r--r-- with your user as owner
+```
+
+**Understanding the security check**:
+- Metricbeat verifies config file ownership to prevent unauthorized modifications
+- The file must be owned by the user running Metricbeat or by root
+- The file should not be world-writable (no write permissions for "others")
+
+7. Start Metricbeat:
+```bash
+# Start in foreground (for testing) - run as current user
+./metricbeat -e
+
+# If you still get permission errors, you have options:
+
+# Option A: Disable permission check (NOT recommended for production)
+./metricbeat -e --strict.perms=false
+
+# Option B: Run as root (if config is owned by root)
+sudo ./metricbeat -e
+
+# Option C: Run as background process
+./metricbeat -e &
+
+# Option D: Install as systemd service
+sudo ./metricbeat setup --index-management
+sudo systemctl enable metricbeat
+sudo systemctl start metricbeat
+sudo systemctl status metricbeat
+```
+
+**Troubleshooting**:
+```bash
+# Check current user
+whoami
+
+# Check file ownership
+ls -l metricbeat.yml
+
+# Check if running as root
+id
+
+# If file is owned by root but you're not root, either:
+# 1. Change ownership: sudo chown $(whoami) metricbeat.yml
+# 2. Run as root: sudo ./metricbeat -e
+# 3. Disable check: ./metricbeat -e --strict.perms=false
+```
+
+8. Verify Metricbeat is sending data:
 ```bash
 GET /metricbeat-*/_search
 {
@@ -3136,6 +3287,12 @@ GET /metricbeat-*/_search
 
 GET /_cat/indices/metricbeat-*?v
 ```
+
+**Verify in Kibana**:
+- Open Kibana in your browser: `http://localhost:5601`
+- Go to **Analytics > Discover** or **Observability > Metrics**
+- In the **Metrics** section, you should see system and Elasticsearch metrics collected by Metricbeat
+- You can also create a Data View for the index pattern `metricbeat-*` in **Stack Management > Data Views** to explore data in Discover
 
 3. Check Elasticsearch module metrics:
 ```bash
@@ -3206,206 +3363,416 @@ GET /metricbeat-*/_search
 
 ---
 
-## Exercise 11.2: Stack Monitoring with Self-Monitoring
+## Exercise 11.2: Filebeat Setup and Log Collection
 
-**Objective**: Enable and use Elasticsearch self-monitoring.
+**Objective**: Install and configure Filebeat to collect Elasticsearch logs and application logs.
 
 **Instructions**:
 
-1. Check monitoring settings:
+1. Download and extract Filebeat:
 ```bash
-GET /_cluster/settings?include_defaults=true&filter_path=*.xpack.monitoring
-
-GET /_xpack/usage?filter_path=monitoring
+# Download Filebeat
+wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-9.0.0-linux-x86_64.tar.gz
+tar -xzf filebeat-9.0.0-linux-x86_64.tar.gz
+cd filebeat-9.0.0-linux-x86_64
 ```
 
-2. View monitoring indices:
-```bash
-GET /_cat/indices/.monitoring-*?v&s=index
+2. Configure authentication for Filebeat (if cluster is secured):
 
-GET /.monitoring-es-*/_search
+**Option A - Use built-in `beats_system` user** (Recommended for getting started):
+```bash
+# If you haven't already done it for Metricbeat
+cd /path/to/elasticsearch-9.0.0
+./bin/elasticsearch-reset-password -u beats_system
+
+# Note the generated password
+```
+
+**Option B - Create a dedicated user with specific permissions**:
+```bash
+# In Kibana Dev Tools
+# Create custom role for Filebeat
+POST /_security/role/filebeat_writer
 {
-  "size": 1,
-  "sort": [{ "timestamp": "desc" }]
+  "cluster": ["monitor", "read_ilm", "read_pipeline", "manage_index_templates", "manage_ingest_pipelines"],
+  "indices": [
+    {
+      "names": ["filebeat-*"],
+      "privileges": ["create_doc", "create_index", "view_index_metadata", "auto_configure"]
+    }
+  ]
+}
+
+# Create the user
+POST /_security/user/filebeat_internal
+{
+  "password": "YourSecurePassword456!",
+  "roles": ["filebeat_writer", "kibana_admin", "remote_monitoring_collector"],
+  "full_name": "Filebeat Internal User"
 }
 ```
 
-3. Query node statistics from monitoring:
+**Option C - Use API key** (More secure for production):
 ```bash
-GET /.monitoring-es-*/_search
+# In Kibana Dev Tools
+POST /_security/api_key
 {
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "type": "node_stats" } },
-        { "range": { "timestamp": { "gte": "now-15m" } } }
+  "name": "filebeat-api-key",
+  "role_descriptors": {
+    "filebeat_writer": {
+      "cluster": ["monitor", "read_ilm", "read_pipeline"],
+      "indices": [
+        {
+          "names": ["filebeat-*"],
+          "privileges": ["auto_configure", "create_doc"]
+        }
       ]
     }
-  },
-  "size": 1,
-  "_source": ["node_stats.jvm.*", "node_stats.os.*", "timestamp"]
+  }
+}
+
+# Note the id and api_key returned
+```
+
+**Note**: If your cluster is not secured, skip this step.
+
+
+3. Create sample application logs to monitor:
+```bash
+# Create a directory for application logs
+mkdir -p /var/log/parkki-app
+
+# Create a sample parking API log file
+cat > /var/log/parkki-app/parking-api.log << 'EOF'
+2025-01-15T10:00:00.123Z INFO [API] User authentication successful - user_id=user123 ip=192.168.1.100
+2025-01-15T10:00:05.456Z INFO [API] Parking spot reserved - user_id=user123 spot_id=A15 parking_id=central
+2025-01-15T10:00:10.789Z ERROR [Payment] Payment processing failed - user_id=user456 error_code=CARD_DECLINED amount=12.50
+2025-01-15T10:00:15.012Z WARN [Capacity] Parking lot nearly full - parking_id=central occupancy=95%
+2025-01-15T10:00:20.345Z INFO [Notification] Email sent successfully - user_id=user123 type=reservation_confirmation
+2025-01-15T10:00:25.678Z DEBUG [Cache] Cache hit - key=parking_central_status ttl=300s
+2025-01-15T10:00:30.901Z ERROR [Database] Connection timeout - service=parking-api error=connection_timeout retry_attempt=3
+EOF
+
+# Add executable permissions
+chmod 644 /var/log/parkki-app/parking-api.log
+```
+
+4. Configure Filebeat to collect Elasticsearch logs and application logs:
+```bash
+# Backup original config
+cp filebeat.yml filebeat.yml.backup
+
+# Edit filebeat.yml
+cat > filebeat.yml << 'EOF'
+# ============================== Filebeat inputs ===============================
+
+filebeat.inputs:
+# Application logs - Parking API
+- type: log
+  enabled: true
+  paths:
+    - /var/log/parkki-app/*.log
+  fields:
+    service: parking-api
+    environment: production
+    app: parkki
+  fields_under_root: true
+  
+  # Multi-line pattern for stack traces
+  multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  
+  # Add tags for filtering
+  tags: ["application", "parkki", "api"]
+
+# ============================== Filebeat modules ==============================
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+  reload.period: 10s
+
+# Elasticsearch module will be enabled separately
+
+# ================================= Processors =================================
+
+processors:
+  # Add host metadata
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  
+  # Add custom fields
+  - add_fields:
+      target: ''
+      fields:
+        log_source: filebeat
+  
+  # Parse Parkki application logs with Dissect (faster than Grok)
+  - dissect:
+      when.contains:
+        tags: "parkki"
+      tokenizer: "%{timestamp} %{log.level} [%{component}] %{log.message}"
+      field: "message"
+      target_prefix: ""
+      ignore_failure: true
+  
+  # Extract key-value pairs from log.message (user_id=xxx, error_code=yyy, etc.)
+  - kv:
+      when.has_fields: ["log.message"]
+      field: "log.message"
+      field_split: " "
+      value_split: "="
+      target_field: "parsed"
+      ignore_failure: true
+      trim_key: " "
+      trim_value: " "
+      include_keys: ["user_id", "error_code", "amount", "parking_id", "spot_id", "ip", "type", "key", "ttl", "error", "retry_attempt", "occupancy"]
+  
+  # Convert timestamp string to @timestamp
+  - timestamp:
+      field: "timestamp"
+      layouts:
+        - '2006-01-02T15:04:05.999Z'
+        - '2006-01-02T15:04:05Z'
+      test:
+        - '2025-01-15T10:00:00.123Z'
+      ignore_failure: true
+  
+  # Decode JSON logs if present (for Elasticsearch JSON logs)
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: false
+      add_error_key: true
+      when.regexp:
+        message: '^[\[\{]'
+  
+  # Drop temporary fields to save space
+  - drop_fields:
+      fields: ["timestamp"]
+      ignore_missing: true
+
+# ================================== Outputs ===================================
+
+output.elasticsearch:
+  hosts: ["https://localhost:9200"]
+  
+  # If cluster is secured - Option A (beats_system)
+  username: "beats_system"
+  password: "the_password_generated_by_reset_password"
+  ssl.verification_mode: none
+  
+  # OR Option B (custom user)
+  # username: "filebeat_internal"
+  # password: "YourSecurePassword456!"
+  # ssl.verification_mode: none
+  
+  # OR Option C (API Key)
+  # api_key: "your_id:your_api_key"
+  # ssl.verification_mode: none
+  
+  # Index naming by input type
+  indices:
+    - index: "filebeat-parkki-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.contains:
+        tags: "parkki"
+    - index: "filebeat-elasticsearch-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.contains:
+        fileset.module: "elasticsearch"
+    - index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+# ================================== Kibana ====================================
+
+setup.kibana:
+  host: "http://localhost:5601"
+  # If Kibana is secured - use the same credentials as above
+  username: "beats_system"
+  password: "the_password_generated_by_reset_password"
+```
+
+5. Enable Elasticsearch module to collect Elasticsearch logs:
+```bash
+# Enable the Elasticsearch module
+./filebeat modules enable elasticsearch
+
+# Configure the Elasticsearch module
+cat > modules.d/elasticsearch.yml << 'EOF'
+# Module: elasticsearch
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/9.0/filebeat-module-elasticsearch.html
+
+- module: elasticsearch
+  # Server logs
+  server:
+    enabled: true
+    var.paths:
+      # Adjust this path to match your Elasticsearch logs location
+      - /path/to/elasticsearch-9.0.0/logs/*.log
+      - /path/to/elasticsearch-9.0.0/logs/*_server.json
+    
+  gc:
+    enabled: true
+    var.paths:
+      - /path/to/elasticsearch-9.0.0/logs/gc.log.[0-9]*
+      - /path/to/elasticsearch-9.0.0/logs/gc.log
+  
+  audit:
+    enabled: false
+    var.paths:
+      - /path/to/elasticsearch-9.0.0/logs/*_audit.json
+  
+  slowlog:
+    enabled: true
+    var.paths:
+      - /path/to/elasticsearch-9.0.0/logs/*_index_search_slowlog.log
+      - /path/to/elasticsearch-9.0.0/logs/*_index_indexing_slowlog.log
+  
+  deprecation:
+    enabled: true
+    var.paths:
+      - /path/to/elasticsearch-9.0.0/logs/*_deprecation.log
+      - /path/to/elasticsearch-9.0.0/logs/*_deprecation.json
+
+# Replace /path/to/elasticsearch-9.0.0 with your actual Elasticsearch path
+```
+
+**Important**: Modify the paths in `modules.d/elasticsearch.yml` to point to your actual Elasticsearch logs. 
+
+Example for a local installation:
+```bash
+# Find your Elasticsearch installation
+ES_HOME="/Users/emmanueldemey/elasticsearch-9.0.0"
+
+# Update the module configuration
+sed -i "s|/path/to/elasticsearch-9.0.0|${ES_HOME}|g" modules.d/elasticsearch.yml
+```
+
+6. Test configuration and setup:
+```bash
+# List enabled modules
+./filebeat modules list
+
+# Test the configuration
+./filebeat test config
+
+# Test output connection
+./filebeat test output
+
+# Setup index templates and Kibana dashboards
+./filebeat setup -e
+```
+
+7. Start Filebeat:
+```bash
+# Start in foreground (for testing)
+./filebeat -e
+
+```
+
+8. Verify Filebeat is sending data:
+```bash
+# Check if indices are created
+GET /_cat/indices/filebeat-*?v&s=index:desc
+
+# Search for recent logs
+GET /filebeat-parkki-*/_search
+{
+  "size": 10,
+  "sort": [{ "@timestamp": "desc" }],
+  "_source": ["message", "service", "log.level", "@timestamp"]
 }
 ```
 
-4. Query index statistics:
+5. Query specific log levels:
 ```bash
-GET /.monitoring-es-*/_search
+# Find all ERROR logs
+GET /filebeat-parkki-*/_search
 {
   "query": {
-    "bool": {
-      "must": [
-        { "term": { "type": "index_stats" } }
-      ]
+    "match": {
+      "message": "ERROR"
     }
   },
   "size": 5,
-  "sort": [{ "timestamp": "desc" }],
-  "_source": ["index_stats.index", "index_stats.primaries.*"]
+  "sort": [{ "@timestamp": "desc" }]
 }
-```
 
-5. Create a health overview:
-```bash
-GET /.monitoring-es-*/_search
+# Count logs by level using aggregation
+GET /filebeat-parkki-*/_search
 {
   "size": 0,
   "query": {
-    "bool": {
-      "must": [
-        { "term": { "type": "cluster_stats" } },
-        { "range": { "timestamp": { "gte": "now-1h" } } }
-      ]
+    "range": {
+      "@timestamp": { "gte": "now-1h" }
     }
   },
   "aggs": {
-    "health_over_time": {
-      "date_histogram": {
-        "field": "timestamp",
-        "fixed_interval": "5m"
+    "log_levels": {
+      "terms": {
+        "field": "message",
+        "include": "(ERROR|WARN|INFO|DEBUG).*"
+      }
+    }
+  }
+}
+```
+
+6. Verify that parsing in Filebeat works:
+```bash
+# Verify that fields were extracted
+GET /filebeat-parkki-*/_search
+{
+  "size": 5,
+  "sort": [{ "@timestamp": "desc" }],
+  "_source": ["message", "log.level", "component", "log.message", "parsed.*", "@timestamp"]
+}
+
+# Search by extracted log level
+GET /filebeat-parkki-*/_search
+{
+  "query": {
+    "term": {
+      "log.level": "ERROR"
+    }
+  },
+  "size": 5
+}
+
+# Search by extracted user_id
+GET /filebeat-parkki-*/_search
+{
+  "query": {
+    "term": {
+      "parsed.user_id": "user456"
+    }
+  }
+}
+
+# Search by error_code
+GET /filebeat-parkki-*/_search
+{
+  "query": {
+    "term": {
+      "parsed.error_code": "CARD_DECLINED"
+    }
+  }
+}
+
+# Aggregate by component
+GET /filebeat-parkki-*/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_component": {
+      "terms": {
+        "field": "component.keyword"
       },
       "aggs": {
-        "status": {
-          "terms": { "field": "cluster_stats.status" }
-        }
-      }
-    }
-  }
-}
-```
-
-**Challenge**:
-- How often has the cluster status changed in the last 24 hours?
-- Find the index with the highest document count from monitoring data
-- Calculate the total indexing rate across all nodes
-
----
-
-## Exercise 11.3: Custom Monitoring Queries
-
-**Objective**: Build custom monitoring and alerting queries.
-
-**Instructions**:
-
-1. Create a monitoring index for custom metrics:
-```bash
-PUT /parkki-metrics
-{
-  "mappings": {
-    "properties": {
-      "@timestamp": { "type": "date" },
-      "metric_type": { "type": "keyword" },
-      "parking_id": { "type": "keyword" },
-      "value": { "type": "double" },
-      "unit": { "type": "keyword" },
-      "tags": { "type": "keyword" }
-    }
-  }
-}
-```
-
-2. Index sample monitoring data:
-```bash
-POST /_bulk
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:00:00Z","metric_type":"occupancy","parking_id":"central","value":78.5,"unit":"percent","tags":["production","paris"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:05:00Z","metric_type":"occupancy","parking_id":"central","value":82.3,"unit":"percent","tags":["production","paris"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:10:00Z","metric_type":"occupancy","parking_id":"central","value":95.1,"unit":"percent","tags":["production","paris"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:00:00Z","metric_type":"response_time","parking_id":"central","value":45,"unit":"ms","tags":["api","production"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:05:00Z","metric_type":"response_time","parking_id":"central","value":120,"unit":"ms","tags":["api","production"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:10:00Z","metric_type":"response_time","parking_id":"central","value":2500,"unit":"ms","tags":["api","production"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:00:00Z","metric_type":"error_rate","parking_id":"central","value":0.5,"unit":"percent","tags":["api","production"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:05:00Z","metric_type":"error_rate","parking_id":"central","value":1.2,"unit":"percent","tags":["api","production"]}
-{"index":{"_index":"parkki-metrics"}}
-{"@timestamp":"2025-01-15T10:10:00Z","metric_type":"error_rate","parking_id":"central","value":15.8,"unit":"percent","tags":["api","production"]}
-```
-
-3. Detect anomalies (high values):
-```bash
-GET /parkki-metrics/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "metric_type": "response_time" } },
-        { "range": { "value": { "gte": 1000 } } }
-      ]
-    }
-  }
-}
-```
-
-4. Calculate percentiles for SLA monitoring:
-```bash
-GET /parkki-metrics/_search
-{
-  "size": 0,
-  "query": {
-    "term": { "metric_type": "response_time" }
-  },
-  "aggs": {
-    "response_percentiles": {
-      "percentiles": {
-        "field": "value",
-        "percents": [50, 90, 95, 99]
-      }
-    },
-    "over_threshold": {
-      "filter": {
-        "range": { "value": { "gte": 500 } }
-      }
-    }
-  }
-}
-```
-
-5. Create a health score aggregation:
-```bash
-GET /parkki-metrics/_search
-{
-  "size": 0,
-  "aggs": {
-    "by_parking": {
-      "terms": { "field": "parking_id" },
-      "aggs": {
-        "by_metric": {
-          "terms": { "field": "metric_type" },
-          "aggs": {
-            "latest": {
-              "top_hits": {
-                "size": 1,
-                "sort": [{ "@timestamp": "desc" }],
-                "_source": ["value", "@timestamp"]
-              }
-            },
-            "avg_value": { "avg": { "field": "value" } },
-            "max_value": { "max": { "field": "value" } }
+        "by_level": {
+          "terms": {
+            "field": "log.level.keyword"
           }
         }
       }
@@ -3414,10 +3781,143 @@ GET /parkki-metrics/_search
 }
 ```
 
+**Note on parsing**: 
+Parsing with **Dissect** and **KV** in Filebeat (as configured above) has several advantages over using an ingest pipeline in Elasticsearch:
+
+✅ **Performance**: Parsing is done before sending to Elasticsearch, reducing cluster load
+✅ **Simplicity**: No need to create and maintain separate ingest pipelines
+✅ **Network efficiency**: Only parsed data is sent (no re-parsing needed)
+✅ **Debugging**: Easier to test locally with `filebeat test`
+
+**Alternative - Parsing with Ingest Pipeline** (if you prefer):
+If you still want to use an Elasticsearch ingest pipeline (for example to share parsing logic across multiple sources), you can:
+
+```bash
+# Create a pipeline in Elasticsearch
+PUT /_ingest/pipeline/parkki-logs-parser
+{
+  "description": "Parse Parkki application logs",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:log.level} \\[%{DATA:component}\\] %{GREEDYDATA:log.message}"
+        ],
+        "ignore_failure": true
+      }
+    },
+    {
+      "kv": {
+        "field": "log.message",
+        "field_split": " ",
+        "value_split": "=",
+        "target_field": "parsed",
+        "ignore_failure": true
+      }
+    }
+  ]
+}
+
+# Then in filebeat.yml, add:
+# output.elasticsearch:
+#   pipeline: "parkki-logs-parser"
+```
+
+**However**, we recommend using Filebeat processors (Dissect + KV) which are already configured in the file above.
+
+9. Query Elasticsearch logs collected by Filebeat:
+```bash
+# Search Elasticsearch server logs
+GET /filebeat-elasticsearch-*/_search
+{
+  "size": 10,
+  "sort": [{ "@timestamp": "desc" }],
+  "query": {
+    "term": {
+      "fileset.name": "server"
+    }
+  },
+  "_source": ["message", "log.level", "@timestamp", "fileset.name"]
+}
+
+# Find ERROR logs in Elasticsearch
+GET /filebeat-elasticsearch-*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "fileset.module": "elasticsearch" } },
+        { "match": { "log.level": "ERROR" } }
+      ]
+    }
+  },
+  "size": 5,
+  "sort": [{ "@timestamp": "desc" }]
+}
+
+# Check slowlog entries
+GET /filebeat-elasticsearch-*/_search
+{
+  "query": {
+    "term": {
+      "fileset.name": "slowlog"
+    }
+  },
+  "size": 10,
+  "sort": [{ "@timestamp": "desc" }]
+}
+```
+
+10. Monitor log ingestion rate:
+```bash
+# Logs per minute
+GET /filebeat-*/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "@timestamp": { "gte": "now-1h" }
+    }
+  },
+  "aggs": {
+    "logs_over_time": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "fixed_interval": "1m"
+      },
+      "aggs": {
+        "by_source": {
+          "terms": {
+            "field": "service.keyword"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Verify in Kibana**:
+- Open Kibana: `http://localhost:5601`
+- Go to **Analytics > Discover**
+- Create a Data View for `filebeat-*`
+- In **Observability > Logs**, you will see Elasticsearch and application logs
+- Go to **Analytics > Dashboard** and search for "Filebeat Elasticsearch" to see pre-configured dashboards
+- The dashboards include:
+  - Elasticsearch Overview
+  - Elasticsearch Errors
+  - Elasticsearch Slowlogs
+  - GC logs analysis
+
 **Challenge**:
-- Create a query that detects when error_rate exceeds 5%
-- Build an aggregation that shows the trend (increasing/decreasing) for each metric
-- Calculate the percentage of time response_time was above SLA (500ms)
+- Add more logs to `/var/log/parkki-app/parking-api.log` and verify they appear in Elasticsearch with parsed fields
+- Verify that fields `log.level`, `component`, `parsed.user_id`, `parsed.error_code` are properly extracted
+- Create a dashboard in Kibana showing:
+  - Number of errors per minute and per component
+  - Distribution of error_codes
+  - Top 10 user_id with the most errors
+- Enable audit log in Elasticsearch and configure Filebeat to collect it
 
 ---
 
@@ -3841,6 +4341,10 @@ GET /_watcher/watch/critical_system_alert?filter_path=status.actions
 - Build a watch that auto-resolves when the condition clears
 
 ---
+RPn1ndPv-yexJ=7sKn3T
+
+eyJ2ZXIiOiI4LjE0LjAiLCJhZHIiOlsiMTI3LjAuMC4xOjkyMDAiXSwiZmdyIjoiNmU5MGNkZDhlOGI1Njc1OTNjNzdiZWE2NDk4NDEzOWM3YWVlNmI1ODJiZmQwZTdlODJkNjEzMWI3YWVmY2FlZSIsImtleSI6InZzdmJ1NXNCS0FVS1NtOURNc0tvOmlpZ3pteXlkYVRCSzJMdG9oUkNOdHcifQ==
+
 
 # Part 13: Security
 
@@ -3852,14 +4356,7 @@ GET /_watcher/watch/critical_system_alert?filter_path=status.actions
 
 **Instructions**:
 
-1. Check security status:
-```bash
-GET /_security/_authenticate
-
-GET /_xpack/security
-```
-
-2. Create a role for parking operators:
+1. Create a role for parking operators:
 ```bash
 PUT /_security/role/parking_operator
 {
@@ -3884,7 +4381,7 @@ PUT /_security/role/parking_operator
 }
 ```
 
-3. Create a role for data analysts:
+2. Create a role for data analysts:
 ```bash
 PUT /_security/role/data_analyst
 {
@@ -3908,7 +4405,7 @@ PUT /_security/role/data_analyst
 }
 ```
 
-4. Create users:
+3. Create users:
 ```bash
 PUT /_security/user/operator_paris
 {
@@ -3930,7 +4427,7 @@ PUT /_security/user/analyst_john
 }
 ```
 
-5. Test user permissions:
+4. Test user permissions:
 ```bash
 # Run as a specific user
 POST /_security/user/_has_privileges
@@ -3947,8 +4444,6 @@ POST /_security/user/_has_privileges
 
 **Challenge**:
 - Create a role that can only read documents from the last 7 days
-- Implement a role that allows write access only during business hours (using a script)
-- Create an API key with limited permissions for a microservice
 
 ---
 
@@ -4020,14 +4515,9 @@ DELETE /_security/api_key
 }
 ```
 
-6. Create a service account token:
-```bash
-POST /_security/service/elastic/fleet-server/credential/token/my-token
-```
 
 **Challenge**:
 - Create an API key that expires in 1 hour for temporary access
-- Implement API key rotation (create new, migrate, invalidate old)
 - Create different API keys for read and write operations
 
 ---
@@ -4138,22 +4628,802 @@ GET /.security-audit-*/_search
 
 # Part 14: APM (Application Performance Monitoring)
 
-## Exercise 14.1: APM Data Exploration
+## Exercise 14.0: APM Server Installation and Configuration
 
-**Objective**: Query and analyze APM data.
-
-**Note**: APM must be configured with the APM Server and agents. These exercises work with APM indices if available.
+**Objective**: Download, install, and configure APM Server to work with a secured Elasticsearch cluster.
 
 **Instructions**:
 
-1. Check APM indices:
-```bash
-GET /_cat/indices/apm-*?v&s=index
+### Step 1: Download and Extract APM Server
 
-GET /_cat/indices/traces-*?v&s=index
+```bash
+# Download APM Server
+wget https://artifacts.elastic.co/downloads/apm-server/apm-server-9.0.0-linux-x86_64.tar.gz
+tar -xzf apm-server-9.0.0-linux-x86_64.tar.gz
+cd apm-server-9.0.0-linux-x86_64
 ```
 
-2. Query transaction data:
+### Step 2: Configure Authentication (if cluster is secured)
+
+```bash
+# Go to Elasticsearch directory
+cd /path/to/elasticsearch-9.0.0
+
+# Reset password for apm_system user (if it exists)
+./bin/elasticsearch-reset-password -u apm_system
+
+# Note the generated password
+```
+
+### Step 3: Choose APM Agent Authentication Method (Optional)
+
+APM Server supports multiple authentication methods for agents. **Authentication is optional** - you can choose one method or disable it entirely:
+
+**Option A - No Authentication** (Simplest - Good for development/testing):
+```yaml
+# No authentication required - agents can send data freely
+# WARNING: Only use this in trusted, isolated environments
+apm-server:
+  auth:
+    anonymous:
+      enabled: true
+      allow_agent: ["rum-js", "js-base", "nodejs", "python", "java", "go", ".NET"]
+      allow_service: []  # Empty array = allow all services
+      rate_limit:
+        ip_limit: 1000
+        event_limit: 300
+```
+
+**Option B - Secret Token** (Simple shared authentication):
+```bash
+# Generate a random secret token (Linux/Mac)
+openssl rand -base64 32
+
+# OR use this command
+head -c 32 /dev/urandom | base64
+
+# Save this token, you'll need it in the APM Server config and in your applications
+# Example output: qX7vK9mN2pL4sT8uR6wY0zA3bC5dE1fG
+```
+
+**Option C - API Key** (Recommended for production - individual keys per agent):
+```bash
+# In Kibana Dev Tools - Create an API key for agent authentication
+POST /_security/api_key
+{
+  "name": "apm-agent-key-service-a",
+  "role_descriptors": {},
+  "metadata": {
+    "application": "apm-agent",
+    "service": "service-a"
+  }
+}
+
+# Use the returned api_key in your agents
+```
+
+**Comparison**:
+
+| Method | Security | Use Case | Agent Config Required | Production Ready |
+|--------|----------|----------|----------------------|------------------|
+| **Anonymous** | ❌ None | Dev/Testing only | No | ❌ |
+| **Secret Token** | ✅ Basic | Shared across all agents | `secretToken: "xxx"` | ⚠️ OK |
+| **API Key** | ✅✅ Best | Individual keys per service | `apiKey: "xxx"` | ✅ |
+
+**Important**: This authentication is for **Agents → APM Server**, not for **APM Server → Elasticsearch** (which was configured in Step 2).
+
+**Recommendation**: 
+- **Development**: Use anonymous auth for simplicity
+- **Staging/Production**: Use API Keys for better security and traceability
+
+### Step 4: Configure APM Server
+
+```bash
+# Backup original config
+cp apm-server.yml apm-server.yml.backup
+
+# Edit apm-server.yml
+# ================================ APM Server ==================================
+
+apm-server:
+  # Defines the host and port the server is listening on
+  host: "localhost:8200"
+  
+  # Maximum permitted size in bytes of a request's header accepted by the server
+  max_header_size: 1048576
+  
+  # Maximum amount of time to wait for the next incoming request before timeout
+  read_timeout: 3600s
+  
+  # Maximum duration before releasing resources when shutting down
+  shutdown_timeout: 30s
+  
+  # Agent Authentication - Choose ONE of the following options:
+  
+  # Option 1: No authentication (Development only)
+  auth:
+    anonymous:
+      enabled: true
+      allow_agent: ["rum-js", "js-base", "nodejs", "python", "java", "go", ".NET"]
+      allow_service: []
+      rate_limit:
+        ip_limit: 1000
+        event_limit: 300
+  
+  # Option 2: Secret Token (Shared authentication) - Uncomment to use
+  # auth:
+  #   secret_token: "qX7vK9mN2pL4sT8uR6wY0zA3bC5dE1fG"
+  
+  # Option 3: API Key (Best for production) - Uncomment to use
+  # auth:
+  #   api_key:
+  #     enabled: true
+  #     limit: 100
+
+# ================================= Outputs ====================================
+
+output.elasticsearch:
+  hosts: ["https://localhost:9200"]
+  
+  # If cluster is secured - Option A (custom user)
+  username: "apm_system"
+  password: "YourSecureAPMPassword123!"
+  ssl.verification_mode: none
+  
+  # OR Option B (API Key) - uncomment and comment username/password
+  # api_key: "VnVhQ2ZHY0JDZGJrUW0tZTVhT3g6dWkybHAyYXhUTm1zeWFrdzl0dk5udw=="
+  # ssl.verification_mode: none
+  
+  # Data stream naming
+  # APM Server 8.0+ uses data streams
+  indices:
+    - index: "traces-apm-%{[observer.version]}"
+      when.contains:
+        processor.event: "transaction"
+    - index: "traces-apm-%{[observer.version]}"
+      when.contains:
+        processor.event: "span"
+    - index: "logs-apm.error-%{[observer.version]}"
+      when.contains:
+        processor.event: "error"
+    - index: "metrics-apm.internal-%{[observer.version]}"
+      when.contains:
+        processor.event: "metric"
+
+# ================================== Kibana ====================================
+
+setup.kibana:
+  host: "http://localhost:5601"
+  # If Kibana is secured
+  username: "apm_system"
+  password: "YourSecureAPMPassword123!"
+
+# ================================ Index Lifecycle =============================
+
+# Enable ILM for automatic index lifecycle management
+setup.ilm.enabled: auto
+setup.ilm.check_exists: true
+
+# ================================== Logging ===================================
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/apm-server
+  name: apm-server
+  keepfiles: 7
+  permissions: 0644
+
+# ================================= Monitoring =================================
+
+# Enable self-monitoring (send APM Server metrics to Elasticsearch)
+monitoring.enabled: true
+monitoring.elasticsearch:
+  hosts: ["https://localhost:9200"]
+  username: "apm_system"
+  password: "YourSecureAPMPassword123!"
+  ssl.verification_mode: none
+
+```
+
+### Step 5: Setup APM Server Assets
+
+```bash
+# This will create index templates and load Kibana dashboards
+./apm-server setup -e
+```
+
+### Step 6: Test Configuration
+
+```bash
+# Test the configuration file
+./apm-server test config
+
+# Test connection to Elasticsearch
+./apm-server test output
+```
+
+### Step 7: Start APM Server
+
+```bash
+# Start in foreground (for testing)
+./apm-server -e
+```
+
+### Step 8: Verify APM Server is Running
+
+```bash
+# Check APM Server health
+curl http://localhost:8200/
+
+# Expected response:
+# {
+#   "build_date": "2024-XX-XXT00:00:00Z",
+#   "build_sha": "xxxxx",
+#   "publish_ready": true,
+#   "version": "9.0.0"
+# }
+
+# Test with secret token
+curl -H "Authorization: Bearer qX7vK9mN2pL4sT8uR6wY0zA3bC5dE1fG" \
+  http://localhost:8200/
+
+# Check APM indices in Elasticsearch
+GET /_cat/indices/traces-apm*,logs-apm*,metrics-apm*?v
+```
+
+### Step 9: Verify in Kibana
+
+- Open Kibana: `http://localhost:5601`
+- Go to **Observability > APM**
+- You should see the APM interface ready (no services yet, we'll add them in Exercise 14.1)
+- Check that APM integration is properly configured
+
+**Important Notes**:
+
+1. **Authentication**: Choose the authentication method that fits your environment:
+   ```javascript
+   // In your Node.js app
+   const apm = require('elastic-apm-node').start({
+     serverUrl: 'http://localhost:8200',
+     serviceName: 'my-service',
+     
+     // Only add secretToken OR apiKey if APM Server requires auth:
+     // secretToken: 'qX7vK9mN2pL4sT8uR6wY0zA3bC5dE1fG',  // For secret token auth
+     // apiKey: 'your-api-key',  // For API key auth
+     // (no auth params needed for anonymous mode)
+   });
+   ```
+
+2. **Firewall**: Ensure port 8200 is accessible from your applications
+
+---
+
+## Exercise 14.1: Hands-on APM with Node.js Applications
+
+**Objective**: Set up APM monitoring with two simple Node.js applications demonstrating distributed tracing.
+
+**Architecture**: We'll create two services:
+- **Service A (API Gateway)**: HTTP server that receives requests and calls Service B
+- **Service B (Backend)**: HTTP server that processes requests
+
+### Prerequisites
+
+Ensure APM Server is running and accessible (completed in Exercise 14.0).
+```bash
+# Check APM Server is running
+curl http://localhost:8200/
+
+# Expected response: {"build_date":"...","build_sha":"...","publish_ready":true,"version":"9.0.0"}
+```
+
+### Step 1: Create Service B (Backend Service)
+
+Create a directory for Service B:
+```bash
+mkdir -p apm-demo/service-b
+cd apm-demo/service-b
+```
+
+Create `package.json`:
+```json
+{
+  "name": "service-b",
+  "version": "1.0.0",
+  "description": "Backend service for APM demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "elastic-apm-node": "^4.7.3"
+  }
+}
+```
+
+Create `index.js`:
+```javascript
+// IMPORTANT: APM must be initialized FIRST, before any other require
+const apm = require('elastic-apm-node').start({
+  serviceName: 'parking-backend',
+  serverUrl: 'http://localhost:8200',
+  
+  // Authentication options (choose one based on APM Server config):
+  
+  // Option 1: No auth (if APM Server has anonymous auth enabled)
+  // No secretToken or apiKey needed
+  
+  // Option 2: Secret Token (if APM Server uses secret_token)
+  // secretToken: 'qX7vK9mN2pL4sT8uR6wY0zA3bC5dE1fG',
+  
+  // Option 3: API Key (if APM Server uses API key auth)
+  // apiKey: 'your-api-key-here',
+  
+  environment: 'development',
+
+  // Capture all transactions for demo
+  transactionSampleRate: 1.0,
+
+  // Capture request/response bodies and headers
+  captureBody: 'all',
+  captureHeaders: true,
+
+  // Log APM activity
+  logLevel: 'info'
+});
+
+const http = require('http');
+const url = require('url');
+
+const PORT = 3001;
+
+// Simulate database query
+function simulateDbQuery(parkingId) {
+  // APM automatically creates a span for this operation
+  const span = apm.startSpan('SELECT FROM parkings', 'db', 'postgresql', 'query');
+
+  // Simulate varying query times
+  const duration = Math.random() * 100 + 50; // 50-150ms
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (span) {
+        // Add context to the span
+        span.addLabels({
+          'db.statement': `SELECT * FROM parkings WHERE id = '${parkingId}'`,
+          'db.rows_affected': 1
+        });
+        span.end();
+      }
+
+      resolve({
+        id: parkingId,
+        name: `Parking ${parkingId}`,
+        available_spots: Math.floor(Math.random() * 100),
+        total_spots: 200
+      });
+    }, duration);
+  });
+}
+
+// Simulate external API call
+function simulateExternalApiCall() {
+  const span = apm.startSpan('GET weather-api', 'external', 'http', 'request');
+
+  // Simulate API call (sometimes slow)
+  const duration = Math.random() < 0.2 ? Math.random() * 500 + 200 : Math.random() * 50 + 20;
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (span) {
+        span.addLabels({
+          'http.url': 'https://api.weather.com/parking-weather',
+          'http.method': 'GET',
+          'http.status_code': 200
+        });
+        span.end();
+      }
+
+      resolve({
+        weather: 'sunny',
+        temperature: 22
+      });
+    }, duration);
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  const parsedUrl = url.parse(req.url, true);
+  const path = parsedUrl.pathname;
+
+  // Get current transaction (automatically created by APM)
+  const transaction = apm.currentTransaction;
+  if (transaction) {
+    // Add custom labels for business context
+    transaction.addLabels({
+      'service.role': 'backend',
+      'user.id': parsedUrl.query.user_id || 'anonymous'
+    });
+  }
+
+  console.log(`[Service B] ${req.method} ${path}`);
+
+  try {
+    if (path === '/health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok', service: 'service-b' }));
+      return;
+    }
+
+    if (path === '/api/parking') {
+      const parkingId = parsedUrl.query.id || 'central';
+
+      // Simulate processing with multiple operations
+      // APM will automatically create spans for each async operation
+      const [parkingData, weatherData] = await Promise.all([
+        simulateDbQuery(parkingId),
+        simulateExternalApiCall()
+      ]);
+
+      // Simulate some processing time
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 30 + 10));
+
+      const response = {
+        ...parkingData,
+        weather: weatherData,
+        timestamp: new Date().toISOString()
+      };
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(response));
+      return;
+    }
+
+    if (path === '/api/slow') {
+      // Simulate a slow endpoint
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ message: 'Slow response' }));
+      return;
+    }
+
+    if (path === '/api/error') {
+      // Simulate an error
+      throw new Error('Simulated backend error');
+    }
+
+    // 404 Not Found
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+
+  } catch (error) {
+    console.error('[Service B] Error:', error);
+
+    // APM automatically captures the error with full context
+    apm.captureError(error);
+
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: error.message }));
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Service B listening on http://localhost:${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+});
+```
+
+### Step 2: Create Service A (API Gateway)
+
+Create a directory for Service A:
+```bash
+cd ..
+mkdir -p service-a
+cd service-a
+```
+
+Create `package.json`:
+```json
+{
+  "name": "service-a",
+  "version": "1.0.0",
+  "description": "API Gateway for APM demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "elastic-apm-node": "^4.7.3"
+  }
+}
+```
+
+Create `index.js`:
+```javascript
+// IMPORTANT: APM must be initialized FIRST
+const apm = require('elastic-apm-node').start({
+  serviceName: 'parking-api-gateway',
+  serverUrl: 'http://localhost:8200',
+  
+  // Authentication options (choose one based on APM Server config):
+  
+  // Option 1: No auth (if APM Server has anonymous auth enabled)
+  // No secretToken or apiKey needed
+  
+  // Option 2: Secret Token (if APM Server uses secret_token)
+  // secretToken: 'qX7vK9mN2pL4sT8uR6wY0zA3bC5dE1fG',
+  
+  // Option 3: API Key (if APM Server uses API key auth)
+  // apiKey: 'your-api-key-here',
+  
+  environment: 'development',
+
+  // Capture all transactions for demo
+  transactionSampleRate: 1.0,
+
+  // Capture request/response bodies and headers
+  captureBody: 'all',
+  captureHeaders: true,
+
+  // Use path as transaction name for better grouping
+  usePathAsTransactionName: true,
+
+  logLevel: 'info'
+});
+
+const http = require('http');
+const url = require('url');
+
+const PORT = 3000;
+const SERVICE_B_URL = 'http://localhost:3001';
+
+// Call Service B
+// APM will automatically instrument this HTTP call and propagate trace context!
+function callServiceB(path) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'localhost',
+      port: 3001,
+      path: path,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Service-A/1.0'
+        // No need to manually add traceparent header - APM does it automatically!
+      }
+    };
+
+    const req = http.request(options, (res) => {
+      let data = '';
+
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            resolve(data);
+          }
+        } else {
+          reject(new Error(`Service B returned ${res.statusCode}: ${data}`));
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      // APM automatically captures errors with trace context
+      apm.captureError(error);
+      reject(error);
+    });
+
+    req.end();
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  const parsedUrl = url.parse(req.url, true);
+  const path = parsedUrl.pathname;
+
+  // Get current transaction (automatically created by APM for incoming HTTP requests)
+  const transaction = apm.currentTransaction;
+  if (transaction) {
+    // Add custom business labels
+    transaction.addLabels({
+      'service.role': 'gateway',
+      'user.id': parsedUrl.query.user_id || 'anonymous',
+      'parking.id': parsedUrl.query.id || 'unknown'
+    });
+  }
+
+  console.log(`[Service A] ${req.method} ${path}`);
+
+  try {
+    if (path === '/health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok', service: 'service-a' }));
+      return;
+    }
+
+    if (path === '/api/parking/status') {
+      const parkingId = parsedUrl.query.id || 'central';
+
+      // Call Service B - APM automatically creates a span and propagates trace context!
+      const backendData = await callServiceB(`/api/parking?id=${parkingId}`);
+
+      // Add some gateway-level processing
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 20 + 5));
+
+      const response = {
+        ...backendData,
+        gateway: {
+          processed_at: new Date().toISOString(),
+          service: 'api-gateway'
+        }
+      };
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(response));
+      return;
+    }
+
+    if (path === '/api/slow') {
+      // This will trigger slow responses through the chain
+      const backendData = await callServiceB('/api/slow');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        message: 'Slow request completed',
+        backend: backendData
+      }));
+      return;
+    }
+
+    if (path === '/api/error') {
+      // This will trigger an error in Service B
+      try {
+        await callServiceB('/api/error');
+      } catch (error) {
+        throw new Error(`Backend error: ${error.message}`);
+      }
+    }
+
+    // 404 Not Found
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+
+  } catch (error) {
+    console.error('[Service A] Error:', error);
+
+    // APM automatically captures the error with full trace context
+    apm.captureError(error);
+
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: error.message }));
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Service A (Gateway) listening on http://localhost:${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`Try: curl "http://localhost:${PORT}/api/parking/status?id=central"`);
+});
+```
+
+### Step 2: Install Dependencies and Run
+
+Open two terminal windows.
+
+**Terminal 1 - Service B:**
+```bash
+cd apm-demo/service-b
+npm install
+npm start
+```
+
+**Terminal 2 - Service A:**
+```bash
+cd apm-demo/service-a
+npm install
+npm start
+```
+
+### Step 3: Generate Traffic
+
+Open a third terminal and generate various types of requests:
+
+```bash
+# Normal requests
+curl "http://localhost:3000/api/parking/status?id=central"
+curl "http://localhost:3000/api/parking/status?id=north&user_id=user123"
+curl "http://localhost:3000/api/parking/status?id=south&user_id=user456"
+
+# Slow request
+curl "http://localhost:3000/api/slow"
+
+# Error request (will generate 500 error)
+curl "http://localhost:3000/api/error"
+
+# Generate continuous load (run in background)
+for i in {1..50}; do
+  curl -s "http://localhost:3000/api/parking/status?id=parking-$((RANDOM % 5))&user_id=user$((RANDOM % 10))" > /dev/null
+  sleep 0.5
+done
+```
+
+### Step 5: Analyze APM Data in Kibana
+
+1. **Open Kibana APM**: Navigate to `http://localhost:5601/app/apm`
+
+2. **View Services**:
+   - You should see two services: `parking-api-gateway` and `parking-backend`
+   - Check the service overview metrics (throughput, latency, error rate)
+
+3. **View Transactions**:
+```bash
+GET /traces-apm*/_search
+{
+  "size": 10,
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "transaction" } },
+        { "range": { "@timestamp": { "gte": "now-15m" } } }
+      ]
+    }
+  },
+  "sort": [{ "@timestamp": "desc" }],
+  "_source": [
+    "transaction.name",
+    "transaction.duration.us",
+    "service.name",
+    "trace.id",
+    "labels.user\\.id",
+    "@timestamp"
+  ]
+}
+```
+
+4. **Trace Complete Request Path (The Magic!)** ⭐:
+```bash
+# Step 1: Find a trace ID from Service A
+GET /traces-apm*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "service.name": "parking-api-gateway" } },
+        { "term": { "processor.event": "transaction" } }
+      ]
+    }
+  },
+  "size": 1,
+  "_source": ["trace.id", "transaction.name", "@timestamp"]
+}
+
+# Step 2: Get ALL events for that trace (both services automatically linked!)
+GET /traces-apm*/_search
+{
+  "query": {
+    "term": { "trace.id": "YOUR_TRACE_ID_HERE" }
+  },
+  "sort": [{ "timestamp.us": "asc" }],
+  "size": 100,
+  "_source": [
+    "processor.event",
+    "transaction.name",
+    "transaction.id",
+    "span.name",
+    "service.name",
+    "transaction.duration.us",
+    "span.duration.us",
+    "parent.id"
+  ]
+}
+# This proves automatic distributed tracing - same trace.id across both services!
+```
+
+5. **Analyze Slow Transactions**:
 ```bash
 GET /traces-apm*/_search
 {
@@ -4161,16 +5431,49 @@ GET /traces-apm*/_search
     "bool": {
       "must": [
         { "term": { "processor.event": "transaction" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
+        { "range": { "transaction.duration.us": { "gte": 500000 } } }
       ]
     }
   },
+  "sort": [{ "transaction.duration.us": "desc" }],
   "size": 5,
-  "_source": ["transaction.name", "transaction.duration.us", "service.name", "@timestamp"]
+  "_source": [
+    "transaction.name",
+    "span.name",
+    "service.name",
+    "transaction.duration.us",
+    "span.duration.us",
+    "parent.id",
+    "labels.user\\.id"
+  ]
 }
 ```
 
-3. Calculate service latency:
+6. **View Spans for Database Queries**:
+```bash
+GET /traces-apm*/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "term": { "processor.event": "span" } },
+        { "term": { "span.type": "db" } },
+        { "range": { "@timestamp": { "gte": "now-15m" } } }
+      ]
+    }
+  },
+  "size": 10,
+  "_source": [
+    "span.name",
+    "span.duration.us",
+    "service.name",
+    "trace.id",
+    "labels"
+  ]
+}
+```
+
+7. **Calculate Service Statistics**:
 ```bash
 GET /traces-apm*/_search
 {
@@ -4179,7 +5482,7 @@ GET /traces-apm*/_search
     "bool": {
       "must": [
         { "term": { "processor.event": "transaction" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
+        { "range": { "@timestamp": { "gte": "now-15m" } } }
       ]
     }
   },
@@ -4187,62 +5490,25 @@ GET /traces-apm*/_search
     "by_service": {
       "terms": { "field": "service.name" },
       "aggs": {
-        "avg_duration": {
-          "avg": { "field": "transaction.duration.us" }
+        "avg_duration_ms": {
+          "avg": {
+            "script": { "source": "doc['transaction.duration.us'].value / 1000" }
+          }
         },
         "percentiles": {
           "percentiles": {
             "field": "transaction.duration.us",
             "percents": [50, 95, 99]
           }
-        }
-      }
-    }
-  }
-}
-```
-
-4. Find slow transactions:
-```bash
-GET /traces-apm*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "processor.event": "transaction" } },
-        { "range": { "transaction.duration.us": { "gte": 5000000 } } }
-      ]
-    }
-  },
-  "sort": [{ "transaction.duration.us": "desc" }],
-  "size": 10,
-  "_source": ["transaction.name", "transaction.duration.us", "service.name", "trace.id"]
-}
-```
-
-5. Analyze error rates:
-```bash
-GET /traces-apm*/_search
-{
-  "size": 0,
-  "query": {
-    "range": { "@timestamp": { "gte": "now-1h" } }
-  },
-  "aggs": {
-    "by_service": {
-      "terms": { "field": "service.name" },
-      "aggs": {
-        "total": {
-          "filter": { "term": { "processor.event": "transaction" } }
         },
-        "errors": {
-          "filter": {
-            "bool": {
-              "must": [
-                { "term": { "processor.event": "transaction" } },
-                { "exists": { "field": "transaction.result" } },
-                { "term": { "transaction.result": "HTTP 5xx" } }
-              ]
+        "by_transaction": {
+          "terms": { "field": "transaction.name" },
+          "aggs": {
+            "count": { "value_count": { "field": "transaction.id" } },
+            "avg_duration_ms": {
+              "avg": {
+                "script": { "source": "doc['transaction.duration.us'].value / 1000" }
+              }
             }
           }
         }
@@ -4252,282 +5518,83 @@ GET /traces-apm*/_search
 }
 ```
 
-**Challenge**:
-- Calculate the error rate percentage for each service
-- Find transactions that have associated spans taking more than 1 second
-- Build a service dependency map by analyzing span data
-
----
-
-## Exercise 14.2: Distributed Tracing Analysis
-
-**Objective**: Analyze traces across services.
-
-**Instructions**:
-
-1. Get a complete trace:
+8. **Trace Full Request Path**:
 ```bash
+# Find a trace ID from Service A transaction
 GET /traces-apm*/_search
 {
   "query": {
-    "term": { "trace.id": "<trace_id>" }
+    "bool": {
+      "must": [
+        { "term": { "service.name": "parking-api-gateway" } },
+        { "term": { "processor.event": "transaction" } }
+      ]
+    }
+  },
+  "size": 1,
+  "_source": ["trace.id"]
+}
+
+# Then get ALL events (transaction + spans) for that trace
+GET /traces-apm*/_search
+{
+  "query": {
+    "term": { "trace.id": "YOUR_TRACE_ID" }
   },
   "sort": [{ "timestamp.us": "asc" }],
   "size": 100,
-  "_source": ["transaction.name", "span.name", "parent.id", "timestamp.us", "transaction.duration.us", "span.duration.us", "service.name"]
+  "_source": [
+    "processor.event",
+    "transaction.name",
+    "span.name",
+    "service.name",
+    "transaction.duration.us",
+    "span.duration.us",
+    "parent.id",
+    "labels.user\\.id"
+  ]
 }
 ```
 
-2. Find traces with errors:
-```bash
-GET /traces-apm*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "processor.event": "error" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
+### Bonus Activities
+
+#### 1. Add Custom Metrics
+
+Enhance Service A to track custom metrics:
+
+```javascript
+// Add after APM initialization in Service A
+setInterval(() => {
+  const memUsage = process.memoryUsage();
+
+  apm.setCustomContext({
+    memory: {
+      rss_mb: Math.round(memUsage.rss / 1024 / 1024),
+      heap_used_mb: Math.round(memUsage.heapUsed / 1024 / 1024),
+      heap_total_mb: Math.round(memUsage.heapTotal / 1024 / 1024)
     }
-  },
-  "aggs": {
-    "error_traces": {
-      "terms": { "field": "trace.id", "size": 10 }
-    }
-  }
-}
+  });
+}, 10000);
 ```
 
-3. Analyze span breakdown:
-```bash
-GET /traces-apm*/_search
-{
-  "size": 0,
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "processor.event": "span" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
-  "aggs": {
-    "by_type": {
-      "terms": { "field": "span.type" },
-      "aggs": {
-        "by_subtype": {
-          "terms": { "field": "span.subtype" },
-          "aggs": {
-            "avg_duration": { "avg": { "field": "span.duration.us" } },
-            "count": { "value_count": { "field": "span.id" } }
-          }
-        }
-      }
-    }
-  }
-}
+#### 2. Add More Custom Spans
+
+Track specific operations:
+
+```javascript
+// In Service A, time the response processing:
+const processingSpan = apm.startSpan('process-gateway-response', 'app');
+// ... do processing ...
+if (processingSpan) processingSpan.end();
 ```
 
-4. Find database query bottlenecks:
+### Cleanup
+
+Stop both services with `Ctrl+C` and optionally remove the demo directory:
 ```bash
-GET /traces-apm*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "span.type": "db" } },
-        { "range": { "span.duration.us": { "gte": 100000 } } }
-      ]
-    }
-  },
-  "sort": [{ "span.duration.us": "desc" }],
-  "size": 10,
-  "_source": ["span.name", "span.duration.us", "span.db.statement", "service.name"]
-}
+cd ../..
+rm -rf apm-demo
 ```
-
-5. Calculate service throughput:
-```bash
-GET /traces-apm*/_search
-{
-  "size": 0,
-  "query": {
-    "bool": {
-      "must": [
-        { "term": { "processor.event": "transaction" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  },
-  "aggs": {
-    "throughput": {
-      "date_histogram": {
-        "field": "@timestamp",
-        "fixed_interval": "1m"
-      },
-      "aggs": {
-        "by_service": {
-          "terms": { "field": "service.name" }
-        }
-      }
-    }
-  }
-}
-```
-
-**Challenge**:
-- Build a query to find the slowest database queries per service
-- Identify external HTTP calls that are causing latency
-- Create a service level objective (SLO) query for 99th percentile latency
-
----
-
-## Exercise 14.3: Custom APM Metrics and Analysis
-
-**Objective**: Create custom APM dashboards and analyses.
-
-**Instructions**:
-
-1. Create a simulated APM metrics index:
-```bash
-PUT /apm-custom-metrics
-{
-  "mappings": {
-    "properties": {
-      "@timestamp": { "type": "date" },
-      "service.name": { "type": "keyword" },
-      "transaction.name": { "type": "keyword" },
-      "transaction.duration.us": { "type": "long" },
-      "transaction.result": { "type": "keyword" },
-      "labels": { "type": "object" },
-      "user.id": { "type": "keyword" }
-    }
-  }
-}
-```
-
-2. Index sample APM data:
-```bash
-POST /_bulk
-{"index":{"_index":"apm-custom-metrics"}}
-{"@timestamp":"2025-01-15T10:00:00Z","service.name":"parking-api","transaction.name":"GET /api/parking/status","transaction.duration.us":45000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user123"}
-{"index":{"_index":"apm-custom-metrics"}}
-{"@timestamp":"2025-01-15T10:00:01Z","service.name":"parking-api","transaction.name":"POST /api/reservations","transaction.duration.us":120000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user456"}
-{"index":{"_index":"apm-custom-metrics"}}
-{"@timestamp":"2025-01-15T10:00:02Z","service.name":"payment-service","transaction.name":"POST /api/payment/process","transaction.duration.us":2500000,"transaction.result":"HTTP 5xx","labels":{"environment":"production"},"user.id":"user456"}
-{"index":{"_index":"apm-custom-metrics"}}
-{"@timestamp":"2025-01-15T10:00:03Z","service.name":"parking-api","transaction.name":"GET /api/parking/status","transaction.duration.us":35000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user789"}
-{"index":{"_index":"apm-custom-metrics"}}
-{"@timestamp":"2025-01-15T10:00:04Z","service.name":"notification-service","transaction.name":"POST /api/notify","transaction.duration.us":350000,"transaction.result":"HTTP 2xx","labels":{"environment":"production"},"user.id":"user123"}
-{"index":{"_index":"apm-custom-metrics"}}
-{"@timestamp":"2025-01-15T10:00:05Z","service.name":"parking-api","transaction.name":"GET /api/parking/status","transaction.duration.us":5500000,"transaction.result":"HTTP 5xx","labels":{"environment":"production"},"user.id":"user999"}
-```
-
-3. Service health dashboard:
-```bash
-GET /apm-custom-metrics/_search
-{
-  "size": 0,
-  "aggs": {
-    "by_service": {
-      "terms": { "field": "service.name" },
-      "aggs": {
-        "avg_latency_ms": {
-          "avg": {
-            "script": { "source": "doc['transaction.duration.us'].value / 1000" }
-          }
-        },
-        "p99_latency": {
-          "percentiles": {
-            "field": "transaction.duration.us",
-            "percents": [99]
-          }
-        },
-        "error_rate": {
-          "filters": {
-            "filters": {
-              "success": { "prefix": { "transaction.result": "HTTP 2" } },
-              "error": { "prefix": { "transaction.result": "HTTP 5" } }
-            }
-          }
-        },
-        "throughput": {
-          "value_count": { "field": "transaction.name" }
-        }
-      }
-    }
-  }
-}
-```
-
-4. User experience analysis:
-```bash
-GET /apm-custom-metrics/_search
-{
-  "size": 0,
-  "aggs": {
-    "user_experience": {
-      "range": {
-        "field": "transaction.duration.us",
-        "ranges": [
-          { "key": "fast", "to": 100000 },
-          { "key": "normal", "from": 100000, "to": 500000 },
-          { "key": "slow", "from": 500000, "to": 2000000 },
-          { "key": "frustrated", "from": 2000000 }
-        ]
-      }
-    },
-    "apdex": {
-      "scripted_metric": {
-        "init_script": "state.satisfied = 0; state.tolerating = 0; state.frustrated = 0;",
-        "map_script": """
-          def duration = doc['transaction.duration.us'].value;
-          if (duration < 100000) { state.satisfied++ }
-          else if (duration < 400000) { state.tolerating++ }
-          else { state.frustrated++ }
-        """,
-        "combine_script": "return state",
-        "reduce_script": """
-          def satisfied = 0; def tolerating = 0; def frustrated = 0;
-          for (s in states) {
-            satisfied += s.satisfied;
-            tolerating += s.tolerating;
-            frustrated += s.frustrated;
-          }
-          def total = satisfied + tolerating + frustrated;
-          return (satisfied + (tolerating / 2.0)) / total;
-        """
-      }
-    }
-  }
-}
-```
-
-5. Transaction breakdown:
-```bash
-GET /apm-custom-metrics/_search
-{
-  "size": 0,
-  "aggs": {
-    "by_transaction": {
-      "terms": { "field": "transaction.name" },
-      "aggs": {
-        "stats": {
-          "extended_stats": { "field": "transaction.duration.us" }
-        },
-        "by_result": {
-          "terms": { "field": "transaction.result" }
-        }
-      }
-    }
-  }
-}
-```
-
-**Challenge**:
-- Calculate the Apdex score for each service
-- Find users experiencing the worst performance
-- Create a query to detect transaction duration anomalies (>3 standard deviations)
 
 ---
 

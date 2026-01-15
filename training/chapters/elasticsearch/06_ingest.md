@@ -75,14 +75,17 @@ node.ingest: false
 * GeoIP: Adds geographical information based on IP
 
 ```json
-{
-  "grok": { 
-    "field": "message", 
-    "patterns": ["%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}"] 
+[ 
+  {
+    "grok": { 
+      "field": "message", 
+      "patterns": ["%{IP:client} %{WORD:method} %{URIPATHPARAM:request} %{NUMBER:bytes} %{NUMBER:duration}"] 
+    }
   },
-  "date": { "field": "timestamp", "formats": ["ISO8601"] },
-  "geoip": { "field": "client" }
-}
+
+  { "date": { "field": "timestamp", "formats": ["ISO8601"]  } },
+  { "geoip": { "field": "client" } }
+]
 ```
 
 ---
