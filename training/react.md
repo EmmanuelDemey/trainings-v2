@@ -132,6 +132,11 @@ hide: false
 ---
 
 ---
+src: ./chapters/react/12_react_hook_form.md
+hide: false
+---
+
+---
 src: ./chapters/react/17_react_query.md
 hide: false
 ---
@@ -158,6 +163,11 @@ hide: false
 
 ---
 src: ./chapters/react/22_docker.md
+hide: false
+---
+
+---
+src: ./chapters/react/14_next.md
 hide: false
 ---
 

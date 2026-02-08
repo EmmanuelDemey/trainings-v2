@@ -10,7 +10,7 @@
 
 # IDE
 
-* Plusieurs IDE peuvent être utilisée pour écrire du code TypeScript
+* Plusieurs IDE peuvent être utilisés pour écrire du code TypeScript
   * WebStorm
   * Intellij IDEA
   * Visual Studio Code
@@ -54,5 +54,5 @@ type User = {
     lastName: string;
     age ?: number
 }
-const user: User = { firstName: 'James`, lastName: 'Bond' };
+const user: User = { firstName: 'James', lastName: 'Bond' };
 ```

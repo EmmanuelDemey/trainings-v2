@@ -20,7 +20,7 @@ layout: cover
 * React propose des *hooks* par défaut, mais il est possible de créer les notres
 
 * Un hook possède quelques contraintes :
-    * Ne peut pas étre défini dans des loop, if, sous-fonctions,...
+    * Ne peut pas être défini dans des loop, if, sous-fonctions,...
     * Ne peut être utilisé que par des composants implémentés avec une fonction
 
 ---
@@ -130,7 +130,7 @@ export default function Counter() {
 # Hook - useEffect
 
 * Hook permettant de définir des effets de bords
-* C'est l'équivalent du **componentWill*** d'un composant utilisant la syntaxe des classes
+* C'est l'équivalent de **componentDidMount** / **componentDidUpdate** / **componentWillUnmount** d'un composant utilisant la syntaxe des classes
 * Un effet peut éventuellement nécessité une phase de `cleanup`
 * Définition d'un tableau de dépendances pour éviter les exécutions multiples
 
@@ -169,7 +169,7 @@ useEffect(() => {
 ```javascript
 useEffect(function fetchData(){
    ...
-}, [];
+}, []);
 useEffect(function saveForm(){
    ...
 }, []);
@@ -189,12 +189,12 @@ useEffect(async () => {
 }, [])
 ```
 
-* Vous devez définir le traitement asynchrone dans une nouvelle fonction
+* Vous devez définir le traitement asynchrone dans une nouvelle fonction interne
 
 ```javascript
-useEffect(async () => {
+useEffect(() => {
     async function fetchData(){
-        await fetchDate();
+        await fetch('/api/data');
     }
     fetchData();
 }, [])
@@ -202,6 +202,104 @@ useEffect(async () => {
 
 ---
 
+# Hook - useRef
+
+* `useRef` permet de créer une référence mutable qui persiste entre les rendus
+* Utilisé pour accéder à des éléments DOM ou stocker des valeurs sans déclencher de re-rendu
+
+```typescript
+import { useRef } from 'react';
+
+const TextInput = () => {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const focusInput = () => {
+        inputRef.current?.focus();
+    };
+
+    return (
+        <>
+            <input ref={inputRef} type="text" />
+            <button onClick={focusInput}>Focus</button>
+        </>
+    );
+}
+```
+
+---
+
+# Hook - useMemo
+
+* `useMemo` mémorise le résultat d'un calcul coûteux
+* Le calcul n'est réexécuté que si l'une des dépendances change
+
+```typescript
+import { useMemo } from 'react';
+
+const UserList = ({ users, filter }) => {
+    const filteredUsers = useMemo(
+        () => users.filter(u => u.name.includes(filter)),
+        [users, filter]
+    );
+
+    return <ul>{filteredUsers.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
+
+---
+
+# Hook - useCallback
+
+* `useCallback` mémorise une fonction pour éviter qu'elle ne soit recréée à chaque rendu
+* Utile quand on passe une callback à un composant enfant optimisé avec `React.memo`
+
+```typescript
+import { useCallback } from 'react';
+
+const Parent = () => {
+    const [count, setCount] = useState(0);
+
+    const increment = useCallback(() => {
+        setCount(c => c + 1);
+    }, []);
+
+    return <Child onIncrement={increment} />;
+}
+```
+
+---
+
+# Hook - useTransition
+
+* `useTransition` (React 18+) permet de marquer des mises à jour comme non-urgentes
+* L'UI reste réactive pendant que la transition s'exécute en arrière-plan
+
+```typescript
+import { useState, useTransition } from 'react';
+
+const SearchPage = () => {
+    const [query, setQuery] = useState('');
+    const [results, setResults] = useState([]);
+    const [isPending, startTransition] = useTransition();
+
+    const handleChange = (e) => {
+        setQuery(e.target.value);
+        startTransition(() => {
+            setResults(filterLargeList(e.target.value));
+        });
+    };
+
+    return (
+        <>
+            <input value={query} onChange={handleChange} />
+            {isPending && <span>Recherche...</span>}
+            <ResultList results={results} />
+        </>
+    );
+}
+```
+
+---
 
 # Hook - custom
 

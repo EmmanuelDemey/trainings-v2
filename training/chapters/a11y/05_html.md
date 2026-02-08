@@ -159,9 +159,9 @@ p {
     <h1> Titre de l'application</h1>
     <nav role="navigation"> ... </nav>
 </header>
-<aside role="contentinfo"> ... </aside>
+<aside role="complementary"> ... </aside>
 <main role="main"> ... </main>
-<footer role="footer"> ... </footer>
+<footer role="contentinfo"> ... </footer>
 ```
 
 ---

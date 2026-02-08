@@ -1,7 +1,7 @@
 # Generics
 
-- Les **Generics** permet de paramètrer via des types.
-- Cela permet de réutiliser du code tout en gardant le coté _type safe_
+- Les **Generics** permettent de paramétriser via des types.
+- Cela permet de réutiliser du code tout en gardant le côté _type safe_
 
 ```typescript
 function echo<T>(arg: T): T {

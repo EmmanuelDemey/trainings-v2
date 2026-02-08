@@ -130,11 +130,11 @@ button.addEventListener('mouseout', () => {
 
 # Les Modales
 
-* Une fois la modale mise en place nous devons s'assurer du bon fonction de certains comportements.
+* Une fois la modale mise en place nous devons nous assurer du bon fonctionnement de certains comportements.
 
 * À l'ouverture de la modale :
-    * Le `focus` doit étre mis sur le premier champs focusable de la modale
-    * Seuls les éléments de la modale doit être `focusable`
+    * Le `focus` doit être mis sur le premier champ focusable de la modale
+    * Seuls les éléments de la modale doivent être `focusable`
     * Il est possible de fermer la fenêtre avec la touche `Echap`
 
 * À la fermeture de la modale :
@@ -166,7 +166,7 @@ button.addEventListener('mouseout', () => {
 ```javascript
 let focustedElementBeforeModal;
 
-const modal = document.querySelector('[role="modal"]')'
+const modal = document.querySelector('[role="dialog"]');
 const modalOverlay = document.querySelector('.modal-overlay');
 const modalToggle = document.querySelector('.open-modal');
 modalToggle.addEventListener('click', openModal);
@@ -196,7 +196,7 @@ function openModal(){
 ```javascript
     ...
 
-    const focusableElementSelectors = 'a[href], button, input:not[disabled]';
+    const focusableElementSelectors = 'a[href], button, input:not([disabled])';
     let focusableElements = modal.querySelectorAll(focusableElementSelectors);
     focusableElements = Array.prototype.slice.call(focusableElements);
 
@@ -226,7 +226,7 @@ function openModal(){
     ...
 
     function tabKeyHandler(e){
-        if(e.keyCode === 9){
+        if(e.key === 'Tab'){
             if(e.shiftKey){
                 if(document.activeElement === firstFocusableElement) {
                     e.preventDefault();
@@ -240,7 +240,7 @@ function openModal(){
             }
         }
 
-        if(e.keyCode === 27){
+        if(e.key === 'Escape'){
             closeModal();
         }
     }
@@ -266,10 +266,9 @@ function openModal(){
 
 # L'attribut Inert
 
-* Dans les prochaines versions des navigateurs, nous allons avoir l'attribut `inert`
+* L'attribut `inert` est **supporté par tous les navigateurs modernes** (Chrome 102+, Firefox 112+, Safari 15.5+)
 * Cet attribut permet de supprimer les événements utilisateur d'un élément
-* Possibilité d'utiliser le `polyfill` *WICG/inert*
-* Nous avons aussi, depuis peu de temps, les éléments **dialog** et **popover** nativement.
+* Très utile pour rendre le contenu derrière une modale inaccessible
 
 ```html
 <div>
@@ -278,6 +277,35 @@ function openModal(){
 <div inert>
   <button>I am inert</button>
 </div>
+```
+
+---
+
+# L'élément `<dialog>`
+
+* L'élément HTML `<dialog>` est désormais supporté par tous les navigateurs
+* Il gère automatiquement le piège de focus, la touche Echap, et l'attribut `inert` sur le reste de la page
+* **Recommandé** comme approche principale pour les modales (plutôt que `role="dialog"` sur un `<div>`)
+
+```html
+<button onclick="document.getElementById('myDialog').showModal()">
+  Ouvrir
+</button>
+
+<dialog id="myDialog">
+  <h2>Confirmation</h2>
+  <p>Êtes-vous sûr ?</p>
+  <form method="dialog">
+    <button value="cancel">Annuler</button>
+    <button value="confirm">Confirmer</button>
+  </form>
+</dialog>
+```
+
+```css
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
 ```
 
 ---
@@ -338,7 +366,7 @@ function openModal(){
 # Alertes
 
 * Il faut laisser le temps à vos utilisateurs de voir/entendre le contenu
-    * Éviter les alertes qui disparraissent rapidement.
+    * Éviter les alertes qui disparaissent rapidement.
     * Ou attendre la lecture par le synthétiseur vocal
     * Ou mettre en place un système d'acquittement
 
@@ -346,7 +374,7 @@ function openModal(){
 
 # Alertes
 
-* Pour des raisons de compatibilité, il est nécessaire que la zone ne soit pas ajouter dynamiquement.
+* Pour des raisons de compatibilité, il est nécessaire que la zone ne soit pas ajoutée dynamiquement.
 
 ```html
 <section role="alert"></section>

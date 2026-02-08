@@ -57,7 +57,8 @@ const getConnection = () => {
   };
 };
 
-using { connection } = getConnection();
+using result = getConnection();
+const { connection } = result; // si besoin de destructurer
 ```
 
 # Les bases de TypeScript
@@ -70,7 +71,7 @@ const user = {};
 user.firstName = "Manu";
 ```
 
-- Si nous souhaitons indiquer que la variable n'est absolument pas modifible, nous pouvons utiliser la syntaxe `as const`
+- Si nous souhaitons indiquer que la variable n'est absolument pas modifiable, nous pouvons utiliser la syntaxe `as const`
 
 ```typescript
 const user = {} as const;
@@ -316,7 +317,7 @@ type OnEvent = {
 
 const eventHandlers: OnEvent = {
   onAdd: () => {},
-  onRemove () => {},
+  onRemove: () => {},
   onMove: () => {},
 }
 ```
@@ -333,19 +334,21 @@ type NonNullable<T> = T extends null | undefined ? never : T;
 
 # Recursive Types
 
-- Tout comme la récurisivité en programmation, nous pouvons utiliser ce mécanisme pour définir des types évolués.
+- Tout comme la récursivité en programmation, nous pouvons utiliser ce mécanisme pour définir des types évolués.
 
 ```typescript
-// Ceci est une réimplementation du Awaited
-type Awaited<T> = T extends Array<infer Inner> ? Awaited<Inner> : T;
+// Flatten récursif : déroule les tableaux imbriqués
+type Flatten<T> = T extends Array<infer Inner> ? Flatten<Inner> : T;
+
+type Result = Flatten<number[][]>; // number
 ```
 
 - Voici un exemple un peu plus compliqué.
 
 ```typescript
-type RGBTuple = Tuple<3, number>;
+type RGBTuple = Tuple<3, number>; // [number, number, number]
 
-type Typle<Length, TupleType, Acc extends TupleType[] = []> = Acc["length"] extends Length
+type Tuple<Length, TupleType, Acc extends TupleType[] = []> = Acc["length"] extends Length
   ? Acc
   : Tuple<Length, TupleType, [...Acc, TupleType]>;
 ```
@@ -371,7 +374,88 @@ const validateAge = (age: number | string) => {
 
 ---
 
+# L'opérateur `satisfies`
+
+- Disponible depuis **TypeScript 4.9**, `satisfies` permet de vérifier qu'une expression est compatible avec un type **sans élargir** le type inféré.
+
+```typescript
+type Colors = Record<string, string | string[]>;
+
+// Avec 'as' : on perd l'information sur le type exact
+const palette1 = {
+  red: "#ff0000", blue: ["#0000ff", "#0000cc"]
+} as Colors;
+palette1.red.toUpperCase(); // Erreur: 'toUpperCase' n'existe pas sur string | string[]
+
+// Avec 'satisfies' : on valide ET on garde le type précis
+const palette2 = {
+  red: "#ff0000", blue: ["#0000ff", "#0000cc"]
+} satisfies Colors;
+palette2.red.toUpperCase(); // OK : TypeScript sait que c'est une string
+palette2.blue.map(c => c);  // OK : TypeScript sait que c'est string[]
+```
+
+---
+
+# Paramètre de type `const`
+
+- Depuis **TypeScript 5.0**, le mot clé `const` dans les generics permet d'inférer des types littéraux
+
+```typescript
+// Sans const : T est inféré comme string[]
+function routes<T extends readonly string[]>(paths: T) { return paths; }
+const r1 = routes(["home", "about"]); // string[]
+
+// Avec const : T est inféré comme readonly ["home", "about"]
+function routesConst<const T extends readonly string[]>(paths: T) { return paths; }
+const r2 = routesConst(["home", "about"]); // readonly ["home", "about"]
+```
+
+---
+
 # Les modules et la gestion des dépendances
+
+- TypeScript supporte les modules ES (ESM) et CommonJS
+- Chaque fichier avec un `import` ou `export` est considéré comme un module
+
+```typescript
+// user.ts - Export nommé
+export interface User {
+  id: number;
+  name: string;
+}
+export function createUser(name: string): User {
+  return { id: Math.random(), name };
+}
+
+// Export par défaut
+export default class UserService { ... }
+```
+
+```typescript
+// app.ts - Import
+import UserService, { User, createUser } from './user';
+import type { User } from './user'; // Import de type uniquement (effacé à la compilation)
+```
+
+---
+
+# Les modules - Configuration
+
+- Les options `module` et `moduleResolution` dans `tsconfig.json` contrôlent le système de modules
+- Pour les projets modernes utilisant un bundler (Vite, webpack), préférer `"moduleResolution": "bundler"`
+
+```json
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true
+  }
+}
+```
+
+- `verbatimModuleSyntax` (TS 5.0+) force l'utilisation de `import type` pour les imports de types
 
 ---
 
@@ -386,6 +470,8 @@ const validateAge = (age: number | string) => {
   - Method Decorators
   - Accessor Decorators
   - Parameter Decorators
+
+> **Note** : Les exemples ci-dessous utilisent les décorateurs **legacy** (`experimentalDecorators`). TypeScript 5.0+ supporte aussi les décorateurs **TC39 Stage 3**, qui ont une API différente et ne nécessitent pas de flag de compilation.
 
 ---
 
@@ -591,7 +677,7 @@ class BugReport {
 
 ---
 
-# Les outils et bonnes pratiques ---
+# Les outils et bonnes pratiques
 
 # tsc
 
@@ -599,7 +685,20 @@ class BugReport {
 - Il se base sur un fichier de configuration **tsconfig.json**
 
 ```json
-
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "declaration": true
+  },
+  "include": ["src/**/*"]
+}
 ```
 
 ---
@@ -637,9 +736,28 @@ Done in 3.53s.
 
 # Fichiers de Définition
 
+- Les fichiers `.d.ts` décrivent les types d'une librairie JavaScript existante
+- Ils permettent d'utiliser des librairies JS avec le support TypeScript
+- La plupart des librairies populaires ont leurs types sur **DefinitelyTyped** (`@types/...`)
+
+```shell
+npm install --save-dev @types/node @types/lodash
+```
+
+```typescript
+// custom.d.ts - Déclaration de types pour un module sans types
+declare module 'ma-librairie' {
+  export function doSomething(input: string): number;
+  export interface Config {
+    debug: boolean;
+    timeout: number;
+  }
+}
+```
+
 ---
 
 
 # Liens
 
-- https://www.youtube.com/watch?v=Lkgpy_ctzIo[Zod/ArkType, Comment typer vos applications JS au runtime]
+- [Zod/ArkType, Comment typer vos applications JS au runtime](https://www.youtube.com/watch?v=Lkgpy_ctzIo)

@@ -2,7 +2,7 @@
 # Introduction à TypeScript
 
 * TypeScript est un langage de Microsoft
-* Créer par le créateur des langages **Delphi** et **C#**
+* Créé par le créateur des langages **Delphi** et **C#**
 * C'est un *superset* de JavaScript
     * Tout ce qui est faisable en JavaScript l'est également en TypeScript
     * TypeScript ajoute le mécanisme de typage au langage
@@ -21,20 +21,19 @@ npm install -D typescript
 npx tsc -init
 ```
 
-- Une fichier de configuration `tsconfig.json` sera créé
+- Un fichier de configuration `tsconfig.json` sera créé
 
 ```json
 {
-  "name": "tsc",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist"
+  }
 }
 ```
 
@@ -60,16 +59,16 @@ npx ts-node hello.ts
 
 # Fonctionnement d'une compilation
 
-- Quand nous executions le compulateur, plusieurs briques sont en fait exécutées les unes à la suite des autres
-  - le _scanner_ pour générer une stream de Token
+- Quand nous exécutons le compilateur, plusieurs briques sont en fait exécutées les unes à la suite des autres
+  - le _scanner_ pour générer un stream de Token
   - le _parser_ pour générer un Abstract Syntax Tree (AST)
-  - le _binder_ pour connecter les différentes parties du code afin de bénéfichier du type checking
+  - le _binder_ pour connecter les différentes parties du code afin de bénéficier du type checking
   - le _checker_ pour la vérification des types dans votre programme
   * le _emitter_ pour la génération du JavaScript
 
 ---
 
-# Options avancée de la ligne de commande
+# Options avancées de la ligne de commande
 
 - `npx tsc --showConfig` permet de visualiser la configuration effective du compilateur
 
@@ -92,7 +91,7 @@ npx tsc --showConfig
 
 ---
 
-# Options avancée de la ligne de commande
+# Options avancées de la ligne de commande
 
 - `npx tsc --listFiles` va lister les fichier TypeScript qui seront manipulés par le compilateur.
 
@@ -123,7 +122,7 @@ npx tsc --showConfig
 
 # IDE
 
-- Plusieurs IDE peuvent être utilisée pour écrire du code TypeScript
+- Plusieurs IDE peuvent être utilisés pour écrire du code TypeScript
   - WebStorm
   - Intellij IDEA
   - Visual Studio Code

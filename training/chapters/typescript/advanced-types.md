@@ -1,6 +1,6 @@
 # Types Avancés - Partial
 
-- Types permettant de modifier des types existant
+- Types permettant de modifier des types existants
 
 ```typescript
 interface User {
@@ -31,7 +31,7 @@ type PartialUser = Partial<User>;
 - **Required** permet de mettre tous les champs obligatoires.
 
 ```typescript
-type PartialUser = Required<User>;
+type RequiredUser = Required<User>;
 
 /*
 {
@@ -45,7 +45,7 @@ type PartialUser = Required<User>;
 - **Omit** permet de supprimer des propriétés.
 
 ```typescript
-type PartialUser = Omit<User, "name" | "age">;
+type UserWithoutName = Omit<User, "name" | "age">;
 
 /*
 {
@@ -56,12 +56,12 @@ type PartialUser = Omit<User, "name" | "age">;
 
 ---
 
-# Types Avancés - Pick et ReadOnly
+# Types Avancés - Pick et Readonly
 
 - **Pick** permet de garder certains champs.
 
 ```typescript
-type PartialUser = Pick<User, "name" | "age">;
+type UserNameAndAge = Pick<User, "name" | "age">;
 
 /*
 {
@@ -74,7 +74,7 @@ type PartialUser = Pick<User, "name" | "age">;
 - **Readonly** permet de rendre tous les champs _readonly_.
 
 ```typescript
-type PartialUser = Readonly<User>;
+type ReadonlyUser = Readonly<User>;
 
 /*
 {

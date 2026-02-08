@@ -4,7 +4,7 @@ layout: cover
 
 # 17 - TanStack Query
 
---- 
+---
 
 # TanStack Query
 
@@ -27,7 +27,7 @@ npm i @tanstack/react-query @tanstack/react-query-devtools
 import {
    QueryClient,
    QueryClientProvider,
- } from 'react-query'
+ } from '@tanstack/react-query'
 import { getTodos, postTodo } from '../my-api'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
@@ -40,7 +40,6 @@ const queryClient = new QueryClient({
 })
  function App() {
    return (
-     // Provide the client to your App
      <QueryClientProvider client={queryClient}>
        <Todos />
        <ReactQueryDevtools initialIsOpen={false} />
@@ -57,12 +56,15 @@ const queryClient = new QueryClient({
 
 ```javascript
 function Todos() {
-   const { data } = useQuery('todos', () => fetch(...).then(response => response.json()))
+   const { data } = useQuery({
+     queryKey: ['todos'],
+     queryFn: () => fetch('/api/todos').then(response => response.json())
+   })
 
    return (
      <div>
        <ul>
-         {query.data.map(todo => (
+         {data?.map(todo => (
            <li key={todo.id}>{todo.title}</li>
          ))}
        </ul>
@@ -76,10 +78,10 @@ function Todos() {
 # Queries
 
 * Voici une liste des propriétés retournées par l'utilisation du hook `useQuery`
-  * isLoading
+  * isPending (la requête n'a pas encore de données)
   * isError
   * isSuccess
-  * isIdle
+  * isFetching (une requête est en cours, y compris en arrière-plan)
   * error
   * data
   * status
@@ -92,9 +94,12 @@ function Todos() {
 
 ```typescript
 function Todos() {
-  const { isLoading, isError, data, error } = useQuery('todos', fetchTodoList)
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ['todos'],
+    queryFn: fetchTodoList
+  })
 
-  if (isLoading) {
+  if (isPending) {
     return <span>Loading...</span>
   }
 
@@ -116,17 +121,18 @@ function Todos() {
 
 # useMutation
 
-* Si vous souhaitez exécuter des requetes de création/mise à jour/suppression, nous allons utiliser le hook `useMutation`.
+* Si vous souhaitez exécuter des requêtes de création/mise à jour/suppression, nous allons utiliser le hook `useMutation`.
 * Nous allons pouvoir révoquer une partie du cache en cas de succès d'une mutation.
 
 ```javascript {*}{maxHeight:'300px'}
 function Todos() {
    const queryClient = useQueryClient()
-   const query = useQuery('todos', getTodos)
-   const mutation = useMutation(postTodo, {
+   const query = useQuery({ queryKey: ['todos'], queryFn: getTodos })
+   const mutation = useMutation({
+     mutationFn: postTodo,
      onSuccess: () => {
        // Invalidate and refetch
-       queryClient.invalidateQueries('todos')
+       queryClient.invalidateQueries({ queryKey: ['todos'] })
      },
    })
 
@@ -148,7 +154,7 @@ function Todos() {
 
 # StoragePersister
 
-* Possibilité de définir des stratégies de persistance synchrone et/ou asynchrone. 
+* Possibilité de définir des stratégies de persistance synchrone et/ou asynchrone.
 
 ```typescript
 import { persistQueryClient } from '@tanstack/react-query-persist-client'

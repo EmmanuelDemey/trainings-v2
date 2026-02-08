@@ -6,8 +6,8 @@ Durant cette formation, nous allons développer une application permettant la vi
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://angular.io/docs[Angular]
-* https://angular.io/cli[@angular/cli]
+* https://angular.dev/docs[Angular]
+* https://angular.dev/cli[@angular/cli]
 * https://bulma.io/[Bulma]
 
 
@@ -17,7 +17,7 @@ Dans votre terminal, veuillez exécuter les commandes suivantes :
 
 ```shell
 npm install -g @angular/cli
-ng new first-project --standalone
+ng new first-project
 ```
 
 Une fois le projet créé, vous pouvez exécuter les commandes suivantes afin de vérifier qu'il est bien fonctionnel.
@@ -54,7 +54,6 @@ Nous allons ensuite intégrer le *layout* de base de la librairie Bulma. Modifie
     <app-root></app-root>
   </body>
 </html>
-<!doctype html>
 ```
 
 Nous allons terminer par la modification du fichier `src/app/app.component.ts` afin qu'il utilise le template suivant.
@@ -224,7 +223,17 @@ Dans l'implementation du composant `app.component.ts`, ajoutez ce template HTML
 </table>
 ```
 
-Vous devez ensuite générer autant de balise `tr` que de personnages à afficher Pour cela, nous allons utiliser la directive `*ngFor`.
+Vous devez ensuite générer autant de balises `tr` que de personnages à afficher. Pour cela, nous allons utiliser la syntaxe `@for`.
+
+```html
+@for (person of people; track person.url) {
+  <tr>
+    <td>{{ person.name }}</td>
+    <td>{{ person.gender }}</td>
+    <td>{{ person.birth_year }}</td>
+  </tr>
+}
+```
 
 ## PW3 - Composant
 
@@ -250,7 +259,7 @@ Veuillez implémenter les communications entre les composants afin de faire le t
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* HTTP Communication [https://angular.io/guide/http-server-communication]
+* HTTP Communication [https://angular.dev/guide/http-server-communication]
 * https://swapi.dev/[SWAPI]
 
 Dans les travaux précédents, les données étaient définies en mémoire. Nous allons dans ce TP récuper les données depuis l'API REST swapi.
@@ -269,7 +278,7 @@ Comme partie bonus, nous allons gérer la pagination de notre tableau. En effet,
 
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* https://angular.io/guide/router-reference[Router]
+* https://angular.dev/guide/router-reference[Router]
 
 Nous allons à présent ajouter une deuxième page à notre application. Cette page sera utilisée lorsque l'utilisateur cliquera sur le nom d'un personnage. Elle affichera les informations du personnage selectionné.
 
@@ -315,7 +324,7 @@ Veuillez ajouter le code nécessaire dans ce service afin d'implémenter le fonc
 ```html
 <button
     type="button"
-    className="button is-warning"
+    class="button is-warning"
     (click)="..." >
   I Like
 </button>
