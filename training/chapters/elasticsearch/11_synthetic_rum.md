@@ -98,6 +98,8 @@ Schedule: Every 3 minutes
 - Screenshots, network traces
 
 ```javascript
+import { step } from '@elastic/synthetics';
+
 // Example: Login and book parking
 step('Navigate to login', async () => { ... })
 step('Fill credentials', async () => { ... })

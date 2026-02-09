@@ -3442,15 +3442,15 @@ POST /_security/api_key
 # Create a directory for application logs
 mkdir -p /var/log/parkki-app
 
-# Create a sample parking API log file
+# Create a sample parking API log file (JSON format - one JSON object per line)
 cat > /var/log/parkki-app/parking-api.log << 'EOF'
-2025-01-15T10:00:00.123Z INFO [API] User authentication successful - user_id=user123 ip=192.168.1.100
-2025-01-15T10:00:05.456Z INFO [API] Parking spot reserved - user_id=user123 spot_id=A15 parking_id=central
-2025-01-15T10:00:10.789Z ERROR [Payment] Payment processing failed - user_id=user456 error_code=CARD_DECLINED amount=12.50
-2025-01-15T10:00:15.012Z WARN [Capacity] Parking lot nearly full - parking_id=central occupancy=95%
-2025-01-15T10:00:20.345Z INFO [Notification] Email sent successfully - user_id=user123 type=reservation_confirmation
-2025-01-15T10:00:25.678Z DEBUG [Cache] Cache hit - key=parking_central_status ttl=300s
-2025-01-15T10:00:30.901Z ERROR [Database] Connection timeout - service=parking-api error=connection_timeout retry_attempt=3
+{"timestamp":"2025-01-15T10:00:00.123Z","level":"INFO","component":"API","message":"User authentication successful","user_id":"user123","ip":"192.168.1.100"}
+{"timestamp":"2025-01-15T10:00:05.456Z","level":"INFO","component":"API","message":"Parking spot reserved","user_id":"user123","spot_id":"A15","parking_id":"central"}
+{"timestamp":"2025-01-15T10:00:10.789Z","level":"ERROR","component":"Payment","message":"Payment processing failed","user_id":"user456","error_code":"CARD_DECLINED","amount":12.50}
+{"timestamp":"2025-01-15T10:00:15.012Z","level":"WARN","component":"Capacity","message":"Parking lot nearly full","parking_id":"central","occupancy":95}
+{"timestamp":"2025-01-15T10:00:20.345Z","level":"INFO","component":"Notification","message":"Email sent successfully","user_id":"user123","type":"reservation_confirmation"}
+{"timestamp":"2025-01-15T10:00:25.678Z","level":"DEBUG","component":"Cache","message":"Cache hit","key":"parking_central_status","ttl":300}
+{"timestamp":"2025-01-15T10:00:30.901Z","level":"ERROR","component":"Database","message":"Connection timeout","service":"parking-api","error":"connection_timeout","retry_attempt":3}
 EOF
 
 # Add executable permissions
@@ -3510,46 +3510,35 @@ processors:
       fields:
         log_source: filebeat
   
-  # Parse Parkki application logs with Dissect (faster than Grok)
-  - dissect:
+  # Parse Parkki JSON application logs
+  # Expected format: {"timestamp":"...","level":"INFO","component":"api","message":"...","user_id":"..."}
+  - decode_json_fields:
       when.contains:
         tags: "parkki"
-      tokenizer: "%{timestamp} %{log.level} [%{component}] %{log.message}"
-      field: "message"
-      target_prefix: ""
-      ignore_failure: true
-  
-  # Extract key-value pairs from log.message (user_id=xxx, error_code=yyy, etc.)
-  - kv:
-      when.has_fields: ["log.message"]
-      field: "log.message"
-      field_split: " "
-      value_split: "="
-      target_field: "parsed"
-      ignore_failure: true
-      trim_key: " "
-      trim_value: " "
-      include_keys: ["user_id", "error_code", "amount", "parking_id", "spot_id", "ip", "type", "key", "ttl", "error", "retry_attempt", "occupancy"]
-  
+      fields: ["message"]
+      target: ""
+      overwrite_keys: true
+      add_error_key: true
+
   # Convert timestamp string to @timestamp
   - timestamp:
       field: "timestamp"
       layouts:
         - '2006-01-02T15:04:05.999Z'
         - '2006-01-02T15:04:05Z'
+        - '2006-01-02T15:04:05'
       test:
         - '2025-01-15T10:00:00.123Z'
       ignore_failure: true
-  
-  # Decode JSON logs if present (for Elasticsearch JSON logs)
-  - decode_json_fields:
-      fields: ["message"]
-      target: "json"
-      overwrite_keys: false
-      add_error_key: true
-      when.regexp:
-        message: '^[\[\{]'
-  
+
+  # Rename level to log.level for ECS compliance
+  - rename:
+      fields:
+        - from: "level"
+          to: "log.level"
+      ignore_missing: true
+      fail_on_error: false
+
   # Drop temporary fields to save space
   - drop_fields:
       fields: ["timestamp"]
@@ -3789,42 +3778,20 @@ Parsing with **Dissect** and **KV** in Filebeat (as configured above) has severa
 ✅ **Network efficiency**: Only parsed data is sent (no re-parsing needed)
 ✅ **Debugging**: Easier to test locally with `filebeat test`
 
-**Alternative - Parsing with Ingest Pipeline** (if you prefer):
-If you still want to use an Elasticsearch ingest pipeline (for example to share parsing logic across multiple sources), you can:
-
-```bash
-# Create a pipeline in Elasticsearch
-PUT /_ingest/pipeline/parkki-logs-parser
+**Expected JSON log format from your application**:
+```json
 {
-  "description": "Parse Parkki application logs",
-  "processors": [
-    {
-      "grok": {
-        "field": "message",
-        "patterns": [
-          "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:log.level} \\[%{DATA:component}\\] %{GREEDYDATA:log.message}"
-        ],
-        "ignore_failure": true
-      }
-    },
-    {
-      "kv": {
-        "field": "log.message",
-        "field_split": " ",
-        "value_split": "=",
-        "target_field": "parsed",
-        "ignore_failure": true
-      }
-    }
-  ]
+  "timestamp": "2025-01-15T10:00:00.123Z",
+  "level": "INFO",
+  "component": "parking-api",
+  "message": "User logged in successfully",
+  "user_id": "user123",
+  "parking_id": "P001",
+  "response_time_ms": 45
 }
-
-# Then in filebeat.yml, add:
-# output.elasticsearch:
-#   pipeline: "parkki-logs-parser"
 ```
 
-**However**, we recommend using Filebeat processors (Dissect + KV) which are already configured in the file above.
+All fields are automatically extracted and indexed in Elasticsearch.
 
 9. Query Elasticsearch logs collected by Filebeat:
 ```bash

@@ -101,17 +101,44 @@ Data Stream: logs-parkki
 
 # Index Lifecycle Management (ILM)
 
-Lifecycle phases:
+Automate index management through lifecycle phases:
 
+```mermaid
+flowchart LR
+    subgraph HOT["🔥 HOT"]
+        H1[Active indexing]
+        H2[Frequent searches]
+        H3[Fast SSDs]
+    end
+    subgraph WARM["🌡️ WARM"]
+        W1[Read-only]
+        W2[Shrink shards]
+        W3[Force merge]
+    end
+    subgraph COLD["❄️ COLD"]
+        C1[Rare searches]
+        C2[Fewer replicas]
+        C3[HDDs OK]
+    end
+    subgraph DELETE["🗑️ DELETE"]
+        D1[Permanent removal]
+    end
+    HOT -->|min_age: 2d| WARM
+    WARM -->|min_age: 7d| COLD
+    COLD -->|min_age: 30d| DELETE
 ```
-Hot → Warm → Cold → Frozen → Delete
- │      │      │       │        │
- │      │      │       │        └─ Permanent deletion
- │      │      │       └─ Snapshot + minimal resources
- │      │      └─ Read-only, fewer replicas
- │      └─ Read-only, shrink, force merge
- └─ Active indexing, frequent searches
-```
+
+---
+
+# ILM Phases Overview
+
+| Phase | Resources | Access | Typical Actions |
+|-------|-----------|--------|-----------------|
+| 🔥 **Hot** | High (SSD + RAM) | Read/Write | Rollover, set priority |
+| 🌡️ **Warm** | Medium | Read-only | Shrink, force merge, relocate |
+| ❄️ **Cold** | Low (HDD) | Rare reads | Reduce replicas, searchable snapshot |
+| 🧊 **Frozen** | Minimal | Very rare | Mounted snapshot |
+| 🗑️ **Delete** | None | None | Permanent deletion |
 
 ---
 

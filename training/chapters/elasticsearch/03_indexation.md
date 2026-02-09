@@ -308,6 +308,58 @@ index.number_of_replicas: 1
 
 ---
 
+# Critical Index Settings
+
+| Setting | Default | Description | Recommendation |
+|---------|---------|-------------|----------------|
+| `number_of_shards` | 1 | Primary shards (immutable) | 1 shard per 10-50GB |
+| `number_of_replicas` | 1 | Replica count | 1-2 for production |
+| `refresh_interval` | 1s | Search visibility delay | 30s for logs |
+| `max_result_window` | 10000 | Max from + size | Increase if needed |
+| `codec` | default | Compression type | `best_compression` for cold |
+
+---
+
+# Critical Index Settings: Examples
+
+```json
+PUT /logs-2025.01/_settings
+{
+  "index": {
+    "refresh_interval": "30s",
+    "number_of_replicas": 1,
+    "max_result_window": 50000
+  }
+}
+```
+
+<v-click>
+
+> **Tip**: Disable refresh during bulk indexing with `"refresh_interval": "-1"`, then re-enable after.
+
+</v-click>
+
+---
+
+# Critical Index Settings: Static vs Dynamic
+
+<v-clicks>
+
+**Static** (set at creation only):
+- `number_of_shards`
+- `codec`
+- `routing_partition_size`
+
+**Dynamic** (can be changed anytime):
+- `number_of_replicas`
+- `refresh_interval`
+- `max_result_window`
+- `max_docvalue_fields_search`
+
+</v-clicks>
+
+---
+
 # Cluster Status
 
 * Elasticsearch will create shards and place them correctly.

@@ -292,3 +292,35 @@ PUT /my-index
 - `ignore_above`: Ignores strings that are too long
 - `enabled`: Enables/disables field indexing
 
+---
+layout: two-cols
+---
+
+# Glossary: Key Terms (1/2)
+
+| Term | Definition |
+|------|------------|
+| **Cluster** | Group of nodes working together |
+| **Node** | Single Elasticsearch server instance |
+| **Index** | Collection of documents (like a DB table) |
+| **Document** | Single JSON record in an index |
+| **Mapping** | Schema defining field types |
+| **Shard** | Horizontal partition of an index |
+| **Primary Shard** | Original shard for write operations |
+| **Replica** | Copy of a primary shard for HA |
+
+::right::
+
+--- 
+
+# Glossary: Key Terms (2/2)
+
+| Term | Definition |
+|------|------------|
+| **Segment** | Immutable Lucene file on disk |
+| **Refresh** | Make new docs searchable (1s) |
+| **Flush** | Persist data to disk (fsync) |
+| **Merge** | Combine segments for efficiency |
+| **Inverted Index** | Term → Document ID mapping |
+
+---

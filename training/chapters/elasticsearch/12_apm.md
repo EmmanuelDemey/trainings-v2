@@ -324,6 +324,8 @@ ELASTIC_APM_SERVICE_NAME=my-cool-service
 # @Traced
 
 ```java
+import co.elastic.apm.api.Traced;
+
 @Traced()
 public void delay(int length) {
     try {
@@ -339,6 +341,9 @@ public void delay(int length) {
 # SPAN API
 
 ```java
+import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Span;
+
 public Response onOutgoingRequest(Request request) throws Exception {
     Span span = ElasticApm.currentSpan()
         .startSpan("external", "http", null)
@@ -373,6 +378,9 @@ public Response onOutgoingRequest(Request request) throws Exception {
 * We can also add labels to the current span
 
 ```java
+import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Span;
+
 Span span = ElasticApm.currentSpan();
 span.setLabel("foo", "bar");
 ```
@@ -385,6 +393,8 @@ span.setLabel("foo", "bar");
 * These plugins will be executed directly by the Java agent
 
 ```java
+import net.bytebuddy.asm.Advice;
+
 @Advice.OnMethodEnter(suppress = Throwable.class, inline = false)
 public static Object onEnterHandle(@Advice.Argument(0) String requestLine) {
 }
@@ -401,6 +411,10 @@ public static void onExitHandle(@Advice.Thrown Throwable thrown, @Advice.Enter O
 * Correlation between the different components of your infrastructure is possible thanks to the `trace-id` header
 
 ```java
+import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Span;
+import co.elastic.apm.api.Scope;
+
 public Response onOutgoingRequest(Request request) throws Exception {
     Span span = ElasticApm.currentSpan()
         .startSpan("external", "http", null)

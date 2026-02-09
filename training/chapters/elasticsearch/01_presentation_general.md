@@ -40,6 +40,12 @@ layout: cover
 * Here is an example of Lucene code:
 
 ```java
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.index.Term;
+
 String str = "foo bar";
 String id = "123456";
 BooleanQuery bq = new BooleanQuery();
