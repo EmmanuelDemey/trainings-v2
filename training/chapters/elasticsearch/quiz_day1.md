@@ -9,16 +9,16 @@ layout: cover
 
 # Quiz Day 1 — Question 1
 
-**Quelle est la structure de données principale utilisée par Elasticsearch pour effectuer des recherches rapides ?**
+**What is the main data structure used by Elasticsearch to perform fast searches?**
 
 <v-clicks>
 
-- A) Un arbre B+
-- B) Une table de hachage
-- C) Un index inversé ✅
-- D) Un graphe orienté
+- A) A B+ tree
+- B) A hash table
+- C) An inverted index ✅
+- D) A directed graph
 
-**Réponse : C** — L'index inversé associe chaque terme à la liste des documents qui le contiennent, permettant des recherches full-text ultra-rapides.
+**Answer: C** — The inverted index maps each term to the list of documents that contain it, enabling ultra-fast full-text searches.
 
 </v-clicks>
 
@@ -26,7 +26,7 @@ layout: cover
 
 # Quiz Day 1 — Question 2
 
-**Quel port est utilisé par défaut par l'API REST d'Elasticsearch ?**
+**What is the default port used by the Elasticsearch REST API?**
 
 <v-clicks>
 
@@ -35,7 +35,7 @@ layout: cover
 - C) 8080
 - D) 9200 ✅
 
-**Réponse : D** — Le port 9200 est le port par défaut pour l'API REST HTTP. Le port 5601 est celui de Kibana, et 9300 celui du transport inter-nœuds.
+**Answer: D** — Port 9200 is the default port for the HTTP REST API. Port 5601 is used by Kibana, and 9300 is used for inter-node transport communication.
 
 </v-clicks>
 
@@ -43,16 +43,16 @@ layout: cover
 
 # Quiz Day 1 — Question 3
 
-**Que signifie un état de cluster "yellow" dans Elasticsearch ?**
+**What does a "yellow" cluster health status mean in Elasticsearch?**
 
 <v-clicks>
 
-- A) Le cluster est totalement opérationnel
-- B) Tous les shards primaires sont assignés, mais certains réplicas ne le sont pas ✅
-- C) Le cluster est en panne
-- D) L'indexation est désactivée
+- A) The cluster is fully operational
+- B) All primary shards are assigned, but some replicas are not ✅
+- C) The cluster is down
+- D) Indexing is disabled
 
-**Réponse : B** — Un cluster yellow indique que les shards primaires fonctionnent, mais que certaines répliques ne sont pas allouées (souvent dans un cluster mono-nœud).
+**Answer: B** — A yellow cluster means primary shards are working, but some replica shards are unassigned (common in single-node clusters).
 
 </v-clicks>
 
@@ -60,16 +60,16 @@ layout: cover
 
 # Quiz Day 1 — Question 4
 
-**Quelle API faut-il privilégier pour indexer un grand volume de documents ?**
+**Which API should you use to index a large volume of documents?**
 
 <v-clicks>
 
-- A) L'API `_search`
-- B) L'API `_doc` document par document
-- C) L'API `_bulk` ✅
-- D) L'API `_reindex`
+- A) The `_search` API
+- B) The `_doc` API, one document at a time
+- C) The `_bulk` API ✅
+- D) The `_reindex` API
 
-**Réponse : C** — L'API `_bulk` permet d'envoyer plusieurs opérations (index, update, delete) en une seule requête HTTP, réduisant considérablement l'overhead réseau.
+**Answer: C** — The `_bulk` API allows sending multiple operations (index, update, delete) in a single HTTP request, significantly reducing network overhead.
 
 </v-clicks>
 
@@ -77,16 +77,16 @@ layout: cover
 
 # Quiz Day 1 — Question 5
 
-**Quelle est la différence entre les types `text` et `keyword` dans un mapping ?**
+**What is the difference between `text` and `keyword` field types in a mapping?**
 
 <v-clicks>
 
-- A) `text` est pour les nombres, `keyword` pour les chaînes
-- B) `text` est analysé (tokenisé) pour la recherche full-text, `keyword` est stocké tel quel pour les recherches exactes ✅
-- C) `keyword` est plus performant que `text` dans tous les cas
-- D) Il n'y a aucune différence
+- A) `text` is for numbers, `keyword` is for strings
+- B) `text` is analyzed (tokenized) for full-text search, `keyword` is stored as-is for exact matching ✅
+- C) `keyword` is more performant than `text` in all cases
+- D) There is no difference
 
-**Réponse : B** — Un champ `text` passe par un analyseur (tokenisation, filtres) pour le full-text search. Un champ `keyword` est indexé sans transformation pour les filtres exacts, le tri et les agrégations.
+**Answer: B** — A `text` field goes through an analyzer (tokenization, filters) for full-text search. A `keyword` field is indexed without transformation for exact filters, sorting, and aggregations.
 
 </v-clicks>
 
@@ -94,16 +94,16 @@ layout: cover
 
 # Quiz Day 1 — Question 6
 
-**Quel est le rôle d'un analyseur (analyzer) dans Elasticsearch ?**
+**What is the role of an analyzer in Elasticsearch?**
 
 <v-clicks>
 
-- A) Optimiser les performances réseau du cluster
-- B) Transformer le texte en tokens lors de l'indexation et de la recherche ✅
-- C) Gérer la réplication des shards
-- D) Compresser les données sur le disque
+- A) Optimize the cluster's network performance
+- B) Transform text into tokens during indexing and search ✅
+- C) Manage shard replication
+- D) Compress data on disk
 
-**Réponse : B** — Un analyseur se compose d'un tokenizer et de filtres (lowercase, stemming, stop words, etc.) qui transforment le texte brut en tokens indexables.
+**Answer: B** — An analyzer consists of a tokenizer and filters (lowercase, stemming, stop words, etc.) that transform raw text into indexable tokens.
 
 </v-clicks>
 
@@ -111,7 +111,7 @@ layout: cover
 
 # Quiz Day 1 — Question 7
 
-**Dans une requête `bool`, quelle clause permet de filtrer les documents sans affecter le score de pertinence ?**
+**In a `bool` query, which clause filters documents without affecting the relevance score?**
 
 <v-clicks>
 
@@ -120,7 +120,7 @@ layout: cover
 - C) `must_not`
 - D) `filter` ✅
 
-**Réponse : D** — La clause `filter` applique un filtre binaire (oui/non) sans calculer de score. Elle est aussi mise en cache pour de meilleures performances.
+**Answer: D** — The `filter` clause applies a binary (yes/no) filter without computing a score. It is also cached for better performance.
 
 </v-clicks>
 
@@ -128,7 +128,7 @@ layout: cover
 
 # Quiz Day 1 — Question 8
 
-**Quel algorithme de scoring est utilisé par défaut dans Elasticsearch ?**
+**Which scoring algorithm is used by default in Elasticsearch?**
 
 <v-clicks>
 
@@ -137,6 +137,6 @@ layout: cover
 - C) BM25 ✅
 - D) Cosine Similarity
 
-**Réponse : C** — BM25 (Best Matching 25) est l'algorithme par défaut depuis Elasticsearch 5.x. C'est une évolution de TF/IDF qui gère mieux la saturation des termes fréquents.
+**Answer: C** — BM25 (Best Matching 25) has been the default algorithm since Elasticsearch 5.x. It is an evolution of TF/IDF that better handles saturation of frequent terms.
 
 </v-clicks>

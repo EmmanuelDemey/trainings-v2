@@ -9,16 +9,16 @@ layout: cover
 
 # Quiz Day 2 — Question 9
 
-**À quoi sert le routing personnalisé dans Elasticsearch ?**
+**What is the purpose of custom routing in Elasticsearch?**
 
 <v-clicks>
 
-- A) À chiffrer les données en transit
-- B) À diriger les documents vers un shard spécifique pour optimiser les recherches ✅
-- C) À configurer les règles réseau du cluster
-- D) À définir l'ordre de réplication
+- A) To encrypt data in transit
+- B) To direct documents to a specific shard in order to optimize searches ✅
+- C) To configure cluster network rules
+- D) To define the replication order
 
-**Réponse : B** — Le routing permet de stocker et rechercher les documents sur un shard précis, évitant le fan-out sur tous les shards. C'est très utile en architecture multi-tenant.
+**Answer: B** — Routing allows storing and searching documents on a specific shard, avoiding fan-out across all shards. This is very useful in multi-tenant architectures.
 
 </v-clicks>
 
@@ -26,16 +26,16 @@ layout: cover
 
 # Quiz Day 2 — Question 10
 
-**Qu'est-ce que la percolation dans Elasticsearch ?**
+**What is percolation in Elasticsearch?**
 
 <v-clicks>
 
-- A) Un mécanisme de compression des données
-- B) L'exécution de requêtes stockées contre un document pour détecter des correspondances ✅
-- C) Le transfert de données entre nœuds
-- D) Un type d'agrégation avancée
+- A) A data compression mechanism
+- B) Running stored queries against a document to detect matches ✅
+- C) Transferring data between nodes
+- D) An advanced type of aggregation
 
-**Réponse : B** — La percolation inverse le paradigme classique : au lieu de chercher des documents avec une requête, on vérifie quelles requêtes stockées correspondent à un document donné. Idéal pour les alertes en temps réel.
+**Answer: B** — Percolation reverses the classic paradigm: instead of searching for documents with a query, it checks which stored queries match a given document. Ideal for real-time alerting.
 
 </v-clicks>
 
@@ -43,7 +43,7 @@ layout: cover
 
 # Quiz Day 2 — Question 11
 
-**Quelle agrégation permet de compter le nombre de valeurs distinctes d'un champ ?**
+**Which aggregation counts the number of distinct values of a field?**
 
 <v-clicks>
 
@@ -52,7 +52,7 @@ layout: cover
 - C) `cardinality` ✅
 - D) `stats`
 
-**Réponse : C** — L'agrégation `cardinality` utilise l'algorithme HyperLogLog++ pour estimer le nombre de valeurs uniques d'un champ, avec une faible marge d'erreur.
+**Answer: C** — The `cardinality` aggregation uses the HyperLogLog++ algorithm to estimate the number of unique values of a field, with a small margin of error.
 
 </v-clicks>
 
@@ -60,16 +60,16 @@ layout: cover
 
 # Quiz Day 2 — Question 12
 
-**Quel est l'avantage principal des alias d'index dans Elasticsearch ?**
+**What is the main advantage of index aliases in Elasticsearch?**
 
 <v-clicks>
 
-- A) Ils accélèrent les requêtes de 10x
-- B) Ils permettent de découpler l'application des index physiques et de réindexer sans downtime ✅
-- C) Ils doublent automatiquement le nombre de réplicas
-- D) Ils compressent les données stockées
+- A) They speed up queries by 10x
+- B) They decouple the application from physical indices and enable zero-downtime reindexing ✅
+- C) They automatically double the number of replicas
+- D) They compress stored data
 
-**Réponse : B** — Les alias fournissent un niveau d'indirection : l'application pointe vers un alias, ce qui permet de basculer entre index (reindexation, migration) de manière transparente et sans interruption.
+**Answer: B** — Aliases provide a level of indirection: the application points to an alias, allowing you to switch between indices (reindexing, migration) transparently and without downtime.
 
 </v-clicks>
 
@@ -77,7 +77,7 @@ layout: cover
 
 # Quiz Day 2 — Question 13
 
-**Dans une pipeline d'ingest, quel processeur est utilisé pour parser des lignes de log non structurées ?**
+**In an ingest pipeline, which processor is used to parse unstructured log lines?**
 
 <v-clicks>
 
@@ -86,7 +86,7 @@ layout: cover
 - C) `grok` ✅
 - D) `split`
 
-**Réponse : C** — Le processeur `grok` utilise des patterns (expressions régulières nommées) pour extraire des champs structurés à partir de texte non structuré, comme des lignes de log Apache ou Nginx.
+**Answer: C** — The `grok` processor uses patterns (named regular expressions) to extract structured fields from unstructured text, such as Apache or Nginx log lines.
 
 </v-clicks>
 
@@ -94,7 +94,7 @@ layout: cover
 
 # Quiz Day 2 — Question 14
 
-**Dans l'Index Lifecycle Management (ILM), quelles sont les phases du cycle de vie d'un index, dans l'ordre ?**
+**In Index Lifecycle Management (ILM), what are the lifecycle phases of an index, in order?**
 
 <v-clicks>
 
@@ -103,7 +103,7 @@ layout: cover
 - C) Primary → Replica → Snapshot → Delete
 - D) Index → Search → Aggregate → Purge
 
-**Réponse : B** — ILM gère automatiquement le cycle de vie des index à travers ces phases, permettant d'optimiser les coûts en déplaçant les données vers du matériel moins coûteux au fil du temps.
+**Answer: B** — ILM automatically manages the index lifecycle through these phases, optimizing costs by moving data to cheaper hardware over time.
 
 </v-clicks>
 
@@ -111,15 +111,15 @@ layout: cover
 
 # Quiz Day 2 — Question 15
 
-**Quelle est la taille recommandée pour un shard en production ?**
+**What is the recommended size for a shard in production?**
 
 <v-clicks>
 
-- A) 1-5 Go
-- B) 20-50 Go ✅
-- C) 100-200 Go
-- D) La taille n'a aucune importance
+- A) 1-5 GB
+- B) 20-50 GB ✅
+- C) 100-200 GB
+- D) Size does not matter
 
-**Réponse : B** — Elastic recommande des shards entre 20 et 50 Go. Des shards trop petits créent un overhead de gestion excessif, tandis que des shards trop grands ralentissent la récupération et le rééquilibrage.
+**Answer: B** — Elastic recommends shards between 20 and 50 GB. Shards that are too small create excessive management overhead, while shards that are too large slow down recovery and rebalancing.
 
 </v-clicks>
