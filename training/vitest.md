@@ -1284,33 +1284,195 @@ test('utilise le store', ({ pinia }) => {
 
 ---
 
-# Projets dans le fichier de config
+# Projets Vitest
 
-Gérer plusieurs configurations :
+Organiser plusieurs configurations de tests dans un seul fichier de config.
+
+Un **projet** est un runner de tests séparé qui :
+- Partage une configuration de base
+- Surcharge les options spécifiques à son contexte
+
+---
+
+# Projets : cas d'usage
+
+Les projets sont utiles pour :
+
+- Séparer les **tests unitaires** des **tests d'intégration** (plus lents)
+- Distinguer les tests en **browser mode** des tests classiques
+- Isoler les tests **frontend** (composants) des tests **backend** (API)
+- Utiliser des **environnements différents** (node, jsdom, happy-dom)
+- Appliquer des **setup/teardown** distincts par catégorie de tests
+
+---
+
+# Projets : configuration de base
+
+```ts
+// vitest.config.ts
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    globals: true,
+    setupFiles: ['./vitest.setup.ts'],
+    environment: 'jsdom',
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['**/*.unit.test.{ts,tsx}'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'integration',
+          include: ['**/*.integration.test.{ts,tsx}'],
+        },
+      },
+    ],
+  },
+});
+```
+
+---
+
+# Projets : extends
+
+La propriété `extends: true` permet l'héritage de la configuration de base.
+
+```ts
+projects: [
+  {
+    extends: true, // hérite de globals, setupFiles, environment...
+    test: {
+      name: 'unit',
+      include: ['**/*.unit.test.{ts,tsx}'],
+    },
+  },
+]
+```
+
+Les options partagées comme `globals` et `environment` s'appliquent automatiquement à tous les projets.
+
+⚠️ Sans `extends: true`, le projet démarre avec une configuration vierge.
+
+---
+
+# Projets : stratégies d'organisation
+
+**Par suffixe de fichier** (recommandé) :
+
+```
+src/utils/sum.unit.test.ts
+src/api/users.integration.test.ts
+```
+
+**Par répertoire** :
+
+```
+__tests__/unit/sum.test.ts
+__tests__/integration/users.test.ts
+```
+
+**Par exclusion** : combiner `include` et `exclude` quand les tests partagent le même nom de base.
+
+---
+
+# Projets : scripts npm
+
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:unit": "vitest --project unit",
+    "test:integration": "vitest --project integration"
+  }
+}
+```
+
+```bash
+# Lancer un seul projet
+npx vitest --project unit
+
+# Lancer plusieurs projets
+npx vitest --project unit --project integration
+
+# Lancer tous les projets
+npx vitest
+```
+
+---
+
+# Projets : intégration browser mode
+
+Les projets permettent de combiner des tests classiques et browser mode :
 
 ```ts
 export default defineConfig({
   test: {
     projects: [
       {
-        name: 'unit',
-        include: ['src/**/*.test.ts'],
-        environment: 'node'
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['**/*.unit.test.ts'],
+          environment: 'jsdom',
+        },
       },
       {
-        name: 'integration',
-        include: ['tests/integration/**/*.test.ts'],
-        environment: 'jsdom'
-      }
-    ]
-  }
+        extends: true,
+        test: {
+          name: 'browser',
+          include: ['**/*.browser.test.ts'],
+          browser: {
+            enabled: true,
+            provider: 'playwright',
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
+  },
 });
 ```
 
-```bash
-# Lancer un projet spécifique
-npm run test -- --project=unit
+---
+
+# Projets : limitations
+
+⚠️ **Coverage et reporters** doivent être définis dans la configuration racine :
+
+```ts
+export default defineConfig({
+  test: {
+    // ✅ Coverage au niveau racine
+    coverage: {
+      reporter: ['text', 'html'],
+    },
+    // ✅ Reporters au niveau racine
+    reporters: ['default'],
+    projects: [
+      // ...
+    ],
+  },
+});
 ```
+
+Ces options ne peuvent pas être spécifiques à un projet sans utiliser des fichiers de configuration séparés.
+
+---
+
+# Projets : avantages
+
+Pourquoi utiliser les projets plutôt que plusieurs fichiers de config ?
+
+- **Un seul fichier** : tout est centralisé dans `vitest.config.ts`
+- **CLI simplifiée** : pas besoin de `--config` différent par contexte
+- **Exécution simultanée** : tous les projets tournent en parallèle avec `vitest`
+- **Configuration partagée** : pas de duplication grâce à `extends: true`
 
 ---
 
@@ -1460,6 +1622,7 @@ layout: cover
 ✅ Snapshots pour capturer l'état
 ✅ Mocks et spies avec vi.*
 ✅ Testing Library pour tester comme un utilisateur
+✅ Projets Vitest : organiser et séparer les configurations de tests
 ✅ Fonctionnalités avancées : browser mode, benchmarks, type testing
 
 ---
