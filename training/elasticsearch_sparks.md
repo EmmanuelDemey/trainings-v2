@@ -2,8 +2,7 @@
 layout: intro
 ---
 
-# Elasticsearch - Sparks Training
-## Utiliser ElasticSearch en production (2 jours)
+# Elasticsearch
 
 Programme Sparks
 

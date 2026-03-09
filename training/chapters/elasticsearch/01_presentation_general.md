@@ -159,19 +159,19 @@ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elas
 
 # Clustering
 
-![](/images/cluster.png)
+<img src="/images/cluster.png" style="max-height: 80%; max-width: 100%; object-fit: contain; opacity: 0.85;" />
 
 ---
 
 # Configuration
 
-![](/images/folder1.png)
+<img src="/images/folder1.png" style="max-height: 80%; max-width: 100%; object-fit: contain; opacity: 0.85;" />
 
 ---
 
 # Configuration
 
-![](/images/folder2.png)
+<img src="/images/folder2.png" style="max-height: 80%; max-width: 100%; object-fit: contain; opacity: 0.85;" />
 
 ---
 

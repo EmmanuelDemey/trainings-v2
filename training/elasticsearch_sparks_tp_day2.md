@@ -12,7 +12,7 @@ All exercises use the Kibana Dev Tools console. Access it at: `http://localhost:
 
 If you cleaned up yesterday, recreate the `books` index:
 
-```bash
+```json
 PUT /books
 {
   "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
@@ -65,7 +65,7 @@ POST /_bulk
 **Instructions**:
 
 1. Create an index with required routing:
-```bash
+```json
 PUT /tenant-data
 {
   "mappings": {
@@ -84,7 +84,7 @@ PUT /tenant-data
 ```
 
 2. Index documents with routing:
-```bash
+```json
 POST /tenant-data/_doc?routing=tenant_A
 { "tenant": "tenant_A", "message": "Order placed for books", "value": 100.00 }
 
@@ -96,13 +96,13 @@ POST /tenant-data/_doc?routing=tenant_B
 ```
 
 3. Try indexing without routing (should fail):
-```bash
+```json
 POST /tenant-data/_doc
 { "tenant": "tenant_C", "message": "This should fail" }
 ```
 
 4. Search with routing (targeted shard) vs without (all shards):
-```bash
+```json
 # Targeted: only queries the shard containing tenant_A data
 POST /tenant-data/_search?routing=tenant_A
 { "query": { "match": { "message": "order" } } }
@@ -132,7 +132,7 @@ GET /_cat/shards/tenant-data?v
 **Instructions**:
 
 1. Create a percolator index:
-```bash
+```json
 PUT /book-alerts
 {
   "mappings": {
@@ -148,7 +148,7 @@ PUT /book-alerts
 ```
 
 2. Register alert rules:
-```bash
+```json
 # Alert when a cheap book is added (< 10 euros)
 POST /book-alerts/_doc/cheap-book
 {
@@ -176,7 +176,7 @@ POST /book-alerts/_doc/distributed-tech
 ```
 
 3. Percolate a new book that should trigger multiple alerts:
-```bash
+```json
 POST /book-alerts/_search
 {
   "query": {
@@ -194,7 +194,7 @@ POST /book-alerts/_search
 ```
 
 4. Percolate a book that triggers no alerts:
-```bash
+```json
 POST /book-alerts/_search
 {
   "query": {
@@ -216,7 +216,7 @@ POST /book-alerts/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 # First, add "pages" field mapping to the percolator index
 PUT /book-alerts/_mapping
 {
@@ -263,7 +263,7 @@ POST /book-alerts/_search
 **Instructions**:
 
 1. Basic metrics on books:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -277,7 +277,7 @@ GET /books/_search
 ```
 
 2. Stats aggregation:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -289,7 +289,7 @@ GET /books/_search
 ```
 
 3. Percentiles:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -305,7 +305,7 @@ GET /books/_search
 ```
 
 4. Cardinality:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -329,7 +329,7 @@ GET /books/_search
 **Instructions**:
 
 1. Group by genre with revenue:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -346,7 +346,7 @@ GET /books/_search
 ```
 
 2. Group by publisher with nested stats:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -363,7 +363,7 @@ GET /books/_search
 ```
 
 3. Range aggregation on price:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -387,7 +387,7 @@ GET /books/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -409,7 +409,7 @@ GET /books/_search
 </details>
 
 5. Filtered aggregation:
-```bash
+```json
 GET /books/_search
 {
   "size": 0,
@@ -442,7 +442,7 @@ GET /books/_search
 **Instructions**:
 
 1. Create an alias pointing to books:
-```bash
+```json
 POST /_aliases
 {
   "actions": [
@@ -452,13 +452,13 @@ POST /_aliases
 ```
 
 2. Search via the alias:
-```bash
+```json
 POST /library/_search
 { "query": { "match_all": {} } }
 ```
 
 3. Create filtered aliases per language:
-```bash
+```json
 POST /_aliases
 {
   "actions": [
@@ -481,7 +481,7 @@ POST /_aliases
 ```
 
 4. Search per language through aliases:
-```bash
+```json
 POST /library-en/_search
 { "query": { "match_all": {} } }
 
@@ -494,7 +494,7 @@ POST /library-fr/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 POST /_aliases
 {
   "actions": [
@@ -530,7 +530,7 @@ POST /library-premium/_search
 **Instructions**:
 
 1. Create the first index with rollover alias:
-```bash
+```json
 PUT /app-logs-000001
 {
   "aliases": {
@@ -560,7 +560,7 @@ POST /_bulk
 ```
 
 3. Try rollover with max_docs=5 (should NOT roll over yet):
-```bash
+```json
 POST /app-logs-write/_rollover
 {
   "conditions": { "max_docs": 5 }
@@ -573,7 +573,7 @@ GET /_cat/indices/app-logs-*?v
 ```
 
 5. Now rollover with max_docs=2 (should roll over):
-```bash
+```json
 POST /app-logs-write/_rollover
 {
   "conditions": { "max_docs": 2 }
@@ -587,7 +587,7 @@ GET /_aliases?filter_path=app-logs-*
 ```
 
 7. Index a new document and verify it goes to the new index:
-```bash
+```json
 POST /app-logs-write/_doc
 { "@timestamp": "2025-01-15T10:03:00Z", "level": "WARN", "message": "High memory" }
 
@@ -609,7 +609,7 @@ POST /app-logs-read/_search
 **Instructions**:
 
 1. Create an index template for data streams:
-```bash
+```json
 PUT /_index_template/metrics-template
 {
   "index_patterns": ["metrics-*"],
@@ -629,7 +629,7 @@ PUT /_index_template/metrics-template
 ```
 
 2. Index documents (data stream created automatically):
-```bash
+```json
 POST /metrics-servers/_doc
 { "@timestamp": "2025-01-15T10:00:00Z", "host": "server-1", "cpu_percent": 45.2, "memory_percent": 72.1 }
 
@@ -646,7 +646,7 @@ GET /_data_stream/metrics-servers
 ```
 
 4. Aggregate per host:
-```bash
+```json
 GET /metrics-servers/_search
 {
   "size": 0,
@@ -677,7 +677,7 @@ GET /metrics-servers/_search
 **Instructions**:
 
 1. Create a pipeline:
-```bash
+```json
 PUT /_ingest/pipeline/log-enrichment
 {
   "description": "Enrich log data",
@@ -714,7 +714,7 @@ PUT /_ingest/pipeline/log-enrichment
 ```
 
 2. Test with simulate:
-```bash
+```json
 POST /_ingest/pipeline/log-enrichment/_simulate
 {
   "docs": [
@@ -735,7 +735,7 @@ POST /_ingest/pipeline/log-enrichment/_simulate
 ```
 
 3. Index using the pipeline:
-```bash
+```json
 POST /enriched-logs/_doc?pipeline=log-enrichment
 {
   "level": "ERROR",
@@ -769,7 +769,7 @@ GET /enriched-logs/_search
 **Instructions**:
 
 1. Create a dissect pipeline:
-```bash
+```json
 PUT /_ingest/pipeline/access-log-parser
 {
   "processors": [
@@ -794,7 +794,7 @@ PUT /_ingest/pipeline/access-log-parser
 ```
 
 2. Test:
-```bash
+```json
 POST /_ingest/pipeline/access-log-parser/_simulate
 {
   "docs": [
@@ -812,7 +812,7 @@ POST /_ingest/pipeline/access-log-parser/_simulate
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 PUT /_ingest/pipeline/csv-parser
 {
   "processors": [
@@ -855,7 +855,7 @@ POST /_ingest/pipeline/csv-parser/_simulate
 **Instructions**:
 
 1. Create an ILM policy with a low rollover threshold (for testing):
-```bash
+```json
 PUT /_ilm/policy/logs-lifecycle
 {
   "policy": {
@@ -879,7 +879,7 @@ PUT /_ilm/policy/logs-lifecycle
 ```
 
 2. Create a template using the policy:
-```bash
+```json
 PUT /_index_template/ilm-logs-template
 {
   "index_patterns": ["ilm-logs-*"],
@@ -902,7 +902,7 @@ PUT /_index_template/ilm-logs-template
 ```
 
 3. Create the initial index:
-```bash
+```json
 PUT /ilm-logs-000001
 {
   "aliases": {
@@ -930,7 +930,7 @@ POST /_bulk
 ```
 
 5. Check ILM status (ILM runs on a poll interval, so you may need to wait or force a check):
-```bash
+```json
 GET /ilm-logs-000001/_ilm/explain
 
 # If ILM hasn't run yet, you can reduce the poll interval:
@@ -961,7 +961,7 @@ GET /_aliases?filter_path=ilm-logs-*
 **Instructions**:
 
 1. Create an index with replicas (on a single-node cluster):
-```bash
+```json
 PUT /shard-test
 {
   "settings": {
@@ -979,7 +979,7 @@ GET /_cat/shards/shard-test?v
 ```
 
 3. Diagnose unassigned replicas:
-```bash
+```json
 GET /_cluster/allocation/explain
 {
   "index": "shard-test",
@@ -989,7 +989,7 @@ GET /_cluster/allocation/explain
 ```
 
 4. Fix by reducing replicas:
-```bash
+```json
 PUT /shard-test/_settings
 { "number_of_replicas": 0 }
 
@@ -1054,7 +1054,7 @@ GET /_cat/indices?v&s=store.size:desc
 ```
 
 5. Profile a query:
-```bash
+```json
 GET /books/_search
 {
   "profile": true,
@@ -1099,7 +1099,7 @@ GET /books/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 # 1. Pipeline
 PUT /_ingest/pipeline/obs-pipeline
 {

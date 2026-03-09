@@ -670,7 +670,7 @@ Pre-deployment, monitoring, and incident response
 # Incident Response Runbook
 
 **General workflow**:
-```
+```text
 [Alert] -> [Triage] -> [Diagnosis] -> [Mitigation] -> [Resolution] -> [Post-Mortem]
 ```
 

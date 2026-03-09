@@ -122,7 +122,7 @@ GET /_cluster/settings?include_defaults=true&filter_path=defaults.cluster.routin
 **Instructions**:
 
 1. Create the `books` index with explicit mapping:
-```bash
+```json
 PUT /books
 {
   "settings": {
@@ -199,7 +199,7 @@ GET /books/_doc/4
 **Instructions**:
 
 1. Partial update - change the price of a book:
-```bash
+```json
 POST /books/_update/5
 {
   "doc": {
@@ -220,7 +220,7 @@ GET /books/_doc/1
 ```
 
 4. Update with concurrency control (use `_seq_no` and `_primary_term` from the previous response):
-```bash
+```json
 POST /books/_update/1?if_seq_no=0&if_primary_term=1
 {
   "doc": {
@@ -230,7 +230,7 @@ POST /books/_update/1?if_seq_no=0&if_primary_term=1
 ```
 
 5. Try the same update again with the old seq_no - this should fail:
-```bash
+```json
 POST /books/_update/1?if_seq_no=0&if_primary_term=1
 {
   "doc": {
@@ -247,7 +247,7 @@ GET /books/_doc/8
 ```
 
 7. Re-index it (we'll need it later):
-```bash
+```json
 POST /books/_doc/8
 {
   "title": "Site Reliability Engineering",
@@ -314,7 +314,7 @@ DELETE /books/_doc/101
 **Instructions**:
 
 1. Compare analyzer behaviors:
-```bash
+```json
 POST /_analyze
 {
   "analyzer": "standard",
@@ -335,7 +335,7 @@ POST /_analyze
 ```
 
 2. **Your turn**: Without running it, predict how many tokens the `standard` analyzer will produce for: `"user-123 logged in from café at 10:30AM"`. Then verify:
-```bash
+```json
 POST /_analyze
 {
   "analyzer": "standard",
@@ -344,7 +344,7 @@ POST /_analyze
 ```
 
 3. Create and test a custom analyzer:
-```bash
+```json
 PUT /analyzer-test
 {
   "settings": {
@@ -385,7 +385,7 @@ GET /books/_mapping
 ```
 
 2. Add a new field to the mapping (you can add fields but not change existing ones):
-```bash
+```json
 PUT /books/_mapping
 {
   "properties": {
@@ -408,7 +408,7 @@ PUT /books/_mapping
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 PUT /books/_mapping
 {
   "properties": {
@@ -436,7 +436,7 @@ GET /books/_mapping
 **Instructions**:
 
 1. Create a `bookstores` index WITHOUT nested type:
-```bash
+```json
 PUT /bookstores-flat
 {
   "mappings": {
@@ -463,7 +463,7 @@ POST /bookstores-flat/_doc
 ```
 
 2. Search for "Alice as cashier" - this should NOT match but it does:
-```bash
+```json
 GET /bookstores-flat/_search
 {
   "query": {
@@ -478,7 +478,7 @@ GET /bookstores-flat/_search
 ```
 
 3. Now create the correct version with nested:
-```bash
+```json
 PUT /bookstores-nested
 {
   "mappings": {
@@ -506,7 +506,7 @@ POST /bookstores-nested/_doc
 ```
 
 4. Same search with nested query:
-```bash
+```json
 GET /bookstores-nested/_search
 {
   "query": {
@@ -538,7 +538,7 @@ GET /bookstores-nested/_search
 **Instructions**:
 
 1. Create a component template:
-```bash
+```json
 PUT /_component_template/base-settings
 {
   "template": {
@@ -557,7 +557,7 @@ PUT /_component_template/base-settings
 ```
 
 2. Create an index template composing it:
-```bash
+```json
 PUT /_index_template/logs-template
 {
   "index_patterns": ["logs-*"],
@@ -575,14 +575,14 @@ PUT /_index_template/logs-template
 }
 ```
 
-**Note ES 9.x**: La priorité est définie à 200 (au lieu de 100) pour éviter les conflits avec les templates built-in d'Elasticsearch 9.x (`logs`, `metrics`, `synthetics`) qui ont une priorité de 100.
+**Note ES 9.x**: The priority is set to 200 (instead of 100) to avoid conflicts with Elasticsearch 9.x built-in templates (`logs`, `metrics`, `synthetics`) which have a priority of 100.
 
 3. **Your turn**: Index a document into `logs-2025-01-15` and verify the template was applied. Check the settings and mapping yourself.
 
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 POST /logs-2025-01-15/_doc
 {
   "@timestamp": "2025-01-15T10:00:00Z",
@@ -611,7 +611,7 @@ GET /logs-2025-01-15/_mapping
 **Instructions**:
 
 1. Simple match query:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -623,7 +623,7 @@ GET /books/_search
 ```
 
 2. Match with operator:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -638,7 +638,7 @@ GET /books/_search
 ```
 
 3. Multi-match with field boosting:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -652,7 +652,7 @@ GET /books/_search
 ```
 
 4. Phrase match:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -668,7 +668,7 @@ GET /books/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -682,7 +682,7 @@ GET /books/_search
 </details>
 
 6. Function score to boost by rating:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -705,7 +705,7 @@ GET /books/_search
 ```
 
 7. Explain API:
-```bash
+```json
 GET /books/_explain/1
 {
   "query": {
@@ -727,7 +727,7 @@ GET /books/_explain/1
 **Instructions**:
 
 1. Term query on keyword field:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -737,7 +737,7 @@ GET /books/_search
 ```
 
 2. Range queries:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -758,7 +758,7 @@ GET /books/_search
 ```
 
 3. Bool query:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -783,7 +783,7 @@ GET /books/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -800,7 +800,7 @@ GET /books/_search
 </details>
 
 5. Fuzzy query (typo-tolerant):
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -827,7 +827,7 @@ GET /books/_search
 **Instructions**:
 
 1. Find books published near Paris (within 50km):
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -843,7 +843,7 @@ GET /books/_search
 ```
 
 2. Sort all books by distance from New York:
-```bash
+```json
 GET /books/_search
 {
   "query": { "match_all": {} },
@@ -864,7 +864,7 @@ GET /books/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -892,7 +892,7 @@ GET /books/_search
 **Instructions**:
 
 1. Basic highlighting:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -909,7 +909,7 @@ GET /books/_search
 ```
 
 2. Custom tags and multiple fields:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -933,7 +933,7 @@ GET /books/_search
 ```
 
 3. Highlighting with bool query:
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -968,7 +968,7 @@ GET /books/_search
 **Instructions**:
 
 1. Sort by price descending:
-```bash
+```json
 GET /books/_search
 {
   "query": { "match_all": {} },
@@ -977,7 +977,7 @@ GET /books/_search
 ```
 
 2. Multi-field sort:
-```bash
+```json
 GET /books/_search
 {
   "query": { "match_all": {} },
@@ -989,7 +989,7 @@ GET /books/_search
 ```
 
 3. Pagination with from/size:
-```bash
+```json
 # Page 1
 GET /books/_search
 {
@@ -1012,7 +1012,7 @@ GET /books/_search
 <details>
 <summary>Solution</summary>
 
-```bash
+```json
 # Page 1
 GET /books/_search
 {
@@ -1035,18 +1035,18 @@ GET /books/_search
 }
 ```
 
-**Note ES 9.x**: On utilise `_doc` au lieu de `_id` car l'accès fielddata sur `_id` est désactivé par défaut dans ES 9.x pour économiser la mémoire. `_doc` utilise l'ordre naturel d'insertion des documents, ce qui est plus performant et recommandé pour la pagination profonde.
+**Note ES 9.x**: We use `_doc` instead of `_id` because fielddata access on `_id` is disabled by default in ES 9.x to save memory. `_doc` uses the natural insertion order of documents, which is more performant and recommended for deep pagination.
 
-**Pourquoi `_doc` ?**
-- `_id` nécessiterait l'activation de fielddata (coûteux en mémoire)
-- `_doc` utilise l'ordre naturel des documents (gratuit et rapide)
-- `_doc` est le tri le plus performant pour `search_after`
-- La valeur dans `search_after` sera un entier (internal doc ID) au lieu d'un string
+**Why `_doc`?**
+- `_id` would require enabling fielddata (expensive in memory)
+- `_doc` uses the natural document order (free and fast)
+- `_doc` is the most performant sort for `search_after`
+- The value in `search_after` will be an integer (internal doc ID) instead of a string
 
 </details>
 
 5. Source filtering:
-```bash
+```json
 GET /books/_search
 {
   "_source": ["title", "author", "price"],
@@ -1077,7 +1077,7 @@ GET /books/_search
 <details>
 <summary>Solution 1: Faceted search</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "_source": ["title", "author", "rating", "price"],
@@ -1103,7 +1103,7 @@ GET /books/_search
 <details>
 <summary>Solution 2: Combined query</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "query": {
@@ -1134,7 +1134,7 @@ GET /books/_search
 <details>
 <summary>Solution 3: Geo + text</summary>
 
-```bash
+```json
 GET /books/_search
 {
   "query": {
