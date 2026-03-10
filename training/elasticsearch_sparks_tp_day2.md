@@ -43,13 +43,13 @@ POST /_bulk
 {"index":{"_index":"books","_id":"3"}}
 {"title":"Data Engineering with Apache Spark","author":"Gerard Maas","genre":"technology","description":"Learn to build scalable data pipelines using Apache Spark. Covers streaming, batch processing, and machine learning integration.","published_date":"2024-01-10","pages":520,"price":52.99,"rating":4.5,"in_stock":true,"tags":["big-data","spark","data-engineering"],"publisher":"Manning","language":"en","location":{"lat":40.7128,"lon":-74.0060}}
 {"index":{"_index":"books","_id":"4"}}
-{"title":"Le Petit Prince","author":"Antoine de Saint-Exupéry","genre":"fiction","description":"Un aviateur tombe en panne dans le désert du Sahara et rencontre un petit garçon venu d'une autre planète. Un conte philosophique sur l'amitié et l'essentiel.","published_date":"1943-04-06","pages":96,"price":8.99,"rating":4.9,"in_stock":true,"tags":["classic","philosophy","children"],"publisher":"Gallimard","language":"fr","location":{"lat":48.8566,"lon":2.3522}}
+{"title":"The Little Prince","author":"Antoine de Saint-Exupéry","genre":"fiction","description":"A pilot stranded in the Sahara desert meets a mysterious young boy from another planet. A philosophical tale about friendship, love, and what truly matters in life.","published_date":"1943-04-06","pages":96,"price":8.99,"rating":4.9,"in_stock":true,"tags":["classic","philosophy","children"],"publisher":"Gallimard","language":"fr","location":{"lat":48.8566,"lon":2.3522}}
 {"index":{"_index":"books","_id":"5"}}
 {"title":"Clean Code","author":"Robert C. Martin","genre":"technology","description":"A handbook of agile software craftsmanship. Learn to write code that is easy to read, maintain, and extend. Covers naming conventions, functions, comments, and error handling.","published_date":"2008-08-01","pages":464,"price":29.99,"rating":4.6,"in_stock":true,"tags":["programming","best-practices","agile"],"publisher":"Prentice Hall","language":"en","location":{"lat":40.7128,"lon":-74.0060}}
 {"index":{"_index":"books","_id":"6"}}
 {"title":"Designing Data-Intensive Applications","author":"Martin Kleppmann","genre":"technology","description":"The big ideas behind reliable, scalable, and maintainable data systems. Covers distributed systems, replication, partitioning, and stream processing.","published_date":"2017-03-16","pages":616,"price":42.99,"rating":4.8,"in_stock":true,"tags":["distributed","data","architecture"],"publisher":"O'Reilly","language":"en","location":{"lat":51.5074,"lon":-0.1278}}
 {"index":{"_index":"books","_id":"7"}}
-{"title":"L'Étranger","author":"Albert Camus","genre":"fiction","description":"Meursault, un jeune employé de bureau à Alger, commet un meurtre absurde sur une plage. Un roman sur l'absurdité de l'existence humaine.","published_date":"1942-06-01","pages":123,"price":7.99,"rating":4.4,"in_stock":true,"tags":["classic","philosophy","existentialism"],"publisher":"Gallimard","language":"fr","location":{"lat":48.8566,"lon":2.3522}}
+{"title":"The Stranger","author":"Albert Camus","genre":"fiction","description":"Meursault, a young office clerk in Algiers, commits an absurd murder on a beach. A novel about the absurdity of human existence and the indifference of the universe.","published_date":"1942-06-01","pages":123,"price":7.99,"rating":4.4,"in_stock":true,"tags":["classic","philosophy","existentialism"],"publisher":"Gallimard","language":"fr","location":{"lat":48.8566,"lon":2.3522}}
 {"index":{"_index":"books","_id":"8"}}
 {"title":"Site Reliability Engineering","author":"Betsy Beyer","genre":"technology","description":"How Google runs production systems. Covers monitoring, alerting, incident response, and capacity planning for large-scale distributed infrastructure.","published_date":"2016-03-23","pages":552,"price":48.99,"rating":4.5,"in_stock":true,"tags":["sre","devops","monitoring","production"],"publisher":"O'Reilly","language":"en","location":{"lat":37.7749,"lon":-122.4194}}
 ```
@@ -429,7 +429,7 @@ POST /books/_search
 
 **Challenge**: Which genre has the highest average rating?
 
-> **Answer**: Fiction, because "Le Petit Prince" has 4.9 and "L'Étranger" has 4.4, averaging 4.65. Technology books average lower due to wider range.
+> **Answer**: Fiction, because "The Little Prince" has 4.9 and "The Stranger" has 4.4, averaging 4.65. Technology books average lower due to wider range.
 
 ---
 
@@ -515,7 +515,7 @@ POST /library-premium/_search
 
 **Challenge**: How many books does `library-fr` return? How many does `library-premium` return?
 
-> **Answer**: `library-fr` returns 2 books (Le Petit Prince and L'Étranger). `library-premium` returns 4 books (those priced above 40: Elasticsearch Guide 45.99, Data Engineering 52.99, Designing Data-Intensive 42.99, SRE 48.99).
+> **Answer**: `library-fr` returns 2 books (The Little Prince and The Stranger). `library-premium` returns 4 books (those priced above 40: Elasticsearch Guide 45.99, Data Engineering 52.99, Designing Data-Intensive 42.99, SRE 48.99).
 
 ---
 
@@ -592,7 +592,7 @@ POST /app-logs-write/_doc
 { "@timestamp": "2025-01-15T10:03:00Z", "level": "WARN", "message": "High memory" }
 
 # Search via read alias (should return all 4 docs across both indices)
-POST /app-logs-read/_search
+POST /app-logs-*/_search
 { "sort": [{ "@timestamp": "desc" }] }
 ```
 

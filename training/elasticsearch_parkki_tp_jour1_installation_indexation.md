@@ -2007,7 +2007,7 @@ PUT /_ingest/pipeline/parking-logs-pipeline
     {
       "set": {
         "field": "ingested_at",
-        "value": "{{_ingest.timestamp}}"
+        "value": "{{{_ingest.timestamp}}}"
       }
     },
     {
