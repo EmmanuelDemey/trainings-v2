@@ -264,7 +264,7 @@ POST /book-alerts/_search
 
 1. Basic metrics on books:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -278,7 +278,7 @@ GET /books/_search
 
 2. Stats aggregation:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -290,7 +290,7 @@ GET /books/_search
 
 3. Percentiles:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -306,7 +306,7 @@ GET /books/_search
 
 4. Cardinality:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -330,7 +330,7 @@ GET /books/_search
 
 1. Group by genre with revenue:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -347,7 +347,7 @@ GET /books/_search
 
 2. Group by publisher with nested stats:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -364,7 +364,7 @@ GET /books/_search
 
 3. Range aggregation on price:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -388,7 +388,7 @@ GET /books/_search
 <summary>Solution</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -410,7 +410,7 @@ GET /books/_search
 
 5. Filtered aggregation:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "size": 0,
   "aggs": {
@@ -647,7 +647,7 @@ GET /_data_stream/metrics-servers
 
 4. Aggregate per host:
 ```json
-GET /metrics-servers/_search
+POST /metrics-servers/_search
 {
   "size": 0,
   "aggs": {
@@ -753,7 +753,7 @@ POST /enriched-logs/_doc?pipeline=log-enrichment
 
 4. Verify:
 ```bash
-GET /enriched-logs/_search
+POST /enriched-logs/_search
 ```
 
 **Challenge**: Does grok extract `client_ip` and `status` from the first doc? What about the second (non-matching) doc?
@@ -1055,7 +1055,7 @@ GET /_cat/indices?v&s=store.size:desc
 
 5. Profile a query:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "profile": true,
   "query": {
@@ -1150,7 +1150,7 @@ POST /obs-logs-app/_doc
 { "@timestamp": "2025-01-15T10:04:00Z", "message": "10.0.0.4 GET /api/health 500" }
 
 # 4. Aggregation
-GET /obs-logs-app/_search
+POST /obs-logs-app/_search
 {
   "size": 0,
   "aggs": {

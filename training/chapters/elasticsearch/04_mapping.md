@@ -167,25 +167,11 @@ PUT movies
 * We can thus search on the `directors` property and `directors.keyword` property.
 
 ```
-POST movies/_search
-{
-    "query": {
-        "match":{
-            "directors": "Charlie"
-        }
-    }
-}
+POST movies/_search?q=directors:Charlie
 ```
 
 ```
-POST movies/_search
-{
-    "query": {
-        "match":{
-            "directors.keyword": "Charlie Chaplin"
-        }
-    }
-}
+POST movies/_search?q=directors.keyword:"Charlie Chaplin"
 ```
 
 ---
@@ -249,17 +235,7 @@ POST /movies/_doc
 * For example, the following search would return the previous movie.
 
 ```
-POST movies/_search
-{
-    "query": {
-        "bool":{
-            "must": [
-                { "match": {"directors.firstName": "Charlie" }},
-                { "match": {"directors.lastName": "Keaton" }}
-            ]
-        }
-    }
-}
+POST movies/_search?q=directors.firstName:Charlie AND directors.lastName:Keaton
 ```
 
 ---

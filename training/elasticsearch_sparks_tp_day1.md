@@ -464,7 +464,7 @@ POST /bookstores-flat/_doc
 
 2. Search for "Alice as cashier" - this should NOT match but it does:
 ```json
-GET /bookstores-flat/_search
+POST /bookstores-flat/_search
 {
   "query": {
     "bool": {
@@ -507,7 +507,7 @@ POST /bookstores-nested/_doc
 
 4. Same search with nested query:
 ```json
-GET /bookstores-nested/_search
+POST /bookstores-nested/_search
 {
   "query": {
     "nested": {
@@ -612,7 +612,7 @@ GET /logs-2025-01-15/_mapping
 
 1. Simple match query:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "match": {
@@ -624,7 +624,7 @@ GET /books/_search
 
 2. Match with operator:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "match": {
@@ -639,7 +639,7 @@ GET /books/_search
 
 3. Multi-match with field boosting:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "multi_match": {
@@ -653,7 +653,7 @@ GET /books/_search
 
 4. Phrase match:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "match_phrase": {
@@ -669,7 +669,7 @@ GET /books/_search
 <summary>Solution</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "multi_match": {
@@ -683,7 +683,7 @@ GET /books/_search
 
 6. Function score to boost by rating:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "function_score": {
@@ -728,7 +728,7 @@ GET /books/_explain/1
 
 1. Term query on keyword field:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "term": { "genre": "technology" }
@@ -738,7 +738,7 @@ GET /books/_search
 
 2. Range queries:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "range": {
@@ -747,7 +747,7 @@ GET /books/_search
   }
 }
 
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "range": {
@@ -759,7 +759,7 @@ GET /books/_search
 
 3. Bool query:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "bool": {
@@ -784,7 +784,7 @@ GET /books/_search
 <summary>Solution</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "bool": {
@@ -801,7 +801,7 @@ GET /books/_search
 
 5. Fuzzy query (typo-tolerant):
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "fuzzy": {
@@ -828,7 +828,7 @@ GET /books/_search
 
 1. Find books published near Paris (within 50km):
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "geo_distance": {
@@ -844,7 +844,7 @@ GET /books/_search
 
 2. Sort all books by distance from New York:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": { "match_all": {} },
   "sort": [
@@ -865,7 +865,7 @@ GET /books/_search
 <summary>Solution</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "geo_bounding_box": {
@@ -893,7 +893,7 @@ GET /books/_search
 
 1. Basic highlighting:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "match": {
@@ -910,7 +910,7 @@ GET /books/_search
 
 2. Custom tags and multiple fields:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "multi_match": {
@@ -934,7 +934,7 @@ GET /books/_search
 
 3. Highlighting with bool query:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "bool": {
@@ -969,7 +969,7 @@ GET /books/_search
 
 1. Sort by price descending:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": { "match_all": {} },
   "sort": [{ "price": "desc" }]
@@ -978,7 +978,7 @@ GET /books/_search
 
 2. Multi-field sort:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": { "match_all": {} },
   "sort": [
@@ -991,7 +991,7 @@ GET /books/_search
 3. Pagination with from/size:
 ```json
 # Page 1
-GET /books/_search
+POST /books/_search
 {
   "from": 0,
   "size": 3,
@@ -999,7 +999,7 @@ GET /books/_search
 }
 
 # Page 2
-GET /books/_search
+POST /books/_search
 {
   "from": 3,
   "size": 3,
@@ -1014,7 +1014,7 @@ GET /books/_search
 
 ```json
 # Page 1
-GET /books/_search
+POST /books/_search
 {
   "size": 3,
   "sort": [
@@ -1024,7 +1024,7 @@ GET /books/_search
 }
 
 # Page 2 (use sort values from last hit of page 1)
-GET /books/_search
+POST /books/_search
 {
   "size": 3,
   "sort": [
@@ -1047,7 +1047,7 @@ GET /books/_search
 
 5. Source filtering:
 ```json
-GET /books/_search
+POST /books/_search
 {
   "_source": ["title", "author", "price"],
   "sort": [{ "price": "desc" }]
@@ -1078,7 +1078,7 @@ GET /books/_search
 <summary>Solution 1: Faceted search</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "_source": ["title", "author", "rating", "price"],
   "query": {
@@ -1104,7 +1104,7 @@ GET /books/_search
 <summary>Solution 2: Combined query</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "bool": {
@@ -1135,7 +1135,7 @@ GET /books/_search
 <summary>Solution 3: Geo + text</summary>
 
 ```json
-GET /books/_search
+POST /books/_search
 {
   "query": {
     "bool": {
