@@ -259,6 +259,16 @@ hide: false
 - [TestContainers](https://testcontainers.com/) - Integration testing with Elasticsearch
 
 ---
+src: ./chapters/elasticsearch/quiz_day1.md
+hide: false
+---
+
+---
+src: ./chapters/elasticsearch/quiz_day2.md
+hide: false
+---
+
+---
 layout: end
 ---
 

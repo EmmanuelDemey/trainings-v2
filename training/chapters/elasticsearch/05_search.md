@@ -76,11 +76,12 @@ POST /movies/_search
 
 * Full text searches return results sorted by relevance (`score`).
 * Preserving a good score calculation is essential.
-* The default algorithm used is `BM25`, an evolution of `TF/IDF`.
-    * **Formula**: tfidf(t,d,D) = tf(t,d) × idf(t,D)
-    * **TF (Term Frequency)**: How many times the searched term `t` appears in document `d`
-    * **IDF (Inverse Document Frequency)**: Measures how rare the term is across all documents `D`
-    * The score is normalized by the field's length
+* The default algorithm used is `BM25` (Best Matching 25).
+    * An evolution of `TF/IDF` with better handling of term frequency saturation
+    * **Formula**: score(t,d,D) = IDF(t,D) × ( tf(t,d) × (k1 + 1) ) / ( tf(t,d) + k1 × (1 - b + b × |d| / avgdl) )
+    * **k1** (default 1.2): Controls term frequency saturation. A higher value means term frequency continues to have more impact
+    * **b** (default 0.75): Controls field length normalization. `b=0` disables normalization, `b=1` fully normalizes by field length
+    * Unlike TF/IDF, repeated occurrences of a term have a **diminishing impact** on the score
     * Can be optionally boosted to increase relevance
 * Use the `_explain` API to understand how scores are calculated
 
