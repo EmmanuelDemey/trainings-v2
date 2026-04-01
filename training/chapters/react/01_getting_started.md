@@ -67,6 +67,7 @@ npm create vite@latest my-react-app -- --template react-ts
     * Prettier
     * ESLint
     * Husky
+    * Knip
 
 ---
 src: ../prettier.md
@@ -80,6 +81,11 @@ hide: false
 
 ---
 src: ../husky.md
+hide: false
+---
+
+---
+src: ../knip.md
 hide: false
 ---
 
