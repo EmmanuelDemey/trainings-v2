@@ -44,20 +44,9 @@ layout: cover
 
 # Obligations légales
 
-* Le secteur publique est composé de :
+* Le secteur public est composé de :
     * Autorités régionale, nationale et locale
-    * Toutes organisations recevant des fonds publiques.
-
-
----
-
-
-# Obligation legales
-
-* Cette directive sera ensuite transposée dans les lois nationales :
-    * Nouveau site web doit être accessible avant le 23/09/2019
-    * Tout autre site web doit être accessible avant le 23/10/2020
-    * Toutes les application mobile doit être accessible avant le 23/06/2021
+    * Toutes organisations recevant des fonds publics
 
 ---
 

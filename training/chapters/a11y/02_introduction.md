@@ -104,18 +104,7 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 
 # Introduction
 
-- À ces problèmes, plusieurs solutions possibles
-    * Responsive Web Design
-    * Internationalisation
-    * User Research
-    * Performance
-    * Service Worker, Cache API,...
-
----
-
-# Introduction
-
-- Mais dans cette formation nous allons nous limiter aux problématiques liées aux déficiences :
+- Dans cette formation nous allons nous concentrer sur les problématiques liées aux déficiences :
     * visuelles
     * auditives
     * motrices
@@ -146,16 +135,6 @@ réseau, leur langue, leur culture, leur localisation géographique ou leurs apt
 - Une déficience peut être
     * permanente
     * temporaire
-
----
-
-# Déficiences
-
-- Ces déficiences ne sont pas forcément liées qu'à des handicaps.
-- L'accessibilité peut être bénéfique pour tout le monde.
-    * lorsque vous êtes dans une zone bruyante (déficience auditive temporaire)
-    * lorsque vous êtes en extérieur avec forte luminosité (déficience visuelle temporaire)
-    * lorsque vous avez un bras cassé (déficience motrice temporaire)
 
 ---
 

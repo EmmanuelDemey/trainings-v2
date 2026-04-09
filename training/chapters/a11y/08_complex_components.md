@@ -166,7 +166,7 @@ button.addEventListener('mouseout', () => {
 ```javascript
 let focustedElementBeforeModal;
 
-const modal = document.querySelector('[role="modal"]')'
+const modal = document.querySelector('[role="dialog"]');
 const modalOverlay = document.querySelector('.modal-overlay');
 const modalToggle = document.querySelector('.open-modal');
 modalToggle.addEventListener('click', openModal);
@@ -266,10 +266,10 @@ function openModal(){
 
 # L'attribut Inert
 
-* Dans les prochaines versions des navigateurs, nous allons avoir l'attribut `inert`
-* Cet attribut permet de supprimer les événements utilisateur d'un élément
-* Possibilité d'utiliser le `polyfill` *WICG/inert*
-* Nous avons aussi, depuis peu de temps, les éléments **dialog** et **popover** nativement.
+* L'attribut `inert` est maintenant supporté par tous les navigateurs modernes
+* Cet attribut permet de supprimer les événements utilisateur d'un élément et de le masquer aux lecteurs d'écran
+* Très utile pour les modales : rendre le reste de la page `inert`
+* Nous avons aussi les éléments **dialog** et **popover** nativement
 
 ```html
 <div>
@@ -277,17 +277,6 @@ function openModal(){
 </div>
 <div inert>
   <button>I am inert</button>
-</div>
-```
-
----
-
-# Panneau dépliant
-
-```html
-<button aria-controls="panel" aria-expanded="true">Expand</button>
-<div id="panel">
-    ... contenu
 </div>
 ```
 

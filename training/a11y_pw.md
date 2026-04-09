@@ -2,9 +2,45 @@
 
 Voici le contenu nécessaire pour la partie pratique de la formation Accessibilité.
 
-Durant ces parties pratiques, nous allons nous concentrer sur du code HTML et JavaScript.
-Nous ne travaillerons pas, en tout cas de façon prioritaire, sur le style de nos pages HTML.
+Durant ces parties pratiques, nous allons travailler en **pur HTML, CSS et JavaScript**.
 L'objectif est de créer une application accessible en appliquant les bonnes pratiques vues en formation.
+
+## Projet Genea11y
+
+Tout au long des TPs, nous travaillerons sur **Genea11y** (Genealogy + a11y), une application de gestion d'arbres généalogiques.
+
+### Récupération du squelette
+
+Un squelette de projet est fourni avec les fichiers suivants :
+
+```
+tp/a11y/
+├── index.html        # Page d'accueil (liste des personnes)
+├── creation.html     # Page de création d'une personne
+├── style.css         # Feuille de styles (avec TODO à compléter)
+└── script.js         # JavaScript (données + TODO à compléter)
+```
+
+Copiez le dossier `tp/a11y/` sur votre poste de travail.
+
+### Serveur local
+
+Pour tester l'application, lancez un serveur local. Vous pouvez utiliser :
+
+```shell
+# Avec Node.js (recommandé)
+npx serve
+
+# Ou avec Python
+python -m http.server 3000
+
+# Ou avec PHP
+php -S localhost:3000
+```
+
+Ouvrez ensuite http://localhost:3000 dans votre navigateur.
+
+---
 
 ## PW 01 - Synthétiseur vocal
 
@@ -73,7 +109,13 @@ Vous pouvez soit auditer l'une de vos applications, soit utiliser : https://www.
 - Labels des formulaires
 - Utilisation du lecteur d'écran
 
-## PW 03 - Focus
+**Livrables :**
+Rédigez un mini-rapport listant au moins 5 problèmes identifiés, avec pour chacun :
+- Description du problème
+- Critère WCAG concerné (ex: 1.1.1 niveau A)
+- Solution proposée
+
+## PW 03 - Focus et Skip Link
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -83,52 +125,44 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [WCAG - Focus Visible](https://www.w3.org/WAI/WCAG21/Understanding/focus-visible.html)
 :::
 
-Durant cette partie pratique, nous allons créer des templates HTML permettant de créer une application de gestion d'arbres généalogiques.
+Nous allons travailler sur le squelette du projet Genea11y pour ajouter la gestion du focus et un skip link.
 
-**Contexte du projet :** Application "Genea11y" (Genealogy + a11y)
+**Fichiers concernés :** `index.html`, `creation.html`, `style.css`
 
-Nous allons faire très simple, nous allons juste gérer les informations générales d'une personne, ainsi que son ascendance directe.
+### Étape 1 : Skip Link
 
-Afin d'initier le projet, veuillez créer les fichiers suivants :
+1. Dans `index.html` et `creation.html`, ajoutez un lien **en tout début du `<body>`** :
+   ```html
+   <a class="skip-link" href="#main">Aller au contenu principal</a>
+   ```
 
-- `index.html` contenant la structure de la page
-- `style.css` contenant le design
-- `script.js` contenant la dynamisation
+2. Dans `style.css`, complétez le style de `.skip-link` :
+   - Position absolute, caché au-dessus de la page (ex: `top: -40px`)
+   - Au `:focus`, ramenez-le à `top: 0` avec un fond visible
+   - Assurez un contraste suffisant (texte blanc sur fond sombre par exemple)
 
-Dans le fichier HTML, créez un squelette de page vide en important les deux autres fichiers créés.
+3. Vérifiez que l'attribut `id="main"` est bien présent sur la balise `<main>`
 
-**Serveur local :**
+**Test :** Rechargez la page, appuyez sur Tab. Le skip link doit apparaître en haut, et un clic dessus doit envoyer le focus sur le `<main>`.
 
-Pour les besoins des TPs suivants, nous allons héberger notre application sur un serveur local.
-Vous pouvez soit utiliser Apache (WAMP, LAMP, MAMP), soit exécuter la ligne de commande suivante (nécessitant Node.js) :
+### Étape 2 : Focus visible
 
-```shell
-npx serve
-```
+1. Dans `style.css`, ajoutez un style `:focus-visible` sur les boutons et les liens :
+   ```css
+   button:focus-visible,
+   a:focus-visible {
+       outline: 3px solid var(--color-focus);
+       outline-offset: 2px;
+   }
+   ```
 
-**Étapes :**
+2. Assurez-vous que le outline a un contraste suffisant (minimum 3:1 par rapport au fond)
 
-1. Dans le contenu du fichier `index.html`, copiez le contenu suivant dans la balise `<body>` (ce contenu sera modifié dans un prochain exercice) :
+3. Vérifiez que le focus n'apparaît **pas** lors d'un clic souris (c'est le comportement de `:focus-visible`)
 
-```html
-<h1>Genea11y</h1>
-<a href="/">Home</a>
-<a href="/creation.html">Création</a>
-Main Contenu
-<button>Action</button>
-```
+**Test :** Naviguez au clavier dans la page. Chaque élément focusable doit avoir un indicateur de focus visible et clair.
 
-2. Une fois ce code inséré, ajoutez le système de **Skip Link** permettant d'aller directement au contenu principal du site.
-   - Créez un lien "Aller au contenu principal" en tout début de page
-   - Masquez-le visuellement par défaut
-   - Affichez-le au focus (`:focus`)
-   - Faites-le pointer vers l'ID du contenu principal
-
-3. Définissez un style particulier (de votre choix) pour le bouton lorsqu'il reçoit le focus.
-   - Utilisez `:focus-visible` pour n'afficher l'indicateur qu'au clavier
-   - Assurez un contraste suffisant (minimum 3:1)
-
-## PW 04 - HTML
+## PW 04 - HTML sémantique
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -136,51 +170,96 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 * [https://html.spec.whatwg.org/multipage/](https://html.spec.whatwg.org/multipage/)
 :::
 
-Nous allons définir, dans la page précédemment créée, une structure HTML sémantique plus propre.
+Nous allons restructurer le HTML du projet Genea11y avec une sémantique correcte.
 
-**Objectifs :**
+**Fichiers concernés :** `index.html`, `style.css`, `script.js`
 
-1. **Structure sémantique :**
-   - Utilisez les balises `<header>`, `<nav>`, et `<main>`
-   - Dans le `<header>`, affichez un menu contenant deux liens :
-     - Un lien pour aller sur la page principale du site (page que nous sommes en train d'éditer)
-     - Un lien pour créer une nouvelle personne
-   - Ajoutez un `<h1>` pour le titre de l'application
+### Étape 1 : Structure sémantique
 
-2. **Page active dans le menu :**
-   - Gérez le cas où le lien d'un élément correspond à la page en cours d'affichage
-   - Utilisez l'attribut `aria-current="page"` sur le lien actif
-   - Ajoutez un style visuel différent pour le lien actif
+1. Dans le `<header>`, transformez les liens de navigation en un vrai menu :
+   ```html
+   <header>
+     <h1>Genea11y</h1>
+     <nav aria-label="Menu principal">
+       <ul>
+         <li><a href="/" aria-current="page">Home</a></li>
+         <li><a href="/creation.html">Création</a></li>
+       </ul>
+     </nav>
+   </header>
+   ```
 
-3. **Tableau de données :**
+2. Ajoutez un style CSS pour le lien actif :
+   ```css
+   nav a[aria-current="page"] {
+       font-weight: bold;
+       border-bottom: 2px solid white;
+   }
+   ```
 
-Dans la partie centrale de notre page, ajoutez un tableau permettant de lister des personnes.
+3. Dans `creation.html`, mettez `aria-current="page"` sur le lien "Création" à la place
 
-**Caractéristiques du tableau :**
-- Utilisez un `<caption>` pour décrire le tableau
-- Utilisez `<thead>` et `<tbody>` pour structurer
-- Colonnes : Nom, Prénom, Date de naissance, Actions
-- Dans la colonne Actions, ajoutez un lien vers une page `details.html` (que nous n'implémenterons pas durant cette formation)
-- Assurez-vous que tous les en-têtes utilisent `<th>` avec l'attribut `scope="col"`
+### Étape 2 : Tableau de données
 
-**Données exemple :**
-```javascript
-const personnes = [
-  { nom: "Dupont", prenom: "Jean", dateNaissance: "1980-05-15" },
-  { nom: "Martin", prenom: "Marie", dateNaissance: "1975-03-22" },
-  { nom: "Bernard", prenom: "Pierre", dateNaissance: "1990-11-08" }
-];
+Dans `index.html`, remplacez le contenu du `<main>` par un tableau structuré :
+
+```html
+<table>
+  <caption>Liste des personnes de l'arbre généalogique</caption>
+  <thead>
+    <tr>
+      <th scope="col">Nom</th>
+      <th scope="col">Prénom</th>
+      <th scope="col">Date de naissance</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="personnes-body">
+    <!-- Lignes générées en JavaScript -->
+  </tbody>
+</table>
 ```
+
+### Étape 3 : Génération JavaScript
+
+Dans `script.js`, créez une fonction qui génère les lignes du tableau à partir du tableau `personnes` :
+
+```javascript
+function renderTableau() {
+  const tbody = document.querySelector("#personnes-body");
+  tbody.innerHTML = "";
+
+  personnes.forEach((personne) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${personne.nom}</td>
+      <td>${personne.prenom}</td>
+      <td><time datetime="${personne.dateNaissance}">${personne.dateNaissance}</time></td>
+      <td><a href="details.html?id=${personne.id}">Voir détails</a></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+```
+
+Appelez cette fonction dans le `DOMContentLoaded`.
+
+**Test :** Vérifiez avec votre lecteur d'écran que le tableau est bien annoncé avec son caption et que les en-têtes sont correctement associés aux cellules.
 
 :::note
 **Partie bonus - Système de tri :**
 
 Implémentez un système de tri pour le tableau. L'utilisateur pourra trier par nom ou prénom (ascendant/descendant).
 
-- Utilisez l'attribut `aria-sort` sur les `<th>` cliquables
-- Valeurs possibles : `none`, `ascending`, `descending`
-- Gérez les événements au clavier (Entrée/Espace) en plus du clic
-- Mettez à jour `aria-sort` dynamiquement en JavaScript
+- Transformez les `<th>` "Nom" et "Prénom" en boutons cliquables :
+  ```html
+  <th scope="col" aria-sort="none">
+    <button type="button">Nom</button>
+  </th>
+  ```
+- Gérez les événements `click` et `keydown` (Entrée/Espace)
+- Mettez à jour `aria-sort` dynamiquement (`ascending`, `descending`, `none`)
+- Re-rendez le tableau trié
 :::
 
 ## PW 05 - Les formulaires
@@ -193,76 +272,175 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [WCAG - Labels or Instructions](https://www.w3.org/WAI/WCAG21/Understanding/labels-or-instructions.html)
 :::
 
-Nous allons à présent créer la seconde page HTML permettant de définir un formulaire pour ajouter une nouvelle personne à notre arbre généalogique.
+Nous allons créer le formulaire accessible dans la page `creation.html`.
 
-**Objectifs :**
+**Fichiers concernés :** `creation.html`, `style.css`, `script.js`
 
-Dans un fichier `creation.html`, créez un formulaire permettant de saisir les informations suivantes :
+### Étape 1 : Structure du formulaire
 
-1. **Champs du formulaire :**
-   - Nom et Prénom de la nouvelle personne
-   - Date de naissance (`<input type="date">`)
-   - Date de décès (optionnel)
-   - Sexe (utiliser des boutons radio dans un `<fieldset>` avec `<legend>`)
-   - Nom et Prénom des deux parents (groupés dans un `<fieldset>`)
+Dans le `<main>` de `creation.html`, remplacez le placeholder par :
 
-2. **Accessibilité du formulaire :**
-   - Tous les champs doivent avoir un `<label>` associé (attribut `for`)
-   - Utilisez `<fieldset>` et `<legend>` pour grouper les champs liés
-   - Ajoutez l'attribut `required` sur les champs obligatoires
-   - Ajoutez l'attribut `autocomplete` approprié sur les champs
+```html
+<form id="creation-form" novalidate>
+  <!-- Identité -->
+  <fieldset>
+    <legend>Identité</legend>
 
-3. **Validation et gestion des erreurs :**
-   - Le nom et le prénom sont **obligatoires**
-   - Si les données sont invalides :
-     - Affichez un message d'erreur clair près du champ concerné
-     - Utilisez `aria-invalid="true"` sur le champ en erreur
-     - Reliez le message d'erreur avec `aria-describedby`
-   - Modifiez la feuille de style pour un look spécifique quand le champ est en erreur
-     - Exemple : `input[aria-invalid="true"] { border-color: red; }`
-   - S'il y a des erreurs, mettez le focus sur le premier élément en erreur
-   - Affichez un résumé des erreurs en haut du formulaire (liste avec liens vers les champs)
+    <label for="nom">Nom <span aria-hidden="true">*</span></label>
+    <input type="text" id="nom" name="nom" required autocomplete="family-name" />
 
-## PW 06 - Les Attributs ARIA
+    <label for="prenom">Prénom <span aria-hidden="true">*</span></label>
+    <input type="text" id="prenom" name="prenom" required autocomplete="given-name" />
+
+    <label for="date-naissance">Date de naissance</label>
+    <input type="date" id="date-naissance" name="dateNaissance" autocomplete="bday" />
+
+    <label for="date-deces">Date de décès <span class="sr-only">(optionnel)</span></label>
+    <input type="date" id="date-deces" name="dateDeces" />
+  </fieldset>
+
+  <!-- Sexe -->
+  <fieldset>
+    <legend>Sexe</legend>
+    <div>
+      <input type="radio" id="sexe-m" name="sexe" value="M" />
+      <label for="sexe-m">Masculin</label>
+    </div>
+    <div>
+      <input type="radio" id="sexe-f" name="sexe" value="F" />
+      <label for="sexe-f">Féminin</label>
+    </div>
+  </fieldset>
+
+  <!-- Parents -->
+  <fieldset>
+    <legend>Parents</legend>
+
+    <label for="parent1-nom">Nom du parent 1</label>
+    <input type="text" id="parent1-nom" name="parent1Nom" />
+
+    <label for="parent1-prenom">Prénom du parent 1</label>
+    <input type="text" id="parent1-prenom" name="parent1Prenom" />
+
+    <label for="parent2-nom">Nom du parent 2</label>
+    <input type="text" id="parent2-nom" name="parent2Nom" />
+
+    <label for="parent2-prenom">Prénom du parent 2</label>
+    <input type="text" id="parent2-prenom" name="parent2Prenom" />
+  </fieldset>
+
+  <button type="submit">Ajouter la personne</button>
+</form>
+```
+
+Notez l'utilisation de :
+- `novalidate` sur le `<form>` pour gérer la validation nous-mêmes
+- `<fieldset>` et `<legend>` pour grouper les champs liés
+- `required` sur les champs obligatoires
+- `autocomplete` pour les champs d'identité
+- `aria-hidden="true"` sur l'astérisque décorative
+
+### Étape 2 : Validation et gestion des erreurs
+
+Dans `script.js`, créez la logique de validation :
+
+1. **Au submit du formulaire**, vérifiez que le nom et le prénom sont remplis
+2. Pour chaque champ en erreur :
+   - Ajoutez `aria-invalid="true"` sur l'input
+   - Ajoutez un message d'erreur avec `aria-describedby` :
+     ```html
+     <p class="error-message" id="nom-error">Le nom est obligatoire</p>
+     ```
+   - Reliez avec `aria-describedby="nom-error"` sur l'input
+3. En haut du formulaire, affichez un **résumé des erreurs** :
+   ```html
+   <div class="error-summary" role="alert">
+     <h3>Il y a des erreurs dans le formulaire</h3>
+     <ul>
+       <li><a href="#nom">Le nom est obligatoire</a></li>
+     </ul>
+   </div>
+   ```
+4. Mettez le **focus sur le premier champ en erreur**
+
+### Étape 3 : Style des erreurs
+
+Dans `style.css`, ajoutez :
+
+```css
+input[aria-invalid="true"] {
+    border-color: var(--color-error);
+    border-width: 2px;
+}
+```
+
+**Test :**
+- Soumettez le formulaire vide et vérifiez que les erreurs apparaissent
+- Vérifiez avec le lecteur d'écran que les erreurs sont annoncées
+- Corrigez un champ et vérifiez que l'erreur disparaît
+
+## PW 06 - Les Attributs ARIA (Radio custom)
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
 * [https://www.w3.org/TR/wai-aria/](https://www.w3.org/TR/wai-aria/)
-* [WAI ARIA Practices - Radio](https://www.w3.org/TR/2017/WD-wai-aria-practices-1.1-20170628/examples/radio/radio-1/radio-1.html)
+* [WAI ARIA Practices - Radio](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
 :::
 
-Dans cette partie pratique, nous allons implémenter un nouveau composant `radio` personnalisé qui sera utilisé dans notre formulaire
-à la place du composant natif (bien évidemment c'est dans un but pédagogique uniquement).
+Dans cette partie pratique, nous allons implémenter un composant `radio` personnalisé qui remplacera les radios natifs du formulaire
+(dans un but pédagogique uniquement).
 
-**⚠️ Rappel important :** En production, utilisez toujours `<input type="radio">` natif !
+**Rappel important :** En production, utilisez toujours `<input type="radio">` natif !
 
-**Objectifs :**
+**Fichiers concernés :** `creation.html`, `style.css`, `script.js`
 
-1. **Structure HTML :**
-   - Créez des `<div>` avec `role="radio"`
-   - Groupez-les dans un conteneur avec `role="radiogroup"`
-   - Ajoutez `aria-labelledby` sur le groupe pour le label
+### Étape 1 : Structure HTML
 
-2. **Attributs ARIA requis :**
-   - `aria-checked="true"` ou `"false"` sur chaque radio
-   - `tabindex="0"` sur le radio sélectionné, `tabindex="-1"` sur les autres
-   - Le groupe doit avoir un label (via `aria-labelledby` ou `aria-label`)
+Dans `creation.html`, remplacez le fieldset "Sexe" par :
 
-3. **Navigation au clavier :**
-   - **Tab** : entre dans le groupe (focus sur l'élément sélectionné)
-   - **Flèches haut/bas** ou **gauche/droite** : sélectionne le radio précédent/suivant
-   - **Espace** : sélectionne le radio focusé
-   - Implémentez le pattern "roving tabindex"
+```html
+<fieldset>
+  <legend id="sexe-label">Sexe</legend>
+  <div role="radiogroup" aria-labelledby="sexe-label">
+    <div role="radio" aria-checked="false" tabindex="0" data-value="M">
+      Masculin
+    </div>
+    <div role="radio" aria-checked="false" tabindex="-1" data-value="F">
+      Féminin
+    </div>
+  </div>
+</fieldset>
+```
 
-4. **Gestion JavaScript :**
-   - Mettez à jour `aria-checked` lors de la sélection
-   - Gérez le déplacement du focus avec les flèches
-   - Mettez à jour les `tabindex` pour le roving tabindex
+Notez :
+- `role="radiogroup"` sur le conteneur
+- `aria-labelledby` pointant vers la legend
+- `role="radio"` et `aria-checked` sur chaque option
+- `tabindex="0"` uniquement sur le premier (ou le sélectionné), `-1` sur les autres
 
-**Référence :** Consultez [WAI ARIA Practices - Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
+### Étape 2 : Navigation au clavier
 
-## PW 07 - Les composants complexes
+Dans `script.js`, implémentez le pattern **roving tabindex** :
+
+1. **Tab** : entre dans le groupe, focus sur l'élément avec `tabindex="0"`
+2. **Flèches haut/bas** ou **gauche/droite** : passe au radio précédent/suivant
+3. **Espace** : sélectionne le radio focusé
+4. Quand on sélectionne un radio :
+   - Mettre `aria-checked="true"` dessus, `aria-checked="false"` sur les autres
+   - Mettre `tabindex="0"` dessus, `tabindex="-1"` sur les autres
+   - Mettre le focus sur le radio sélectionné
+
+### Étape 3 : Style visuel
+
+Les styles pour `[role="radio"]` et `[role="radio"][aria-checked="true"]` sont déjà fournis dans `style.css`.
+Vérifiez qu'ils sont suffisamment distincts visuellement.
+
+**Test :**
+- Vérifiez la navigation au clavier (Tab entre dans le groupe, flèches changent la sélection)
+- Vérifiez avec le lecteur d'écran que le rôle "radio" et l'état "coché/non coché" sont annoncés
+
+## PW 07 - Les composants complexes (Modale)
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -272,93 +450,148 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 - [A11ycasts - Dialog](https://www.youtube.com/watch?v=JS68faEUduk)
 :::
 
-Dans cette partie pratique, nous allons ouvrir une modale suite au clic sur une ligne du tableau. La modale affichera
-le détail de la personne sélectionnée.
+Nous allons ajouter une modale qui s'ouvre au clic sur une ligne du tableau pour afficher le détail d'une personne.
 
-**Objectifs :**
+**Fichiers concernés :** `index.html`, `style.css`, `script.js`
 
-1. **Structure de la modale :**
-   - Utilisez `<dialog>` natif (recommandé) ou `role="dialog"` avec ARIA
-   - Ajoutez `aria-modal="true"` pour indiquer que c'est une modale
-   - Ajoutez `aria-labelledby` pointant vers le titre de la modale
-   - Incluez un bouton de fermeture clairement identifiable
+### Étape 1 : Structure de la modale
 
-2. **Gestion du focus :**
-   - **À l'ouverture :** mettez le focus sur le bouton "Fermer" en premier
-   - **Piège à focus :** le focus doit rester dans la modale (Tab/Shift+Tab en boucle)
-   - **À la fermeture :** remettez le focus sur l'élément à l'origine de l'ouverture (ligne du tableau)
+Dans `index.html`, ajoutez avant la fermeture de `</body>` :
 
-3. **Navigation au clavier :**
-   - **Échap** : ferme la modale
-   - **Tab** : navigue entre les éléments focusables de la modale
-   - **Shift+Tab** : navigation inverse
-   - Le focus ne doit jamais sortir de la modale tant qu'elle est ouverte
+```html
+<div class="modal-overlay" id="modal-overlay"></div>
 
-4. **Contenu de la modale :**
-   - Titre : "Détails de [Prénom Nom]"
-   - Affichage des informations : nom, prénom, date de naissance
-   - Bouton "Fermer" clairement visible
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal">
+  <button class="close-btn" type="button" aria-label="Fermer">✕</button>
+  <h2 id="modal-title">Détails</h2>
+  <dl id="modal-content">
+    <!-- Contenu généré en JS -->
+  </dl>
+  <button type="button" id="modal-close">Fermer</button>
+</div>
+```
 
-5. **Accessibilité supplémentaire :**
-   - Masquez le contenu derrière la modale avec `aria-hidden="true"`
-   - Empêchez le scroll du body quand la modale est ouverte
-   - Ajoutez un overlay semi-transparent
+Notez l'utilisation de :
+- `role="dialog"` et `aria-modal="true"`
+- `aria-labelledby` pointant vers le titre
+- `aria-label="Fermer"` sur le bouton de fermeture (icône seule)
+- `<dl>` pour les paires clé/valeur des détails
 
-**Référence :** Consultez [WAI ARIA Practices - Dialog (Modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+### Étape 2 : Ouverture de la modale
 
-## PW 08 - Audit
+Dans `script.js` :
+
+1. Modifiez la colonne "Actions" du tableau pour ajouter un bouton :
+   ```javascript
+   `<td><button type="button" class="btn-details" data-id="${personne.id}">Voir détails</button></td>`
+   ```
+
+2. Écoutez le clic sur ces boutons et ouvrez la modale :
+   ```javascript
+   function openModal(personne, triggerElement) {
+     // Sauvegarder l'élément déclencheur pour y remettre le focus
+     // Remplir le contenu de la modale
+     // Afficher la modale et l'overlay
+     // Mettre le focus sur le bouton "Fermer" (ou le premier élément focusable)
+   }
+   ```
+
+### Étape 3 : Piège à focus
+
+Implémentez le piège à focus (focus trap) :
+
+1. Listez tous les éléments focusables dans la modale
+2. Sur `Tab` au dernier élément : reboucler sur le premier
+3. Sur `Shift+Tab` au premier élément : reboucler sur le dernier
+
+```javascript
+function trapFocus(modal, event) {
+  const focusable = modal.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.key === "Tab") {
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+}
+```
+
+### Étape 4 : Fermeture de la modale
+
+1. **Échap** : ferme la modale
+2. **Clic sur l'overlay** : ferme la modale
+3. **Clic sur le bouton Fermer** : ferme la modale
+4. À la fermeture :
+   - Masquer la modale et l'overlay
+   - Remettre le focus sur l'élément déclencheur
+
+### Étape 5 : Masquer le contenu derrière
+
+Ajoutez `aria-hidden="true"` et `inert` sur le contenu derrière la modale quand elle est ouverte :
+
+```javascript
+document.querySelector("header").setAttribute("inert", "");
+document.querySelector("main").setAttribute("inert", "");
+// et les retirer à la fermeture
+```
+
+**Test :**
+- Ouvrez la modale, vérifiez que le focus est piégé dedans
+- Appuyez sur Échap, vérifiez que le focus revient sur le bouton d'origine
+- Testez avec le lecteur d'écran que le contenu derrière n'est plus accessible
+
+## PW 08 - Audit automatisé
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
 
-* [Lighthouse](https://developers.google.com/web/tools/lighthouse/?utm_campaign=chrome_series_lighthouse_110317&utm_source=chromedev&utm_medium=yt-desc)
+* [Lighthouse](https://developers.google.com/web/tools/lighthouse/)
 * [Playwright](https://playwright.dev/docs/accessibility-testing)
 :::
 
-Nous allons dans cette partie pratique mettre en place une solution permettant d'assurer un niveau d'accessibilité dans notre application.
-Pour cela, nous allons utiliser les outils suivants :
+Nous allons auditer notre application avec des outils automatisés.
 
-- **Lighthouse** (Chrome DevTools)
-- **Playwright** avec **Axe-core**
-
-### Lighthouse
-
-**Objectifs :**
+### Partie 1 : Lighthouse (sans installation)
 
 1. Ouvrez votre application dans Chrome
 2. Ouvrez les DevTools (F12)
-3. Allez dans l'onglet "Lighthouse"
-4. Sélectionnez uniquement "Accessibility" dans les catégories
+3. Allez dans l'onglet **Lighthouse**
+4. Sélectionnez uniquement **Accessibility** dans les catégories
 5. Lancez l'audit
-6. Analysez les résultats :
-   - Score global
-   - Liste des problèmes détectés
-   - Recommandations pour corriger
 
 **À faire :**
-- Identifiez les problèmes critiques (score < 90)
-- Corrigez au moins 3 problèmes détectés
+- Notez le score obtenu
+- Identifiez les problèmes critiques
+- Corrigez les problèmes détectés
 - Relancez l'audit et visez un score > 95
 
-### Playwright
+### Partie 2 : axe DevTools (extension navigateur)
+
+1. Installez l'extension [axe DevTools](https://www.deque.com/axe/devtools/)
+2. Ouvrez les DevTools → onglet **axe DevTools**
+3. Lancez un scan complet
+4. Comparez les résultats avec ceux de Lighthouse
+
+### Partie 3 : Playwright + Axe-core (optionnel)
+
+Si vous souhaitez automatiser les tests d'accessibilité :
 
 **Installation :**
 
-1. Initialisez un nouveau projet Playwright :
 ```bash
 npm init playwright@latest
-```
-
-2. Installez axe-core :
-```bash
 npm install -D @axe-core/playwright
 ```
 
-Suite à cette commande, un nouveau répertoire **tests** a été ajouté à votre projet.
-
-**Objectifs :**
-
-3. Créez un fichier `tests/accessibility.spec.js` :
+**Créez un fichier `tests/accessibility.spec.js` :**
 
 ```javascript
 import { test, expect } from '@playwright/test';
@@ -385,18 +618,17 @@ test.describe('Tests d\'accessibilité', () => {
 });
 ```
 
-4. Exécutez les tests :
+**Exécution :**
+
 ```bash
 npx playwright test
 ```
 
-5. Si des violations sont détectées, corrigez-les et relancez les tests
-
 **Bonus :**
-- Ajoutez des tests pour différents états de l'application (modale ouverte, formulaire en erreur)
-- Configurez Playwright pour tester sur plusieurs navigateurs
+- Ajoutez des tests pour la modale ouverte et le formulaire en erreur
+- Filtrez par tags WCAG : `.withTags(['wcag2a', 'wcag2aa'])`
 
-## PW 09 - Microdata
+## PW 09 - Microdata (bonus)
 
 :::note
 Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
@@ -404,39 +636,30 @@ Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient ê
 * [Outils de test des données structurées](https://search.google.com/structured-data/testing-tool/u/0/?hl=fr)
 :::
 
-Nous allons à présent ajouter des microdonnées (microdata) sur notre code HTML existant pour enrichir la sémantique.
+Nous allons ajouter des microdonnées (microdata) sur notre code HTML existant pour enrichir la sémantique.
 
-**Objectifs :**
+**Fichiers concernés :** `index.html`
 
-Dans le tableau listant toutes les personnes de notre arbre généalogique, ajoutez les microdonnées nécessaires afin
-de structurer nos données pour les moteurs de recherche.
+### Objectifs
 
-1. **Schema.org - Person :**
+Dans le tableau listant toutes les personnes, ajoutez les microdonnées Schema.org :
 
-Utilisez le vocabulaire [Schema.org/Person](https://schema.org/Person) pour marquer les données des personnes :
+1. **Sur chaque ligne `<tr>`** :
+   ```html
+   <tr itemscope itemtype="https://schema.org/Person">
+     <td itemprop="familyName">Dupont</td>
+     <td itemprop="givenName">Jean</td>
+     <td><time itemprop="birthDate" datetime="1980-05-15">1980-05-15</time></td>
+     <td><button type="button" class="btn-details" data-id="1">Voir détails</button></td>
+   </tr>
+   ```
 
-```html
-<tr itemscope itemtype="https://schema.org/Person">
-  <td itemprop="familyName">Dupont</td>
-  <td itemprop="givenName">Jean</td>
-  <td itemprop="birthDate">1980-05-15</td>
-  <td><a href="details.html">Détails</a></td>
-</tr>
-```
-
-2. **Propriétés à utiliser :**
-   - `familyName` : nom de famille
-   - `givenName` : prénom
-   - `birthDate` : date de naissance
-   - `deathDate` : date de décès (si applicable)
+2. Mettez à jour la fonction `renderTableau()` dans `script.js` pour générer ces attributs
 
 3. **Test des microdonnées :**
-
-Une fois implémenté, testez vos microdonnées avec :
-- [Google Rich Results Test](https://search.google.com/test/rich-results)
-- [Schema.org Validator](https://validator.schema.org/)
+   - [Google Rich Results Test](https://search.google.com/test/rich-results)
+   - [Schema.org Validator](https://validator.schema.org/)
 
 **Bonus :**
 - Ajoutez des microdonnées sur le formulaire de création
 - Utilisez `itemscope` imbriqué pour les relations parent-enfant
-- Explorez d'autres vocabulaires comme `FamilyTree` ou `Person.parent`

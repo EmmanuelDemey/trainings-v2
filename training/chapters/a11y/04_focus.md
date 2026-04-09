@@ -170,9 +170,9 @@ element.addEventListener('blur', () => {
 # Skip Link
 
 * Voici quelques exemples
-    * https://axesslab.com/[Axesslab]
-    * https://github.com/[Github]
-    * https://www2.hm.com/fr_fr/index.html[H&M]
+    * [Axesslab](https://axesslab.com/)
+    * [Github](https://github.com/)
+    * [H&M](https://www2.hm.com/fr_fr/index.html)
 
 ---
 layout: statement
