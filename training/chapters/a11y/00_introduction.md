@@ -28,10 +28,10 @@
 
 ## Jour 1
 
-- Rappels techniques (JavaScript, CSS, React)
-- Introduction à l'accessibilité
-- Obligations légales et normes
-- Gestion du focus
+- Rappels techniques (JavaScript, CSS)
+- Introduction à l'accessibilité et déficiences
+- Obligations légales et normes (WCAG, RGAA)
+- Gestion du focus et navigation clavier
 - HTML sémantique
 - Formulaires accessibles
 - ARIA (Accessible Rich Internet Applications)
@@ -42,10 +42,10 @@
 
 ## Jour 2
 
-- Composants complexes (modales, tabs, accordéons)
-- Outils d'audit et tests
-- Microdata et SEO
-- Mise en pratique et exercices
+- Composants complexes (modales, tabs, alertes)
+- Outils d'audit et tests automatisés
+- Frameworks et bibliothèques accessibles
+- Microdata et SEO (bonus)
 - Conclusion et ressources
 
 ---
@@ -80,7 +80,7 @@
 
 - Navigateur moderne (Chrome, Firefox, Edge, Safari)
 - Éditeur de code (VS Code recommandé)
-- Node.js installé (pour les exercices React/Playwright)
+- Node.js installé (pour le serveur local et les tests Playwright)
 - Extensions recommandées :
   - [axe DevTools](https://www.deque.com/axe/devtools/) - Chrome, Firefox, Edge
   - [WAVE Evaluation Tool](https://wave.webaim.org/extension/) - Chrome, Firefox

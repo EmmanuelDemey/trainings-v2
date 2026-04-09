@@ -212,43 +212,8 @@ for(let i=0; i < headings.length; i++){
 
 * Si vous ne souhaitez pas afficher un titre dans votre design mais qu'il est nécessaire pour la structure
     * ajoutez tout de même la balise HTML
-    * cachez-le visuellement en CSS (classe `.sr-only` ou `.visually-hidden`)
+    * cachez-le visuellement en CSS (classe `.sr-only` vue dans le chapitre Rappels)
     * **Ne pas utiliser** `display: none` ou `visibility: hidden` (masque pour les lecteurs d'écran aussi)
-
----
-
-# Implémentation .sr-only complète
-
-```css
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Pour les éléments focusables (skip links) */
-.sr-only:focus {
-  position: static;
-  width: auto;
-  height: auto;
-  overflow: visible;
-  clip: auto;
-  white-space: normal;
-}
-```
-
-**Pourquoi chaque propriété** :
-- `position: absolute; width/height: 1px` - Retirer du flux layout
-- `margin: -1px` - Empêcher l'espace inutile
-- `overflow: hidden` - Assurer aucun overflow visuel
-- `clip: rect(0,0,0,0)` - Masquage visuel additionnel
-- `white-space: nowrap` - Éviter les problèmes de wrapping
 
 ---
 
