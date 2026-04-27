@@ -12,8 +12,8 @@ highlighter: shiki
 lineNumbers: true
 # some information about the slides, markdown enabled
 info: |
-  ## Slidev Starter Template
-  Presentation slides for developers.
+  ## Node.js Avancé
+  Formation Node.js niveau avancé.
 
   Learn more at [Sli.dev](https://sli.dev)
 # persist drawings in exports and build
@@ -25,8 +25,81 @@ transition: slide-left
 css: unocss
 ---
 
-# Node.js
+# Node.js Avancé
+
+<br />
+<br />
+
+<div style="display: flex; justify-content: center; align-items: center;">
+  <div>
+    <img src="/images/authors/Manu.jpeg" alt="Manu" height="150" width="150" />
+    <div>
+      <a href="https://github.com/emmanueldemey" target="_blank" rel="noopener noreferrer">Emmanuel Demey</a>
+    </div>
+  </div>
+</div>
 
 ---
+src: ./chapters/node/00_intro.md
+hide: false
+---
 
-# Fastify 
+---
+src: ./chapters/node/01_async.md
+hide: false
+---
+
+---
+src: ./chapters/node/02_event_loop.md
+hide: false
+---
+
+---
+src: ./chapters/node/03_events.md
+hide: false
+---
+
+---
+src: ./chapters/node/04_express.md
+hide: false
+---
+
+---
+src: ./chapters/node/05_streams.md
+hide: false
+---
+
+---
+src: ./chapters/node/06_tests.md
+hide: false
+---
+
+---
+src: ./chapters/node/07_performance.md
+hide: false
+---
+
+---
+src: ./chapters/node/08_clusters_workers.md
+hide: false
+---
+
+---
+src: ./chapters/node/09_advanced_streams.md
+hide: false
+---
+
+---
+src: ./chapters/node/10_quality.md
+hide: false
+---
+
+---
+src: ./chapters/node/11_advanced_modules.md
+hide: false
+---
+
+---
+src: ./chapters/node/12_native_addons.md
+hide: false
+---
