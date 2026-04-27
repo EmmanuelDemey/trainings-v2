@@ -2,21 +2,21 @@
 layout: cover
 ---
 
-# 1 - Dompter le paradigme asynchrone
+# 1 - Taming the async paradigm
 
 ---
 
-# Pourquoi l'asynchrone ?
+# Why async?
 
-- Node.js est **mono-thread** par défaut
-- Bloquer le thread principal = bloquer toutes les requêtes
-- Toutes les opérations d'**I/O** (fichier, réseau, DB) sont **non bloquantes**
+- Node.js is **single-threaded** by default
+- Blocking the main thread = blocking every other request
+- All **I/O** operations (file, network, DB) are **non-blocking**
 
 ```javascript
-// Bloquant - à éviter
+// Blocking - to avoid
 const data = fs.readFileSync('./big.json');
 
-// Non bloquant - à privilégier
+// Non-blocking - preferred
 fs.readFile('./big.json', (err, data) => { ... });
 
 // Promise / async-await
@@ -25,18 +25,18 @@ const data = await fs.promises.readFile('./big.json');
 
 ---
 
-# Avantages de l'asynchrone
+# Benefits of async
 
-- **Scalabilité** : un seul thread peut gérer des milliers de connexions
-- **Empreinte mémoire** réduite (pas un thread par requête comme en Java/PHP)
-- Modèle **event-driven** naturel pour des serveurs HTTP, websockets, IoT, etc.
-- Composabilité avec les **streams** et les **EventEmitter**
+- **Scalability**: a single thread can handle thousands of connections
+- Smaller **memory footprint** (no thread per request like in Java/PHP)
+- **Event-driven** model that fits HTTP servers, websockets, IoT, etc.
+- Composability with **streams** and **EventEmitter**
 
 ---
 
-# Pièges à éviter
+# Pitfalls to avoid
 
-- Le **callback hell**
+- **Callback hell**
 
 ```javascript
 fs.readFile(file, (err, data) => {
@@ -50,16 +50,16 @@ fs.readFile(file, (err, data) => {
 });
 ```
 
-- L'oubli du `return` ou du `await` (la promise est ignorée silencieusement)
-- Les exceptions levées à l'intérieur d'un callback async qui crashent le process
-- L'ordre d'exécution **non intuitif** entre `setTimeout`, `setImmediate`, `process.nextTick` et microtasks
+- Forgetting `return` or `await` (the promise is silently ignored)
+- Exceptions thrown inside an async callback that crash the process
+- **Counter-intuitive** ordering between `setTimeout`, `setImmediate`, `process.nextTick` and microtasks
 
 ---
 
-# Callbacks - convention Node.js
+# Callbacks - Node.js convention
 
-- Le premier argument est **toujours l'erreur** (convention `errback`)
-- Les arguments suivants sont les valeurs de retour
+- The first argument is **always the error** (the `errback` convention)
+- The remaining arguments are the return values
 
 ```javascript
 const fs = require('node:fs');
@@ -73,15 +73,15 @@ fs.readFile('./config.json', 'utf-8', (err, data) => {
 });
 ```
 
-- Les modules récents proposent une version `promise` accessible via `require('node:fs/promises')` ou `require('node:fs').promises`
+- Recent modules ship a `promise` flavor available via `require('node:fs/promises')` or `require('node:fs').promises`
 
 ---
 
 # Promises
 
-- Une **Promise** représente un traitement asynchrone à venir
-- Trois états : `pending`, `fulfilled`, `rejected`
-- On attache des traitements via `.then()`, `.catch()`, `.finally()`
+- A **Promise** represents an upcoming asynchronous computation
+- Three states: `pending`, `fulfilled`, `rejected`
+- Handlers are attached via `.then()`, `.catch()`, `.finally()`
 
 ```javascript
 fetch('https://api.example.com/users')
@@ -93,7 +93,7 @@ fetch('https://api.example.com/users')
 
 ---
 
-# Promises - création
+# Promises - creation
 
 ```javascript
 const wait = (ms) => new Promise((resolve, reject) => {
@@ -107,18 +107,18 @@ const wait = (ms) => new Promise((resolve, reject) => {
 await wait(1000);
 ```
 
-- `Promise.resolve(value)` / `Promise.reject(error)` permettent de construire directement une promise résolue/rejetée
+- `Promise.resolve(value)` / `Promise.reject(error)` build an already-resolved/rejected promise
 
 ---
 
-# Promises - utilitaires
+# Promises - utilities
 
-| Méthode | Comportement |
-|---------|--------------|
-| `Promise.all([...])` | Résout quand toutes ok, rejette à la première erreur |
-| `Promise.allSettled([...])` | Attend toutes (ok ou ko) et retourne leur statut |
-| `Promise.race([...])` | Résout/rejette dès la première promise terminée |
-| `Promise.any([...])` | Résout dès la première promise réussie |
+| Method | Behavior |
+|--------|----------|
+| `Promise.all([...])` | Resolves when all succeed, rejects on the first error |
+| `Promise.allSettled([...])` | Waits for all (success or failure) and returns their status |
+| `Promise.race([...])` | Resolves/rejects as soon as the first promise settles |
+| `Promise.any([...])` | Resolves as soon as the first promise succeeds |
 
 ```javascript
 const [user, orders] = await Promise.all([
@@ -131,9 +131,9 @@ const [user, orders] = await Promise.all([
 
 # async / await
 
-- Sucre syntaxique au-dessus des Promises
-- Une fonction `async` retourne **toujours** une Promise
-- `await` ne peut s'utiliser **que** dans une fonction `async` (ou top-level dans un module ESM)
+- Syntactic sugar over Promises
+- An `async` function **always** returns a Promise
+- `await` can be used **only** inside an `async` function (or top-level in an ESM module)
 
 ```javascript
 const loadUser = async (id) => {
@@ -150,34 +150,34 @@ const loadUser = async (id) => {
 
 ---
 
-# async / await - parallélisme
+# async / await - parallelism
 
-- `await` séquentiel par défaut
+- `await` is sequential by default
 
 ```javascript
-// Séquentiel - lent
+// Sequential - slow
 const user = await fetchUser(id);
 const orders = await fetchOrders(id);
 ```
 
-- Pour paralléliser, on lance d'abord les promises puis on les `await` ensemble
+- To parallelize, kick off the promises first then `await` them together
 
 ```javascript
-// Parallèle - rapide
+// Parallel - fast
 const userPromise = fetchUser(id);
 const ordersPromise = fetchOrders(id);
 const user = await userPromise;
 const orders = await ordersPromise;
 
-// Ou plus simplement
+// Or more simply
 const [user, orders] = await Promise.all([fetchUser(id), fetchOrders(id)]);
 ```
 
 ---
 
-# Conversion callback ➜ Promise
+# Callback ➜ Promise conversion
 
-- L'utilitaire **`util.promisify`** transforme une fonction callback en fonction qui retourne une Promise
+- **`util.promisify`** turns a callback-style function into one that returns a Promise
 
 ```javascript
 const { promisify } = require('node:util');
@@ -188,14 +188,14 @@ const readFile = promisify(fs.readFile);
 const data = await readFile('./data.json', 'utf-8');
 ```
 
-- Inversement, `util.callbackify` adapte une promise vers une signature callback
+- Conversely, `util.callbackify` adapts a promise-returning function to a callback signature
 
 ---
 
 # Top-level await
 
-- Disponible dans les modules ESM (`type: module` dans `package.json` ou fichier `.mjs`)
-- Permet d'éviter de wrapper le code dans une IIFE async
+- Available in ESM modules (`type: module` in `package.json` or `.mjs` files)
+- Avoids wrapping the code in an async IIFE
 
 ```javascript
 // app.mjs
@@ -205,13 +205,13 @@ const db = await connect();
 console.log('connected');
 ```
 
-- Attention : retarde le chargement du module ; à utiliser avec parcimonie
+- Caveat: it delays module loading; use sparingly
 
 ---
 
-# Le futur avec ES-Next
+# The future with ES-Next
 
-- **Promise.withResolvers()** (ES2024) - création de Promise avec accès direct à `resolve`/`reject`
+- **Promise.withResolvers()** (ES2024) - create a Promise with direct access to `resolve`/`reject`
 
 ```javascript
 const { promise, resolve, reject } = Promise.withResolvers();
@@ -222,14 +222,14 @@ emitter.once('error', reject);
 const data = await promise;
 ```
 
-- **Iterator helpers** asynchrones (ES2025) - `.map`, `.filter`, `.take`, `.toArray` sur des `AsyncIterator`
+- Async **iterator helpers** (ES2025) - `.map`, `.filter`, `.take`, `.toArray` on `AsyncIterator`
 - **Explicit Resource Management** (`using`, `await using`)
 
 ---
 
 # Async iterators
 
-- Permettent de consommer un flux asynchrone avec `for await ... of`
+- Consume an asynchronous flow with `for await ... of`
 
 ```javascript
 const fs = require('node:fs');
@@ -241,13 +241,13 @@ for await (const chunk of stream) {
 }
 ```
 
-- Implémentation manuelle via `Symbol.asyncIterator`
+- Manual implementation via `Symbol.asyncIterator`
 
 ---
 
 # AbortController
 
-- Norme web reprise par Node.js pour **annuler** les opérations asynchrones
+- Web standard adopted by Node.js to **cancel** asynchronous operations
 
 ```javascript
 const controller = new AbortController();
@@ -260,31 +260,31 @@ try {
   const body = await res.text();
 } catch (err) {
   if (err.name === 'AbortError') {
-    console.log('Requête annulée');
+    console.log('Request aborted');
   }
 }
 ```
 
 ---
 
-# Code synchrone vs asynchrone
+# Sync vs async code
 
-| Synchrone | Asynchrone |
-|-----------|------------|
+| Synchronous | Asynchronous |
+|-------------|--------------|
 | `fs.readFileSync` | `fs.readFile` / `fs.promises.readFile` |
 | `crypto.pbkdf2Sync` | `crypto.pbkdf2` |
 | `child_process.execSync` | `child_process.exec` |
 
-- Les API `Sync` ne doivent être utilisées **qu'au démarrage** (chargement de configuration) ou dans des scripts CLI
-- Dans un serveur HTTP, elles bloquent toutes les requêtes en cours
+- The `Sync` APIs should only be used **at startup** (loading config) or in CLI scripts
+- Inside an HTTP server, they block every in-flight request
 
 ---
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 1 - Asynchrone
-- Réécrire un script callback en async/await
-- Paralléliser des appels HTTP avec `Promise.all`
-- Mettre en place un timeout via `AbortController`
+## Workshop 1 - Async
+- Rewrite a callback-based script using async/await
+- Parallelize HTTP calls with `Promise.all`
+- Set up a timeout with `AbortController`

@@ -2,38 +2,38 @@
 layout: cover
 ---
 
-# 12 - Addons natifs
+# 12 - Native addons
 
 ---
 
-# Pourquoi un addon natif ?
+# Why a native addon?
 
-- Réutiliser une **bibliothèque C/C++** existante (ex: OpenCV, FFmpeg, libsodium)
-- **Performances extrêmes** sur des calculs CPU-bound
-- Accéder à des **APIs système** non exposées par Node
-- ⚠️ Avant de partir là-dessus, considérer :
+- Reuse an existing **C/C++ library** (e.g. OpenCV, FFmpeg, libsodium)
+- **Extreme performance** for CPU-bound computations
+- Access **system APIs** not exposed by Node
+- ⚠️ Before going there, consider:
   - Worker Threads
   - WebAssembly (wasm)
-  - Service séparé en Rust/Go appelé via HTTP/gRPC
+  - Separate Rust/Go service called via HTTP/gRPC
 
 ---
 
-# Trois APIs disponibles
+# Three available APIs
 
-| API | Quand l'utiliser |
-|-----|------------------|
-| **Node-API (N-API)** | **Recommandé** : ABI stable, compatible toutes versions Node |
-| **NAN** (Native Abstractions for Node) | Legacy, à migrer vers Node-API |
-| **V8 / libuv direct** | Cas avancés, fragile entre versions |
-| **Embedder API** | Embarquer Node.js dans une appli C++ |
+| API | When to use |
+|-----|-------------|
+| **Node-API (N-API)** | **Recommended**: stable ABI, compatible with all Node versions |
+| **NAN** (Native Abstractions for Node) | Legacy, migrate to Node-API |
+| **V8 / libuv directly** | Advanced cases, fragile across versions |
+| **Embedder API** | Embed Node.js into a C++ application |
 
 ---
 
 # Node-API (N-API)
 
-- API **C** stable, indépendante des versions de V8
-- Disponible aussi en **C++** via **`node-addon-api`** (wrapper plus ergonomique)
-- Compilation via **`node-gyp`** (puis **`prebuildify`** pour distribuer des binaires précompilés)
+- Stable **C** API, independent of V8 versions
+- Also available in **C++** via **`node-addon-api`** (more ergonomic wrapper)
+- Built with **`node-gyp`** (then **`prebuildify`** to ship precompiled binaries)
 
 ```bash
 npm install node-addon-api
@@ -42,14 +42,14 @@ npm install -g node-gyp
 
 ---
 
-# Structure d'un addon
+# Addon structure
 
 ```
 my-addon/
-├── binding.gyp        # config de build
+├── binding.gyp        # build config
 ├── package.json
 ├── src/
-│   └── addon.cc       # code C++
+│   └── addon.cc       # C++ code
 └── index.js           # require('./build/Release/addon.node')
 ```
 
@@ -76,7 +76,7 @@ my-addon/
 
 ---
 
-# Exemple - Hello World
+# Example - Hello World
 
 ```cpp
 // src/addon.cc
@@ -109,7 +109,7 @@ node-gyp configure build
 
 # Async work
 
-- Pour ne **pas bloquer l'event loop**, utiliser un `AsyncWorker`
+- To **avoid blocking the event loop**, use an `AsyncWorker`
 
 ```cpp
 class HashWorker : public Napi::AsyncWorker {
@@ -118,7 +118,7 @@ public:
     : AsyncWorker(cb), input(std::move(input)) {}
 
   void Execute() override {
-    // s'exécute sur un thread du pool libuv
+    // runs on a libuv thread pool thread
     result = compute_sha256(input);
   }
 
@@ -136,9 +136,9 @@ private:
 
 # Embedder API
 
-- Permet d'**embarquer** Node.js comme **bibliothèque** dans une application C++ existante
-- Cas d'usage : éditeurs (VS Code), produits desktop intégrant un runtime JS
-- API exposée via **`libnode`**
+- Lets you **embed** Node.js as a **library** inside an existing C++ application
+- Use cases: editors (VS Code), desktop products embedding a JS runtime
+- API exposed via **`libnode`**
 
 ```cpp
 #include <node.h>
@@ -150,24 +150,24 @@ int main(int argc, char** argv) {
   std::vector<std::string> errors;
 
   int exit_code = node::InitializeNodeWithArgs(&args, &exec_args, &errors);
-  // ... lancer un environnement Node
+  // ... start a Node environment
   return exit_code;
 }
 ```
 
-- Plus complexe : ABI moins stable, build personnalisé
+- More complex: less stable ABI, custom build
 
 ---
 
-# Alternatives modernes
+# Modern alternatives
 
-- **WebAssembly** :
-  - Compiler du C/C++/Rust/Go en `.wasm`
-  - Charger via `WebAssembly.instantiate`
-  - **Sandbox** native, multiplateforme, pas de `node-gyp`
-- **Rust + neon / napi-rs** :
-  - Écrire l'addon en Rust avec memory safety
-  - **`napi-rs`** est l'écosystème de référence (cargo-npm)
+- **WebAssembly**:
+  - Compile C/C++/Rust/Go to `.wasm`
+  - Load via `WebAssembly.instantiate`
+  - Native **sandbox**, cross-platform, no `node-gyp`
+- **Rust + neon / napi-rs**:
+  - Write the addon in Rust with memory safety
+  - **`napi-rs`** is the de-facto ecosystem (cargo-npm)
 
 ```rust
 // napi-rs
@@ -183,33 +183,33 @@ fn hello() -> String {
 
 # Distribution
 
-- Compiler en C/C++ nécessite **toolchain** sur la machine cible
-- Solutions :
-  - **`prebuildify`** : binaires précompilés par OS/arch dans le tarball npm
-  - **`prebuild-install`** : téléchargement à l'install
-  - **`node-pre-gyp`** : variante historique
-- Tester sur Linux x64/arm64, macOS x64/arm64, Windows x64
+- Compiling C/C++ requires a **toolchain** on the target machine
+- Solutions:
+  - **`prebuildify`**: precompiled binaries per OS/arch in the npm tarball
+  - **`prebuild-install`**: download on install
+  - **`node-pre-gyp`**: historic variant
+- Test on Linux x64/arm64, macOS x64/arm64, Windows x64
 
 ---
 
-# Quand NE PAS écrire un addon
+# When NOT to write an addon
 
-- Vous voulez juste **paralléliser** : Worker Threads suffisent
-- Vous voulez juste **plus de perf JS** : optimiser le code, profiler
-- Vous voulez intégrer **une lib HTTP** : appel REST/gRPC à un service séparé
-- Vous voulez **du Rust** : commencer par WebAssembly, escalader vers `napi-rs` si besoin
-- Le coût de maintenance d'un addon natif est **élevé** : ne le payer que si la valeur est claire
+- You only want **parallelism**: Worker Threads are enough
+- You only want **more JS perf**: optimize the code, profile it
+- You want to integrate **an HTTP library**: REST/gRPC call to a separate service
+- You want to use **Rust**: start with WebAssembly, escalate to `napi-rs` if needed
+- The maintenance cost of a native addon is **high**: only pay it when the value is clear
 
 ---
 layout: cover
 ---
 
-# Conclusion de la formation
+# Training conclusion
 
-- Vous avez vu les fondamentaux **avancés** de Node.js
-- Vous savez **profiler**, **debugger**, **scaler** une application
-- Vous maîtrisez les **streams**, **événements**, **modules avancés**
-- Continuez à pratiquer ! Liens utiles :
+- You have covered the **advanced** fundamentals of Node.js
+- You can **profile**, **debug**, **scale** an application
+- You master **streams**, **events**, **advanced modules**
+- Keep practicing! Useful links:
   - https://nodejs.org/api/
   - https://nodejs.org/en/learn/
   - https://github.com/goldbergyoni/nodebestpractices

@@ -2,45 +2,45 @@
 layout: cover
 ---
 
-# 7 - Gestion de la performance
+# 7 - Performance management
 
 ---
 
-# Objectifs
+# Goals
 
-- Identifier les **bottlenecks** dans une application Node.js
-- Écrire du JavaScript **performant pour V8**
-- Maîtriser la **mémoire** et détecter les **fuites**
-- Décharger les **calculs lourds** (worker threads, clusters)
-- **Profiler** et **analyser** les performances
-
----
-
-# JavaScript performant pour V8
-
-- V8 compile le JS en plusieurs étapes : Ignition (interpréteur) → SparkPlug → Maglev → TurboFan
-- Quelques règles pour rester sur le **chemin rapide** :
-  - Garder une **forme d'objet stable** (les Hidden Classes sont créées à partir des propriétés ajoutées)
-  - Initialiser **toutes** les propriétés dans le constructeur
-  - Éviter de **changer le type** d'une propriété en cours de vie
-  - Utiliser des **tableaux denses** plutôt que des objets pour les listes ordonnées
-  - Préférer les **fonctions monomorphiques** (mêmes types d'arguments)
+- Identify **bottlenecks** in a Node.js application
+- Write JavaScript that is **performant for V8**
+- Master **memory** and detect **leaks**
+- Offload **heavy computations** (worker threads, clusters)
+- **Profile** and **analyze** performance
 
 ---
 
-# Hidden classes - exemple
+# JavaScript that's performant for V8
+
+- V8 compiles JS through several stages: Ignition (interpreter) → SparkPlug → Maglev → TurboFan
+- A few rules to stay on the **fast path**:
+  - Keep a **stable object shape** (Hidden Classes are derived from the order of property additions)
+  - Initialize **all** properties in the constructor
+  - Avoid **changing the type** of a property over time
+  - Use **dense arrays** instead of objects for ordered lists
+  - Prefer **monomorphic** functions (same argument types)
+
+---
+
+# Hidden classes - example
 
 ```javascript
-// ✗ Mauvais : changement de forme
+// ✗ Bad: shape change
 const a = {};
 a.x = 1;
 a.y = 2;
 
 const b = {};
 b.y = 2;
-b.x = 1; // forme différente de a !
+b.x = 1; // different shape from a!
 
-// ✓ Bon : même forme
+// ✓ Good: same shape
 class Point {
   constructor(x, y) {
     this.x = x;
@@ -51,23 +51,23 @@ class Point {
 
 ---
 
-# Inlining et déoptimisation
+# Inlining and deoptimization
 
-- V8 **inline** les fonctions courtes appelées dans une boucle chaude
-- Éviter :
-  - Les fonctions trop **longues** (>600 caractères)
-  - Les blocs `try/catch` autour du hot path (avant Node 18 surtout)
-  - L'usage de `arguments` hors fonction fléchée
+- V8 **inlines** short functions called inside a hot loop
+- Avoid:
+  - Functions that are too **long** (>600 chars)
+  - `try/catch` around the hot path (especially before Node 18)
+  - Using `arguments` outside arrow functions
 
 ```javascript
-// Mauvais
+// Bad
 function sum() {
   let total = 0;
   for (const n of arguments) total += n;
   return total;
 }
 
-// Bon
+// Good
 function sum(...nums) {
   let total = 0;
   for (const n of nums) total += n;
@@ -77,45 +77,45 @@ function sum(...nums) {
 
 ---
 
-# Gestion de la mémoire
+# Memory management
 
-- V8 utilise un **GC générationnel** :
-  - **New Space** : objets jeunes, GC fréquent (Scavenger)
-  - **Old Space** : objets promus, GC moins fréquent (Mark-Sweep-Compact)
-- Limite par défaut : **~4 Go** sur 64 bits → ajustable
+- V8 uses a **generational GC**:
+  - **New Space**: young objects, frequent GC (Scavenger)
+  - **Old Space**: promoted objects, less frequent GC (Mark-Sweep-Compact)
+- Default limit: **~4 GB** on 64-bit → tunable
 
 ```bash
 node --max-old-space-size=8192 server.js
 ```
 
-- Le GC bloque l'event loop : limiter les **allocations dans le hot path**
+- The GC blocks the event loop: limit **allocations on the hot path**
 
 ---
 
-# Fuites mémoire - causes fréquentes
+# Memory leaks - common causes
 
-- **Closures** qui capturent un grand objet
-- **Listeners** non désabonnés sur un EventEmitter
-- **Caches** sans politique d'éviction (LRU manquante)
-- Variables **globales** qui grandissent
-- Timers (`setInterval`) jamais arrêtés
+- **Closures** capturing a large object
+- **Listeners** never unsubscribed on an EventEmitter
+- **Caches** without an eviction policy (no LRU)
+- **Global** variables that grow forever
+- Timers (`setInterval`) never stopped
 
 ```javascript
-// Fuite typique
+// Typical leak
 const cache = {};
 app.get('/users/:id', (req, res) => {
   if (!cache[req.params.id]) {
     cache[req.params.id] = fetchUser(req.params.id);
   }
-  // cache grandit indéfiniment
+  // cache grows indefinitely
 });
 ```
 
 ---
 
-# Détection de fuites
+# Detecting leaks
 
-- Surveiller `process.memoryUsage()` dans le temps
+- Watch `process.memoryUsage()` over time
 
 ```javascript
 setInterval(() => {
@@ -127,24 +127,24 @@ setInterval(() => {
 }, 5000);
 ```
 
-- Snapshots heap via Chrome DevTools : `node --inspect server.js` puis "Memory" → "Heap snapshot" (méthode des **3 snapshots**)
-- Outils : `clinic heap`, `heapdump`, `memlab` (Meta)
+- Heap snapshots in Chrome DevTools: `node --inspect server.js` then "Memory" → "Heap snapshot" (the **3-snapshots** technique)
+- Tools: `clinic heap`, `heapdump`, `memlab` (Meta)
 
 ---
 
-# Calculs lourds - stratégies
+# Heavy computations - strategies
 
-| Stratégie | Cas d'usage |
-|-----------|-------------|
-| **Découpage `setImmediate`** | Calcul itératif sur grosse collection |
-| **Worker Threads** | Calcul CPU-bound dans le même process |
-| **Cluster** | Multiplier les process sur les coeurs |
-| **Service externe** | Calcul long, isolé, scalable indépendamment |
-| **Native addon** | Vraiment besoin de perf C++ |
+| Strategy | Use case |
+|----------|----------|
+| **`setImmediate` slicing** | Iterative compute over a large collection |
+| **Worker Threads** | CPU-bound work in the same process |
+| **Cluster** | Spread processes across CPU cores |
+| **External service** | Long-running, isolated, independently scalable |
+| **Native addon** | Truly need C++ performance |
 
 ---
 
-# Découpage avec setImmediate
+# Slicing with setImmediate
 
 ```javascript
 function processChunk(items, i = 0) {
@@ -157,54 +157,54 @@ function processChunk(items, i = 0) {
 }
 ```
 
-- Permet à l'event loop de **respirer** entre les chunks
-- Trop de `setImmediate` = overhead, à doser
+- Lets the event loop **breathe** between chunks
+- Too many `setImmediate` = overhead, dose accordingly
 
 ---
 
-# Profilage CPU
+# CPU profiling
 
-- **`--prof`** intégré à Node
+- Built-in **`--prof`**
 
 ```bash
 node --prof server.js
-# génère isolate-XXXX-v8.log
+# generates isolate-XXXX-v8.log
 node --prof-process isolate-XXXX-v8.log > report.txt
 ```
 
-- **`--cpu-prof`** : profile au format compatible Chrome DevTools
+- **`--cpu-prof`**: Chrome DevTools-compatible profile
 
 ```bash
 node --cpu-prof --cpu-prof-dir=./profiles server.js
 ```
 
-- Charger le fichier dans **Chrome DevTools → Performance**
+- Load the file in **Chrome DevTools → Performance**
 
 ---
 
-# Outils externes
+# External tools
 
-- **clinic.js** (NearForm) : `doctor`, `flame`, `bubbleprof`, `heap`
+- **clinic.js** (NearForm): `doctor`, `flame`, `bubbleprof`, `heap`
 
 ```bash
 clinic doctor -- node server.js
 clinic flame -- node server.js
 ```
 
-- **0x** : flamegraphs prêts à l'emploi
-- **autocannon** : benchmarking HTTP
+- **0x**: ready-made flamegraphs
+- **autocannon**: HTTP benchmarking
 
 ```bash
 autocannon -c 100 -d 30 http://localhost:3000/api/users
 ```
 
-- APM : Datadog, NewRelic, Dynatrace, Sentry, Elastic APM
+- APMs: Datadog, NewRelic, Dynatrace, Sentry, Elastic APM
 
 ---
 
 # Performance Measurement APIs
 
-- Module `node:perf_hooks`
+- The `node:perf_hooks` module
 
 ```javascript
 const { performance, PerformanceObserver } = require('node:perf_hooks');
@@ -222,17 +222,17 @@ performance.mark('end');
 performance.measure('heavy', 'start', 'end');
 ```
 
-- Compatible Web Performance API → portable navigateur ↔ Node
+- Aligned with the Web Performance API → portable browser ↔ Node
 
 ---
 
 # Bottlenecks - diagnostic
 
-1. **Mesurer** avant d'optimiser (`autocannon`, métriques APM)
-2. **Identifier** la phase coupable (CPU, mémoire, I/O, GC, lock DB)
-3. **Profiler** la zone chaude
-4. **Optimiser** une chose à la fois
-5. **Re-mesurer**
+1. **Measure** before optimizing (`autocannon`, APM metrics)
+2. **Identify** the responsible phase (CPU, memory, I/O, GC, DB lock)
+3. **Profile** the hot zone
+4. **Optimize** one thing at a time
+5. **Re-measure**
 
 > *Premature optimization is the root of all evil* - Donald Knuth
 
@@ -240,9 +240,9 @@ performance.measure('heavy', 'start', 'end');
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 7 - Performance
-- Profiler une route lente avec `clinic doctor`
-- Détecter une fuite mémoire (3 snapshots)
-- Découper un calcul lourd avec `setImmediate`
+## Workshop 7 - Performance
+- Profile a slow route with `clinic doctor`
+- Detect a memory leak (3 snapshots)
+- Slice a heavy computation with `setImmediate`

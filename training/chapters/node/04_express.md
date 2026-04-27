@@ -2,16 +2,16 @@
 layout: cover
 ---
 
-# 4 - Framework Express
+# 4 - Express framework
 
 ---
 
 # Express
 
-- Framework HTTP **minimaliste** pour Node.js
-- Le plus utilisé de l'écosystème
-- Repose sur le concept de **middlewares** chaînés
-- Alternative modernes : **Fastify**, **Koa**, **Hono**, **NestJS**
+- **Minimalist** HTTP framework for Node.js
+- The most widely used in the ecosystem
+- Built on the concept of chained **middlewares**
+- Modern alternatives: **Fastify**, **Koa**, **Hono**, **NestJS**
 
 ```bash
 npm install express
@@ -31,9 +31,9 @@ app.listen(3000, () => console.log('Listening on 3000'));
 
 # Middlewares
 
-- Une fonction de signature `(req, res, next)`
-- S'exécutent dans l'ordre de déclaration
-- Peuvent terminer la réponse ou passer la main avec `next()`
+- A function with the `(req, res, next)` signature
+- Run in declaration order
+- Either end the response or pass control with `next()`
 
 ```javascript
 app.use((req, res, next) => {
@@ -51,10 +51,10 @@ app.use((req, res, next) => {
 
 ---
 
-# Middlewares - gestion d'erreurs
+# Middlewares - error handling
 
-- Les middlewares d'erreur ont **4 paramètres** : `(err, req, res, next)`
-- À déclarer **après** toutes les routes
+- Error middlewares take **4 parameters**: `(err, req, res, next)`
+- Must be declared **after** all routes
 
 ```javascript
 app.use((err, req, res, next) => {
@@ -63,14 +63,14 @@ app.use((err, req, res, next) => {
 });
 ```
 
-- Pour une fonction handler async, propager l'erreur via `next(err)` ou utiliser `express-async-errors`
+- For an async handler, propagate the error via `next(err)` or use `express-async-errors`
 
 ---
 
-# Routage
+# Routing
 
-- Méthodes HTTP : `app.get`, `app.post`, `app.put`, `app.patch`, `app.delete`, `app.all`
-- Paramètres dynamiques
+- HTTP methods: `app.get`, `app.post`, `app.put`, `app.patch`, `app.delete`, `app.all`
+- Dynamic parameters
 
 ```javascript
 app.get('/users/:id', (req, res) => {
@@ -78,14 +78,14 @@ app.get('/users/:id', (req, res) => {
 });
 ```
 
-- Wildcards : `/files/*`
-- Validation : utiliser `zod`, `joi` ou `express-validator`
+- Wildcards: `/files/*`
+- Validation: use `zod`, `joi` or `express-validator`
 
 ---
 
-# Routage - Router
+# Routing - Router
 
-- `express.Router()` permet de modulariser les routes
+- `express.Router()` lets you modularize routes
 
 ```javascript
 // users.router.js
@@ -107,7 +107,7 @@ app.use('/api/users', require('./users.router'));
 
 # Body parsing
 
-- Express expose nativement les middlewares de parsing
+- Express ships built-in parsing middlewares
 
 ```javascript
 app.use(express.json({ limit: '1mb' }));
@@ -115,18 +115,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 ```
 
-- Pour les **uploads** multipart : `multer` ou `busboy`
+- For **multipart uploads**: `multer` or `busboy`
 
 ---
 
-# Guards - sécurisation
+# Guards - securing access
 
-- Un **guard** est un middleware qui vérifie une condition avant d'autoriser l'accès
-- Patterns d'auth :
-  - **Session/cookie** : `express-session` + store (Redis, Mongo)
-  - **JWT** : `jsonwebtoken`, `passport-jwt`
-  - **OAuth2 / OIDC** : `passport`, `openid-client`
-  - **API Key** : header custom
+- A **guard** is a middleware that checks a condition before allowing access
+- Auth patterns:
+  - **Session/cookie**: `express-session` + store (Redis, Mongo)
+  - **JWT**: `jsonwebtoken`, `passport-jwt`
+  - **OAuth2 / OIDC**: `passport`, `openid-client`
+  - **API Key**: custom header
 
 ---
 
@@ -153,9 +153,9 @@ app.get('/me', authGuard, (req, res) => res.json(req.user));
 
 ---
 
-# Guard - rôles / permissions
+# Guard - roles / permissions
 
-- Composer plusieurs middlewares pour appliquer une politique
+- Compose multiple middlewares to enforce a policy
 
 ```javascript
 const requireRole = (role) => (req, res, next) => {
@@ -170,9 +170,9 @@ app.delete('/users/:id', authGuard, requireRole('admin'), deleteUser);
 
 ---
 
-# Stratégies Passport
+# Passport strategies
 
-- **passport** propose un système de **stratégies** pluggables
+- **passport** offers a pluggable **strategy** system
 
 ```javascript
 const passport = require('passport');
@@ -194,15 +194,15 @@ app.post('/login',
 
 ---
 
-# Sécurité - bonnes pratiques
+# Security - best practices
 
-- **`helmet`** : durcit les headers HTTP (CSP, HSTS, X-Frame-Options...)
-- **`cors`** : configurer finement les origines autorisées
-- **`express-rate-limit`** : protection brute force / DDoS
-- **`csurf`** ou tokens CSRF custom pour les formulaires
-- Valider **toutes** les entrées (body, query, params)
-- Toujours **hasher** les mots de passe (`bcrypt`, `argon2`)
-- Désactiver `x-powered-by` (`app.disable('x-powered-by')`)
+- **`helmet`**: hardens HTTP headers (CSP, HSTS, X-Frame-Options...)
+- **`cors`**: fine-tune allowed origins
+- **`express-rate-limit`**: brute-force / DDoS protection
+- **`csurf`** or custom CSRF tokens for forms
+- Validate **all** inputs (body, query, params)
+- Always **hash** passwords (`bcrypt`, `argon2`)
+- Disable `x-powered-by` (`app.disable('x-powered-by')`)
 
 ```javascript
 app.use(helmet());
@@ -212,25 +212,25 @@ app.use(rateLimit({ windowMs: 60_000, max: 100 }));
 
 ---
 
-# Alternatives modernes
+# Modern alternatives
 
-| Framework | Atouts |
-|-----------|--------|
-| **Fastify** | Très performant, schémas JSON natifs, plugin system |
-| **Koa** | Cœur minimaliste, async/await first |
+| Framework | Strengths |
+|-----------|-----------|
+| **Fastify** | Very fast, native JSON schemas, plugin system |
+| **Koa** | Minimalist core, async/await first |
 | **Hono** | Multi-runtime (Node, Bun, Deno, Workers) |
-| **NestJS** | Architecture opinionnée, DI, décorateurs |
+| **NestJS** | Opinionated architecture, DI, decorators |
 
-- Express reste une référence pour sa **stabilité** et sa **communauté**
-- Pour de nouveaux projets, considérer Fastify ou NestJS si performance/structure sont critiques
+- Express remains the reference for its **stability** and **community**
+- For new projects, consider Fastify or NestJS if performance/structure matter most
 
 ---
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 4 - Express
-- Construire une API REST `/api/users` avec routage modulaire
-- Ajouter un guard JWT + un guard rôle admin
-- Configurer helmet, cors, rate-limit
+## Workshop 4 - Express
+- Build a `/api/users` REST API with modular routing
+- Add a JWT guard + an admin role guard
+- Configure helmet, cors, rate-limit

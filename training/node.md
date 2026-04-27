@@ -12,8 +12,8 @@ highlighter: shiki
 lineNumbers: true
 # some information about the slides, markdown enabled
 info: |
-  ## Node.js Avancé
-  Formation Node.js niveau avancé.
+  ## Advanced Node.js
+  Advanced Node.js training.
 
   Learn more at [Sli.dev](https://sli.dev)
 # persist drawings in exports and build
@@ -25,7 +25,7 @@ transition: slide-left
 css: unocss
 ---
 
-# Node.js Avancé
+# Advanced Node.js
 
 <br />
 <br />

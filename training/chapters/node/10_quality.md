@@ -2,32 +2,32 @@
 layout: cover
 ---
 
-# 10 - Contrôle de qualité
+# 10 - Quality control
 
 ---
 
-# Trois piliers
+# Three pillars
 
-1. **Debug** : reproduire et inspecter un bug
-2. **Profiling** : mesurer les performances
-3. **Qualité du code** : prévenir les bugs en amont
+1. **Debug**: reproduce and inspect a bug
+2. **Profiling**: measure performance
+3. **Code quality**: prevent bugs upstream
 
 ---
 
-# Debugger V8
+# V8 Debugger
 
-- Node embarque le **Inspector Protocol** (même que Chrome DevTools)
+- Node embeds the **Inspector Protocol** (the same Chrome DevTools uses)
 
 ```bash
-node --inspect server.js          # debug attachable
-node --inspect-brk server.js      # break sur la 1ère ligne
+node --inspect server.js          # attachable debugger
+node --inspect-brk server.js      # break on the first line
 ```
 
-- Connexion :
-  - **Chrome** : `chrome://inspect`
-  - **VS Code** : extension "JavaScript Debug" (intégrée)
-  - **WebStorm**, **JetBrains** : configuration "Attach to Node"
-  - **`ndb`** : DevTools standalone
+- Connection:
+  - **Chrome**: `chrome://inspect`
+  - **VS Code**: built-in "JavaScript Debug" extension
+  - **WebStorm**, **JetBrains**: "Attach to Node" configuration
+  - **`ndb`**: standalone DevTools
 
 ---
 
@@ -57,21 +57,21 @@ node --inspect-brk server.js      # break sur la 1ère ligne
 
 ---
 
-# Outils externes
+# External tools
 
-- **node --inspect** + Chrome DevTools : debugger, profiler, heap snapshots
-- **clinic.js** : suite de profilers (doctor, flame, bubbleprof, heap)
-- **0x** : flamegraphs CPU
-- **autocannon**, **wrk** : load testing
-- **why-is-node-running** : trouver ce qui empêche le process de s'arrêter
-- **NODE_DEBUG** : logs internes (`NODE_DEBUG=net,http node app.js`)
+- **node --inspect** + Chrome DevTools: debugger, profiler, heap snapshots
+- **clinic.js**: profiler suite (doctor, flame, bubbleprof, heap)
+- **0x**: CPU flamegraphs
+- **autocannon**, **wrk**: load testing
+- **why-is-node-running**: find what prevents the process from exiting
+- **NODE_DEBUG**: internal logs (`NODE_DEBUG=net,http node app.js`)
 
 ---
 
-# Profiling - rappel
+# Profiling - recap
 
 ```bash
-# CPU sampling natif
+# Native CPU sampling
 node --cpu-prof --cpu-prof-dir=./profiles app.js
 
 # Heap profile
@@ -81,15 +81,15 @@ node --heap-prof --heap-prof-dir=./profiles app.js
 0x -- node app.js
 ```
 
-- Charger les `.cpuprofile` / `.heapprofile` dans **Chrome DevTools → Performance / Memory**
+- Open the `.cpuprofile` / `.heapprofile` files in **Chrome DevTools → Performance / Memory**
 
 ---
 
-# Qualité du code - linting
+# Code quality - linting
 
-- **ESLint** : standard pour JavaScript/TypeScript
-  - Plugins : `eslint-plugin-node`, `eslint-plugin-security`, `eslint-plugin-promise`
-- Configurations recommandées : **`@eslint/js`**, **`eslint-config-standard`**, **`@typescript-eslint`**
+- **ESLint**: standard for JavaScript/TypeScript
+  - Plugins: `eslint-plugin-node`, `eslint-plugin-security`, `eslint-plugin-promise`
+- Recommended configurations: **`@eslint/js`**, **`eslint-config-standard`**, **`@typescript-eslint`**
 
 ```bash
 npm i -D eslint @eslint/js
@@ -98,11 +98,11 @@ npx eslint --init
 
 ---
 
-# Qualité du code - format
+# Code quality - formatting
 
-- **Prettier** : formatter opinionated
-- Couplage avec ESLint via `eslint-config-prettier` (désactive les règles de style en conflit)
-- Lancement automatique au commit via **Husky** + **lint-staged**
+- **Prettier**: opinionated formatter
+- Pair with ESLint via `eslint-config-prettier` (disables conflicting style rules)
+- Run automatically on commit via **Husky** + **lint-staged**
 
 ```json
 // package.json
@@ -115,11 +115,11 @@ npx eslint --init
 
 ---
 
-# Qualité du code - typage
+# Code quality - typing
 
-- **TypeScript** apporte un typage statique fort
-- Alternative : **JSDoc** + `// @ts-check` pour conserver du JS pur
-- Validation runtime aux frontières : **`zod`**, **`ajv`**, **`io-ts`**, **`arktype`**
+- **TypeScript** brings strong static typing
+- Alternative: **JSDoc** + `// @ts-check` to keep pure JS
+- Runtime validation at boundaries: **`zod`**, **`ajv`**, **`io-ts`**, **`arktype`**
 
 ```typescript
 import { z } from 'zod';
@@ -127,36 +127,36 @@ import { z } from 'zod';
 const UserSchema = z.object({ id: z.number(), email: z.string().email() });
 type User = z.infer<typeof UserSchema>;
 
-const user = UserSchema.parse(req.body); // throw si invalide
+const user = UserSchema.parse(req.body); // throws if invalid
 ```
 
 ---
 
-# Qualité - audits sécurité
+# Quality - security audits
 
-- **`npm audit`** / **`pnpm audit`** : vulnérabilités connues sur les dépendances
-- **Snyk**, **Socket.dev**, **Dependabot**, **Renovate** : alertes automatiques
-- **`npm-check-updates`** : suivre les versions
-- **`knip`** : détecte les exports / dépendances inutilisés
-- **SAST** : SonarQube, CodeQL
-
----
-
-# Gestion des erreurs
-
-- En Node.js, plusieurs canaux d'erreurs :
-  - **throw** synchrone
-  - **callback `(err, ...)`**
-  - **promise rejetée**
-  - **`error` event** sur EventEmitter
-  - **`uncaughtException`** / **`unhandledRejection`** au niveau process
-- Une erreur non gérée peut **crasher** le process
+- **`npm audit`** / **`pnpm audit`**: known dependency vulnerabilities
+- **Snyk**, **Socket.dev**, **Dependabot**, **Renovate**: automated alerts
+- **`npm-check-updates`**: track versions
+- **`knip`**: detects unused exports / dependencies
+- **SAST**: SonarQube, CodeQL
 
 ---
 
-# Erreurs - bonnes pratiques
+# Error handling
 
-- Étendre `Error` pour des erreurs **typées**
+- In Node.js there are several error channels:
+  - Synchronous **throw**
+  - **`(err, ...)`** callback
+  - **Rejected promise**
+  - **`error` event** on EventEmitter
+  - **`uncaughtException`** / **`unhandledRejection`** at the process level
+- An unhandled error can **crash** the process
+
+---
+
+# Errors - best practices
+
+- Extend `Error` to define **typed** errors
 
 ```javascript
 class HttpError extends Error {
@@ -170,17 +170,17 @@ class HttpError extends Error {
 throw new HttpError(404, 'User not found');
 ```
 
-- Distinguer **opérationnelles** (réseau down, validation) des **bugs** (TypeError, accès undefined)
-- Pour les bugs → laisser **crasher** le process et relancer (PM2, Kubernetes)
+- Distinguish **operational errors** (network down, validation) from **bugs** (TypeError, undefined access)
+- For bugs → let the process **crash** and restart it (PM2, Kubernetes)
 
 ---
 
-# Erreurs globales
+# Global errors
 
 ```javascript
 process.on('uncaughtException', (err) => {
   logger.fatal(err, 'uncaughtException');
-  // après log : on quitte
+  // after logging: exit
   process.exit(1);
 });
 
@@ -188,16 +188,16 @@ process.on('unhandledRejection', (reason) => {
   logger.error(reason, 'unhandledRejection');
 });
 
-// Node 15+ : unhandledRejection => process.exit(1) par défaut
+// Node 15+: unhandledRejection => process.exit(1) by default
 ```
 
-- Pour `unhandledRejection`, on peut configurer `--unhandled-rejections=strict|warn|none`
+- For `unhandledRejection`, configure via `--unhandled-rejections=strict|warn|none`
 
 ---
 
-# AsyncLocalStorage pour le contexte
+# AsyncLocalStorage for context
 
-- Permet d'attacher un **contexte** (request id, user id, locale...) à une chaîne async sans le passer en paramètre
+- Attach a **context** (request id, user id, locale...) to an async chain without passing it as a parameter
 
 ```javascript
 const { AsyncLocalStorage } = require('node:async_hooks');
@@ -218,9 +218,9 @@ logger.info = (msg) => {
 
 # Logging
 
-- **`pino`** : très rapide, JSON par défaut
-- **`winston`** : ancien, très flexible
-- **`bunyan`** : JSON, transport multiple
+- **`pino`**: very fast, JSON by default
+- **`winston`**: older, very flexible
+- **`bunyan`**: JSON, multiple transports
 
 ```javascript
 const pino = require('pino');
@@ -230,15 +230,15 @@ logger.info({ userId: 1 }, 'login');
 logger.error(err, 'request failed');
 ```
 
-- Toujours produire des **logs structurés** (JSON) pour les pipelines d'observabilité
+- Always emit **structured logs** (JSON) for observability pipelines
 
 ---
 
-# Observabilité - les 3 piliers
+# Observability - the 3 pillars
 
-- **Logs** : événements discrets (pino, winston)
-- **Metrics** : valeurs numériques (Prometheus, OpenTelemetry)
-- **Traces** : suivi distribué (OpenTelemetry, Jaeger, Zipkin)
+- **Logs**: discrete events (pino, winston)
+- **Metrics**: numerical values (Prometheus, OpenTelemetry)
+- **Traces**: distributed tracing (OpenTelemetry, Jaeger, Zipkin)
 
 ```javascript
 // OpenTelemetry SDK
@@ -254,9 +254,9 @@ new NodeSDK({
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 10 - Qualité
-- Configurer ESLint + Prettier + Husky + lint-staged
-- Implémenter une hiérarchie d'erreurs HTTP
-- Ajouter un middleware de logging avec `pino` + AsyncLocalStorage
+## Workshop 10 - Quality
+- Configure ESLint + Prettier + Husky + lint-staged
+- Implement an HTTP error hierarchy
+- Add a logging middleware with `pino` + AsyncLocalStorage

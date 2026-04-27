@@ -2,14 +2,14 @@
 layout: cover
 ---
 
-# 11 - Modules avancés
+# 11 - Advanced modules
 
 ---
 
-# Tour d'horizon
+# Tour
 
-- Node.js expose une API standard très riche
-- Cette section parcourt les **modules clés** pour des cas avancés :
+- Node.js exposes a very rich standard API
+- This section goes through the **key modules** for advanced cases:
   - Async Hooks & AsyncLocalStorage
   - Process events
   - File System
@@ -22,9 +22,9 @@ layout: cover
 
 # Asynchronous Context Tracking
 
-- Suivre le contexte d'une **chaîne d'appels asynchrones**
-- Cas d'usage : request id, locale, user, span de tracing
-- API recommandée : **`AsyncLocalStorage`** (`node:async_hooks`)
+- Track context across an **asynchronous call chain**
+- Use cases: request id, locale, user, tracing span
+- Recommended API: **`AsyncLocalStorage`** (`node:async_hooks`)
 
 ```javascript
 const { AsyncLocalStorage } = require('node:async_hooks');
@@ -37,16 +37,16 @@ function handle(req, res) {
   });
 }
 
-// n'importe où dans la chaîne async
+// anywhere in the async chain
 const { requestId } = ctx.getStore();
 ```
 
 ---
 
-# Async Hooks - bas niveau
+# Async Hooks - low level
 
-- API plus bas niveau pour observer **chaque** ressource async (création, before, after, destroy)
-- Coût en performance : à n'utiliser qu'à des fins de **debug/instrumentation**
+- Lower-level API to observe **every** async resource (init, before, after, destroy)
+- Performance cost: only use for **debug/instrumentation**
 
 ```javascript
 const { createHook } = require('node:async_hooks');
@@ -61,18 +61,18 @@ const hook = createHook({
 hook.enable();
 ```
 
-- À privilégier `AsyncLocalStorage` au quotidien
+- Prefer `AsyncLocalStorage` day to day
 
 ---
 
 # Child Process
 
-- Module `node:child_process` : lancer des process système
-- Variantes :
-  - **`spawn`** : process avec stdio en streams
-  - **`exec`** : process avec output bufferisé (ne pas dépasser ~1 Mo)
-  - **`execFile`** : variante de `exec` sans shell
-  - **`fork`** : sous-process **Node** avec canal IPC
+- The `node:child_process` module: spawn system processes
+- Variants:
+  - **`spawn`**: process with stdio as streams
+  - **`exec`**: process with buffered output (don't exceed ~1 MB)
+  - **`execFile`**: `exec` variant without a shell
+  - **`fork`**: spawn a **Node** sub-process with an IPC channel
 
 ```javascript
 const { fork } = require('node:child_process');
@@ -86,9 +86,9 @@ child.on('message', (msg) => console.log('result', msg));
 
 # Clusters
 
-- Vu en détail au chapitre 8
-- Module `node:cluster` : N process Node enfants sur un même port
-- En production, déléguer à **PM2** ou à un orchestrateur (Kubernetes)
+- Covered in detail in chapter 8
+- The `node:cluster` module: N child Node processes on the same port
+- In production, delegate to **PM2** or an orchestrator (Kubernetes)
 
 ```javascript
 const cluster = require('node:cluster');
@@ -105,8 +105,8 @@ if (cluster.isPrimary) {
 
 # Debugger
 
-- Module `node:inspector` : API programmatique du protocole DevTools
-- Utile pour ouvrir/fermer une session de debug **dynamiquement**
+- The `node:inspector` module: programmatic API of the DevTools protocol
+- Useful to open/close a debug session **dynamically**
 
 ```javascript
 const inspector = require('node:inspector');
@@ -115,14 +115,14 @@ if (process.env.DEBUG === '1') {
   inspector.open(9229, '0.0.0.0', true); // wait for client
 }
 
-inspector.close(); // détache le debugger
+inspector.close(); // detach the debugger
 ```
 
 ---
 
 # Errors
 
-- Node fournit des **classes d'erreur** standardisées avec `code`
+- Node ships standardized **error classes** with a `code`
 
 ```javascript
 try {
@@ -134,15 +134,15 @@ try {
 }
 ```
 
-- Les erreurs Node ont un `code` stable (`ECONNREFUSED`, `ETIMEDOUT`, `EADDRINUSE`...)
-- Tester sur `code` plutôt que `message` (i18n ou évolution du wording)
+- Node errors carry a stable `code` (`ECONNREFUSED`, `ETIMEDOUT`, `EADDRINUSE`...)
+- Match on `code` rather than `message` (i18n or wording changes)
 
 ---
 
-# Events - lien avec RxJS
+# Events - link with RxJS
 
-- `EventEmitter` : push primitif (chapitre 3)
-- **RxJS** apporte la composition d'événements : `Observable`, opérateurs, schedulers
+- `EventEmitter`: primitive push (chapter 3)
+- **RxJS** brings event composition: `Observable`, operators, schedulers
 
 ```javascript
 import { fromEvent, debounceTime, scan } from 'rxjs';
@@ -155,14 +155,14 @@ fromEvent(server, 'request')
   .subscribe((count) => console.log('reqs/sec:', count));
 ```
 
-- Très utile pour les événements **temps réel** (websockets, streams d'événements)
+- Very useful for **real-time** events (websockets, event streams)
 
 ---
 
 # Worker Threads
 
-- Vu au chapitre 8
-- Module `node:worker_threads` : threads JS dans le même process
+- Covered in chapter 8
+- The `node:worker_threads` module: JS threads in the same process
 
 ```javascript
 const { Worker, isMainThread, parentPort } = require('node:worker_threads');
@@ -180,9 +180,9 @@ if (isMainThread) {
 
 # Web Streams API
 
-- Standard W3C, dispo dans Node 18+
-- 3 types : `ReadableStream`, `WritableStream`, `TransformStream`
-- Utiles pour partager du code avec le **navigateur** ou les **Workers/Edge Functions**
+- W3C standard, available in Node 18+
+- 3 types: `ReadableStream`, `WritableStream`, `TransformStream`
+- Useful to share code with the **browser** or **Workers/Edge Functions**
 
 ```javascript
 const stream = new ReadableStream({
@@ -193,22 +193,22 @@ const reader = stream.getReader();
 const { value } = await reader.read();
 ```
 
-- Conversion : `Readable.toWeb(nodeStream)` / `Readable.fromWeb(webStream)`
+- Conversion: `Readable.toWeb(nodeStream)` / `Readable.fromWeb(webStream)`
 
 ---
 
 # Process Events
 
-- Le `process` est lui-même un EventEmitter
+- The `process` is itself an EventEmitter
 
-| Événement | Cas d'usage |
-|-----------|-------------|
-| `exit` | Cleanup synchrone avant terminaison |
-| `beforeExit` | Dernière chance de programmer du travail async |
-| `uncaughtException` | Crash non géré → logger puis quitter |
-| `unhandledRejection` | Promise rejetée sans `.catch` |
+| Event | Use case |
+|-------|----------|
+| `exit` | Synchronous cleanup before termination |
+| `beforeExit` | Last chance to schedule async work |
+| `uncaughtException` | Unhandled crash → log then exit |
+| `unhandledRejection` | Promise rejected without `.catch` |
 | `SIGINT` / `SIGTERM` | Graceful shutdown |
-| `warning` | Warning Node (DEP, MaxListenersExceeded...) |
+| `warning` | Node warning (DEP, MaxListenersExceeded...) |
 
 ```javascript
 process.on('SIGTERM', async () => {
@@ -222,10 +222,10 @@ process.on('SIGTERM', async () => {
 
 # File System
 
-- Module `node:fs` : trois saveurs d'API
-  - **Sync** : `fs.readFileSync`
-  - **Callback** : `fs.readFile`
-  - **Promise** : `fs.promises.readFile`
+- The `node:fs` module: three API flavors
+  - **Sync**: `fs.readFileSync`
+  - **Callback**: `fs.readFile`
+  - **Promise**: `fs.promises.readFile`
 
 ```javascript
 const fs = require('node:fs/promises');
@@ -241,11 +241,11 @@ for await (const dirent of await fs.opendir('./src')) {
 
 ---
 
-# File System - watch et streams
+# File System - watch and streams
 
-- `fs.watch` / `fs.watchFile` : surveiller des changements
-- `fs.createReadStream` / `fs.createWriteStream` : streams pour gros fichiers
-- **`chokidar`** : alternative cross-platform plus fiable
+- `fs.watch` / `fs.watchFile`: watch for changes
+- `fs.createReadStream` / `fs.createWriteStream`: streams for large files
+- **`chokidar`**: more reliable cross-platform alternative
 
 ```javascript
 const chokidar = require('chokidar');
@@ -259,9 +259,9 @@ chokidar.watch('./src/**/*.ts').on('change', (path) => {
 
 # Buffer
 
-- Représente une **zone mémoire binaire** brute
-- Sous-classe de `Uint8Array` (donc API similaire)
-- Allocation : `Buffer.alloc(n)` (zéro), `Buffer.allocUnsafe(n)` (rapide mais non initialisé)
+- Represents a raw **binary memory region**
+- Subclass of `Uint8Array` (so similar API)
+- Allocation: `Buffer.alloc(n)` (zeroed), `Buffer.allocUnsafe(n)` (fast but uninitialized)
 
 ```javascript
 const buf = Buffer.from('hello', 'utf-8');
@@ -273,15 +273,15 @@ console.log(buf[0]); // 104
 const merged = Buffer.concat([buf, Buffer.from(' world')]);
 ```
 
-- Utilisé partout : streams, `fs`, `crypto`, `net`...
+- Used everywhere: streams, `fs`, `crypto`, `net`...
 
 ---
 
 # Stream
 
-- Vu en détail aux chapitres 5 et 9
-- Quatre types : `Readable`, `Writable`, `Duplex`, `Transform`
-- Toujours utiliser `pipeline` pour propager les erreurs et gérer le back-pressure
+- Covered in detail in chapters 5 and 9
+- Four types: `Readable`, `Writable`, `Duplex`, `Transform`
+- Always use `pipeline` to propagate errors and handle back-pressure
 
 ```javascript
 const { pipeline } = require('node:stream/promises');
@@ -298,7 +298,7 @@ await pipeline(
 
 # Performance Measurement APIs
 
-- Module `node:perf_hooks` (vu au chapitre 7)
+- The `node:perf_hooks` module (covered in chapter 7)
 
 ```javascript
 const { performance, PerformanceObserver, monitorEventLoopDelay } = require('node:perf_hooks');
@@ -314,13 +314,13 @@ const obs = new PerformanceObserver((list) => {
 obs.observe({ entryTypes: ['measure', 'gc', 'function'] });
 ```
 
-- `monitorEventLoopDelay` pour mesurer la latence event loop
+- `monitorEventLoopDelay` to measure event loop latency
 
 ---
 
 # Crypto
 
-- Hash, HMAC, chiffrement symétrique/asymétrique, signatures, KDF
+- Hash, HMAC, symmetric/asymmetric encryption, signatures, KDF
 
 ```javascript
 const crypto = require('node:crypto');
@@ -328,24 +328,24 @@ const crypto = require('node:crypto');
 // Hash
 const hash = crypto.createHash('sha256').update('hello').digest('hex');
 
-// Chiffrement AES-256-GCM
+// AES-256-GCM encryption
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(12);
 const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
 const enc = Buffer.concat([cipher.update('secret'), cipher.final()]);
 const tag = cipher.getAuthTag();
 
-// Génération aléatoire sécurisée
+// Secure random generation
 const id = crypto.randomUUID();
 const token = crypto.randomBytes(32).toString('base64url');
 ```
 
 ---
 
-# Crypto - KDF / hash de mot de passe
+# Crypto - KDF / password hashing
 
-- **Jamais** stocker un mot de passe en clair ou hashé en SHA-256
-- Utiliser un KDF lent : `scrypt`, `argon2`, `bcrypt`
+- **Never** store a password in clear or hashed with SHA-256
+- Use a slow KDF: `scrypt`, `argon2`, `bcrypt`
 
 ```javascript
 const { scrypt, randomBytes } = require('node:crypto');
@@ -364,8 +364,8 @@ async function hashPassword(password) {
 
 # TLS (SSL)
 
-- Module `node:tls` : sockets chiffrés
-- Module `node:https` : serveur HTTP avec TLS
+- The `node:tls` module: encrypted sockets
+- The `node:https` module: HTTP server with TLS
 
 ```javascript
 const https = require('node:https');
@@ -380,15 +380,15 @@ https.createServer({
 }).listen(443);
 ```
 
-- En production, déléguer souvent au **reverse proxy** (NGINX, Traefik, ALB) qui termine le TLS
+- In production, often delegate to a **reverse proxy** (NGINX, Traefik, ALB) that terminates TLS
 
 ---
 
 # Web Crypto API
 
-- Standard W3C, dispo via `globalThis.crypto`
-- Asynchrone (retourne des Promises)
-- Portable navigateur ↔ Node ↔ Workers
+- W3C standard, available via `globalThis.crypto`
+- Asynchronous (returns Promises)
+- Portable browser ↔ Node ↔ Workers
 
 ```javascript
 const data = new TextEncoder().encode('hello');
@@ -404,14 +404,14 @@ const key = await crypto.subtle.generateKey(
 
 ---
 
-# Choix entre `crypto` et Web Crypto
+# Choosing between `crypto` and Web Crypto
 
-| Critère | `node:crypto` | `crypto.subtle` |
-|---------|---------------|-----------------|
-| API | Synchrone & async | Promise-based |
-| Portable web | Non | Oui |
-| Algorithmes | Très riche (legacy inclus) | Modernes uniquement |
+| Criterion | `node:crypto` | `crypto.subtle` |
+|-----------|---------------|-----------------|
+| API | Sync & async | Promise-based |
+| Web portable | No | Yes |
+| Algorithms | Very rich (legacy included) | Modern only |
 | Performance | Excellent | Excellent |
 
-- **Greenfield** : Web Crypto par défaut
-- **Legacy / besoins spécifiques** : `node:crypto`
+- **Greenfield**: Web Crypto by default
+- **Legacy / specific needs**: `node:crypto`

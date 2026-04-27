@@ -2,15 +2,15 @@
 layout: cover
 ---
 
-# 3 - Événements Node.js
+# 3 - Node.js events
 
 ---
 
-# Architecture event-driven
+# Event-driven architecture
 
-- Une grande partie de l'API Node.js est construite autour du module **`events`**
-- HTTP server, streams, child process, websockets... émettent et écoutent des événements
-- Pattern **Observateur** natif
+- A large part of the Node.js API is built around the **`events`** module
+- HTTP server, streams, child process, websockets... all emit and listen to events
+- Built-in **Observer** pattern
 
 ```javascript
 const { EventEmitter } = require('node:events');
@@ -18,7 +18,7 @@ const { EventEmitter } = require('node:events');
 const bus = new EventEmitter();
 
 bus.on('user:created', (user) => {
-  console.log('Nouvel utilisateur:', user.id);
+  console.log('New user:', user.id);
 });
 
 bus.emit('user:created', { id: 1, email: 'manu@sparks.fr' });
@@ -26,23 +26,23 @@ bus.emit('user:created', { id: 1, email: 'manu@sparks.fr' });
 
 ---
 
-# EventEmitter - API principale
+# EventEmitter - main API
 
-| Méthode | Description |
-|---------|-------------|
-| `on(event, listener)` | Abonne un listener |
-| `once(event, listener)` | Abonne pour une seule émission |
-| `off / removeListener` | Désabonne |
-| `emit(event, ...args)` | Déclenche les listeners |
-| `removeAllListeners(event?)` | Vide les listeners |
-| `listenerCount(event)` | Nombre d'auditeurs |
-| `setMaxListeners(n)` | Désactive l'avertissement à 10 listeners |
+| Method | Description |
+|--------|-------------|
+| `on(event, listener)` | Subscribe a listener |
+| `once(event, listener)` | Subscribe for a single emission |
+| `off / removeListener` | Unsubscribe |
+| `emit(event, ...args)` | Trigger the listeners |
+| `removeAllListeners(event?)` | Clear listeners |
+| `listenerCount(event)` | Number of listeners |
+| `setMaxListeners(n)` | Disable the warning at 10 listeners |
 
 ---
 
-# Héritage et composition
+# Inheritance and composition
 
-- On peut **étendre** EventEmitter pour créer ses propres composants observables
+- You can **extend** EventEmitter to build your own observable components
 
 ```javascript
 class OrderService extends EventEmitter {
@@ -60,16 +60,16 @@ service.on('order:created', updateInventory);
 
 ---
 
-# Erreurs et événement `error`
+# Errors and the `error` event
 
-- Émettre `error` **sans listener** plante le process
+- Emitting `error` **without a listener** crashes the process
 
 ```javascript
 emitter.emit('error', new Error('boom'));
-// throw new Error('boom') si pas de listener
+// throw new Error('boom') if no listener
 ```
 
-- Toujours brancher un listener `error` ou utiliser `events.errorMonitor`
+- Always wire an `error` listener or use `events.errorMonitor`
 
 ```javascript
 const { errorMonitor } = require('node:events');
@@ -81,10 +81,10 @@ emitter.on(errorMonitor, (err) => {
 
 ---
 
-# EventEmitter et async/await
+# EventEmitter and async/await
 
-- `events.once(emitter, event)` retourne une Promise
-- `events.on(emitter, event)` retourne un async iterable
+- `events.once(emitter, event)` returns a Promise
+- `events.on(emitter, event)` returns an async iterable
 
 ```javascript
 const { once, on } = require('node:events');
@@ -98,10 +98,10 @@ for await (const [conn] of on(server, 'connection')) {
 
 ---
 
-# Comparaison avec RxJS
+# Comparison with RxJS
 
-- **EventEmitter** : push pur, pas de composition, pas de back-pressure
-- **RxJS** : Observable, opérateurs (`map`, `filter`, `debounce`, `throttle`, `mergeMap`...)
+- **EventEmitter**: pure push, no composition, no back-pressure
+- **RxJS**: Observable, operators (`map`, `filter`, `debounce`, `throttle`, `mergeMap`...)
 
 ```javascript
 import { fromEvent, throttleTime, map } from 'rxjs';
@@ -114,30 +114,30 @@ fromEvent(emitter, 'tick')
   .subscribe(console.log);
 ```
 
-- À utiliser quand vous avez besoin de **composer** des flux d'événements complexes
+- Useful when you need to **compose** complex event flows
 
 ---
 
-# Architecture event-driven distribuée
+# Distributed event-driven architecture
 
-- Au-delà du process Node.js, l'event-driven s'applique à **plusieurs services**
-  - Brokers : **Kafka**, **RabbitMQ** (AMQP), **NATS**, **Redis Streams**
+- Beyond a single Node.js process, event-driven scales to **multiple services**
+  - Brokers: **Kafka**, **RabbitMQ** (AMQP), **NATS**, **Redis Streams**
   - CQRS / Event Sourcing
-  - SAGA pattern pour la cohérence inter-services
-- Avantages :
-  - **Découplage** entre producteurs et consommateurs
-  - Scalabilité horizontale
-  - Rejouabilité de l'historique
-- Inconvénients :
-  - Complexité opérationnelle
-  - Cohérence éventuelle, pas immédiate
+  - SAGA pattern for cross-service consistency
+- Pros:
+  - **Decoupling** between producers and consumers
+  - Horizontal scalability
+  - Replayable history
+- Cons:
+  - Operational complexity
+  - Eventual consistency, not immediate
 
 ---
 
-# Bonnes pratiques
+# Best practices
 
-- Préfixer les événements par un domaine (`user:created`, `order:paid`)
-- Documenter les payloads (typage TS, schemas JSON)
-- Toujours nettoyer les listeners pour éviter les **fuites mémoire**
-- Limiter le nombre de listeners (`setMaxListeners` est un avertissement, pas un mur)
-- Préférer un module dédié pour le bus d'événements applicatif
+- Prefix events with a domain (`user:created`, `order:paid`)
+- Document payloads (TS types, JSON schemas)
+- Always clean up listeners to avoid **memory leaks**
+- Limit the number of listeners (`setMaxListeners` is a warning, not a hard wall)
+- Prefer a dedicated module for the application-wide event bus

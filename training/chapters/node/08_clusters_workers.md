@@ -2,25 +2,25 @@
 layout: cover
 ---
 
-# 8 - Clusters et Worker Threads
+# 8 - Clusters and Worker Threads
 
 ---
 
-# Le problème du single-thread
+# The single-thread problem
 
-- Node.js n'utilise **qu'un coeur** par défaut
-- Sur une machine 8 coeurs, **87,5%** de la CPU dort
-- Deux solutions natives :
-  - **Cluster** : N process Node enfants partageant un port
-  - **Worker Threads** : N threads dans le même process
+- By default Node.js uses **only one core**
+- On an 8-core machine, **87.5%** of the CPU sits idle
+- Two native solutions:
+  - **Cluster**: N child Node processes sharing a port
+  - **Worker Threads**: N threads inside the same process
 
 ---
 
-# Cluster - principe
+# Cluster - principle
 
-- Le module `node:cluster` (et le plus moderne `node:child_process`) lance des **process enfants**
-- Le master fait du **load balancing** (round-robin sous Linux)
-- Chaque worker est un process Node **complet** : pas de mémoire partagée
+- The `node:cluster` module (and the more modern `node:child_process`) spawns **child processes**
+- The primary handles **load balancing** (round-robin on Linux)
+- Each worker is a **full** Node process: no shared memory
 
 ```javascript
 const cluster = require('node:cluster');
@@ -39,26 +39,26 @@ if (cluster.isPrimary) {
 
 ---
 
-# Cluster - en pratique
+# Cluster - in practice
 
-- Préférer **PM2** ou un orchestrateur (Kubernetes, Docker Swarm) plutôt que `cluster` à la main
-- PM2 expose `pm2 start app.js -i max` qui fait du clustering géré
+- Prefer **PM2** or an orchestrator (Kubernetes, Docker Swarm) over hand-rolled `cluster`
+- PM2 exposes `pm2 start app.js -i max` which manages the cluster for you
 
 ```bash
 pm2 start server.js -i max
 pm2 reload server.js  # zero-downtime
 ```
 
-- En conteneur, on lance **un process par container** et on scale via le runtime
+- In containers, run **one process per container** and scale through the runtime
 
 ---
 
 # Worker Threads
 
-- Threads JS isolés dans **le même process**
-- Communication via **postMessage** (sérialisation structurée)
-- Possibilité de partager de la mémoire via **`SharedArrayBuffer`**
-- Idéal pour les calculs **CPU-bound** sans overhead de process
+- Isolated JS threads inside **the same process**
+- Communication via **postMessage** (structured cloning)
+- Memory sharing is possible via **`SharedArrayBuffer`**
+- Ideal for **CPU-bound** computations without process overhead
 
 ```javascript
 // main.js
@@ -72,7 +72,7 @@ worker.postMessage({ password: 'secret' });
 
 ---
 
-# Worker Threads - implémentation
+# Worker Threads - implementation
 
 ```javascript
 // hash.js
@@ -85,28 +85,28 @@ parentPort.on('message', async ({ password }) => {
 });
 ```
 
-- On peut aussi utiliser `new Worker(__filename)` pour partager le fichier
-- Voir `piscina` pour un **pool de workers** clé en main
+- You can also use `new Worker(__filename)` to share the file
+- Check out `piscina` for a turnkey **worker pool**
 
 ---
 
 # Cluster vs Worker Threads
 
-| Critère | Cluster | Worker Threads |
-|---------|---------|----------------|
-| Isolation | Forte (process) | Moyenne (thread) |
-| Overhead démarrage | Élevé | Faible |
-| Partage mémoire | Non | `SharedArrayBuffer` |
+| Criterion | Cluster | Worker Threads |
+|-----------|---------|----------------|
+| Isolation | Strong (process) | Medium (thread) |
+| Startup overhead | High | Low |
+| Memory sharing | No | `SharedArrayBuffer` |
 | IPC | `process.send` (JSON) | `postMessage` (structured clone) |
-| Cas typique | Serveur HTTP scaling | Calcul CPU-bound |
-| Crash | N'affecte qu'un worker | Peut tuer le process |
+| Typical use case | HTTP server scaling | CPU-bound compute |
+| Crash | Affects only one worker | May kill the whole process |
 
 ---
 
 # Child Process
 
-- API plus bas niveau pour lancer un **process arbitraire** (Node ou pas)
-- Variantes : `spawn`, `exec`, `execFile`, `fork`
+- Lower-level API to spawn an **arbitrary process** (Node or otherwise)
+- Variants: `spawn`, `exec`, `execFile`, `fork`
 
 ```javascript
 const { spawn } = require('node:child_process');
@@ -117,7 +117,7 @@ ls.on('close', (code) => console.log('exit', code));
 ```
 
 ```javascript
-// fork = spawn('node', [...]) avec canal IPC
+// fork = spawn('node', [...]) with an IPC channel
 const child = fork('./worker.js');
 child.send({ task: 'compute', value: 42 });
 child.on('message', console.log);
@@ -127,48 +127,48 @@ child.on('message', console.log);
 
 # SharedArrayBuffer & Atomics
 
-- Mémoire **partagée** entre threads
-- `Atomics` pour les opérations atomiques (lecture, écriture, lock)
+- **Shared** memory between threads
+- `Atomics` for atomic operations (read, write, lock)
 
 ```javascript
 const sab = new SharedArrayBuffer(1024);
 const view = new Int32Array(sab);
 
-// dans deux workers
+// in two workers
 Atomics.add(view, 0, 1);
 Atomics.notify(view, 0, 1);
 Atomics.wait(view, 0, 0);
 ```
 
-- À utiliser avec **précaution** : risques de race conditions, deadlocks
+- Use with **caution**: race condition and deadlock risks
 
 ---
 
-# Single-thread distribué
+# Distributed single-thread
 
-- Au-delà de la machine : **plusieurs instances** sur plusieurs serveurs
-- Coordination via :
+- Beyond a single machine: **multiple instances** across multiple servers
+- Coordination via:
   - **Redis** (locks, pub/sub, queues)
   - **Brokers** (Kafka, RabbitMQ, NATS)
-  - **Zookeeper / etcd** pour la coordination
-- Penser **stateless** : pas d'état en mémoire dans une instance, tout dans un store partagé
+  - **Zookeeper / etcd** for coordination
+- Think **stateless**: no in-memory state in an instance, everything in a shared store
 
 ---
 
-# Bonnes pratiques
+# Best practices
 
-- Sur 1 machine, on combine **clustering** (1 process / coeur) et **Worker Threads** pour les tâches lourdes
-- Sur N machines, on délègue le clustering au runtime (Kubernetes)
-- Toujours **tester la résilience** : kill -9 d'un worker, redémarrage correct ?
-- Mesurer : un cluster mal calibré peut **dégrader** les perfs (overhead IPC, contention disque/réseau)
+- On a single machine, combine **clustering** (1 process / core) with **Worker Threads** for heavy tasks
+- Across machines, delegate clustering to the runtime (Kubernetes)
+- Always **test resilience**: kill -9 a worker, does it restart correctly?
+- Measure: a poorly tuned cluster can **degrade** performance (IPC overhead, disk/network contention)
 
 ---
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 8 - Workers
-- Mettre en place un cluster avec PM2
-- Décharger un calcul bcrypt sur un Worker Thread
-- Comparer les perfs avec/sans Worker via `autocannon`
+## Workshop 8 - Workers
+- Set up a cluster with PM2
+- Offload a bcrypt computation to a Worker Thread
+- Compare performance with/without Worker via `autocannon`

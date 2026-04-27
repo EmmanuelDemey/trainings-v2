@@ -2,11 +2,11 @@
 layout: cover
 ---
 
-# 6 - Tests avec Node.js
+# 6 - Testing with Node.js
 
 ---
 
-# Pyramide des tests
+# Testing pyramid
 
 ```
         /\
@@ -18,16 +18,16 @@ layout: cover
   /--------------\
 ```
 
-- **Unitaires** : rapides, nombreux, isolés
-- **Intégration** : valident la collaboration de plusieurs modules
-- **End-to-end** : valident le parcours utilisateur via un navigateur
+- **Unit**: fast, numerous, isolated
+- **Integration**: validate the collaboration of several modules
+- **End-to-end**: validate user journeys via a browser
 
 ---
 
-# Le runner natif `node:test`
+# The native `node:test` runner
 
-- Disponible depuis Node.js 18, stable en 20
-- Pas besoin de dépendances externes
+- Available since Node.js 18, stable in 20
+- No external dependency required
 
 ```javascript
 const test = require('node:test');
@@ -37,9 +37,9 @@ test('addition', () => {
   assert.equal(1 + 1, 2);
 });
 
-test('groupe', async (t) => {
-  await t.test('cas 1', () => assert.ok(true));
-  await t.test('cas 2', () => assert.ok(true));
+test('group', async (t) => {
+  await t.test('case 1', () => assert.ok(true));
+  await t.test('case 2', () => assert.ok(true));
 });
 ```
 
@@ -52,8 +52,8 @@ node --test --watch
 
 # Mocha
 
-- Runner historique, très flexible
-- BDD-style (`describe` / `it`) ou TDD-style
+- The historic, very flexible runner
+- BDD-style (`describe` / `it`) or TDD-style
 
 ```javascript
 const { describe, it, beforeEach } = require('mocha');
@@ -63,24 +63,24 @@ describe('Calculator', () => {
   let calc;
   beforeEach(() => { calc = new Calculator(); });
 
-  it('additionne deux nombres', () => {
+  it('adds two numbers', () => {
     expect(calc.add(1, 2)).to.equal(3);
   });
 });
 ```
 
-- Nécessite une lib d'assertion (`chai`, `node:assert`) et une lib de mocks (`sinon`)
+- Requires an assertion library (`chai`, `node:assert`) and a mocking library (`sinon`)
 
 ---
 
 # Jest
 
-- Tout-en-un : runner + assertions + mocks + couverture
-- Très utilisé côté frontend, très productif
+- All-in-one: runner + assertions + mocks + coverage
+- Heavily used on the frontend, very productive
 
 ```javascript
 describe('Calculator', () => {
-  it('additionne deux nombres', () => {
+  it('adds two numbers', () => {
     expect(new Calculator().add(1, 2)).toBe(3);
   });
 });
@@ -90,13 +90,13 @@ describe('Calculator', () => {
 jest --coverage --watch
 ```
 
-- Inconvénient : transpileur intégré (Babel) parfois lourd, moins rapide que Vitest
+- Drawback: built-in transpiler (Babel) can be heavy, slower than Vitest
 
 ---
 
-# Tests asynchrones
+# Async tests
 
-- Toutes les libs supportent les Promises ; il suffit de retourner ou `await` la promise
+- All libraries support Promises; just return or `await` the promise
 
 ```javascript
 it('fetch user', async () => {
@@ -105,23 +105,23 @@ it('fetch user', async () => {
 });
 ```
 
-- Pour tester un timeout
+- Testing a timeout
 
 ```javascript
-it('rejette après 1s', async () => {
+it('rejects after 1s', async () => {
   await expect(slowOp()).rejects.toThrow('Timeout');
 });
 ```
 
-- Avec `node:test`, le timeout est configurable via `t.test(name, { timeout: 5000 }, ...)`
+- With `node:test`, the timeout is configurable via `t.test(name, { timeout: 5000 }, ...)`
 
 ---
 
-# Mocks et stubs
+# Mocks and stubs
 
-- **Stub** : remplace une fonction par une version contrôlée
-- **Mock** : stub avec assertions sur les appels (paramètres, nombre, ordre)
-- **Spy** : observe sans modifier
+- **Stub**: replaces a function with a controlled version
+- **Mock**: a stub with assertions on calls (parameters, count, order)
+- **Spy**: observes without modifying
 
 ```javascript
 // Jest
@@ -142,28 +142,28 @@ console.log(fn.mock.calls.length); // 1
 
 ---
 
-# Mocking de modules
+# Module mocking
 
 ```javascript
 // Jest
 jest.mock('./repo', () => ({ save: jest.fn() }));
 
-// node:test (à partir de Node 22)
+// node:test (since Node 22)
 mock.module('./repo.js', { namedExports: { save: () => ({ id: 1 }) } });
 ```
 
-- Pour mocker `fetch`, on peut utiliser `nock`, `msw` ou `undici.MockAgent`
+- To mock `fetch`, use `nock`, `msw` or `undici.MockAgent`
 
 ---
 
-# Isolation des tests
+# Test isolation
 
-- Chaque test doit pouvoir s'exécuter **seul**, dans **n'importe quel ordre**
-- Pas d'état global partagé : nettoyer dans `afterEach`
-- Base de données :
-  - Transactions rollback
-  - Conteneurs éphémères (`testcontainers`)
-  - Schémas par worker
+- Each test must be runnable **alone**, in **any order**
+- No shared global state: clean up in `afterEach`
+- Database:
+  - Rollback transactions
+  - Ephemeral containers (`testcontainers`)
+  - One schema per worker
 
 ```javascript
 beforeEach(async () => {
@@ -177,9 +177,9 @@ afterEach(async () => {
 
 ---
 
-# Tests d'intégration HTTP
+# HTTP integration tests
 
-- **`supertest`** : envoie des requêtes à un serveur Express en mémoire
+- **`supertest`**: sends requests to an in-memory Express server
 
 ```javascript
 const request = require('supertest');
@@ -194,11 +194,11 @@ it('GET /health', async () => {
 
 ---
 
-# Tests fonctionnels avec headless browsers
+# Functional tests with headless browsers
 
-- **Playwright** : multi-navigateur (Chromium, Firefox, WebKit), API moderne, auto-wait
-- **Puppeteer** : centré Chromium, plus ancien
-- **Cypress** : DX éprouvée, mais limité à un seul navigateur par session
+- **Playwright**: multi-browser (Chromium, Firefox, WebKit), modern API, auto-wait
+- **Puppeteer**: Chromium-focused, older
+- **Cypress**: well-known DX, but limited to a single browser per session
 
 ```javascript
 const { test, expect } = require('@playwright/test');
@@ -214,34 +214,34 @@ test('login', async ({ page }) => {
 
 ---
 
-# Couverture de code
+# Code coverage
 
-- `c8` (V8 native) ou `nyc` (Istanbul)
+- `c8` (V8 native) or `nyc` (Istanbul)
 
 ```bash
 c8 --reporter=lcov --reporter=text node --test
 ```
 
-- Métriques : lines, statements, branches, functions
-- Ne pas viser **100%** mais une couverture **utile** sur la logique métier
+- Metrics: lines, statements, branches, functions
+- Don't aim for **100%** but for **useful** coverage on business logic
 
 ---
 
-# Bonnes pratiques
+# Best practices
 
-- **Arrange / Act / Assert** dans chaque test
-- Un test = **une** assertion logique
-- Nommer les tests sous forme de **comportement** (`should reject when ...`)
-- Lancer la suite sur la **CI** à chaque PR
-- Mesurer le temps des tests et **paralléliser** quand possible
+- **Arrange / Act / Assert** in every test
+- One test = **one** logical assertion
+- Name tests as a **behavior** (`should reject when ...`)
+- Run the suite on **CI** for every PR
+- Measure test duration and **parallelize** when possible
 
 ---
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 6 - Tests
-- Écrire des tests unitaires d'un service avec mocks de repository
-- Tester une route Express avec `supertest`
-- Écrire un test e2e Playwright sur une page `/login`
+## Workshop 6 - Testing
+- Write unit tests of a service with repository mocks
+- Test an Express route with `supertest`
+- Write a Playwright e2e test on a `/login` page

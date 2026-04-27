@@ -2,25 +2,25 @@
 layout: cover
 ---
 
-# 2 - Architecture interne de Node.js
+# 2 - Node.js internal architecture
 
 ---
 
-# Vue d'ensemble
+# Overview
 
-- Node.js repose sur :
-  - Le moteur JavaScript **V8** (Google) pour exécuter le code JS
-  - **libuv** (C/C++) pour les I/O non bloquantes et l'event loop
-  - Une bibliothèque standard exposée en JS (modules `fs`, `http`, `crypto`, etc.)
-  - Des **bindings** entre JS et code C++
+- Node.js is built on:
+  - The **V8** JavaScript engine (Google) to execute JS code
+  - **libuv** (C/C++) for non-blocking I/O and the event loop
+  - A standard library exposed in JS (`fs`, `http`, `crypto`, etc.)
+  - **Bindings** between JS and C++ code
 
 ```
 +----------------------------+
-|     Votre code JS          |
+|       Your JS code         |
 +----------------------------+
-| Modules core (fs, http...) |
+| Core modules (fs, http...) |
 +----------------------------+
-|        Bindings C++         |
+|       C++ Bindings         |
 +--------------+-------------+
 |     V8       |    libuv    |
 +--------------+-------------+
@@ -30,12 +30,12 @@ layout: cover
 
 # Single-thread
 
-- Le code JavaScript s'exécute sur **un seul thread**
-- Les opérations bloquantes (CPU, I/O sync) gèlent **toutes** les autres requêtes
-- libuv délègue certaines opérations à un **pool de threads** (par défaut 4)
-  - Filesystem (sauf opérations natives non bloquantes)
+- JavaScript code runs on **a single thread**
+- Blocking operations (CPU, sync I/O) freeze **all** other requests
+- libuv delegates some operations to a **thread pool** (4 by default)
+  - Filesystem (except natively non-blocking operations)
   - DNS (`dns.lookup`)
-  - Crypto (`pbkdf2`, `randomBytes` async, etc.)
+  - Crypto (`pbkdf2`, async `randomBytes`, etc.)
   - Compression (`zlib`)
 
 ```bash
@@ -44,9 +44,9 @@ UV_THREADPOOL_SIZE=8 node server.js
 
 ---
 
-# L'Event Loop
+# The Event Loop
 
-- Boucle infinie orchestrant les phases d'exécution
+- Infinite loop orchestrating execution phases
 
 ```
    ┌───────────────────────────┐
@@ -73,9 +73,9 @@ UV_THREADPOOL_SIZE=8 node server.js
 
 # Microtasks vs macrotasks
 
-- Entre chaque phase, Node exécute :
-  - Toutes les **`process.nextTick`** en attente
-  - Toutes les **microtasks** (promises résolues)
+- Between each phase, Node runs:
+  - All pending **`process.nextTick`** callbacks
+  - All **microtasks** (resolved promises)
 
 ```javascript
 console.log('1');
@@ -85,37 +85,37 @@ Promise.resolve().then(() => console.log('4'));
 process.nextTick(() => console.log('5'));
 console.log('6');
 
-// Sortie : 1, 6, 5, 4, 2, 3
+// Output: 1, 6, 5, 4, 2, 3
 ```
 
 ---
 
 # setImmediate vs setTimeout(fn, 0)
 
-- `setImmediate(cb)` : exécuté à la phase **check** (après `poll`)
-- `setTimeout(cb, 0)` : programmé à la phase **timers**, déclenché dès que possible
-- Quand on est à l'intérieur d'un callback I/O, **`setImmediate` est garanti d'être exécuté avant** le timer
+- `setImmediate(cb)`: runs in the **check** phase (after `poll`)
+- `setTimeout(cb, 0)`: scheduled in the **timers** phase, fired as soon as possible
+- When inside an I/O callback, **`setImmediate` is guaranteed to run before** the timer
 
 ```javascript
 fs.readFile('./file', () => {
   setTimeout(() => console.log('timeout'), 0);
   setImmediate(() => console.log('immediate'));
 });
-// Sortie : immediate, timeout
+// Output: immediate, timeout
 ```
 
 ---
 
 # process.nextTick
 
-- Programme une fonction à exécuter **avant** la prochaine itération de l'event loop
-- Plus prioritaire que les microtasks (Promises)
-- À utiliser avec prudence : un `nextTick` infini affame l'event loop
+- Schedules a function to run **before** the next event loop iteration
+- Higher priority than microtasks (Promises)
+- Use with care: an infinite `nextTick` starves the event loop
 
 ```javascript
 function deferred() {
   process.nextTick(() => {
-    // ... exécuté juste après la pile courante
+    // ... runs right after the current stack
   });
 }
 ```
@@ -124,21 +124,21 @@ function deferred() {
 
 # Bottlenecks
 
-- Tout calcul **CPU-bound** > quelques millisecondes bloque l'event loop
-  - Hash bcrypt synchrone
-  - JSON.parse/stringify sur des très gros payloads
-  - Boucles complexes
-- Les opérations Sync de l'API standard sont à proscrire dans le hot path
-- Solutions :
-  - Découper en chunks via `setImmediate`
+- Any **CPU-bound** computation > a few milliseconds blocks the event loop
+  - Synchronous bcrypt hashing
+  - JSON.parse/stringify on huge payloads
+  - Complex loops
+- Sync APIs from the standard library should be banned from the hot path
+- Solutions:
+  - Slice the work using `setImmediate`
   - **Worker Threads**
-  - Externaliser sur un autre service
+  - Offload to another service
 
 ---
 
-# Mesurer le délai de l'event loop
+# Measuring event loop latency
 
-- Module `perf_hooks.monitorEventLoopDelay`
+- The `perf_hooks.monitorEventLoopDelay` module
 
 ```javascript
 const { monitorEventLoopDelay } = require('node:perf_hooks');
@@ -153,13 +153,13 @@ setInterval(() => {
 }, 1000);
 ```
 
-- Outils externes : `clinic doctor`, `0x`, APM (Datadog, NewRelic, Dynatrace)
+- External tools: `clinic doctor`, `0x`, APMs (Datadog, NewRelic, Dynatrace)
 
 ---
 
-# Récapitulatif
+# Recap
 
 - Node = V8 + libuv + bindings
-- **1 seul thread** pour le JS, **N threads** pour certaines I/O
-- L'event loop a **6 phases** entrecoupées de microtasks
-- Les bottlenecks sont presque toujours du **CPU sur le main thread**
+- **One thread** for JS, **N threads** for some I/O
+- The event loop has **6 phases** interleaved with microtasks
+- Bottlenecks are almost always **CPU work on the main thread**

@@ -2,41 +2,41 @@
 layout: cover
 ---
 
-# 5 - Streams Node.js
+# 5 - Node.js streams
 
 ---
 
-# Pourquoi les streams ?
+# Why streams?
 
-- Traiter une donnée **par morceaux** sans la charger entièrement en mémoire
-- Indispensables pour :
-  - Lire/écrire des **gros fichiers**
-  - Manipuler des **flux réseau** (HTTP, TCP)
-  - Brancher des **transformations** en pipeline (compression, chiffrement, parsing)
-- Reposent sur l'event-driven (`data`, `end`, `error`, `drain`...)
+- Process data in **chunks** without loading it entirely in memory
+- Essential for:
+  - Reading/writing **large files**
+  - Handling **network flows** (HTTP, TCP)
+  - Building **transformation pipelines** (compression, encryption, parsing)
+- Built on event-driven primitives (`data`, `end`, `error`, `drain`...)
 
 ---
 
-# Les 4 types de streams
+# The 4 stream types
 
-| Type | Description | Exemple |
+| Type | Description | Example |
 |------|-------------|---------|
-| **Readable** | Source de données | `fs.createReadStream` |
-| **Writable** | Destination de données | `fs.createWriteStream` |
-| **Duplex** | Lecture + écriture indépendantes | `net.Socket` |
-| **Transform** | Duplex avec transformation | `zlib.createGzip` |
+| **Readable** | Data source | `fs.createReadStream` |
+| **Writable** | Data destination | `fs.createWriteStream` |
+| **Duplex** | Independent read + write | `net.Socket` |
+| **Transform** | Duplex with transformation | `zlib.createGzip` |
 
 ---
 
 # Readable streams
 
-- On lit la donnée en se mettant à l'écoute des événements ou en utilisant `for await ... of`
+- Data is consumed by listening to events or with `for await ... of`
 
 ```javascript
 const fs = require('node:fs');
 
 const stream = fs.createReadStream('./big.log', {
-  highWaterMark: 64 * 1024, // taille des chunks
+  highWaterMark: 64 * 1024, // chunk size
 });
 
 stream.on('data', (chunk) => console.log('chunk:', chunk.length));
@@ -52,9 +52,9 @@ for await (const chunk of stream) {
 
 ---
 
-# Readable - création custom
+# Readable - custom creation
 
-- En étendant `Readable` ou via `Readable.from(iterable)`
+- Either by extending `Readable` or with `Readable.from(iterable)`
 
 ```javascript
 const { Readable } = require('node:stream');
@@ -63,7 +63,7 @@ class CounterStream extends Readable {
   constructor(max) { super(); this.i = 0; this.max = max; }
 
   _read() {
-    if (this.i >= this.max) return this.push(null); // fin
+    if (this.i >= this.max) return this.push(null); // end
     this.push(`${this.i++}\n`);
   }
 }
@@ -72,7 +72,7 @@ new CounterStream(10).pipe(process.stdout);
 ```
 
 ```javascript
-// Plus simple
+// Simpler
 const stream = Readable.from(async function* () {
   for (let i = 0; i < 10; i++) yield `${i}\n`;
 }());
@@ -87,18 +87,18 @@ const fs = require('node:fs');
 
 const out = fs.createWriteStream('./out.log');
 
-out.write('Ligne 1\n');
-out.write('Ligne 2\n');
-out.end(); // ferme le stream
+out.write('Line 1\n');
+out.write('Line 2\n');
+out.end(); // closes the stream
 
-out.on('finish', () => console.log('écriture terminée'));
+out.on('finish', () => console.log('write completed'));
 ```
 
-- `write()` retourne `false` si le buffer interne est plein → écouter `drain` avant de continuer
+- `write()` returns `false` if the internal buffer is full → wait for `drain` before continuing
 
 ---
 
-# Writable - création custom
+# Writable - custom creation
 
 ```javascript
 const { Writable } = require('node:stream');
@@ -120,23 +120,23 @@ w.end();
 
 # Duplex streams
 
-- Lecture **et** écriture, mais les deux côtés sont indépendants
-- Exemple typique : `net.Socket`
+- Read **and** write, but the two sides are independent
+- Typical example: `net.Socket`
 
 ```javascript
 const net = require('node:net');
 
 const socket = net.createConnection(8080);
 
-socket.write('PING\n');     // côté Writable
-socket.on('data', (chunk) => console.log(chunk.toString())); // côté Readable
+socket.write('PING\n');     // Writable side
+socket.on('data', (chunk) => console.log(chunk.toString())); // Readable side
 ```
 
 ---
 
 # Transform streams
 
-- Cas particulier de Duplex : ce qu'on **écrit** est transformé puis poussé en sortie
+- Special case of Duplex: what you **write** is transformed and pushed out
 
 ```javascript
 const { Transform } = require('node:stream');
@@ -150,14 +150,14 @@ class UpperCase extends Transform {
 process.stdin.pipe(new UpperCase()).pipe(process.stdout);
 ```
 
-- Exemples natifs : `zlib.createGzip`, `crypto.createCipheriv`, `csv-parser`
+- Built-in examples: `zlib.createGzip`, `crypto.createCipheriv`, `csv-parser`
 
 ---
 
 # Pipelines
 
-- `stream.pipeline` (ou `pipeline` from `node:stream/promises`) : chaîne plusieurs streams **avec gestion des erreurs**
-- Préférer **toujours** à `.pipe().pipe().pipe()`
+- `stream.pipeline` (or `pipeline` from `node:stream/promises`) chains multiple streams **with error handling**
+- **Always** prefer it over `.pipe().pipe().pipe()`
 
 ```javascript
 const { pipeline } = require('node:stream/promises');
@@ -175,8 +175,8 @@ await pipeline(
 
 # Object mode
 
-- Par défaut, les streams travaillent avec des **`Buffer`** ou des **strings**
-- En activant `objectMode: true`, on peut faire passer des objets JS arbitraires
+- By default, streams work with **`Buffer`** or strings
+- Enabling `objectMode: true` lets you push arbitrary JS objects
 
 ```javascript
 const { Transform } = require('node:stream');
@@ -196,8 +196,8 @@ const parseJson = new Transform({
 
 # Web Streams API
 
-- API standard W3C disponible dans Node.js 18+
-- Inter-opérable avec les Workers, Service Workers, Fetch
+- W3C standard available in Node.js 18+
+- Interoperable with Workers, Service Workers, Fetch
 
 ```javascript
 const stream = new ReadableStream({
@@ -213,25 +213,25 @@ for await (const chunk of stream) {
 }
 ```
 
-- Conversion Node ↔ Web : `Readable.toWeb(stream)` / `Readable.fromWeb(webStream)`
+- Conversion Node ↔ Web: `Readable.toWeb(stream)` / `Readable.fromWeb(webStream)`
 
 ---
 
-# Bonnes pratiques
+# Best practices
 
-- Toujours utiliser `pipeline` pour propager les erreurs
-- Définir un `highWaterMark` adapté à votre I/O
-- Penser au **back-pressure** (chapitre dédié)
-- Préférer `for await ... of` à l'écoute manuelle des événements pour la lisibilité
-- Tester les streams sur des **gros volumes** réels, pas sur 1 ko
+- Always use `pipeline` to propagate errors
+- Pick a `highWaterMark` suited to your I/O profile
+- Mind **back-pressure** (dedicated chapter)
+- Prefer `for await ... of` over manual event listening for readability
+- Test streams on **real, large** volumes - not 1 KB samples
 
 ---
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 5 - Streams
-- Lire un CSV de plusieurs Go et compter les lignes correspondant à un critère
-- Brancher gzip + chiffrement AES en pipeline
-- Implémenter un Transform stream custom pour parser du JSON Lines
+## Workshop 5 - Streams
+- Read a multi-GB CSV and count lines matching a criterion
+- Pipe gzip + AES encryption together
+- Implement a custom Transform stream parsing JSON Lines

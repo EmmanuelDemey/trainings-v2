@@ -2,32 +2,32 @@
 layout: cover
 ---
 
-# 9 - Gestion avancée des flux
+# 9 - Advanced flow handling
 
 ---
 
 # Back-pressure
 
-- Quand le **producteur** va plus vite que le **consommateur**, les buffers grossissent → fuite mémoire / OOM
-- Les streams Node gèrent nativement le back-pressure si on **utilise les bonnes API**
+- When the **producer** outpaces the **consumer**, buffers grow → memory leak / OOM
+- Node streams handle back-pressure natively if you **use the right APIs**
 
 ```javascript
-// ✗ Ignore le back-pressure
+// ✗ Ignores back-pressure
 src.on('data', (chunk) => dest.write(chunk));
 
-// ✓ Respecte le back-pressure
+// ✓ Honors back-pressure
 src.pipe(dest);
 
-// ✓ Encore mieux : pipeline
+// ✓ Even better: pipeline
 await pipeline(src, transform, dest);
 ```
 
 ---
 
-# write() et drain
+# write() and drain
 
-- `writable.write(chunk)` retourne `false` quand le buffer est plein
-- Il faut alors **arrêter d'écrire** et écouter `drain` avant de reprendre
+- `writable.write(chunk)` returns `false` when the buffer is full
+- You must then **stop writing** and listen for `drain` before resuming
 
 ```javascript
 function writeMany(dest, items, cb) {
@@ -48,23 +48,23 @@ function writeMany(dest, items, cb) {
 
 # Back-pressure - highWaterMark
 
-- Chaque stream a un **`highWaterMark`** définissant la taille du buffer interne
-- Par défaut : 16 ko pour les bytes, 16 objets pour `objectMode`
+- Every stream has a **`highWaterMark`** that defines the internal buffer size
+- Defaults: 16 KB for bytes, 16 objects in `objectMode`
 
 ```javascript
 const stream = fs.createReadStream('./big.log', { highWaterMark: 256 * 1024 });
 ```
 
-- Augmenter améliore le débit mais consomme plus de RAM
-- Diminuer améliore la latence mais multiplie les boucles
+- Increasing improves throughput but uses more RAM
+- Decreasing reduces latency but multiplies loop iterations
 
 ---
 
-# AMQP dans Node.js
+# AMQP in Node.js
 
-- **AMQP** (Advanced Message Queuing Protocol) : standard de messaging async
-- Brokers : **RabbitMQ** (référence), **ActiveMQ**, **Azure Service Bus**, **Qpid**
-- Lib Node : **`amqplib`**
+- **AMQP** (Advanced Message Queuing Protocol): standard for async messaging
+- Brokers: **RabbitMQ** (reference), **ActiveMQ**, **Azure Service Bus**, **Qpid**
+- Node library: **`amqplib`**
 
 ```bash
 npm install amqplib
@@ -72,7 +72,7 @@ npm install amqplib
 
 ---
 
-# AMQP - producteur
+# AMQP - producer
 
 ```javascript
 const amqp = require('amqplib');
@@ -92,14 +92,14 @@ await conn.close();
 
 ---
 
-# AMQP - consommateur
+# AMQP - consumer
 
 ```javascript
 const conn = await amqp.connect('amqp://localhost');
 const channel = await conn.createChannel();
 
 await channel.assertQueue('orders', { durable: true });
-channel.prefetch(10); // back-pressure : max 10 msg en cours
+channel.prefetch(10); // back-pressure: max 10 in-flight messages
 
 channel.consume('orders', async (msg) => {
   try {
@@ -118,19 +118,19 @@ channel.consume('orders', async (msg) => {
 
 | Pattern | Description |
 |---------|-------------|
-| **Work queue** | Distribuer une tâche à un worker dans un pool |
-| **Pub/Sub** | Diffuser à tous les abonnés (exchange `fanout`) |
-| **Routing** | Filtrer par routing key (exchange `direct`/`topic`) |
-| **RPC** | Requête/réponse via `replyTo` + `correlationId` |
-| **Dead letter** | Acheminer les messages échoués vers une autre queue |
+| **Work queue** | Distribute a task to a worker in a pool |
+| **Pub/Sub** | Broadcast to all subscribers (`fanout` exchange) |
+| **Routing** | Filter by routing key (`direct`/`topic` exchange) |
+| **RPC** | Request/response via `replyTo` + `correlationId` |
+| **Dead letter** | Route failed messages to another queue |
 
 ---
 
-# Pub/Sub avec Redis
+# Pub/Sub with Redis
 
-- Redis offre un mécanisme **Pub/Sub** simple et rapide
-- Pas de persistance des messages (au contraire d'AMQP / Kafka)
-- Lib : **`ioredis`**
+- Redis offers a simple, fast **Pub/Sub** mechanism
+- No message persistence (unlike AMQP / Kafka)
+- Library: **`ioredis`**
 
 ```javascript
 const Redis = require('ioredis');
@@ -150,13 +150,13 @@ await publisher.publish('user:created', JSON.stringify({ id: 1 }));
 
 # Redis Streams
 
-- Évolution de Pub/Sub avec **persistance** et **consumer groups**
+- Evolution of Pub/Sub with **persistence** and **consumer groups**
 
 ```javascript
-// producteur
+// producer
 await redis.xadd('events', '*', 'type', 'login', 'user', 'manu');
 
-// consommateur (avec groupe)
+// consumer (with group)
 await redis.xgroup('CREATE', 'events', 'g1', '$', 'MKSTREAM');
 
 const entries = await redis.xreadgroup(
@@ -166,16 +166,16 @@ const entries = await redis.xreadgroup(
 );
 ```
 
-- Alternative à Kafka pour des volumes modérés
+- Alternative to Kafka for moderate volumes
 
 ---
 
-# Communication inter-process en temps réel
+# Real-time inter-process communication
 
-- **WebSockets** (`ws`, `socket.io`) : bidirectionnel client ↔ serveur
-- **Server-Sent Events** (SSE) : serveur → client unidirectionnel
-- **gRPC** : RPC binaire HTTP/2, multi-langage
-- **MQTT** : très léger, IoT
+- **WebSockets** (`ws`, `socket.io`): bidirectional client ↔ server
+- **Server-Sent Events** (SSE): server → client one-way
+- **gRPC**: binary RPC over HTTP/2, multi-language
+- **MQTT**: very lightweight, IoT
 
 ```javascript
 const { WebSocketServer } = require('ws');
@@ -193,7 +193,7 @@ wss.on('connection', (ws) => {
 
 # Socket.io + Redis adapter
 
-- Permet de **scale** Socket.io sur plusieurs instances Node
+- Lets you **scale** Socket.io across multiple Node instances
 
 ```javascript
 const { Server } = require('socket.io');
@@ -206,28 +206,28 @@ await Promise.all([pub.connect(), sub.connect()]);
 const io = new Server(httpServer, { adapter: createAdapter(pub, sub) });
 ```
 
-- Les `emit` sont relayés via Redis Pub/Sub à toutes les instances
+- `emit` calls are forwarded via Redis Pub/Sub to every instance
 
 ---
 
-# Choisir sa techno
+# Choosing your stack
 
-| Besoin | Choix recommandé |
-|--------|------------------|
-| Tâches asynchrones différées | RabbitMQ (AMQP) ou BullMQ (Redis) |
-| Event streaming massif | Kafka, Redis Streams |
-| Pub/Sub léger temps réel | Redis Pub/Sub, NATS |
-| Notifications push web | WebSocket + Redis adapter |
-| RPC inter-microservices | gRPC, AMQP RPC |
-| IoT bas débit | MQTT |
+| Need | Recommended choice |
+|------|--------------------|
+| Deferred async tasks | RabbitMQ (AMQP) or BullMQ (Redis) |
+| Massive event streaming | Kafka, Redis Streams |
+| Lightweight real-time pub/sub | Redis Pub/Sub, NATS |
+| Web push notifications | WebSocket + Redis adapter |
+| Inter-microservice RPC | gRPC, AMQP RPC |
+| Low-bandwidth IoT | MQTT |
 
 ---
 layout: cover
 ---
 
-# Travaux Pratiques
+# Hands-on
 
-## Atelier 9 - Flux avancés
-- Reproduire un cas de back-pressure et le corriger avec `pipeline`
-- Mettre en place un consumer RabbitMQ avec ack/nack
-- Diffuser un événement via Redis Pub/Sub à 2 instances Node
+## Workshop 9 - Advanced flows
+- Reproduce a back-pressure issue and fix it with `pipeline`
+- Set up a RabbitMQ consumer with ack/nack
+- Broadcast an event via Redis Pub/Sub to 2 Node instances
