@@ -1,0 +1,21 @@
+{
+  "name": "tp-07-performance",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/server.ts",
+    "dev": "node --watch src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "load": "npx autocannon http://localhost:3000/slow",
+    "clinic": "npx clinic doctor -- node src/server.ts"
+  },
+  "dependencies": {
+    "express": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "@types/node": "^24.0.0",
+    "@types/express": "^5.0.0"
+  }
+}

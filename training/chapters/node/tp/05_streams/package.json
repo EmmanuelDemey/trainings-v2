@@ -1,0 +1,12 @@
+{
+  "name": "tp-05-streams",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/index.ts",
+    "generate": "node src/generate-data.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": { "typescript": "^5.8.0", "@types/node": "^24.0.0" }
+}

@@ -95,9 +95,16 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 NODE_API_MODULE(addon, Init)
 ```
 
-```javascript
-// index.js
-const addon = require('./build/Release/addon.node');
+```ts
+// index.ts
+import { createRequire } from 'node:module';
+
+interface Addon {
+  hello(): string;
+}
+
+const require = createRequire(import.meta.url);
+const addon: Addon = require('./build/Release/addon.node');
 console.log(addon.hello()); // "Hello from C++"
 ```
 
@@ -199,6 +206,15 @@ fn hello() -> String {
 - You want to integrate **an HTTP library**: REST/gRPC call to a separate service
 - You want to use **Rust**: start with WebAssembly, escalate to `napi-rs` if needed
 - The maintenance cost of a native addon is **high**: only pay it when the value is clear
+
+---
+
+# Hands-on
+
+## Workshop 12 - Native addons
+- Compile a "Hello World" Node-API addon with `node-gyp` and call it from JS
+- Expose a function doing a heavy computation (e.g. Fibonacci) in the addon
+- Benchmark the addon against the pure-JS equivalent with `autocannon` / `perf_hooks`
 
 ---
 layout: cover

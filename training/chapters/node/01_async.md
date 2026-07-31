@@ -12,15 +12,18 @@ layout: cover
 - Blocking the main thread = blocking every other request
 - All **I/O** operations (file, network, DB) are **non-blocking**
 
-```javascript
+```ts
+import fs from 'node:fs';
+import { readFile } from 'node:fs/promises';
+
 // Blocking - to avoid
-const data = fs.readFileSync('./big.json');
+const data: Buffer = fs.readFileSync('./big.json');
 
 // Non-blocking - preferred
 fs.readFile('./big.json', (err, data) => { ... });
 
 // Promise / async-await
-const data = await fs.promises.readFile('./big.json');
+const data: Buffer = await readFile('./big.json');
 ```
 
 ---
@@ -38,7 +41,7 @@ const data = await fs.promises.readFile('./big.json');
 
 - **Callback hell**
 
-```javascript
+```ts
 fs.readFile(file, (err, data) => {
   parse(data, (err, json) => {
     save(json, (err, id) => {
@@ -61,10 +64,10 @@ fs.readFile(file, (err, data) => {
 - The first argument is **always the error** (the `errback` convention)
 - The remaining arguments are the return values
 
-```javascript
-const fs = require('node:fs');
+```ts
+import fs from 'node:fs';
 
-fs.readFile('./config.json', 'utf-8', (err, data) => {
+fs.readFile('./config.json', 'utf-8', (err: NodeJS.ErrnoException | null, data: string) => {
   if (err) {
     console.error(err);
     return;
@@ -73,7 +76,7 @@ fs.readFile('./config.json', 'utf-8', (err, data) => {
 });
 ```
 
-- Recent modules ship a `promise` flavor available via `require('node:fs/promises')` or `require('node:fs').promises`
+- Recent modules ship a `promise` flavor available via `import ... from 'node:fs/promises'`
 
 ---
 
@@ -83,11 +86,13 @@ fs.readFile('./config.json', 'utf-8', (err, data) => {
 - Three states: `pending`, `fulfilled`, `rejected`
 - Handlers are attached via `.then()`, `.catch()`, `.finally()`
 
-```javascript
+```ts
+interface User { id: number; name: string }
+
 fetch('https://api.example.com/users')
-  .then(response => response.json())
-  .then(users => console.log(users))
-  .catch(err => console.error(err))
+  .then((response: Response) => response.json() as Promise<User[]>)
+  .then((users: User[]) => console.log(users))
+  .catch((err: unknown) => console.error(err))
   .finally(() => console.log('done'));
 ```
 
@@ -95,8 +100,8 @@ fetch('https://api.example.com/users')
 
 # Promises - creation
 
-```javascript
-const wait = (ms) => new Promise((resolve, reject) => {
+```ts
+const wait = (ms: number): Promise<void> => new Promise((resolve, reject) => {
   if (ms < 0) {
     reject(new Error('Invalid delay'));
     return;
@@ -120,8 +125,8 @@ await wait(1000);
 | `Promise.race([...])` | Resolves/rejects as soon as the first promise settles |
 | `Promise.any([...])` | Resolves as soon as the first promise succeeds |
 
-```javascript
-const [user, orders] = await Promise.all([
+```ts
+const [user, orders]: [User, Order[]] = await Promise.all([
   fetchUser(id),
   fetchOrders(id),
 ]);
@@ -135,12 +140,12 @@ const [user, orders] = await Promise.all([
 - An `async` function **always** returns a Promise
 - `await` can be used **only** inside an `async` function (or top-level in an ESM module)
 
-```javascript
-const loadUser = async (id) => {
+```ts
+const loadUser = async (id: number): Promise<User> => {
   try {
     const response = await fetch(`/api/users/${id}`);
     if (!response.ok) throw new Error('Not found');
-    return await response.json();
+    return await response.json() as User;
   } catch (err) {
     console.error(err);
     throw err;
@@ -154,18 +159,18 @@ const loadUser = async (id) => {
 
 - `await` is sequential by default
 
-```javascript
+```ts
 // Sequential - slow
-const user = await fetchUser(id);
-const orders = await fetchOrders(id);
+const user: User = await fetchUser(id);
+const orders: Order[] = await fetchOrders(id);
 ```
 
 - To parallelize, kick off the promises first then `await` them together
 
-```javascript
+```ts
 // Parallel - fast
-const userPromise = fetchUser(id);
-const ordersPromise = fetchOrders(id);
+const userPromise: Promise<User> = fetchUser(id);
+const ordersPromise: Promise<Order[]> = fetchOrders(id);
 const user = await userPromise;
 const orders = await ordersPromise;
 
@@ -179,13 +184,13 @@ const [user, orders] = await Promise.all([fetchUser(id), fetchOrders(id)]);
 
 - **`util.promisify`** turns a callback-style function into one that returns a Promise
 
-```javascript
-const { promisify } = require('node:util');
-const fs = require('node:fs');
+```ts
+import { promisify } from 'node:util';
+import fs from 'node:fs';
 
 const readFile = promisify(fs.readFile);
 
-const data = await readFile('./data.json', 'utf-8');
+const data: Buffer = await readFile('./data.json');
 ```
 
 - Conversely, `util.callbackify` adapts a promise-returning function to a callback signature
@@ -197,11 +202,12 @@ const data = await readFile('./data.json', 'utf-8');
 - Available in ESM modules (`type: module` in `package.json` or `.mjs` files)
 - Avoids wrapping the code in an async IIFE
 
-```javascript
-// app.mjs
-import { connect } from './db.js';
+```ts
+// app.ts
+import { connect } from './db.ts';
+import type { Db } from './db.ts';
 
-const db = await connect();
+const db: Db = await connect();
 console.log('connected');
 ```
 
@@ -213,13 +219,13 @@ console.log('connected');
 
 - **Promise.withResolvers()** (ES2024) - create a Promise with direct access to `resolve`/`reject`
 
-```javascript
-const { promise, resolve, reject } = Promise.withResolvers();
+```ts
+const { promise, resolve, reject } = Promise.withResolvers<Buffer>();
 
 emitter.once('data', resolve);
 emitter.once('error', reject);
 
-const data = await promise;
+const data: Buffer = await promise;
 ```
 
 - Async **iterator helpers** (ES2025) - `.map`, `.filter`, `.take`, `.toArray` on `AsyncIterator`
@@ -231,8 +237,8 @@ const data = await promise;
 
 - Consume an asynchronous flow with `for await ... of`
 
-```javascript
-const fs = require('node:fs');
+```ts
+import fs from 'node:fs';
 
 const stream = fs.createReadStream('./log.txt', { encoding: 'utf-8' });
 
@@ -249,7 +255,7 @@ for await (const chunk of stream) {
 
 - Web standard adopted by Node.js to **cancel** asynchronous operations
 
-```javascript
+```ts
 const controller = new AbortController();
 const { signal } = controller;
 
@@ -257,13 +263,34 @@ setTimeout(() => controller.abort(), 5000);
 
 try {
   const res = await fetch('https://slow.example.com', { signal });
-  const body = await res.text();
+  const body: string = await res.text();
 } catch (err) {
-  if (err.name === 'AbortError') {
+  if (err instanceof Error && err.name === 'AbortError') {
     console.log('Request aborted');
   }
 }
 ```
+
+---
+
+# Explicit Resource Management
+
+- Stable since **Node 24** (V8 13.6): `using` / `await using` auto-clean a resource at scope end
+- A disposable implements `Symbol.dispose` (sync) or `Symbol.asyncDispose` (async)
+- `await using` awaits the async cleanup - ideal for I/O resources
+
+```ts
+import { open } from 'node:fs/promises';
+
+async function read(path: string): Promise<string> {
+  // FileHandle implements Symbol.asyncDispose
+  await using file = await open(path, 'r');
+  const { buffer } = await file.read();
+  return buffer.toString('utf-8');
+} // file.close() called automatically here, even on throw
+```
+
+- No more `try/finally` to release file handles, DB connections or locks
 
 ---
 

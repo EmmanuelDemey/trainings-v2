@@ -30,22 +30,22 @@ layout: cover
 
 # Hidden classes - example
 
-```javascript
+```ts
 // ✗ Bad: shape change
-const a = {};
+const a: Record<string, number> = {};
 a.x = 1;
 a.y = 2;
 
-const b = {};
+const b: Record<string, number> = {};
 b.y = 2;
 b.x = 1; // different shape from a!
 
 // ✓ Good: same shape
 class Point {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
+  constructor(
+    public x: number,
+    public y: number,
+  ) {}
 }
 ```
 
@@ -59,16 +59,16 @@ class Point {
   - `try/catch` around the hot path (especially before Node 18)
   - Using `arguments` outside arrow functions
 
-```javascript
+```ts
 // Bad
-function sum() {
+function sum(): number {
   let total = 0;
   for (const n of arguments) total += n;
   return total;
 }
 
 // Good
-function sum(...nums) {
+function sum(...nums: number[]): number {
   let total = 0;
   for (const n of nums) total += n;
   return total;
@@ -100,10 +100,10 @@ node --max-old-space-size=8192 server.js
 - **Global** variables that grow forever
 - Timers (`setInterval`) never stopped
 
-```javascript
+```ts
 // Typical leak
-const cache = {};
-app.get('/users/:id', (req, res) => {
+const cache: Record<string, Promise<User>> = {};
+app.get('/users/:id', (req: Request, res: Response) => {
   if (!cache[req.params.id]) {
     cache[req.params.id] = fetchUser(req.params.id);
   }
@@ -117,9 +117,9 @@ app.get('/users/:id', (req, res) => {
 
 - Watch `process.memoryUsage()` over time
 
-```javascript
-setInterval(() => {
-  const m = process.memoryUsage();
+```ts
+setInterval((): void => {
+  const m: NodeJS.MemoryUsage = process.memoryUsage();
   console.log({
     rss: Math.round(m.rss / 1e6),
     heap: Math.round(m.heapUsed / 1e6),
@@ -146,8 +146,8 @@ setInterval(() => {
 
 # Slicing with setImmediate
 
-```javascript
-function processChunk(items, i = 0) {
+```ts
+function processChunk<T>(items: T[], i = 0): void {
   const end = Math.min(i + 1000, items.length);
   for (; i < end; i++) heavyWork(items[i]);
 
@@ -206,10 +206,11 @@ autocannon -c 100 -d 30 http://localhost:3000/api/users
 
 - The `node:perf_hooks` module
 
-```javascript
-const { performance, PerformanceObserver } = require('node:perf_hooks');
+```ts
+import { performance, PerformanceObserver } from 'node:perf_hooks';
+import type { PerformanceObserverEntryList } from 'node:perf_hooks';
 
-const obs = new PerformanceObserver((items) => {
+const obs = new PerformanceObserver((items: PerformanceObserverEntryList) => {
   for (const entry of items.getEntries()) {
     console.log(`${entry.name}: ${entry.duration}ms`);
   }

@@ -17,12 +17,13 @@ layout: cover
 npm install express
 ```
 
-```javascript
-const express = require('express');
+```ts
+import express from 'express';
+import type { Request, Response } from 'express';
 
 const app = express();
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req: Request, res: Response) => res.json({ status: 'ok' }));
 
 app.listen(3000, () => console.log('Listening on 3000'));
 ```
@@ -35,15 +36,16 @@ app.listen(3000, () => console.log('Listening on 3000'));
 - Run in declaration order
 - Either end the response or pass control with `next()`
 
-```javascript
-app.use((req, res, next) => {
-  req.startTime = Date.now();
-  next();
-});
+```ts
+import type { Request, Response, NextFunction } from 'express';
 
-app.use((req, res, next) => {
+const timing = new WeakMap<Request, number>();
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  timing.set(req, Date.now());
   res.on('finish', () => {
-    console.log(`${req.method} ${req.url} - ${Date.now() - req.startTime}ms`);
+    const start = timing.get(req) ?? Date.now();
+    console.log(`${req.method} ${req.url} - ${Date.now() - start}ms`);
   });
   next();
 });
@@ -56,10 +58,16 @@ app.use((req, res, next) => {
 - Error middlewares take **4 parameters**: `(err, req, res, next)`
 - Must be declared **after** all routes
 
-```javascript
-app.use((err, req, res, next) => {
+```ts
+import type { Request, Response, NextFunction } from 'express';
+
+interface HttpError extends Error {
+  status?: number;
+}
+
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   logger.error(err);
-  res.status(err.status || 500).json({ message: err.message });
+  res.status(err.status ?? 500).json({ message: err.message });
 });
 ```
 
@@ -72,8 +80,10 @@ app.use((err, req, res, next) => {
 - HTTP methods: `app.get`, `app.post`, `app.put`, `app.patch`, `app.delete`, `app.all`
 - Dynamic parameters
 
-```javascript
-app.get('/users/:id', (req, res) => {
+```ts
+import type { Request, Response } from 'express';
+
+app.get('/users/:id', (req: Request, res: Response) => {
   res.json({ id: req.params.id });
 });
 ```
@@ -87,20 +97,24 @@ app.get('/users/:id', (req, res) => {
 
 - `express.Router()` lets you modularize routes
 
-```javascript
-// users.router.js
-const router = express.Router();
+```ts
+// users.router.ts
+import { Router } from 'express';
+
+const router = Router();
 
 router.get('/', listUsers);
 router.get('/:id', getUser);
 router.post('/', createUser);
 
-module.exports = router;
+export default router;
 ```
 
-```javascript
-// app.js
-app.use('/api/users', require('./users.router'));
+```ts
+// app.ts
+import usersRouter from './users.router.ts';
+
+app.use('/api/users', usersRouter);
 ```
 
 ---
@@ -109,7 +123,7 @@ app.use('/api/users', require('./users.router'));
 
 - Express ships built-in parsing middlewares
 
-```javascript
+```ts
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -132,23 +146,24 @@ app.use(express.static('public'));
 
 # Guard - JWT
 
-```javascript
-const jwt = require('jsonwebtoken');
+```ts
+import jwt from 'jsonwebtoken';
+import type { Request, Response, NextFunction } from 'express';
 
-const authGuard = (req, res, next) => {
+const authGuard = (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
   if (!header?.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   try {
-    req.user = jwt.verify(header.slice(7), process.env.JWT_SECRET);
+    req.user = jwt.verify(header.slice(7), process.env.JWT_SECRET!);
     next();
-  } catch (err) {
+  } catch {
     res.status(401).json({ message: 'Invalid token' });
   }
 };
 
-app.get('/me', authGuard, (req, res) => res.json(req.user));
+app.get('/me', authGuard, (req: Request, res: Response) => res.json(req.user));
 ```
 
 ---
@@ -157,13 +172,16 @@ app.get('/me', authGuard, (req, res) => res.json(req.user));
 
 - Compose multiple middlewares to enforce a policy
 
-```javascript
-const requireRole = (role) => (req, res, next) => {
-  if (!req.user?.roles?.includes(role)) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
-  next();
-};
+```ts
+import type { Request, Response, NextFunction } from 'express';
+
+const requireRole =
+  (role: string) => (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user?.roles?.includes(role)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    next();
+  };
 
 app.delete('/users/:id', authGuard, requireRole('admin'), deleteUser);
 ```
@@ -174,9 +192,10 @@ app.delete('/users/:id', authGuard, requireRole('admin'), deleteUser);
 
 - **passport** offers a pluggable **strategy** system
 
-```javascript
-const passport = require('passport');
-const LocalStrategy = require('passport-local');
+```ts
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import type { Request, Response } from 'express';
 
 passport.use(new LocalStrategy(async (username, password, done) => {
   const user = await userRepo.findByUsername(username);
@@ -188,7 +207,7 @@ passport.use(new LocalStrategy(async (username, password, done) => {
 
 app.post('/login',
   passport.authenticate('local', { session: false }),
-  (req, res) => res.json({ token: signToken(req.user) }),
+  (req: Request, res: Response) => res.json({ token: signToken(req.user) }),
 );
 ```
 
@@ -204,10 +223,33 @@ app.post('/login',
 - Always **hash** passwords (`bcrypt`, `argon2`)
 - Disable `x-powered-by` (`app.disable('x-powered-by')`)
 
-```javascript
+```ts
 app.use(helmet());
 app.use(cors({ origin: 'https://app.sparks.fr' }));
 app.use(rateLimit({ windowMs: 60_000, max: 100 }));
+```
+
+---
+
+# Node.js 24 - zero-dependency wins
+
+- **Native `.env`** loading - no more `dotenv`:
+
+```bash
+node --env-file=.env app.ts
+```
+
+```ts
+process.loadEnvFile(); // or process.loadEnvFile('.env.local')
+console.log(process.env.JWT_SECRET);
+```
+
+- **Global `URLPattern`** for path matching without a dependency:
+
+```ts
+const pattern = new URLPattern({ pathname: '/users/:id' });
+const match = pattern.exec({ pathname: '/users/42' });
+console.log(match?.pathname.groups.id); // '42'
 ```
 
 ---

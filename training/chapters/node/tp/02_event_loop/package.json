@@ -1,0 +1,13 @@
+{
+  "name": "tp-02-event-loop",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "node --watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "profile": "node --prof src/blocking.ts"
+  },
+  "devDependencies": { "typescript": "^5.8.0", "@types/node": "^24.0.0" }
+}

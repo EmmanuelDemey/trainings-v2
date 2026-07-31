@@ -1,0 +1,23 @@
+{
+  "name": "tp-12-native-addons",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node-gyp configure build",
+    "rebuild": "node-gyp rebuild",
+    "start": "node src/index.ts",
+    "bench": "node src/bench.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "node-addon-api": "^8.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "@types/node": "^24.0.0",
+    "node-gyp": "^11.0.0"
+  }
+}

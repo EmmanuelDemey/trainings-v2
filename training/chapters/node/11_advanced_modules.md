@@ -25,20 +25,24 @@ layout: cover
 - Track context across an **asynchronous call chain**
 - Use cases: request id, locale, user, tracing span
 - Recommended API: **`AsyncLocalStorage`** (`node:async_hooks`)
+- Node 24: backed by **`AsyncContextFrame`** by default (faster, better for APM), plus `new AsyncLocalStorage({ name, defaultValue })`
 
-```javascript
-const { AsyncLocalStorage } = require('node:async_hooks');
+```ts
+import { AsyncLocalStorage } from 'node:async_hooks';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
-const ctx = new AsyncLocalStorage();
+interface Store { requestId: string }
 
-function handle(req, res) {
+const ctx = new AsyncLocalStorage<Store>({ name: 'http' });
+
+function handle(req: IncomingMessage & { id: string }, res: ServerResponse): void {
   ctx.run({ requestId: req.id }, async () => {
     await businessLogic();
   });
 }
 
 // anywhere in the async chain
-const { requestId } = ctx.getStore();
+const { requestId } = ctx.getStore()!;
 ```
 
 ---
@@ -48,14 +52,14 @@ const { requestId } = ctx.getStore();
 - Lower-level API to observe **every** async resource (init, before, after, destroy)
 - Performance cost: only use for **debug/instrumentation**
 
-```javascript
-const { createHook } = require('node:async_hooks');
+```ts
+import { createHook } from 'node:async_hooks';
 
 const hook = createHook({
-  init(asyncId, type, triggerAsyncId) { /* ... */ },
-  before(asyncId) { /* ... */ },
-  after(asyncId) { /* ... */ },
-  destroy(asyncId) { /* ... */ },
+  init(asyncId: number, type: string, triggerAsyncId: number) { /* ... */ },
+  before(asyncId: number) { /* ... */ },
+  after(asyncId: number) { /* ... */ },
+  destroy(asyncId: number) { /* ... */ },
 });
 
 hook.enable();
@@ -74,12 +78,12 @@ hook.enable();
   - **`execFile`**: `exec` variant without a shell
   - **`fork`**: spawn a **Node** sub-process with an IPC channel
 
-```javascript
-const { fork } = require('node:child_process');
+```ts
+import { fork } from 'node:child_process';
 
-const child = fork('./worker.js');
+const child = fork('./worker.ts');
 child.send({ task: 'compute' });
-child.on('message', (msg) => console.log('result', msg));
+child.on('message', (msg: unknown) => console.log('result', msg));
 ```
 
 ---
@@ -90,14 +94,14 @@ child.on('message', (msg) => console.log('result', msg));
 - The `node:cluster` module: N child Node processes on the same port
 - In production, delegate to **PM2** or an orchestrator (Kubernetes)
 
-```javascript
-const cluster = require('node:cluster');
-const os = require('node:os');
+```ts
+import cluster from 'node:cluster';
+import os from 'node:os';
 
 if (cluster.isPrimary) {
   os.cpus().forEach(() => cluster.fork());
 } else {
-  require('./server');
+  await import('./server.ts');
 }
 ```
 
@@ -108,8 +112,8 @@ if (cluster.isPrimary) {
 - The `node:inspector` module: programmatic API of the DevTools protocol
 - Useful to open/close a debug session **dynamically**
 
-```javascript
-const inspector = require('node:inspector');
+```ts
+import inspector from 'node:inspector';
 
 if (process.env.DEBUG === '1') {
   inspector.open(9229, '0.0.0.0', true); // wait for client
@@ -124,13 +128,14 @@ inspector.close(); // detach the debugger
 
 - Node ships standardized **error classes** with a `code`
 
-```javascript
+```ts
 try {
   fs.readFileSync('/missing');
 } catch (err) {
-  console.log(err.code); // 'ENOENT'
-  console.log(err.errno); // -2
-  console.log(err.syscall); // 'open'
+  const e = err as NodeJS.ErrnoException;
+  console.log(e.code); // 'ENOENT'
+  console.log(e.errno); // -2
+  console.log(e.syscall); // 'open'
 }
 ```
 
@@ -144,18 +149,26 @@ try {
 - `EventEmitter`: primitive push (chapter 3)
 - **RxJS** brings event composition: `Observable`, operators, schedulers
 
-```javascript
+```ts
 import { fromEvent, debounceTime, scan } from 'rxjs';
 
 fromEvent(server, 'request')
   .pipe(
-    scan((acc) => acc + 1, 0),
+    scan((acc: number) => acc + 1, 0),
     debounceTime(1000),
   )
-  .subscribe((count) => console.log('reqs/sec:', count));
+  .subscribe((count: number) => console.log('reqs/sec:', count));
 ```
 
 - Very useful for **real-time** events (websockets, event streams)
+- Node 24: **`WebSocket`** is now a stable global client (powered by Undici 7) — no extra dependency
+
+```ts
+const ws = new WebSocket('wss://example.com/feed');
+ws.addEventListener('message', (e: MessageEvent) => console.log(e.data));
+```
+
+- Node 24: legacy `url.parse()` is deprecated → use the WHATWG `new URL()`
 
 ---
 
@@ -164,15 +177,15 @@ fromEvent(server, 'request')
 - Covered in chapter 8
 - The `node:worker_threads` module: JS threads in the same process
 
-```javascript
-const { Worker, isMainThread, parentPort } = require('node:worker_threads');
+```ts
+import { Worker, isMainThread, parentPort } from 'node:worker_threads';
 
 if (isMainThread) {
-  const w = new Worker(__filename);
+  const w = new Worker(import.meta.filename);
   w.postMessage('ping');
   w.on('message', console.log);
 } else {
-  parentPort.on('message', (msg) => parentPort.postMessage(`pong:${msg}`));
+  parentPort!.on('message', (msg: string) => parentPort!.postMessage(`pong:${msg}`));
 }
 ```
 
@@ -184,8 +197,8 @@ if (isMainThread) {
 - 3 types: `ReadableStream`, `WritableStream`, `TransformStream`
 - Useful to share code with the **browser** or **Workers/Edge Functions**
 
-```javascript
-const stream = new ReadableStream({
+```ts
+const stream = new ReadableStream<string>({
   start(c) { c.enqueue('a'); c.enqueue('b'); c.close(); },
 });
 
@@ -210,7 +223,7 @@ const { value } = await reader.read();
 | `SIGINT` / `SIGTERM` | Graceful shutdown |
 | `warning` | Node warning (DEP, MaxListenersExceeded...) |
 
-```javascript
+```ts
 process.on('SIGTERM', async () => {
   await server.close();
   await db.disconnect();
@@ -227,8 +240,8 @@ process.on('SIGTERM', async () => {
   - **Callback**: `fs.readFile`
   - **Promise**: `fs.promises.readFile`
 
-```javascript
-const fs = require('node:fs/promises');
+```ts
+import fs from 'node:fs/promises';
 
 const content = await fs.readFile('./config.json', 'utf-8');
 await fs.writeFile('./out.txt', content);
@@ -247,12 +260,21 @@ for await (const dirent of await fs.opendir('./src')) {
 - `fs.createReadStream` / `fs.createWriteStream`: streams for large files
 - **`chokidar`**: more reliable cross-platform alternative
 
-```javascript
-const chokidar = require('chokidar');
+```ts
+import chokidar from 'chokidar';
 
-chokidar.watch('./src/**/*.ts').on('change', (path) => {
+chokidar.watch('./src/**/*.ts').on('change', (path: string) => {
   console.log('changed', path);
 });
+```
+
+- Node 24: experimental **`node:sqlite`** ships a built-in SQLite engine
+
+```ts
+import { DatabaseSync } from 'node:sqlite';
+
+const db = new DatabaseSync('app.db');
+db.exec('CREATE TABLE IF NOT EXISTS users(id INTEGER, name TEXT)');
 ```
 
 ---
@@ -263,17 +285,19 @@ chokidar.watch('./src/**/*.ts').on('change', (path) => {
 - Subclass of `Uint8Array` (so similar API)
 - Allocation: `Buffer.alloc(n)` (zeroed), `Buffer.allocUnsafe(n)` (fast but uninitialized)
 
-```javascript
-const buf = Buffer.from('hello', 'utf-8');
+```ts
+const buf: Buffer = Buffer.from('hello', 'utf-8');
 
 console.log(buf.length); // 5
 console.log(buf.toString('hex')); // '68656c6c6f'
 console.log(buf[0]); // 104
 
-const merged = Buffer.concat([buf, Buffer.from(' world')]);
+const merged: Buffer = Buffer.concat([buf, Buffer.from(' world')]);
 ```
 
 - Used everywhere: streams, `fs`, `crypto`, `net`...
+- Node 24: `Float16Array` typed array (V8 13.6) for half-precision floats
+- Deprecated/removed in Node 24: `SlowBuffer` → use `Buffer.alloc()`
 
 ---
 
@@ -283,8 +307,8 @@ const merged = Buffer.concat([buf, Buffer.from(' world')]);
 - Four types: `Readable`, `Writable`, `Duplex`, `Transform`
 - Always use `pipeline` to propagate errors and handle back-pressure
 
-```javascript
-const { pipeline } = require('node:stream/promises');
+```ts
+import { pipeline } from 'node:stream/promises';
 
 await pipeline(
   fs.createReadStream('./in.csv'),
@@ -300,15 +324,16 @@ await pipeline(
 
 - The `node:perf_hooks` module (covered in chapter 7)
 
-```javascript
-const { performance, PerformanceObserver, monitorEventLoopDelay } = require('node:perf_hooks');
+```ts
+import { performance, PerformanceObserver, monitorEventLoopDelay } from 'node:perf_hooks';
+import type { PerformanceObserverEntryList } from 'node:perf_hooks';
 
 performance.mark('a');
 await heavy();
 performance.mark('b');
 performance.measure('heavy', 'a', 'b');
 
-const obs = new PerformanceObserver((list) => {
+const obs = new PerformanceObserver((list: PerformanceObserverEntryList) => {
   list.getEntries().forEach((e) => console.log(e.name, e.duration));
 });
 obs.observe({ entryTypes: ['measure', 'gc', 'function'] });
@@ -322,8 +347,8 @@ obs.observe({ entryTypes: ['measure', 'gc', 'function'] });
 
 - Hash, HMAC, symmetric/asymmetric encryption, signatures, KDF
 
-```javascript
-const crypto = require('node:crypto');
+```ts
+import crypto from 'node:crypto';
 
 // Hash
 const hash = crypto.createHash('sha256').update('hello').digest('hex');
@@ -347,15 +372,15 @@ const token = crypto.randomBytes(32).toString('base64url');
 - **Never** store a password in clear or hashed with SHA-256
 - Use a slow KDF: `scrypt`, `argon2`, `bcrypt`
 
-```javascript
-const { scrypt, randomBytes } = require('node:crypto');
-const { promisify } = require('node:util');
+```ts
+import { scrypt, randomBytes } from 'node:crypto';
+import { promisify } from 'node:util';
 
 const scryptAsync = promisify(scrypt);
 
-async function hashPassword(password) {
+async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16);
-  const key = await scryptAsync(password, salt, 64);
+  const key = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${salt.toString('hex')}:${key.toString('hex')}`;
 }
 ```
@@ -367,9 +392,9 @@ async function hashPassword(password) {
 - The `node:tls` module: encrypted sockets
 - The `node:https` module: HTTP server with TLS
 
-```javascript
-const https = require('node:https');
-const fs = require('node:fs');
+```ts
+import https from 'node:https';
+import fs from 'node:fs';
 
 https.createServer({
   key: fs.readFileSync('./key.pem'),
@@ -390,12 +415,12 @@ https.createServer({
 - Asynchronous (returns Promises)
 - Portable browser ↔ Node ↔ Workers
 
-```javascript
+```ts
 const data = new TextEncoder().encode('hello');
 const hash = await crypto.subtle.digest('SHA-256', data);
 const hex = Buffer.from(hash).toString('hex');
 
-const key = await crypto.subtle.generateKey(
+const key: CryptoKey = await crypto.subtle.generateKey(
   { name: 'AES-GCM', length: 256 },
   true,
   ['encrypt', 'decrypt'],
@@ -415,3 +440,12 @@ const key = await crypto.subtle.generateKey(
 
 - **Greenfield**: Web Crypto by default
 - **Legacy / specific needs**: `node:crypto`
+
+---
+
+# Hands-on
+
+## Workshop 11 - Advanced modules
+- Trace a request end-to-end with `AsyncLocalStorage` (propagate a request id into the logs)
+- Hash and verify a password with `crypto.scrypt` (+ random salt)
+- Watch a file with `fs.watch` and stream its new content on change

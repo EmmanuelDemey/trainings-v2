@@ -13,7 +13,7 @@ lineNumbers: true
 # some information about the slides, markdown enabled
 info: |
   ## Advanced Node.js
-  Advanced Node.js training.
+  Advanced Node.js training — based on Node.js 24 LTS.
 
   Learn more at [Sli.dev](https://sli.dev)
 # persist drawings in exports and build
@@ -26,6 +26,8 @@ css: unocss
 ---
 
 # Advanced Node.js
+
+<div style="opacity: 0.75; font-size: 0.9em;">Based on Node.js 24 LTS</div>
 
 <br />
 <br />

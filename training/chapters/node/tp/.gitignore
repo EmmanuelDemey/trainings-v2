@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Generated data / build artifacts
+**/data/*.csv
+**/build/
+**/dist/
+*.log
+isolate-*.log
+.clinic/
+
+# Playwright
+**/test-results/
+**/playwright-report/
+
+# Env
+.env
+*.local

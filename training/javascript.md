@@ -5,15 +5,15 @@ theme: seriph
 # like them? see https://unsplash.com/collections/94734566/slidev
 background: https://source.unsplash.com/collection/94734566/1920x1080
 # apply any windi css classes to the current slide
-class: 'text-center'
+class: "text-center"
 # https://sli.dev/custom/highlighters.html
 highlighter: shiki
 # show line numbers in code blocks
-lineNumbers: false
+lineNumbers: true
 # some information about the slides, markdown enabled
 info: |
-  ## Slidev Starter Template
-  Presentation slides for developers.
+  ## JavaScript
+  JavaScript training for beginners — 3 days.
 
   Learn more at [Sli.dev](https://sli.dev)
 # persist drawings in exports and build
@@ -27,46 +27,61 @@ css: unocss
 
 # JavaScript
 
----
+<div style="opacity: 0.75; font-size: 0.9em;">Understanding and using JavaScript in the browser</div>
 
-# Plan
+<br />
+<br />
 
----
-
-# Promise
-
-* Une **Promise** représente un traitement asynchrone.
-* Elle peut avoir trois états : 
-  * pending
-  * fullfilled
-  * in error
-* Nous allons attacher les traitements grâce à **then**, **catch** et **finally**
-
-```javascript
-setLoading(true);
-
-fetch("https://api/person")
-  .then(response => response.json())
-  .then(body => setData(body))
-  .catch(error => setError(error))
-  .finally(() => setLoading(false))
-```
+<div style="display: flex; justify-content: center; align-items: center;">
+  <div>
+    <img src="/images/authors/Manu.jpeg" alt="Manu" height="150" width="150" />
+    <div>
+      <a href="https://github.com/emmanueldemey" target="_blank" rel="noopener noreferrer">Emmanuel Demey</a>
+    </div>
+  </div>
+</div>
 
 ---
+src: ./chapters/javascript/00_intro.md
+hide: false
+---
 
-# Async / Await 
+---
+src: ./chapters/javascript/01_introduction.md
+hide: false
+---
 
-* Les termes **async/await** est une seconde solution pour mettre en place des traitements asynchrones
-* La syntaxe ressemble plus à une syntaxe *séquentielle* (même si elle ne l'est pas).
+---
+src: ./chapters/javascript/02_mental_model.md
+hide: false
+---
 
-```javascript
+---
+src: ./chapters/javascript/03_syntax.md
+hide: false
+---
 
-const fetchData = async () => {
-  const response = await fetch("https://api/person");
-  const body = await response.json();
-  return body;
-}
+---
+src: ./chapters/javascript/04_window.md
+hide: false
+---
 
-fetchData().then(body => setData(body))
-```
+---
+src: ./chapters/javascript/05_dom.md
+hide: false
+---
 
+---
+src: ./chapters/javascript/06_events.md
+hide: false
+---
+
+---
+src: ./chapters/javascript/07_responsive.md
+hide: false
+---
+
+---
+src: ./chapters/javascript/08_guided_practice.md
+hide: false
+---

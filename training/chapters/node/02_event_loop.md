@@ -77,12 +77,12 @@ UV_THREADPOOL_SIZE=8 node server.js
   - All pending **`process.nextTick`** callbacks
   - All **microtasks** (resolved promises)
 
-```javascript
+```ts
 console.log('1');
-setTimeout(() => console.log('2'), 0);
-setImmediate(() => console.log('3'));
-Promise.resolve().then(() => console.log('4'));
-process.nextTick(() => console.log('5'));
+setTimeout((): void => console.log('2'), 0);
+setImmediate((): void => console.log('3'));
+Promise.resolve().then((): void => console.log('4'));
+process.nextTick((): void => console.log('5'));
 console.log('6');
 
 // Output: 1, 6, 5, 4, 2, 3
@@ -96,10 +96,12 @@ console.log('6');
 - `setTimeout(cb, 0)`: scheduled in the **timers** phase, fired as soon as possible
 - When inside an I/O callback, **`setImmediate` is guaranteed to run before** the timer
 
-```javascript
-fs.readFile('./file', () => {
-  setTimeout(() => console.log('timeout'), 0);
-  setImmediate(() => console.log('immediate'));
+```ts
+import { readFile } from 'node:fs';
+
+readFile('./file', (): void => {
+  setTimeout((): void => console.log('timeout'), 0);
+  setImmediate((): void => console.log('immediate'));
 });
 // Output: immediate, timeout
 ```
@@ -112,9 +114,9 @@ fs.readFile('./file', () => {
 - Higher priority than microtasks (Promises)
 - Use with care: an infinite `nextTick` starves the event loop
 
-```javascript
-function deferred() {
-  process.nextTick(() => {
+```ts
+function deferred(): void {
+  process.nextTick((): void => {
     // ... runs right after the current stack
   });
 }
@@ -140,13 +142,14 @@ function deferred() {
 
 - The `perf_hooks.monitorEventLoopDelay` module
 
-```javascript
-const { monitorEventLoopDelay } = require('node:perf_hooks');
+```ts
+import { monitorEventLoopDelay } from 'node:perf_hooks';
+import type { IntervalHistogram } from 'node:perf_hooks';
 
-const histogram = monitorEventLoopDelay({ resolution: 20 });
+const histogram: IntervalHistogram = monitorEventLoopDelay({ resolution: 20 });
 histogram.enable();
 
-setInterval(() => {
+setInterval((): void => {
   console.log('mean:', histogram.mean / 1e6, 'ms');
   console.log('p99:', histogram.percentile(99) / 1e6, 'ms');
   histogram.reset();
@@ -163,3 +166,12 @@ setInterval(() => {
 - **One thread** for JS, **N threads** for some I/O
 - The event loop has **6 phases** interleaved with microtasks
 - Bottlenecks are almost always **CPU work on the main thread**
+
+---
+
+# Hands-on
+
+## Workshop 2 - Event loop
+- Predict then verify the output order of `nextTick` / `Promise` / `setImmediate` / `setTimeout`
+- Measure event-loop latency under load with `monitorEventLoopDelay`
+- Spot a CPU block on the main thread with `node --prof` + `--prof-process`

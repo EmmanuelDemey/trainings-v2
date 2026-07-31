@@ -11,9 +11,11 @@ layout: cover
 - When the **producer** outpaces the **consumer**, buffers grow → memory leak / OOM
 - Node streams handle back-pressure natively if you **use the right APIs**
 
-```javascript
+```ts
+import { pipeline } from 'node:stream/promises';
+
 // ✗ Ignores back-pressure
-src.on('data', (chunk) => dest.write(chunk));
+src.on('data', (chunk: Buffer) => dest.write(chunk));
 
 // ✓ Honors back-pressure
 src.pipe(dest);
@@ -29,10 +31,12 @@ await pipeline(src, transform, dest);
 - `writable.write(chunk)` returns `false` when the buffer is full
 - You must then **stop writing** and listen for `drain` before resuming
 
-```javascript
-function writeMany(dest, items, cb) {
+```ts
+import type { Writable } from 'node:stream';
+
+function writeMany(dest: Writable, items: Buffer[], cb: () => void): void {
   let i = 0;
-  function next() {
+  function next(): void {
     let canContinue = true;
     while (i < items.length && canContinue) {
       canContinue = dest.write(items[i++]);
@@ -51,7 +55,9 @@ function writeMany(dest, items, cb) {
 - Every stream has a **`highWaterMark`** that defines the internal buffer size
 - Defaults: 16 KB for bytes, 16 objects in `objectMode`
 
-```javascript
+```ts
+import fs from 'node:fs';
+
 const stream = fs.createReadStream('./big.log', { highWaterMark: 256 * 1024 });
 ```
 
@@ -74,15 +80,18 @@ npm install amqplib
 
 # AMQP - producer
 
-```javascript
-const amqp = require('amqplib');
+```ts
+import amqp from 'amqplib';
+
+interface Order { id: number }
 
 const conn = await amqp.connect('amqp://localhost');
 const channel = await conn.createChannel();
 
 await channel.assertQueue('orders', { durable: true });
 
-channel.sendToQueue('orders', Buffer.from(JSON.stringify({ id: 1 })), {
+const order: Order = { id: 1 };
+channel.sendToQueue('orders', Buffer.from(JSON.stringify(order)), {
   persistent: true,
 });
 
@@ -94,16 +103,19 @@ await conn.close();
 
 # AMQP - consumer
 
-```javascript
+```ts
+import type { ConsumeMessage } from 'amqplib';
+
 const conn = await amqp.connect('amqp://localhost');
 const channel = await conn.createChannel();
 
 await channel.assertQueue('orders', { durable: true });
 channel.prefetch(10); // back-pressure: max 10 in-flight messages
 
-channel.consume('orders', async (msg) => {
+channel.consume('orders', async (msg: ConsumeMessage | null) => {
+  if (!msg) return;
   try {
-    const order = JSON.parse(msg.content.toString());
+    const order: Order = JSON.parse(msg.content.toString());
     await processOrder(order);
     channel.ack(msg);
   } catch (err) {
@@ -132,14 +144,14 @@ channel.consume('orders', async (msg) => {
 - No message persistence (unlike AMQP / Kafka)
 - Library: **`ioredis`**
 
-```javascript
-const Redis = require('ioredis');
+```ts
+import Redis from 'ioredis';
 
 const publisher = new Redis();
 const subscriber = new Redis();
 
 await subscriber.subscribe('user:created');
-subscriber.on('message', (channel, message) => {
+subscriber.on('message', (channel: string, message: string) => {
   console.log(`[${channel}]`, message);
 });
 
@@ -152,14 +164,14 @@ await publisher.publish('user:created', JSON.stringify({ id: 1 }));
 
 - Evolution of Pub/Sub with **persistence** and **consumer groups**
 
-```javascript
+```ts
 // producer
 await redis.xadd('events', '*', 'type', 'login', 'user', 'manu');
 
 // consumer (with group)
 await redis.xgroup('CREATE', 'events', 'g1', '$', 'MKSTREAM');
 
-const entries = await redis.xreadgroup(
+const entries: unknown = await redis.xreadgroup(
   'GROUP', 'g1', 'consumer-1',
   'BLOCK', 5000, 'COUNT', 10,
   'STREAMS', 'events', '>',
@@ -177,13 +189,13 @@ const entries = await redis.xreadgroup(
 - **gRPC**: binary RPC over HTTP/2, multi-language
 - **MQTT**: very lightweight, IoT
 
-```javascript
-const { WebSocketServer } = require('ws');
+```ts
+import { WebSocketServer, type WebSocket, type RawData } from 'ws';
 
 const wss = new WebSocketServer({ port: 8080 });
 
-wss.on('connection', (ws) => {
-  ws.on('message', (data) => {
+wss.on('connection', (ws: WebSocket) => {
+  ws.on('message', (data: RawData) => {
     wss.clients.forEach((client) => client.send(data));
   });
 });
@@ -195,10 +207,10 @@ wss.on('connection', (ws) => {
 
 - Lets you **scale** Socket.io across multiple Node instances
 
-```javascript
-const { Server } = require('socket.io');
-const { createAdapter } = require('@socket.io/redis-adapter');
-const { createClient } = require('redis');
+```ts
+import { Server } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
 
 const pub = createClient(); const sub = pub.duplicate();
 await Promise.all([pub.connect(), sub.connect()]);

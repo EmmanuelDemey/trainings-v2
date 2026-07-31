@@ -32,21 +32,21 @@ layout: cover
 
 - Data is consumed by listening to events or with `for await ... of`
 
-```javascript
-const fs = require('node:fs');
+```ts
+import fs from 'node:fs';
 
 const stream = fs.createReadStream('./big.log', {
   highWaterMark: 64 * 1024, // chunk size
 });
 
-stream.on('data', (chunk) => console.log('chunk:', chunk.length));
+stream.on('data', (chunk: Buffer) => console.log('chunk:', chunk.length));
 stream.on('end', () => console.log('done'));
-stream.on('error', (err) => console.error(err));
+stream.on('error', (err: Error) => console.error(err));
 ```
 
-```javascript
+```ts
 for await (const chunk of stream) {
-  process(chunk);
+  process(chunk as Buffer);
 }
 ```
 
@@ -56,14 +56,15 @@ for await (const chunk of stream) {
 
 - Either by extending `Readable` or with `Readable.from(iterable)`
 
-```javascript
-const { Readable } = require('node:stream');
+```ts
+import { Readable } from 'node:stream';
 
 class CounterStream extends Readable {
-  constructor(max) { super(); this.i = 0; this.max = max; }
+  private i = 0;
+  constructor(private max: number) { super(); }
 
-  _read() {
-    if (this.i >= this.max) return this.push(null); // end
+  _read(): void {
+    if (this.i >= this.max) return void this.push(null); // end
     this.push(`${this.i++}\n`);
   }
 }
@@ -71,7 +72,7 @@ class CounterStream extends Readable {
 new CounterStream(10).pipe(process.stdout);
 ```
 
-```javascript
+```ts
 // Simpler
 const stream = Readable.from(async function* () {
   for (let i = 0; i < 10; i++) yield `${i}\n`;
@@ -82,8 +83,8 @@ const stream = Readable.from(async function* () {
 
 # Writable streams
 
-```javascript
-const fs = require('node:fs');
+```ts
+import fs from 'node:fs';
 
 const out = fs.createWriteStream('./out.log');
 
@@ -100,13 +101,15 @@ out.on('finish', () => console.log('write completed'));
 
 # Writable - custom creation
 
-```javascript
-const { Writable } = require('node:stream');
+```ts
+import { Writable, type WritableOptions } from 'node:stream';
+
+type Json = Record<string, unknown>;
 
 class JsonLinesWriter extends Writable {
-  constructor(opts) { super({ ...opts, objectMode: true }); }
+  constructor(opts?: WritableOptions) { super({ ...opts, objectMode: true }); }
 
-  _write(obj, _enc, cb) {
+  _write(obj: Json, _enc: BufferEncoding, cb: (err?: Error | null) => void): void {
     process.stdout.write(JSON.stringify(obj) + '\n', cb);
   }
 }
@@ -123,13 +126,13 @@ w.end();
 - Read **and** write, but the two sides are independent
 - Typical example: `net.Socket`
 
-```javascript
-const net = require('node:net');
+```ts
+import net from 'node:net';
 
 const socket = net.createConnection(8080);
 
 socket.write('PING\n');     // Writable side
-socket.on('data', (chunk) => console.log(chunk.toString())); // Readable side
+socket.on('data', (chunk: Buffer) => console.log(chunk.toString())); // Readable side
 ```
 
 ---
@@ -138,11 +141,11 @@ socket.on('data', (chunk) => console.log(chunk.toString())); // Readable side
 
 - Special case of Duplex: what you **write** is transformed and pushed out
 
-```javascript
-const { Transform } = require('node:stream');
+```ts
+import { Transform, type TransformCallback } from 'node:stream';
 
 class UpperCase extends Transform {
-  _transform(chunk, _enc, cb) {
+  _transform(chunk: Buffer, _enc: BufferEncoding, cb: TransformCallback): void {
     cb(null, chunk.toString().toUpperCase());
   }
 }
@@ -159,10 +162,10 @@ process.stdin.pipe(new UpperCase()).pipe(process.stdout);
 - `stream.pipeline` (or `pipeline` from `node:stream/promises`) chains multiple streams **with error handling**
 - **Always** prefer it over `.pipe().pipe().pipe()`
 
-```javascript
-const { pipeline } = require('node:stream/promises');
-const fs = require('node:fs');
-const zlib = require('node:zlib');
+```ts
+import { pipeline } from 'node:stream/promises';
+import fs from 'node:fs';
+import zlib from 'node:zlib';
 
 await pipeline(
   fs.createReadStream('./big.log'),
@@ -178,16 +181,16 @@ await pipeline(
 - By default, streams work with **`Buffer`** or strings
 - Enabling `objectMode: true` lets you push arbitrary JS objects
 
-```javascript
-const { Transform } = require('node:stream');
+```ts
+import { Transform, type TransformCallback } from 'node:stream';
 
 const parseJson = new Transform({
   readableObjectMode: true,
   writableObjectMode: false,
-  transform(chunk, _enc, cb) {
+  transform(chunk: Buffer, _enc: BufferEncoding, cb: TransformCallback) {
     try {
-      cb(null, JSON.parse(chunk));
-    } catch (err) { cb(err); }
+      cb(null, JSON.parse(chunk.toString()));
+    } catch (err) { cb(err as Error); }
   },
 });
 ```
@@ -199,8 +202,8 @@ const parseJson = new Transform({
 - W3C standard available in Node.js 18+
 - Interoperable with Workers, Service Workers, Fetch
 
-```javascript
-const stream = new ReadableStream({
+```ts
+const stream = new ReadableStream<string>({
   start(controller) {
     controller.enqueue('hello');
     controller.enqueue('world');

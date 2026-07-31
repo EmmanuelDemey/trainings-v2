@@ -128,6 +128,9 @@ const UserSchema = z.object({ id: z.number(), email: z.string().email() });
 type User = z.infer<typeof UserSchema>;
 
 const user = UserSchema.parse(req.body); // throws if invalid
+
+// Node 24 / V8 13.6: build injection-safe regex from user input
+const re = new RegExp(RegExp.escape(user.email));
 ```
 
 ---
@@ -139,6 +142,12 @@ const user = UserSchema.parse(req.body); // throws if invalid
 - **`npm-check-updates`**: track versions
 - **`knip`**: detects unused exports / dependencies
 - **SAST**: SonarQube, CodeQL
+- **Permission Model** (stable in Node 24): restrict filesystem/child-process access
+  - Denied access throws `ERR_ACCESS_DENIED`
+
+```bash
+node --permission --allow-fs-read=./config app.ts
+```
 
 ---
 
@@ -158,16 +167,18 @@ const user = UserSchema.parse(req.body); // throws if invalid
 
 - Extend `Error` to define **typed** errors
 
-```javascript
+```ts
 class HttpError extends Error {
-  constructor(status, message) {
+  readonly name = 'HttpError';
+  constructor(readonly status: number, message: string) {
     super(message);
-    this.name = 'HttpError';
-    this.status = status;
   }
 }
 
 throw new HttpError(404, 'User not found');
+
+// Node 24 / V8 13.6: robust check across realms
+if (Error.isError(value)) { /* safer than instanceof */ }
 ```
 
 - Distinguish **operational errors** (network down, validation) from **bugs** (TypeError, undefined access)
@@ -177,14 +188,14 @@ throw new HttpError(404, 'User not found');
 
 # Global errors
 
-```javascript
-process.on('uncaughtException', (err) => {
+```ts
+process.on('uncaughtException', (err: Error) => {
   logger.fatal(err, 'uncaughtException');
   // after logging: exit
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason) => {
+process.on('unhandledRejection', (reason: unknown) => {
   logger.error(reason, 'unhandledRejection');
 });
 
@@ -199,16 +210,17 @@ process.on('unhandledRejection', (reason) => {
 
 - Attach a **context** (request id, user id, locale...) to an async chain without passing it as a parameter
 
-```javascript
-const { AsyncLocalStorage } = require('node:async_hooks');
+```ts
+import { AsyncLocalStorage } from 'node:async_hooks';
 
-const als = new AsyncLocalStorage();
+type Ctx = { requestId?: string };
+const als = new AsyncLocalStorage<Ctx>();
 
 app.use((req, res, next) => {
-  als.run({ requestId: req.headers['x-request-id'] }, next);
+  als.run({ requestId: req.headers['x-request-id'] as string }, next);
 });
 
-logger.info = (msg) => {
+logger.info = (msg: string) => {
   const ctx = als.getStore();
   console.log(JSON.stringify({ msg, ...ctx }));
 };
@@ -222,8 +234,8 @@ logger.info = (msg) => {
 - **`winston`**: older, very flexible
 - **`bunyan`**: JSON, multiple transports
 
-```javascript
-const pino = require('pino');
+```ts
+import pino from 'pino';
 const logger = pino({ level: 'info' });
 
 logger.info({ userId: 1 }, 'login');
@@ -240,10 +252,10 @@ logger.error(err, 'request failed');
 - **Metrics**: numerical values (Prometheus, OpenTelemetry)
 - **Traces**: distributed tracing (OpenTelemetry, Jaeger, Zipkin)
 
-```javascript
+```ts
 // OpenTelemetry SDK
-const { NodeSDK } = require('@opentelemetry/sdk-node');
-const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
 new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()],

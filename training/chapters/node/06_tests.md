@@ -26,27 +26,31 @@ layout: cover
 
 # The native `node:test` runner
 
-- Available since Node.js 18, stable in 20
+- Introduced in Node.js 18; fully stable and mature through Node.js 24
 - No external dependency required
 
-```javascript
-const test = require('node:test');
-const assert = require('node:assert/strict');
+```ts
+import test, { type TestContext } from 'node:test';
+import assert from 'node:assert/strict';
 
 test('addition', () => {
   assert.equal(1 + 1, 2);
 });
 
-test('group', async (t) => {
-  await t.test('case 1', () => assert.ok(true));
-  await t.test('case 2', () => assert.ok(true));
+test('group', async (t: TestContext) => {
+  // subtests are awaited automatically in Node 24
+  t.test('case 1', () => assert.ok(true));
+  t.test('case 2', () => assert.ok(true));
 });
 ```
 
 ```bash
 node --test
 node --test --watch
+node --test --test-timeout=5000   # per-test timeout
 ```
+
+- Global setup/teardown via top-level `before`/`after` hooks
 
 ---
 
@@ -55,12 +59,13 @@ node --test --watch
 - The historic, very flexible runner
 - BDD-style (`describe` / `it`) or TDD-style
 
-```javascript
-const { describe, it, beforeEach } = require('mocha');
-const { expect } = require('chai');
+```ts
+import { describe, it, beforeEach } from 'mocha';
+import { expect } from 'chai';
+import { Calculator } from './calculator.ts';
 
 describe('Calculator', () => {
-  let calc;
+  let calc: Calculator;
   beforeEach(() => { calc = new Calculator(); });
 
   it('adds two numbers', () => {
@@ -78,7 +83,9 @@ describe('Calculator', () => {
 - All-in-one: runner + assertions + mocks + coverage
 - Heavily used on the frontend, very productive
 
-```javascript
+```ts
+import { Calculator } from './calculator.ts';
+
 describe('Calculator', () => {
   it('adds two numbers', () => {
     expect(new Calculator().add(1, 2)).toBe(3);
@@ -98,22 +105,22 @@ jest --coverage --watch
 
 - All libraries support Promises; just return or `await` the promise
 
-```javascript
+```ts
 it('fetch user', async () => {
-  const user = await api.getUser(1);
+  const user: User = await api.getUser(1);
   expect(user.id).toBe(1);
 });
 ```
 
 - Testing a timeout
 
-```javascript
+```ts
 it('rejects after 1s', async () => {
   await expect(slowOp()).rejects.toThrow('Timeout');
 });
 ```
 
-- With `node:test`, the timeout is configurable via `t.test(name, { timeout: 5000 }, ...)`
+- With `node:test`, the timeout is per-test via `t.test(name, { timeout: 5000 }, ...)` or globally with `--test-timeout`
 
 ---
 
@@ -123,19 +130,20 @@ it('rejects after 1s', async () => {
 - **Mock**: a stub with assertions on calls (parameters, count, order)
 - **Spy**: observes without modifying
 
-```javascript
+```ts
 // Jest
 jest.spyOn(repo, 'save').mockResolvedValue({ id: 1 });
 
-const order = await service.create(payload);
+const order: Order = await service.create(payload);
 
 expect(repo.save).toHaveBeenCalledWith(payload);
 ```
 
-```javascript
-// node:test (Node 20+)
-const { mock } = require('node:test');
-const fn = mock.fn(() => 42);
+```ts
+// node:test
+import { mock } from 'node:test';
+
+const fn = mock.fn((): number => 42);
 fn();
 console.log(fn.mock.calls.length); // 1
 ```
@@ -144,12 +152,12 @@ console.log(fn.mock.calls.length); // 1
 
 # Module mocking
 
-```javascript
+```ts
 // Jest
-jest.mock('./repo', () => ({ save: jest.fn() }));
+jest.mock('./repo.ts', () => ({ save: jest.fn() }));
 
 // node:test (since Node 22)
-mock.module('./repo.js', { namedExports: { save: () => ({ id: 1 }) } });
+mock.module('./repo.ts', { namedExports: { save: (): { id: number } => ({ id: 1 }) } });
 ```
 
 - To mock `fetch`, use `nock`, `msw` or `undici.MockAgent`
@@ -165,12 +173,12 @@ mock.module('./repo.js', { namedExports: { save: () => ({ id: 1 }) } });
   - Ephemeral containers (`testcontainers`)
   - One schema per worker
 
-```javascript
-beforeEach(async () => {
+```ts
+beforeEach(async (): Promise<void> => {
   await db.migrate.latest();
 });
 
-afterEach(async () => {
+afterEach(async (): Promise<void> => {
   await db.migrate.rollback();
 });
 ```
@@ -181,9 +189,9 @@ afterEach(async () => {
 
 - **`supertest`**: sends requests to an in-memory Express server
 
-```javascript
-const request = require('supertest');
-const app = require('../app');
+```ts
+import request from 'supertest';
+import app from '../app.ts';
 
 it('GET /health', async () => {
   const res = await request(app).get('/health');
@@ -200,8 +208,8 @@ it('GET /health', async () => {
 - **Puppeteer**: Chromium-focused, older
 - **Cypress**: well-known DX, but limited to a single browser per session
 
-```javascript
-const { test, expect } = require('@playwright/test');
+```ts
+import { test, expect } from '@playwright/test';
 
 test('login', async ({ page }) => {
   await page.goto('https://app.sparks.fr/login');

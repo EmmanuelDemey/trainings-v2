@@ -12,10 +12,13 @@ layout: cover
 - HTTP server, streams, child process, websockets... all emit and listen to events
 - Built-in **Observer** pattern
 
-```javascript
-const { EventEmitter } = require('node:events');
+```ts
+import { EventEmitter } from 'node:events';
 
-const bus = new EventEmitter();
+interface User { id: number; email: string }
+type AppEvents = { 'user:created': [user: User] };
+
+const bus = new EventEmitter<AppEvents>();
 
 bus.on('user:created', (user) => {
   console.log('New user:', user.id);
@@ -44,16 +47,20 @@ bus.emit('user:created', { id: 1, email: 'manu@sparks.fr' });
 
 - You can **extend** EventEmitter to build your own observable components
 
-```javascript
-class OrderService extends EventEmitter {
-  async create(payload) {
+```ts
+type OrderEvents = { 'order:created': [order: Order] };
+
+class OrderService extends EventEmitter<OrderEvents> {
+  constructor(private repo: OrderRepository) { super(); }
+
+  async create(payload: OrderInput): Promise<Order> {
     const order = await this.repo.save(payload);
     this.emit('order:created', order);
     return order;
   }
 }
 
-const service = new OrderService();
+const service = new OrderService(repo);
 service.on('order:created', sendConfirmationEmail);
 service.on('order:created', updateInventory);
 ```
@@ -64,17 +71,17 @@ service.on('order:created', updateInventory);
 
 - Emitting `error` **without a listener** crashes the process
 
-```javascript
+```ts
 emitter.emit('error', new Error('boom'));
 // throw new Error('boom') if no listener
 ```
 
 - Always wire an `error` listener or use `events.errorMonitor`
 
-```javascript
-const { errorMonitor } = require('node:events');
+```ts
+import { errorMonitor } from 'node:events';
 
-emitter.on(errorMonitor, (err) => {
+emitter.on(errorMonitor, (err: Error) => {
   logger.warn('event error', err);
 });
 ```
@@ -86,13 +93,14 @@ emitter.on(errorMonitor, (err) => {
 - `events.once(emitter, event)` returns a Promise
 - `events.on(emitter, event)` returns an async iterable
 
-```javascript
-const { once, on } = require('node:events');
+```ts
+import { once, on } from 'node:events';
+import type { Server, Socket } from 'node:net';
 
-const [data] = await once(server, 'listening');
+const [data] = await once(server as Server, 'listening');
 
-for await (const [conn] of on(server, 'connection')) {
-  handle(conn);
+for await (const [conn] of on(server as Server, 'connection')) {
+  handle(conn as Socket);
 }
 ```
 
@@ -103,15 +111,15 @@ for await (const [conn] of on(server, 'connection')) {
 - **EventEmitter**: pure push, no composition, no back-pressure
 - **RxJS**: Observable, operators (`map`, `filter`, `debounce`, `throttle`, `mergeMap`...)
 
-```javascript
+```ts
 import { fromEvent, throttleTime, map } from 'rxjs';
 
 fromEvent(emitter, 'tick')
   .pipe(
     throttleTime(1000),
-    map(() => Date.now()),
+    map((): number => Date.now()),
   )
-  .subscribe(console.log);
+  .subscribe((ts: number) => console.log(ts));
 ```
 
 - Useful when you need to **compose** complex event flows
@@ -141,3 +149,12 @@ fromEvent(emitter, 'tick')
 - Always clean up listeners to avoid **memory leaks**
 - Limit the number of listeners (`setMaxListeners` is a warning, not a hard wall)
 - Prefer a dedicated module for the application-wide event bus
+
+---
+
+# Hands-on
+
+## Workshop 3 - Events
+- Build a domain `EventEmitter` (e.g. `order:created`, `order:paid`) with a typed payload
+- Handle the `error` event and clean up listeners with `once` / `off`
+- Implement the same throttled-tick logic with EventEmitter, then with RxJS, and compare

@@ -22,18 +22,19 @@ layout: cover
 - The primary handles **load balancing** (round-robin on Linux)
 - Each worker is a **full** Node process: no shared memory
 
-```javascript
-const cluster = require('node:cluster');
-const os = require('node:os');
+```ts
+import cluster from 'node:cluster';
+import os from 'node:os';
+import type { Worker } from 'node:cluster';
 
 if (cluster.isPrimary) {
   for (let i = 0; i < os.cpus().length; i++) cluster.fork();
-  cluster.on('exit', (worker) => {
+  cluster.on('exit', (worker: Worker) => {
     console.log(`worker ${worker.process.pid} died, restarting`);
     cluster.fork();
   });
 } else {
-  require('./server');
+  await import('./server.ts');
 }
 ```
 
@@ -60,13 +61,17 @@ pm2 reload server.js  # zero-downtime
 - Memory sharing is possible via **`SharedArrayBuffer`**
 - Ideal for **CPU-bound** computations without process overhead
 
-```javascript
-// main.js
-const { Worker } = require('node:worker_threads');
+```ts
+// main.ts
+import { Worker } from 'node:worker_threads';
 
-const worker = new Worker('./hash.js', { workerData: { rounds: 12 } });
+interface HashData { rounds: number; }
 
-worker.on('message', (hash) => console.log('hash:', hash));
+const worker = new Worker('./hash.ts', {
+  workerData: { rounds: 12 } satisfies HashData,
+});
+
+worker.on('message', (hash: string) => console.log('hash:', hash));
 worker.postMessage({ password: 'secret' });
 ```
 
@@ -74,14 +79,16 @@ worker.postMessage({ password: 'secret' });
 
 # Worker Threads - implementation
 
-```javascript
-// hash.js
-const { parentPort, workerData } = require('node:worker_threads');
-const bcrypt = require('bcryptjs');
+```ts
+// hash.ts
+import { parentPort, workerData } from 'node:worker_threads';
+import bcrypt from 'bcryptjs';
 
-parentPort.on('message', async ({ password }) => {
-  const hash = await bcrypt.hash(password, workerData.rounds);
-  parentPort.postMessage(hash);
+const { rounds } = workerData as { rounds: number };
+
+parentPort?.on('message', async ({ password }: { password: string }) => {
+  const hash = await bcrypt.hash(password, rounds);
+  parentPort?.postMessage(hash);
 });
 ```
 
@@ -108,18 +115,22 @@ parentPort.on('message', async ({ password }) => {
 - Lower-level API to spawn an **arbitrary process** (Node or otherwise)
 - Variants: `spawn`, `exec`, `execFile`, `fork`
 
-```javascript
-const { spawn } = require('node:child_process');
+```ts
+import { spawn } from 'node:child_process';
 
 const ls = spawn('ls', ['-la', '/tmp']);
-ls.stdout.on('data', (chunk) => console.log(chunk.toString()));
-ls.on('close', (code) => console.log('exit', code));
+ls.stdout.on('data', (chunk: Buffer) => console.log(chunk.toString()));
+ls.on('close', (code: number | null) => console.log('exit', code));
 ```
 
-```javascript
+```ts
 // fork = spawn('node', [...]) with an IPC channel
-const child = fork('./worker.js');
-child.send({ task: 'compute', value: 42 });
+import { fork } from 'node:child_process';
+
+interface Task { task: string; value: number; }
+
+const child = fork('./worker.ts');
+child.send({ task: 'compute', value: 42 } satisfies Task);
 child.on('message', console.log);
 ```
 
@@ -130,7 +141,7 @@ child.on('message', console.log);
 - **Shared** memory between threads
 - `Atomics` for atomic operations (read, write, lock)
 
-```javascript
+```ts
 const sab = new SharedArrayBuffer(1024);
 const view = new Int32Array(sab);
 
