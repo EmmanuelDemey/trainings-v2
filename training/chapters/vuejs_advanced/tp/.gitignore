@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+**/dist/
+**/dist-ssr/
+**/stats.html
+*.local
+*.log
+*.tsbuildinfo
+
+# Test output
+**/coverage/
+**/cypress/screenshots/
+**/cypress/videos/
+**/cypress/downloads/
+**/test-results/
+
+# Env — the mode files are part of the workshop and ARE committed.
+# Only the local overrides (which may hold real values) are ignored.
+.env.local
+.env.*.local
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/

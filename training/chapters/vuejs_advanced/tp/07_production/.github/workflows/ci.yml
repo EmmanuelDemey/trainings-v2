@@ -1,0 +1,56 @@
+# STEP 7 — The pipeline.
+#
+# This workflow is INCOMPLETE on purpose: it lints and type-checks, then stops.
+# Your job is to take it all the way to a deployment, building the artifact ONCE.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      # TODO 7.1: build the app, then upload `dist/` with actions/upload-artifact.
+      #   The whole point is to build ONCE and have every later job consume the
+      #   same artifact — never rebuild before deploying.
+      #
+      #   - run: npm run build
+      #   - uses: actions/upload-artifact@v4
+      #     with: { name: dist, path: dist }
+
+      # TODO 7.2: enforce the size budget declared in `.size-limit.json`.
+      #   A budget that does not fail the build is not a budget.
+      #
+      #   - run: npm run size
+
+  # TODO 7.3: add an `e2e` job that `needs: quality`, downloads the `dist`
+  #   artifact, serves it with `npx vite preview --port 4173` and runs the
+  #   Cypress suite against it. Test the BUILT app, not the dev server.
+
+  # TODO 7.4: add a `deploy` job that `needs: e2e`, runs only on the default
+  #   branch (`if: github.ref == 'refs/heads/main'`), downloads the same
+  #   artifact and deploys it:
+  #
+  #   - run: npx netlify-cli deploy --dir=dist --prod
+  #     env:
+  #       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+  #       NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+  #
+  # TODO 7.5: what is your rollback procedure, and have you tested it? Write the
+  #   answer in the README of your fork — an untested rollback is not a rollback.

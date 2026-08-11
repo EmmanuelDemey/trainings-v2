@@ -1,0 +1,10 @@
+{
+  "$comment": [
+    "The Vercel equivalent of netlify.toml — pick ONE of the two for the workshop.",
+    "TODO 5.1: add the SPA rewrite so a hard refresh on /invoices serves index.html.",
+    "TODO 5.2: add the cache headers: immutable for /assets/*, no-cache for index.html.",
+    "TODO 5.4: add the security headers."
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}

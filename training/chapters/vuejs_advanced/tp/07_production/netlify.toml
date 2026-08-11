@@ -1,0 +1,41 @@
+# STEP 5 — Serving the SPA correctly.
+#
+# This file is INCOMPLETE on purpose. A `vite build` deployed as-is breaks on the
+# first hard refresh of a deep link, and re-downloads everything on every visit.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# TODO 5.1: history-mode fallback. Without it, a hard refresh on /invoices is a
+#   404 — the server looks for a file that does not exist.
+#
+#   [[redirects]]
+#     from = "/*"
+#     to = "/index.html"
+#     status = 200
+#
+#   Verify it: deploy, open /invoices, then press F5.
+
+# TODO 5.2: cache headers. Asset file names are content-hashed, so they can be
+#   cached forever; `index.html` must never be cached, or users keep loading the
+#   previous deployment's manifest.
+#
+#   [[headers]]
+#     for = "/assets/*"
+#     [headers.values]
+#       Cache-Control = "public, max-age=31536000, immutable"
+#
+#   [[headers]]
+#     for = "/index.html"
+#     [headers.values]
+#       Cache-Control = "no-cache"
+
+# TODO 5.4 (bonus): add the security headers — CSP, HSTS, X-Content-Type-Options,
+#   Referrer-Policy, Permissions-Policy. Start with
+#   `Content-Security-Policy-Report-Only` and only enforce once the console is
+#   clean. A Vue build needs NO 'unsafe-eval' — if you had to add it, something
+#   else is wrong.
