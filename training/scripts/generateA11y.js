@@ -15,6 +15,13 @@
  * Formations React:
  * - Génère le PDF des slides (react.md) avec Slidev
  * - Génère le PDF du cahier d'exercices (react_pw.md) avec Puppeteer
+ *
+ * Formations Vue.js Avancé:
+ * - Génère le PDF des slides (vuejs_advanced.md) avec Slidev
+ * - Génère le PDF du cahier d'exercices avec Puppeteer, assemblé à partir des
+ *   README des ateliers (chapters/vuejs_advanced/tp/) plutôt que d'un fichier
+ *   `_pw.md` dédié : les README sont lus dans l'IDE pendant la formation, les
+ *   dupliquer ferait diverger les deux versions.
  */
 
 const fs = require('fs');
@@ -48,6 +55,12 @@ const REACT_PW_INPUT = path.join(TRAINING_DIR, 'react_pw.md');
 const REACT_SLIDES_OUTPUT = path.join(DIST_DIR, 'react_slides.pdf');
 const REACT_PW_OUTPUT = path.join(DIST_DIR, 'react_exercices.pdf');
 
+// Vue.js Avancé
+const VUE_ADV_SLIDES_INPUT = path.join(TRAINING_DIR, 'vuejs_advanced.md');
+const VUE_ADV_TP_DIR = path.join(TRAINING_DIR, 'chapters', 'vuejs_advanced', 'tp');
+const VUE_ADV_SLIDES_OUTPUT = path.join(DIST_DIR, 'vuejs_advanced_slides.pdf');
+const VUE_ADV_PW_OUTPUT = path.join(DIST_DIR, 'vuejs_advanced_exercices.pdf');
+
 console.log('🚀 Génération des PDFs pour les formations\n');
 
 /**
@@ -61,6 +74,31 @@ function ensureDistDirectory() {
 }
 
 /**
+ * Option `--executable-path` à passer à `slidev export`.
+ *
+ * Slidev exporte via Playwright, dont les navigateurs pré-compilés ne couvrent pas
+ * toutes les distributions : sur Ubuntu 26.04, `npx playwright install` répond
+ * « Playwright does not support chromium on ubuntu26.04-x64 » tant que la version
+ * de playwright-chromium n'est pas assez récente (>= 1.62).
+ *
+ * Puppeteer, déjà requis par ce script pour les cahiers d'exercices, télécharge son
+ * propre Chrome (`npx puppeteer browsers install chrome`). On le réutilise quand il
+ * est là : un seul navigateur à télécharger, et plus de problème de plateforme.
+ * S'il est absent, on retombe sur le comportement par défaut de Slidev.
+ */
+function chromeExecutableFlag() {
+  try {
+    const executablePath = require('puppeteer').executablePath();
+    if (executablePath && fs.existsSync(executablePath)) {
+      return ` --executable-path "${executablePath}"`;
+    }
+  } catch (error) {
+    // Puppeteer introuvable : on laisse Slidev utiliser son Chromium Playwright
+  }
+  return '';
+}
+
+/**
  * Générer le PDF des slides A11y avec Slidev
  */
 async function generateA11ySlidesPdf() {
@@ -68,7 +106,7 @@ async function generateA11ySlidesPdf() {
 
   try {
     const { stdout, stderr } = await execAsync(
-      `cd "${TRAINING_DIR}" && npx slidev export a11y.md --output ../dist/a11y_slides.pdf --timeout 180000`,
+      `cd "${TRAINING_DIR}" && npx slidev export a11y.md --output ../dist/a11y_slides.pdf --timeout 180000${chromeExecutableFlag()}`,
       {
         maxBuffer: 1024 * 1024 * 10,
         timeout: 600000 // 10 minutes pour le process Node
@@ -101,7 +139,7 @@ async function generateElasticsearchSlidesPdf() {
 
   try {
     const { stdout, stderr } = await execAsync(
-      `cd "${TRAINING_DIR}" && npx slidev export elasticsearch_ops.md --output ../dist/elasticsearch_ops_slides.pdf --timeout 180000`,
+      `cd "${TRAINING_DIR}" && npx slidev export elasticsearch_ops.md --output ../dist/elasticsearch_ops_slides.pdf --timeout 180000${chromeExecutableFlag()}`,
       {
         maxBuffer: 1024 * 1024 * 10,
         timeout: 600000 // 10 minutes pour le process Node
@@ -134,7 +172,7 @@ async function generateReactSlidesPdf() {
 
   try {
     const { stdout, stderr } = await execAsync(
-      `cd "${TRAINING_DIR}" && npx slidev export react.md --output ../dist/react_slides.pdf --timeout 180000`,
+      `cd "${TRAINING_DIR}" && npx slidev export react.md --output ../dist/react_slides.pdf --timeout 180000${chromeExecutableFlag()}`,
       {
         maxBuffer: 1024 * 1024 * 10,
         timeout: 600000 // 10 minutes pour le process Node
@@ -155,6 +193,132 @@ async function generateReactSlidesPdf() {
     }
   } catch (error) {
     console.error('❌ [REACT] Erreur lors de la génération des slides:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Générer le PDF des slides Vue.js Avancé avec Slidev
+ */
+async function generateVueAdvancedSlidesPdf() {
+  console.log('📊 [VUE-ADV] Génération du PDF des slides avec Slidev...');
+
+  try {
+    const { stdout, stderr } = await execAsync(
+      `cd "${TRAINING_DIR}" && npx slidev export vuejs_advanced.md --output ../dist/vuejs_advanced_slides.pdf --timeout 180000${chromeExecutableFlag()}`,
+      {
+        maxBuffer: 1024 * 1024 * 10,
+        timeout: 600000 // 10 minutes pour le process Node
+      }
+    );
+
+    if (stderr && !stderr.includes('Fetching') && !stderr.includes('warning')) {
+      console.warn('⚠️  Avertissements:', stderr);
+    }
+
+    if (fs.existsSync(VUE_ADV_SLIDES_OUTPUT)) {
+      const stats = fs.statSync(VUE_ADV_SLIDES_OUTPUT);
+      const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
+      console.log(`✅ [VUE-ADV] Slides PDF généré: ${VUE_ADV_SLIDES_OUTPUT}`);
+      console.log(`   Taille: ${fileSizeInMB} MB\n`);
+    } else {
+      throw new Error('Le fichier PDF des slides Vue.js Avancé n\'a pas été créé');
+    }
+  } catch (error) {
+    console.error('❌ [VUE-ADV] Erreur lors de la génération des slides:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Assembler le cahier d'exercices Vue.js Avancé à partir des README des ateliers.
+ *
+ * Le sommaire (tp/README.md) puis chaque atelier dans l'ordre. Chaque README
+ * commence par un `# TP n — ...`, et le CSS d'impression met un saut de page
+ * avant chaque `h1` : un atelier par page, sans séparateur à ajouter ici.
+ */
+function buildVueAdvancedExercisesMarkdown() {
+  const intro = fs.readFileSync(path.join(VUE_ADV_TP_DIR, 'README.md'), 'utf-8');
+
+  const workshopDirs = fs
+    .readdirSync(VUE_ADV_TP_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && /^\d+_/.test(entry.name))
+    .map((entry) => entry.name)
+    .sort();
+
+  if (workshopDirs.length === 0) {
+    throw new Error(`Aucun atelier trouvé dans ${VUE_ADV_TP_DIR}`);
+  }
+
+  const workshops = workshopDirs.map((name) => {
+    const readme = path.join(VUE_ADV_TP_DIR, name, 'README.md');
+    if (!fs.existsSync(readme)) {
+      throw new Error(`README.md manquant pour l'atelier ${name}`);
+    }
+    return fs.readFileSync(readme, 'utf-8');
+  });
+
+  console.log(`   ${workshopDirs.length} ateliers assemblés: ${workshopDirs.join(', ')}`);
+
+  return [intro, ...workshops].join('\n\n');
+}
+
+/**
+ * Générer le PDF du cahier d'exercices Vue.js Avancé avec Puppeteer
+ */
+async function generateVueAdvancedExercisesPdf() {
+  console.log('📝 [VUE-ADV] Génération du PDF du cahier d\'exercices avec Puppeteer...');
+
+  const puppeteer = require('puppeteer');
+  const { marked } = require('marked');
+
+  try {
+    const markdownContent = buildVueAdvancedExercisesMarkdown();
+    const htmlContent = marked.parse(markdownContent);
+    const fullHtml = createHtmlDocument(htmlContent, 'Formation Vue.js Avancé - Cahier d\'Exercices Pratiques');
+
+    const tempHtml = path.join(DIST_DIR, 'vuejs_advanced_pw_temp.html');
+    fs.writeFileSync(tempHtml, fullHtml, 'utf-8');
+
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.goto(`file://${tempHtml}`, { waitUntil: 'networkidle0' });
+
+    await page.pdf({
+      path: VUE_ADV_PW_OUTPUT,
+      format: 'A4',
+      margin: { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' },
+      printBackground: true,
+      displayHeaderFooter: true,
+      headerTemplate: `
+        <div style="font-size: 9px; text-align: center; width: 100%; color: #666; margin-top: 10px;">
+          Formation Vue.js Avancé - Cahier d'Exercices Pratiques
+        </div>
+      `,
+      footerTemplate: `
+        <div style="font-size: 9px; text-align: center; width: 100%; color: #666; margin-bottom: 10px;">
+          Page <span class="pageNumber"></span> / <span class="totalPages"></span>
+        </div>
+      `
+    });
+
+    await browser.close();
+    fs.unlinkSync(tempHtml);
+
+    if (fs.existsSync(VUE_ADV_PW_OUTPUT)) {
+      const stats = fs.statSync(VUE_ADV_PW_OUTPUT);
+      const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
+      console.log(`✅ [VUE-ADV] Cahier d'exercices PDF généré: ${VUE_ADV_PW_OUTPUT}`);
+      console.log(`   Taille: ${fileSizeInMB} MB\n`);
+    } else {
+      throw new Error('Le fichier PDF du cahier d\'exercices Vue.js Avancé n\'a pas été créé');
+    }
+  } catch (error) {
+    console.error('❌ [VUE-ADV] Erreur lors de la génération du cahier d\'exercices:', error.message);
     throw error;
   }
 }
@@ -624,11 +788,74 @@ async function checkDependencies() {
 }
 
 /**
+ * Catalogue des documents générables.
+ *
+ * `formation` sert au filtre `--only=`, `type` au filtre `--slides` / `--exercices`.
+ * Les `slides` passent par Slidev (séquentiel : conflit de port), les `exercices`
+ * par Puppeteer (parallélisables).
+ */
+const DOCUMENTS = [
+  { formation: 'a11y', type: 'slides', output: A11Y_SLIDES_OUTPUT, run: generateA11ySlidesPdf },
+  { formation: 'a11y', type: 'exercices', output: A11Y_PW_OUTPUT, run: generateA11yExercisesPdf },
+  { formation: 'elasticsearch', type: 'slides', output: ES_SLIDES_OUTPUT, run: generateElasticsearchSlidesPdf },
+  { formation: 'elasticsearch', type: 'exercices', output: ES_PW_OUTPUT, run: generateElasticsearchExercisesPdf },
+  { formation: 'elasticsearch', type: 'exercices', output: ES_CHEATSHEET_OUTPUT, run: generateElasticsearchCheatsheetPdf },
+  { formation: 'react', type: 'slides', output: REACT_SLIDES_OUTPUT, run: generateReactSlidesPdf },
+  { formation: 'react', type: 'exercices', output: REACT_PW_OUTPUT, run: generateReactExercisesPdf },
+  { formation: 'vuejs-advanced', type: 'slides', output: VUE_ADV_SLIDES_OUTPUT, run: generateVueAdvancedSlidesPdf },
+  { formation: 'vuejs-advanced', type: 'exercices', output: VUE_ADV_PW_OUTPUT, run: generateVueAdvancedExercisesPdf }
+];
+
+/**
+ * Sélectionner les documents à générer à partir des arguments CLI.
+ *
+ *   --only=<formation>[,<formation>]  restreint aux formations données
+ *   --slides                          seulement les slides
+ *   --exercices                       seulement les cahiers d'exercices
+ *
+ * Sans argument, tout est généré.
+ */
+function selectDocuments(argv) {
+  const formations = argv
+    .filter((arg) => arg.startsWith('--only='))
+    .flatMap((arg) => arg.slice('--only='.length).split(','))
+    .map((name) => name.trim())
+    .filter(Boolean);
+
+  const known = [...new Set(DOCUMENTS.map((doc) => doc.formation))];
+  const unknown = formations.filter((name) => !known.includes(name));
+  if (unknown.length > 0) {
+    throw new Error(
+      `Formation inconnue: ${unknown.join(', ')}. Valeurs possibles: ${known.join(', ')}`
+    );
+  }
+
+  const wantsSlides = argv.includes('--slides');
+  const wantsExercises = argv.includes('--exercices');
+  // Aucun drapeau, ou les deux : on ne filtre pas sur le type
+  const types = wantsSlides === wantsExercises
+    ? ['slides', 'exercices']
+    : (wantsSlides ? ['slides'] : ['exercices']);
+
+  const selected = DOCUMENTS.filter((doc) =>
+    (formations.length === 0 || formations.includes(doc.formation)) && types.includes(doc.type)
+  );
+
+  if (selected.length === 0) {
+    throw new Error('Aucun document ne correspond aux filtres demandés');
+  }
+
+  return selected;
+}
+
+/**
  * Fonction principale
  */
 async function main() {
   try {
     const startTime = Date.now();
+
+    const selected = selectDocuments(process.argv.slice(2));
 
     // Vérifier les dépendances
     await checkDependencies();
@@ -637,22 +864,23 @@ async function main() {
     ensureDistDirectory();
 
     // Générer les PDFs
-    console.log('📦 Génération des PDFs...\n');
+    console.log(`📦 Génération de ${selected.length} document(s)...\n`);
 
     // Générer les slides Slidev en séquentiel (conflit de port si parallèle)
-    console.log('🎬 Génération des slides Slidev (séquentiel)...\n');
-    await generateA11ySlidesPdf();
-    await generateElasticsearchSlidesPdf();
-    await generateReactSlidesPdf();
+    const slides = selected.filter((doc) => doc.type === 'slides');
+    if (slides.length > 0) {
+      console.log('🎬 Génération des slides Slidev (séquentiel)...\n');
+      for (const doc of slides) {
+        await doc.run();
+      }
+    }
 
     // Générer les PDFs Puppeteer en parallèle (pas de conflit)
-    console.log('📄 Génération des documents Puppeteer (parallèle)...\n');
-    await Promise.all([
-      generateA11yExercisesPdf(),
-      generateElasticsearchExercisesPdf(),
-      generateElasticsearchCheatsheetPdf(),
-      generateReactExercisesPdf()
-    ]);
+    const exercises = selected.filter((doc) => doc.type === 'exercices');
+    if (exercises.length > 0) {
+      console.log('📄 Génération des documents Puppeteer (parallèle)...\n');
+      await Promise.all(exercises.map((doc) => doc.run()));
+    }
 
     const endTime = Date.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
@@ -661,16 +889,10 @@ async function main() {
     console.log(`⏱️  Temps total: ${duration}s\n`);
 
     console.log('📂 Fichiers générés:');
-    console.log('\n📘 Formation Accessibilité:');
-    console.log(`   - ${A11Y_SLIDES_OUTPUT}`);
-    console.log(`   - ${A11Y_PW_OUTPUT}`);
-    console.log('\n📙 Formation Elasticsearch Ops:');
-    console.log(`   - ${ES_SLIDES_OUTPUT}`);
-    console.log(`   - ${ES_PW_OUTPUT}`);
-    console.log(`   - ${ES_CHEATSHEET_OUTPUT}`);
-    console.log('\n⚛️  Formation React:');
-    console.log(`   - ${REACT_SLIDES_OUTPUT}`);
-    console.log(`   - ${REACT_PW_OUTPUT}\n`);
+    for (const doc of selected) {
+      console.log(`   - ${doc.output}`);
+    }
+    console.log('');
 
   } catch (error) {
     console.error('\n❌ Erreur lors de la génération:', error.message);
