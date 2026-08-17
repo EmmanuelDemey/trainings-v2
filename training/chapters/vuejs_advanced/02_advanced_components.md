@@ -6,6 +6,21 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Defer** a heavy component with `defineAsyncComponent`, with its loading, error
+  and retry states
+- **Coordinate** several async children under a single `Suspense` fallback, and
+  handle its errors
+- **Design** a component API with named and scoped slots, typed with `defineSlots`
+- **Extract** reusable logic into a renderless component when the markup varies
+- **Decide** when `v-once` and `v-memo` are worth it, and **measure** the gain
+  before and after
+
+---
+
 # Why async components?
 
 - A Vue application is shipped as **one JavaScript bundle** by default

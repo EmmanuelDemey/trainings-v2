@@ -6,6 +6,24 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Declare** named routes and **type** their `meta` fields to make the router
+  refactor-safe
+- **Navigate** programmatically and **handle** the results: `NavigationFailure`,
+  history manipulation, `router.onError`
+- **Animate** route changes with `<RouterView v-slot>`, `Transition` and
+  `KeepAlive`, and **restore** the scroll position
+- **Order** the three levels of guards — global, per-route, in-component — in the
+  full resolution sequence
+- **Build** a complete authentication flow: guard, `?redirect=`, session
+  restoration, logout on a 401
+- **Configure** the history mode together with the server-side SPA fallback
+
+---
+
 # Recap — a typed router
 
 ```ts

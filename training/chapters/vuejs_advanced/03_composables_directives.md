@@ -6,6 +6,23 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Write** a `useXxx` composable that returns refs and cleans up its own effects
+- **Design** a flexible API by accepting `MaybeRefOrGetter` arguments and
+  unwrapping them with `toValue`
+- **Choose** between per-instance and shared state, and own effects outside a
+  component with `effectScope`
+- **Decide**, for a given need, between a composable and a custom directive
+- **Implement** a custom directive with the right hooks, `binding` values and
+  cleanup on `unmounted`
+- **Package** composables and directives as an app plugin, and **handle** SSR with
+  `getSSRProps`
+
+---
+
 # What is a composable?
 
 > A **composable** is a function that uses Vue's Composition API to encapsulate

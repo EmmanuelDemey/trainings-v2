@@ -6,6 +6,21 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Set up** Vitest and `@vue/test-utils` on a Vue project, jsdom included
+- **Position** a test in the pyramid: unit, component, integration, end-to-end
+- **Mount** a component and **query** it through `data-testid` rather than CSS
+  selectors
+- **Await** interactions and flush promises before asserting on async behaviour
+- **Decide** what to stub — and explain what each stub costs
+- **Test** a composable outside of a component, and **control** time with fake
+  timers and spies declared with `using`
+
+---
+
 # Why testing, here
 
 You now have the two reuse mechanisms of Vue 3: **components** (chapter 2) and

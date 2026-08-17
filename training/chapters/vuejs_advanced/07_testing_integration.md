@@ -6,6 +6,22 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Mount** a component with the router and Pinia installed through
+  `global.plugins`, with fresh instances per test
+- **Choose** between a real memory router and a `vi.mock`ed one, depending on what
+  is under test
+- **Test** a navigation guard and a Pinia store, both connected and in isolation
+- **Mock** HTTP at the network level with **MSW**, shared by Vitest and Cypress
+- **Write** a readable Cypress end-to-end test with `cy.intercept`, aliases and
+  `cy.session`
+- **Run** the whole suite in **CI** on every pull request
+
+---
+
 # Where we left off
 
 Chapter 4 tested components and composables **in isolation**. Since then you have

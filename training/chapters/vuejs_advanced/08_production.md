@@ -6,6 +6,21 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Read** a `vite build` output and **analyze** the bundle with the visualizer
+- **Split** code by route and by feature, and **group** vendors with `manualChunks`
+- **Drive** loading with prefetch and preload hints
+- **Configure** typed, validated environments, and **keep** secrets out of `VITE_*`
+- **Serve** an SPA correctly: fallback, immutable assets, uncached `index.html`,
+  security headers
+- **Build** a CI/CD pipeline with a size budget, **deploy** to Netlify or Vercel,
+  and **wire** error reporting
+
+---
+
 # What "production" means for a Vue app
 
 1. A **build** that is small, cached and split sensibly

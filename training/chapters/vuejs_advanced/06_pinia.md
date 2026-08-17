@@ -6,6 +6,20 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Write** setup stores and **destructure** them safely with `storeToRefs`
+- **Normalize** state and **build** indexed getters instead of O(n) lookups
+- **Cut** the render cost with `shallowRef` / `markRaw` and targeted subscriptions
+- **Split** state by domain and **compose** stores with one another
+- **React** to state and actions with `$patch`, `$subscribe` and `$onAction`
+- **Write** a typed Pinia plugin — persistence, logging — and **enable** HMR on
+  every store
+
+---
+
 # Recap — the two store syntaxes
 
 ```ts

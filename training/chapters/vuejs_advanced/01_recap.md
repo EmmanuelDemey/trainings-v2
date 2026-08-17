@@ -6,6 +6,20 @@ layout: cover
 
 ---
 
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Choose** between `ref`, `reactive` and `shallowRef` for a given piece of state
+- **Write** a watcher with the right source, timing (`flush`) and cleanup
+- **Express** a component contract with `props`, `emits` and `defineModel`
+- **Share** data with `provide` / `inject` and reach the DOM with template refs
+- **Diagnose** the classic reactivity traps — destructured `reactive`, reassignment,
+  missing `.value`
+- **Identify** what **Vue 3.5** changed, and check that a project actually runs it
+
+---
+
 # Where we start from
 
 This chapter is a **fast recap**, not a re-teaching. It fixes the vocabulary used
