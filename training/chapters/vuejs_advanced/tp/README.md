@@ -16,6 +16,30 @@ npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
 ```
 
+## Before day 1 — check your machine
+
+Run this **about a week before the training**, from this folder:
+
+```bash
+node check-env.mjs
+```
+
+It has no dependency to install: if it does not even start, Node.js is missing or too
+old — and that is already the first thing to fix. It checks Node.js and npm versions,
+Git, free disk space, the ports Vite uses (5173 / 4173), and whether your network lets
+you reach the npm registry and the Cypress CDN (the two things a corporate proxy
+usually blocks).
+
+```bash
+node check-env.mjs --install    # also run `npm install` in every workshop
+node check-env.mjs --offline    # skip the network checks
+node check-env.mjs --help
+```
+
+The `--install` run is the one that matters: doing it at home beats doing it on the
+room Wi-Fi on day 1. It exits with code `1` if anything is blocking — in that case,
+**copy the whole output and send it to your trainer** before the session.
+
 ## Workshops
 
 | Chapter | Folder | Topic | Extra requirements |

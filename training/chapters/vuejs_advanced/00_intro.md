@@ -189,3 +189,5 @@ npm run typecheck    # vue-tsc --noEmit
 
 - The code ships as a **skeleton with `// TODO` markers**; the steps are described
   in each workshop's `README.md`
+- `node check-env.mjs --install` (at the root of `tp/`) checks your machine and
+  pre-installs every workshop — ideally **run a week before** the session
