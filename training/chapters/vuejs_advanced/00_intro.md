@@ -19,15 +19,11 @@ layout: cover
             </li>
             <li>1 - Vue fundamentals recap
                 <ul>
-                    <li>SFC, <code>script setup</code>, TypeScript</li>
                     <li>Reactivity: <code>ref</code>, <code>computed</code>, <code>watch</code></li>
-                    <li>Props, emits, lifecycle</li>
+                    <li>Props, emits, <code>defineModel</code></li>
+                    <li>Reactivity traps, Vue 3.5</li>
                 </ul>
             </li>
-        </ul>
-    </td>
-    <td>
-        <ul>
             <li>2 - Advanced components
                 <ul>
                     <li>Async components &amp; <code>Suspense</code></li>
@@ -35,11 +31,22 @@ layout: cover
                     <li><code>v-once</code> and <code>v-memo</code></li>
                 </ul>
             </li>
+        </ul>
+    </td>
+    <td>
+        <ul>
             <li>3 - Composables &amp; custom directives
                 <ul>
                     <li>Writing reusable composables</li>
                     <li>Custom directives</li>
                     <li>Case study: image lazy loading</li>
+                </ul>
+            </li>
+            <li>4 - Testing fundamentals
+                <ul>
+                    <li>Vitest &amp; <code>@vue/test-utils</code> setup</li>
+                    <li>Mounting, querying, stubbing</li>
+                    <li>Testing composables, spies, fake timers</li>
                 </ul>
             </li>
         </ul>
@@ -55,7 +62,7 @@ layout: cover
  <tr style="border: 0; font-size: 0.95em">
     <td>
         <ul>
-            <li>4 - Advanced routing with Vue Router
+            <li>5 - Advanced routing with Vue Router
                 <ul>
                     <li>Route transitions</li>
                     <li>Programmatic navigation &amp; history</li>
@@ -63,7 +70,7 @@ layout: cover
                     <li>Case study: authentication</li>
                 </ul>
             </li>
-            <li>5 - State management with Pinia
+            <li>6 - State management with Pinia
                 <ul>
                     <li>Optimizing stores</li>
                     <li>Global state and modules</li>
@@ -74,14 +81,14 @@ layout: cover
     </td>
     <td>
         <ul>
-            <li>6 - Advanced testing
+            <li>7 - Testing in integration &amp; e2e
                 <ul>
-                    <li>Mocking &amp; stubbing with test-utils</li>
-                    <li>Components with external dependencies</li>
+                    <li>Testing router and Pinia dependencies</li>
+                    <li>Mocking HTTP with MSW</li>
                     <li>End-to-end with Cypress</li>
                 </ul>
             </li>
-            <li>7 - Production &amp; deployment
+            <li>8 - Production &amp; deployment
                 <ul>
                     <li>Code-splitting and lazy loading</li>
                     <li>Environments and server config</li>

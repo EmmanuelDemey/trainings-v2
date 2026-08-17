@@ -165,7 +165,7 @@ export function useTheme() {
 - Module-scope state is a **singleton for the whole app** — convenient, but:
   - It breaks **SSR** (state leaks between requests)
   - It makes **tests** order-dependent
-- For real application state, use **Pinia** (chapter 5)
+- For real application state, use **Pinia** (chapter 6)
 
 ---
 

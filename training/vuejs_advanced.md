@@ -62,21 +62,26 @@ hide: false
 ---
 
 ---
-src: ./chapters/vuejs_advanced/04_router.md
+src: ./chapters/vuejs_advanced/04_testing_fundamentals.md
 hide: false
 ---
 
 ---
-src: ./chapters/vuejs_advanced/05_pinia.md
+src: ./chapters/vuejs_advanced/05_router.md
 hide: false
 ---
 
 ---
-src: ./chapters/vuejs_advanced/06_testing.md
+src: ./chapters/vuejs_advanced/06_pinia.md
 hide: false
 ---
 
 ---
-src: ./chapters/vuejs_advanced/07_production.md
+src: ./chapters/vuejs_advanced/07_testing_integration.md
+hide: false
+---
+
+---
+src: ./chapters/vuejs_advanced/08_production.md
 hide: false
 ---

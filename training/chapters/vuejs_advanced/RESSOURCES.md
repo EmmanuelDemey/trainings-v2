@@ -37,7 +37,19 @@
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
 - Écouter — https://deja-vue.io
 
-## 4. Vue Router
+## 4. Tests — fondamentaux
+
+- Lire — https://vuejs.org/guide/scaling-up/testing.html
+- Lire — https://test-utils.vuejs.org
+- Lire — https://vitest.dev/guide/
+- Lire — https://testing-library.com/docs/vue-testing-library/intro/
+- Lire — https://kentcdodds.com/blog/testing-implementation-details
+- Lire — https://kentcdodds.com/blog/write-tests
+- Lire — https://github.com/tc39/proposal-explicit-resource-management
+- Lire — https://lachlan-miller.me
+- Écouter — https://frontendfirst.fm
+
+## 5. Vue Router
 
 - Lire — https://router.vuejs.org/guide/advanced/navigation-guards.html
 - Lire — https://router.vuejs.org/guide/advanced/transitions.html
@@ -47,7 +59,7 @@
 - Lire — https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
 - Lire — https://developer.chrome.com/docs/web-platform/view-transitions/
 
-## 5. Pinia
+## 6. Pinia
 
 - Lire — https://pinia.vuejs.org/core-concepts/plugins.html
 - Lire — https://pinia.vuejs.org/cookbook/composing-stores.html
@@ -56,22 +68,17 @@
 - Lire — https://github.com/vuejs/pinia/tree/v3/packages/pinia/src
 - Lire — https://github.com/prazdevs/pinia-plugin-persistedstate
 
-## 6. Tests
+## 7. Tests — intégration & e2e
 
-- Lire — https://vuejs.org/guide/scaling-up/testing.html
-- Lire — https://test-utils.vuejs.org
-- Lire — https://vitest.dev/guide/
-- Lire — https://testing-library.com/docs/vue-testing-library/intro/
-- Lire — https://kentcdodds.com/blog/testing-implementation-details
-- Lire — https://kentcdodds.com/blog/write-tests
+- Lire — https://test-utils.vuejs.org/guide/advanced/vue-router.html
+- Lire — https://pinia.vuejs.org/cookbook/testing.html
 - Lire — https://mswjs.io/docs/
 - Lire — https://docs.cypress.io/app/core-concepts/best-practices
 - Lire — https://docs.cypress.io/api/commands/session
-- Lire — https://github.com/tc39/proposal-explicit-resource-management
-- Lire — https://lachlan-miller.me
-- Écouter — https://frontendfirst.fm
+- Lire — https://docs.cypress.io/api/commands/intercept
+- Lire — https://github.com/cypress-io/github-action
 
-## 7. Production & déploiement
+## 8. Production & déploiement
 
 - Lire — https://vite.dev/config/build-options.html
 - Lire — https://vite.dev/guide/env-and-mode.html

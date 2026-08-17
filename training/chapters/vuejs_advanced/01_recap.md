@@ -9,41 +9,16 @@ layout: cover
 # Where we start from
 
 This chapter is a **fast recap**, not a re-teaching. It fixes the vocabulary used
-for the next three days.
+for the next three days, and lingers only on what still bites experienced
+developers.
 
-- Single-File Components and `<script setup>`
-- The reactivity primitives: `ref`, `reactive`, `computed`, `watch`
-- The component contract: `props`, `emits`, `v-model`
-- Lifecycle and `provide` / `inject`
-- The reactivity traps that bite in real applications
+- Reactivity primitives, and the traps around them
+- Watchers: sources, timing, cleanup
+- The component contract: `props`, `emits`, `defineModel`
+- The escape hatches: `provide` / `inject`, template refs
+- What **Vue 3.5** changed
 
-> If a slide in this chapter surprises you, say so now — everything that follows
-> builds on it.
-
----
-
-# Single-File Component with `script setup`
-
-```vue
-<script setup lang="ts">
-import { ref } from 'vue';
-
-const count = ref(0);
-const increment = (): void => { count.value += 1; };
-</script>
-
-<template>
-  <button type="button" @click="increment">{{ count }}</button>
-</template>
-
-<style scoped>
-button { padding: 0.5rem 1rem; }
-</style>
-```
-
-- `<script setup>` is **compiled**: every top-level binding is exposed to the template
-- No `return` statement, no `setup()` boilerplate
-- `.value` is needed in the script, **auto-unwrapped** in the template
+> If a slide here surprises you, say so now — everything that follows builds on it.
 
 ---
 
@@ -61,38 +36,23 @@ const rows = shallowRef<Row[]>([]);      // reactive on reassign only
 | | `ref` | `reactive` |
 |---|---|---|
 | Accepts primitives | ✅ | ❌ |
-| Needs `.value` | ✅ (script only) | ❌ |
+| Needs `.value` | ✅ (script only — auto-unwrapped in the template) | ❌ |
 | Survives destructuring | ✅ | ❌ (loses reactivity) |
 | Can be reassigned | ✅ | ❌ |
 
 > Rule of thumb: **default to `ref`**. Reach for `reactive` only for an object
-> you never reassign.
+> you never reassign, and `shallowRef` for large lists you always replace whole.
 
 ---
 
-# `watch` vs `watchEffect`
+# Watchers: sources, timing, cleanup
 
 ```ts
-import { watch, watchEffect } from 'vue';
+watch(userId, async (id, previousId) => { /* explicit source, lazy */ },
+      { immediate: true });
 
-// Explicit source — you control what triggers it
-watch(userId, async (id, previousId) => {
-  user.value = await fetchUser(id);
-}, { immediate: true });
-
-// Implicit sources — every reactive read inside is tracked
-watchEffect(() => {
-  console.log(`${query.value} on page ${page.value}`);
-});
+watchEffect(() => { /* implicit sources, runs immediately, re-tracks */ });
 ```
-
-- `watch` is **lazy** by default, gives you the previous value
-- `watchEffect` runs **immediately** and re-tracks its dependencies on every run
-- Both stop automatically when the owning component unmounts
-
----
-
-# Watcher timing and cleanup
 
 ```ts
 watch(source, callback, { flush: 'post' });  // after the DOM update
@@ -108,69 +68,45 @@ watch(id, async (newId, oldId, onCleanup) => {
 - Default `flush: 'pre'` — runs **before** the component re-renders
 - `onCleanup` is the idiomatic way to cancel in-flight work when the source changes
 - Since Vue 3.5, `onWatcherCleanup()` can be imported and called directly
+- Both stop automatically when the owning component unmounts
 
 ---
 
-# The component contract: props and emits
+# The component contract
 
 ```vue
 <script setup lang="ts">
-interface Props {
-  label: string;
-  disabled?: boolean;
-}
+interface Props { label: string; disabled?: boolean }
 
 const { label, disabled = false } = defineProps<Props>();
 
-const emit = defineEmits<{
-  submit: [value: string];
-  cancel: [];
-}>();
+const emit = defineEmits<{ submit: [value: string]; cancel: [] }>();
+
+const model = defineModel<string>({ required: true });
+const count = defineModel<number>('count', { default: 0 });
 </script>
+```
+
+```vue
+<SearchInput v-model="query" v-model:count="resultCount" />
 ```
 
 - Type-only `defineProps` / `defineEmits` — no runtime declaration duplicated
 - Since **Vue 3.5**, destructured props stay **reactive** (Reactive Props Destructure)
 - Props are **read-only**: never mutate them, emit an event instead
+- `defineModel` (stable since 3.4) replaces the `props` + `emit('update:modelValue')`
+  boilerplate
 
 ---
 
-# `defineModel` — two-way binding, made simple
-
-```vue
-<!-- SearchInput.vue -->
-<script setup lang="ts">
-const model = defineModel<string>({ required: true });
-const count = defineModel<number>('count', { default: 0 });
-</script>
-
-<template>
-  <input v-model="model" />
-</template>
-```
-
-```vue
-<!-- Parent -->
-<SearchInput v-model="query" v-model:count="resultCount" />
-```
-
-- Replaces the `props` + `emit('update:modelValue')` boilerplate
-- Stable since Vue 3.4 — the recommended way to build form components
-
----
-
-# Lifecycle hooks
+# Lifecycle and teardown
 
 ```ts
-import { onMounted, onUpdated, onUnmounted, onErrorCaptured } from 'vue';
+import { onMounted, onUnmounted, onErrorCaptured } from 'vue';
 
-onMounted(() => {
-  observer.observe(el.value!);
-});
+onMounted(() => observer.observe(el.value!));
 
-onUnmounted(() => {
-  observer.disconnect();      // always undo what you did on mount
-});
+onUnmounted(() => observer.disconnect());   // always undo what you did on mount
 
 onErrorCaptured((err, instance, info) => {
   report(err, info);
@@ -179,52 +115,36 @@ onErrorCaptured((err, instance, info) => {
 ```
 
 - Hooks must be called **synchronously** during `setup` — never inside a callback
-- Every subscription created on mount needs a matching teardown
+  or after an `await`
+- Every subscription created on mount needs a matching teardown; this is the
+  contract composables have to honour too (chapter 3)
 
 ---
 
-# `provide` / `inject`
+# The escape hatches
 
 ```ts
 // Typed injection key — shared between provider and consumers
-import type { InjectionKey, Ref } from 'vue';
-
 export interface Theme { mode: Ref<'light' | 'dark'>; toggle: () => void }
 export const themeKey: InjectionKey<Theme> = Symbol('theme');
+
+provide(themeKey, { mode, toggle });              // ancestor
+const theme = inject(themeKey, defaultTheme);     // any descendant → Theme
 ```
-
-```ts
-// Ancestor
-provide(themeKey, { mode, toggle });
-
-// Any descendant, at any depth
-const theme = inject(themeKey);                  // Theme | undefined
-const theme = inject(themeKey, defaultTheme);    // Theme
-```
-
-- Avoids "props drilling" through intermediate components
-- Use it for **cross-cutting concerns** (theme, i18n, config), not for app state — that's Pinia's job
-
----
-
-# Template refs
 
 ```vue
 <script setup lang="ts">
-import { useTemplateRef, onMounted } from 'vue';
-
 const input = useTemplateRef<HTMLInputElement>('search');
-
 onMounted(() => input.value?.focus());
 </script>
 
-<template>
-  <input ref="search" />
-</template>
+<template><input ref="search" /></template>
 ```
 
-- `useTemplateRef()` (Vue 3.5+) decouples the variable name from the `ref` attribute
-- A child component's ref exposes only what it declares with `defineExpose()`
+- `provide` / `inject` for **cross-cutting concerns** (theme, i18n, config), not
+  for app state — that's Pinia's job (chapter 6)
+- `useTemplateRef()` (3.5+) decouples the variable name from the `ref` attribute;
+  a child ref exposes only what it declares with `defineExpose()`
 
 ---
 
@@ -232,37 +152,24 @@ onMounted(() => input.value?.focus());
 
 ```ts
 const state = reactive({ count: 0 });
-const { count } = state;        // ❌ plain number, reactivity lost
+const { count } = state;         // ❌ plain number, reactivity lost
 const { count } = toRefs(state); // ✅ Ref<number>
 
 const list = ref<Item[]>([]);
-list.value.push(item);          // ✅ tracked
-list = [...];                   // ❌ compile error — assign to .value
+list.value.push(item);           // ✅ tracked
+list = [...];                    // ❌ compile error — assign to .value
+```
+
+```ts
+count.value = 1; count.value = 2; count.value = 3;
+// one single re-render, with count === 3
+await nextTick();
+console.log(el.textContent);     // '3' — the DOM is now up to date
 ```
 
 - `reactive` cannot wrap primitives, and **destructuring breaks it**
-- Replacing a `reactive` object entirely loses the proxy — use `ref` instead
-- Vue's reactivity is **synchronous in tracking, asynchronous in rendering**:
-  await `nextTick()` before reading the DOM
-
----
-
-# Rendering is batched
-
-```ts
-import { nextTick } from 'vue';
-
-count.value = 1;
-count.value = 2;
-count.value = 3;
-// one single re-render, with count === 3
-
-await nextTick();
-console.log(el.textContent);  // '3' — the DOM is now up to date
-```
-
-- Multiple mutations in the same tick are **coalesced** into one render
-- This is why tests must `await nextTick()` (or `await flushPromises()`) before asserting
+- Mutations in the same tick are **coalesced** into one render — which is why
+  tests must `await nextTick()` (or `flushPromises()`) before asserting (chapter 4)
 
 ---
 
