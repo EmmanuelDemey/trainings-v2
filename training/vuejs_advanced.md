@@ -62,6 +62,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/retro.md
+title: Retro - Day 1
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/04_testing_fundamentals.md
 hide: false
 ---
@@ -77,11 +83,23 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/retro.md
+title: Retro - Day 2
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/07_testing_integration.md
 hide: false
 ---
 
 ---
 src: ./chapters/vuejs_advanced/08_production.md
+hide: false
+---
+
+---
+src: ./chapters/vuejs_advanced/retro.md
+title: Retro - Day 3
 hide: false
 ---
