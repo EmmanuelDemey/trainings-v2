@@ -82,6 +82,44 @@ must stay there (that is what `restoreSession` buys you).
 3. In `InvoiceFormView`, block navigation away from a dirty form with
    `onBeforeRouteLeave` — and do **not** block right after a successful submit.
 
+## Definition of Done
+
+Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
+section are **not** part of this list.
+
+**It builds and runs**
+
+- [ ] `npm run typecheck` exits 0
+- [ ] `npm run build` succeeds
+- [ ] `grep -rn TODO src | grep -v bonus` returns nothing
+- [ ] No Vue Router warning in the browser console during a full navigation tour
+
+**The behaviour is there**
+
+- [ ] `RouteMeta` is typed: a typo in `meta.rols` or `roles: 'admin'` is a **compile
+      error**, not a silent no-op
+- [ ] Signed out, `/invoices` sends you to `/login?redirect=/invoices` and lands you
+      back on `/invoices` after signing in
+- [ ] Signed in, a **hard refresh** on `/invoices` keeps you there
+- [ ] `?redirect=https://example.com` and `?redirect=//example.com` are both refused
+- [ ] A signed-in user opening `/login` is bounced away
+- [ ] `alan@example.com` on `/admin` lands on `/forbidden`; `ada@example.com` gets in
+- [ ] The transition name comes from `route.meta.transition`, falling back to `fade`
+- [ ] Back from an invoice restores the scroll position on the long `/invoices` page; a
+      brand-new route starts at the top; a link with a `#hash` scrolls to the anchor
+- [ ] "Next invoice" on the last id does **not** throw: the `NavigationFailure` is
+      handled and something is shown to the user
+- [ ] `document.title` changes on every navigation
+- [ ] Editing the form then navigating away asks for confirmation — and a **successful
+      submit** navigates without asking
+
+**You can explain**
+
+- [ ] What an unvalidated `?redirect=` gives an attacker
+- [ ] Why the login navigation uses `replace` and not `push`
+- [ ] Why `restoreSession` has to run inside the guard, before the auth check
+- [ ] What `<KeepAlive>` changes for the guards of a cached component
+
 ## Going further
 
 - Replace the `confirm()` in the leave guard with a real modal. Why is that

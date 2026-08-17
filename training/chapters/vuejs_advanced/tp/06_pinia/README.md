@@ -84,6 +84,50 @@ file, and confirm the cart survives.
    and watch the type change.
 3. *(Bonus)* Expose the log on every store as `$actionLog` and type it.
 
+## Definition of Done
+
+Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
+section are **not** part of this list.
+
+**It builds and runs**
+
+- [ ] `npm run typecheck` exits 0
+- [ ] `npm run build` succeeds
+- [ ] `grep -rn TODO src | grep -v bonus` returns nothing
+- [ ] No Pinia or Vue warning in the browser console
+
+**The behaviour is there**
+
+- [ ] Three stores in three files; `src/stores/shop.ts` is gone and nothing imports it
+- [ ] `useCartStore` reads the catalog by calling `useCatalogStore()` inside its setup —
+      no cross-import of state
+- [ ] Reloading the catalog no longer moves `ThemePanel`'s render counter, and you have
+      the before/after numbers written down
+- [ ] `products` is a `shallowRef`, and you have the assignment duration for a
+      30 000-product catalog before and after
+- [ ] `productById` is replaced by a cached `byId` `Map` computed, `CartPanel` uses it,
+      and you have the "last update" timing before and after
+- [ ] Filling the cart and reloading brings the cart back — and the catalog **does not**
+- [ ] `persist: { paths: ['lines'] }` persists only `lines`
+- [ ] A corrupted `localStorage` entry does not break app startup
+- [ ] `src/plugins/pinia.d.ts` declares `DefineStoreOptionsBase.persist`, so
+      `options.persist` is typed inside the plugin and `persist: { path: [] }` (typo) is
+      a compile error — with no `as any` / `as never` left in `persist.ts`
+- [ ] Every store has `acceptHMRUpdate`: editing a store file keeps the cart filled
+- [ ] The logger records **both** successful and failed actions with a duration —
+      checked with `failureSwitch.products = true`
+- [ ] Converting `addToCart` to `$patch` changes the mutation type in the log, and you
+      saw it change
+
+**You can explain**
+
+- [ ] Why a getter taking an argument cannot be cached, and what the `Map` index
+      replaces it with
+- [ ] What breaks with `shallowRef` if some code mutates `products.value[0].price`, and
+      how you would support that anyway
+- [ ] Why splitting the store reduced re-renders — which dependency disappeared
+- [ ] What `$onAction` sees that a `watch` on the state does not
+
 ## Going further
 
 - Normalize the catalog (`byId` + `allIds`) and measure what changes when a

@@ -102,6 +102,66 @@ Add `app.config.errorHandler`, and *(bonus)* report the web vitals.
    artifact.
 5. Write down your rollback procedure — and test it.
 
+## Definition of Done
+
+Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
+section are **not** part of this list. The deployment boxes assume you took the
+optional Netlify/Vercel account — if you did not, the configuration files still have
+to be complete and reviewable.
+
+**It builds and runs**
+
+- [ ] `npm run typecheck` exits 0
+- [ ] `npm run build` succeeds
+- [ ] `npm run size` passes against a `.size-limit.json` you **lowered** to fit your
+      optimized build
+- [ ] `grep -rn TODO src vite.config.ts env.d.ts netlify.toml vercel.json .github |
+      grep -v bonus` returns nothing
+
+**The numbers moved, and you have them**
+
+- [ ] The step 0 baseline table is filled in, and updated again after steps 2 and 3
+- [ ] `npm run analyze` produces the treemap, and you can name the three biggest
+      contributors to the entry chunk
+- [ ] Every route except `HomeView` is lazy: the chunk count went up and the entry chunk
+      went down — you can state the drop as a percentage
+- [ ] Hovering a nav link fetches its chunk **before** the click, verified in the
+      Network tab
+- [ ] `heavyReport` is fetched on the export click, not at startup
+- [ ] `vue` / `vue-router` / `pinia` sit in one chunk, and you answered whether the
+      **total** size went up and whether the trade is worth it here
+
+**The configuration is production-grade**
+
+- [ ] `ImportMetaEnv` declares every `VITE_` variable the app reads, so
+      `import.meta.env.VITE_API_URL` is `string` and not `any` (hover it, or assign it to
+      a `number` and watch `vue-tsc` complain)
+- [ ] Commenting out `VITE_API_URL` makes the app fail **loudly** at startup, not
+      silently call `undefined/api`
+- [ ] `VITE_FEATURE_REPORTS=false` actually disables the feature (the string `'false'`
+      is handled)
+- [ ] You grepped the staging URL out of `dist/assets/*.js` and answered, with that
+      evidence, whether a `VITE_` variable can hold a secret
+- [ ] The host config has the history-mode fallback, `immutable` caching for
+      `/assets/*` and `no-cache` for `index.html`
+- [ ] A **hard refresh** on a deep link returns the app, not a 404
+- [ ] `app.config.errorHandler` is wired and catches an error thrown from a component
+
+**The pipeline is real**
+
+- [ ] The `quality` job builds and uploads `dist/` as an artifact
+- [ ] The `e2e` job `needs: quality`, **downloads** the artifact and serves it with
+      `vite preview` — it never rebuilds
+- [ ] The `deploy` job `needs: e2e`, consumes the **same** artifact and runs on the
+      default branch only
+- [ ] Your rollback procedure is written down **and** you have run it once
+
+**You can explain**
+
+- [ ] Why the artifact is built once and passed along, rather than rebuilt per job
+- [ ] Why a size budget that does not fail the build is not a budget
+- [ ] What the `no-cache` on `index.html` protects you from
+
 ## Going further
 
 - Add a `vite-plugin-compression` step and compare with what your host already

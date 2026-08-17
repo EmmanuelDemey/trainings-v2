@@ -90,8 +90,40 @@ Prove that three keystrokes produce one call, using
 `useDebouncedSearch` takes its `search` function as an argument — no HTTP mock
 needed, just a `vi.fn()`.
 
-**Checkpoint** — `npm test` green on three files, and you can explain why the
-loading test has no `await`.
+## Definition of Done — part 1
+
+Tick every box before closing part 1. The part 2 steps and the "Going further"
+section are **not** part of this list.
+
+**It runs**
+
+- [ ] `npm test` is green, with the three part-1 files reporting tests (not zero)
+- [ ] `npm run typecheck` exits 0
+- [ ] No `.only` and no `.skip` left in `tests/`
+- [ ] No `TODO` left in `tests/InvoiceList.spec.ts` (first two tests),
+      `tests/InvoiceChart.stub.spec.ts` and `tests/useDebouncedSearch.spec.ts`
+
+**The tests earn their keep**
+
+- [ ] The loading test asserts on the **first render**, with no `await` — and it fails
+      if you add one
+- [ ] The data test goes through `flushPromises()` and asserts on rendered rows
+- [ ] Every element lookup goes through `[data-testid=…]`: no
+      `wrapper.find('.some-class')` and no tag selector left in your specs
+- [ ] The stub test declares the stub's props and asserts on the props
+      `InvoiceChart` receives
+- [ ] You mounted the same component **without** the stub and wrote down what the stub
+      made you stop testing
+- [ ] The debounce test proves three keystrokes produce **one** call, via
+      `vi.advanceTimersByTimeAsync`
+- [ ] At least one spy is declared with `using`, and it has no matching
+      `mockRestore()` / `afterEach` cleanup left
+
+**You can explain**
+
+- [ ] Why the loading test has no `await`
+- [ ] What the stub stopped testing, and when that trade is worth it
+- [ ] Why fake timers need the **async** advance variant here
 
 ---
 
@@ -127,6 +159,44 @@ actions, then compare with `stubActions: false`.
 
 To make `cy.session` actually useful, you will need to persist the token in
 `localStorage` in `src/stores/auth.ts`. Do it, and be able to explain why.
+
+## Definition of Done — part 2
+
+Part 2 is done when part 1's list still holds **and**:
+
+**It runs**
+
+- [ ] `npm test` is green, part-1 tests included — no regression
+- [ ] `npm run e2e` is green against `npm run preview` on the **built** app
+- [ ] `npm run typecheck` exits 0
+- [ ] `grep -rn TODO tests cypress | grep -v bonus` returns nothing
+
+**The tests earn their keep**
+
+- [ ] The empty and error states come from `server.use(...)` overrides, not from a
+      component prop or a stubbed method
+- [ ] The retry test proves the button **re-fetches**: it fails if you make the click a
+      no-op
+- [ ] You checked that removing `resetHandlers()` from `tests/setup.ts` leaks an
+      override into a later test
+- [ ] `LoginForm` is tested both ways — real memory router **and**
+      `vi.mock('vue-router')` — and both are green
+- [ ] The real-router tests cover: disabled submit, redirect to `?redirect=`, refusal of
+      an absolute redirect, and the 401 path
+- [ ] You wrote down which of the two approaches you keep, and why
+- [ ] `CartSummary` seeds state with `createTestingPinia`, asserts on the **real**
+      getters and spies on the actions
+- [ ] You ran the same test with `stubActions: false` and noted what changed
+- [ ] `getByTestId` and a `cy.session`-based `login` command exist and are used
+- [ ] The Cypress runner shows the login flow ran **once** across two tests
+- [ ] The token is persisted in `localStorage` by `src/stores/auth.ts`
+
+**You can explain**
+
+- [ ] Why `cy.session` needs the token in `localStorage` to be useful
+- [ ] Why the same response shape has to be mocked in three places, and what drift that
+      catches
+- [ ] What `stubActions: true` hides from you
 
 ## Going further
 

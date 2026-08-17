@@ -31,6 +31,12 @@ npm run typecheck    # vue-tsc --noEmit
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
 
+Every workshop README ends with a **Definition of Done** — a checklist of criteria
+you can verify yourself (a command that exits 0, something observable in the browser,
+a question you can answer). Steps marked *(Bonus)* and the "Going further" section are
+deliberately **outside** it: the DoD is the floor, not the ceiling. `04_testing/` has
+one DoD per part.
+
 **Chapters 4 and 7 share the same project** (`04_testing/`): part 1 tests
 components and composables in isolation, part 2 comes back to it once the router
 and Pinia chapters are done. There is no `07_` folder.

@@ -84,6 +84,47 @@ Then swap the static `:src` in `GalleryPanel.vue` for the directive and watch th
 1. Register `vLazyImg` globally as `lazy-img`.
 2. *(Bonus)* Add a `v-autofocus` directive and use it on the catalog filter.
 
+## Definition of Done
+
+Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
+section are **not** part of this list.
+
+**It builds and runs**
+
+- [ ] `npm run typecheck` exits 0
+- [ ] `npm run build` succeeds
+- [ ] `grep -rn TODO src | grep -v bonus` returns nothing
+- [ ] No Vue warning or error in the browser console while you exercise the panels
+
+**The behaviour is there**
+
+- [ ] Switching category three times fast: exactly **one** request resolves, the
+      others are `cancelled` in the Network tab
+- [ ] A cancelled request shows **no** error to the user
+- [ ] With `failureSwitch.products = true`: the error state is displayed, and it clears
+      when you switch to a working category
+- [ ] `useFetch` re-runs when the URL is a `ref` **and** when it is a getter
+- [ ] Writing `{{{` into the `tp3:favorites` key then reloading: the app starts
+      normally and the corrupted entry is gone
+- [ ] The favourites counter and the catalog agree — one shared state, not one per caller
+- [ ] `isFavorite` goes through the `computed` `Set`, not an array scan
+- [ ] Images load only as they enter the viewport: the "images actually loaded"
+      counter stays well below the number of items on first paint
+- [ ] A broken image URL swaps in the fallback image
+- [ ] "Shuffle photos" re-observes the changed elements (new images do load)
+- [ ] Navigating away disconnects the observers — nothing keeps firing after unmount
+- [ ] With `IntersectionObserver` stubbed out (`delete window.IntersectionObserver`
+      before mount), the images still display
+- [ ] `GalleryPanel` uses `v-lazy-img` through the globally registered plugin, with no
+      local `directives` option left
+
+**You can explain**
+
+- [ ] Why `toValue()` must be called **inside** the effect and not around it
+- [ ] What module-scope state costs you under SSR and between two tests
+- [ ] At roughly what catalog size the `Set` index starts to pay for itself
+- [ ] When you would reach for a composable rather than a directive
+
 ## Going further
 
 - Compare your directive with `<img loading="lazy">`. Which one would you ship,

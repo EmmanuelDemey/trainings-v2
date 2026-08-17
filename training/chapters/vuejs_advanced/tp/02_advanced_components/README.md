@@ -78,6 +78,45 @@ this workshop is about observing, not just writing.
 Write the four numbers down. The point of this step is the **ordering** of the
 optimizations, not the final figure.
 
+## Definition of Done
+
+Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
+section are **not** part of this list.
+
+**It builds and runs**
+
+- [ ] `npm run typecheck` exits 0
+- [ ] `npm run build` succeeds
+- [ ] `grep -rn TODO src | grep -v bonus` returns nothing
+- [ ] No Vue warning or error in the browser console while you exercise the four panels
+
+**The behaviour is there**
+
+- [ ] `SalesChart` is **not** in the entry chunk: its chunk is fetched on "Show" only
+- [ ] Throttled to Slow 3G: nothing for 200 ms, then the skeleton, then the chart
+- [ ] With `failureSwitch.chart = true`: the Network tab shows **two** load attempts
+      (one retry), then `ChartError` is rendered
+- [ ] The `Suspense` fallback shows while the profile loads, and re-shows when you
+      switch user (thanks to `:key`)
+- [ ] With `failureSwitch.profile = true`: an error is rendered by `onErrorCaptured` —
+      not the fallback, not a blank panel
+- [ ] `DataTable` contains **no** invoice-specific code: `total` is formatted as a
+      currency and `status` rendered as a badge entirely from the panel's `cell` slot
+- [ ] The `empty` slot renders on an empty list, and the table still works when the
+      parent provides no `empty` slot
+- [ ] Inside the `cell` slot, `row` is typed `Invoice` — `row.nope` is a compile error
+- [ ] The four measurements of step 4 are written down, in order: baseline →
+      `shallowRef` → stable `key` → `v-memo`
+
+**You can explain**
+
+- [ ] Why an async component's code leaves the entry chunk, and what `delay` /
+      `timeout` each protect against
+- [ ] Why a rejected async `setup()` does not show the `#fallback`
+- [ ] What removing `:key` on the `Suspense` boundary changes
+- [ ] Why an incomplete `v-memo` array produces a stale UI — and why that makes
+      `v-memo` the *last* optimization you reach for
+
 ## Going further
 
 - Add `hydrate: hydrateOnVisible()` to the async chart and read the Vue 3.5 lazy
