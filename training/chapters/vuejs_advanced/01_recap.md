@@ -10,33 +10,218 @@ layout: cover
 
 At the end of this chapter, you will be able to:
 
-- **Choose** between `ref`, `reactive` and `shallowRef` for a given piece of state
-- **Write** a watcher with the right source, timing (`flush`) and cleanup
-- **Express** a component contract with `props`, `emits` and `defineModel`
-- **Share** data with `provide` / `inject` and reach the DOM with template refs
-- **Diagnose** the classic reactivity traps — destructured `reactive`, reassignment,
-  missing `.value`
+- **Diagnose** a piece of state that stopped being reactive — destructured
+  `reactive`, `shallowRef`, missing `.value`
+- **Recognise** the two watcher bugs that reach production: the stale async
+  response and the DOM read one render too early
+- **Fix** a broken component contract with `defineModel` instead of mutating a prop
+- **Explain** why a lifecycle hook or an `inject()` placed after an `await` never runs
+- **Choose** the right primitive (`ref`, `reactive`, `shallowRef`) for a given
+  piece of state
 - **Identify** what **Vue 3.5** changed, and check that a project actually runs it
 
 ---
 
-# Where we start from
+# How this chapter works
 
-This chapter is a **fast recap**, not a re-teaching. It fixes the vocabulary used
-for the next three days, and lingers only on what still bites experienced
-developers.
+This is a **fast recap**, not a re-teaching. So we skip the recitation: you get
+**six snippets that are already broken**, taken from real projects.
 
-- Reactivity primitives, and the traps around them
-- Watchers: sources, timing, cleanup
-- The component contract: `props`, `emits`, `defineModel`
-- The escape hatches: `provide` / `inject`, template refs
-- What **Vue 3.5** changed
+For each one:
 
-> If a slide here surprises you, say so now — everything that follows builds on it.
+1. Read the code and the **symptom** — 60 seconds, out loud
+2. Name the **cause** before we reveal it
+3. We compare with the fix, and extract the rule
+
+<br />
+
+> Everything after this chapter assumes these six are automatic. If one of them
+> surprises you, say so now — that is exactly what this hour is for.
 
 ---
 
-# The reactivity primitives
+# Snippet 1 / 6 — the filter that never moves
+
+```ts
+// useFilters.ts
+export function useFilters() {
+  const state = reactive({ query: '', page: 1 });
+  return { ...state, next: () => state.page++ };
+}
+
+// FilterBar.vue — <script setup>
+const { page, next } = useFilters();
+```
+
+```vue
+<template>Page {{ page }} <button @click="next">Next</button></template>
+```
+
+**The click fires, `state.page` really does increment — the template stays on `1`.
+Why?**
+
+<v-click>
+
+> ✅ `...state` **reads** every property once and copies its value. `page` is a plain
+> `number`, disconnected from the Proxy — the composable returns a snapshot.
+>
+> **Fix** — `return { ...toRefs(state), next }`, or build the state from `ref`s and
+> never destructure a `reactive` again.
+
+</v-click>
+
+---
+
+# Snippet 2 / 6 — the row that keeps its old style
+
+```ts
+const rows = shallowRef<Row[]>([]);
+
+async function load() {
+  rows.value = await fetchRows();   // the table renders, all good
+}
+
+function markAsRead(row: Row) {
+  row.read = true;                  // the row stays "unread" on screen
+}
+```
+
+**The table fills in correctly, but clicking a row changes nothing. Why?**
+
+<v-click>
+
+> ✅ `shallowRef` tracks **reassignment of `.value` only**. Nothing inside the array
+> is wrapped in a Proxy, so the mutation is invisible to the renderer.
+
+```ts
+// Fix — replace the array instead of mutating a row in place
+rows.value = rows.value.map((r) => (r === row ? { ...r, read: true } : r));
+// or go back to `ref`, and pay for a deep Proxy over every row
+```
+
+</v-click>
+
+---
+
+# Snippet 3 / 6 — the results for the query before
+
+```ts
+const query = ref('');
+const results = ref<Hit[]>([]);
+
+watch(query, async (q) => {
+  results.value = await search(q);
+});
+```
+
+**Type `vue` quickly and the list sometimes settles on the hits for `vu`. Why?**
+
+<v-click>
+
+> ✅ Nothing cancels the previous call. Three requests are in flight and the last one
+> to **resolve** wins, not the last one **sent**.
+
+```ts
+watch(query, async (q) => {
+  const controller = new AbortController();
+  onWatcherCleanup(() => controller.abort());   // 3.5 — or the 3rd callback argument
+  results.value = await search(q, controller.signal);
+});
+```
+
+</v-click>
+
+---
+
+# Snippet 4 / 6 — the measurement one render late
+
+```ts
+const list = useTemplateRef<HTMLUListElement>('list');
+const height = ref(0);
+
+watch(items, () => {
+  height.value = list.value!.scrollHeight;
+});
+```
+
+**Add a tenth item: `height` still reports the height of the list with nine. Why?**
+
+<v-click>
+
+> ✅ The default `flush: 'pre'` runs the callback **before** the component re-renders,
+> so you measure the previous DOM.
+>
+> **Fix** — `watch(items, cb, { flush: 'post' })`, or `await nextTick()` inside the
+> callback. `'sync'` would fire on every single mutation — almost never what you want.
+
+</v-click>
+
+---
+
+# Snippet 5 / 6 — the child that writes to its props
+
+```vue
+<script setup lang="ts">
+const props = defineProps<{ modelValue: string }>();
+
+function onInput(event: Event) {
+  props.modelValue = (event.target as HTMLInputElement).value;
+}
+</script>
+
+<template><input :value="modelValue" @input="onInput" /></template>
+```
+
+**Vue warns in the console, and the parent never sees the new value. What is the
+contract here?**
+
+<v-click>
+
+> ✅ Props are **read-only**: the value belongs to the parent. The child owes it an
+> `update:modelValue` event — and since 3.4 the compiler writes that plumbing:
+
+```vue
+<script setup lang="ts">
+const model = defineModel<string>({ required: true });
+</script>
+
+<template><input v-model="model" /></template>
+```
+
+</v-click>
+
+---
+
+# Snippet 6 / 6 — the input that is never focused
+
+```vue
+<script setup lang="ts">
+const input = useTemplateRef<HTMLInputElement>('search');
+
+const user = await fetchUser();              // top-level await
+
+const theme = inject(themeKey);              // returns undefined
+onMounted(() => input.value?.focus());       // never runs
+</script>
+```
+
+**The component renders, the user is there — no focus, no error, nothing in the
+console. Why?**
+
+<v-click>
+
+> ✅ `inject()` and the lifecycle hooks bind to the **currently active instance**,
+> which only exists while `setup` runs **synchronously**. After an `await`, that
+> context is gone and both calls are silently no-ops.
+>
+> **Fix** — call them **before** the `await` (fetch inside `onMounted` or a `watch`);
+> a component that awaits at top level needs a `<Suspense>` boundary anyway (chapter 2).
+
+</v-click>
+
+---
+
+# Reference card — the primitives
 
 ```ts
 import { ref, reactive, computed, shallowRef } from 'vue';
@@ -59,131 +244,55 @@ const rows = shallowRef<Row[]>([]);      // reactive on reassign only
 
 ---
 
-# Watchers: sources, timing, cleanup
+# Reference card — watchers and lifecycle
 
 ```ts
-watch(userId, async (id, previousId) => { /* explicit source, lazy */ },
-      { immediate: true });
+watch(userId, (id, previousId) => { /* explicit source, lazy */ },
+      { immediate: true, flush: 'post' });
 
 watchEffect(() => { /* implicit sources, runs immediately, re-tracks */ });
-```
-
-```ts
-watch(source, callback, { flush: 'post' });  // after the DOM update
-watch(source, callback, { flush: 'sync' });  // synchronously — use sparingly
-
-watch(id, async (newId, oldId, onCleanup) => {
-  const controller = new AbortController();
-  onCleanup(() => controller.abort());       // cancels the stale request
-  data.value = await fetch(`/api/${newId}`, { signal: controller.signal });
-});
-```
-
-- Default `flush: 'pre'` — runs **before** the component re-renders
-- `onCleanup` is the idiomatic way to cancel in-flight work when the source changes
-- Since Vue 3.5, `onWatcherCleanup()` can be imported and called directly
-- Both stop automatically when the owning component unmounts
-
----
-
-# The component contract
-
-```vue
-<script setup lang="ts">
-interface Props { label: string; disabled?: boolean }
-
-const { label, disabled = false } = defineProps<Props>();
-
-const emit = defineEmits<{ submit: [value: string]; cancel: [] }>();
-
-const model = defineModel<string>({ required: true });
-const count = defineModel<number>('count', { default: 0 });
-</script>
-```
-
-```vue
-<SearchInput v-model="query" v-model:count="resultCount" />
-```
-
-- Type-only `defineProps` / `defineEmits` — no runtime declaration duplicated
-- Since **Vue 3.5**, destructured props stay **reactive** (Reactive Props Destructure)
-- Props are **read-only**: never mutate them, emit an event instead
-- `defineModel` (stable since 3.4) replaces the `props` + `emit('update:modelValue')`
-  boilerplate
-
----
-
-# Lifecycle and teardown
-
-```ts
-import { onMounted, onUnmounted, onErrorCaptured } from 'vue';
 
 onMounted(() => observer.observe(el.value!));
-
 onUnmounted(() => observer.disconnect());   // always undo what you did on mount
 
 onErrorCaptured((err, instance, info) => {
   report(err, info);
-  return false;               // stop the error from propagating further up
+  return false;                 // stop the error from propagating further up
 });
 ```
 
-- Hooks must be called **synchronously** during `setup` — never inside a callback
-  or after an `await`
-- Every subscription created on mount needs a matching teardown; this is the
-  contract composables have to honour too (chapter 3)
+- `flush`: `'pre'` (default, before the re-render) · `'post'` (after the DOM update)
+  · `'sync'` (every mutation — sparingly)
+- Mutations in the same tick are **coalesced** into one render, which is why tests
+  `await nextTick()` before asserting (chapter 4)
+- Watchers and hooks stop with the component; every subscription needs its teardown —
+  a contract composables must honour too (chapter 3)
 
 ---
 
-# The escape hatches
-
-```ts
-// Typed injection key — shared between provider and consumers
-export interface Theme { mode: Ref<'light' | 'dark'>; toggle: () => void }
-export const themeKey: InjectionKey<Theme> = Symbol('theme');
-
-provide(themeKey, { mode, toggle });              // ancestor
-const theme = inject(themeKey, defaultTheme);     // any descendant → Theme
-```
+# Reference card — contract and escape hatches
 
 ```vue
 <script setup lang="ts">
-const input = useTemplateRef<HTMLInputElement>('search');
-onMounted(() => input.value?.focus());
+const { label, disabled = false } = defineProps<Props>();   // reactive since 3.5
+const emit = defineEmits<{ submit: [value: string]; cancel: [] }>();
+const model = defineModel<string>({ required: true });
+defineExpose({ focus });          // the only thing a parent ref can reach
 </script>
-
-<template><input ref="search" /></template>
-```
-
-- `provide` / `inject` for **cross-cutting concerns** (theme, i18n, config), not
-  for app state — that's Pinia's job (chapter 6)
-- `useTemplateRef()` (3.5+) decouples the variable name from the `ref` attribute;
-  a child ref exposes only what it declares with `defineExpose()`
-
----
-
-# Reactivity traps
-
-```ts
-const state = reactive({ count: 0 });
-const { count } = state;         // ❌ plain number, reactivity lost
-const { count } = toRefs(state); // ✅ Ref<number>
-
-const list = ref<Item[]>([]);
-list.value.push(item);           // ✅ tracked
-list = [...];                    // ❌ compile error — assign to .value
 ```
 
 ```ts
-count.value = 1; count.value = 2; count.value = 3;
-// one single re-render, with count === 3
-await nextTick();
-console.log(el.textContent);     // '3' — the DOM is now up to date
+export interface Theme { mode: Ref<'light' | 'dark'>; toggle: () => void }
+export const themeKey: InjectionKey<Theme> = Symbol('theme');
+
+provide(themeKey, { mode, toggle });            // ancestor
+const theme = inject(themeKey, defaultTheme);   // any descendant → Theme
 ```
 
-- `reactive` cannot wrap primitives, and **destructuring breaks it**
-- Mutations in the same tick are **coalesced** into one render — which is why
-  tests must `await nextTick()` (or `flushPromises()`) before asserting (chapter 4)
+- A **typed `InjectionKey`** turns `provide` / `inject` into a checked contract
+- `provide` / `inject` for **cross-cutting concerns** (theme, i18n, config), not for
+  app state — that's Pinia's job (chapter 6)
+- `useTemplateRef()` (3.5+) decouples the variable name from the `ref` attribute
 
 ---
 
@@ -191,7 +300,7 @@ console.log(el.textContent);     // '3' — the DOM is now up to date
 
 - **Reactive Props Destructure** is stable: `const { label } = defineProps<Props>()`
 - **`useTemplateRef()`** and **`useId()`** for SSR-safe unique ids
-- **`onWatcherCleanup()`** importable outside the watcher callback
+- **`onWatcherCleanup()`** importable outside the watcher callback (snippet 3)
 - **Lazy hydration** for async components (see chapter 2)
 - Significantly **lower memory usage** on large reactive arrays
 - **`useHost()`** / custom element improvements
@@ -201,62 +310,6 @@ console.log(el.textContent);     // '3' — the DOM is now up to date
 ---
 
 # Quiz — Question 1 / 4
-
-**What does `const { count } = reactive({ count: 0 })` give you?**
-
-- **A.** A `Ref<number>` you read with `.value`
-- **B.** A plain `number`, disconnected from the reactive object
-- **C.** A `computed` recalculated on every access
-- **D.** A compile error — a `reactive` object cannot be destructured
-
-<v-click>
-
-> ✅ **B** — `reactive` returns a Proxy: destructuring **reads** the property once
-> and you keep a copy of the value. Use `toRefs(state)` to keep refs, or default to
-> `ref` in the first place.
-
-</v-click>
-
----
-
-# Quiz — Question 2 / 4
-
-**A watcher needs to read the DOM the component has just re-rendered. Which option?**
-
-- **A.** `{ immediate: true }`
-- **B.** `{ deep: true }`
-- **C.** `{ flush: 'post' }`
-- **D.** `{ flush: 'sync' }`
-
-<v-click>
-
-> ✅ **C** — The default `flush: 'pre'` runs the callback **before** the re-render.
-> `'post'` runs it after the DOM update; `'sync'` runs it on every mutation, which
-> you rarely want.
-
-</v-click>
-
----
-
-# Quiz — Question 3 / 4
-
-**Since Vue 3.5, what happens to `const { label } = defineProps<Props>()`?**
-
-- **A.** It throws at runtime
-- **B.** It works, but `label` is frozen after the first render
-- **C.** `label` stays reactive — Reactive Props Destructure is stable
-- **D.** It still requires `toRefs(props)` to stay reactive
-
-<v-click>
-
-> ✅ **C** — The compiler rewrites every read of `label` into `props.label`.
-> This is one of the few places where destructuring does **not** break reactivity.
-
-</v-click>
-
----
-
-# Quiz — Question 4 / 4
 
 ```ts
 count.value = 1;
@@ -280,6 +333,70 @@ count.value = 3;
 </v-click>
 
 ---
+
+# Quiz — Question 2 / 4
+
+**Since Vue 3.5, what happens to `const { label } = defineProps<Props>()`?**
+
+- **A.** It throws at runtime
+- **B.** It works, but `label` is frozen after the first render
+- **C.** `label` stays reactive — Reactive Props Destructure is stable
+- **D.** It still requires `toRefs(props)` to stay reactive
+
+<v-click>
+
+> ✅ **C** — The compiler rewrites every read of `label` into `props.label`.
+> This is one of the few places where destructuring does **not** break reactivity —
+> and the reason snippet 1 is about `reactive`, not about props.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**Your app needs the current theme in components at every depth. `provide` / `inject`
+or Pinia?**
+
+- **A.** Pinia — any shared value belongs in a store
+- **B.** `provide` / `inject` with a typed `InjectionKey` — it is a cross-cutting
+  concern, scoped to the app instance
+- **C.** Neither: a module-level `ref` exported from a `.ts` file
+- **D.** `provide` / `inject`, but only with a `string` key so tests can override it
+
+<v-click>
+
+> ✅ **B** — Theme, i18n and config are **cross-cutting concerns**: no business logic,
+> no actions, no devtools timeline needed. A `Symbol` key typed as `InjectionKey<Theme>`
+> gives the consumers their types for free. Application **state** goes to Pinia.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+```vue
+<SearchInput ref="search" />
+```
+
+**The parent holds a ref on the child and calls `search.value.focus()`. What does the
+child have to do?**
+
+- **A.** Nothing — a `<script setup>` component is open by default
+- **B.** Declare `focus` with `defineExpose({ focus })`
+- **C.** Emit a `focus` event the parent listens to
+- **D.** Replace the template ref with `provide` / `inject`
+
+<v-click>
+
+> ✅ **B** — A `<script setup>` component is **closed** by default: the parent sees only
+> what `defineExpose()` publishes. That is what makes the public surface of a component
+> explicit, exactly like `props` and `emits`.
+
+</v-click>
+
+---
 layout: cover
 ---
 
@@ -288,8 +405,9 @@ layout: cover
 ## Workshop 1 - Warm-up
 - Read the starter project of workshop 2 and identify: the props contract, the
   reactive state and the watchers
-- Convert one `props` + `emit('update:modelValue')` pair to `defineModel`
-- Spot the reactivity bug: a `reactive` object destructured in a composable
+- Convert one `props` + `emit('update:modelValue')` pair to `defineModel` (snippet 5)
+- Find, in the codebase, one instance of a snippet you have just diagnosed — and
+  say which one
 
 <style>
 /* The `cover` layout sets color: white; inline code would inherit it and
