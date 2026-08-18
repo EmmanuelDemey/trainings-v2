@@ -14,6 +14,8 @@ each of them actually buys you:
 - **`Suspense`** — one fallback for a subtree that awaits, plus the error path
   `Suspense` does *not* handle
 - **Scoped slots** — a headless `DataTable` whose cells are rendered by the parent
+- **`Teleport`** — a modal that escapes a clipping ancestor, `:disabled` to bring
+  it back, and `defer` for a target rendered by the app itself
 - **Rendering performance** — a 2 000-row list: baseline, `shallowRef`, stable
   `key`, then `v-memo`
 
@@ -78,6 +80,27 @@ this workshop is about observing, not just writing.
 Write the four numbers down. The point of this step is the **ordering** of the
 optimizations, not the final figure.
 
+### 5. `Teleport` — `src/components/AppModal.vue`
+
+The panel of this step carries `overflow: hidden` **and** a `transform`: the
+dialog is clipped, and its `position: fixed` is resolved against the panel
+instead of the viewport. Open the modal once before changing anything — the bug
+is the point of departure.
+
+1. Wrap the backdrop in a `<Teleport to="body">`. Check in the **Elements** tab
+   that the nodes moved to the end of `<body>`, and that the dialog is centred
+   again — with no CSS change.
+2. Bind `:disabled="inline"` on the teleport. Type something in the "Reason"
+   field, then tick the checkbox **inside the dialog**: the nodes move back into
+   the panel, and the input keeps its value.
+3. Retarget the teleport at `#modal-root` — the container `App.vue` renders
+   *after* the panels. Reload: Vue warns that the target cannot be found. Add the
+   `defer` prop (Vue 3.5) and reload again.
+4. Explain the warning: when is `to` resolved, and why does keeping the `v-if`
+   *inside* the teleport (rather than on it) make the problem visible?
+5. *(Bonus)* Close on `Escape` and focus the dialog on open — `Teleport` moves
+   the DOM, never the focus.
+
 ## Definition of Done
 
 Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
@@ -107,6 +130,12 @@ section are **not** part of this list.
 - [ ] Inside the `cell` slot, `row` is typed `Invoice` — `row.nope` is a compile error
 - [ ] The four measurements of step 4 are written down, in order: baseline →
       `shallowRef` → stable `key` → `v-memo`
+- [ ] The open modal is a child of `#modal-root` in the Elements tab, is centred on
+      the viewport and is not clipped by the panel
+- [ ] Toggling `:disabled` while the modal is open moves the nodes **without**
+      losing the content of the "Reason" field
+- [ ] With `defer`, no "Failed to locate Teleport target" warning is logged at
+      startup
 
 **You can explain**
 
@@ -116,9 +145,13 @@ section are **not** part of this list.
 - [ ] What removing `:key` on the `Suspense` boundary changes
 - [ ] Why an incomplete `v-memo` array produces a stale UI — and why that makes
       `v-memo` the *last* optimization you reach for
+- [ ] When a `Teleport` resolves its `to` target, and what `defer` changes
 
 ## Going further
 
 - Add `hydrate: hydrateOnVisible()` to the async chart and read the Vue 3.5 lazy
   hydration docs — it only takes effect under SSR, but the API is worth knowing.
 - Replace the manual list with `vue-virtual-scroller` and compare with `v-memo`.
+- Rewrite the modal on top of the native `<dialog>` element (`showModal()` gives
+  you the top layer, the backdrop and the focus trap for free) and decide whether
+  the teleport is still needed.

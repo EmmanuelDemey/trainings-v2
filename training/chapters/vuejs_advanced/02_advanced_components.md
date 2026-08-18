@@ -16,6 +16,8 @@ At the end of this chapter, you will be able to:
   handle its errors
 - **Design** a component API with named and scoped slots, typed with `defineSlots`
 - **Extract** reusable logic into a renderless component when the markup varies
+- **Move** a modal out of its stacking context with `Teleport`, including the
+  `defer` prop when the target is rendered by the app itself
 - **Decide** when `v-once` and `v-memo` are worth it, and **measure** the gain
   before and after
 
@@ -319,6 +321,54 @@ onUnmounted(() => window.removeEventListener('mousemove', update));
 
 ---
 
+# `Teleport` — render here, mount elsewhere
+
+- A modal is **logically** a child of the component that opens it…
+- …but an ancestor with `overflow: hidden`, a `transform` or a competing
+  `z-index` traps it visually — the classic "my dialog is clipped" bug
+
+```vue
+<template>
+  <button type="button" @click="open = true">Delete</button>
+
+  <Teleport to="body">
+    <div v-if="open" class="backdrop" @click.self="open = false">
+      <div class="modal" role="dialog" aria-modal="true">
+        <slot />
+      </div>
+    </div>
+  </Teleport>
+</template>
+```
+
+- Only the **DOM nodes** move: props, `provide` / `inject`, emitted events and
+  lifecycle hooks all behave as if the node had stayed in place
+
+---
+
+# `Teleport` — `disabled` and `defer`
+
+```vue
+<!-- Fullscreen on mobile, inline in the panel on desktop -->
+<Teleport to="body" :disabled="isDesktop"> ... </Teleport>
+
+<!-- The target is rendered by the app itself, later in the same tick -->
+<Teleport defer to="#modal-root"> ... </Teleport>
+<div id="modal-root" />
+```
+
+- `to` takes a **selector or an element**, resolved when the teleport *mounts* —
+  a missing target logs a warning and renders nothing
+- `defer` (Vue **3.5**) resolves `to` **after** the current render tick, which is
+  the only way to target a container rendered by the same app
+- Toggling `:disabled` moves the nodes back and forth and **preserves state**
+- Several teleports to the same target are **appended** in mount order
+
+> In unit tests, `Teleport` escapes the wrapper's DOM: either mount with
+> `attachTo` and query `document`, or stub it (see chapter 4).
+
+---
+
 # Rendering cost: what actually happens
 
 - On every re-render, Vue builds a new **virtual DOM tree** for the component and
@@ -427,12 +477,13 @@ const options = Object.freeze(bigStaticList);
 | `Suspense` | One fallback for a subtree | Still experimental |
 | Named slots | Layout composition | — |
 | Scoped slots | Logic in the child, markup in the parent | Type them with `defineSlots` |
+| `Teleport` | Modals, toasts, tooltips | Target must exist — or use `defer` |
 | `v-once` | Truly immutable subtrees | Silently stale if it changes |
 | `v-memo` | Huge `v-for` lists | Must list *every* dependency |
 
 ---
 
-# Quiz — Question 1 / 4
+# Quiz — Question 1 / 5
 
 **When is the chunk of a `defineAsyncComponent` actually downloaded?**
 
@@ -450,7 +501,7 @@ const options = Object.freeze(bigStaticList);
 
 ---
 
-# Quiz — Question 2 / 4
+# Quiz — Question 2 / 5
 
 **What is the `delay` option of `defineAsyncComponent` for?**
 
@@ -468,7 +519,7 @@ const options = Object.freeze(bigStaticList);
 
 ---
 
-# Quiz — Question 3 / 4
+# Quiz — Question 3 / 5
 
 **A top-level `await` inside a component wrapped in `<Suspense>` rejects. What happens?**
 
@@ -487,7 +538,7 @@ const options = Object.freeze(bigStaticList);
 
 ---
 
-# Quiz — Question 4 / 4
+# Quiz — Question 4 / 5
 
 **Which `v-memo` usage is correct?**
 
@@ -505,6 +556,27 @@ const options = Object.freeze(bigStaticList);
 </v-click>
 
 ---
+
+# Quiz — Question 5 / 5
+
+**`<Teleport to="#modal-root">` targets a `<div id="modal-root">` rendered by the
+app itself. Vue warns that the target cannot be found. Why, and what fixes it?**
+
+- **A.** The target is resolved on mount, before the app rendered it — add `defer`
+- **B.** `to` only accepts `body` — use `to="body"`
+- **C.** The teleported component must be async — wrap it in `Suspense`
+- **D.** The target must carry a `ref` — pass the element instead of a selector
+
+<v-click>
+
+> ✅ **A** — `to` is resolved when the teleport mounts, and a container rendered
+> later in the *same* tick does not exist yet. `defer` (Vue 3.5) postpones the
+> lookup to after the render. Passing the element (**D**) has the same problem:
+> the `ref` is still `null` at that point.
+
+</v-click>
+
+---
 layout: cover
 ---
 
@@ -515,6 +587,8 @@ layout: cover
   an error component and a retry strategy
 - Wrap an `await`-ing profile component in **`Suspense`** and handle its rejection
 - Build a `DataTable` exposing a **scoped slot** per column, typed with `defineSlots`
+- Free a modal from a clipping ancestor with **`Teleport`**, then target a
+  container rendered by the app thanks to `defer`
 - Measure a 5 000-row list, then optimize it with `shallowRef`, a stable `key`
   and finally `v-memo` — comparing the numbers at each step
 

@@ -3,6 +3,7 @@ import ChartPanel from './components/ChartPanel.vue';
 import ProfilePanel from './components/ProfilePanel.vue';
 import InvoiceTablePanel from './components/InvoiceTablePanel.vue';
 import BigListPanel from './components/BigListPanel.vue';
+import ModalPanel from './components/ModalPanel.vue';
 </script>
 
 <template>
@@ -16,4 +17,12 @@ import BigListPanel from './components/BigListPanel.vue';
   <ProfilePanel />
   <InvoiceTablePanel />
   <BigListPanel />
+  <ModalPanel />
+
+  <!--
+    Teleport target for step 5. It is rendered by the app, AFTER the panels:
+    a `<Teleport to="#modal-root">` mounted above cannot see it yet — that is
+    what the `defer` prop is for. Do not move it to `index.html`.
+  -->
+  <div id="modal-root" />
 </template>
