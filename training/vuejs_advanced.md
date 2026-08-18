@@ -68,6 +68,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/03bis_plugins.md
+title: 3bis - Anatomy of a Vue plugin
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/retro.md
 title: Retro - Day 1
 hide: false

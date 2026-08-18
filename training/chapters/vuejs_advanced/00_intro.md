@@ -43,6 +43,13 @@ layout: cover
                     <li>Case study: image lazy loading</li>
                 </ul>
             </li>
+            <li>3bis - Anatomy of a Vue plugin
+                <ul>
+                    <li><code>app.use</code> and the <code>install</code> contract</li>
+                    <li>Injection, options and app-level state</li>
+                    <li>Testing and packaging a plugin</li>
+                </ul>
+            </li>
             <li>4 - Testing fundamentals
                 <ul>
                     <li>Vitest &amp; <code>@vue/test-utils</code> setup</li>

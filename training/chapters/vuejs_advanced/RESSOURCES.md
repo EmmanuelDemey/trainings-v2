@@ -37,6 +37,16 @@
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
 - Écouter — https://deja-vue.io
 
+## 3bis. Plugins
+
+- Lire — https://vuejs.org/guide/reusability/plugins.html
+- Lire — https://vuejs.org/api/application.html
+- Lire — https://vuejs.org/guide/typescript/options-api.html#augmenting-global-properties
+- Lire — https://github.com/vuejs/router/blob/main/packages/router/src/router.ts (`install`)
+- Lire — https://github.com/vuejs/pinia/blob/v3/packages/pinia/src/createPinia.ts
+- Lire — https://github.com/vuejs/devtools/tree/main/packages/devtools-api
+- Lire — https://vite.dev/guide/build.html#library-mode
+
 ## 4. Tests — fondamentaux
 
 - Lire — https://vuejs.org/guide/scaling-up/testing.html
@@ -163,10 +173,6 @@ La formation est 100 % Composition API ; le QCM peut porter sur les deux.
 - Lire — https://vuejs.org/guide/built-ins/transition-group.html
 - Lire — https://vuejs.org/guide/built-ins/teleport.html
 - Lire — https://vuejs.org/guide/built-ins/keep-alive.html
-
-### Plugins
-
-- Lire — https://vuejs.org/guide/reusability/plugins.html
 
 ### Écosystème
 
