@@ -419,6 +419,83 @@ For a small invoicing app:
 - Run everything in **CI** on every pull request
 
 ---
+
+# Quiz — Question 1 / 4
+
+**Why build a fresh router and a fresh Pinia in every test?**
+
+- **A.** To make the suite run faster
+- **B.** Because both hold global state that leaks from one test to the next
+- **C.** Because `mount` mutates the `plugins` array
+- **D.** Because `createMemoryHistory` can only be used once per process
+
+<v-click>
+
+> ✅ **B** — Navigation state and store state survive the component. A test that
+> passes alone and fails in the suite (or vice-versa) is almost always this.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+**A guard redirects the navigation you triggered with `await router.push('/admin')`.
+What do you assert on?**
+
+- **A.** The rejected promise
+- **B.** The return value of `push`, which is the target location
+- **C.** `router.currentRoute.value`, after awaiting the push
+- **D.** A thrown `NavigationFailure`
+
+<v-click>
+
+> ✅ **C** — `push` **resolves** on a redirect (and resolves to a `NavigationFailure`
+> when the navigation is aborted or duplicated — it never throws). The truth is in
+> `currentRoute`.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**With `createTestingPinia({ createSpy: vi.fn })`, what happens when the component
+calls `cart.clear()`?**
+
+- **A.** The real action runs, and is also recorded by a spy
+- **B.** The action is replaced by a spy and does not execute
+- **C.** The action throws until you provide an `initialState`
+- **D.** The action runs, but the state is reset after each test
+
+<v-click>
+
+> ✅ **B** — `stubActions: true` is the default: you assert on the **call**, not on
+> its effect. Pass `stubActions: false` when you want integration-style behaviour.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+**What does MSW give you that `vi.mock('@/api/client')` does not?**
+
+- **A.** Faster tests
+- **B.** Interception at the network layer — the same handlers serve Vitest,
+  Cypress and the dev server
+- **C.** No need to call `flushPromises()`
+- **D.** Automatic typing of the responses
+
+<v-click>
+
+> ✅ **B** — A module mock tests your own abstraction; MSW tests the code path that
+> really runs in production, `fetch` / `axios` included. Set
+> `onUnhandledRequest: 'error'` so a forgotten handler fails loudly.
+
+</v-click>
+
+---
 layout: cover
 ---
 

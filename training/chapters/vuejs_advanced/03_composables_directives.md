@@ -537,6 +537,83 @@ export function useLazyImage(target: Ref<HTMLImageElement | null>, src: Ref<stri
 - Always disconnect observers and listeners in `unmounted`
 
 ---
+
+# Quiz — Question 1 / 4
+
+**Why does a composable return refs rather than a `reactive` object?**
+
+- **A.** Because `reactive` cannot hold functions
+- **B.** So the caller can destructure the result without losing reactivity
+- **C.** Because refs are faster than proxies
+- **D.** Because `reactive` is deprecated since Vue 3.5
+
+<v-click>
+
+> ✅ **B** — `const { count, increment } = useCounter()` only works because `count`
+> is a ref. Returning a `reactive` object would force every caller to keep the
+> object around, or to call `toRefs` themselves.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+**What do `MaybeRefOrGetter` and `toValue` buy you?**
+
+- **A.** Deep reactivity on plain objects
+- **B.** Automatic cleanup of the watchers you create
+- **C.** Callers may pass a plain value, a ref or a getter — the composable handles
+  all three
+- **D.** SSR-safe access to `window`
+
+<v-click>
+
+> ✅ **C** — One signature, three call styles: `useTitle('Home')`,
+> `useTitle(pageTitle)`, `useTitle(() => user.value.name)`. `toValue` unwraps
+> whichever one you got.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**A composable declares its state at module scope. What is the consequence?**
+
+- **A.** Nothing — that is the recommended way to share state
+- **B.** Every caller gets an independent copy
+- **C.** The state is no longer reactive
+- **D.** It becomes an app-wide singleton: SSR leaks it between requests and tests
+  become order-dependent
+
+<v-click>
+
+> ✅ **D** — Convenient for a theme toggle in a client-only app, dangerous
+> everywhere else. For real application state, use **Pinia** (chapter 6).
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+**Your directive must affect the server-rendered HTML. What do you write?**
+
+- **A.** The logic in `mounted` — it also runs on the server
+- **B.** A `getSSRProps(binding)` returning the attributes to render
+- **C.** The logic in `beforeUpdate`, the only hook available during SSR
+- **D.** Nothing — a directive can never influence the SSR output
+
+<v-click>
+
+> ✅ **B** — On the server only `created` and `beforeMount` run, and `el` is not a
+> real element. `getSSRProps` is the single hook whose return value ends up in the
+> HTML string.
+
+</v-click>
+
+---
 layout: cover
 ---
 

@@ -148,6 +148,7 @@ Duration: **3 days**
 # Evaluation
 
 - A **self-assessment questionnaire** before the session
+- A short **formative quiz** closing each chapter, corrected together
 - Continuous evaluation through **workshops, exercises and practical work**
 - A **final questionnaire** mirroring the self-assessment, to measure progress
 

@@ -513,6 +513,82 @@ api.interceptors.response.use(
 - Handle `NavigationFailure` and `router.onError` — silent failures are the norm otherwise
 
 ---
+
+# Quiz — Question 1 / 4
+
+**In-app navigation works, but a hard refresh on `/invoices/42` returns a 404. Why?**
+
+- **A.** The route is missing `props: true`
+- **B.** The server has no SPA fallback serving `index.html` for unknown paths
+- **C.** `scrollBehavior` is not configured
+- **D.** The route component is lazy loaded
+
+<v-click>
+
+> ✅ **B** — With `createWebHistory`, the browser really asks the server for
+> `/invoices/42`. Add `try_files $uri /index.html` (nginx) or the `/*  /index.html  200`
+> Netlify redirect — or fall back to `createWebHashHistory`.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+**Navigating from `/invoices/1` to `/invoices/2`, same route record. What runs?**
+
+- **A.** `onMounted`, so loading the data there is enough
+- **B.** `beforeEnter`, so the route-level guard can reload the data
+- **C.** Neither — the instance is reused; watch the param or key the view
+- **D.** The component is unmounted and remounted automatically
+
+<v-click>
+
+> ✅ **C** — `beforeEnter` only fires when *entering* the route. Use
+> `watch(() => route.params.id, load, { immediate: true })`, `onBeforeRouteUpdate`,
+> or force a new instance with `:key="route.fullPath"`.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**Which guard cannot change the outcome of a navigation?**
+
+- **A.** `beforeEach`
+- **B.** `beforeEnter`
+- **C.** `onBeforeRouteLeave`
+- **D.** `afterEach`
+
+<v-click>
+
+> ✅ **D** — `afterEach` runs once the navigation is confirmed: it is for side
+> effects only (page title, analytics). Returning a location from it does nothing.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+**Your login view redirects to `route.query.redirect` after a successful login.
+What must you check first?**
+
+- **A.** That the value is URL-encoded
+- **B.** That the value is a relative path — otherwise you ship an open redirect
+- **C.** Nothing: Vue Router refuses external URLs
+- **D.** That the target route carries `meta.requiresAuth`
+
+<v-click>
+
+> ✅ **B** — `?redirect=https://evil.example` would send a freshly authenticated user
+> straight to an attacker's page. And remember: guards protect the **UI**, never the
+> **data** — the server must enforce the same rules.
+
+</v-click>
+
+---
 layout: cover
 ---
 

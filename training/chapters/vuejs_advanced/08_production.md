@@ -486,6 +486,82 @@ app.config.errorHandler = (err, instance, info) => { /* log it */ };
 - Add a **size budget** and **error reporting**, or you will find out from users
 
 ---
+
+# Quiz — Question 1 / 4
+
+**You add `VITE_API_TOKEN=abc123` to `.env.production`. Who can read it?**
+
+- **A.** Only the build server
+- **B.** Only code guarded by `import.meta.env.PROD`
+- **C.** Anyone — `VITE_*` values are inlined into the shipped JavaScript
+- **D.** Nobody, Vite encrypts the value at build time
+
+<v-click>
+
+> ✅ **C** — Drop the prefix and the variable simply never reaches the bundle. A
+> frontend build can never hold a secret: it belongs on the server, behind an
+> endpoint.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+**Which caching policy is correct for a Vite SPA build?**
+
+- **A.** Cache everything for a year, `index.html` included
+- **B.** `no-cache` on everything, to always serve the latest version
+- **C.** `/assets/*` immutable for a year, `index.html` never cached
+- **D.** `index.html` immutable, `/assets/*` revalidated on every request
+
+<v-click>
+
+> ✅ **C** — Asset file names are content-hashed, so they can be cached forever.
+> `index.html` is the manifest pointing at them: cache it and users keep loading the
+> previous deployment.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**Which optimization pays the most in a typical SPA?**
+
+- **A.** `manualChunks` splitting every dependency into its own file
+- **B.** Route-level `import()`, so each route ships its own chunk
+- **C.** Pre-compressing the assets with brotli
+- **D.** Setting `build.target` to `es2022`
+
+<v-click>
+
+> ✅ **B** — Users pay for what they render. The others are real but marginal, and
+> over-splitting with `manualChunks` actively hurts: more requests, worse
+> compression.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+**Why do the `e2e` and `deploy` jobs download the `dist` artifact instead of
+rebuilding it?**
+
+- **A.** To save CI minutes, and nothing else
+- **B.** Because `vite build` cannot run twice in the same workflow
+- **C.** So that the tests and production run the exact same artifact
+- **D.** Because Cypress cannot run a build step
+
+<v-click>
+
+> ✅ **C** — Build once, test that build, deploy that build. Rebuilding before deploy
+> means shipping something no test ever ran against.
+
+</v-click>
+
+---
 layout: cover
 ---
 

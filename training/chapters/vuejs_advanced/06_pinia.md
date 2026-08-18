@@ -423,6 +423,91 @@ expect(useCartStore().add).toHaveBeenCalledWith(item);
 - `acceptHMRUpdate` in every store file
 
 ---
+
+# Quiz — Question 1 / 4
+
+```ts
+const { items, total, add } = useCartStore();
+```
+
+**What is wrong here?**
+
+- **A.** Nothing — a store is already a set of refs
+- **B.** `items` and `total` lose their reactivity; only `add` still works
+- **C.** `add` loses its binding to the store
+- **D.** Pinia throws in development mode
+
+<v-click>
+
+> ✅ **B** — A store instance is a `reactive` object, so destructuring unwraps state
+> and getters. Use `storeToRefs(cart)` for `items` / `total`; actions are plain
+> functions and can be destructured as-is.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+```ts
+const itemById = computed(() => (id: number) => items.value.find((i) => i.id === id));
+```
+
+**What is the problem with this getter?**
+
+- **A.** It cannot be typed properly
+- **B.** It returns a function, so nothing is cached — every call re-runs the lookup
+- **C.** It breaks `$subscribe`
+- **D.** It makes the store non-serializable
+
+<v-click>
+
+> ✅ **B** — The `computed` caches the *function*, not its results. Build the index
+> instead: `const byId = computed(() => new Map(items.value.map(i => [i.id, i])))`,
+> then `byId.get(42)` in O(1).
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**What does `cart.$patch({ shipping: 4.9, coupon: 'SPARKS' })` change compared to
+two separate assignments?**
+
+- **A.** Nothing, it is only nicer syntax
+- **B.** It triggers reactivity once instead of twice
+- **C.** It bypasses `$subscribe`
+- **D.** It is the only legal way to mutate state outside an action
+
+<v-click>
+
+> ✅ **B** — One mutation, one notification, one re-render. `$subscribe` still fires,
+> with `mutation.type === 'patch object'`. Use the function form when you need to
+> push into an array.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+**You call `store.$reset()` on a setup store. What happens?**
+
+- **A.** It resets the state to its initial value
+- **B.** It resets the getters only
+- **C.** It throws — `$reset` exists on option stores only
+- **D.** It works, but only if the persistence plugin is installed
+
+<v-click>
+
+> ✅ **C** — A setup store has no declarative `state()` for Pinia to replay. Expose
+> your own: keep an `initial()` factory and a `$reset()` function in the returned
+> object.
+
+</v-click>
+
+---
 layout: cover
 ---
 

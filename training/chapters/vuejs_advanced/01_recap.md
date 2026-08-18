@@ -199,6 +199,87 @@ console.log(el.textContent);     // '3' — the DOM is now up to date
 > Check your project actually runs 3.5+: `npm ls vue`.
 
 ---
+
+# Quiz — Question 1 / 4
+
+**What does `const { count } = reactive({ count: 0 })` give you?**
+
+- **A.** A `Ref<number>` you read with `.value`
+- **B.** A plain `number`, disconnected from the reactive object
+- **C.** A `computed` recalculated on every access
+- **D.** A compile error — a `reactive` object cannot be destructured
+
+<v-click>
+
+> ✅ **B** — `reactive` returns a Proxy: destructuring **reads** the property once
+> and you keep a copy of the value. Use `toRefs(state)` to keep refs, or default to
+> `ref` in the first place.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+**A watcher needs to read the DOM the component has just re-rendered. Which option?**
+
+- **A.** `{ immediate: true }`
+- **B.** `{ deep: true }`
+- **C.** `{ flush: 'post' }`
+- **D.** `{ flush: 'sync' }`
+
+<v-click>
+
+> ✅ **C** — The default `flush: 'pre'` runs the callback **before** the re-render.
+> `'post'` runs it after the DOM update; `'sync'` runs it on every mutation, which
+> you rarely want.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**Since Vue 3.5, what happens to `const { label } = defineProps<Props>()`?**
+
+- **A.** It throws at runtime
+- **B.** It works, but `label` is frozen after the first render
+- **C.** `label` stays reactive — Reactive Props Destructure is stable
+- **D.** It still requires `toRefs(props)` to stay reactive
+
+<v-click>
+
+> ✅ **C** — The compiler rewrites every read of `label` into `props.label`.
+> This is one of the few places where destructuring does **not** break reactivity.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+```ts
+count.value = 1;
+count.value = 2;
+count.value = 3;
+```
+
+**How many re-renders, and when is the DOM up to date?**
+
+- **A.** Three re-renders, the DOM updates after each assignment
+- **B.** One re-render with `count === 3`, DOM up to date after `await nextTick()`
+- **C.** One re-render with `count === 1`
+- **D.** No re-render until a `flush: 'sync'` watcher forces one
+
+<v-click>
+
+> ✅ **B** — Mutations in the same tick are **coalesced** into a single render.
+> This is exactly why component tests must `await nextTick()` (or `flushPromises()`)
+> before asserting on the DOM.
+
+</v-click>
+
+---
 layout: cover
 ---
 

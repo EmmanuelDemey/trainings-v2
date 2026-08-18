@@ -430,6 +430,80 @@ const options = Object.freeze(bigStaticList);
 | `v-memo` | Huge `v-for` lists | Must list *every* dependency |
 
 ---
+
+# Quiz — Question 1 / 4
+
+**When is the chunk of a `defineAsyncComponent` actually downloaded?**
+
+- **A.** When the module declaring it is imported
+- **B.** During `createApp()`, with the rest of the entry chunk
+- **C.** The first time the component is rendered
+- **D.** As soon as the browser goes idle
+
+<v-click>
+
+> ✅ **C** — The loader is called on the first render, not on import. Declaring an
+> async component at the top of a file costs nothing until something renders it.
+
+</v-click>
+
+---
+
+# Quiz — Question 2 / 4
+
+**What is the `delay` option of `defineAsyncComponent` for?**
+
+- **A.** Delaying the dynamic `import()` to protect the critical path
+- **B.** Waiting before showing `loadingComponent`, to avoid a flash of spinner
+- **C.** Delaying the moment `timeout` starts counting
+- **D.** Throttling the retries triggered from `onError`
+
+<v-click>
+
+> ✅ **B** — On a fast connection the chunk arrives in 30 ms; showing a skeleton for
+> 30 ms looks worse than showing nothing. `delay: 200` is the usual value.
+
+</v-click>
+
+---
+
+# Quiz — Question 3 / 4
+
+**A top-level `await` inside a component wrapped in `<Suspense>` rejects. What happens?**
+
+- **A.** The `#fallback` slot stays displayed forever
+- **B.** `Suspense` renders its `errorComponent`
+- **C.** The error propagates — catch it with `onErrorCaptured` in a parent
+- **D.** The last successfully rendered subtree is kept
+
+<v-click>
+
+> ✅ **C** — `Suspense` has **no error slot**: the fallback is a *loading* state, not
+> an error state. Wrap it in an error boundary, or handle the rejection inside the
+> component.
+
+</v-click>
+
+---
+
+# Quiz — Question 4 / 4
+
+**Which `v-memo` usage is correct?**
+
+- **A.** On a child element of the element carrying `v-for`
+- **B.** On the same element as `v-for`, listing every reactive value the subtree reads
+- **C.** `v-memo="[]"` on a subtree that changes on every render
+- **D.** With a dependency array whose length varies between renders
+
+<v-click>
+
+> ✅ **B** — `v-memo` must sit on the `v-for` element, its array must have a
+> **constant length**, and forgetting one dependency ships silently stale UI.
+> `v-memo="[]"` is just `v-once`, so **C** would freeze a changing subtree.
+
+</v-click>
+
+---
 layout: cover
 ---
 
