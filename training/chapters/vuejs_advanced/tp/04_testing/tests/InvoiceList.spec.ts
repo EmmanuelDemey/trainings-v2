@@ -8,7 +8,7 @@ import { server, invoices } from './msw';
  * STEP 1 — Four states, four tests, one component.
  *
  * Split across the two parts: loading + data in PART 1 (chapter 4), empty +
- * error + retry in PART 2 (chapter 7), once MSW has been covered.
+ * error + retry in PART 2 (chapter 8), once MSW has been covered.
  *
  * The default MSW handlers return the happy path. Override them per test with
  * `server.use(...)` — `resetHandlers()` in `tests/setup.ts` undoes it afterwards.

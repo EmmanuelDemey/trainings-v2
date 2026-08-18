@@ -152,7 +152,7 @@ async function checkGit() {
     return warn(
       'Git',
       'not found',
-      'Not strictly required, but chapter 8 (CI/CD) assumes a Git repository.',
+      'Not strictly required, but chapter 9 (CI/CD) assumes a Git repository.',
     );
   }
   return ok('Git', output.replace(/^git version /, 'v'));

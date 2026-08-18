@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 /**
- * STEP 6 (PART 2 — chapter 7) — End-to-end.
+ * STEP 6 (PART 2 — chapter 8) — End-to-end.
  *
  * The app answers /api/* in the browser, but a real e2e suite should not depend
  * on that: stub the network with `cy.intercept` so the test is deterministic and

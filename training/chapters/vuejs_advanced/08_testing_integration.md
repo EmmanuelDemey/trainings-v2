@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 7 - Testing in integration & end-to-end
+# 8 - Testing in integration & end-to-end
 
 ---
 
@@ -385,7 +385,7 @@ it('emits select on click', () => {
 - Test the **built** app (`vite preview`), not the dev server
 - Save `cypress/screenshots` and `cypress/videos` as artifacts on failure
 - Split specs across parallel jobs when the suite grows past a few minutes
-- This job is the one you will wire into the pipeline of chapter 8
+- This job is the one you will wire into the pipeline of chapter 9
 
 ---
 
@@ -501,7 +501,7 @@ layout: cover
 
 # Hands-on
 
-## Workshop 7 - Testing in integration & e2e (part 2 of the testing workshop)
+## Workshop 8 - Testing in integration & e2e (part 2 of the testing workshop)
 - Pick up the project from workshop 4 and add the integration layer
 - Test `InvoiceList` in its **empty** and **error** states with **MSW**
 - Test a component that uses **`useRoute` / `useRouter`**, twice: with a real

@@ -32,7 +32,7 @@ That sentence comes back three times over the next three days:
 
 - **Chapter 2** — is this `v-memo` worth it?
 - **Chapter 6** — is this store really re-rendering the whole page?
-- **Chapter 8** — what is actually in that entry chunk?
+- **Chapter 9** — what is actually in that entry chunk?
 
 <br />
 
@@ -172,7 +172,7 @@ app.mount('#app');
   props and the whole store state would be readable by anyone
 
 ```ts
-// vite.config.ts — chapter 8
+// vite.config.ts — chapter 9
 define: {
   __VUE_PROD_DEVTOOLS__: 'false',   // keep it false for a public build
 }

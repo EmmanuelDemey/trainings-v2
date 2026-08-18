@@ -29,7 +29,7 @@ exactly what a test suite is good at pinning down.
 
 - This chapter: **Vitest + `@vue/test-utils`** on components and composables in
   isolation
-- Chapter 7, once router and Pinia are in play: testing a component **wired to the
+- Chapter 8, once router and Pinia are in play: testing a component **wired to the
   application** — router, stores, HTTP — and end-to-end with Cypress
 
 > Everything you write from chapter 5 onwards is meant to be tested with what you
@@ -285,7 +285,7 @@ it('debounces the search', async () => {
   check teardown
 - `using` for spies, fake timers for debounce and polling
 
-> Next steps in chapter 7: the same components, but plugged into the router,
+> Next steps in chapter 8: the same components, but plugged into the router,
 > Pinia and the network.
 
 ---

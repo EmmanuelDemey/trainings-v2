@@ -5,7 +5,7 @@ import LoginForm from '@/components/LoginForm.vue';
 import { makeRouter } from './helpers';
 
 /**
- * STEP 2 (PART 2 — chapter 7) — The same component, tested two ways.
+ * STEP 2 (PART 2 — chapter 8) — The same component, tested two ways.
  *
  * A) with a REAL router (memory history): slower, but it exercises the actual
  *    navigation, the query parsing and the redirect validation.

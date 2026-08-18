@@ -1,4 +1,4 @@
-# TP 4 & 7 — Testing
+# TP 4 & 8 — Testing
 
 > This TP is **autonomous**: it does not depend on any other TP. The application
 > is provided and working; your job is to fill in the test files, which ship as
@@ -127,7 +127,7 @@ section are **not** part of this list.
 
 ---
 
-# Part 2 — after chapter 7 (integration & e2e)
+# Part 2 — after chapter 8 (integration & e2e)
 
 ### Step 1b. Empty and error with MSW — `tests/InvoiceList.spec.ts`
 
@@ -204,4 +204,4 @@ Part 2 is done when part 1's list still holds **and**:
   gaps matter and which do not — coverage is a smell detector, not a target.
 - Add a Cypress **component test** for `InvoiceChart`: it is the one component
   jsdom cannot test properly.
-- Wire it all into a GitHub Actions workflow (this is the subject of TP 8).
+- Wire it all into a GitHub Actions workflow (this is the subject of TP 9).

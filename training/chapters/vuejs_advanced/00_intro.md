@@ -85,18 +85,25 @@ layout: cover
                     <li>Plugins</li>
                 </ul>
             </li>
+            <li>7 - Forms &amp; validation
+                <ul>
+                    <li>Schemas with Zod, a <code>useForm</code> from scratch</li>
+                    <li>VeeValidate and <code>toTypedSchema</code></li>
+                    <li>Async rules, server errors, accessibility</li>
+                </ul>
+            </li>
         </ul>
     </td>
     <td>
         <ul>
-            <li>7 - Testing in integration &amp; e2e
+            <li>8 - Testing in integration &amp; e2e
                 <ul>
                     <li>Testing router and Pinia dependencies</li>
                     <li>Mocking HTTP with MSW</li>
                     <li>End-to-end with Cypress</li>
                 </ul>
             </li>
-            <li>8 - Production &amp; deployment
+            <li>9 - Production &amp; deployment
                 <ul>
                     <li>Code-splitting and lazy loading</li>
                     <li>Environments and server config</li>
@@ -117,13 +124,14 @@ layout: cover
   and custom directives
 - Master **routing and navigation** with Vue Router
 - Efficiently manage application state with **Pinia**
+- Build **typed, validated and accessible forms** with Zod and VeeValidate
 - Write **unit and end-to-end tests** to guarantee code quality
 - **Ship to production** and deploy Vue.js applications following best practices
 
 <br />
 
 > This training is based on **Vue 3.5**, **Vite 6**, **Vue Router 4**, **Pinia 3**,
-> **Vitest 3** and **Cypress 14**.
+> **Zod 4**, **VeeValidate 4**, **Vitest 3** and **Cypress 14**.
 
 ---
 

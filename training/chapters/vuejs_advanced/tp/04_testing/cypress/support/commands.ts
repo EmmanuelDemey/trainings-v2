@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 /**
- * STEP 6 (PART 2 — chapter 7) — Custom commands.
+ * STEP 6 (PART 2 — chapter 8) — Custom commands.
  *
  * TODO 6.1: implement `getByTestId(id)` so specs stop repeating
  *   `cy.get('[data-testid="..."]')`. One line, used everywhere.

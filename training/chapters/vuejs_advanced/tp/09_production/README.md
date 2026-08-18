@@ -1,4 +1,4 @@
-# TP 8 — Production & deployment
+# TP 9 — Production & deployment
 
 > This TP is **autonomous**: it does not depend on any other TP. The app works;
 > it is just built the default way, which is *almost* right. Your job is to find
@@ -6,7 +6,7 @@
 
 ## Goal
 
-Chapter 8 — Take a working Vue app all the way to a deployment you would defend:
+Chapter 9 — Take a working Vue app all the way to a deployment you would defend:
 
 - **Analyze** the bundle and find what does not belong in the entry chunk
 - **Split** by route, defer a heavy library, group the framework

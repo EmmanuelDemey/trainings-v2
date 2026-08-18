@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 8 - Production & deployment
+# 9 - Production & deployment
 
 ---
 
@@ -567,7 +567,7 @@ layout: cover
 
 # Hands-on
 
-## Workshop 8 - Production & deployment
+## Workshop 9 - Production & deployment
 - Analyze the bundle with `rollup-plugin-visualizer` and note the entry size
 - Make every route lazy, move a heavy library behind a dynamic `import()`, and
   group `vue`/`vue-router`/`pinia` with `manualChunks` — compare before/after

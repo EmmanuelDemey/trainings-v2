@@ -78,7 +78,20 @@
 - Lire — https://github.com/vuejs/pinia/tree/v3/packages/pinia/src
 - Lire — https://github.com/prazdevs/pinia-plugin-persistedstate
 
-## 7. Tests — intégration & e2e
+## 7. Formulaires & validation
+
+- Lire — https://zod.dev
+- Lire — https://zod.dev/v4 (nouveautés, `treeifyError`, `prettifyError`)
+- Lire — https://vee-validate.logaretm.com/v4/
+- Lire — https://vee-validate.logaretm.com/v4/guide/composition-api/typed-schema/
+- Lire — https://vee-validate.logaretm.com/v4/examples/array-fields/
+- Lire — https://github.com/standard-schema/standard-schema
+- Lire — https://www.w3.org/WAI/tutorials/forms/
+- Lire — https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
+- Lire — https://adamsilver.io/blog/ (design de formulaires)
+- Lire — https://valibot.dev (l'alternative légère à Zod)
+
+## 8. Tests — intégration & e2e
 
 - Lire — https://test-utils.vuejs.org/guide/advanced/vue-router.html
 - Lire — https://pinia.vuejs.org/cookbook/testing.html
@@ -88,7 +101,7 @@
 - Lire — https://docs.cypress.io/api/commands/intercept
 - Lire — https://github.com/cypress-io/github-action
 
-## 8. Production & déploiement
+## 9. Production & déploiement
 
 - Lire — https://vite.dev/config/build-options.html
 - Lire — https://vite.dev/guide/env-and-mode.html
@@ -153,7 +166,10 @@ La formation est 100 % Composition API ; le QCM peut porter sur les deux.
 - Lire — https://vuejs.org/guide/essentials/list.html
 - Lire — https://vuejs.org/api/built-in-directives.html
 
-### Événements & formulaires
+### Événements & liaisons de formulaire
+
+Le chapitre 7 couvre la validation et l'accessibilité ; les bases de `v-model`
+sur chaque type de contrôle restent à réviser.
 
 - Lire — https://vuejs.org/guide/essentials/event-handling.html
 - Lire — https://vuejs.org/guide/essentials/forms.html

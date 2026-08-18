@@ -10,7 +10,7 @@ const lines: CartLine[] = [
 ];
 
 /**
- * STEP 4 (PART 2 — chapter 7) — Testing a Pinia-connected component.
+ * STEP 4 (PART 2 — chapter 8) — Testing a Pinia-connected component.
  *
  * `createTestingPinia` seeds the state and turns every action into a spy, so the
  * component is tested WITHOUT the store's real logic running.
