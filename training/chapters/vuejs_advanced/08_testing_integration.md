@@ -18,6 +18,8 @@ At the end of this chapter, you will be able to:
 - **Mock** HTTP at the network level with **MSW**, shared by Vitest and Cypress
 - **Write** a readable Cypress end-to-end test with `cy.intercept`, aliases and
   `cy.session`
+- **Compare** Cypress and Playwright on the same test, and pick one on real
+  criteria
 - **Run** the whole suite in **CI** on every pull request
 
 ---
@@ -389,6 +391,147 @@ it('emits select on click', () => {
 
 ---
 
+# Cypress or Playwright?
+
+| | **Cypress** | **Playwright** |
+|---|---|---|
+| Execution | **inside** the browser, in the app's event loop | out-of-process, over CDP |
+| Test code | chained commands, queued for later | plain `async` / `await` |
+| Browsers | Chromium, Firefox, Electron — WebKit experimental | Chromium, Firefox, WebKit, all first-class |
+| Parallelism | one spec at a time; Cypress Cloud (paid) to orchestrate | workers and `--shard`, built in |
+| Tabs & origins | one tab, `cy.origin()` to cross a domain | contexts, tabs and origins are native |
+| Network stubs | `cy.intercept` | `page.route` |
+| Session reuse | `cy.session` | `storageState` |
+| Component tests | mature, `cy.mount` | still experimental |
+| Debugging | time-travel UI, DOM snapshots | trace viewer, `--ui`, `codegen` |
+
+> Both auto-wait and both retry their assertions — "flaky vs. not flaky" is not the
+> criterion. Decide on **parallelism, multi-origin and component testing**.
+
+<style>
+table { font-size: 0.74em; }
+th, td { padding: 0.3em 0.7em; }
+blockquote { font-size: 0.9em; }
+</style>
+
+---
+
+# The same e2e test, twice
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em;">
+<div>
+
+```ts
+// cypress/e2e/checkout.cy.ts
+describe('Checkout', () => {
+  beforeEach(() => {
+    cy.intercept('GET', '/api/products',
+      { fixture: 'products.json' }).as('products');
+    cy.visit('/catalog');
+    cy.wait('@products');
+  });
+
+  it('adds a product and checks out', () => {
+    cy.getByTestId('product-1')
+      .findByTestId('add-to-cart').click();
+    cy.getByTestId('cart-count')
+      .should('have.text', '1');
+
+    cy.getByTestId('checkout').click();
+    cy.location('pathname')
+      .should('eq', '/checkout');
+  });
+});
+```
+
+</div>
+<div>
+
+```ts
+// e2e/checkout.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Checkout', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/products', (route) =>
+      route.fulfill({ path: 'e2e/products.json' }));
+    await page.goto('/catalog');
+  });
+
+  test('adds a product and checks out',
+    async ({ page }) => {
+    await page.getByTestId('product-1')
+      .getByTestId('add-to-cart').click();
+    await expect(page.getByTestId('cart-count'))
+      .toHaveText('1');
+
+    await page.getByTestId('checkout').click();
+    await expect(page).toHaveURL('/checkout');
+  });
+});
+```
+
+</div>
+</div>
+
+- Same reflexes: **stub the network first**, then drive the UI through `data-testid`
+- Cypress **queues** its commands; Playwright is ordinary async code — a forgotten
+  `await` is a genuinely flaky test
+- `expect(locator).toHaveText(…)` **retries** like `.should()` does —
+  `expect(await locator.textContent())` does not
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 10px;
+  --slidev-code-line-height: 1.45;
+}
+ul { font-size: 0.82em; }
+</style>
+
+---
+
+# Playwright — the config side
+
+```ts
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  retries: process.env.CI ? 2 : 0,
+  use: {
+    baseURL: 'http://localhost:4173',
+    testIdAttribute: 'data-testid',        // getByTestId() reads this attribute
+    trace: 'on-first-retry',
+  },
+  webServer: {
+    command: 'npm run preview',
+    url: 'http://localhost:4173',
+    reuseExistingServer: !process.env.CI,
+  },
+  projects: [
+    { name: 'chromium', use: devices['Desktop Chrome'] },
+    { name: 'webkit', use: devices['Desktop Safari'] },
+  ],
+});
+```
+
+- `webServer` starts **and stops** the preview build itself — no `wait-on` step in CI
+- `trace: 'on-first-retry'` turns a red CI job into a replayable session
+  (`npx playwright show-trace trace.zip`)
+- One `projects` entry per engine, all running in parallel
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 10px;
+  --slidev-code-line-height: 1.45;
+}
+ul { font-size: 0.85em; }
+</style>
+
+---
+
 # Case study — a full test suite
 
 For a small invoicing app:
@@ -416,6 +559,8 @@ For a small invoicing app:
   a detail
 - **MSW** to mock the network once, for both Vitest and Cypress
 - Cypress: `intercept` + aliases, never fixed waits, `cy.session` for auth
+- Playwright writes the **same** test in plain `async` / `await` — choose on
+  parallelism, multi-origin and component testing, not on syntax
 - Run everything in **CI** on every pull request
 
 ---
@@ -511,11 +656,16 @@ layout: cover
   spied action — then test the store on its own with `setActivePinia`
 - Write a Cypress e2e: login with `cy.session`, add an item, check out — with
   `cy.intercept` stubs and a custom `getByTestId` command
+- **Bonus** — port that same spec to Playwright and compare what each one tells you
+  when it fails
 
 <style>
 /* The `cover` layout sets color: white; inline code would inherit it and
    become unreadable on the theme's light-grey chip background. */
 :not(pre) > code {
   color: #000;
+}
+ul {
+  font-size: 0.92em;
 }
 </style>
