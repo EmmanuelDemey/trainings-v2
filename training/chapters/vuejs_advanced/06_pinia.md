@@ -17,6 +17,8 @@ At the end of this chapter, you will be able to:
 - **React** to state and actions with `$patch`, `$subscribe` and `$onAction`
 - **Write** a typed Pinia plugin — persistence, logging — and **enable** HMR on
   every store
+- **Delegate** server state to a query layer, and **compare** TanStack Query and
+  Pinia Colada on the same request
 
 ---
 
@@ -345,6 +347,197 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
 ---
 
+# Server state is not client state
+
+The store above handles **loading**, **error** and **cancellation**. It still does not
+handle:
+
+- **Deduplication** — three components mounting together fire three requests
+- **Caching** — coming back to the list refetches everything from scratch
+- **Staleness** — nothing says when the data is old enough to be refreshed
+- **Revalidation** — on window focus, on reconnect, on an interval
+- **Invalidation** — after a `POST`, who tells the list to reload?
+- **Retry**, **pagination**, **optimistic updates**, **SSR hydration**
+
+<br />
+
+> Remote data is **shared**, **asynchronous** and **stale the moment you read it**.
+> Pinia is excellent at client state — filters, UI, the current user. Hand the rest
+> to a query layer instead of re-implementing it store by store.
+
+---
+
+# TanStack Query or Pinia Colada?
+
+| | **`@tanstack/vue-query`** | **`@pinia/colada`** |
+|---|---|---|
+| Origin | port of the React library, v5 | written for Vue by the Pinia / Vue Router author |
+| Runtime | its own `QueryClient` | built **on top of Pinia** — one cache store |
+| Size | ~14 kB gzip | ~5 kB gzip, ~2 kB tree-shaken |
+| Cache key | `queryKey`, refs unwrapped | `key`, array or getter |
+| Fetcher | `queryFn` | `query` |
+| Request state | `isPending` + `isFetching` | `status` **and** `asyncStatus`, split on purpose |
+| Devtools | its own panel, React-based | **Vue Devtools**, right next to your stores |
+| Router | wire the prefetch yourself | official **Data Loaders** for Vue Router |
+| Ecosystem | huge: infinite, offline, persistence | smaller, growing: retry, auto-refetch, delay |
+| Maturity | battle-tested, frozen API | 1.x — stable, but younger |
+
+> Same mental model on both sides. Pick **Colada** if you are already all-in on Pinia
+> and want Vue Devtools; pick **TanStack** for the ecosystem, or when the team already
+> knows it from React.
+
+<style>
+table { font-size: 0.72em; }
+th, td { padding: 0.3em 0.7em; }
+blockquote { font-size: 0.88em; }
+</style>
+
+---
+
+# The same query, twice
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em;">
+<div>
+
+```ts
+// main.ts
+import { VueQueryPlugin } from '@tanstack/vue-query';
+
+app.use(VueQueryPlugin);
+```
+
+```vue
+<script setup lang="ts">
+import { useQuery } from '@tanstack/vue-query';
+
+const props = defineProps<{ clientId: number }>();
+
+const { data, isPending, isError, error, refetch }
+  = useQuery({
+  queryKey: ['invoices', toRef(props, 'clientId')],
+  queryFn: () =>
+    api.get<Invoice[]>(`/clients/${props.clientId}/invoices`),
+  staleTime: 30_000,
+});
+</script>
+```
+
+</div>
+<div>
+
+```ts
+// main.ts
+import { PiniaColada } from '@pinia/colada';
+
+app.use(createPinia()).use(PiniaColada);
+```
+
+```vue
+<script setup lang="ts">
+import { useQuery } from '@pinia/colada';
+
+const props = defineProps<{ clientId: number }>();
+
+const { data, status, asyncStatus, error, refresh }
+  = useQuery({
+  key: () => ['invoices', props.clientId],
+  query: () =>
+    api.get<Invoice[]>(`/clients/${props.clientId}/invoices`),
+  staleTime: 30_000,
+});
+</script>
+```
+
+</div>
+</div>
+
+- The key must stay **reactive**: a `ref` inside the array for TanStack, a **getter**
+  for Colada — otherwise changing `clientId` never refetches
+- Colada splits the two questions: `status` is *do I have data?*
+  (`pending` / `success` / `error`), `asyncStatus` is *is a request in flight?*
+  (`idle` / `loading`) — TanStack mixes them into `isPending` + `isFetching`
+- `refresh()` respects `staleTime`, `refetch()` ignores the cache
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 10px;
+  --slidev-code-line-height: 1.4;
+}
+ul { font-size: 0.78em; }
+</style>
+
+---
+
+# Mutating, and invalidating
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em;">
+<div>
+
+```ts
+import { useMutation, useQueryClient }
+  from '@tanstack/vue-query';
+
+const queryClient = useQueryClient();
+
+const { mutate, isPending } = useMutation({
+  mutationFn: (draft: NewInvoice) =>
+    api.post<Invoice>('/invoices', draft),
+  onSuccess: () =>
+    queryClient.invalidateQueries({
+      queryKey: ['invoices'],
+    }),
+});
+
+mutate(draft);
+```
+
+</div>
+<div>
+
+```ts
+import { useMutation, useQueryCache }
+  from '@pinia/colada';
+
+const queryCache = useQueryCache();
+
+const { mutate, asyncStatus } = useMutation({
+  mutation: (draft: NewInvoice) =>
+    api.post<Invoice>('/invoices', draft),
+  onSettled: () =>
+    queryCache.invalidateQueries({
+      key: ['invoices'],
+    }),
+});
+
+mutate(draft);
+```
+
+</div>
+</div>
+
+- Invalidation is **prefix-based** on both: `['invoices']` also invalidates
+  `['invoices', 42]`. Pass `exact: true` to stop at the parent
+- `onSuccess` / `onError` / `onSettled` on both, plus `onMutate` for the optimistic
+  update and its rollback
+- Nothing to unsubscribe: the cache entry is dropped after `gcTime` once the last
+  component using it unmounts
+
+<br />
+
+> Keep the store for what stays on the client — the active filters, the cart, the
+> UI — and let the query layer own everything that came over the wire.
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 10px;
+  --slidev-code-line-height: 1.4;
+}
+ul { font-size: 0.8em; }
+blockquote { font-size: 0.85em; }
+</style>
+
+---
+
 # Hot Module Replacement
 
 ```ts
@@ -420,6 +613,8 @@ expect(useCartStore().add).toHaveBeenCalledWith(item);
 - Split by **domain**; compose stores by calling one inside another's setup
 - `$patch` for bulk updates, `$subscribe` / `$onAction` for side effects
 - **Plugins** for cross-cutting concerns: persistence, logging, injected services
+- Server state belongs to a **query layer** — `@tanstack/vue-query` or
+  `@pinia/colada` — not to a hand-rolled `status` / `error` pair
 - `acceptHMRUpdate` in every store file
 
 ---
@@ -520,6 +715,8 @@ layout: cover
 - Write a **persistence plugin** with an opt-in `persist` store option, and type it
 - Add an **`$onAction`** plugin that logs action duration and reports errors
 - Enable **HMR** on every store
+- **Bonus** — move the invoices fetch to `@pinia/colada` and delete the `status` /
+  `error` / `AbortController` plumbing it replaces
 
 <style>
 /* The `cover` layout sets color: white; inline code would inherit it and

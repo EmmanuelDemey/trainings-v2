@@ -77,6 +77,10 @@
 - Lire — https://pinia.vuejs.org/cookbook/hot-module-replacement.html
 - Lire — https://github.com/vuejs/pinia/tree/v3/packages/pinia/src
 - Lire — https://github.com/prazdevs/pinia-plugin-persistedstate
+- Lire — https://pinia-colada.esm.dev/guide/queries.html
+- Lire — https://pinia-colada.esm.dev/guide/query-invalidation.html
+- Lire — https://tanstack.com/query/latest/docs/framework/vue/overview
+- Lire — https://uvr.esm.is/data-loaders/
 
 ## 7. Formulaires & validation
 
