@@ -330,8 +330,9 @@ onUnmounted(() => window.removeEventListener('mousemove', update));
 
 <br />
 
-> Before optimizing, **measure** with the Vue Devtools "Performance" tab or
-> `performance.mark`. Most perf problems are unnecessary re-renders of big lists.
+> Before optimizing, **measure**: the Vue Devtools **Timeline** tells you *what*
+> re-rendered, `app.config.performance = true` tells you *how long* it took (see the
+> Devtools sequence). Most perf problems are unnecessary re-renders of big lists.
 
 ---
 

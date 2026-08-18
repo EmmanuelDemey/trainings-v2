@@ -158,8 +158,8 @@ const { total } = storeToRefs(cart);    // ✅ this component re-renders on tota
 
 <br />
 
-> Measure with the Vue Devtools **Timeline / Component render** track before
-> reorganizing anything.
+> Measure before reorganizing anything: record a **Timeline**, click once, and count
+> the component updates — the method from the Devtools sequence in day 1.
 
 ---
 

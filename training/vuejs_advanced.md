@@ -47,6 +47,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/00bis_devtools.md
+title: Tooling - Vue Devtools
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/01_recap.md
 hide: false
 ---

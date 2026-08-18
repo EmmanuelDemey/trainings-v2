@@ -40,6 +40,10 @@ The `--install` run is the one that matters: doing it at home beats doing it on 
 room Wi-Fi on day 1. It exits with code `1` if anything is blocking — in that case,
 **copy the whole output and send it to your trainer** before the session.
 
+One thing the script cannot check for you: install the **Vue Devtools** browser
+extension (Chrome or Firefox). Day 1 opens with a guided tour of it, and every
+workshop below assumes the panel is open next to the app.
+
 ## Workshops
 
 | Chapter | Folder | Topic | Extra requirements |

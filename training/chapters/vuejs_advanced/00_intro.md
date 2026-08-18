@@ -15,6 +15,7 @@ layout: cover
                 <ul>
                     <li>Objectives and content</li>
                     <li>Tooling and versions</li>
+                    <li>Vue Devtools: guided tour</li>
                 </ul>
             </li>
             <li>1 - Vue fundamentals recap
@@ -125,6 +126,8 @@ layout: cover
 - Solid **development experience with Vue**
 - Comfortable with **TypeScript** and modern JavaScript (ES2015+)
 - A **laptop** with Node.js >= 22 installed
+- The **Vue Devtools** browser extension (Chrome or Firefox) — we use it from the
+  first hour
 
 ---
 
