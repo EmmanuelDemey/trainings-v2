@@ -32,6 +32,13 @@ layout: cover
                     <li><code>v-once</code> and <code>v-memo</code></li>
                 </ul>
             </li>
+            <li>2bis - Render functions &amp; JSX
+                <ul>
+                    <li>What a template compiles to, <code>h()</code></li>
+                    <li>Slots, functional components, VNode manipulation</li>
+                    <li>JSX setup and the Vue-specific sugar</li>
+                </ul>
+            </li>
         </ul>
     </td>
     <td>

@@ -27,6 +27,16 @@
 - Lire — https://github.com/unovue/reka-ui
 - Regarder — https://antfu.me/talks
 
+## 2bis. Render functions & JSX
+
+- Lire — https://vuejs.org/guide/extras/render-function.html
+- Lire — https://vuejs.org/api/render-function.html
+- Lire — https://vuejs.org/guide/extras/rendering-mechanism.html
+- Lire — https://github.com/vuejs/babel-plugin-jsx
+- Lire — https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue-jsx
+- Lire — https://github.com/vuejs/core/blob/main/packages/runtime-core/src/h.ts
+- Essayer — https://play.vuejs.org (onglet « Compiled » pour lire le render généré)
+
 ## 3. Composables & directives
 
 - Lire — https://vuejs.org/guide/reusability/composables.html

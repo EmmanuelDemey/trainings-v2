@@ -63,6 +63,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/02bis_render_functions.md
+title: 2bis - Render functions & JSX
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/03_composables_directives.md
 hide: false
 ---
