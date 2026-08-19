@@ -20,6 +20,8 @@ At the end of this chapter, you will be able to:
   full resolution sequence
 - **Build** a complete authentication flow: guard, `?redirect=`, session
   restoration, logout on a 401
+- **Assemble** the route table at runtime with `addRoute` / `removeRoute`, driven
+  by the permissions returned by the backend
 - **Configure** the history mode together with the server-side SPA fallback
 
 ---
@@ -502,6 +504,284 @@ api.interceptors.response.use(
 
 ---
 
+# Dynamic routes — when the table is not known at build time
+
+A static table plus a `meta.roles` guard covers most applications. It stops being
+enough when:
+
+- Permissions come from the **backend**, per user or per tenant — not a fixed
+  role enum frozen in the bundle
+- Whole **modules** are sold as options: a customer without the billing module
+  should never download its chunk, nor see it in the menu
+- The route table is itself **data**: a plugin, a remote module or a
+  micro-frontend registers its own screens at runtime
+
+<br />
+
+> The router exposes a **mutable** matcher: `addRoute`, `removeRoute`,
+> `hasRoute`, `getRoutes`.
+
+---
+
+# Static + guard vs. dynamic table
+
+| | Static table + guard | `addRoute` after login |
+|---|---|---|
+| Route table | known at build time | assembled per user |
+| Forbidden route | matches, then guard redirects to `/forbidden` | **does not match** ➜ falls into the 404 |
+| Menu | filter on `meta` | the table *is* the menu |
+| Payload | every chunk is referenced | unreachable modules are never requested |
+| Complexity | one guard | bootstrap, teardown, tests |
+
+<br />
+
+- Start static. Go dynamic when permissions become **data**, not an enum
+- The two combine: dynamic routes still carry `meta.requiresAuth`
+
+---
+
+# The matcher API
+
+```ts
+const stop = router.addRoute({           // ➜ returns its own remover
+  path: '/invoices',
+  name: 'invoices',
+  component: () => import('@/modules/invoices/InvoicesView.vue'),
+  meta: { requiresAuth: true },
+});
+
+router.addRoute('settings', { path: 'billing', name: 'billing', component: Billing });
+                // ^ name of the parent record ➜ adds a nested route
+
+router.removeRoute('invoices');   // also removes its children and its aliases
+router.hasRoute('invoices');      // ➜ boolean
+router.getRoutes();               // ➜ RouteRecordNormalized[] (a snapshot)
+
+stop();                           // same as removeRoute('invoices')
+```
+
+- `addRoute` **never navigates** — it only changes what *would* match next time
+- Adding a route whose `name` already exists **silently replaces** the previous
+  record: double registration is invisible without a `hasRoute` check
+
+---
+
+# Insertion order does not matter
+
+```ts
+router.addRoute({ path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound });
+router.addRoute({ path: '/invoices/:id',    name: 'invoice',   component: Invoice });
+
+// /invoices/42 still matches `invoice`, not `not-found`
+```
+
+- Vue Router 4 **ranks** records by score and inserts each one at its ranked
+  position: a static segment beats a param, a param beats a repeated wildcard
+- The catch-all has the lowest possible score, so it stays last **whatever the
+  order** in which you add routes
+- The Vue Router 3 habit of "always register the 404 last" is obsolete
+
+> Only records with the **same score** fall back to insertion order —
+> `/:a` added before `/:b` wins. Two routes tied on score are a modelling bug.
+
+---
+
+# The trap — the current navigation is already resolved
+
+```
+   URL /invoices  (routes not registered yet)
+        │
+        ▼
+   ┌──────────────────────────────┐
+   │  resolve  ➜  `to` = 404      │  ① the match is computed *before* the guard
+   └──────────────────────────────┘
+        │
+        ▼
+   ┌──────────────────────────────┐
+   │  beforeEach ➜ addRoute(...)  │  ② the table now contains /invoices
+   └──────────────────────────────┘     but `to` still points at the 404 record
+        │
+        ├── return true      ➜ renders the 404  ❌
+        ├── return to        ➜ renders the 404  ❌  (already-resolved location)
+        └── return to.fullPath ➜ resolve again ➜ /invoices  ✅
+```
+
+- Returning the **string** forces the router to re-run the matcher against the
+  new table; returning `to` hands back a stale, already-resolved match
+
+---
+
+# The module map — permissions to routes
+
+```ts
+// router/modules.ts
+import type { RouteRecordRaw } from 'vue-router';
+
+export type Permission = 'invoices:read' | 'admin:users' | 'reports:read';
+
+export const MODULES: Record<Permission, RouteRecordRaw[]> = {
+  'invoices:read': [
+    { path: '/invoices', name: 'invoices', component: () => import('@/modules/invoices/List.vue'),
+      meta: { requiresAuth: true, permission: 'invoices:read', nav: { label: 'Invoices', order: 10 } } },
+    { path: '/invoices/:id', name: 'invoice', props: true,
+      component: () => import('@/modules/invoices/Detail.vue'),
+      meta: { requiresAuth: true, permission: 'invoices:read' } },
+  ],
+  'admin:users': [/* ... */],
+  'reports:read': [/* ... */],
+};
+```
+
+- One **declarative** map, one source of truth for the router *and* the menu
+- Extend `RouteMeta` with `permission?: Permission` and `nav?: { label: string; order: number }`
+
+---
+
+# Registering and tearing down
+
+```ts
+// router/dynamic.ts
+import { ref } from 'vue';
+import type { Router } from 'vue-router';
+import { router } from './index';
+import { MODULES, type Permission } from './modules';
+
+let removers: Array<() => void> = [];
+export const synced = ref(false);                      // flag *and* reactive dep
+
+export function syncRoutes(permissions: Permission[], target: Router = router): void {
+  resetRoutes();
+  for (const permission of permissions) {
+    for (const route of MODULES[permission] ?? []) {
+      if (target.hasRoute(route.name!)) continue;      // HMR, double bootstrap
+      removers.push(target.addRoute(route));
+    }
+  }
+  synced.value = true;
+}
+
+export function resetRoutes(): void {
+  removers.forEach((remove) => remove());
+  removers = [];
+  synced.value = false;
+}
+```
+
+- Keep the **removers**: they undo exactly what you added, including the records
+  you registered **without a `name`** — those cannot be removed any other way
+
+---
+
+# The bootstrap guard
+
+```ts
+router.beforeEach(async (to) => {
+  const auth = useAuthStore();
+  if (!auth.initialized) await auth.restoreSession();     // ① who is it?
+
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    return { name: 'login', query: { redirect: to.fullPath } };
+  }
+
+  if (auth.isAuthenticated && !synced.value) {            // ② build the table
+    syncRoutes(auth.permissions);
+    return to.fullPath;                                   // ③ resolve again
+  }
+});
+```
+
+- `restoreSession` runs **before** the sync — on a hard refresh the permissions
+  are not in memory yet
+- `return to.fullPath` re-enters `beforeEach`, but `synced` is now `true`:
+  no loop
+- Anything reached by `router.push` **after** the bootstrap needs no special case
+
+---
+
+# Logging out — order matters
+
+```ts
+async function logout(): Promise<void> {
+  auth.logout();
+  await router.replace({ name: 'login' });   // ① leave the dynamic area first
+  resetRoutes();                             // ② then shrink the table
+}
+```
+
+- `removeRoute` does **not** unmount anything: the current view stays on screen
+  until the next navigation, now backed by a record that no longer exists
+- Any `<RouterLink :to="{ name: 'invoices' }">` still rendered then throws
+  *"No match for {name: invoices}"*
+- Same sequence when switching tenant or when a token refresh returns a
+  **narrower** permission set
+
+---
+
+# The menu is a projection of the table
+
+```ts
+const links = computed(() => {
+  synced.value;                                   // ⬅ the only reactive dependency
+  return router.getRoutes()
+    .filter((r) => r.meta.nav)
+    .sort((a, b) => a.meta.nav!.order - b.meta.nav!.order);
+});
+```
+
+- `getRoutes()` returns a **snapshot**: mutating the matcher triggers no
+  reactivity at all — without that first line the menu never refreshes
+- On normalized records `meta` is the record's **own** meta; the merge with the
+  parents only happens on the resolved `route.meta`
+- Simpler and safer: build the menu from `MODULES` and the permission list —
+  the same source of truth, already reactive
+
+---
+
+# Testing a dynamic router
+
+```ts
+function makeRouter() {
+  return createRouter({ history: createMemoryHistory(), routes: baseRoutes });
+}
+
+it('keeps an invoice URL on the 404 when the permission is missing', async () => {
+  const router = makeRouter();
+  syncRoutes([], router);
+  await router.push('/invoices/42');
+  expect(router.currentRoute.value.name).toBe('not-found');
+});
+
+it('matches the invoice route once the permission is granted', async () => {
+  const router = makeRouter();
+  syncRoutes(['invoices:read'], router);
+  await router.push('/invoices/42');
+  expect(router.currentRoute.value.name).toBe('invoice');
+});
+```
+
+- A module-scope router is **shared state**: build a fresh one per test, and take
+  the router as a parameter rather than importing the singleton
+
+---
+
+# Dynamic routes — pitfalls
+
+| Symptom | Cause |
+|---|---|
+| The 404 shows on the first deep link | the guard returned `true` or `to` instead of `to.fullPath` |
+| Infinite redirect | the sync runs on **every** navigation — flag it |
+| The same screen registered twice | no `hasRoute` check — the second `addRoute` silently replaced the first |
+| A user sees another user's screens after logout | `resetRoutes()` never ran |
+| Green in tests, broken in the app | the test reused the singleton router |
+| One request leaks routes to the next (SSR) | one router per request, created inside the app factory |
+
+<br />
+
+> The chunk of a module you did not register is **still served** by your CDN.
+> Dynamic routes buy payload and UX, never access control.
+
+---
+
 # Recap
 
 - Named routes + typed `meta` make the router refactor-safe
@@ -511,10 +791,12 @@ api.interceptors.response.use(
 - Guards: `beforeEach` for auth, `beforeEnter` for route-specific rules,
   `onBeforeRouteLeave` for unsaved changes
 - Handle `NavigationFailure` and `router.onError` — silent failures are the norm otherwise
+- `addRoute` builds the table from the permissions — return **`to.fullPath`** from
+  the guard, and `removeRoute` everything on logout
 
 ---
 
-# Quiz — Question 1 / 4
+# Quiz — Question 1 / 5
 
 **In-app navigation works, but a hard refresh on `/invoices/42` returns a 404. Why?**
 
@@ -533,7 +815,7 @@ api.interceptors.response.use(
 
 ---
 
-# Quiz — Question 2 / 4
+# Quiz — Question 2 / 5
 
 **Navigating from `/invoices/1` to `/invoices/2`, same route record. What runs?**
 
@@ -552,7 +834,7 @@ api.interceptors.response.use(
 
 ---
 
-# Quiz — Question 3 / 4
+# Quiz — Question 3 / 5
 
 **Which guard cannot change the outcome of a navigation?**
 
@@ -570,7 +852,7 @@ api.interceptors.response.use(
 
 ---
 
-# Quiz — Question 4 / 4
+# Quiz — Question 4 / 5
 
 **Your login view redirects to `route.query.redirect` after a successful login.
 What must you check first?**
@@ -589,6 +871,27 @@ What must you check first?**
 </v-click>
 
 ---
+
+# Quiz — Question 5 / 5
+
+**Routes are registered in `beforeEach` with `addRoute`. A deep link on
+`/invoices` still lands on the 404 page. What is missing?**
+
+- **A.** The catch-all route was declared before `/invoices`
+- **B.** The guard must return `to.fullPath` so the router resolves again
+- **C.** `addRoute` has to be called before `createRouter`
+- **D.** The route component must not be lazy loaded
+
+<v-click>
+
+> ✅ **B** — `to` was resolved *before* the guard ran: it still points at the
+> catch-all record. Returning the string re-runs the matcher against the new
+> table. **A** is a Vue Router 3 reflex: v4 ranks routes by score, so the
+> catch-all stays last however late you add the others.
+
+</v-click>
+
+---
 layout: cover
 ---
 
@@ -601,6 +904,8 @@ layout: cover
 - Build the **auth flow**: store, `beforeEach` guard, `?redirect=` handling and
   session restoration
 - Add a **role-based** route (`meta.roles`) and a `/forbidden` view
+- Register the `/admin` module with **`addRoute`** from the permissions returned
+  at login, and remove it on logout
 - Restore the **scroll position** on back/forward, and reset it on a new route
 
 <style>
