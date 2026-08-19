@@ -10,6 +10,8 @@ layout: cover
 
 At the end of this chapter, you will be able to:
 
+- **Choose** between CSR, SSR and SSG for a given route, and **explain** what Nuxt
+  adds on top of Vue
 - **Read** a `vite build` output and **analyze** the bundle with the visualizer
 - **Split** code by route and by feature, and **group** vendors with `manualChunks`
 - **Drive** loading with prefetch and preload hints
@@ -33,6 +35,48 @@ At the end of this chapter, you will be able to:
 
 > Every one of these has a default that is *almost* right. The failures are
 > always in the details.
+
+---
+
+# CSR / SSR / SSG — choosing a rendering strategy
+
+| | **CSR** (this course) | **SSR** | **SSG** |
+|---|---|---|---|
+| HTML built | in the browser, after the JS | per request, on a server | once, at build time |
+| First paint | after the bundle loads | immediate, then hydration | immediate, then hydration |
+| Indexable | only if the crawler runs JS | yes, full markup | yes, full markup |
+| Runtime | a static file server | a Node / edge process | a static file server |
+| Freshness | free — fetched live | one render per request | a rebuild (or ISR) |
+| **Choose when** | it sits behind a login | it is public **and** minute-fresh | it is public, deploy-cadenced |
+
+> Nobody crawls a back-office, and its first paint is not the product.
+
+---
+
+# Nuxt — the three modes, one per route
+
+Most real apps want **two or three of them at once** — which is what Nuxt is for:
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  routeRules: {
+    '/':           { prerender: true },   // SSG, at build time
+    '/blog/**':    { isr: 3600 },         // rendered once, revalidated hourly
+    '/product/**': { ssr: true },         // rendered per request
+    '/admin/**':   { ssr: false },        // pure CSR, behind the login
+  },
+});
+```
+
+- Nuxt is **not a fourth strategy**: it makes the choice a per-route setting on top of
+  Vue — file-based routing, auto-imports (chapter 5bis), layouts, and **Nitro**, a server
+  that deploys to Node, an edge runtime or a static host
+- `useFetch` / `useAsyncData` run **on the server**, and the payload travels with the
+  HTML — the client does not refetch during hydration
+- The price: a server to run, `window` / `document` behind `import.meta.client`, and
+  hydration mismatches as a new class of bug — `useId()` (ch. 1), `getSSRProps` (ch. 3),
+  the Pinia payload (ch. 6)
 
 ---
 
