@@ -371,12 +371,114 @@ onUnmounted(() => window.removeEventListener('mousemove', update));
 
 # Rendering cost: what actually happens
 
-- On every re-render, Vue builds a new **virtual DOM tree** for the component and
-  diffs it against the previous one
-- The compiler already helps a lot:
-  - **static hoisting** — static nodes are created once
-  - **patch flags** — only dynamic bindings are compared
-  - **tree flattening** — static subtrees are skipped during diff
+```
+      a reactive dependency changed
+                  │
+                  ▼
+   ┌───────────────────────────────┐
+   │  render()                     │  ① rebuild a VNode tree
+   └───────────────────────────────┘     plain JS objects
+                  │  new tree
+                  ▼
+   ┌───────────────────────────────┐
+   │  patch — diff vs previous     │  ② compare, node by node
+   └───────────────────────────────┘     ⬅ the compiler shrinks *this*
+                  │  minimal set of changes
+                  ▼
+   ┌───────────────────────────────┐
+   │  DOM operations               │  ③ the expensive part
+   └───────────────────────────────┘     (layout, paint)
+```
+
+- ③ is what the user pays for — the whole game is to reach it with as few
+  operations as possible
+- The compiler already helps a lot, for free: **static hoisting**,
+  **patch flags**, **tree flattening**
+
+---
+
+# Patch flags — the compiler marks what can change
+
+```vue
+<div class="card">
+  <h2 class="title">Invoice</h2>
+  <p>Reference: {{ invoice.ref }}</p>
+  <span :class="statusClass">{{ invoice.status }}</span>
+</div>
+```
+
+```js
+const _hoisted_1 = { class: "card" }
+
+export function render(_ctx, _cache) {
+  return (_openBlock(), _createElementBlock("div", _hoisted_1, [
+    _cache[0] || (_cache[0] = _createElementVNode(
+      "h2", { class: "title" }, "Invoice", -1 /* CACHED */)),          // ⬅ hoisted
+    _createElementVNode("p", null,
+      "Reference: " + _toDisplayString(_ctx.invoice.ref), 1 /* TEXT */),
+    _createElementVNode("span", { class: _normalizeClass(_ctx.statusClass) },
+      _toDisplayString(_ctx.invoice.status), 3 /* TEXT, CLASS */)
+  ]))
+}
+```
+
+- The trailing number is the **patch flag**: a bitmask of *what may differ* on
+  the next render — everything else is never even compared
+
+---
+
+# Patch flags — the vocabulary
+
+| Flag | Value | The diff will only look at |
+|---|---|---|
+| `TEXT` | 1 | the text child |
+| `CLASS` | 2 | the `class` binding |
+| `STYLE` | 4 | the `style` binding |
+| `PROPS` | 8 | the props listed in `dynamicProps` |
+| `FULL_PROPS` | 16 | everything — the prop **keys** are dynamic |
+| `STABLE_FRAGMENT` | 64 | nothing structural — the children order cannot change |
+| `KEYED_FRAGMENT` | 128 | keyed children — run the keyed reconciliation |
+| `CACHED` | -1 | nothing: hoisted node, reused as-is |
+| `BAIL` | -2 | everything: **optimized mode is off** for that subtree |
+
+- Flags combine with `|` — `3` above is `TEXT | CLASS`
+- `BAIL` is what you get on VNodes the compiler did not produce: `h()`, JSX,
+  `v-html` content, third-party render functions
+
+---
+
+# Tree flattening — the diff walks a flat array
+
+```
+   the VNode tree                        what patch() really visits
+   ──────────────                        ──────────────────────────
+
+   div.card  ← BLOCK ────────────────▶  block.dynamicChildren = [
+   ├── h2.title      CACHED                 <p>     1 /* TEXT */,
+   ├── p             1 /* TEXT */           <span>  3 /* TEXT, CLASS */
+   └── span          3 /* TEXT, CLASS */    ]
+
+   4 nodes to walk, at any depth         2 entries, no tree walk at all
+```
+
+- A **block** (`_openBlock()` / `_createElementBlock()`) collects its dynamic
+  descendants in **one flat array**, whatever their nesting depth
+- On update the renderer iterates that array — static subtrees are never entered,
+  so the diff cost follows the number of **bindings**, not the size of the template
+- `v-if`, `v-for` and dynamic slots open **new blocks**: their structure can
+  change, so they are diffed as a unit
+
+---
+
+# What this means in practice
+
+- You almost never need `v-once` / `v-memo`: the compiler already skips the static
+  parts of a template
+- What it cannot skip is a **component re-rendering for nothing** — that is a
+  reactivity problem (a prop that changes identity, a store getter recomputed),
+  not a diff problem
+- Writing `render()` or JSX by hand costs you the three optimizations at once —
+  every VNode is `BAIL`, every child is diffed (see chapter 2bis)
 
 <br />
 
