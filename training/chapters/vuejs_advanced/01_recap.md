@@ -18,6 +18,8 @@ At the end of this chapter, you will be able to:
 - **Explain** why a lifecycle hook or an `inject()` placed after an `await` never runs
 - **Choose** the right primitive (`ref`, `reactive`, `shallowRef`) for a given
   piece of state
+- **Normalise** what a composable accepts with `toRef` / `unref` / `toValue`, and hand
+  state out through `readonly()` so only its owner can write
 - **Identify** what **Vue 3.5** changed, and check that a project actually runs it
 
 ---
@@ -244,6 +246,61 @@ const rows = shallowRef<Row[]>([]);      // reactive on reassign only
 
 ---
 
+# Reference card — the `ref` toolbox
+
+```ts
+import { isRef, unref, toRef, toRefs, toValue } from 'vue';
+
+isRef(maybe);              // type guard — narrows `Ref<T> | T` down to `Ref<T>`
+unref(maybe);              // isRef(maybe) ? maybe.value : maybe
+toRef(props, 'label');     // ONE property of a reactive object → Ref, still linked
+toRef(() => props.label);  // 3.3+ — a getter → read-only Ref (the modern form)
+toRefs(state);             // the whole object → { query: Ref, page: Ref }  (snippet 1)
+toValue(maybe);            // 3.3+ — unwraps a ref, calls a getter, passes a value through
+```
+
+A composable should accept **whatever the caller already has**, and normalise once:
+
+```ts
+export function useSearch(query: MaybeRefOrGetter<string>) {
+  const results = ref<Hit[]>([]);
+  watch(() => toValue(query), async (q) => { results.value = await search(q); });
+  return { results };
+}
+useSearch('vue');   useSearch(queryRef);   useSearch(() => props.query);   // all three
+```
+
+- `unref` unwraps **refs only**; `toValue` also calls **getters** — prefer it in new code
+- `isRef` belongs in **library code**, where a `Ref<T>` and a `T` reach the same branch
+
+---
+
+# Reference card — `readonly()`, the one-way contract
+
+```ts
+const state = reactive({ user: null, token: '' });
+
+function login(credentials: Credentials) { /* the only place that writes */ }
+
+// what leaves the module is a deep read-only Proxy over the SAME source
+export const session = readonly(state);
+export { login };
+```
+
+```ts
+session.token = 'x';        // dev warning: "target is readonly" — the write is a no-op
+watchEffect(() => track(session.token));   // still reactive: re-runs when login() writes
+```
+
+- Read-only ≠ frozen: the proxy **tracks its source**, so `computed` and `watch` keep working
+- `shallowReadonly()` guards the first level only — which is exactly what `props` are made
+  of under the hood, and why snippet 5 warns instead of throwing
+- The `provide` / `inject` pattern: `provide(themeKey, { mode: readonly(mode), toggle })` —
+  descendants read, only the owner writes
+- Cost: a second Proxy layer. Expose the raw state inside the module, `readonly` at the border
+
+---
+
 # Reference card — watchers and lifecycle
 
 ```ts
@@ -309,7 +366,7 @@ const theme = inject(themeKey, defaultTheme);   // any descendant → Theme
 
 ---
 
-# Quiz — Question 1 / 4
+# Quiz — Question 1 / 5
 
 ```ts
 count.value = 1;
@@ -334,7 +391,7 @@ count.value = 3;
 
 ---
 
-# Quiz — Question 2 / 4
+# Quiz — Question 2 / 5
 
 **Since Vue 3.5, what happens to `const { label } = defineProps<Props>()`?**
 
@@ -353,7 +410,7 @@ count.value = 3;
 
 ---
 
-# Quiz — Question 3 / 4
+# Quiz — Question 3 / 5
 
 **Your app needs the current theme in components at every depth. `provide` / `inject`
 or Pinia?**
@@ -374,7 +431,7 @@ or Pinia?**
 
 ---
 
-# Quiz — Question 4 / 4
+# Quiz — Question 4 / 5
 
 ```vue
 <SearchInput ref="search" />
@@ -393,6 +450,32 @@ child have to do?**
 > ✅ **B** — A `<script setup>` component is **closed** by default: the parent sees only
 > what `defineExpose()` publishes. That is what makes the public surface of a component
 > explicit, exactly like `props` and `emits`.
+
+</v-click>
+
+---
+
+# Quiz — Question 5 / 5
+
+```ts
+export function usePagination(total: MaybeRefOrGetter<number>) { /* ... */ }
+```
+
+**The three call sites below must all work. How do you read `total` inside the composable?**
+
+`usePagination(42)` · `usePagination(totalRef)` · `usePagination(() => props.total)`
+
+- **A.** `total.value` — every caller has to pass a ref
+- **B.** `unref(total)`, read inside a `computed`
+- **C.** `toValue(total)`, read inside a `computed` or a watch source
+- **D.** `isRef(total) ? total.value : total`, resolved once in the composable body
+
+<v-click>
+
+> ✅ **C** — `unref` (B) handles the ref and the plain number, but hands the third caller
+> back the **function itself**. **D** does the same *and* reads **once**, outside any
+> reactive scope. `toValue()` unwraps a ref, calls a getter, passes a value through — and
+> because the call happens **inside** the computed, the dependency is tracked.
 
 </v-click>
 
