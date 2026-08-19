@@ -139,6 +139,11 @@
 - Lire — https://test-utils.vuejs.org/guide/advanced/vue-router.html
 - Lire — https://pinia.vuejs.org/cookbook/testing.html
 - Lire — https://mswjs.io/docs/
+- Lire — https://mswjs.io/docs/integrations/browser (MSW côté navigateur)
+- Lire — https://vitest.dev/guide/browser/ (Vitest browser mode)
+- Lire — https://vitest.dev/guide/browser/webdriverio (le provider WebdriverIO)
+- Lire — https://vitest.dev/guide/browser/locators (l'API de locators)
+- Lire — https://github.com/vitest-dev/vitest-browser-vue
 - Lire — https://docs.cypress.io/app/core-concepts/best-practices
 - Lire — https://docs.cypress.io/api/commands/session
 - Lire — https://docs.cypress.io/api/commands/intercept

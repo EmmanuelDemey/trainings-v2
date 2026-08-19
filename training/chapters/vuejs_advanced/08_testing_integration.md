@@ -16,6 +16,8 @@ At the end of this chapter, you will be able to:
   is under test
 - **Test** a navigation guard and a Pinia store, both connected and in isolation
 - **Mock** HTTP at the network level with **MSW**, shared by Vitest and Cypress
+- **Run** the very component you had to stub in a real browser with **Vitest
+  browser mode**, and tell when jsdom stops being enough
 - **Write** a readable Cypress end-to-end test with `cy.intercept`, aliases and
   `cy.session`
 - **Compare** Cypress and Playwright on the same test, and pick one on real
@@ -32,8 +34,8 @@ added the two things that make a component hard to isolate:
 - a **router** (chapter 5) — `useRoute`, `useRouter`, guards, redirects
 - a **store** (chapter 6) — shared state that survives the component
 
-This chapter plugs them back in, adds the **network**, and finishes with a real
-browser.
+This chapter plugs them back in, adds the **network**, and climbs the last two
+rungs: the same component in a **real browser**, then the whole app end-to-end.
 
 | Dependency | In isolation (ch. 4) | In integration (here) |
 |---|---|---|
@@ -41,7 +43,7 @@ browser.
 | Router | — | memory router, or `vi.mock` |
 | Store | — | `createTestingPinia` |
 | HTTP | — | module mock, or **MSW** |
-| Browser | jsdom | **Cypress** |
+| Browser | jsdom | **Vitest browser mode**, then **Cypress** |
 
 ---
 
@@ -236,6 +238,225 @@ it('shows an error banner on 500', async () => {
 
 - Intercepts at the **network layer**: works with `fetch`, `axios`, anything
 - The **same handlers** can drive your Cypress tests and your dev server
+
+---
+
+# Vitest browser mode — the missing rung
+
+Chapter 4 stubbed `InvoiceChart` for exactly one reason:
+
+```ts
+onMounted(() => {
+  width.value = document.body.getBoundingClientRect().width;   // 0 in jsdom
+});
+```
+
+| | **jsdom** | **browser mode** | **e2e** |
+|---|---|---|---|
+| What runs | a DOM emulated in Node | your **component**, in a real browser | your **app**, in a real browser |
+| CSS | parsed, never applied | applied | applied |
+| Layout, `getBoundingClientRect` | zeros | real | real |
+| `vi.mock`, `vi.useFakeTimers` | yes | yes | no |
+| Startup | milliseconds | ~1 s + a driver | build + server |
+
+> Same `vitest` binary, same `expect`, same specs. **Only the environment changes** —
+> which is what makes it cheap enough to use for a handful of components.
+
+<style>
+table { font-size: 0.72em; }
+th, td { padding: 0.25em 0.6em; }
+blockquote { font-size: 0.85em; }
+</style>
+
+---
+
+# Browser mode — setup
+
+```bash
+npm i -D @vitest/browser webdriverio      # or playwright, or preview
+```
+
+```ts
+// vitest.browser.config.ts
+export default defineConfig({
+  plugins: [vue()],
+  test: {
+    include: ['tests/**/*.browser.spec.ts'],
+    setupFiles: ['./tests/setup.browser.ts'],      // imports the real stylesheet
+    browser: {
+      enabled: true,
+      provider: 'webdriverio',       // the WebDriver protocol, as Selenium speaks it
+      headless: true,                // `false` to watch the tests run
+      viewport: { width: 1280, height: 720 },
+      instances: [{ browser: 'chrome' }],          // add firefox: both run
+    },
+  },
+});
+```
+
+- `instances` replaces the old `browser.name`: **one entry per browser**, all parallel
+- WebdriverIO **downloads the matching driver** on the first run; on Ubuntu ≥ 24.04 and
+  in CI containers Chrome also needs `args: ['--no-sandbox']` in its `capabilities`
+- Vitest 4 moves each provider into its own package —
+  `import { webdriverio } from '@vitest/browser-webdriverio'`, then `provider: webdriverio()`
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.4;
+}
+ul { font-size: 0.82em; }
+</style>
+
+---
+
+# Browser mode — as a second project
+
+```ts
+// vitest.config.ts — one config, two environments
+export default defineConfig({
+  test: {
+    projects: [
+      { extends: true,
+        test: { name: 'unit', environment: 'jsdom',
+                exclude: [...configDefaults.exclude, '**/*.browser.spec.ts'] } },
+      { extends: true,
+        test: { name: 'browser',
+                include: ['**/*.browser.spec.ts'],
+                browser: { enabled: true, provider: 'webdriverio',
+                           instances: [{ browser: 'chrome' }] } } },
+    ],
+  },
+});
+```
+
+- `vitest` runs both; `vitest --project unit` keeps the fast loop fast, and lets CI run
+  the browser job on its own
+- `extends: true` inherits the root `plugins` and `resolve.alias` — no duplication
+- The `exclude` is **not** optional: otherwise the jsdom project collects the browser
+  specs and they die on `import { page } from '@vitest/browser/context'`
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 10.5px;
+  --slidev-code-line-height: 1.4;
+}
+ul { font-size: 0.82em; }
+</style>
+
+---
+
+# Browser mode — the same component, unstubbed
+
+```ts
+import { render } from 'vitest-browser-vue';
+import { page } from '@vitest/browser/context';
+
+it('sizes every bar in proportion to its invoice', async () => {
+  render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
+
+  await expect.element(page.getByTestId('invoice-chart')).toBeVisible();
+
+  const [first] = [...document.querySelectorAll('.bar')];
+  expect(first.getBoundingClientRect().height)              // 0 in jsdom
+    .toBeCloseTo((invoices[0].total / total) * 80, 0);
+  expect(getComputedStyle(first).backgroundColor)           // '' in jsdom
+    .toBe('rgb(66, 184, 131)');
+});
+```
+
+- `render()` from **`vitest-browser-vue`** mounts into the real document and unmounts
+  after each test — `mount()` from test-utils also works, with `attachTo: document.body`
+- No `flushPromises()` and no `nextTick()`: `expect.element(...)` **retries** the whole
+  assertion until the timeout, the way `.should()` does in Cypress
+- This is the demo in TP 4/8 — `npm run test:browser`
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.4;
+}
+ul { font-size: 0.8em; }
+</style>
+
+---
+
+# Browser mode — locators and real events
+
+```ts
+await page.getByLabelText('Email').fill('ada@example.com');
+await page.getByRole('button', { name: 'Sign in' }).click();
+
+await expect.element(page.getByRole('alert')).toHaveTextContent('Invalid');
+
+// Lower level, when a locator method is not enough
+import { userEvent } from '@vitest/browser/context';
+await userEvent.tripleClick(page.getByLabelText('Email'));
+await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+```
+
+- The locator API is **Playwright's**: `getByRole`, `getByLabelText`, `getByTestId`,
+  `getByText` — with the jest-dom matchers you already know
+- Events go through the **driver**, not through `dispatchEvent`: a click on a disabled
+  button, or on an element hidden behind an overlay, genuinely does nothing.
+  In jsdom, `trigger('click')` happily fires either way
+- `page.screenshot()` on demand — and a failing test drops one in `__screenshots__/`
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.4;
+}
+ul { font-size: 0.82em; }
+</style>
+
+---
+
+# Browser mode — what it costs
+
+- **MSW changes side**: `msw/node` patches Node's http layer, so it is gone. You need
+  `setupWorker` from `msw/browser` plus `npx msw init public/` to install its worker
+- Everything **Node-only** goes with it: `fs`, `path`, and mocking a node builtin
+- Your **setup files** split in two — a browser setup imports the real stylesheet,
+  which is exactly what a jsdom setup has no reason to do
+- **Coverage**: `istanbul` works everywhere, the `v8` provider only with Playwright
+  and Chromium
+- **CI** must be able to install a driver, and each instance costs ~1 s of startup
+
+<br />
+
+> Keep **jsdom as the default**. Promote to browser mode the handful of components where
+> the *rendering* is the risk — a chart, a virtual list, a popover that measures itself.
+> A browser-mode suite that mirrors your whole jsdom suite is a slow tautology.
+
+<style>
+ul { font-size: 0.9em; }
+blockquote { font-size: 0.85em; }
+</style>
+
+---
+
+# Browser mode, Cypress CT or Playwright?
+
+| | **Vitest browser mode** | **Cypress component** | **Playwright e2e** |
+|---|---|---|---|
+| Unit under test | one component | one component | the whole app |
+| Runner | Vitest — same specs, same `vi.mock` | Cypress | Playwright |
+| Porting a jsdom spec | mostly copy-paste | rewrite | rewrite |
+| Assertions | `expect` + jest-dom, retried | `.should()`, retried | `expect(locator)`, retried |
+| Network | MSW `setupWorker` | `cy.intercept` | `page.route` |
+| Debugging | devtools + Vitest UI | time-travel UI | trace viewer |
+| Startup | ~1 s | ~5 s | build + server |
+
+> Three rungs, one ladder: **jsdom** for logic, **browser mode** for rendering,
+> **Cypress or Playwright** for the flow. Every rung you add has to earn its
+> maintenance — do not test the same behaviour twice.
+
+<style>
+table { font-size: 0.7em; }
+th, td { padding: 0.25em 0.6em; }
+blockquote { font-size: 0.85em; }
+</style>
 
 ---
 
@@ -541,6 +762,7 @@ For a small invoicing app:
 | Unit | `useFetch`, `formatCurrency`, `useCartStore` | Vitest |
 | Component | `InvoiceList` (loading / empty / error / data) | test-utils + MSW |
 | Component | `LoginForm` (validation, submit, redirect) | test-utils + router mock |
+| Rendering | `InvoiceChart` (layout, CSS, measurements) | Vitest **browser mode** |
 | E2E | login ➜ list ➜ detail ➜ create ➜ logout | Cypress + `cy.session` |
 | E2E | 401 handling, deep-link redirect | Cypress + `cy.intercept` |
 
@@ -558,6 +780,8 @@ For a small invoicing app:
 - Real memory router when the navigation *is* the behaviour, `vi.mock` when it is
   a detail
 - **MSW** to mock the network once, for both Vitest and Cypress
+- **Vitest browser mode** for the components jsdom cannot render — same runner, same
+  specs, a real layout and a real stylesheet; jsdom stays the default
 - Cypress: `intercept` + aliases, never fixed waits, `cy.session` for auth
 - Playwright writes the **same** test in plain `async` / `await` — choose on
   parallelism, multi-origin and component testing, not on syntax
@@ -565,7 +789,7 @@ For a small invoicing app:
 
 ---
 
-# Quiz — Question 1 / 4
+# Quiz — Question 1 / 5
 
 **Why build a fresh router and a fresh Pinia in every test?**
 
@@ -583,7 +807,7 @@ For a small invoicing app:
 
 ---
 
-# Quiz — Question 2 / 4
+# Quiz — Question 2 / 5
 
 **A guard redirects the navigation you triggered with `await router.push('/admin')`.
 What do you assert on?**
@@ -603,7 +827,7 @@ What do you assert on?**
 
 ---
 
-# Quiz — Question 3 / 4
+# Quiz — Question 3 / 5
 
 **With `createTestingPinia({ createSpy: vi.fn })`, what happens when the component
 calls `cart.clear()`?**
@@ -622,7 +846,7 @@ calls `cart.clear()`?**
 
 ---
 
-# Quiz — Question 4 / 4
+# Quiz — Question 4 / 5
 
 **What does MSW give you that `vi.mock('@/api/client')` does not?**
 
@@ -637,6 +861,25 @@ calls `cart.clear()`?**
 > ✅ **B** — A module mock tests your own abstraction; MSW tests the code path that
 > really runs in production, `fetch` / `axios` included. Set
 > `onUnhandledRequest: 'error'` so a forgotten handler fails loudly.
+
+</v-click>
+
+---
+
+# Quiz — Question 5 / 5
+
+**Which of these tests genuinely needs Vitest browser mode rather than jsdom?**
+
+- **A.** A component that formats a currency and renders it
+- **B.** A component that reads `getBoundingClientRect()` to size itself
+- **C.** A component that calls a Pinia action on click
+- **D.** A composable using `vi.useFakeTimers()`
+
+<v-click>
+
+> ✅ **B** — jsdom answers zeros for anything layout-related and never applies your
+> CSS. A, C and D are all cheaper and just as truthful in jsdom; fake timers and
+> `vi.mock` keep working in browser mode, so that is never the reason to switch.
 
 </v-click>
 
@@ -656,6 +899,8 @@ layout: cover
   spied action — then test the store on its own with `setActivePinia`
 - Write a Cypress e2e: login with `cy.session`, add an item, check out — with
   `cy.intercept` stubs and a custom `getByTestId` command
+- **Demo** — `npm run test:browser`: `InvoiceChart`, the component part 1 made you
+  stub, rendered and measured for real in Vitest browser mode
 - **Bonus** — port that same spec to Playwright and compare what each one tells you
   when it fails
 

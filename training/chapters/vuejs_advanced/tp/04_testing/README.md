@@ -25,6 +25,8 @@ Cover one small application at every level:
 - **`createTestingPinia`** for a store-connected component
 - **MSW** to mock the network for Vitest
 - **Cypress**: `cy.intercept`, fixtures, custom commands, `cy.session`
+- **Vitest browser mode**: the one component jsdom cannot test, tested for real
+  (demo, nothing to fill in)
 
 ## Prerequisites
 
@@ -41,6 +43,13 @@ npm run dev          # http://localhost:5173 — the app, to see what you are te
 npm test             # vitest run
 npm run test:watch   # re-runs on change
 npm run typecheck    # vue-tsc --noEmit
+```
+
+For the browser mode demo (chapter 8, see below):
+
+```bash
+npm run test:browser         # a real Chrome, headless
+npm run test:browser:headed  # the same, in a visible window
 ```
 
 For the end-to-end part (part 2 only):
@@ -198,10 +207,47 @@ Part 2 is done when part 1's list still holds **and**:
       catches
 - [ ] What `stubActions: true` hides from you
 
+## Demo — Vitest browser mode
+
+`InvoiceChart` is the component step 3 asked you to **stub**: it measures itself
+with `getBoundingClientRect()` and paints itself with CSS, and jsdom does neither.
+`tests/InvoiceChart.browser.spec.ts` runs that same component in a real Chrome,
+driven by the same Vitest, and stubs nothing.
+
+```bash
+npm run test:browser          # headless
+npm run test:browser:headed   # watch it happen
+```
+
+Nothing to fill in here — the four tests are written and green. What to look at:
+
+- Each one fails in jsdom for a **different** reason: a width of `0`, a percentage
+  height that never resolves, a `var(--accent)` that resolves to nothing. Rename the
+  file to `*.spec.ts`, run `npm test` and read the four failures.
+- Browser mode gets its **own** `vitest.browser.config.ts`, so the everyday
+  `npm test` never starts a browser — and `vitest.config.ts` **excludes**
+  `*.browser.spec.ts` for the same reason. In a real project you would declare the
+  two as `test.projects` in a single config (chapter 8 shows how).
+- The provider is **WebdriverIO** — the WebDriver protocol, the one Selenium speaks.
+  It downloads the matching driver on the first run, so allow a minute and a network
+  connection. The config passes `--no-sandbox` to Chrome, because its own sandbox cannot
+  start when the kernel forbids unprivileged user namespaces — the default on
+  Ubuntu >= 24.04 and in most CI containers. Drop the flag if your kernel allows it.
+- **No MSW**: `msw/node` patches Node's http layer and cannot run in a browser. The
+  dataset moved to `tests/fixtures.ts` so both worlds import it from one place; the
+  browser equivalent is `setupWorker` from `msw/browser`, plus `npx msw init public/`
+  to install its service worker.
+- `vitest-browser-vue` is pinned to **1.x**: 2.x requires Vitest 4, which also moves
+  the provider into its own package (`@vitest/browser-webdriverio`). The slides show
+  both forms.
+- `tests/setup.browser.ts` imports `src/style.css`. In jsdom that import is pointless
+  — nothing applies the stylesheet. Here it is what makes the assertions possible.
+
 ## Going further
 
 - Run `npm run test:coverage` and look at what is **not** covered. Decide which
   gaps matter and which do not — coverage is a smell detector, not a target.
-- Add a Cypress **component test** for `InvoiceChart`: it is the one component
-  jsdom cannot test properly.
+- Add a Cypress **component test** for `InvoiceChart`, and compare it with the
+  browser mode demo above: same real browser, two very different harnesses. Which
+  one would you keep, and what does it cost to run in CI?
 - Wire it all into a GitHub Actions workflow (this is the subject of TP 9).
