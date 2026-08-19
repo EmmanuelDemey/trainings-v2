@@ -69,6 +69,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/02ter_transitions.md
+title: 2ter - Transition & TransitionGroup
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/03_composables_directives.md
 hide: false
 ---

@@ -43,6 +43,13 @@ layout: cover
     </td>
     <td>
         <ul>
+            <li>2ter - Transition &amp; TransitionGroup
+                <ul>
+                    <li>The six classes, modes, <code>appear</code></li>
+                    <li>JS hooks and animation libraries</li>
+                    <li><code>TransitionGroup</code>, FLIP, reduced motion</li>
+                </ul>
+            </li>
             <li>3 - Composables &amp; custom directives
                 <ul>
                     <li>Writing reusable composables</li>

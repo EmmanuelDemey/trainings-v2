@@ -37,6 +37,18 @@
 - Lire — https://github.com/vuejs/core/blob/main/packages/runtime-core/src/h.ts
 - Essayer — https://play.vuejs.org (onglet « Compiled » pour lire le render généré)
 
+## 2ter. Transition & TransitionGroup
+
+- Lire — https://vuejs.org/guide/built-ins/transition.html
+- Lire — https://vuejs.org/guide/built-ins/transition-group.html
+- Lire — https://vuejs.org/api/built-in-components.html#transition
+- Lire — https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
+- Lire — https://web.dev/articles/animations-guide (ce qui coûte cher au navigateur)
+- Lire — https://aerotwist.com/blog/flip-your-animations/ (la technique FLIP)
+- Lire — https://motion.dev/docs (piloter les hooks JS)
+- Lire — https://gsap.com/docs/v3/
+- Essayer — https://play.vuejs.org (tester une transition sans monter un projet)
+
 ## 3. Composables & directives
 
 - Lire — https://vuejs.org/guide/reusability/composables.html
