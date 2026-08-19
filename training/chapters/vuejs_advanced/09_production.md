@@ -453,7 +453,7 @@ Sentry.init({
 ```
 
 ```ts
-// Vue's own last-resort handler
+// Vue's own last-resort handler — wired in chapter 8bis
 app.config.errorHandler = (err, instance, info) => { /* log it */ };
 ```
 

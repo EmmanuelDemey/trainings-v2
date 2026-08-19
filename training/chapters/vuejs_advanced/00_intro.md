@@ -124,6 +124,13 @@ layout: cover
                     <li>End-to-end with Cypress</li>
                 </ul>
             </li>
+            <li>8bis - Error handling &amp; observability
+                <ul>
+                    <li><code>onErrorCaptured</code> and <code>&lt;ErrorBoundary&gt;</code></li>
+                    <li><code>app.config.errorHandler</code>, the global net</li>
+                    <li>Reporting to Sentry: releases, context, noise</li>
+                </ul>
+            </li>
             <li>9 - Production &amp; deployment
                 <ul>
                     <li>Code-splitting and lazy loading</li>

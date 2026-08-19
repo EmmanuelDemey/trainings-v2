@@ -144,6 +144,21 @@
 - Lire — https://docs.cypress.io/api/commands/intercept
 - Lire — https://github.com/cypress-io/github-action
 
+## 8bis. Erreurs & observabilité
+
+- Lire — https://vuejs.org/api/composition-api-lifecycle.html#onerrorcaptured
+- Lire — https://vuejs.org/api/application.html#app-config-errorhandler
+- Lire — https://vuejs.org/error-reference/ (les codes d'erreur en production)
+- Lire — https://router.vuejs.org/guide/advanced/navigation-failures.html
+- Lire — https://docs.sentry.io/platforms/javascript/guides/vue/
+- Lire — https://docs.sentry.io/platforms/javascript/guides/vue/sourcemaps/
+- Lire — https://docs.sentry.io/platforms/javascript/guides/vue/configuration/filtering/
+- Lire — https://docs.sentry.io/platforms/javascript/guides/vue/data-management/sensitive-data/
+- Lire — https://glitchtip.com/documentation (alternative auto-hébergée, SDK Sentry)
+- Lire — https://grafana.com/docs/grafana-cloud/monitor-applications/frontend-observability/
+- Lire — https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event
+- Lire — https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event (« Script error. » et CORS)
+
 ## 9. Production & déploiement
 
 - Lire — https://vite.dev/config/build-options.html

@@ -129,6 +129,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/08bis_error_handling.md
+title: 8bis - Error handling & observability
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/09_production.md
 hide: false
 ---

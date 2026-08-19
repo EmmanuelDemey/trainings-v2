@@ -162,7 +162,7 @@ const user = await fetchUser(props.id);   // top-level await
 <br />
 
 - A rejected top-level `await` **does not** trigger the fallback: catch it with
-  `onErrorCaptured` in a parent, or an error boundary component
+  `onErrorCaptured` in a parent, or an error boundary component (chapter 8bis)
 
 ```ts
 onErrorCaptured((err) => { error.value = err; return false; });
