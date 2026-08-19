@@ -8,8 +8,8 @@
 
 | Part | After chapter | Steps | Theme |
 |---|---|---|---|
-| **Part 1** | 4 — Testing fundamentals | 1a, 3, 5 | components and composables **in isolation** |
-| **Part 2** | 7 — Testing in integration & e2e | 1b, 2, 4, 6 | router, Pinia, network, real browser |
+| **Part 1** | 4 — Testing fundamentals | 1a, 3, 5, 7 | components and composables **in isolation** |
+| **Part 2** | 8 — Testing in integration & e2e | 1b, 2, 4, 6, 8 | router, Pinia, network, real browser |
 
 Come back to the same clone for part 2 — the tests you wrote in part 1 must still
 be green.
@@ -27,6 +27,8 @@ Cover one small application at every level:
 - **Cypress**: `cy.intercept`, fixtures, custom commands, `cy.session`
 - **Vitest browser mode**: the one component jsdom cannot test, tested for real
   (demo, nothing to fill in)
+- **Sabotage**: break the source on purpose, and check that the right test — and
+  only it — goes red
 
 ## Prerequisites
 
@@ -99,6 +101,35 @@ Prove that three keystrokes produce one call, using
 `useDebouncedSearch` takes its `search` function as an argument — no HTTP mock
 needed, just a `vi.fn()`.
 
+### Step 7. Sabotage — check that the tests can fail
+
+Every spec in this project starts green, with no assertion in it. A test that
+asserts nothing and a test that asserts something look exactly alike in the
+runner: a green dot. The only way to tell them apart is to **break the source on
+purpose** and watch the runner go red.
+
+Keep `npm run test:watch` open, apply **one** mutation at a time and revert it
+before the next — `git diff src/` must be empty when you are done.
+
+| Break this | Where | What must go red |
+|---|---|---|
+| `loading` starts at `false` instead of `true` | `src/components/InvoiceList.vue` | the loading test |
+| keep one invoice: `.slice(0, 1)` on the `await api.getInvoices()` result | `src/components/InvoiceList.vue` | the data test, on the row count |
+| pass `:currency="'USD'"` to `<InvoiceChart>` | `src/components/InvoiceList.vue` | the stub test, on `props('currency')` |
+| delete the `clearTimeout(timer)` line | `src/composables/useDebouncedSearch.ts` | the debounce test — three calls instead of one |
+
+Read the failure, not just the colour: a test that goes red for the **wrong**
+reason (a `TypeError`, an unhandled rejection, a snapshot of the whole DOM) is
+barely more useful than one that never fails at all.
+
+The interesting case is a mutation that leaves everything green: that behaviour
+is **not** covered, whatever the test names claim. Fix the *test*, keep the
+mutation in place until it is red, then revert it.
+
+> This is mutation testing, done by hand — Stryker automates it over a whole
+> project. What matters here is the reflex: a test is not finished until you have
+> seen it fail.
+
 ## Definition of Done — part 1
 
 Tick every box before closing part 1. The part 2 steps and the "Going further"
@@ -127,6 +158,8 @@ section are **not** part of this list.
       `vi.advanceTimersByTimeAsync`
 - [ ] At least one spy is declared with `using`, and it has no matching
       `mockRestore()` / `afterEach` cleanup left
+- [ ] You ran the four mutations of step 7, one at a time: each one turned the
+      expected test red, for the expected reason — and `git diff src/` is empty again
 
 **You can explain**
 
@@ -169,6 +202,33 @@ actions, then compare with `stubActions: false`.
 To make `cy.session` actually useful, you will need to persist the token in
 `localStorage` in `src/stores/auth.ts`. Do it, and be able to explain why.
 
+### Step 8. Sabotage, round 2 — `src/`, `cypress/`
+
+Same exercise as step 7, on the layers part 2 added. One mutation at a time,
+reverted before the next — `git diff src/ cypress/` must be empty when you are
+done.
+
+| Break this | Where | What must go red |
+|---|---|---|
+| make the retry button a no-op: `@click="() => {}"` | `src/components/InvoiceList.vue` | the retry test — and *only* it |
+| accept any leading slash: `/^\/(?!\/)/` → `/^\//` | `src/components/LoginForm.vue` | the absolute-redirect test |
+| drop the quantity: `n + l.price * l.qty` → `n + l.price` | `src/stores/cart.ts` | the `CartSummary` test — the proof you asserted on the **real** getter |
+| comment out the `cy.intercept` in `beforeEach` | `cypress/e2e/checkout.cy.ts` | the row-count test — the app serves 3 invoices, the fixture 4 |
+
+Two of them are traps on purpose:
+
+- The **redirect** mutation only rejects `//evil.example`, not `http://evil.example`.
+  If your test stays green, you tested the scheme-prefixed form and left the
+  protocol-relative one open — the very case the regex exists for.
+- The **Cypress** mutation is the only one that tells you whether your e2e suite
+  tests the app or tests your own fixture. If the row count still matches with the
+  interception gone, the assertion is not specific enough.
+
+Two checks the Definitions of Done already ask for belong to the same family:
+adding an `await` to the loading test (part 1), and removing `resetHandlers()`
+from `tests/setup.ts` (part 2). Same reflex, aimed at the harness instead of at
+the source.
+
 ## Definition of Done — part 2
 
 Part 2 is done when part 1's list still holds **and**:
@@ -199,6 +259,8 @@ Part 2 is done when part 1's list still holds **and**:
 - [ ] `getByTestId` and a `cy.session`-based `login` command exist and are used
 - [ ] The Cypress runner shows the login flow ran **once** across two tests
 - [ ] The token is persisted in `localStorage` by `src/stores/auth.ts`
+- [ ] You ran the four mutations of step 8, one at a time — including the Cypress
+      one — each turning the expected test red, and `git diff src/ cypress/` is empty again
 
 **You can explain**
 
@@ -206,6 +268,8 @@ Part 2 is done when part 1's list still holds **and**:
 - [ ] Why the same response shape has to be mocked in three places, and what drift that
       catches
 - [ ] What `stubActions: true` hides from you
+- [ ] Which mutation of steps 7 and 8 stayed green the longest, and what that told you
+      about the test that was supposed to catch it
 
 ## Demo — Vitest browser mode
 
