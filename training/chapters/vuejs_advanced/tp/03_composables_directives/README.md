@@ -27,7 +27,14 @@ when each one is the right tool:
 npm install
 npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
+npm test             # vitest run
+npm run test:watch   # vitest, in watch mode
 ```
+
+Step 1 comes with its spec already written: **`tests/useFetch.spec.ts`** describes
+the whole contract of `useFetch` — abort on change, error handling, `ref` **and**
+getter URLs. It is red on the skeleton. Keep `npm run test:watch` running in a
+second terminal and make it go green; the other steps are checked in the browser.
 
 There is **no backend to start**: `installFakeBackend()` patches `window.fetch`
 for `/api/*` with a 700 ms artificial latency that honours `AbortSignal`.
@@ -43,8 +50,11 @@ for `/api/*` with a 700 ms artificial latency that honours `AbortSignal`.
    Trigger a 500 with `failureSwitch.products = true` in `src/api/fakeApi.ts`.
 4. Swallow `AbortError` — a cancelled request is not a failure the user should see.
 
-**Check it**: switch categories quickly. Exactly one request must resolve; the
-others show as cancelled in the Network tab.
+**Check it**: `npm test` — the ten specs in `tests/useFetch.spec.ts` are the
+contract above, and the trickiest one is `loading` during an abort: the cancelled
+run must **not** hand `loading` back while its replacement is still in flight.
+Then switch categories quickly in the browser: exactly one request must resolve,
+the others show as cancelled in the Network tab.
 
 ### 2. `useLocalStorage` — `src/composables/useLocalStorage.ts`
 
@@ -92,6 +102,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
+- [ ] `npm test` exits 0 — the ten `useFetch` specs pass
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src | grep -v bonus` returns nothing
 - [ ] No Vue warning or error in the browser console while you exercise the panels

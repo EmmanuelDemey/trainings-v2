@@ -61,6 +61,11 @@ workshop below assumes the panel is open next to the app.
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
 
+`03_composables_directives/` also ships the spec of its first step:
+`tests/useFetch.spec.ts` is red on the skeleton, and `npm test` (Vitest) is the
+fastest way to know whether your `useFetch` really aborts, really re-runs on a
+getter, and really keeps `loading` straight when a request is cancelled.
+
 Every workshop README ends with a **Definition of Done** — a checklist of criteria
 you can verify yourself (a command that exits 0, something observable in the browser,
 a question you can answer). Steps marked *(Bonus)* and the "Going further" section are
