@@ -64,6 +64,13 @@ layout: cover
                     <li>Testing and packaging a plugin</li>
                 </ul>
             </li>
+            <li>3ter - Anatomy of a team composable library
+                <ul>
+                    <li>What belongs in a shared library</li>
+                    <li>Signature, return value and cleanup conventions</li>
+                    <li>Packaging, versioning and the review checklist</li>
+                </ul>
+            </li>
             <li>4 - Testing fundamentals
                 <ul>
                     <li>Vitest &amp; <code>@vue/test-utils</code> setup</li>

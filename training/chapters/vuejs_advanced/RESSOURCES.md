@@ -69,6 +69,21 @@
 - Lire — https://github.com/vuejs/devtools/tree/main/packages/devtools-api
 - Lire — https://vite.dev/guide/build.html#library-mode
 
+## 3ter. Une lib de composables d'équipe
+
+- Lire — https://vuejs.org/guide/reusability/composables.html#conventions-and-best-practices
+- Lire — https://github.com/vueuse/vueuse/blob/main/CONTRIBUTING.md (leurs conventions, écrites)
+- Lire — https://github.com/vueuse/vueuse/tree/main/packages/shared/createSharedComposable
+- Lire — https://github.com/vueuse/vueuse/tree/main/packages/shared/createInjectionState
+- Lire — https://nodejs.org/api/packages.html#exports (la carte `exports`)
+- Lire — https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
+- Lire — https://vite.dev/guide/build.html#library-mode
+- Outil — https://github.com/bluwy/publint
+- Outil — https://arethetypeswrong.github.io
+- Outil — https://github.com/changesets/changesets
+- Outil — https://github.com/ai/size-limit
+- Outil — https://histoire.dev (ou https://vitepress.dev pour la doc + démos)
+
 ## 4. Tests — fondamentaux
 
 - Lire — https://vuejs.org/guide/scaling-up/testing.html

@@ -86,6 +86,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/03ter_composables_library.md
+title: 3ter - Anatomy of a team composable library
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/retro.md
 title: Retro - Day 1
 hide: false
