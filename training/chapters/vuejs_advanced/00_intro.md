@@ -131,6 +131,13 @@ layout: cover
                     <li>Reporting to Sentry: releases, context, noise</li>
                 </ul>
             </li>
+            <li>8ter - Internationalization with vue-i18n
+                <ul>
+                    <li>Pluralization, <code>Intl</code> number &amp; date formats</li>
+                    <li>Lazy-loaded locales and the router</li>
+                    <li>Dropping the message compiler from the bundle</li>
+                </ul>
+            </li>
             <li>9 - Production &amp; deployment
                 <ul>
                     <li>Code-splitting and lazy loading</li>

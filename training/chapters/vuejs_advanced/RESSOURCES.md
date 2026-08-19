@@ -164,6 +164,24 @@
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event (« Script error. » et CORS)
 
+## 8ter. Internationalisation (vue-i18n)
+
+- Lire — https://vue-i18n.intlify.dev/guide/introduction.html
+- Lire — https://vue-i18n.intlify.dev/guide/essentials/pluralization.html
+- Lire — https://vue-i18n.intlify.dev/guide/essentials/syntax.html
+- Lire — https://vue-i18n.intlify.dev/guide/advanced/lazy.html
+- Lire — https://vue-i18n.intlify.dev/guide/advanced/optimization.html
+- Lire — https://vue-i18n.intlify.dev/guide/advanced/typescript.html
+- Lire — https://github.com/intlify/vue-i18n/blob/master/CHANGELOG.md (v11 : dépréciation de l'API Legacy)
+- Lire — https://github.com/intlify/bundle-tools/tree/main/packages/unplugin-vue-i18n
+- Lire — https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules
+- Lire — https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat
+- Lire — https://cldr.unicode.org/index/cldr-spec/plural-rules
+- Lire — https://www.unicode.org/cldr/charts/47/supplemental/language_plural_rules.html
+- Lire — https://i18n.nuxtjs.org (la même stack, intégrée à Nuxt)
+- Lire — https://formatjs.io/docs/core-concepts/icu-syntax (l'alternative ICU)
+- Lire — https://www.w3.org/International/questions/qa-html-language-declarations (`<html lang>`)
+
 ## 9. Production & déploiement
 
 - Lire — https://vite.dev/config/build-options.html

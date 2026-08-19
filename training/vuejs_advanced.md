@@ -135,6 +135,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/08ter_i18n.md
+title: 8ter - Internationalization with vue-i18n
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/09_production.md
 hide: false
 ---
