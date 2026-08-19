@@ -182,7 +182,8 @@ export function useTheme() {
 - Module-scope state is a **singleton for the whole app** — convenient, but:
   - It breaks **SSR** (state leaks between requests)
   - It makes **tests** order-dependent
-- For real application state, use **Pinia** (chapter 6)
+- For real application state, use **Pinia** — the full decision tree
+  (`ref` vs shared composable vs `provide` / `inject` vs store) is in chapter 6
 
 ---
 

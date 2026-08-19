@@ -10,6 +10,8 @@ layout: cover
 
 At the end of this chapter, you will be able to:
 
+- **Choose** between a local `ref`, a shared composable, `provide` / `inject`
+  and a store — and **recognize** the symptoms of the wrong choice
 - **Write** setup stores and **destructure** them safely with `storeToRefs`
 - **Normalize** state and **build** indexed getters instead of O(n) lookups
 - **Cut** the render cost with `shallowRef` / `markRaw` and targeted subscriptions
@@ -19,6 +21,147 @@ At the end of this chapter, you will be able to:
   every store
 - **Delegate** server state to a query layer, and **compare** TanStack Query and
   Pinia Colada on the same request
+
+---
+
+# Where should this state live?
+
+```
+                    a new piece of state
+                              │
+                              ▼
+      ┌────────────────────────────────────────────────┐
+      │  Does it come from the server?                 │──yes──▶  a query layer
+      └───────────────────────┬────────────────────────┘          vue-query, Pinia Colada
+                              │ no
+                              ▼
+      ┌────────────────────────────────────────────────┐
+      │  Read or written outside one component?        │──no───▶  a ref() in the component,
+      └───────────────────────┬────────────────────────┘          or a per-instance composable
+                              │ yes
+                              ▼
+      ┌────────────────────────────────────────────────┐
+      │  Scoped to a subtree — several independent     │──yes──▶  provide / inject
+      │  instances alive at the same time?             │          with a typed InjectionKey
+      └───────────────────────┬────────────────────────┘
+                              │ no — one single instance for the whole app
+                              ▼
+      ┌────────────────────────────────────────────────┐
+      │  Needs SSR, devtools, HMR, plugins,            │──no───▶  a shared composable
+      │  isolation between tests?                      │          (module-scope ref)
+      └───────────────────────┬────────────────────────┘
+                              │ yes
+                              ▼
+                            Pinia
+```
+
+- Read it **top to bottom**: each question you answer *no* keeps the state one
+  step **smaller** than a store
+- Most teams read it backwards — they open `stores/` first, and every `ref` ends
+  up global
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.25;
+}
+ul { font-size: 0.85em; }
+</style>
+
+---
+
+# The three options, side by side
+
+| | **shared composable** | **`provide` / `inject`** | **Pinia** |
+|---|---|---|---|
+| Scope | the module graph | one component subtree | the app |
+| Instances | one, for the process | one per providing component | one per `createPinia()` |
+| Created on | first `import` | the ancestor's `setup()` | first `useXxxStore()` |
+| Read from | an `import` | `inject(key)`, descendants only | `useXxxStore()`, anywhere |
+| Outside a component | ✅ | ❌ `app.runWithContext()` | ✅ once the app exists |
+| SSR | ❌ leaks across requests | ✅ one tree per request | ✅ one Pinia per request |
+| Test isolation | ❌ shared module cache | ✅ mount a fresh tree | ✅ `createTestingPinia()` |
+| Devtools | ❌ | component inspector only | ✅ own tab, time travel |
+| HMR | ❌ full reload | ❌ full reload | ✅ `acceptHMRUpdate` |
+| Plugins | — | — | ✅ persistence, logging |
+| Runtime cost | 0 kB | 0 kB | ~1.5 kB gzip |
+
+> The three are **not** competitors on the same axis: they differ by **who can reach
+> the state**. Pick the narrowest reach that satisfies the feature.
+
+<style>
+table { font-size: 0.7em; }
+th, td { padding: 0.25em 0.6em; }
+blockquote { font-size: 0.85em; }
+</style>
+
+---
+
+# `provide` / `inject` — scoped state, not global state
+
+```ts
+// wizard/context.ts
+import { provide, inject, ref, computed, readonly, type InjectionKey } from 'vue';
+
+export interface WizardContext { /* index, current, next */ }
+const wizardKey = Symbol('wizard') as InjectionKey<WizardContext>;
+
+export function provideWizard(steps: string[]): WizardContext {
+  const index = ref(0);
+  const context: WizardContext = {
+    index: readonly(index),                                  // descendants read
+    current: computed(() => steps[index.value]),
+    next: () => { index.value = Math.min(index.value + 1, steps.length - 1); },
+  };
+  provide(wizardKey, context);                               // ancestors write
+  return context;
+}
+
+export function useWizard(): WizardContext {
+  const context = inject(wizardKey);
+  if (!context) throw new Error('useWizard() must be called inside <Wizard>');
+  return context;                                            // never undefined
+}
+```
+
+- Two `<Wizard>` on the same page ➜ **two independent states** — a module-scope
+  `ref` could not do that, and a store would need an id-keyed map
+- Ship the **pair**, not the key: `provideXxx` / `useXxx`, the symbol stays private
+- `readonly()` on what must not be mutated from below; expose intent-named actions
+- `inject()` resolves **synchronously during `setup()`** — after an `await` it
+  returns `undefined` (chapter 1)
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.35;
+}
+ul { font-size: 0.78em; }
+</style>
+
+---
+
+# Signals that you picked wrong
+
+| Symptom | What it actually means | Move to |
+|---|---|---|
+| A router guard or an HTTP interceptor needs the state | it must live **outside** the component tree | **Pinia** |
+| Two instances of the feature fight over the same values | your singleton needs a **scope** | **`provide` / `inject`** |
+| Tests pass alone, fail in the suite | module-scope state **leaks between tests** | **Pinia** + `createTestingPinia()` |
+| SSR serves one user's data to another | a module-scope singleton on the server | **Pinia**, one per request |
+| The store is mostly `data` / `loading` / `error` triplets | it is **server** state, not client state | a **query layer** |
+| Only one component has ever read it | premature globalization | a plain **`ref()`** |
+
+<br />
+
+> Moving *up* the tree — from a `ref` to a store — is a refactor of a few lines.
+> Moving *down*, once the whole app imports `useCartStore()`, is not. Start small.
+
+<style>
+table { font-size: 0.72em; }
+th, td { padding: 0.3em 0.7em; }
+blockquote { font-size: 0.85em; }
+</style>
 
 ---
 
@@ -607,6 +750,8 @@ expect(useCartStore().add).toHaveBeenCalledWith(item);
 
 # Recap
 
+- Pick the **narrowest reach** that works: a local `ref` ➜ a shared composable ➜
+  `provide` / `inject` ➜ Pinia ➜ a query layer for anything that came from the server
 - **Setup stores** by default; `storeToRefs` to destructure state and getters
 - Getters are `computed` — build **indexes**, don't return lookup functions
 - `shallowRef` / `markRaw` for large or non-reactive payloads
