@@ -69,6 +69,23 @@
 - Lire — https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
 - Lire — https://developer.chrome.com/docs/web-platform/view-transitions/
 
+## 5bis. Écosystème unplugin-*
+
+- Lire — https://unplugin.unjs.io
+- Lire — https://github.com/unjs/unplugin
+- Lire — https://uvr.esm.is
+- Lire — https://uvr.esm.is/guide/file-based-routing.html
+- Lire — https://uvr.esm.is/guide/extending-routes.html
+- Lire — https://uvr.esm.is/guide/typescript.html
+- Lire — https://github.com/vuejs/router (uvr y a été fusionné)
+- Lire — https://github.com/unplugin/unplugin-auto-import
+- Lire — https://github.com/unjs/unimport (le moteur derrière auto-import)
+- Lire — https://github.com/unplugin/unplugin-vue-components
+- Lire — https://github.com/unplugin/unplugin-vue-components/tree/main/src/core/resolvers
+- Lire — https://github.com/antfu-collective/vitesse (les trois plugins en situation)
+- Lire — https://nuxt.com/docs/guide/concepts/auto-imports (la même idée, intégrée)
+- Regarder — https://antfu.me/talks
+
 ## 6. Pinia
 
 - Lire — https://pinia.vuejs.org/core-concepts/plugins.html

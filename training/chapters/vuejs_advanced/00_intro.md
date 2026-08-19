@@ -78,6 +78,13 @@ layout: cover
                     <li>Case study: authentication</li>
                 </ul>
             </li>
+            <li>5bis - The <code>unplugin-*</code> ecosystem
+                <ul>
+                    <li>File-based &amp; typed routing</li>
+                    <li>Auto-imports of APIs and components</li>
+                    <li>Generated types, ESLint and CI</li>
+                </ul>
+            </li>
             <li>6 - State management with Pinia
                 <ul>
                     <li>Optimizing stores</li>
@@ -122,7 +129,8 @@ layout: cover
 
 - Deepen your understanding of **key Vue.js concepts**: async components, composables
   and custom directives
-- Master **routing and navigation** with Vue Router
+- Master **routing and navigation** with Vue Router, up to **file-based typed
+  routes**
 - Efficiently manage application state with **Pinia**
 - Build **typed, validated and accessible forms** with Zod and VeeValidate
 - Write **unit and end-to-end tests** to guarantee code quality

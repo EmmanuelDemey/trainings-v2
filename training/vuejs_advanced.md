@@ -90,6 +90,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/05bis_unplugin.md
+title: 5bis - The unplugin-* ecosystem
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/06_pinia.md
 hide: false
 ---
