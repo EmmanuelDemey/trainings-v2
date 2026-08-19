@@ -62,6 +62,7 @@ workshop below assumes the panel is open next to the app.
 | 7 | `07_forms/` | Zod schema, `useZodForm`, VeeValidate, a11y | — |
 | 8 | `04_testing/` — **part 2** | Router & Pinia in tests, MSW, Cypress | Cypress downloads a browser |
 | 9 | `09_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) — or Docker for the local plan B |
+| 10 | `10_final_project/` — **optional** | Everything above, in one slice — then a cross-review round | A second pair |
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
@@ -81,6 +82,13 @@ one DoD per part.
 components and composables in isolation, part 2 comes back to it once the router
 and Pinia chapters are done. There is no `08_` folder.
 
+`10_final_project/` is the **optional** half-day that closes the training. It is
+run **in pairs**, and it is the only workshop whose second half is not code: at
+the freeze you hand your work to another pair, they run it before they read it,
+and each side leaves with three findings written on someone else's code. Its
+`README.md` carries the timetable, the review grid and the rules; `REVIEW.md` is
+the sheet the reviewers fill in.
+
 ## Node version
 
 Every workshop targets **Node.js >= 22**. Run `nvm use` in the workshop folder to
@@ -93,3 +101,5 @@ pick up the version from its `.nvmrc`.
 (`src/api/fakeApi.ts`) with an artificial latency, so nothing has to be installed
 or running besides Vite.
 `04_testing/` mocks the network explicitly (MSW, `cy.intercept`).
+`10_final_project/` uses a fake API too — with `AbortSignal` support on the reads
+and a switch, in the app header, that makes every write fail.

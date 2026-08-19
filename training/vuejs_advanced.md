@@ -152,6 +152,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/10_final_project.md
+title: 10 - Final project & cross-review (optional)
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/retro.md
 title: Retro - Day 3
 hide: false
