@@ -10,7 +10,10 @@
     "preview": "vite preview --port 4173",
     "typecheck": "vue-tsc --noEmit",
     "analyze": "ANALYZE=1 vite build",
-    "size": "size-limit"
+    "size": "size-limit",
+    "serve:local": "docker compose -f docker/compose.yml up -d",
+    "serve:local:stop": "docker compose -f docker/compose.yml down",
+    "verify:serving": "bash docker/verify-serving.sh"
   },
   "dependencies": {
     "pinia": "^3.0.0",

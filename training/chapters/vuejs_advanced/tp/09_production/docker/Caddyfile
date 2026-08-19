@@ -1,0 +1,58 @@
+# PLAN B — serving the SPA yourself, with Caddy.
+#
+# Same exercise as `nginx.conf`, in the other syntax — do ONE of the two, then
+# read the other and notice how little of this is nginx-specific. INCOMPLETE on
+# purpose: `npm run verify:serving -- http://localhost:8081` fails as it stands.
+#
+# Reload without rebuilding anything:
+#   docker compose -f docker/compose.yml restart caddy
+
+:80 {
+	root * /srv
+	encode gzip zstd
+
+	# TODO B1: history-mode fallback. `file_server` alone 404s on /invoices,
+	#   because there is no such file — the route only exists once index.html has
+	#   booted the router:
+	#
+	#     try_files {path} /index.html
+	#
+	#   (Caddy also ships a `handle` + `rewrite` form; either is fine.)
+
+	# TODO B2: cache headers — immutable for the content-hashed assets, no-cache
+	#   for the manifest:
+	#
+	#     @assets path /assets/*
+	#     header @assets Cache-Control "public, max-age=31536000, immutable"
+	#     header /index.html Cache-Control "no-cache"
+
+	# TODO B3: the trap. With B1 in place, a request for an asset that does not
+	#   exist gets index.html back with `Content-Type: text/html`, and the browser
+	#   reports `Unexpected token '<'` instead of "404 chunk not found". Keep
+	#   /assets/* out of the fallback:
+	#
+	#     handle /assets/* {
+	#       file_server
+	#     }
+	#
+	#     handle {
+	#       try_files {path} /index.html
+	#       file_server
+	#     }
+	#
+	#   Two `handle` blocks are mutually exclusive: the first path that matches
+	#   wins, so the fallback never applies to /assets/*. The bare `file_server`
+	#   at the bottom then becomes redundant — delete it.
+
+	# TODO B4 (bonus): the security headers from the slides, in
+	#   `Content-Security-Policy-Report-Only` first:
+	#
+	#     header {
+	#       X-Content-Type-Options "nosniff"
+	#       Referrer-Policy "strict-origin-when-cross-origin"
+	#     }
+	#
+	#   Unlike nginx, `header` blocks here are additive — no inheritance surprise.
+
+	file_server
+}

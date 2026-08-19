@@ -23,7 +23,13 @@ const execFileAsync = promisify(execFile);
 
 const MIN_NODE = [22, 0, 0];
 const MIN_NPM = [10, 0, 0];
-const PORTS = [5173, 4173]; // vite dev / vite preview
+const PORTS = [
+  { port: 5173, usedBy: 'vite dev', hint: 'Free it before the session, or Vite will silently move to another port.' },
+  { port: 4173, usedBy: 'vite preview', hint: 'Free it before the session, or Vite will silently move to another port.' },
+  // Workshop 9 serves its build from a local nginx/Caddy container (step 5bis).
+  { port: 8080, usedBy: 'nginx, TP 9', hint: 'Only needed for the local deployment of workshop 9; edit `docker/compose.yml` if it is taken.' },
+  { port: 8081, usedBy: 'Caddy, TP 9', hint: 'Only needed for the local deployment of workshop 9; edit `docker/compose.yml` if it is taken.' },
+];
 const ENDPOINTS = [
   {
     label: 'npm registry',
@@ -195,23 +201,45 @@ async function checkEndpoint({ label, url, required, hint }) {
   }
 }
 
-function checkPort(port) {
+function checkPort({ port, usedBy, hint }) {
+  const label = `Port ${port} (${usedBy})`;
   return new Promise((resolve) => {
     const server = createServer();
     server.once('error', (error) => {
       resolve(
         error.code === 'EADDRINUSE'
-          ? warn(
-              `Port ${port}`,
-              'already in use',
-              `Free it before the session, or Vite will silently move to another port.`,
-            )
-          : warn(`Port ${port}`, `could not be tested (${error.code})`),
+          ? warn(label, 'already in use', hint)
+          : warn(label, `could not be tested (${error.code})`),
       );
     });
-    server.once('listening', () => server.close(() => resolve(ok(`Port ${port}`, 'free'))));
+    server.once('listening', () => server.close(() => resolve(ok(label, 'free'))));
     server.listen(port, '127.0.0.1');
   });
+}
+
+/**
+ * Optional: workshop 9 deploys its build to a local nginx/Caddy container when
+ * you do not have (or do not want) a Netlify/Vercel account. Everything else in
+ * the training runs without it, so a missing Docker is a warning, never a failure.
+ */
+async function checkDocker() {
+  const output = await run('docker', ['--version']);
+  if (output === null) {
+    return warn(
+      'Docker',
+      'not found',
+      'Optional — only workshop 9 step 5bis (deploying the build locally) uses it. Podman with `podman compose` works too.',
+    );
+  }
+  const compose = await run('docker', ['compose', 'version']);
+  if (compose === null) {
+    return warn(
+      'Docker',
+      `v${parseVersion(output)?.join('.') ?? output} — but \`docker compose\` is missing`,
+      'Install the Compose v2 plugin, or start the containers by hand with `docker run`.',
+    );
+  }
+  return ok('Docker', `v${parseVersion(output)?.join('.') ?? output} with compose`);
 }
 
 async function checkDisk(directory) {
@@ -359,7 +387,13 @@ async function main(argv = process.argv.slice(2)) {
 
   log(`Advanced Vue.js — environment check  (${process.platform}, ${process.arch})\n`);
 
-  const results = [await checkNode(), await checkNpm(), await checkGit(), await checkRegistryConfig()];
+  const results = [
+    await checkNode(),
+    await checkNpm(),
+    await checkGit(),
+    await checkDocker(),
+    await checkRegistryConfig(),
+  ];
 
   const proxy = proxyInfo();
   if (proxy) results.push(proxy);

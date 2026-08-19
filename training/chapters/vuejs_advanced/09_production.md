@@ -401,6 +401,68 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 ---
 
+# `vite preview` is not your production
+
+```bash
+npm run build && npm run preview                  # :4173
+curl -i http://localhost:4173/assets/nope.js      # a chunk that does not exist
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Cache-Control: no-cache
+```
+
+- Its SPA fallback is **hard-coded** — it passes whether or not your host config has one
+- `no-cache` on everything — it can never validate your caching policy
+- A missing chunk comes back as HTML: `Uncaught SyntaxError: Unexpected token '<'`
+
+> Perfect for testing the *app*. It proves nothing about the *deployment*.
+
+---
+
+# Plan B — no account, same three rules
+
+```yaml
+# docker/compose.yml — dist/ mounted, so edit the config and `restart`
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports: ['8080:80']
+    volumes:
+      - ../dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+```
+
+```bash
+curl -o /dev/null -w '%{http_code}\n' localhost:8080/invoices          # 200, not 404
+curl -sI localhost:8080/index.html          | grep -i cache-control     # no-cache
+curl -sI localhost:8080/assets/index-C1a.js | grep -i cache-control     # immutable
+curl -o /dev/null -w '%{http_code}\n' localhost:8080/assets/nope.js    # 404, NOT 200
+```
+
+- Netlify and Vercel are convenient; they are not a prerequisite to learning this
+- Same trap on all three: a catch-all rewrite serves `index.html` for a **missing asset**
+
+---
+
+# The image you would actually ship
+
+```dockerfile
+FROM nginx:1.27-alpine
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY dist/ /usr/share/nginx/html/
+```
+
+- No `npm ci`, no `vite build`: the artifact was built **once**, upstream
+- The popular multi-stage variant (`FROM node AS build` … `COPY --from=build`)
+  quietly rebuilds at deploy time — know which trade-off you are making
+- Runtime config (`window.__CONFIG__` substituted by the entrypoint) is what lets
+  the **same image** go to staging and to production
+
+---
+
 # A CI/CD pipeline
 
 ```yaml
@@ -531,7 +593,7 @@ app.config.errorHandler = (err, instance, info) => { /* log it */ };
 
 ---
 
-# Quiz — Question 1 / 4
+# Quiz — Question 1 / 5
 
 **You add `VITE_API_TOKEN=abc123` to `.env.production`. Who can read it?**
 
@@ -550,7 +612,7 @@ app.config.errorHandler = (err, instance, info) => { /* log it */ };
 
 ---
 
-# Quiz — Question 2 / 4
+# Quiz — Question 2 / 5
 
 **Which caching policy is correct for a Vite SPA build?**
 
@@ -569,7 +631,7 @@ app.config.errorHandler = (err, instance, info) => { /* log it */ };
 
 ---
 
-# Quiz — Question 3 / 4
+# Quiz — Question 3 / 5
 
 **Which optimization pays the most in a typical SPA?**
 
@@ -588,7 +650,7 @@ app.config.errorHandler = (err, instance, info) => { /* log it */ };
 
 ---
 
-# Quiz — Question 4 / 4
+# Quiz — Question 4 / 5
 
 **Why do the `e2e` and `deploy` jobs download the `dist` artifact instead of
 rebuilding it?**
@@ -606,6 +668,26 @@ rebuilding it?**
 </v-click>
 
 ---
+
+# Quiz — Question 5 / 5
+
+**`npm run preview` serves your deep links fine. What does that prove about
+production?**
+
+- **A.** The history-mode fallback is correctly configured
+- **B.** Nothing — `vite preview` has its own fallback built in
+- **C.** That the app has no dynamic routes
+- **D.** That the cache headers are right too
+
+<v-click>
+
+> ✅ **B** — `vite preview` is a dev convenience with the SPA fallback hard-coded and
+> `no-cache` on everything. It even answers a **missing** chunk with `index.html`.
+> Test the config you deploy: a local nginx/Caddy container, or the host itself.
+
+</v-click>
+
+---
 layout: cover
 ---
 
@@ -619,8 +701,11 @@ layout: cover
 - Add a typed, validated `import.meta.env` configuration with a `.env.staging` mode
 - Write the GitHub Actions pipeline: lint, typecheck, unit, build, Cypress on
   `vite preview`, then deploy
-- Deploy the app to **Netlify or Vercel** with the fallback and cache headers,
-  and verify a hard refresh on a deep link
+- Deploy the app **to Netlify or Vercel**, or — no account needed — **to a local
+  nginx/Caddy container** with the fallback and cache headers, and verify a hard
+  refresh on a deep link
+- Prove the trap: make a request for a chunk that does not exist return a 404 and
+  not `index.html`
 
 <style>
 /* The `cover` layout sets color: white; inline code would inherit it and

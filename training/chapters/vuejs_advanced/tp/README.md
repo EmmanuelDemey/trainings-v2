@@ -27,9 +27,14 @@ node check-env.mjs
 
 It has no dependency to install: if it does not even start, Node.js is missing or too
 old — and that is already the first thing to fix. It checks Node.js and npm versions,
-Git, free disk space, the ports Vite uses (5173 / 4173), and whether your network lets
+Git, Docker, free disk space, the ports the training binds (5173 / 4173 for Vite,
+8080 / 8081 for the local deployment of workshop 9), and whether your network lets
 you reach the npm registry and the Cypress CDN (the two things a corporate proxy
 usually blocks).
+
+Docker is reported as a **warning**, never a blocker: it is only used by workshop 9,
+whose last step deploys the build to a local nginx or Caddy container when you do not
+have a Netlify/Vercel account.
 
 ```bash
 node check-env.mjs --install    # also run `npm install` in every workshop
@@ -56,7 +61,7 @@ workshop below assumes the panel is open next to the app.
 | 6 | `06_pinia/` | Store splitting, indexes, `shallowRef`, plugins | — |
 | 7 | `07_forms/` | Zod schema, `useZodForm`, VeeValidate, a11y | — |
 | 8 | `04_testing/` — **part 2** | Router & Pinia in tests, MSW, Cypress | Cypress downloads a browser |
-| 9 | `09_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) |
+| 9 | `09_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) — or Docker for the local plan B |
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.

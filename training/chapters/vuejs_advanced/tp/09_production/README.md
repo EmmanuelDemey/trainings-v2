@@ -19,8 +19,11 @@ Chapter 9 — Take a working Vue app all the way to a deployment you would defen
 ## Prerequisites
 
 - **Node.js >= 22** — run `nvm use` to pick up the version from `.nvmrc`
-- *(Optional)* A **Netlify** or **Vercel** account for the last step. Everything
-  before it runs locally.
+- *(Optional)* A **Netlify** or **Vercel** account for the deployment step.
+- **No account?** Step 5bis is the plan B: you deploy to an nginx or Caddy
+  container on your own machine and verify the exact same three rules. It needs
+  **Docker** (Docker Desktop, Colima, Podman with `podman compose`…) and nothing
+  else. Everything else in this workshop runs locally either way.
 
 ## Setup
 
@@ -88,6 +91,91 @@ it here, and what would make it not worth it?
    the most common production bug in this whole chapter.
 4. *(Bonus)* Add the security headers and a CSP, in report-only first.
 
+No account? Do step 5bis instead — same three rules, same verification, no signup.
+
+### 5bis. Plan B — deploy it on your own machine
+
+> Do this step **even if you have a Netlify account**: it takes five minutes and
+> it is the only version of step 5 where you can see *what the host was doing for
+> you*.
+
+Start with the measurement that motivates the whole step. Serve the build the way
+you have been serving it all along, and check it:
+
+```bash
+npm run build
+npm run preview                                    # http://localhost:4173
+npm run verify:serving -- http://localhost:4173    # ← from another terminal
+```
+
+Three checks pass, two fail, and none of the five is visible in the browser.
+
+The two failures are the cache headers (`no-cache` on *everything*) and the missing
+asset, which comes back as `index.html` with `HTTP 200`. The three passes are worse
+news: `vite preview` has the SPA fallback **hard-coded**, so `/invoices` works there
+whether or not your host config says so. It is a dev convenience, and **it ignores
+your serving config entirely** — a green `vite preview` is not evidence about
+anything you are about to deploy.
+
+> No `bash` on your machine? Every check in the script is one `curl` — the ones that
+> matter are spelled out below, and `curl -sI <url>` prints the headers.
+
+Now a real static server:
+
+```bash
+npm run serve:local        # nginx on :8080, Caddy on :8081 — pick one
+npm run verify:serving     # nginx; add `-- http://localhost:8081` for Caddy
+```
+
+Red, and this time the browser agrees: open <http://localhost:8080/invoices>
+directly and you get nginx's own 404 page. That is your production, minus the CDN.
+
+1. Fix `docker/nginx.conf` (or `docker/Caddyfile`) TODO by TODO. After each edit:
+
+   ```bash
+   docker compose -f docker/compose.yml restart nginx    # or caddy
+   npm run verify:serving
+   ```
+
+   `dist/` and the config are mounted into the container, so there is nothing to
+   rebuild between two attempts.
+
+2. **B1 — the fallback.** `/invoices` must return `index.html`.
+3. **B2 — the cache headers.** `immutable` on `/assets/*`, `no-cache` on
+   `index.html`. Check it in the Network tab too, not only in the script.
+4. **B3 — the trap.** Once B1 is in, request a chunk that does not exist:
+
+   ```bash
+   curl -i http://localhost:8080/assets/does-not-exist-0000.js
+   ```
+
+   Without B3 you get `200 OK` and `Content-Type: text/html` — the fallback served
+   the app in place of a JavaScript file, and the browser reports
+   `Uncaught SyntaxError: Unexpected token '<'`. This is the same catch-all
+   rewrite you just wrote into `netlify.toml`, so **the trap is not
+   nginx-specific**: it is a property of "rewrite everything to index.html".
+5. Get `npm run verify:serving` to exit 0, then do the manual test anyway: open
+   <http://localhost:8080/invoices> and press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>.
+6. *(Bonus)* B4 — the security headers. The script reports them but never fails on
+   them. Watch out for nginx's `add_header` inheritance rule: a `location` block
+   that declares one header drops every header inherited from `server`.
+7. Stop everything with `npm run serve:local:stop`.
+
+Then read `docker/Dockerfile`: the image copies `dist/` in and never rebuilds it —
+the same "build once" rule as step 7, applied to the container.
+
+```bash
+docker build -f docker/Dockerfile -t tp09-production .
+docker run --rm -p 8080:80 tp09-production
+```
+
+The script takes any base URL, so once you *do* have a deployment, the same
+command grades it:
+
+```bash
+npm run verify:serving -- https://my-app.netlify.app
+```
+
 ### 6. Observability — `src/main.ts`
 
 Add `app.config.errorHandler`, and *(bonus)* report the web vitals.
@@ -105,9 +193,9 @@ Add `app.config.errorHandler`, and *(bonus)* report the web vitals.
 ## Definition of Done
 
 Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
-section are **not** part of this list. The deployment boxes assume you took the
-optional Netlify/Vercel account — if you did not, the configuration files still have
-to be complete and reviewable.
+section are **not** part of this list. Every box is reachable without a Netlify or
+Vercel account: wherever one says "your deployment", the container from step 5bis
+counts.
 
 **It builds and runs**
 
@@ -115,8 +203,8 @@ to be complete and reviewable.
 - [ ] `npm run build` succeeds
 - [ ] `npm run size` passes against a `.size-limit.json` you **lowered** to fit your
       optimized build
-- [ ] `grep -rn TODO src vite.config.ts env.d.ts netlify.toml vercel.json .github |
-      grep -v bonus` returns nothing
+- [ ] `grep -rn TODO src vite.config.ts env.d.ts netlify.toml vercel.json .github
+      docker/nginx.conf docker/Caddyfile | grep -v bonus` returns nothing
 
 **The numbers moved, and you have them**
 
@@ -144,7 +232,14 @@ to be complete and reviewable.
       evidence, whether a `VITE_` variable can hold a secret
 - [ ] The host config has the history-mode fallback, `immutable` caching for
       `/assets/*` and `no-cache` for `index.html`
+- [ ] `npm run verify:serving` exits 0 against your deployment — the step 5bis
+      container, or your Netlify/Vercel URL if you have one
 - [ ] A **hard refresh** on a deep link returns the app, not a 404
+- [ ] A request for an asset that does not exist returns **404**, not `index.html`
+      with `Content-Type: text/html` — and you have seen what the browser reports
+      when it does not
+- [ ] You can name the two checks `npm run verify:serving -- http://localhost:4173`
+      fails on `vite preview`, and why the others pass there for free
 - [ ] `app.config.errorHandler` is wired and catches an error thrown from a component
 
 **The pipeline is real**
@@ -161,6 +256,7 @@ to be complete and reviewable.
 - [ ] Why the artifact is built once and passed along, rather than rebuilt per job
 - [ ] Why a size budget that does not fail the build is not a budget
 - [ ] What the `no-cache` on `index.html` protects you from
+- [ ] Why a green `vite preview` is no evidence that your serving config is right
 
 ## Going further
 
@@ -168,6 +264,11 @@ to be complete and reviewable.
   does. Is it redundant?
 - Set up the runtime-configuration pattern (`window.__CONFIG__` substituted at
   container startup) so the same artifact can be deployed to staging and
-  production. Is it worth it for this app?
+  production. You now have the container: add an entrypoint that rewrites the
+  placeholder in `index.html` before nginx starts, and deploy the *same* image
+  twice with two different `API_URL` values. Is it worth it for this app?
+- Add a `serve` job to `ci.yml` that runs the step 5bis container and calls
+  `bash docker/verify-serving.sh` against it. The serving rules are the one part
+  of this workshop nothing in the pipeline currently tests.
 - Add `treosh/lighthouse-ci-action` with assertions on LCP, CLS and TBT, and make
   it fail the build.
