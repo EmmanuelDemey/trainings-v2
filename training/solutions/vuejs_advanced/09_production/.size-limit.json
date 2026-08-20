@@ -1,0 +1,12 @@
+[
+  {
+    "name": "entry chunk",
+    "path": "dist/assets/index-*.js",
+    "limit": "30 kB"
+  },
+  {
+    "name": "css",
+    "path": "dist/assets/*.css",
+    "limit": "10 kB"
+  }
+]

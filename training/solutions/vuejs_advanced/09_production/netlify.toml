@@ -1,0 +1,70 @@
+# STEP 5 — Serving the SPA correctly.
+#
+# Three rules, and the same three you had to write by hand in `docker/nginx.conf`
+# for step 5bis. Read them side by side once: nothing here is Netlify-specific
+# except the syntax.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# 5.1 — history-mode fallback.
+#
+# Without it, a hard refresh on /invoices is a 404: the server looks for a file
+# that does not exist. The route only comes into being once index.html has
+# booted the router.
+#
+# `status = 200` and not 301: this is a REWRITE, not a redirect. The URL stays
+# /invoices, which is what the router reads on boot.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 5.2 — cache headers.
+#
+# Asset file names are content-hashed, so a given name can never serve different
+# bytes: cache it for a year and never revalidate.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# `index.html` is the opposite case — a stable name whose content changes on
+# every deploy. Cache it and returning users keep loading the previous
+# deployment's manifest, asking for chunks that were deleted an hour ago.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# 5.4 (bonus) — security headers.
+#
+# The CSP is REPORT-ONLY on purpose: ship it, watch the console (and the report
+# endpoint) for a few days, then rename the key to `Content-Security-Policy` to
+# enforce. A Vue build needs NO 'unsafe-eval' — if you had to add it, something
+# else is wrong, usually a runtime template compiler.
+#
+# `style-src 'unsafe-inline'` is required by Vue's scoped-style and `:style`
+# bindings; there is no way around it short of a nonce-based CSP with SSR.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'"
+
+# NOTE on the trap of step B3: Netlify's catch-all rewrite above swallows a
+# missing asset exactly like a naive nginx `try_files` does — a deleted chunk
+# comes back as index.html with `Content-Type: text/html`, and the browser says
+# `Unexpected token '<'`. Keep /assets/* out of the fallback:
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+  force = false

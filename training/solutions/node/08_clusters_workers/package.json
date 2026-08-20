@@ -1,0 +1,22 @@
+{
+  "name": "tp-08-clusters-workers",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "load": "npx autocannon -c 50 http://localhost:3000/hash?password=secret",
+    "pm2": "npx pm2 start src/server.ts -i max --interpreter node"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "@types/node": "^24.13.3",
+    "@types/express": "^5.0.6"
+  }
+}

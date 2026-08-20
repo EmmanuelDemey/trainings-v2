@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+**/dist/
+**/build/
+**/stats.html
+*.tsbuildinfo
+*.log
+isolate-*.log
+.clinic/
+
+# Generated data
+**/data/*.csv
+**/data/*.enc
+
+# Test output
+**/coverage/
+**/cypress/screenshots/
+**/cypress/videos/
+**/cypress/downloads/
+**/test-results/
+**/__screenshots__/
+
+# Env — the mode files are part of the workshops and ARE committed.
+.env.local
+.env.*.local

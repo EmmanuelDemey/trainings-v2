@@ -1,0 +1,46 @@
+# PLAN B — serving the SPA yourself, with Caddy.
+#
+# The same three rules as `nginx.conf`, in the other syntax. Read both and
+# notice how little of this is nginx-specific.
+#
+# Reload without rebuilding anything:
+#   docker compose -f docker/compose.yml restart caddy
+#   npm run verify:serving -- http://localhost:8081
+
+:80 {
+	root * /srv
+	encode gzip zstd
+
+	# B4 — security headers. Unlike nginx, `header` blocks are additive here:
+	# no inheritance surprise, nothing to repeat per matcher.
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'"
+	}
+
+	# B2 — cache headers: immutable for the content-hashed assets, no-cache for
+	# the manifest whose name never changes but whose content does.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	header /index.html Cache-Control "no-cache"
+
+	# B3 — /assets/* is served WITHOUT the fallback, so a chunk that no longer
+	# exists comes back as a 404 rather than as index.html with
+	# `Content-Type: text/html` (and the browser's useless
+	# `Unexpected token '<'`).
+	#
+	# The two `handle` blocks are mutually exclusive: the first matching one
+	# wins, so the fallback below can never apply to an asset.
+	handle /assets/* {
+		file_server
+	}
+
+	# B1 — history-mode fallback for everything else. /invoices is not a file;
+	# it only becomes a route once index.html has booted the router.
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+}

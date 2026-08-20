@@ -1,0 +1,127 @@
+# STEP 7 — The pipeline.
+#
+# One rule governs the whole file: BUILD ONCE, then have every later job consume
+# that exact artifact. A job that rebuilds before deploying ships something no
+# test ever ran against — and the difference will not show up until production.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # The artifact every later job downloads. Nothing downstream runs
+      # `npm run build` again.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+      # A budget that does not fail the build is a number in a README. This runs
+      # after the build, against the same `dist/`, and exits non-zero when a
+      # chunk crosses the limit declared in `.size-limit.json`.
+      - name: Size budget
+        run: npm run size
+
+  e2e:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # The SAME bytes the quality job produced — not a rebuild.
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+
+      # Serve the BUILT app, not the dev server: minification, the production
+      # Vue build and the real chunk splitting are all things the dev server
+      # does not do, and all things that break differently.
+      - name: Run the e2e suite against the build
+        run: |
+          npx vite preview --port 4173 &
+          npx wait-on http://localhost:4173 --timeout 60000
+          npx cypress run
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-artifacts
+          path: |
+            cypress/screenshots
+            cypress/videos
+
+  deploy:
+    needs: e2e
+    # Only from the default branch. A pull request must run every check above and
+    # deploy nothing.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+
+      - name: Deploy to Netlify
+        run: npx netlify-cli deploy --dir=dist --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      # The checks of step 5, run against the URL that was just deployed. This is
+      # what turns "the deploy succeeded" into "the deploy works".
+      - name: Verify the deployed site
+        run: bash docker/verify-serving.sh "${{ vars.PRODUCTION_URL }}"
+
+# STEP 7.5 — The rollback procedure.
+#
+# Netlify keeps every deploy immutable and addressable, so a rollback is a
+# promotion, not a rebuild:
+#
+#   npx netlify-cli api listSiteDeploys --data '{"site_id":"<id>"}' | jq '.[0:5]'
+#   npx netlify-cli api restoreSiteDeploy --data '{"site_id":"<id>","deploy_id":"<previous>"}'
+#
+# Two properties make it trustworthy, and both are consequences of choices made
+# earlier in this file:
+#
+#  - the previous deploy is the exact artifact that passed CI, still stored —
+#    nothing is rebuilt, so nothing can build differently;
+#  - `index.html` is served `no-cache` (step 5.2), so clients pick up the
+#    restored manifest on their next navigation instead of on cache expiry.
+#    Had we cached index.html for a year, the rollback would be invisible to
+#    everyone who had already loaded the broken version.
+#
+# And the part that is not automatable: TEST IT. Deploy something deliberately
+# broken to a staging site, roll it back, and time yourself. An untested
+# rollback is not a rollback — it is a paragraph in a runbook.
