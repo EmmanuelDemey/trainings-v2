@@ -44,7 +44,7 @@ export function throttledTickWithRxjs(
   onTick: (value: number) => void,
 ): () => void {
   // TODO: const sub = fromEvent<number>(source, 'tick').pipe(throttleTime(windowMs)).subscribe(onTick);
-  const sub: Subscription | undefined = undefined; // TODO
+  let sub: Subscription | undefined; // TODO: assign the subscription here.
 
   return () => {
     sub?.unsubscribe();

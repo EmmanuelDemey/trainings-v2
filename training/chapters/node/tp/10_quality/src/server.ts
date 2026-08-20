@@ -1,7 +1,8 @@
 import express from 'express';
 import type { ErrorRequestHandler } from 'express';
 import { requestLogging, logger } from './logging.ts';
-import { HttpError, NotFoundError } from './errors.ts';
+import { HttpError } from './errors.ts';
+// TODO: import { NotFoundError } from './errors.ts'; once you have written it.
 
 const app = express();
 app.use(express.json());
@@ -16,7 +17,6 @@ void requestLogging;
  */
 app.get('/hello/:name', (req, res) => {
   // TODO: if `req.params.name === 'unknown'`, throw new NotFoundError('user not found').
-  void NotFoundError;
   logger().info({ name: req.params.name }, 'greeting');
   res.json({ message: `Hello, ${req.params.name}!` });
 });

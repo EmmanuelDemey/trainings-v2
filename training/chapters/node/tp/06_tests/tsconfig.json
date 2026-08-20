@@ -11,5 +11,8 @@
     "rewriteRelativeImportExtensions": true,
     "noEmit": true,
     "strict": true
-  }
+  },
+  // e2e/ needs @playwright/test, which is optional and deliberately not installed.
+  // Add it back to "exclude": [] once you run `npm install -D @playwright/test`.
+  "exclude": ["e2e"]
 }

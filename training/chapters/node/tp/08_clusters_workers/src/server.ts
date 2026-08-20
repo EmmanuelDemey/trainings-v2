@@ -18,7 +18,13 @@ const PORT = 3000;
 function hashInline(password: string): string {
   const salt = randomBytes(16);
   // High cost so the blocking is clearly visible under load.
-  const derived = scryptSync(password, salt, 64, { N: 2 ** 15 });
+  const derived = scryptSync(password, salt, 64, {
+    N: 2 ** 15,
+    // scrypt needs 128 * N * r bytes (~34 MB here) and Node's default
+    // `maxmem` is 32 MB — without this it throws `RangeError: Invalid
+    // scrypt params` before doing any work at all.
+    maxmem: 64 * 1024 * 1024,
+  });
   return `${salt.toString('hex')}:${derived.toString('hex')}`;
 }
 
