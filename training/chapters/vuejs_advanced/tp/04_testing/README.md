@@ -32,7 +32,7 @@ Cover one small application at every level:
 
 ## Prerequisites
 
-- **Node.js >= 22** — run `nvm use` to pick up the version from `.nvmrc`
+- **Node.js >= 22.22.2** (24.15+ recommended) — run `nvm use` to pick up the version from `.nvmrc`
 - `npm install` downloads the **Cypress binary** (~250 MB). Skip it with
   `CYPRESS_INSTALL_BINARY=0 npm install` if you only want the Vitest steps —
   **part 1 does not need Cypress at all**.
@@ -72,6 +72,13 @@ npm run e2e:open     # in another terminal
 
 Three mechanisms, **one contract**. If you change a response shape, all three
 have to agree — which is exactly the kind of drift these tests are meant to catch.
+
+They are also mutually exclusive: the fake backend steps aside under Cypress
+(`if (!('Cypress' in window))` in `src/main.ts`). It patches `window.fetch` and
+answers `/api/*` before the request ever reaches the network — the exact layer
+`cy.intercept` listens on. Leave it installed and every `cy.wait('@invoices')`
+fails with *"No request ever occurred"*, because none did. Under Cypress the e2e
+suite owns the whole network, `POST /api/login` included.
 
 > The MSW server is already wired in `tests/setup.ts` and serves the happy path.
 > In part 1 you just benefit from it; in part 2 you override it per test.
@@ -301,9 +308,10 @@ Nothing to fill in here — the four tests are written and green. What to look a
   dataset moved to `tests/fixtures.ts` so both worlds import it from one place; the
   browser equivalent is `setupWorker` from `msw/browser`, plus `npx msw init public/`
   to install its service worker.
-- `vitest-browser-vue` is pinned to **1.x**: 2.x requires Vitest 4, which also moves
-  the provider into its own package (`@vitest/browser-webdriverio`). The slides show
-  both forms.
+- The workshop runs **Vitest 4**, so `vitest-browser-vue` is on **2.x** and the browser
+  provider lives in its own package: `@vitest/browser-webdriverio`. `provider` takes the
+  imported `webdriverio()` factory, not the string `'webdriverio'`, and the Chrome
+  `capabilities` are passed to that factory (see `vitest.browser.config.ts`).
 - `tests/setup.browser.ts` imports `src/style.css`. In jsdom that import is pointless
   — nothing applies the stylesheet. Here it is what makes the assertions possible.
 

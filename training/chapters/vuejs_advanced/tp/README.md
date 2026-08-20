@@ -1,8 +1,8 @@
 # Advanced Vue.js — Workshops (TP)
 
 Hands-on exercises for the **Advanced Vue.js** training, based on **Vue 3.5**,
-**Vite 6**, **Vue Router 4**, **Pinia 3**, **Zod**, **VeeValidate 4**,
-**Vitest 3** and **Cypress 14**.
+**Vite 8**, **Vue Router 5**, **Pinia 4**, **Zod 3**, **VeeValidate 4**,
+**Vitest 4** and **Cypress 15**.
 
 Each workshop is a **standalone project**: it has its own `package.json`,
 `tsconfig.json`, `.nvmrc` and `README.md`, and it **does not depend on any other
@@ -50,6 +50,30 @@ One thing the script cannot check for you: install the **Vue Devtools** browser
 extension (Chrome or Firefox). Day 1 opens with a guided tour of it, and every
 workshop below assumes the panel is open next to the app.
 
+## Toolchain versions
+
+Dependencies were last refreshed on **2026-08-20**, to the latest release of every
+package. Three deliberate pins, each with a reason that will lift on its own:
+
+| Pin | Why |
+|---|---|
+| `typescript` **6.0.3**, not 7.x | `vue-tsc@3` patches TypeScript's `lib/tsc`, which TypeScript 7 (the native port) no longer exposes: `npm run typecheck` fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`. |
+| `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. `10_final_project` could take Zod 4 on its own, but teaching two Zod dialects in one training is worse than being one major behind. |
+| `webdriverio` **9.x** | Latest; listed here only because Vitest 4 moved the browser provider into `@vitest/browser-webdriverio`, which is now a dependency of workshop 4. |
+
+Two migrations changed workshop code, not just versions:
+
+- **Vitest 4** — `browser.provider` is now a factory imported from its own
+  package, not the string `'webdriverio'` (`vitest.browser.config.ts`, and the
+  chapter 8 slides).
+- **Vite 8 / Rolldown** — `build.rollupOptions.output.manualChunks` only accepts
+  the **function** form. The `{ vue: ['vue', 'vue-router'] }` object form every
+  article shows now fails with `TypeError: manualChunks is not a function`
+  (workshop 9).
+
+The worked answer to every workshop lives in `solutions/vuejs_advanced/`, one
+runnable folder per workshop. Do not hand it out before the exercise.
+
 ## Workshops
 
 | Chapter | Folder | Topic | Extra requirements |
@@ -91,7 +115,8 @@ the sheet the reviewers fill in.
 
 ## Node version
 
-Every workshop targets **Node.js >= 22**. Run `nvm use` in the workshop folder to
+Every workshop targets **Node.js >= 22.22.2** (24.15+ recommended, and what
+`.nvmrc` pins). Run `nvm use` in the workshop folder to
 pick up the version from its `.nvmrc`.
 
 ## A note on the API

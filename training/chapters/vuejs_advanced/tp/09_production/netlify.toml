@@ -8,7 +8,7 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "24"
 
 # TODO 5.1: history-mode fallback. Without it, a hard refresh on /invoices is a
 #   404 — the server looks for a file that does not exist.

@@ -13,7 +13,7 @@
 # is the one you will see most often online. It is convenient, and it quietly
 # rebuilds the artifact at deploy time. Know which trade-off you are making.
 
-FROM nginx:1.27-alpine
+FROM nginx:1.31-alpine
 
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY dist/ /usr/share/nginx/html/

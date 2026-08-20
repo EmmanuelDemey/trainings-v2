@@ -273,11 +273,13 @@ blockquote { font-size: 0.85em; }
 # Browser mode — setup
 
 ```bash
-npm i -D @vitest/browser webdriverio      # or playwright, or preview
+npm i -D @vitest/browser @vitest/browser-webdriverio webdriverio   # or -playwright
 ```
 
 ```ts
 // vitest.browser.config.ts
+import { webdriverio } from '@vitest/browser-webdriverio';
+
 export default defineConfig({
   plugins: [vue()],
   test: {
@@ -285,7 +287,9 @@ export default defineConfig({
     setupFiles: ['./tests/setup.browser.ts'],      // imports the real stylesheet
     browser: {
       enabled: true,
-      provider: 'webdriverio',       // the WebDriver protocol, as Selenium speaks it
+      provider: webdriverio({                      // WebDriver, as Selenium speaks it
+        capabilities: { 'goog:chromeOptions': { args: ['--no-sandbox'] } },
+      }),
       headless: true,                // `false` to watch the tests run
       viewport: { width: 1280, height: 720 },
       instances: [{ browser: 'chrome' }],          // add firefox: both run
@@ -295,10 +299,10 @@ export default defineConfig({
 ```
 
 - `instances` replaces the old `browser.name`: **one entry per browser**, all parallel
+- Since **Vitest 4** the provider is a **factory imported from its own package**, not the
+  string `'webdriverio'` — and the WebDriver `capabilities` are passed to that factory
 - WebdriverIO **downloads the matching driver** on the first run; on Ubuntu ≥ 24.04 and
-  in CI containers Chrome also needs `args: ['--no-sandbox']` in its `capabilities`
-- Vitest 4 moves each provider into its own package —
-  `import { webdriverio } from '@vitest/browser-webdriverio'`, then `provider: webdriverio()`
+  in CI containers Chrome also needs `args: ['--no-sandbox']`, hence the flag above
 
 <style>
 .slidev-layout {
@@ -314,6 +318,8 @@ ul { font-size: 0.82em; }
 
 ```ts
 // vitest.config.ts — one config, two environments
+import { webdriverio } from '@vitest/browser-webdriverio';
+
 export default defineConfig({
   test: {
     projects: [
@@ -323,7 +329,7 @@ export default defineConfig({
       { extends: true,
         test: { name: 'browser',
                 include: ['**/*.browser.spec.ts'],
-                browser: { enabled: true, provider: 'webdriverio',
+                browser: { enabled: true, provider: webdriverio(),
                            instances: [{ browser: 'chrome' }] } } },
     ],
   },

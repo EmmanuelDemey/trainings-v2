@@ -21,7 +21,9 @@ const execFileAsync = promisify(execFile);
 
 // --- What the training needs -------------------------------------------------
 
-const MIN_NODE = [22, 0, 0];
+// 22.22.2 is the floor imposed by the toolchain (jsdom 30, lint-staged 17,
+// size-limit 13). Node 24.15+ is what `.nvmrc` pins and what the room should run.
+const MIN_NODE = [22, 22, 2];
 const MIN_NPM = [10, 0, 0];
 const PORTS = [
   { port: 5173, usedBy: 'vite dev', hint: 'Free it before the session, or Vite will silently move to another port.' },

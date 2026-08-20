@@ -17,7 +17,7 @@ Chapter 7 — Build the same registration form twice, on one Zod schema:
 
 ## Prerequisites
 
-- **Node.js >= 22** — run `nvm use` to pick up the version from `.nvmrc`
+- **Node.js >= 22.22.2** (24.15+ recommended) — run `nvm use` to pick up the version from `.nvmrc`
 - The **Vue Devtools** browser extension
 
 ## Setup

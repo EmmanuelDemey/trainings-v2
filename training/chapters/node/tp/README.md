@@ -34,3 +34,18 @@ npm run typecheck  # tsc --noEmit (type-check only)
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the steps
 > in its own `README.md`.
+
+The worked answer to every workshop lives in `solutions/node/`, one runnable
+folder per workshop. Do not hand it out before the exercise.
+
+## Toolchain versions
+
+Dependencies were last refreshed on **2026-08-20**, to the latest release of every
+package. Two deliberate exceptions, both of which will lift on their own:
+
+| Pin | Why |
+|---|---|
+| `@types/node` on **24.x**, not 26.x | It must describe the runtime the training targets. The 26.x types declare APIs Node 24 does not have, so code would type-check and then crash at runtime. |
+| `typescript` **6.0.3** in `10_quality` only | `typescript-eslint@8` peers `typescript <6.1.0`; no release supports TypeScript 7 yet. Every other workshop is on **TypeScript 7**. |
+
+`@types/amqplib` was dropped: **amqplib 2** ships its own type definitions.

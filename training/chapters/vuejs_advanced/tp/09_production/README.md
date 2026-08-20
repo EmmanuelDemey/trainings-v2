@@ -18,7 +18,7 @@ Chapter 9 — Take a working Vue app all the way to a deployment you would defen
 
 ## Prerequisites
 
-- **Node.js >= 22** — run `nvm use` to pick up the version from `.nvmrc`
+- **Node.js >= 22.22.2** (24.15+ recommended) — run `nvm use` to pick up the version from `.nvmrc`
 - *(Optional)* A **Netlify** or **Vercel** account for the deployment step.
 - **No account?** Step 5bis is the plan B: you deploy to an nginx or Caddy
   container on your own machine and verify the exact same three rules. It needs

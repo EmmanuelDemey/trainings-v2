@@ -23,7 +23,7 @@ Chapter 5 — Turn a set of unprotected pages into a real application:
 
 ## Prerequisites
 
-- **Node.js >= 22** — run `nvm use` to pick up the version from `.nvmrc`
+- **Node.js >= 22.22.2** (24.15+ recommended) — run `nvm use` to pick up the version from `.nvmrc`
 
 ## Setup
 

@@ -2,7 +2,9 @@
   "name": "tp-07-performance",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "scripts": {
     "start": "node src/server.ts",
     "dev": "node --watch src/server.ts",
@@ -11,11 +13,11 @@
     "clinic": "npx clinic doctor -- node src/server.ts"
   },
   "dependencies": {
-    "express": "^5.0.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
-    "typescript": "^5.8.0",
-    "@types/node": "^24.0.0",
-    "@types/express": "^5.0.0"
+    "typescript": "^7.0.2",
+    "@types/node": "^24.13.3",
+    "@types/express": "^5.0.6"
   }
 }

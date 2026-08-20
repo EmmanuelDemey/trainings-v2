@@ -173,8 +173,8 @@ layout: cover
 
 <br />
 
-> This training is based on **Vue 3.5**, **Vite 6**, **Vue Router 4**, **Pinia 3**,
-> **Zod 4**, **VeeValidate 4**, **Vitest 3** and **Cypress 14**.
+> This training is based on **Vue 3.5**, **Vite 8**, **Vue Router 5**, **Pinia 4**,
+> **Zod 3**, **VeeValidate 4**, **Vitest 4** and **Cypress 15**.
 
 ---
 
@@ -183,7 +183,7 @@ layout: cover
 - Having attended our **Vue.js** training, or equivalent knowledge
 - Solid **development experience with Vue**
 - Comfortable with **TypeScript** and modern JavaScript (ES2015+)
-- A **laptop** with Node.js >= 22 installed
+- A **laptop** with Node.js >= 22.22.2 installed (24.15+ recommended)
 - The **Vue Devtools** browser extension (Chrome or Firefox) — we use it from the
   first hour
 

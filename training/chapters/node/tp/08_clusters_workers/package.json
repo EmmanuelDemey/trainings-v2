@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": ">=24.15.0"
   },
   "scripts": {
     "start": "node src/server.ts",
@@ -12,11 +12,11 @@
     "pm2": "npx pm2 start src/server.ts -i max --interpreter node"
   },
   "dependencies": {
-    "express": "^5.0.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
-    "typescript": "^5.8.0",
-    "@types/node": "^24.0.0",
-    "@types/express": "^5.0.0"
+    "typescript": "^7.0.2",
+    "@types/node": "^24.13.3",
+    "@types/express": "^5.0.6"
   }
 }

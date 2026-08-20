@@ -2,7 +2,9 @@
   "name": "tp-09-advanced-streams",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "producer": "node src/amqp/producer.ts",
@@ -14,12 +16,11 @@
     "infra:down": "docker compose down"
   },
   "dependencies": {
-    "amqplib": "^0.10.0",
-    "ioredis": "^5.4.0"
+    "amqplib": "^2.0.1",
+    "ioredis": "^6.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.0",
-    "@types/node": "^24.0.0",
-    "@types/amqplib": "^0.10.0"
+    "typescript": "^7.0.2",
+    "@types/node": "^24.13.3"
   }
 }

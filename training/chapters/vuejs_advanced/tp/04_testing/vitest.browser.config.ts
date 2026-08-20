@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vitest/config';
+import { webdriverio } from '@vitest/browser-webdriverio';
 import vue from '@vitejs/plugin-vue';
 
 /**
@@ -21,27 +22,26 @@ export default defineConfig({
     browser: {
       enabled: true,
       // WebDriver protocol, the same one Selenium speaks. WebdriverIO downloads
-      // the matching driver on first run.
-      provider: 'webdriverio',
+      // the matching driver on first run. Since Vitest 4 the provider is a
+      // factory imported from its own package, not the string 'webdriverio',
+      // and the WebDriver capabilities are passed to that factory.
+      provider: webdriverio({
+        capabilities: {
+          // Chrome's own sandbox cannot start when the kernel forbids
+          // unprivileged user namespaces — the default on Ubuntu >= 24.04
+          // (`/proc/sys/kernel/apparmor_restrict_unprivileged_userns` is 1)
+          // and inside most CI containers. Harmless here: this browser only
+          // ever loads our own test page. Drop the flag if your kernel allows
+          // the sandbox.
+          'goog:chromeOptions': { args: ['--no-sandbox', '--disable-dev-shm-usage'] },
+        },
+      }),
       // `false` (or `npm run test:browser:headed`) to watch the tests run.
       headless: true,
       // A fixed viewport, otherwise a layout assertion depends on the window.
       viewport: { width: 1280, height: 720 },
       // One entry per browser to run. Add `{ browser: 'firefox' }` and both run.
-      instances: [
-        {
-          browser: 'chrome',
-          capabilities: {
-            // Chrome's own sandbox cannot start when the kernel forbids
-            // unprivileged user namespaces — the default on Ubuntu >= 24.04
-            // (`/proc/sys/kernel/apparmor_restrict_unprivileged_userns` is 1)
-            // and inside most CI containers. Harmless here: this browser only
-            // ever loads our own test page. Drop the flag if your kernel allows
-            // the sandbox.
-            'goog:chromeOptions': { args: ['--no-sandbox', '--disable-dev-shm-usage'] },
-          },
-        },
-      ],
+      instances: [{ browser: 'chrome' }],
     },
   },
 });

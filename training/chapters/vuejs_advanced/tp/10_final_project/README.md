@@ -26,7 +26,7 @@ deliverable too, and the harder one.
 
 ## Prerequisites
 
-- **Node.js >= 22** — `nvm use` picks it up from `.nvmrc`
+- **Node.js >= 22.22.2** (24.15+ recommended) — `nvm use` picks it up from `.nvmrc`
 - Chapters 2 to 9. Workshops 2 to 9 are not required, but everything here has
   been seen in one of them.
 - A pair. Not a group of three, not alone: the review round needs an even number

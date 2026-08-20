@@ -2,12 +2,19 @@
   "name": "tp-03-events",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "scripts": {
     "start": "node src/index.ts",
     "dev": "node --watch src/index.ts",
     "typecheck": "tsc --noEmit"
   },
-  "devDependencies": { "typescript": "^5.8.0", "@types/node": "^24.0.0" },
-  "dependencies": { "rxjs": "^7.8.0" }
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "@types/node": "^24.13.3"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.2"
+  }
 }

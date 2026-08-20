@@ -2,7 +2,9 @@
   "name": "tp-11-advanced-modules",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "trace": "node src/tracing.ts",
@@ -10,7 +12,7 @@
     "watch": "node src/file-watch.ts"
   },
   "devDependencies": {
-    "typescript": "^5.8.0",
-    "@types/node": "^24.0.0"
+    "typescript": "^7.0.2",
+    "@types/node": "^24.13.3"
   }
 }
