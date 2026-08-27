@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Password generator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Password generator</h1>
+      <p class="subtitle">Strings, arrays, and randomness.</p>
+
+      <section>
+        <p>
+          <label for="length">Length: <strong id="length-value">16</strong></label><br />
+          <input id="length" type="range" min="4" max="64" value="16" />
+        </p>
+        <p>
+          <label><input id="uppercase" type="checkbox" checked /> Uppercase</label>
+          <label><input id="digits" type="checkbox" checked /> Digits</label>
+          <label><input id="symbols" type="checkbox" /> Symbols</label>
+          <label><input id="lowercase" type="checkbox" checked /> Lowercase</label>
+        </p>
+        <button id="generate" class="primary" type="button">Generate</button>
+        <p id="options-error" class="error"></p>
+      </section>
+
+      <section>
+        <p id="password" class="password">—</p>
+        <p>
+          Strength: <strong id="strength">—</strong>
+          <span id="entropy" class="muted"></span>
+        </p>
+        <button id="copy" type="button" disabled>Copy</button>
+        <span id="copy-feedback"></span>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
