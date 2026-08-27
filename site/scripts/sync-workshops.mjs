@@ -210,7 +210,7 @@ for (const training of TRAININGS) {
       `- **[Read the deck online](/slides/${training.slug}/)** — press <kbd>f</kbd> for fullscreen, <kbd>o</kbd> for the slide overview.`,
       downloadable(pdf)
         ? `- **[Download the slides (PDF)](/downloads/${pdf})** — the same deck, printable, for taking notes offline.`
-        : '- _A PDF export of this deck is not available: it is too large to render in one pass. Use the browser\'s own print dialog from the deck, or export it locally with `npx slidev export`._',
+        : `- _No PDF export of this deck was produced by this build. To make one: \`npm run dev -- ${training.deck}\` in \`training/\`, open the **/export/** page it prints, and let the browser save it._`,
       '',
       '## Workshops',
       '',
