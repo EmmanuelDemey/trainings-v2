@@ -164,7 +164,7 @@ for (const training of TRAININGS) {
       return `| ${position + 1} | [${name}](${workshop.href}) | ${workshop.description} |`;
     }),
     '',
-    `[Resources — slides and solutions](/${training.slug}/resources/)`,
+    `[Resources — the deck, the workshop handbook and the solutions](/${training.slug}/resources/)`,
   ].join('\n');
 
   await writeFile(
@@ -191,6 +191,7 @@ for (const training of TRAININGS) {
   //    A link is only rendered if the file is there — the PDF export of a very
   //    large deck can legitimately fail without taking the deploy down.
   const pdf = `${training.slug}-slides.pdf`;
+  const handbook = `${training.slug}-workshops.pdf`;
   const zipFile = `${training.slug}-solutions.zip`;
 
   await writeFile(
@@ -198,7 +199,7 @@ for (const training of TRAININGS) {
     [
       '---',
       `title: ${yaml('Resources')}`,
-      `description: ${yaml(`The ${training.label} slides and the worked solutions of the ${workshops.length} workshops.`)}`,
+      `description: ${yaml(`The ${training.label} deck, the ${workshops.length} workshops as a printable handbook, and the worked solutions.`)}`,
       'sidebar:',
       '  order: 999',
       '  label: "Resources"',
@@ -210,6 +211,13 @@ for (const training of TRAININGS) {
       downloadable(pdf)
         ? `- **[Download the slides (PDF)](/downloads/${pdf})** — the same deck, printable, for taking notes offline.`
         : '- _A PDF export of this deck is not available: it is too large to render in one pass. Use the browser\'s own print dialog from the deck, or export it locally with `npx slidev export`._',
+      '',
+      '## Workshops',
+      '',
+      `- **[Read them online](/${training.slug}/)** — the same instructions as below, one page per workshop.`,
+      downloadable(handbook)
+        ? `- **[Download the handbook (PDF)](/downloads/${handbook})** — the ${workshops.length} workshops in one printable booklet: cover, contents, then one workshop per page.`
+        : '- _The workshop handbook was not produced by this build._',
       '',
       '## Solutions',
       '',

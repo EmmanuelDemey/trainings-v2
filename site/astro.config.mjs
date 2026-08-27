@@ -1,8 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-
-const REPO = 'https://github.com/EmmanuelDemey/trainings-v2';
+import { TRAININGS, REPO_URL } from '../scripts/trainings.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,31 +16,27 @@ export default defineConfig({
       title: 'Workshops',
       description:
         'The hands-on workshops of the trainings — instructions, steps and acceptance criteria.',
-      social: [{ icon: 'github', label: 'GitHub', href: REPO }],
+      social: [{ icon: 'github', label: 'GitHub', href: REPO_URL }],
       // Pages are generated from the workshop READMEs, so "Edit this page" has to
       // point at the README, not at the generated file. Each page carries its own
       // `editUrl` in frontmatter; this only turns the feature on.
-      editLink: { baseUrl: `${REPO}/edit/main/` },
+      editLink: { baseUrl: `${REPO_URL}/edit/main/` },
       lastUpdated: false,
-      sidebar: [
-        {
-          label: 'JavaScript',
-          items: [{ autogenerate: { directory: 'javascript' } }],
-        },
-        {
-          label: 'Advanced Vue.js',
-          items: [{ autogenerate: { directory: 'vuejs-advanced' } }],
-        },
-        {
-          // Built by `node scripts/build-all.mjs` into build/slides/, next to
-          // this site. They 404 under `astro dev`, which only serves the site.
-          label: 'Slides',
-          items: [
-            { label: 'JavaScript deck', link: '/slides/javascript/' },
-            { label: 'Advanced Vue.js deck', link: '/slides/vuejs-advanced/' },
-          ],
-        },
-      ],
+      // One group per training. Only the group of the training you are currently
+      // in is kept in the sidebar — see src/starlightRouteData.js.
+      sidebar: TRAININGS.map((training) => ({
+        label: training.label,
+        items: [
+          { autogenerate: { directory: training.slug } },
+          {
+            // Built by `node scripts/build-all.mjs` into build/slides/, next to
+            // this site. It 404s under `astro dev`, which only serves the site.
+            label: 'Slides — the deck',
+            link: `/slides/${training.slug}/`,
+          },
+        ],
+      })),
+      routeMiddleware: './src/starlightRouteData.js',
       customCss: ['./src/styles/custom.css'],
     }),
   ],

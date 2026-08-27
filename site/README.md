@@ -28,10 +28,11 @@ It also generates, per training:
   the training's own `tp/README.md` says. The index comes first so the overview
   never reads as "all the workshops dumped on one page";
 - a **Resources** page (last in the sidebar): the deck online, the deck as a PDF,
-  and the worked solutions as a ZIP. Those two files are produced by
-  `scripts/build-all.mjs` into `build/downloads/`, and **a link is only rendered
-  if the file is actually there** — the PDF export of a very large deck can fail
-  without that taking the deploy down.
+  the workshops as one printable handbook (PDF), and the worked solutions as a
+  ZIP. Those three files are produced by `scripts/build-all.mjs` into
+  `build/downloads/`, and **a link is only rendered if the file is actually
+  there** — the PDF export of a very large deck can fail without that taking the
+  deploy down.
 
 For each workshop page the script derives:
 
@@ -48,19 +49,40 @@ folder, where the learner actually works — never the copy under `src/`.
 `npm run dev` and `npm run build` both run the sync first, so the site cannot
 drift from the workshops.
 
+## One menu per training
+
+The trainings do not share a menu. Inside `/javascript/` the sidebar shows the
+JavaScript group and nothing else, plus one link back to the picker at `/`.
+
+Starlight builds a single sidebar out of the whole config, so the narrowing is
+done per route in `src/starlightRouteData.js`, registered as `routeMiddleware`.
+It also recomputes prev/next — pagination is derived from the *full* sidebar
+before middleware runs, so without that the last JavaScript page would link into
+the first Vue.js one.
+
+The groups themselves are generated from `TRAININGS`; `astro.config.mjs` has no
+hand-written list.
+
 ## Publishing another training
 
-One entry in the `TRAININGS` array of `scripts/sync-workshops.mjs`, and one group
-in the `sidebar` of `astro.config.mjs`:
+One entry in the `TRAININGS` array of `../scripts/trainings.mjs` — the single
+list shared with the deck build. Nothing to add here:
 
 ```js
-{ slug: 'node', label: 'Advanced Node.js', source: 'training/chapters/node/tp' }
+{
+  slug: 'node',
+  label: 'Advanced Node.js',
+  workshops: 'training/chapters/node/tp',
+  deck: 'node.md',
+  solutions: 'training/solutions/node',
+}
 ```
 
-## What is deliberately not published
+## The solutions
 
-The **solutions** (`training/solutions/`). A learner who reads the answer first
-never sees the problem the answer is for.
+They are published, as a ZIP on each Resources page, behind an explicit warning:
+a learner who reads the answer first never sees the problem the answer is for.
+Open them after the correction, to compare with what you wrote.
 
 ## Before deploying
 

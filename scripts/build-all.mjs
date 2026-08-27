@@ -23,8 +23,9 @@
 //       javascript/         the Slidev deck
 //       vuejs-advanced/
 //     downloads/
-//       javascript-slides.pdf
-//       javascript-solutions.zip
+//       javascript-slides.pdf       the deck, exported
+//       javascript-workshops.pdf    the TPs, as one printable handbook
+//       javascript-solutions.zip    the worked answers
 //     _redirects            SPA fallback, one rule per deck
 //
 // The site lives at the root and the decks under /slides/<training>/, so the
@@ -115,20 +116,24 @@ console.log(`Building ${TRAININGS.map((t) => t.label).join(' + ')} into build/`)
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
 
+// --- 0. training/, and the browser both PDF exports drive --------------------
+// training/ is a pnpm project; the CI host only knows about the root, so pnpm is
+// fetched on demand rather than assumed to be installed. It is needed by the
+// decks AND by the workshop handbooks, which run out of training/scripts/.
+if (buildSlides || withPdf) {
+  install(trainingDir, 'npx', ['--yes', 'pnpm@10', 'install', '--frozen-lockfile']);
+}
+
+// Both PDF exports need a browser. SLIDEV_CHROME skips the download when one is
+// already on the machine — which is the normal case locally, and never on CI.
+if (withPdf && !localChrome) {
+  run('npx', ['--yes', 'pnpm@10', 'exec', 'playwright', 'install', 'chromium'], trainingDir);
+}
+
 // --- 1. The decks (Slidev) --------------------------------------------------
 // One build per deck. `--base` matters: without it the deck requests its assets
 // from the domain root and every chunk 404s once it is served from a sub-path.
 if (buildSlides) {
-  // training/ is a pnpm project; the CI host only knows about the root, so pnpm
-  // is fetched on demand rather than assumed to be installed.
-  install(trainingDir, 'npx', ['--yes', 'pnpm@10', 'install', '--frozen-lockfile']);
-
-  // The PDF export needs a browser. SLIDEV_CHROME skips the download when one is
-  // already on the machine — which is the normal case locally, and never on CI.
-  if (withPdf && !localChrome) {
-    run('npx', ['--yes', 'pnpm@10', 'exec', 'playwright', 'install', 'chromium'], trainingDir);
-  }
-
   for (const training of TRAININGS) {
     if (!existsSync(join(trainingDir, training.deck))) {
       console.warn(`⚠ ${training.deck} not found — deck skipped`);
@@ -192,8 +197,8 @@ if (buildSlides) {
 }
 
 // --- 2. Downloads -----------------------------------------------------------
-// What the Resources page of each training links to: the deck as a PDF, and the
-// worked answers as a zip.
+// What the Resources page of each training links to: the deck as a PDF, the
+// workshops as a printable handbook, and the worked answers as a zip.
 const downloadsDir = join(outDir, 'downloads');
 await mkdir(downloadsDir, { recursive: true });
 
@@ -206,6 +211,28 @@ for (const training of TRAININGS) {
     await cp(exported, join(downloadsDir, `${training.slug}-slides.pdf`));
   } else if (buildSlides && withPdf) {
     console.warn(`⚠ no PDF produced for ${training.label}`);
+  }
+
+  // The workshops as one printable handbook: cover, contents, then one workshop
+  // per page. Cheap (seconds, not minutes) but it drives the same browser as the
+  // deck export, so it follows --no-pdf.
+  const workshopsDir = join(repoRoot, training.workshops);
+  if (withPdf && existsSync(workshopsDir)) {
+    run(
+      'node',
+      [
+        'scripts/workshops-pdf.mjs',
+        '--source',
+        workshopsDir,
+        '--title',
+        training.label,
+        '--out',
+        join(downloadsDir, `${training.slug}-workshops.pdf`),
+        ...(localChrome ? ['--executable-path', localChrome] : []),
+      ],
+      trainingDir,
+      { allowFailure: true },
+    );
   }
 
   const solutionsDir = join(repoRoot, training.solutions ?? '');
