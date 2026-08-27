@@ -33,6 +33,12 @@ It also generates, per training:
   `build/downloads/`, and **a link is only rendered if the file is actually
   there** — the PDF export of a very large deck can fail without that taking the
   deploy down.
+- a **Feedback** page, after Resources: the end-of-training form (see below),
+  plus the thank-you page it posts to, hidden from the menu and from the search
+  index.
+
+Each workshop page also opens with a **theory quiz** (see below) and gets its
+own correction page, `<workshop>-answers`, hidden the same way.
 
 For each workshop page the script derives:
 
@@ -62,6 +68,55 @@ the first Vue.js one.
 
 The groups themselves are generated from `TRAININGS`; `astro.config.mjs` has no
 hand-written list.
+
+## The theory quiz
+
+Every workshop page opens with a handful of multiple-choice questions on the
+chapter it follows, submitted as a [Netlify form](https://docs.netlify.com/manage/forms/overview/)
+and answered on a correction page the form redirects to. One form per workshop
+(`quiz-javascript-03-syntax`), so the Netlify UI shows the answers grouped by
+workshop rather than in one pile.
+
+The questions come from two places, resolved by
+[`../scripts/quizzes/`](../scripts/quizzes/):
+
+- **Advanced Vue.js** — parsed out of the deck. Every chapter already ends with
+  `# Quiz — Question n / m` slides holding the question, four options and the
+  answer with its explanation, so the site reads those rather than copying them.
+  Change a chapter and the workshop quiz follows.
+- **JavaScript** — the deck has no quiz slides, so the questions are written in
+  `../scripts/quizzes/javascript.mjs`, against the chapter each workshop follows.
+
+A workshop absent from `QUIZ_SOURCES` simply gets no quiz and no correction page
+— the Vue final project teaches nothing new, so there is nothing to recall.
+
+The form is emitted as **raw HTML inside a Markdown page**
+([`scripts/quiz-render.mjs`](scripts/quiz-render.mjs)), which forbids a blank
+line anywhere inside it: a blank line closes an HTML block in CommonMark and the
+rest of the form would be parsed as Markdown. `lines()` enforces that.
+
+Two things to know before relying on it:
+
+- the correction page is **public** and its URL is guessable. This is a warm-up,
+  not an exam — a static site has nowhere to hide an answer key;
+- the Netlify free plan caps form submissions. One class going through eleven
+  workshops is over a hundred submissions.
+
+## The feedback form
+
+`src/components/FeedbackForm.astro`, placed by the generated `feedback.mdx` of
+each training. It is a [Netlify form](https://docs.netlify.com/manage/forms/overview/):
+plain HTML, no backend, no JavaScript — Netlify collects the submissions by
+parsing the deployed markup, so the form must render statically.
+
+Each training has its own form name (`feedback-javascript`,
+`feedback-vuejs-advanced`), so the answers arrive in two separate lists rather
+than one pile to sort by hand. Two consequences worth knowing:
+
+- a form only exists once a **production** deploy has contained it — submissions
+  made from a deploy preview are not collected;
+- **form detection has to be enabled** for the project in the Netlify UI
+  (Project configuration ➜ Forms), otherwise the markup is deployed and ignored.
 
 ## Publishing another training
 

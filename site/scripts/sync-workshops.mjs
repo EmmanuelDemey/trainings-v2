@@ -12,6 +12,8 @@ import { existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TRAININGS, REPO_URL, BRANCH } from '../../scripts/trainings.mjs';
+import { quizFor } from '../../scripts/quizzes/index.mjs';
+import { renderQuizForm, renderAnswersBody } from './quiz-render.mjs';
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(siteRoot, '..');
@@ -126,6 +128,29 @@ for (const training of TRAININGS) {
     const sourcePath = `${training.workshops}/${folder}`;
     const href = `/${training.slug}/${toSlug(folder)}/`;
 
+    // The theory questions that open the workshop. A workshop without any — the
+    // Vue final project teaches nothing new — simply keeps its README as it is.
+    const questions = await quizFor(training.slug, folder);
+    const quiz = questions
+      ? [
+          '## Before you start — check the theory',
+          '',
+          `A few questions on ${training.label} theory this workshop builds on. Send them`,
+          'and the correction opens, with the reasoning behind each answer.',
+          '',
+          renderQuizForm({
+            trainingSlug: training.slug,
+            trainingLabel: training.label,
+            workshopSlug: toSlug(folder),
+            workshopTitle: title,
+            questions,
+          }),
+          '',
+          '## The workshop',
+          '',
+        ].join('\n')
+      : '';
+
     await writeFile(
       join(outDir, `${toSlug(folder)}.md`),
       page({
@@ -134,7 +159,7 @@ for (const training of TRAININGS) {
         order: orderOf(folder),
         label: shortLabel(title),
         sourcePath: `${sourcePath}/README.md`,
-        body,
+        body: quiz + body,
         note: [
           ':::note[Where to work]',
           `Open \`${sourcePath}/\` —`,
@@ -144,6 +169,32 @@ for (const training of TRAININGS) {
       }),
     );
     written++;
+
+    // Where the quiz posts to. Hidden from the menu and from the search index —
+    // it is reached by sending the form, not by browsing.
+    if (questions) {
+      await writeFile(
+        join(outDir, `${toSlug(folder)}-answers.md`),
+        [
+          '---',
+          `title: ${yaml(`Answers — ${shortLabel(title)}`)}`,
+          `description: ${yaml(`The correction of the theory questions of ${title}.`)}`,
+          'sidebar:',
+          '  hidden: true',
+          'pagefind: false',
+          '---',
+          '',
+          renderAnswersBody({
+            trainingSlug: training.slug,
+            workshopSlug: toSlug(folder),
+            workshopLabel: title,
+            questions,
+          }),
+        ].join('\n'),
+      );
+      written++;
+    }
+
     workshops.push({ href, label: shortLabel(title), title, description });
   }
 
@@ -231,10 +282,63 @@ for (const training of TRAININGS) {
       'Open the archive **after** the correction, to compare it with what you wrote.',
       ':::',
       '',
+      '## Feedback',
+      '',
+      `- **[Tell me what you thought](/${training.slug}/feedback/)** — two minutes, at the end of the training. The next session is built on it.`,
+      '',
       '## Elsewhere',
       '',
       `- [The whole repository on GitHub](${REPO_URL})`,
       `- [The workshop folders](${REPO_URL}/tree/${BRANCH}/${training.workshops})`,
+      '',
+    ].join('\n'),
+  );
+  written++;
+
+  // 4. Feedback: a Netlify form, one per training so the answers arrive in two
+  //    separate lists. The markup lives in a component — this page only places
+  //    it, and the form is only collected from a production deploy.
+  await writeFile(
+    join(outDir, 'feedback.mdx'),
+    [
+      '---',
+      `title: ${yaml('Feedback')}`,
+      `description: ${yaml(`Tell me what worked and what did not in the ${training.label} training — it is what the next session is built on.`)}`,
+      'sidebar:',
+      // After Resources (999), which is the last workshop page.
+      '  order: 1000',
+      '  label: "Feedback"',
+      '---',
+      '',
+      "import FeedbackForm from '../../../components/FeedbackForm.astro';",
+      '',
+      'Two minutes at the end of the training, and the next one is better for it.',
+      'Nothing here is required except the rating, and you can stay anonymous —',
+      'the name and the email are only there if you want an answer.',
+      '',
+      `<FeedbackForm slug=${yaml(training.slug)} label=${yaml(training.label)} />`,
+      '',
+    ].join('\n'),
+  );
+  written++;
+
+  //    Where the form posts to. Hidden from the menu and from the search index:
+  //    it is only ever reached by submitting the form.
+  await writeFile(
+    join(outDir, 'feedback-thanks.md'),
+    [
+      '---',
+      `title: ${yaml('Thank you')}`,
+      `description: ${yaml(`Your feedback on the ${training.label} training was sent.`)}`,
+      'sidebar:',
+      '  hidden: true',
+      'pagefind: false',
+      '---',
+      '',
+      'It landed. Thank you — this is what the next session gets built on.',
+      '',
+      `- [Back to the ${training.label} workshops](/${training.slug}/)`,
+      `- [Resources — the deck, the handbook and the solutions](/${training.slug}/resources/)`,
       '',
     ].join('\n'),
   );

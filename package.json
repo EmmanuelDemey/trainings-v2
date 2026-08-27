@@ -11,5 +11,9 @@
   },
   "dependencies": {
     "archiver": "^7.0.1"
+  },
+  "devDependencies": {
+    "@netlify/plugin-lighthouse": "^6.0.4",
+    "netlify-plugin-checklinks": "^4.1.1"
   }
 }

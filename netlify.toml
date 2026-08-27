@@ -10,7 +10,9 @@
 
 [build.environment]
   NODE_VERSION = "24"
-  # The build installs training/ and site/ itself; nothing to install at the root.
+  # The build installs training/ and site/ itself. The root install only brings
+  # in the build script's own dependencies and the two build plugins declared
+  # below — devDependencies included, which Netlify installs by default.
   NPM_FLAGS = "--no-audit --no-fund"
 
 # The SPA fallback for the decks is generated into build/_redirects by the build
@@ -25,3 +27,54 @@
   for = "/slides/*/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# ── Build plugins ────────────────────────────────────────────────────────────
+# Both are declared in package.json (devDependencies) so Netlify installs the
+# pinned versions rather than resolving them itself.
+
+# Every internal link and asset reference, crawled from build/index.html: the
+# workshop pages, the /downloads/ PDFs and ZIPs, the decks under /slides/. A
+# renamed workshop or a download that the build did not produce fails the deploy
+# instead of shipping a 404. Runs in a few seconds on the full build.
+[[plugins]]
+  package = "netlify-plugin-checklinks"
+
+  [plugins.inputs]
+    # Relative to the publish dir: start at build/index.html and follow.
+    entryPoints = ["*.html"]
+    recursive = true
+    pretty = true
+    # External links are not checked (checkExternal = false), but external
+    # *assets* still are — the Slidev decks pull their fonts and a couple of
+    # scripts from these hosts. A slow third party must not fail our deploy.
+    skipPatterns = [
+      "fonts.googleapis.com",
+      "fonts.gstatic.com",
+      "cdn.jsdelivr.net",
+    ]
+    todoPatterns = []
+    checkExternal = false
+    followSourceMaps = false
+
+# Lighthouse on the deployed pages. Report only: it runs after the deploy is
+# live and posts the scores to the deploy summary. To make it a gate, set
+# thresholds below and fail_deploy_on_score_thresholds = "true" — it then runs
+# before the deploy and blocks it.
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+
+  # [plugins.inputs.thresholds]
+  #   performance = 0.85
+  #   accessibility = 0.9
+  #   best-practices = 0.9
+  #   seo = 0.9
+
+  # The home page — the training picker.
+  [[plugins.inputs.audits]]
+    path = ""
+
+  [[plugins.inputs.audits]]
+    path = "javascript"
+
+  [[plugins.inputs.audits]]
+    path = "vuejs-advanced"

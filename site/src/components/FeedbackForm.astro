@@ -1,0 +1,202 @@
+---
+// The end-of-training feedback form, collected by Netlify Forms — no backend.
+//
+// Netlify finds forms by parsing the HTML of a deploy, so this has to render
+// statically: no client-side rendering, no JavaScript submit. Two things follow
+// from that:
+//   - a form only exists once a *production* deploy has contained it, and
+//     submissions made from a deploy preview are not collected;
+//   - each training gets its own form name, so the answers land in two separate
+//     lists in the Netlify UI instead of one pile to sort by hand.
+interface Props {
+  /** The training slug — `javascript`. Also names the form. */
+  slug: string;
+  /** The training's display name — `JavaScript`. Stored with each submission. */
+  label: string;
+}
+
+const { slug, label } = Astro.props;
+const formName = `feedback-${slug}`;
+const scale = [1, 2, 3, 4, 5];
+---
+
+<form
+  class="feedback"
+  name={formName}
+  method="POST"
+  action={`/${slug}/feedback-thanks/`}
+  data-netlify="true"
+  data-netlify-honeypot="bot-field"
+>
+  {/* Netlify pairs a submission with its form through this field. It injects it
+      into plain HTML forms itself, but being explicit costs one line and keeps
+      working whatever renders the page. */}
+  <input type="hidden" name="form-name" value={formName} />
+  <input type="hidden" name="training" value={label} />
+
+  {/* The honeypot: hidden from people, irresistible to bots. Netlify drops any
+      submission that fills it in. */}
+  <p class="feedback__honeypot">
+    <label>Leave this field empty <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+  </p>
+
+  <fieldset class="feedback__field">
+    <legend>How would you rate this training? <span class="feedback__required">*</span></legend>
+    <div class="feedback__scale">
+      {
+        scale.map((score) => (
+          <label class="feedback__score">
+            {/* `required` on one radio makes the whole group required. */}
+            <input type="radio" name="rating" value={score} required={score === 1} />
+            <span>{score}</span>
+          </label>
+        ))
+      }
+    </div>
+    <p class="feedback__hint">1 — it was not worth your time · 5 — excellent</p>
+  </fieldset>
+
+  <p class="feedback__field">
+    <label for="feedback-pace">The pace was</label>
+    <select id="feedback-pace" name="pace">
+      <option value="">— pick one —</option>
+      <option value="too-slow">Too slow</option>
+      <option value="about-right">About right</option>
+      <option value="too-fast">Too fast</option>
+    </select>
+  </p>
+
+  <p class="feedback__field">
+    <label for="feedback-best">What was the most useful part?</label>
+    <textarea id="feedback-best" name="most-useful" rows="3"></textarea>
+  </p>
+
+  <p class="feedback__field">
+    <label for="feedback-improve">What should be changed next time?</label>
+    <textarea id="feedback-improve" name="to-improve" rows="3"></textarea>
+  </p>
+
+  <p class="feedback__field">
+    <label for="feedback-name">Your name <span class="feedback__hint">(optional)</span></label>
+    <input id="feedback-name" type="text" name="name" autocomplete="name" />
+  </p>
+
+  <p class="feedback__field">
+    <label for="feedback-email">Your email <span class="feedback__hint">(optional — only if you want an answer)</span></label>
+    <input id="feedback-email" type="email" name="email" autocomplete="email" />
+  </p>
+
+  <button type="submit" class="feedback__submit">Send the feedback</button>
+</form>
+
+<style>
+  .feedback {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-block: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    background: var(--sl-color-black);
+  }
+
+  /* Hidden from people, still reachable by a bot filling every input it finds. */
+  .feedback__honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .feedback__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+
+  .feedback__field label,
+  .feedback__field legend {
+    font-weight: 600;
+    color: var(--sl-color-white);
+    padding: 0;
+  }
+
+  .feedback__required {
+    color: var(--sl-color-text-accent);
+  }
+
+  .feedback__hint {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 400;
+    color: var(--sl-color-gray-3);
+  }
+
+  .feedback__scale {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 0.25rem;
+  }
+
+  /* The whole box is the target: a 1-to-5 scale is tapped, not aimed at. */
+  .feedback__score {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 3.5rem;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.4rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .feedback__score:hover {
+    border-color: var(--sl-color-text-accent);
+  }
+
+  .feedback__score:has(input:checked) {
+    border-color: var(--sl-color-text-accent);
+    background: var(--sl-color-gray-6);
+  }
+
+  .feedback input[type='text'],
+  .feedback input[type='email'],
+  .feedback select,
+  .feedback textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.4rem;
+    background: var(--sl-color-black);
+    color: var(--sl-color-white);
+    font: inherit;
+  }
+
+  .feedback textarea {
+    resize: vertical;
+  }
+
+  .feedback__submit {
+    align-self: flex-start;
+    padding: 0.6rem 1.2rem;
+    border: 0;
+    border-radius: 0.4rem;
+    background: var(--sl-color-text-accent);
+    color: var(--sl-color-black);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .feedback__submit:hover {
+    opacity: 0.85;
+  }
+</style>
