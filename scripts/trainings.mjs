@@ -13,11 +13,14 @@ export const TRAININGS = [
     workshops: 'training/chapters/javascript/tp',
     /** Slidev entry point, relative to training/. */
     deck: 'javascript.md',
+    /** Worked answers, zipped for download on the Resources page. */
+    solutions: 'training/solutions/javascript',
   },
   {
     slug: 'vuejs-advanced',
     label: 'Advanced Vue.js',
     workshops: 'training/chapters/vuejs_advanced/tp',
     deck: 'vuejs_advanced.md',
+    solutions: 'training/solutions/vuejs_advanced',
   },
 ];

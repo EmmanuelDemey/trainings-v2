@@ -8,5 +8,8 @@
     "build:site": "node scripts/build-all.mjs --only site",
     "build:slides": "node scripts/build-all.mjs --only slides",
     "preview": "npx --yes serve build"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1"
   }
 }

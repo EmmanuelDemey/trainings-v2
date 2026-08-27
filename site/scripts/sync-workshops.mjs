@@ -16,6 +16,10 @@ import { TRAININGS, REPO_URL, BRANCH } from '../../scripts/trainings.mjs';
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(siteRoot, '..');
 const outRoot = join(siteRoot, 'src/content/docs');
+// scripts/build-all.mjs fills this before building the site, so the Resources
+// pages can only offer links to files that were actually produced.
+const downloadsDir = join(repoRoot, 'build/downloads');
+const downloadable = (file) => existsSync(join(downloadsDir, file));
 
 /** `01_introduction` -> `01-introduction` */
 const toSlug = (name) => name.replaceAll('_', '-').toLowerCase();
@@ -100,40 +104,15 @@ for (const training of TRAININGS) {
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
 
-  // 1. The overview page, from the tp/README.md of the training.
-  const overviewPath = join(sourceDir, 'README.md');
-  if (existsSync(overviewPath)) {
-    const raw = await readFile(overviewPath, 'utf8');
-    const { title, description, body } = parse(raw, `${training.label} workshops`);
-    await writeFile(
-      join(outDir, 'index.md'),
-      page({
-        title,
-        description,
-        order: 0,
-        label: 'Overview',
-        sourcePath: `${training.workshops}/README.md`,
-        body,
-        note: [
-          ':::note[Where the code lives]',
-          `The workshops themselves are in \`${training.workshops}/\` —`,
-          `[browse them on GitHub](${REPO_URL}/tree/${BRANCH}/${training.workshops}).`,
-          'This site only publishes the instructions.',
-          ':::',
-          '',
-          `**Slides:** [the ${training.label} deck](/slides/${training.slug}/) is served next to this site.`,
-        ].join('\n'),
-      }),
-    );
-    written++;
-  }
-
-  // 2. One page per workshop folder.
+  // 1. One page per workshop. The meta is kept so that the overview can link to
+  //    them without re-reading anything.
   const entries = await readdir(sourceDir, { withFileTypes: true });
   const folders = entries
     .filter((entry) => entry.isDirectory() && /^\d/.test(entry.name))
     .map((entry) => entry.name)
     .sort();
+
+  const workshops = [];
 
   for (const folder of folders) {
     const readmePath = join(sourceDir, folder, 'README.md');
@@ -145,6 +124,7 @@ for (const training of TRAININGS) {
     const raw = await readFile(readmePath, 'utf8');
     const { title, description, body } = parse(raw, folder);
     const sourcePath = `${training.workshops}/${folder}`;
+    const href = `/${training.slug}/${toSlug(folder)}/`;
 
     await writeFile(
       join(outDir, `${toSlug(folder)}.md`),
@@ -164,7 +144,93 @@ for (const training of TRAININGS) {
       }),
     );
     written++;
+    workshops.push({ href, label: shortLabel(title), title, description });
   }
+
+  // 2. The overview: an index of links to those pages, then whatever the
+  //    training's own tp/README.md says. Without the index the overview reads as
+  //    "every workshop dumped on one page", which is exactly what it is not.
+  const overviewPath = join(sourceDir, 'README.md');
+  const overviewRaw = existsSync(overviewPath) ? await readFile(overviewPath, 'utf8') : '';
+  const overview = parse(overviewRaw, `${training.label} workshops`);
+
+  const index = [
+    '## The workshops',
+    '',
+    '| # | Workshop | |',
+    '|---|----------|---|',
+    ...workshops.map((workshop, position) => {
+      const name = workshop.label.replace(/^\d+\.\s*/, '');
+      return `| ${position + 1} | [${name}](${workshop.href}) | ${workshop.description} |`;
+    }),
+    '',
+    `[Resources — slides and solutions](/${training.slug}/resources/)`,
+  ].join('\n');
+
+  await writeFile(
+    join(outDir, 'index.md'),
+    page({
+      title: overview.title,
+      description: overview.description,
+      order: 0,
+      label: 'Overview',
+      sourcePath: `${training.workshops}/README.md`,
+      body: overviewRaw ? `${index}\n\n## About these workshops\n\n${overview.body}` : index,
+      note: [
+        ':::note[Where the code lives]',
+        `The workshops themselves are in \`${training.workshops}/\` —`,
+        `[browse them on GitHub](${REPO_URL}/tree/${BRANCH}/${training.workshops}).`,
+        'This site publishes the instructions; the code stays in the repository.',
+        ':::',
+      ].join('\n'),
+    }),
+  );
+  written++;
+
+  // 3. Resources: everything downloadable, produced by scripts/build-all.mjs.
+  //    A link is only rendered if the file is there — the PDF export of a very
+  //    large deck can legitimately fail without taking the deploy down.
+  const pdf = `${training.slug}-slides.pdf`;
+  const zipFile = `${training.slug}-solutions.zip`;
+
+  await writeFile(
+    join(outDir, 'resources.md'),
+    [
+      '---',
+      `title: ${yaml('Resources')}`,
+      `description: ${yaml(`The ${training.label} slides and the worked solutions of the ${workshops.length} workshops.`)}`,
+      'sidebar:',
+      '  order: 999',
+      '  label: "Resources"',
+      '---',
+      '',
+      '## Slides',
+      '',
+      `- **[Read the deck online](/slides/${training.slug}/)** — press <kbd>f</kbd> for fullscreen, <kbd>o</kbd> for the slide overview.`,
+      downloadable(pdf)
+        ? `- **[Download the slides (PDF)](/downloads/${pdf})** — the same deck, printable, for taking notes offline.`
+        : '- _A PDF export of this deck is not available: it is too large to render in one pass. Use the browser\'s own print dialog from the deck, or export it locally with `npx slidev export`._',
+      '',
+      '## Solutions',
+      '',
+      downloadable(zipFile)
+        ? `- **[Download the solutions (ZIP)](/downloads/${zipFile})** — a complete, runnable answer for each of the ${workshops.length} workshops.`
+        : '- _The solutions archive was not produced by this build._',
+      '',
+      ':::caution[Not before you have tried]',
+      'The workshops are written so that the starters fail in instructive ways. A',
+      'learner who reads the answer first never sees the problem the answer is for.',
+      'Open the archive **after** the correction, to compare it with what you wrote.',
+      ':::',
+      '',
+      '## Elsewhere',
+      '',
+      `- [The whole repository on GitHub](${REPO_URL})`,
+      `- [The workshop folders](${REPO_URL}/tree/${BRANCH}/${training.workshops})`,
+      '',
+    ].join('\n'),
+  );
+  written++;
 
   console.log(`✔ ${training.label}: ${folders.length} workshops`);
 }

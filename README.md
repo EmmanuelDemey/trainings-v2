@@ -28,11 +28,24 @@ build/
   slides/
     javascript/       the Slidev deck
     vuejs-advanced/
+  downloads/
+    javascript-slides.pdf       linked from the Resources page
+    javascript-solutions.zip
   _redirects          SPA fallback, one rule per deck
 ```
 
 The site is at the root, the decks under `/slides/<training>/`. Partial builds:
-`--only site`, `--only slides`.
+`--only site`, `--only slides`, and `--no-pdf` to skip the slow PDF export.
+
+The PDF export drives a real browser. On CI it downloads one; locally, point
+`SLIDEV_CHROME` at a Chrome you already have:
+
+```bash
+SLIDEV_CHROME=~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome npm run build
+```
+
+It is **non-fatal**: a deck that fails to export simply loses its PDF link on the
+Resources page.
 
 ## Adding a training to the site
 

@@ -22,7 +22,18 @@ training/chapters/vuejs_advanced/tp/06_pinia/README.md
    ➜ src/content/docs/vuejs-advanced/06-pinia.md
 ```
 
-For each page the script derives:
+It also generates, per training:
+
+- an **Overview** page: a table linking to every workshop, followed by whatever
+  the training's own `tp/README.md` says. The index comes first so the overview
+  never reads as "all the workshops dumped on one page";
+- a **Resources** page (last in the sidebar): the deck online, the deck as a PDF,
+  and the worked solutions as a ZIP. Those two files are produced by
+  `scripts/build-all.mjs` into `build/downloads/`, and **a link is only rendered
+  if the file is actually there** — the PDF export of a very large deck can fail
+  without that taking the deploy down.
+
+For each workshop page the script derives:
 
 - the **title**, from the leading `# ` heading (removed from the body — Starlight
   renders its own `h1`, keeping it would show the title twice);
