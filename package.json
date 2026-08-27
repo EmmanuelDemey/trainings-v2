@@ -1,0 +1,12 @@
+{
+  "name": "trainings-v2",
+  "private": true,
+  "type": "module",
+  "description": "Builds the workshops site and the slide decks into a single build/ folder",
+  "scripts": {
+    "build": "node scripts/build-all.mjs",
+    "build:site": "node scripts/build-all.mjs --only site",
+    "build:slides": "node scripts/build-all.mjs --only slides",
+    "preview": "npx --yes serve build"
+  }
+}

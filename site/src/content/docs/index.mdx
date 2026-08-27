@@ -1,0 +1,47 @@
+---
+title: Workshops
+description: The hands-on workshops of the trainings — instructions, steps and acceptance criteria.
+template: splash
+hero:
+  tagline: The hands-on part of the trainings. Every workshop is autonomous, and every one of them has a worked solution.
+  actions:
+    - text: JavaScript workshops
+      link: /javascript/
+      icon: right-arrow
+    - text: Advanced Vue.js workshops
+      link: /vuejs-advanced/
+      icon: right-arrow
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title="JavaScript" icon="seti:javascript">
+    11 workshops, 3 days, for beginners. Plain HTML, CSS and JavaScript — no build
+    step, no `npm install`. Days 1 and 2 follow the chapters; day 3 is four
+    mini-projects built with the same state ➜ render ➜ events method.
+
+    [Start here](/javascript/)
+  </Card>
+
+  <Card title="Advanced Vue.js" icon="seti:vue">
+    8 workshops, 3 days, based on Vue 3.5. Each one is a standalone TypeScript
+    project with its own `package.json`: async components, composables, Router,
+    Pinia, forms, testing and production.
+
+    [Start here](/vuejs-advanced/)
+  </Card>
+
+  <Card title="How a workshop reads" icon="open-book">
+    A goal, the prerequisites, a setup block, then **numbered steps** and the
+    acceptance criteria that tell you when you are done. The "going further"
+    section at the end is deliberately longer than the workshop.
+  </Card>
+
+  <Card title="Solutions" icon="approve-check">
+    Every workshop has a complete worked answer in the repository, under
+    `training/solutions/`. They are **not** published here on purpose: a learner
+    who reads the answer first never sees the problem the answer is for.
+  </Card>
+</CardGrid>

@@ -11,3 +11,5 @@ elasticsearch_ops_pw_complete.md
 dist/
 training/dist/
 training/index.html
+# Unified build output (scripts/build-all.mjs)
+build/

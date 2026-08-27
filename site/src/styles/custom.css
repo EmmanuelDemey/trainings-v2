@@ -1,0 +1,22 @@
+/* The workshop instructions are dense: give the code and the tables room. */
+:root {
+  --sl-content-width: 50rem;
+}
+
+/* Wide tables (the "8 errors", the acceptance grids) must scroll on their own
+   rather than pushing the page sideways. */
+.sl-markdown-content table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Numbered steps are the backbone of every workshop — make them readable. */
+.sl-markdown-content ol > li {
+  margin-block: 0.5rem;
+}
+
+.sl-markdown-content ol > li::marker {
+  font-weight: 600;
+  color: var(--sl-color-text-accent);
+}
