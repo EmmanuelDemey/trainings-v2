@@ -1,0 +1,52 @@
+name: JavaScript workshops
+
+on:
+  push:
+    paths:
+      - 'training/chapters/javascript/tp/**'
+      - 'training/solutions/javascript/**'
+      - '.github/workflows/javascript-workshops.yml'
+  pull_request:
+    paths:
+      - 'training/chapters/javascript/tp/**'
+      - 'training/solutions/javascript/**'
+  workflow_dispatch:
+
+jobs:
+  verify-solutions:
+    name: The 11 solutions still work
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: training
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: training/.nvmrc
+          cache: pnpm
+          cache-dependency-path: training/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify the workshop solutions
+        run: pnpm run verify:javascript
+
+      - name: The starters must still be unsolved
+        # A starter that passes the suite means a solution leaked into it.
+        run: |
+          if pnpm run verify:javascript -- --dir chapters/javascript/tp; then
+            echo "::error::The starters pass the solution suite — an answer leaked into chapters/javascript/tp/"
+            exit 1
+          fi
+          echo "Starters fail as expected."
