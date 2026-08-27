@@ -161,9 +161,9 @@ if (buildSlides) {
       trainingDir,
     );
 
-    // The PDF: a separate, slow step that drives a real browser over every
-    // slide. A deck that fails to export must NOT take the deploy down with it —
-    // the Resources page simply drops its PDF link (see sync-workshops.mjs).
+    // The PDF: a separate, slow step that renders the whole deck in a real
+    // browser. A deck that fails to export must NOT take the deploy down with
+    // it — the Resources page simply drops its PDF link (see sync-workshops.mjs).
     if (withPdf) {
       run(
         'npx',
@@ -176,17 +176,18 @@ if (buildSlides) {
           training.deck,
           '--output',
           join(deckOut, 'slidev-exported.pdf'),
-          // The defaults are tuned for a small deck. A 200-slide deck never
-          // reaches `networkidle`, and not even `load` — the cover slide pulls a
-          // background from source.unsplash.com, which no longer answers.
-          // `domcontentloaded` does not wait for that image.
-          '--wait-until',
-          'domcontentloaded',
+          // One navigation for the whole deck — do NOT add `--per-slide` here.
+          // Slidev exports from a Vite *dev* server, where a page load is a few
+          // hundred module requests, and the print view loads every slide of the
+          // deck on each navigation. One navigation per slide therefore repeats
+          // that work N times and Chromium gives up somewhere around the 20th
+          // with net::ERR_INSUFFICIENT_RESOURCES.
+          //
+          // The wait is left at its default (`networkidle`) on purpose:
+          // `--wait-until domcontentloaded` returns before Vue has rendered, and
+          // the export then prints a single blank page.
           '--timeout',
-          '300000',
-          // Rendering 200 slides in one print page is what blows the budget;
-          // per-slide navigation is slower per slide but finishes.
-          '--per-slide',
+          '900000',
           ...(localChrome ? ['--executable-path', localChrome] : []),
         ],
         trainingDir,
