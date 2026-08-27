@@ -82,9 +82,49 @@ console.log('Hello world');
 
 ---
 
+# Reading an error
+
+```javascript
+const languages = [{ name: 'JavaScript' }];
+console.log(languages.lenght.toFixed(2));
+// ❌ Uncaught TypeError: Cannot read properties of undefined (reading 'toFixed')
+//    at app.js:2:32
+```
+
+- **The type**: `TypeError`, `ReferenceError`, `SyntaxError` — three different problems
+- **The message**: names the value that failed, here `undefined`
+- **The location**: `app.js:2:32` — file, line, column. **Click it.**
+
+> "Cannot read properties of X" always accuses the value **before the dot**.
+> Here `languages.lenght` is `undefined` — the typo is the real bug.
+
+---
+
+# Debugging: the Sources panel
+
+`console.log` tells you what a value **was**. A breakpoint lets you ask
+**anything**, at the moment it happens.
+
+- **Sources** panel ➜ click a line number ➜ reload: the page freezes there
+- The **Scope** pane lists every variable and its current value
+- The console still works, **in the paused context**: type a variable name
+
+| Key | Action |
+|-----|--------|
+| **F8** | Resume until the next breakpoint |
+| **F10** | Step over — run the line, stay in this function |
+| **F11** | Step into — enter the function being called |
+
+> `debugger;` written in your code is a breakpoint too. Just never commit it.
+
+---
+
 # Hands-on
 
 ## Workshop 1 - First steps
+
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/01_introduction/</code> — ⏱ ~30 min — open <code>index.html</code>, steps in its <code>README.md</code></div>
+
 - Open the developer tools on any website
 - Inspect and modify an element in the **Elements** panel
 - Run your first instructions in the **Console**

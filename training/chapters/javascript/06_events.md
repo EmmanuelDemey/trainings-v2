@@ -126,9 +126,54 @@ form.addEventListener('submit', (event) => {
 
 ---
 
+# Bubbling and delegation
+
+- An event **bubbles**: it fires on the element, then on its parents, up to `document`
+
+```javascript
+// ❌ one listener per row — and nothing for rows added later
+document.querySelectorAll('li').forEach((li) => {
+  li.addEventListener('click', () => li.remove());
+});
+
+// ✅ ONE listener on the parent — works for future rows too
+list.addEventListener('click', (event) => {
+  const li = event.target.closest('li');
+  if (li) li.remove();
+});
+```
+
+- `event.target` = what was **clicked**, `event.currentTarget` = what **listens**
+- `closest('li')` climbs back up to the row from whatever was clicked inside it
+- `event.stopPropagation()` stops the bubbling — use it sparingly
+
+---
+
+# Accessible interactions
+
+Four reflexes that cost one line each, and decide whether your interface is
+usable without a mouse.
+
+```javascript
+button.disabled = true;              // greyed out AND announced as unavailable
+input.focus();                       // give the focus back after an action
+burger.setAttribute('aria-expanded', 'true');   // "this opens something, it is open"
+errorZone.textContent = 'Email is required';    // the error IN the page, not in an alert
+```
+
+- Use a **`<button>`** for anything clickable — a `<div>` with a listener is not
+  reachable with Tab and does not react to Enter or Space
+- Test it: unplug your mouse and go through your form with **Tab** and **Enter**
+- `alert()` and `confirm()` freeze the page — errors belong next to the field
+
+---
+
 # Hands-on
 
 ## Workshop 6 - Interactive interfaces
+
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/06_events/</code> — ⏱ ~1h15 — open <code>index.html</code>, steps in its <code>README.md</code></div>
+
 - A counter with `+` / `-` buttons that updates a displayed number
 - A character counter under a text field (`input` event)
 - A form with `submit` validation and error messages in the page
