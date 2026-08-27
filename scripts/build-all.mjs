@@ -164,30 +164,24 @@ if (buildSlides) {
     // The PDF: a separate, slow step that renders the whole deck in a real
     // browser. A deck that fails to export must NOT take the deploy down with
     // it — the Resources page simply drops its PDF link (see sync-workshops.mjs).
+    // Not `slidev export` directly: it drives a Vite dev server, which a deck of
+    // a few hundred slides defeats. deck-pdf.mjs prints the built deck instead —
+    // the note at the top of that file has the details. It must therefore run
+    // AFTER the deck has been built, and it reads it from `deckOut`.
     if (withPdf) {
       run(
-        'npx',
+        'node',
         [
-          '--yes',
-          'pnpm@10',
-          'exec',
-          'slidev',
-          'export',
+          'scripts/deck-pdf.mjs',
+          '--deck',
           training.deck,
-          '--output',
+          // It prints the deck that was just built, not a fresh dev server.
+          '--dist',
+          deckOut,
+          '--base',
+          `/slides/${training.slug}/`,
+          '--out',
           join(deckOut, 'slidev-exported.pdf'),
-          // One navigation for the whole deck — do NOT add `--per-slide` here.
-          // Slidev exports from a Vite *dev* server, where a page load is a few
-          // hundred module requests, and the print view loads every slide of the
-          // deck on each navigation. One navigation per slide therefore repeats
-          // that work N times and Chromium gives up somewhere around the 20th
-          // with net::ERR_INSUFFICIENT_RESOURCES.
-          //
-          // The wait is left at its default (`networkidle`) on purpose:
-          // `--wait-until domcontentloaded` returns before Vue has rendered, and
-          // the export then prints a single blank page.
-          '--timeout',
-          '900000',
           ...(localChrome ? ['--executable-path', localChrome] : []),
         ],
         trainingDir,
