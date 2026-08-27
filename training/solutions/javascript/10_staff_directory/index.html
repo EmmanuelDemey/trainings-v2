@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Staff directory</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Staff directory</h1>
+      <p class="subtitle">One list, two controls, one render function.</p>
+
+      <section class="toolbar">
+        <input id="search" type="search" placeholder="Search a name or a role" />
+        <select id="sort">
+          <option value="name">Sort by name</option>
+          <option value="role">Sort by role</option>
+        </select>
+        <button id="reset" type="button">Reset</button>
+        <span id="count" class="muted"></span>
+      </section>
+
+      <p id="empty" class="hidden"></p>
+      <div id="grid" class="grid"></div>
+    </main>
+
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+    <script src="checker.js" defer></script>
+    <script src="check.js" defer></script>
+  </body>
+</html>

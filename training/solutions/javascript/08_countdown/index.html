@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Countdown</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Countdown</h1>
+      <p class="subtitle">State ➜ render ➜ events.</p>
+
+      <section>
+        <p>
+          <label for="duration">Duration (seconds)</label>
+          <input id="duration" type="number" min="1" max="3600" value="10" />
+        </p>
+        <p id="form-error" class="error"></p>
+
+        <p id="display" class="display">00:00</p>
+        <p id="message"></p>
+
+        <button id="start" class="primary" type="button">Start</button>
+        <button id="pause" type="button">Pause</button>
+        <button id="reset" type="button">Reset</button>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

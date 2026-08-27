@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TP 5 - Manipulating the page</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>My shop</h1>
+      <p class="subtitle">An array of data on the left, a piece of interface on the right.</p>
+
+      <section>
+        <h2>Existing items</h2>
+        <ul>
+          <li class="item">Apple</li>
+          <li class="item">Kiwi</li>
+          <li class="item">Mango</li>
+        </ul>
+        <a id="doc-link" href="#">The documentation</a>
+      </section>
+
+      <section>
+        <h2>Show / hide</h2>
+        <button id="toggle" type="button">Details</button>
+        <div id="panel" class="hidden">
+          <p>This panel is hidden by default, via the <code>hidden</code> class.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Products</h2>
+        <ul id="products"></ul>
+        <p id="summary"></p>
+      </section>
+    </main>
+
+    <script src="ui.js" defer></script>
+    <script src="app.js" defer></script>
+    <script src="checker.js" defer></script>
+    <script src="check.js" defer></script>
+  </body>
+</html>

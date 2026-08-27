@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TP 7 - Responsive behaviour</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Responsive behaviour</h1>
+      <p class="subtitle">Resize the window and watch what changes.</p>
+
+      <section>
+        <h2>1 &amp; 2. Where are we?</h2>
+        <p>Viewport width: <strong id="width">-</strong> px</p>
+        <p>Mode: <strong id="mode">-</strong></p>
+        <p>
+          <code>resize</code> events: <strong id="resize-count">0</strong> —
+          <code>matchMedia</code> changes: <strong id="media-count">0</strong>
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Burger menu</h2>
+        <nav id="nav">
+          <button id="burger" type="button" aria-expanded="false">☰ Menu</button>
+          <ul id="menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </nav>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script src="checker.js" defer></script>
+    <script src="check.js" defer></script>
+  </body>
+</html>

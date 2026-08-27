@@ -2,9 +2,8 @@ node_modules
 .DS_Store
 dist
 *.local
-# Slidev generates one at the root — but the workshops need theirs.
-index.html
-!chapters/**/tp/**/index.html
+# Slidev generates one at the root — but the workshops keep theirs.
+/index.html
 .remote-assets
 components.d.ts
 .training_platform
