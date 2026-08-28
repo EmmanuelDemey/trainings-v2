@@ -36,6 +36,12 @@
 # workshop pages, the /downloads/ PDFs and ZIPs, the decks under /slides/. A
 # renamed workshop or a download that the build did not produce fails the deploy
 # instead of shipping a 404. Runs in a few seconds on the full build.
+#
+# It runs BEFORE the deploy, so it can only ever read the built files — and it
+# maps absolute URLs onto them by comparing their origin with $URL. That is why
+# site/astro.config.mjs stamps $URL, and not $DEPLOY_PRIME_URL, into every page's
+# og:url and canonical: any other origin looks external, gets fetched over the
+# network from a site that does not have these pages yet, and fails the build.
 [[plugins]]
   package = "netlify-plugin-checklinks"
 
@@ -51,6 +57,12 @@
       "fonts.googleapis.com",
       "fonts.gstatic.com",
       "cdn.jsdelivr.net",
+      # The 404 page is emitted as build/404.html — Netlify serves it for unknown
+      # paths — but it advertises itself as /404/. That address is never a 200 by
+      # construction, so its own og:url is the one link that cannot be checked.
+      # Matching the expected result, not the file, keeps this to that single check
+      # instead of silencing every link the 404 page carries.
+      "200 build/404",
     ]
     todoPatterns = []
     checkExternal = false
