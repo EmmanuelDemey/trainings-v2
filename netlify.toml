@@ -90,3 +90,6 @@
 
   [[plugins.inputs.audits]]
     path = "vuejs-advanced"
+
+  [[plugins.inputs.audits]]
+    path = "angular"

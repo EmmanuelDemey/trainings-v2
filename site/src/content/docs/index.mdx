@@ -12,6 +12,10 @@ hero:
       link: /vuejs-advanced/
       icon: right-arrow
       variant: minimal
+    - text: Angular
+      link: /angular/
+      icon: right-arrow
+      variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
@@ -33,6 +37,14 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     [The workshops](/vuejs-advanced/) · [Slides & downloads](/vuejs-advanced/resources/)
   </Card>
 
+  <Card title="Angular" icon="seti:html">
+    6 workshops, based on Angular 22. One project built across all six — from
+    `ng new` to a shared state service: templates, components, RxJS and
+    `HttpClient`, the router, and dependency injection.
+
+    [The workshops](/angular/) · [Slides & downloads](/angular/resources/)
+  </Card>
+
   <Card title="How a workshop reads" icon="open-book">
     A goal, the prerequisites, a setup block, then **numbered steps** and the
     acceptance criteria that tell you when you are done. The "going further"
@@ -40,8 +52,9 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   </Card>
 
   <Card title="What you can download" icon="download">
-    Every training has a **Resources** page: the deck as a PDF, its workshops as
-    one printable handbook, and the worked solutions as a ZIP — one complete,
-    runnable answer per workshop. Open the answers *after* you have tried.
+    Every training has a **Resources** page: the deck as a PDF and its workshops
+    as one printable handbook. JavaScript and Vue.js also ship the worked
+    solutions as a ZIP — one runnable answer per workshop. Open those *after* you
+    have tried.
   </Card>
 </CardGrid>

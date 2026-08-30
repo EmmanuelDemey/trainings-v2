@@ -25,9 +25,11 @@ build/
   index.html          the workshops site
   javascript/         its workshop pages
   vuejs-advanced/
+  angular/
   slides/
     javascript/       the Slidev deck
     vuejs-advanced/
+    angular/
   downloads/                    all linked from the training's Resources page
     javascript-slides.pdf       the deck, exported
     javascript-workshops.pdf    the TPs, as one printable handbook
@@ -54,16 +56,26 @@ the Resources page.
 
 One entry in [`scripts/trainings.mjs`](scripts/trainings.mjs). It is the only
 list: the workshop pages, the deck build, the downloads, the sidebar and the
-per-training menu all read from it. The only thing left to write by hand is a
-card on the home page, [`site/src/content/docs/index.mdx`](site/src/content/docs/index.mdx).
+per-training menu all read from it. Three things are still written by hand:
+
+- a card (and a hero action) on the home page,
+  [`site/src/content/docs/index.mdx`](site/src/content/docs/index.mdx);
+- `src/content/docs/<slug>/` in [`site/.gitignore`](site/.gitignore) — those pages
+  are generated from the workshop READMEs on every build and must not be committed;
+- a Lighthouse audit path in [`netlify.toml`](netlify.toml), if you want the new
+  overview scored with the others.
 
 Each training is its own space on the site: inside `/javascript/` the menu shows
 the JavaScript workshops and nothing else, with one link back to the picker. That
 narrowing lives in
 [`site/src/starlightRouteData.js`](site/src/starlightRouteData.js).
 
-Only **JavaScript** and **Advanced Vue.js** are published for now. The other decks
+**JavaScript**, **Advanced Vue.js** and **Angular** are published. The other decks
 under `training/` are still built one at a time with `npm run dev -- <deck>.md`.
+
+`solutions` is optional: the Angular workshops build a single project the learner
+creates with `ng new`, so there is nothing to hand out per exercise, and the
+Resources page drops the ZIP link on its own.
 
 ## Deploying
 
@@ -80,7 +92,7 @@ Two build plugins run on every deploy, both declared in the root
   in a few seconds. External links are not checked, and the hosts the Slidev
   decks pull their fonts from are skipped so a slow third party cannot fail a
   deploy.
-- **`@netlify/plugin-lighthouse`** audits the home page and both training
+- **`@netlify/plugin-lighthouse`** audits the home page and the three training
   overviews on the live deploy and posts the scores to the deploy summary. It is
   report-only; `netlify.toml` shows how to turn it into a gate.
 

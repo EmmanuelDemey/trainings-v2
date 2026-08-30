@@ -1,5 +1,9 @@
 # Formation Angular
 
+> **Ce fichier n'est plus la source des TP.** Les mises en pratique publiées sur le
+> site vivent dans `chapters/angular/tp/`, un dossier par TP — c'est là qu'il faut
+> les modifier. Ce document reste comme trace de la version d'origine.
+
 Durant cette formation, nous allons développer une application permettant la visualisation des personnages des films Star Wars.
 
 ## PW1 - Getting Started
