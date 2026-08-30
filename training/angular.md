@@ -656,22 +656,20 @@ const routes: Routes = [
   - `canActivate`
   - `canActivateChild`
   - `canDeactivate`
-  - `canLoad`
+  - `canLoad` (déprécié depuis Angular 15, remplacé par `canMatch`)
   - `canMatch`
 
 ```typescript
-const routes = [
+const routes: Routes = [
   {
-    path: ‘admin’,
-    canActivate: [() => inject(LoginService).isLoggedIn()]
+    path: "admin",
+    canActivate: [() => inject(LoginService).isLoggedIn()],
   },
   {
-    path: ‘edit’,
+    path: "edit",
     component: EditCmp,
-    canDeactivate: [
-      (component: EditCmp) => !component.hasUnsavedChanges
-    ]
-  }
+    canDeactivate: [(component: EditCmp) => !component.hasUnsavedChanges],
+  },
 ];
 ```
 
@@ -766,7 +764,6 @@ import { Routes, RouterModule } from "@angular/router";
 
 import { ProductComponent } from "../products/product.component";
 import { ProductResolver } from "../product.resolver";
-import { CanActivateGuard } from "../core/guards/can-activate.guard";
 
 const routes: Routes = [
   {
