@@ -250,7 +250,10 @@ for (const training of TRAININGS) {
     [
       '---',
       `title: ${yaml('Resources')}`,
-      `description: ${yaml(`The ${training.label} deck, the ${workshops.length} workshops as a printable handbook, and the worked solutions.`)}`,
+      `description: ${yaml(
+        `The ${training.label} deck and the ${workshops.length} workshops as a printable handbook` +
+          (training.solutions ? ', plus the worked solutions.' : '.'),
+      )}`,
       'sidebar:',
       '  order: 999',
       '  label: "Resources"',
@@ -272,15 +275,28 @@ for (const training of TRAININGS) {
       '',
       '## Solutions',
       '',
-      downloadable(zipFile)
-        ? `- **[Download the solutions (ZIP)](/downloads/${zipFile})** — a complete, runnable answer for each of the ${workshops.length} workshops.`
-        : '- _The solutions archive was not produced by this build._',
-      '',
-      ':::caution[Not before you have tried]',
-      'The workshops are written so that the starters fail in instructive ways. A',
-      'learner who reads the answer first never sees the problem the answer is for.',
-      'Open the archive **after** the correction, to compare it with what you wrote.',
-      ':::',
+      // Three cases, and they must not read alike. A training that declares no
+      // `solutions` in scripts/trainings.mjs has none by design — saying "not
+      // produced by this build" there reads as a broken deploy, and the caution
+      // below would point at an archive that does not exist.
+      ...(training.solutions
+        ? [
+            downloadable(zipFile)
+              ? `- **[Download the solutions (ZIP)](/downloads/${zipFile})** — a complete, runnable answer for each of the ${workshops.length} workshops.`
+              : '- _The solutions archive was not produced by this build._',
+            '',
+            ':::caution[Not before you have tried]',
+            'The workshops are written so that the starters fail in instructive ways. A',
+            'learner who reads the answer first never sees the problem the answer is for.',
+            'Open the archive **after** the correction, to compare it with what you wrote.',
+            ':::',
+          ]
+        : [
+            `- _This training has no solutions archive: its ${workshops.length} workshops build a`,
+            '  single project, one continuing the next, rather than one exercise each. The state',
+            '  to start from is the state you finished the previous workshop in — ask your',
+            '  trainer for it if you fell behind._',
+          ]),
       '',
       '## Feedback',
       '',

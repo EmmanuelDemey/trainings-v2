@@ -23,4 +23,13 @@ export const TRAININGS = [
     deck: 'vuejs_advanced.md',
     solutions: 'training/solutions/vuejs_advanced',
   },
+  {
+    slug: 'angular',
+    label: 'Angular',
+    workshops: 'training/chapters/angular/tp',
+    deck: 'angular.md',
+    // No `solutions`: the six workshops build one project, created by the learner
+    // with `ng new` in workshop 1 — there is nothing to hand out per exercise. The
+    // Resources page drops the ZIP link on its own when the key is absent.
+  },
 ];
