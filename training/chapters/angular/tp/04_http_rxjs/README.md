@@ -66,6 +66,11 @@ Nothing works without this, and the error you get when you forget it —
 `NullInjectorError: No provider for HttpClient!` — is worth causing once on
 purpose.
 
+> **No `withFetch()`.** Since Angular 22 the client is built on `fetch`, so that
+> option is the default and the function is deprecated. Older instructions add it;
+> on this version it does nothing. You can see it for yourself in the Network tab —
+> the requests are `fetch`, not `xhr`.
+
 ### 2. Type the response — `src/app/person.ts`
 
 ```ts

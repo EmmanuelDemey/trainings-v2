@@ -13,7 +13,7 @@ lineNumbers: false
 # some information about the slides, markdown enabled
 info: |
   ## Angular
-  Angular training — templates, components, forms, services, RxJS, HTTP and the router.
+  Angular 22 training — templates, components, forms, services, RxJS, HTTP and the router.
 
   Learn more at [Sli.dev](https://sli.dev)
 # persist drawings in exports and build
@@ -27,7 +27,7 @@ css: unocss
 
 # Angular
 
-<div style="opacity: 0.75; font-size: 0.9em;">Templates, composants, formulaires, services, RxJS, HTTP et le router</div>
+<div style="opacity: 0.75; font-size: 0.9em;">Angular 22 — templates, composants, formulaires, services, RxJS, HTTP et le router</div>
 
 <br />
 <br />
@@ -50,6 +50,25 @@ css: unocss
   - Intellij IDEA
   - Visual Studio Code
     - ajout de l'extension **yoavbls.pretty-ts-errors**
+
+---
+
+# Angular 22
+
+- Cette formation est à jour pour **Angular 22**, sortie en juin 2026
+- Les changements structurants de cette version
+  - **OnPush** devient la stratégie de détection de changement par défaut
+  - les **Signal Forms**, les **resources** (`resource`, `rxResource`, `httpResource`) et **Angular Aria** sont stables
+  - **HttpClient** s'appuie sur l'API **fetch**, et non plus sur `XMLHttpRequest`
+  - le décorateur **@Service()** et la fonction **injectAsync**
+  - côté router, **isActive** devient une fonction qui renvoie un `Signal`
+- Deux prérequis à ne pas oublier lors de la montée de version
+  - **TypeScript 6** (les versions 5.x ne sont plus supportées)
+  - **Node 22, 24 ou 26** — le support de Node 20 a été supprimé
+
+```shell
+ng update @angular/core @angular/cli
+```
 
 ---
 layout: cover
@@ -159,36 +178,43 @@ layout: cover
 
 # Composants Standalone
 
-- Angular propose une nouvelle solution pour activer les composants globalement via les **Standalone component**
-- Avant, nous étions obligé d'utiliser des **ngModule**
+- Un composant déclare lui-même ses dépendances, via la propriété **imports** : il n'a plus besoin d'un **NgModule**
+- Depuis Angular 19, `standalone: true` est la valeur par défaut : il est inutile de l'écrire
 
 ```typescript
 @Component({
-  selector: 'app-foo',
-  standalone: true,
-  templateUrl: './foo.component.html',
+  selector: "app-foo",
+  imports: [DatePipe, UserCard],
+  templateUrl: "./foo.html",
 })
-export class FooComponent {
-           👇
-}
+export class Foo {}
 ```
+
+- `standalone: false` reste disponible pour un composant encore déclaré dans un **NgModule** existant
+- Un projet généré aujourd'hui par `@angular/cli` ne contient plus aucun `NgModule`
 
 ---
 
-# Input obligatoires
+# Input
 
-- Depuis **Angular 16**, nous pouvons définir que des _input_ sont obligatoires.
+- Un _input_ se déclare avec la fonction **input()**, qui renvoie un `Signal` : il est donc utilisable dans un `computed` ou un `effect`
+- **input.required()** rend la valeur obligatoire — le compilateur refuse alors un template qui ne la fournit pas
 
 ```typescript
 @Component({
   selector: "app-error",
-  standalone: true,
-  templateUrl: "./error.component.html",
+  templateUrl: "./error.html",
 })
 export class ErrorMessage {
-  @Input({ required: true }) error: string;
+  error = input.required<string>();
+  code = input(500);
+  label = input("", { alias: "title" });
+
+  message = computed(() => `${this.code()} — ${this.error()}`);
 }
 ```
+
+- Le décorateur historique `@Input({ required: true })` fonctionne toujours, mais il n'est pas réactif
 
 ---
 
@@ -206,14 +232,32 @@ npm run ng g c login
 ```json
 {
   "@schematics/angular:component": {
-    "standalone": true,
     "inlineTemplate": true,
     "inlineStyle": true,
-    "flat": true,
-    "changeDetection": "OnPush"
+    "flat": true
   }
 }
 ```
+
+---
+
+# Détection de changement
+
+- Depuis Angular 22, **OnPush** est la stratégie par défaut de tous les composants : il n'est plus nécessaire de la déclarer
+- L'ancien comportement porte désormais le nom **Eager**
+
+```typescript
+@Component({
+  selector: "app-legacy",
+  changeDetection: ChangeDetectionStrategy.Eager,
+  templateUrl: "./legacy.html",
+})
+export class Legacy {}
+```
+
+- La migration `ng update` ajoute `Eager` sur les composants existants, afin de ne rien casser lors de la montée de version
+- Avec `OnPush`, un composant est rafraîchi lorsqu'un `Signal` lu par son template change, lorsqu'un _input_ change, ou lors d'un événement déclaré dans son template
+- C'est une raison de plus d'écrire l'état d'un composant avec des **Signals**
 
 ---
 layout: cover
@@ -329,6 +373,59 @@ export class FormComponent {
 
 ---
 
+# Signal Forms
+
+- Stables depuis Angular 22, elles proposent une troisième approche : le formulaire n'est plus un arbre de `FormControl`, mais la **projection d'un Signal** de données
+- La structure du formulaire est déduite du modèle, et la validation est déclarée dans un _schema_
+
+```typescript
+import { Component, signal } from "@angular/core";
+import { form, FormField, submit, required, email } from "@angular/forms/signals";
+
+@Component({
+  imports: [FormField],
+  templateUrl: "./contact.html",
+})
+export class Contact {
+  protected readonly model = signal({ name: "", email: "" });
+
+  protected readonly contactForm = form(this.model, (path) => {
+    required(path.name, { message: "Le nom est obligatoire" });
+    email(path.email, { message: "Email invalide" });
+  });
+
+  onSubmit() {
+    submit(this.contactForm, async () => console.log(this.model()));
+  }
+}
+```
+
+- Les Signal Forms sont exposées par un point d'entrée dédié : **@angular/forms/signals**
+
+---
+
+# Signal Forms
+
+- Dans le template, la directive **FormField** relie un champ du formulaire à un élément de saisie
+- Chaque champ est une fonction qui renvoie son état : `errors()`, `touched()`, `valid()`, `disabled()`
+
+```html
+<form (submit)="onSubmit(); $event.preventDefault()">
+  <input [formField]="contactForm.name" />
+  @if (contactForm.name().touched() && contactForm.name().errors().length) {
+    <p class="help is-danger">{{ contactForm.name().errors()[0].message }}</p>
+  }
+
+  <input type="email" [formField]="contactForm.email" />
+
+  <button [disabled]="contactForm().invalid()">Envoyer</button>
+</form>
+```
+
+- Les _Reactive Forms_ restent supportées : les deux APIs cohabitent, et rien n'oblige à migrer un formulaire existant
+
+---
+
 # Custom Validators
 
 - Nous pouvons créer nos propres validateurs
@@ -423,6 +520,55 @@ export class UserProfilComponent {
 
 ---
 
+# @Service
+
+- Depuis Angular 22, le décorateur **@Service()** remplace le très courant `@Injectable({ providedIn: "root" })`
+
+```typescript
+import { Service, inject } from "@angular/core";
+
+@Service()
+export class UserService {
+  private http = inject(HttpClient);
+
+  getUsers() {
+    return this.http.get<User[]>("/api/users");
+  }
+}
+```
+
+- Le service est automatiquement fourni au niveau de la racine de l'application
+- L'injection doit se faire via la fonction **inject** : l'injection par constructeur n'est pas supportée par ce décorateur
+- `@Service({ autoProvided: false })` pour un service que nous souhaitons déclarer nous-mêmes dans un tableau de `providers`
+
+---
+
+# injectAsync
+
+- Toujours depuis Angular 22, **injectAsync** permet de charger un service **à la demande** : sa classe est placée dans un _chunk_ séparé, téléchargé lors du premier appel
+
+```typescript
+export class ExportButton {
+  private exportService = injectAsync(() =>
+    import("./export-service").then((m) => m.ExportService)
+  );
+
+  async onClick() {
+    (await this.exportService()).exportAsPdf();
+  }
+}
+```
+
+- L'option **prefetch** permet de télécharger le code en avance, par exemple lorsque le navigateur est inactif
+
+```typescript
+injectAsync(() => import("./export-service"), { prefetch: onIdle });
+```
+
+- Le service chargé doit être _auto-provided_ : `@Service()` ou `@Injectable({ providedIn: "root" })`
+
+---
+
 # Stratégies
 
 - Nous avons plusieurs stratégies pour définir des _provider_
@@ -474,17 +620,12 @@ export class UserService {
 
 - Depuis Angular 15, nous pouvons créer nos propres APIs compatibles avec l'API Standalone.
 - Pour cela, il faudra utiliser la méthode **makeEnvironmentProviders**
+- **provideAppInitializer** remplace le token `APP_INITIALIZER`, déprécié depuis Angular 19
 
 ```typescript
 export function provideFeatureFlags(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (service: FeatureFlagService) =>
-        service.initializeFeatureFlags(),
-      deps: [FeatureFlagService],
-      multi: true,
-    },
+    provideAppInitializer(() => inject(FeatureFlagService).initialize()),
   ]);
 }
 
@@ -509,9 +650,32 @@ export const appConfig: ApplicationConfig = {
 - Introduite en _Developer Preview_ dans Angular 16, l'API des **Signals** est stable depuis Angular 17
   - signal
   - computed
-  - input
+  - input, model, output
   - viewChild, viewChildren, contentChild, contentChildren
-  - resource, linkedSignal — plus récentes, encore expérimentales
+  - linkedSignal
+  - resource, rxResource, httpResource — stables depuis Angular 22
+- C'est aujourd'hui le modèle de réactivité par défaut d'Angular : les formulaires (**Signal Forms**) et le router (**isActive**) exposent eux aussi des `Signal`
+
+---
+
+# Reactivité - httpResource
+
+- **httpResource** déclare une requête HTTP **à partir de Signals** : elle est rejouée automatiquement lorsque l'un d'eux change
+
+```typescript
+export class People {
+  search = signal("");
+
+  people = httpResource<Person[]>(
+    () => ({ url: "/api/people", params: { search: this.search() } }),
+    { defaultValue: [] }
+  );
+  // people.value(), people.isLoading(), people.error()
+}
+```
+
+- Plus besoin de `subscribe`, ni de gérer soi-même les états de chargement et d'erreur
+- `resource` pour une source de données quelconque, `rxResource` lorsque la source est un `Observable`
 
 ---
 layout: cover
@@ -714,6 +878,21 @@ export class UserService {
 
 ---
 
+# HttpClient - fetch
+
+- Depuis Angular 22, le client s'appuie sur l'API **fetch**, et non plus sur `XMLHttpRequest`
+- La fonction `withFetch()` est dépréciée : son comportement est devenu celui par défaut
+- Une conséquence directe : le suivi de progression doit être demandé explicitement, en émission comme en réception
+
+```typescript
+http.post("/upload", file, { reportUploadProgress: true, observe: "events" });
+http.get("/report.pdf", { reportDownloadProgress: true, observe: "events" });
+```
+
+- Les intercepteurs, les tests (`HttpTestingController`) et le reste de l'API ne changent pas
+
+---
+
 # Http Interceptors
 
 - Nous pouvons définir des intercepteurs afin de manipuler les requêtes et réponses HTTP
@@ -767,15 +946,16 @@ bootstrapApplication(App, {
 
 ```typescript
 @Component({})
-export class SearchComponent implements OnInit {
-  @Input() query?: string;
-  @Input("id") pathId?: string;
-  @Input("title") dataTitle?: string;
-  @Input("searchData") resolvedData?: any;
-
-  ngOnInit() {}
+export class Search {
+  query = input<string | undefined>(undefined);
+  pathId = input<string | undefined>(undefined, { alias: "id" });
+  dataTitle = input<string | undefined>(undefined, { alias: "title" });
+  resolvedData = input<SearchData | undefined>(undefined, { alias: "searchData" });
 }
 ```
+
+- Les _query params_, les paramètres de route, les `data` et les `resolve` sont tous exposés de la même manière
+- Avec un `input()`, la valeur est un `Signal` : elle est mise à jour lors d'une navigation d'une page vers elle-même, sans le moindre abonnement
 
 ---
 
@@ -797,6 +977,94 @@ const routes: Routes = [
   },
 ];
 ```
+
+---
+
+# Router - Liens
+
+- La directive **routerLink** navigue sans recharger l'application, tout en produisant un vrai lien que le navigateur sait ouvrir dans un nouvel onglet
+- **routerLinkActive** ajoute une classe CSS lorsque la route correspondante est active
+
+```html
+<a routerLink="/dashboard" routerLinkActive="is-active">Dashboard</a>
+
+<a
+  [routerLink]="['/person', person.id]"
+  routerLinkActive="is-active"
+  [routerLinkActiveOptions]="{ exact: true }"
+  >{{ person.name }}</a
+>
+```
+
+- Depuis Angular 22, l'input **browserUrl** permet d'afficher dans la barre d'adresse une URL différente de celle réellement activée
+
+---
+
+# Router - isActive
+
+- La méthode `Router.isActive()` répond à la question « cette URL est-elle active ? », mais elle n'est **pas réactive** : sa valeur est celle de l'instant où nous l'appelons
+- Depuis Angular 21.1, `@angular/router` expose une **fonction** `isActive`, qui renvoie un `Signal<boolean>` recalculé à chaque navigation
+
+```typescript
+import { Component, inject } from "@angular/core";
+import { isActive, Router } from "@angular/router";
+
+@Component({
+  template: `
+    <div [class.active]="isSettingsActive()">
+      <h2>Settings</h2>
+    </div>
+  `,
+})
+export class Panel {
+  private router = inject(Router);
+
+  isSettingsActive = isActive("/settings", this.router);
+}
+```
+
+- La méthode `Router.isActive()` est dépréciée au profit de cette fonction
+
+---
+
+# Router - isActive
+
+- Signature : `isActive(url, router, matchOptions?): Signal<boolean>`
+- Le troisième paramètre décrit **comment** comparer l'URL courante à celle demandée
+
+```typescript
+isSettingsActive = isActive("/settings", this.router, {
+  paths: "subset",
+  queryParams: "ignored",
+  fragment: "ignored",
+  matrixParams: "ignored",
+});
+```
+
+- `paths` : `"exact"` ou `"subset"` — `/settings` est-il actif lorsque nous sommes sur `/settings/profile` ?
+- `queryParams` : `"exact"`, `"subset"` ou `"ignored"`
+- `fragment` et `matrixParams` : `"exact"` ou `"ignored"`
+- Par défaut : `paths` et `queryParams` en `"subset"`, `fragment` et `matrixParams` `"ignored"`
+
+---
+
+# Router - isActive
+
+- L'intérêt d'un `Signal` : il se compose avec le reste de l'état du composant
+
+```typescript
+export class NavBar {
+  private router = inject(Router);
+
+  private onAdmin = isActive("/admin", this.router);
+  private user = inject(UserService).currentUser;
+
+  showAdminTools = computed(() => this.onAdmin() && this.user().isAdmin);
+}
+```
+
+- Le code est **tree-shakable** : une application qui n'utilise ni `isActive` ni `routerLinkActive` n'embarque pas cette fonctionnalité
+- Pour un simple lien de navigation, `routerLinkActive` reste la solution la plus courte ; `isActive` est utile dès que la réponse doit alimenter une logique dans le composant
 
 ---
 
@@ -883,6 +1151,7 @@ export const routes: Routes = [
 # Router - Guard - CanMatch
 
 - Le guard _canMatch_ peut être utile si vous souhaitez activer une route même si deux objets de configuration utilisent le même _path_
+- Depuis Angular 22, un `CanMatchFn` reçoit un troisième paramètre : `(route, segments, currentSnapshot)`
 
 ```typescript
 export const routes: Routes = [
@@ -909,17 +1178,19 @@ export const routes: Routes = [
   - d'éviter de le faire dans le composant lui-même
 
 ```typescript
+export const productResolver: ResolveFn<Product> = (route, state) =>
+  inject(ProductService).getProduct(route.paramMap.get("productId"));
+```
+
+- La forme historique — une classe implémentant l'interface **Resolve** — reste supportée, mais la fonction est aujourd'hui la solution recommandée
+
+```typescript
 @Injectable({ providedIn: "root" })
 export class ProductResolver implements Resolve<Product> {
   private service = inject(ProductService);
 
-  resolve(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<Product> {
-    const productId = route.paramMap.get("productId");
-
-    return this.service.getProduct(productId);
+  resolve(route: ActivatedRouteSnapshot): Observable<Product> {
+    return this.service.getProduct(route.paramMap.get("productId"));
   }
 }
 ```
@@ -941,52 +1212,35 @@ export const routes: Routes = [
     path: "product/:productId",
     component: ProductComponent,
     resolve: {
-      product: ProductResolver,
+      product: productResolver,
     },
   },
 ];
-```
-
-- Un resolver peut aussi être une simple fonction — **ResolveFn** — plutôt qu'une classe
-
-```typescript
-export const productResolver: ResolveFn<Product> = (route) =>
-  inject(ProductService).getProduct(route.paramMap.get("productId"));
 ```
 
 ---
 
 # Resolver
 
-- Dernière étape, nous allons récupérer ces données depuis les composants grâce à l'observable data de l'objet **ActivatedRoute**
+- Dernière étape, nous allons récupérer ces données depuis les composants grâce à l'observable `data` de l'objet **ActivatedRoute**
 
 ```typescript
-import { Component, OnDestroy } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { Subscription } from "rxjs";
-import { Product } from "../shared/models/products.model";
-
 @Component({
   selector: "app-product",
-  templateUrl: "./product.component.html",
-  styleUrls: ["./product.component.scss"],
+  templateUrl: "./product.html",
 })
-export class ProductComponent implements OnDestroy {
-  public product: Product;
-  private productSubscription: Subscription;
+export class ProductPage {
+  private route = inject(ActivatedRoute);
 
-  constructor(
-    private productsService: ProductsService,
-    private route: ActivatedRoute
-  ) {
-    this.productSubscription = this.route.data.subscribe((data) => {
-      this.product = data.product;
-    });
-  }
+  product = toSignal(this.route.data.pipe(map((data) => data["product"])));
+}
+```
 
-  ngOnDestroy() {
-    this.productSubscription?.unsubscribe();
-  }
+- Avec **withComponentInputBinding()**, la donnée résolue arrive directement en _input_, et l'abonnement disparaît complètement
+
+```typescript
+export class ProductPage {
+  product = input.required<Product>();
 }
 ```
 
@@ -1060,38 +1314,36 @@ const routes: Routes = [
 
 # Tests Unitaires
 
-- Pourquoi Jest et Testing Library ?
-
-- Jest :
-
-  - Framework de test JavaScript populaire.
-  - Prise en charge de l'ensemble du cycle de vie du test.
-  - Simple à configurer et à utiliser.
-
-- Testing Library :
-  - Met l'accent sur le test de comportement utilisateur.
-  - Facilite la création de tests plus robustes et maintenables.
-  - Encourage les tests orientés utilisateur.
+- **Vitest** est aujourd'hui le lanceur de tests proposé par `@angular/cli`, à la place de Karma
+  - rapide, compatible avec l'API de Jest, et configuré par le builder d'Angular
+  - la migration d'un projet existant est outillée : `ng generate @schematics/angular:refactor-jasmine-vitest` réécrit les fichiers de test
+- **Testing Library** :
+  - met l'accent sur le test du comportement utilisateur
+  - facilite la création de tests plus robustes et maintenables
 
 ```typescript
-import { render } from "@testing-library/angular";
-import { MyComponent } from "./my-component.component";
+import { render, screen } from "@testing-library/angular";
+import { Greeting } from "./greeting";
 
-describe("MyComponent", () => {
-  test("renders component with correct text", async () => {
-    const { getByText } = await render(MyComponent);
-    expect(getByText("Hello, World!")).toBeTruthy();
+describe("Greeting", () => {
+  test("affiche le message", async () => {
+    await render(Greeting);
+    expect(screen.getByText("Hello, World!")).toBeTruthy();
   });
 });
 ```
+
+- `TestBed` reste la base de tout : `TestBed.getLastFixture()` évite de conserver soi-même la référence à la fixture
 
 ---
 
 # Tests E2E
 
 - Historiquement, Angular proposait une intégration de **Protractor**
-- **Protractor** est à présent déprécié, mais Angular propose des intégrations à des solutions connues
+- **Protractor** est à présent abandonné, mais `ng e2e` propose des intégrations aux solutions du marché
+  - Playwright
   - Cypress
+  - WebdriverIO
   - Nightwatch
 
 ```shell
