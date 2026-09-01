@@ -176,12 +176,18 @@ search = model('');
 The parent then writes `<app-people-filter [(search)]="search" />` — the "banana in
 a box". Look at what it saves, and at what it hides.
 
-### 7. *(Bonus)* `OnPush`
+### 7. *(Bonus)* `OnPush`, and what it costs you
 
-Add `changeDetection: ChangeDetectionStrategy.OnPush` to the three new components.
-Everything still works, because inputs and events are exactly the two things that
-mark an `OnPush` component dirty. This is the default you want in a real project —
-`angular.json` can make the schematics generate it for you.
+Since Angular 22 your three components are **already** `OnPush` — it is the default,
+and there is nothing to add. Everything works because a signal read in the template,
+an input, and an event are exactly what marks such a component dirty.
+
+To see what that default buys you, break it on purpose: replace one component's
+state with a plain field mutated from a `setTimeout`, and watch the view not update.
+Then switch that component to the old behaviour —
+`changeDetection: ChangeDetectionStrategy.Eager` — and watch it update again. `Eager`
+is the strategy every component had before v22, and the one `ng update` writes into
+existing projects so that a version bump changes nothing.
 
 ## Definition of Done
 

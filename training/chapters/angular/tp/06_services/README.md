@@ -60,10 +60,16 @@ export class LikesService {
 }
 ```
 
+> **`@Service()`** — Angular 22 adds a shorter spelling of exactly this line:
+> `@Service()` *is* `@Injectable({ providedIn: 'root' })`, with one constraint — the
+> class must use `inject()` rather than constructor injection. Either decorator works
+> here; know that you will meet both.
+
 `isLiked$` returns a **stream**, not a boolean: the button's label has to change
 when the character is liked from the *other* page, and a value read once cannot do
-that. (A synchronous `isLiked()` would appear to work — until you add `OnPush`, at
-which point it silently stops updating. That is a bad afternoon.)
+that. (A synchronous `isLiked()` returning a plain boolean would appear to work in an
+`Eager` component — but every component is `OnPush` since Angular 22, and there it
+silently stops updating. That is a bad afternoon.)
 
 Three things this shape is doing on purpose:
 

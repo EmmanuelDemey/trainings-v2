@@ -8,6 +8,7 @@ Turn one page into an application with two. By the end you can:
 
 - declare routes, including one with a parameter, and render them in an outlet
 - navigate with `routerLink`, and read a parameter without subscribing to anything
+- highlight the current page, with `routerLinkActive` and with the `isActive` signal
 - lazy-load a route, and see the chunk it saves in the build output
 
 The feature you are adding: clicking a character's name opens **its own page**.
@@ -164,7 +165,70 @@ that read the parameter once, in a constructor.
 `/person/9999` returns a 404. Catch it and render "Personnage introuvable" with a
 link home, rather than leaving the page blank.
 
-### 7. *(Bonus)* Lazy-load the detail page
+### 7. Show which page you are on
+
+Give `App` a navigation bar, above the outlet — `src/app/app.html`:
+
+```html
+<nav class="navbar">
+  <a class="navbar-item" routerLink="/" routerLinkActive="is-active"
+     [routerLinkActiveOptions]="{ exact: true }">Personnages</a>
+  <a class="navbar-item" routerLink="/person/1" routerLinkActive="is-active">Luke</a>
+</nav>
+
+<router-outlet />
+```
+
+`App` now uses three directives — `imports: [RouterOutlet, RouterLink, RouterLinkActive]`.
+
+`routerLinkActive` adds the class while its link's route is active — and
+`{ exact: true }` is what stops `/` from being "active" on every page, since every
+URL starts with it.
+
+**Check it**: the highlight moves as you navigate, and survives a hard refresh.
+
+Now the same question, but in TypeScript. `routerLinkActive` only styles a link;
+when the *component* needs to know where it is, use the `isActive` **function** of
+`@angular/router` — added in Angular 21.1, it returns a `Signal<boolean>` that the
+router recomputes on every navigation:
+
+```ts
+import { Component, inject } from '@angular/core';
+import { isActive, Router } from '@angular/router';
+
+export class App {
+  private router = inject(Router);
+
+  onDetail = isActive('/person', this.router);
+}
+```
+
+```html
+<nav class="navbar">
+  <!-- … the two links … -->
+  @if (onDetail()) {
+    <span class="tag is-info">Fiche personnage</span>
+  }
+</nav>
+```
+
+**Check it**: the badge appears on `/person/3` and disappears on `/`. You wrote no
+subscription, no `NavigationEnd`, no `ngOnInit` — and the value is a signal, so you
+can build on it: `showBackLink = computed(() => this.onDetail() && !this.isLoading())`.
+
+> **Why not `router.isActive('/person', ...)`?** Because the *method* answers once,
+> at the moment you call it: put it in a field and it is frozen; put it in a getter
+> and it only re-runs when something else happens to trigger change detection. The
+> method is deprecated for exactly this reason. The function returns a signal, so
+> `@if` re-evaluates when — and only when — the URL changes.
+
+> The third argument decides how strictly the URLs are compared:
+> `isActive('/person', this.router, { paths: 'exact', queryParams: 'ignored',
+> fragment: 'ignored', matrixParams: 'ignored' })`. With the default `paths:
+> 'subset'`, `/person` counts as active while you are on `/person/3` — which is what
+> we want here. Switch it to `'exact'` and watch the badge never appear.
+
+### 8. *(Bonus)* Lazy-load the detail page
 
 ```ts
 {
@@ -177,7 +241,7 @@ Run `npm run build` before and after, and compare: the person page is now its ow
 chunk, not part of the initial bundle. Watch it load in the Network tab on the
 first navigation.
 
-### 8. *(Bonus)* A resolver, and a guard
+### 9. *(Bonus)* A resolver, and a guard
 
 - A `resolve` on the route fetches the character **before** the component is
   created — the page never renders empty. What did you lose in exchange?
@@ -202,12 +266,18 @@ first navigation.
 - [ ] A hard refresh on `/person/3` lands on that character
 - [ ] `/person/9999` shows a "not found" message, not a blank page
 - [ ] An unknown URL — `/nope` — lands on the table
+- [ ] The navigation bar highlights the page you are on, and `Personnages` is *not*
+      highlighted while you are on a character
+- [ ] The `Fiche personnage` badge shows on `/person/:id` only, and it is driven by
+      `isActive`, not by a subscription
 
 **You can explain**
 
 - [ ] Why `routerLink` and not `href`
 - [ ] Why `route.snapshot` breaks when navigating between two ids, and what fixes it
 - [ ] What `withComponentInputBinding()` does, and what you would write without it
+- [ ] Why `isActive(...)` returns a signal, and what the deprecated `Router.isActive()`
+      method could not do
 
 ## Going further
 

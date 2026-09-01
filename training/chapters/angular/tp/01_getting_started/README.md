@@ -31,8 +31,9 @@ workshop.
 
 ## Prerequisites
 
-- **Node.js** — a version supported by the current Angular CLI (`node -v`; 22.x or
-  24.x are safe). Angular's own error message tells you if yours is too old.
+- **Node.js** — a version supported by the current Angular CLI (`node -v`; 22.x, 24.x
+  and 26.x are supported by Angular 22, which dropped Node 20). Angular's own error
+  message tells you if yours is too old.
 - A terminal, and an editor with the **Angular Language Service** extension
   (VS Code: `Angular.ng-template`). It is what turns a typo in a template into a
   red squiggle instead of a blank page.
@@ -62,6 +63,11 @@ The generator asks a few questions. Answer:
 cd first-project
 npm start          # http://localhost:4200
 ```
+
+> **Which version did you get?** `ng version` — these workshops and the deck are
+> written for **Angular 22**. Two of its defaults are visible from the first
+> minute: components are `OnPush` unless they say otherwise, and `HttpClient`
+> (workshop 4) runs on `fetch`.
 
 ## Steps
 
