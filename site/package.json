@@ -2,12 +2,11 @@
   "name": "trainings-workshops-site",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@12.3.1",
   "scripts": {
     "sync": "node scripts/sync-workshops.mjs",
-    "predev": "npm run sync",
-    "dev": "astro dev",
-    "prebuild": "npm run sync",
-    "build": "astro build",
+    "dev": "pnpm run sync && astro dev",
+    "build": "pnpm run sync && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },

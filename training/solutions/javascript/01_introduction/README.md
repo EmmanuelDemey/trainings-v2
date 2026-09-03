@@ -41,7 +41,7 @@ Open `index.html` in your browser, then press **F12** to open the devtools.
 ## Checking your work
 
 The console shows four groups of output and no red error (except in step 4,
-where the error is the point). Run `npm run verify:javascript -- --dir
+where the error is the point). Run `pnpm run verify:javascript --dir
 chapters/javascript/tp --tp 01` to have it checked for you.
 
 ## Going further

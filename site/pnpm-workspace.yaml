@@ -1,0 +1,25 @@
+# Marks site/ as its own pnpm root, so it installs into site/node_modules with
+# its own lockfile. Without this file pnpm walks up, finds the one at the repo
+# root, and the install here becomes a silent no-op.
+#
+# The three projects (., site/, training/) are installed separately on purpose —
+# scripts/build-all.mjs installs each one, and training/ needs settings the
+# others must not inherit.
+
+# pnpm reads .npmrc for auth and registries only, since v11 — every other
+# setting lives here.
+
+# Astro externalises a handful of its own dependencies in the server bundle it
+# prerenders from, and Node then resolves them from site/dist/ — walking up to
+# site/node_modules, where pnpm's strict layout only links what site/ declares.
+# `cookie` is the one that bites: not found here, resolution reaches the repo
+# root and picks up express's CommonJS cookie@0.7.2 instead of the ESM cookie@2
+# Astro asks for, and the build dies on `parseCookie` during prerendering.
+# Hoisting reproduces the flat layout npm gave us, which is what Astro assumes.
+shamefullyHoist: true
+
+# Astro's toolchain is the only thing here with a build script, and it needs
+# none: the platform binaries ship as optional dependencies.
+allowBuilds:
+  esbuild: false
+  sharp: false

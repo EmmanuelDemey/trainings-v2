@@ -1,11 +1,11 @@
 // Functional check of the JavaScript workshops.
 //
-//   npm run verify:javascript                                  # the solutions
-//   npm run verify:javascript -- --dir chapters/javascript/tp  # YOUR work
-//   npm run verify:javascript -- --tp 08                       # one workshop
+//   pnpm run verify:javascript                                # the solutions
+//   pnpm run verify:javascript --dir chapters/javascript/tp  # YOUR work
+//   pnpm run verify:javascript --tp 08                       # one workshop
 //
-// Needs a Chromium: `npx playwright install chromium`, or point PW_CHROME at an
-// existing binary (PW_CHROME=/path/to/chrome npm run verify:javascript).
+// Needs a Chromium: `pnpm exec playwright install chromium`, or point PW_CHROME
+// at an existing binary (PW_CHROME=/path/to/chrome pnpm run verify:javascript).
 import { chromium } from 'playwright-chromium';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';

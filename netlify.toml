@@ -10,10 +10,18 @@
 
 [build.environment]
   NODE_VERSION = "24"
-  # The build installs training/ and site/ itself. The root install only brings
-  # in the build script's own dependencies and the two build plugins declared
-  # below — devDependencies included, which Netlify installs by default.
-  NPM_FLAGS = "--no-audit --no-fund"
+  # pnpm, not npm: Netlify picks it up from pnpm-lock.yaml and the
+  # `packageManager` field of package.json, and installs that exact version
+  # before running the build command — which is what puts `pnpm` on PATH for
+  # scripts/build-all.mjs.
+  #
+  # The build installs training/ and site/ itself, each being its own pnpm root
+  # with its own lockfile. The root install only brings in the build script's own
+  # dependencies and the two build plugins declared below — devDependencies
+  # included, which Netlify installs by default.
+  #
+  # No NPM_FLAGS here: pnpm neither audits nor prints funding notices, and the
+  # flags npm took are not its.
 
 # The SPA fallback for the decks is generated into build/_redirects by the build
 # script, so it stays in sync with the list of trainings in scripts/trainings.mjs.

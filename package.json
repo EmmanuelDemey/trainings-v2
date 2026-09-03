@@ -3,11 +3,12 @@
   "private": true,
   "type": "module",
   "description": "Builds the workshops site and the slide decks into a single build/ folder",
+  "packageManager": "pnpm@12.3.1",
   "scripts": {
     "build": "node scripts/build-all.mjs",
     "build:site": "node scripts/build-all.mjs --only site",
     "build:slides": "node scripts/build-all.mjs --only slides",
-    "preview": "npx --yes serve build"
+    "preview": "pnpm dlx serve build"
   },
   "dependencies": {
     "archiver": "^7.0.1"

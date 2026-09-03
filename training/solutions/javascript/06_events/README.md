@@ -51,7 +51,7 @@ Open `index.html`, console visible.
 Or have it checked for you:
 
 ```bash
-npm run verify:javascript -- --dir chapters/javascript/tp --tp 06
+pnpm run verify:javascript --dir chapters/javascript/tp --tp 06
 ```
 
 ## Going further

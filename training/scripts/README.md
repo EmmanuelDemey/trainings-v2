@@ -19,7 +19,7 @@ Les dépendances nécessaires sont déjà définies dans `training/package.json`
 Depuis le dossier `training/` :
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Utilisation
@@ -28,16 +28,16 @@ Depuis le dossier `training/` :
 
 ```bash
 # Tous les PDFs (A11y + Elasticsearch + React + Vue.js Avancé) — plusieurs minutes
-npm run generate:all
+pnpm run generate:all
 
 # Une seule formation (slides + cahier d'exercices)
-npm run generate:a11y
-npm run generate:elasticsearch
-npm run generate:react
-npm run generate:vuejs-advanced
+pnpm run generate:a11y
+pnpm run generate:elasticsearch
+pnpm run generate:react
+pnpm run generate:vuejs-advanced
 
 # Le cahier d'exercices Vue.js Avancé seul (~1 s, pas d'export Slidev)
-npm run generate:vuejs-advanced:tp
+pnpm run generate:vuejs-advanced:tp
 ```
 
 ### Filtres
@@ -126,7 +126,7 @@ Les styles CSS sont optimisés pour :
 **Erreur "Dépendances manquantes"** :
 ```bash
 cd training
-npm install
+pnpm install
 ```
 
 **Erreur Slidev** :
@@ -138,7 +138,7 @@ Sur certains systèmes, Puppeteer peut nécessiter des dépendances système sup
 **Erreur "Could not find Chrome"** :
 Puppeteer ne télécharge pas toujours son navigateur à l'installation :
 ```bash
-npx puppeteer browsers install chrome
+pnpm dlx puppeteer browsers install chrome
 ```
 
 **Erreur "Executable doesn't exist at .../ms-playwright/..." (export Slidev)** :
@@ -147,7 +147,7 @@ Slidev exporte via Playwright, qui a besoin de son propre Chromium. Deux options
 1. Installer le Chrome de Puppeteer (commande ci-dessus). Le script le détecte et le
    passe à Slidev via `--executable-path` — c'est le chemin recommandé, un seul
    navigateur à télécharger pour les deux moteurs.
-2. Installer le Chromium de Playwright : `npx playwright install chromium`.
+2. Installer le Chromium de Playwright : `pnpm exec playwright install chromium`.
 
 **Erreur "Playwright does not support chromium on <distro>"** :
 Les navigateurs pré-compilés de Playwright ne couvrent pas toutes les distributions.

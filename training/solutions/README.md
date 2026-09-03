@@ -56,7 +56,7 @@ Every solution was run, not just written:
 
 | Suite | Verified with |
 |---|---|
-| JavaScript 01–11 | `npm run verify:javascript` — 91 assertions in a real Chromium, plus the in-page `check.js` of workshops 2, 3, 4, 5, 7 and 10 |
+| JavaScript 01–11 | `pnpm run verify:javascript` — 91 assertions in a real Chromium, plus the in-page `check.js` of workshops 2, 3, 4, 5, 7 and 10 |
 | Node 01–12 | `npm run typecheck`, plus each workshop's own entry point |
 | Node 04 | the API driven end to end with `curl` (401 / 403 / 404 / 201, helmet + rate-limit headers) |
 | Node 06 | `npm test` — 4 tests |
@@ -79,7 +79,7 @@ replaced by the local Docker plan B, which is verified).
 
 ```bash
 npx playwright install chromium     # once
-npm run verify:javascript
+pnpm run verify:javascript
 ```
 
 It drives the 11 pages: the countdown really counts down and stops, the password
@@ -92,7 +92,7 @@ The same suite runs against a **learner's** folder, which is how a workshop is
 corrected without reading it line by line:
 
 ```bash
-npm run verify:javascript -- --dir chapters/javascript/tp --tp 09
+pnpm run verify:javascript --dir chapters/javascript/tp --tp 09
 ```
 
 It runs in CI on every push touching these folders

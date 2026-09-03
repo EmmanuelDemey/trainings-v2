@@ -1,0 +1,14 @@
+# pnpm reads .npmrc for auth and registries only, since v11 — every other
+# setting lives here. Same shape as training/pnpm-workspace.yaml; the two
+# projects are installed separately, so each carries its own file.
+
+# strictDepBuilds is on by default since v11: a dependency with a build script
+# that is neither allowed nor denied fails the install.
+allowBuilds:
+  # Its postinstall only prints a funding banner. npm ran it, nothing depended
+  # on it.
+  core-js: false
+  # Pulled by @netlify/plugin-lighthouse, which drives it to audit the deployed
+  # pages. Its postinstall downloads the Chrome it needs — npm ran it, and the
+  # plugin has no other way to find a browser. Keep it true.
+  puppeteer: true

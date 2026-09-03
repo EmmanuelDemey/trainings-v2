@@ -117,20 +117,19 @@ await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
 
 // --- 0. training/, and the browser both PDF exports drive --------------------
-// training/ is a pnpm project; the CI host only knows about the root, so pnpm is
-// fetched on demand rather than assumed to be installed. It is needed by the
-// decks AND by the workshop handbooks, which run out of training/scripts/.
-// `pnpm@12` only bootstraps the right major: the exact version is the one that
-// training/package.json pins in `packageManager`, which pnpm downloads and hands
-// over to when the one npx fetched is not it.
+// Every project here — this one, site/ and training/ — is a separate pnpm root
+// with its own lockfile, and each is installed on its own. training/ is needed
+// by the decks AND by the workshop handbooks, which run out of training/scripts/.
+// `pnpm` is on PATH because the root pins it in `packageManager`: the CI host
+// (and corepack locally) installs that exact version before running this script.
 if (buildSlides || withPdf) {
-  install(trainingDir, 'npx', ['--yes', 'pnpm@12', 'install', '--frozen-lockfile']);
+  install(trainingDir, 'pnpm', ['install', '--frozen-lockfile']);
 }
 
 // Both PDF exports need a browser. SLIDEV_CHROME skips the download when one is
 // already on the machine — which is the normal case locally, and never on CI.
 if (withPdf && !localChrome) {
-  run('npx', ['--yes', 'pnpm@12', 'exec', 'playwright', 'install', 'chromium'], trainingDir);
+  run('pnpm', ['exec', 'playwright', 'install', 'chromium'], trainingDir);
 }
 
 // --- 1. The decks (Slidev) --------------------------------------------------
@@ -146,10 +145,8 @@ if (buildSlides) {
 
     // The deck itself: fast, and never allowed to fail.
     run(
-      'npx',
+      'pnpm',
       [
-        '--yes',
-        'pnpm@12',
         'exec',
         'slidev',
         'build',
@@ -248,10 +245,12 @@ for (const training of TRAININGS) {
 // Built LAST, and copied to the root of build/: its Resources pages look at
 // build/downloads/ to decide which links they can honestly offer.
 // It goes to the root of build/, so that the domain lands on the workshop index.
-// `npm run build` runs the README ➜ Starlight sync first (prebuild).
+// `pnpm run build` chains the README ➜ Starlight sync itself: pnpm does not run
+// pre/post scripts, so site/package.json spells the sync out rather than relying
+// on a `prebuild` hook that would be silently skipped.
 if (buildSite) {
-  install(siteDir, 'npm', ['ci']);
-  run('npm', ['run', 'build'], siteDir);
+  install(siteDir, 'pnpm', ['install', '--frozen-lockfile']);
+  run('pnpm', ['run', 'build'], siteDir);
   await cp(join(siteDir, 'dist'), outDir, { recursive: true });
 }
 
@@ -274,4 +273,4 @@ for (const training of TRAININGS) {
 }
 console.log('─────────────────────────────────────────');
 console.log('\nPreview it exactly as Netlify will serve it:');
-console.log('  npx serve build          (or: npx netlify dev)');
+console.log('  pnpm run preview         (or: pnpm dlx netlify dev)');

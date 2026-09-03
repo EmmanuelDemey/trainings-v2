@@ -14,8 +14,9 @@ scripts/             the build that assembles everything
 ## Build everything
 
 ```bash
-node scripts/build-all.mjs      # or: npm run build
-npx serve build                 # preview
+pnpm install                    # once, at the root
+pnpm run build                  # or: node scripts/build-all.mjs
+pnpm run preview                # serves build/ as Netlify does
 ```
 
 It produces a single deployable folder:
@@ -46,7 +47,7 @@ drive a real browser. On CI it downloads one; locally, point `SLIDEV_CHROME` at 
 Chrome you already have:
 
 ```bash
-SLIDEV_CHROME=~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome npm run build
+SLIDEV_CHROME=~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome pnpm run build
 ```
 
 Both are **non-fatal**: a deck that fails to export simply loses its PDF link on
@@ -71,7 +72,7 @@ narrowing lives in
 [`site/src/starlightRouteData.js`](site/src/starlightRouteData.js).
 
 **JavaScript**, **Advanced Vue.js** and **Angular** are published. The other decks
-under `training/` are still built one at a time with `npm run dev -- <deck>.md`.
+under `training/` are still built one at a time with `pnpm run dev <deck>.md`.
 
 `solutions` is optional: the Angular workshops build a single project the learner
 creates with `ng new`, so there is nothing to hand out per exercise, and the

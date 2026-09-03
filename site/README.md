@@ -5,9 +5,9 @@ instructions** of the trainings. Two trainings are exposed for now: **JavaScript
 and **Advanced Vue.js**.
 
 ```bash
-npm install
-npm run dev      # http://localhost:4321
-npm run build    # static site in dist/
+pnpm install
+pnpm run dev      # http://localhost:4321
+pnpm run build    # static site in dist/
 ```
 
 ## Where the content comes from
@@ -52,7 +52,7 @@ For each workshop page the script derives:
 
 The generated folders are **gitignored**. The source of truth is the workshop
 folder, where the learner actually works — never the copy under `src/`.
-`npm run dev` and `npm run build` both run the sync first, so the site cannot
+`pnpm run dev` and `pnpm run build` both run the sync first, so the site cannot
 drift from the workshops.
 
 ## One menu per training

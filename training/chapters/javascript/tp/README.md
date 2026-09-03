@@ -59,10 +59,10 @@ All red at the start is normal — that *is* the to-do list. Nothing to install.
 solutions can be pointed at **your** work:
 
 ```bash
-npx playwright install chromium                              # once
+pnpm exec playwright install chromium                        # once
 
-npm run verify:javascript -- --dir chapters/javascript/tp    # all 11
-npm run verify:javascript -- --dir chapters/javascript/tp --tp 08   # just one
+pnpm run verify:javascript --dir chapters/javascript/tp           # all 11
+pnpm run verify:javascript --dir chapters/javascript/tp --tp 08   # just one
 ```
 
 It drives a real browser: it clicks *Start* twice on your countdown, generates
