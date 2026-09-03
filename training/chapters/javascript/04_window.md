@@ -113,6 +113,109 @@ now.toISOString();             // '2026-08-27T13:04:11.000Z' — for machines
 
 ---
 
+# `Date` and its four traps
+
+```javascript
+const d = new Date(2026, 11, 31); // ⚠️ months start at 0 → this is December
+d.setDate(d.getDate() + 1);       // mutable: d changed, nothing was returned
+new Date('31/12/2026');           // Invalid Date — that format is not portable
+d.getHours();                     // in the timezone of the machine, whichever it is
+```
+
+- Months are **0-indexed**, days are **1-indexed**
+- A `Date` is **mutable**: every `setX()` rewrites the object in place
+- Only the ISO form (`'2026-12-31T20:00:00'`) parses the same everywhere
+- **One single type** for a day, a time, an instant and a timezone
+
+> `Date` was copied from Java 1.0 in ten days, in 1995, and never changed since.
+
+---
+
+# `Temporal`, the new date API
+
+- The standard replacement for `Date` — **stage 4 since March 2026** (ES2026)
+- **Immutable** objects, one **explicit type** per need, months starting at 1
+
+```javascript
+const today = Temporal.Now.plainDateISO();        // 2026-09-03, no time, no zone
+const party = Temporal.PlainDate.from('2026-12-31');
+
+today.month;                    // 9 — September really is 9
+today.add({ days: 30 });        // a NEW date, `today` is untouched
+party.since(today).days;        // 119
+Temporal.PlainDate.compare(today, party); // -1 — sorts like a comparator
+
+Temporal.Now.zonedDateTimeISO('Europe/Paris');    // an instant, in a real zone
+Temporal.Duration.from({ minutes: 90 }).total('hours'); // 1.5
+```
+
+> `PlainDate` (a day), `PlainTime`, `PlainDateTime`, `ZonedDateTime` (an instant
+> in a zone), `Instant` (a point on the timeline), `Duration` (a length of time).
+
+---
+
+# `Temporal` — can I use it today?
+
+| Browser | State |
+|---------|-------|
+| Chrome / Edge **144+** | ✅ shipped (January 2026) |
+| Firefox **139+** | ✅ shipped (May 2025) |
+| Safari | ⚠️ Technology Preview only |
+
+- Not **Baseline** yet: one browser short, so not usable bare in production
+- A polyfill covers the gap: `temporal-polyfill` or `@js-temporal/polyfill`
+- Existing code bridges over: `new Date().toTemporalInstant()`
+
+> For this training: keep `Date` for *storing* an instant (`Date.now()`), and
+> `Intl` for *displaying* it. Know that `Temporal` is what you will write next.
+
+---
+
+# `Intl` — formatting for humans
+
+- Never build a displayed number or date by hand: the browser knows the rules
+
+```javascript
+const price = 1234.5;
+
+new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(price);
+// '1 234,50 €'          — the separators, the position of the symbol, all of it
+new Intl.NumberFormat('en-US', { style: 'percent' }).format(0.256);  // '26%'
+new Intl.NumberFormat('en', { notation: 'compact' }).format(48000);  // '48K'
+
+new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' })
+  .format(new Date());  // 'Thursday 3 September 2026 at 14:05'
+```
+
+- `toLocaleDateString()` / `toLocaleString()` are the same engine, one-shot
+- Build the formatter **once** and reuse it — creating one is the costly part
+- Locale: `'fr-FR'`, `navigator.language` (the user's), or `undefined` (default)
+
+---
+
+# `Intl` — the four others
+
+```javascript
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+rtf.format(-1, 'day');   // 'yesterday'
+rtf.format(3, 'hour');   // 'in 3 hours'
+
+new Intl.ListFormat('en').format(['Ada', 'Grace', 'Linus']);
+// 'Ada, Grace, and Linus'
+
+new Intl.PluralRules('en').select(1);   // 'one'  — English has 2 forms, Polish 4
+new Intl.PluralRules('en').select(0);   // 'other'
+
+const collator = new Intl.Collator('fr');
+['Zoé', 'Émile', 'Emma'].sort(collator.compare); // Émile, Emma, Zoé
+```
+
+- `localeCompare` of chapter 3 **is** a `Collator` — built again on every
+  comparison. On a long list, create it once and pass `collator.compare` to `sort`
+- `${n} day${n > 1 ? 's' : ''}` only ever works in English — that is `PluralRules`
+
+---
+
 # Why a countdown drifts
 
 ```javascript
@@ -145,3 +248,4 @@ setInterval(() => {
 - Display a message 2 seconds after page load with `setTimeout`
 - Build a timer that logs every second and stops after 10 seconds
 - Bonus: a "Back to top" smooth scroll with `scrollTo`
+- Going further: display the date and a price with `Intl`, in two locales

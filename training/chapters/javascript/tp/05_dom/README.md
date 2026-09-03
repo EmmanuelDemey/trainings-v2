@@ -52,3 +52,16 @@ summary, and the *Details* button hides and shows the panel.
   appending once beats 1000 `append` calls.
 - `<template>` + `cloneNode(true)`: the third way to build DOM, the one
   frameworks are built on.
+- **The other selectors** — redo step 1 with `document.getElementById('panel')`
+  and step 3 with `document.getElementsByClassName('item')`. Then:
+
+  ```javascript
+  const items = document.getElementsByClassName('item'); // live collection
+  console.log(items.length);          // 3
+  document.querySelector('.item').remove();
+  console.log(items.length);          // 2 — nobody touched `items`
+  items.forEach;                      // undefined — it is not a NodeList
+  ```
+
+  Now remove all of them with `for (const item of items) item.remove()` and
+  count what is left. Then fix it with `[...items]`.

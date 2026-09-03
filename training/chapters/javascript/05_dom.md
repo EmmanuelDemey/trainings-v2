@@ -45,6 +45,29 @@ items.forEach((item) => console.log(item.textContent));
 
 ---
 
+# The historical selectors: `getElementBy...`
+
+- Older than `querySelector`, and still all over existing code
+
+```javascript
+document.getElementById('cart');           // '#cart' without the #  → one element
+document.getElementsByClassName('item');   // '.item' without the .  → a collection
+document.getElementsByTagName('li');
+```
+
+| Method | Returns | On DOM change | `forEach` |
+|--------|---------|---------------|-----------|
+| `getElementById` | the element, or `null` | — | — |
+| `getElementsBy...` | an **HTMLCollection** — *live* | updates itself | ❌ |
+| `querySelectorAll` | a **NodeList** — *static* | frozen at call time | ✅ |
+
+> **Live** is the trap: the collection changes under your feet.
+> `const items = document.getElementsByClassName('item');`
+> `for (const i of items) i.remove();` skips one element out of two.
+> Copy it first — `[...items]` — or use `querySelectorAll`.
+
+---
+
 # Reading and modifying content
 
 ```javascript
@@ -126,3 +149,4 @@ fruits.forEach((fruit) => {
 - Hide / show a block by toggling a `hidden` class
 - Render an array of products as an HTML list with `createElement`
 - Add a "Remove" behavior that deletes an item from the list
+- Going further: the same selection with `getElementById` — and the live-collection trap
