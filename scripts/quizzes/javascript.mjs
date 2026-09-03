@@ -639,4 +639,204 @@ export default {
         'Slower on paper, immune to two parts of the screen disagreeing — and the first display goes through the same function as every other one.',
     },
   ],
+
+  // --- Optional modules -----------------------------------------------------
+  // Only reachable when the module is switched on (`pnpm run modules fetch on`);
+  // while it is off, the folder is `_12_fetch` and nothing here is ever read.
+
+  // Chapter 9 — Talking to a server
+  '12_fetch': [
+    {
+      code: { language: 'javascript', source: "const data = fetch('/products');" },
+      prompt: 'What does `data` hold on the very next line?',
+      options: [
+        { letter: 'A', text: 'The array of products' },
+        { letter: 'B', text: 'A Promise — the answer has not arrived yet' },
+        { letter: 'C', text: 'The JSON text of the response' },
+        { letter: 'D', text: '`undefined` until the request finishes' },
+      ],
+      answer: 'B',
+      explanation:
+        'A function cannot return a value that does not exist yet. It returns a promise, and you say what to do with the value once it lands — `.then(...)` or `await`.',
+    },
+    {
+      prompt: 'The server answers `404`. What does the promise returned by `fetch` do?',
+      options: [
+        { letter: 'A', text: 'It rejects, so `.catch` runs' },
+        { letter: 'B', text: 'It fulfils — a 404 is an answer. You must check `response.ok` yourself' },
+        { letter: 'C', text: 'It stays pending forever' },
+        { letter: 'D', text: 'It throws synchronously' },
+      ],
+      answer: 'B',
+      explanation:
+        '`fetch` only rejects when the request could not be made at all: offline, DNS, CORS. Without an `if (!response.ok) throw`, the error page reaches `.json()` and crashes there, with a message about unexpected characters.',
+    },
+    {
+      prompt: 'Why does `response.json()` return a promise too?',
+      options: [
+        { letter: 'A', text: 'To keep the API consistent' },
+        { letter: 'B', text: 'Because the body is streamed: the headers are there, the content is not yet' },
+        { letter: 'C', text: 'Because parsing JSON is slow' },
+        { letter: 'D', text: 'It does not — it returns the object directly' },
+      ],
+      answer: 'B',
+      explanation:
+        'The promise resolves as soon as the *headers* arrive. Reading the body is a second wait — which is also why you can inspect `response.status` before paying for the download.',
+    },
+    {
+      prompt: 'What does `await` do to the page while it waits?',
+      options: [
+        { letter: 'A', text: 'It freezes it — nothing else runs' },
+        { letter: 'B', text: 'Nothing: the rest of the app keeps running, only this function is paused' },
+        { letter: 'C', text: 'It shows the browser loading spinner' },
+        { letter: 'D', text: 'It retries the request every second' },
+      ],
+      answer: 'B',
+      explanation:
+        '`await` pauses one function, not the page — unlike `alert()`, which really does block everything. That is why the loading state you show must be your own.',
+    },
+    {
+      prompt: 'A screen that loads data has how many states to render?',
+      options: [
+        { letter: 'A', text: 'One: the data' },
+        { letter: 'B', text: 'Two: data, or nothing' },
+        { letter: 'C', text: 'Three at least: loading, error, data — and empty is a fourth' },
+        { letter: 'D', text: 'It depends on the server' },
+      ],
+      answer: 'C',
+      explanation:
+        'An error is a state the user must see, not a `console.error`. And an empty list is not a failure: it deserves its own sentence.',
+    },
+  ],
+
+  // Chapter 10 — ES Modules
+  '13_es_modules': [
+    {
+      prompt: 'Two classic `<script>` files each declare `const total`. What happens?',
+      options: [
+        { letter: 'A', text: 'Nothing — each file has its own scope' },
+        { letter: 'B', text: '`SyntaxError: Identifier \'total\' has already been declared` — they share one global scope' },
+        { letter: 'C', text: 'The second silently wins' },
+        { letter: 'D', text: 'The browser renames one of them' },
+      ],
+      answer: 'B',
+      explanation:
+        'Classic scripts share the page\'s global scope, and their order is a dependency graph nobody wrote down. Modules exist to end both problems.',
+    },
+    {
+      code: { language: 'javascript', source: "import { price } from 'format';" },
+      prompt: 'Why does the browser refuse this line?',
+      options: [
+        { letter: 'A', text: 'Because `price` is not exported' },
+        { letter: 'B', text: 'Because a browser needs a real path: `./format.js`, extension included' },
+        { letter: 'C', text: 'Because the import must be inside a function' },
+        { letter: 'D', text: 'Because `format` is a reserved word' },
+      ],
+      answer: 'B',
+      explanation:
+        'A bare name like `format` is resolved by a bundler or by an import map, never by the browser on its own. And the `.js` is part of the URL.',
+    },
+    {
+      prompt: 'Three modules import `./store.js`. How many times does its top-level code run?',
+      options: [
+        { letter: 'A', text: 'Three times, once per import' },
+        { letter: 'B', text: 'Once — a module is evaluated one single time per page' },
+        { letter: 'C', text: 'Once per import that actually uses an export' },
+        { letter: 'D', text: 'It depends on the load order' },
+      ],
+      answer: 'B',
+      explanation:
+        'Everyone shares the same instance and the same exported objects. That is what makes a module a natural place for shared state.',
+    },
+    {
+      prompt: 'What does `<script type="module">` change, besides allowing `import`?',
+      options: [
+        { letter: 'A', text: 'Nothing else' },
+        { letter: 'B', text: 'It is deferred by default, runs in strict mode, has its own scope, and allows top-level `await`' },
+        { letter: 'C', text: 'It makes the script run before the HTML is parsed' },
+        { letter: 'D', text: 'It disables the console' },
+      ],
+      answer: 'B',
+      explanation:
+        'And it is fetched like any resource — which is exactly why a `file://` page refuses to run it.',
+    },
+    {
+      code: { language: 'javascript', source: "const { renderChart } = await import('./chart.js');" },
+      prompt: 'What does this buy you over a top-level `import`?',
+      options: [
+        { letter: 'A', text: 'Nothing, it is just another syntax' },
+        { letter: 'B', text: 'The file is only downloaded when this line runs — the users who never click never pay for it' },
+        { letter: 'C', text: 'It bypasses the module cache' },
+        { letter: 'D', text: 'It works in a classic script too' },
+      ],
+      answer: 'B',
+      explanation:
+        '`import(...)` is a function call returning a promise, so it can sit inside a handler or an `if`. A second call downloads nothing: same module cache.',
+    },
+  ],
+
+  // Chapter 11 — Local & Session Storage
+  '14_storage': [
+    {
+      code: { language: 'javascript', source: "localStorage.setItem('count', 3);\nlocalStorage.getItem('count') + 1;" },
+      prompt: 'What is the second line worth?',
+      options: [
+        { letter: 'A', text: '4' },
+        { letter: 'B', text: "'31' — storage only holds strings" },
+        { letter: 'C', text: 'NaN' },
+        { letter: 'D', text: '`3` as a number, storage keeps the type' },
+      ],
+      answer: 'B',
+      explanation:
+        'Everything goes in through `String()`. Objects come back as `[object Object]`, which is why the rule is JSON in, JSON out.',
+    },
+    {
+      prompt: 'The key has never been written. What does `JSON.parse(localStorage.getItem(KEY))` give you?',
+      options: [
+        { letter: 'A', text: 'It throws' },
+        { letter: 'B', text: '`null` — so a default value is still needed, and a `try` / `catch` for the corrupted case' },
+        { letter: 'C', text: '`undefined`' },
+        { letter: 'D', text: 'An empty array' },
+      ],
+      answer: 'B',
+      explanation:
+        '`JSON.parse(null)` returns `null`; `JSON.parse(\'oops\')` throws. A hand-edited value, or one written by last month\'s version of your code, is exactly that second case.',
+    },
+    {
+      prompt: 'What is the difference between `localStorage` and `sessionStorage`?',
+      options: [
+        { letter: 'A', text: '`sessionStorage` is sent to the server' },
+        { letter: 'B', text: '`sessionStorage` dies with the tab; `localStorage` stays until it is cleared' },
+        { letter: 'C', text: '`sessionStorage` is encrypted' },
+        { letter: 'D', text: '`localStorage` is shared between different sites' },
+      ],
+      answer: 'B',
+      explanation:
+        'Same API, same origin rule, different lifetime — and two tabs of the same site share a `localStorage`, never a `sessionStorage`.',
+    },
+    {
+      prompt: 'Where should the authentication token of your users be stored?',
+      options: [
+        { letter: 'A', text: 'In `localStorage`, it is convenient' },
+        { letter: 'B', text: 'Nowhere near it: any script on the page reads the whole box, so one XSS takes everything' },
+        { letter: 'C', text: 'In `sessionStorage`, which is safe' },
+        { letter: 'D', text: 'In a variable named `_secret`' },
+      ],
+      answer: 'B',
+      explanation:
+        'Storage has no `HttpOnly`, no expiry, no protection of any kind. Tokens belong in a cookie the JavaScript cannot read.',
+    },
+    {
+      prompt: 'Where does the call to `save()` belong?',
+      options: [
+        { letter: 'A', text: 'In every handler, right after each change' },
+        { letter: 'B', text: 'In the single `update()` that already writes the state — one funnel, like `render()`' },
+        { letter: 'C', text: 'In a `setInterval`, every second' },
+        { letter: 'D', text: 'In `render()`' },
+      ],
+      answer: 'B',
+      explanation:
+        'Scattered `setItem` calls are how the screen and the storage end up disagreeing. One place changes the state, so one place persists it.',
+    },
+  ],
 };

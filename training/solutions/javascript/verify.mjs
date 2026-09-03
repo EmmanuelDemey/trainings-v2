@@ -7,8 +7,11 @@
 // Needs a Chromium: `pnpm exec playwright install chromium`, or point PW_CHROME
 // at an existing binary (PW_CHROME=/path/to/chrome pnpm run verify:javascript).
 import { chromium } from 'playwright-chromium';
-import { pathToFileURL } from 'node:url';
-import { resolve } from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import { extname, join, resolve } from 'node:path';
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 
 const args = process.argv.slice(2);
 const readArg = (name) => {
@@ -42,6 +45,55 @@ async function open(folder, viewport) {
   page.on('console', (m) => logs.push(m.text()));
   page.on('pageerror', (e) => logs.push('PAGEERROR ' + e.message));
   await page.goto(`${base}/${folder}/index.html`);
+  return { page, logs };
+}
+
+// --- the optional workshops ------------------------------------------------
+// 12, 13 and 14 need a real origin: fetch, ES modules and localStorage are all
+// refused on file://. They also only exist when their module is switched on
+// (`pnpm run modules fetch on`) — off, the folder is named `_12_fetch`.
+const rootDir = dir ? resolve(process.cwd(), dir) : fileURLToPath(new URL('.', import.meta.url));
+const present = (folder) => existsSync(join(rootDir, folder));
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+};
+
+let server;
+let origin;
+
+/** A one-file static server over the workshops, started on first use. */
+async function httpOrigin() {
+  if (origin) return origin;
+  server = createServer(async (request, response) => {
+    const path = join(rootDir, decodeURIComponent(new URL(request.url, 'http://x').pathname));
+    try {
+      const body = await readFile(path);
+      response.writeHead(200, { 'Content-Type': MIME[extname(path)] ?? 'application/octet-stream' });
+      response.end(body);
+    } catch {
+      response.writeHead(404, { 'Content-Type': 'text/plain' });
+      response.end('not found');
+    }
+  });
+  await new Promise((resolveListening) => server.listen(0, '127.0.0.1', resolveListening));
+  origin = `http://127.0.0.1:${server.address().port}`;
+  return origin;
+}
+
+/** Text of the first match, or '' — never waits, unlike page.textContent. */
+const textOf = (page, selector) =>
+  page.evaluate((s) => document.querySelector(s)?.textContent ?? '', selector);
+
+async function openHttp(folder) {
+  const page = await browser.newPage();
+  const logs = [];
+  page.on('console', (m) => logs.push(m.text()));
+  page.on('pageerror', (e) => logs.push('PAGEERROR ' + e.message));
+  await page.goto(`${await httpOrigin()}/${folder}/index.html`);
   return { page, logs };
 }
 
@@ -301,6 +353,100 @@ if (!skip('11_social_network')) {
   await page.close();
 }
 
+// --- TP12 (optional module: fetch) -----------------------------------------
+if (!skip('12_fetch') && present('12_fetch')) {
+  console.log('TP12 fetch');
+  const { page, logs } = await openHttp('12_fetch');
+  await page.waitForTimeout(600);
+  ok('4 products rendered', (await page.locator('#products li').count()) === 4);
+  ok('prices formatted', /12[.,]00/.test(await textOf(page, '#products li:first-child')));
+  ok('summary totals', (await textOf(page, '#summary')).includes('46'), await textOf(page, '#summary'));
+  ok('loading hidden once done', await page.locator('#loading').isHidden());
+  ok('no error on the happy path', await page.locator('#error').isHidden());
+  ok('the first request was logged', logs.some((l) => /Response|status/i.test(l)));
+  await page.click('#load-missing');
+  await page.waitForTimeout(400);
+  ok('a missing file shows a readable error', (await textOf(page, '#error')).length > 3, await textOf(page, '#error'));
+  ok('the error is visible in the page', await page.locator('#error').isVisible());
+  await page.click('#reload');
+  await page.waitForTimeout(400);
+  ok('reloading clears the error', await page.locator('#error').isHidden());
+  ok('and brings the products back', (await page.locator('#products li').count()) === 4);
+  await page.fill('#search', 'mug');
+  await page.waitForTimeout(500);
+  ok('search filters the list', (await page.locator('#products li').count()) === 1, String(await page.locator('#products li').count()));
+  await page.close();
+}
+
+// --- TP13 (optional module: ES modules) ------------------------------------
+if (!skip('13_es_modules') && present('13_es_modules')) {
+  console.log('TP13 es modules');
+  const { page } = await openHttp('13_es_modules');
+  await page.waitForTimeout(300);
+  const loaded = () => page.evaluate(() =>
+    performance.getEntriesByType('resource').map((entry) => entry.name));
+  const files = await loaded();
+  ok('format.js is imported', files.some((n) => n.endsWith('/format.js')), files.join(','));
+  ok('store.js is imported', files.some((n) => n.endsWith('/store.js')));
+  ok('cart-item.js is imported', files.some((n) => n.endsWith('/cart-item.js')));
+  ok('stats.js is not loaded yet', !files.some((n) => n.endsWith('/stats.js')));
+  ok('nothing leaked into window', await page.evaluate(() => typeof window.plural === 'undefined'));
+  ok('2 items rendered', (await page.locator('#items li').count()) === 2);
+  ok('total formatted', /20[.,]50/.test(await textOf(page, '#total')), await textOf(page, '#total'));
+  await page.fill('#name', 'Sticker');
+  await page.fill('#price', '1.5');
+  await page.click('#add-form button[type=submit]');
+  ok('adding renders a third item', (await page.locator('#items li').count()) === 3);
+  ok('total recomputed', /22[.,]00/.test(await textOf(page, '#total')), await textOf(page, '#total'));
+  if ((await page.locator('#items li').count()) > 0) {
+    await page.click('#items li:first-child button:last-child');
+  }
+  ok('removing works', (await page.locator('#items li').count()) === 2);
+  await page.click('#stats');
+  await page.waitForTimeout(300);
+  ok('the dynamic import ran', (await textOf(page, '#stats-output')).includes('average'), await textOf(page, '#stats-output'));
+  ok('stats.js was downloaded on the click', (await loaded()).some((n) => n.endsWith('/stats.js')));
+  await page.close();
+}
+
+// --- TP14 (optional module: storage) ---------------------------------------
+if (!skip('14_storage') && present('14_storage')) {
+  console.log('TP14 storage');
+  const { page } = await openHttp('14_storage');
+  await page.fill('#task', 'buy milk');
+  await page.click('#add-form button[type=submit]');
+  ok('the task is rendered', (await page.locator('#todos li').count()) === 1);
+  const stored = await page.evaluate(() => localStorage.getItem('trainings.todos.v1'));
+  ok('it was written as JSON', /^\[.*"buy milk".*\]$/.test(stored ?? ''), String(stored));
+  await page.fill('#draft', 'an unsent note');
+  await page.waitForTimeout(100);
+  await page.reload();
+  await page.waitForTimeout(200);
+  ok('it survived the reload', (await textOf(page, '#todos li span')) === 'buy milk');
+  ok('the draft came back from sessionStorage', (await page.inputValue('#draft')) === 'an unsent note');
+  if ((await page.locator('#todos li').count()) > 0) {
+    await page.click('#todos li button:nth-child(2)');
+  }
+  await page.reload();
+  await page.waitForTimeout(200);
+  ok('the done flag is persisted too', await page.evaluate(() => {
+    try {
+      return JSON.parse(localStorage.getItem('trainings.todos.v1'))[0].done === true;
+    } catch {
+      return false;
+    }
+  }));
+  await page.click('#clear');
+  ok('clearing empties the list', (await page.locator('#todos li').count()) === 0);
+  ok('and removes the key', await page.evaluate(() =>
+    localStorage.getItem('trainings.todos.v1') === null));
+  await page.reload();
+  await page.waitForTimeout(200);
+  ok('still empty after a reload', (await page.locator('#todos li').count()) === 0);
+  await page.close();
+}
+
 await browser.close();
+server?.close();
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

@@ -588,13 +588,14 @@ in front of an empty file.
 
 | Subject | Why it was left out | Where to start |
 |---------|--------------------|----------------|
-| `fetch` and promises | Needs the async model — half a day on its own | `fetch(url).then(...)`, then `async` / `await` |
-| ES modules | Needs a server, changes the tooling | `<script type="module">`, `import` / `export` |
-| `localStorage` | Ten minutes, once the state pattern is solid | `JSON.stringify` in, `JSON.parse` out |
+| `fetch` and promises | Needs the async model — half a day on its own | **optional module** — chapter 9 |
+| ES modules | Needs a server, changes the tooling | **optional module** — chapter 10 |
+| `localStorage` | Ten minutes, once the state pattern is solid | **optional module** — chapter 11 |
 | Classes, `this` | Rarely needed to write an interface today | after the three above |
 | A framework | It only makes sense once today's pattern hurts | React, Vue, Angular |
 
-> In that order. Each one assumes the previous.
+> In that order. Each one assumes the previous. The first three exist as
+> **optional modules**, with their own workshop — ask for them.
 
 ---
 

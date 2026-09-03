@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TP 14 - Remembering</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>A to-do list that survives</h1>
+      <p class="subtitle">
+        Same list as always — except this one is still there after
+        <kbd>F5</kbd>.
+      </p>
+
+      <section>
+        <h2>To do</h2>
+        <form id="add-form">
+          <input id="task" type="text" placeholder="Something to do…" autocomplete="off" />
+          <button type="submit" class="primary">Add</button>
+        </form>
+        <ul id="todos"></ul>
+        <p id="empty" class="muted">Nothing yet — add a task, then reload the page.</p>
+        <p id="count" class="muted"></p>
+        <button id="clear" type="button">Clear everything</button>
+      </section>
+
+      <section>
+        <h2>The draft</h2>
+        <p class="muted">
+          Type here without submitting, then reload: the text is back. Open the
+          same page in a <b>new tab</b>: it is not.
+        </p>
+        <textarea id="draft" rows="3" placeholder="An unsent note…"></textarea>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script src="checker.js" defer></script>
+    <script src="check.js" defer></script>
+  </body>
+</html>

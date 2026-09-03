@@ -14,7 +14,8 @@
     "generate:vuejs-advanced:tp": "node ./scripts/generateA11y.js --only=vuejs-advanced --exercices",
     "generate:elasticsearch-ops-pdf": "node generate_elasticsearch_ops_pw_pdf_playwright.js",
     "merge:elasticsearch-ops": "bash merge_elasticsearch_ops_pw.sh",
-    "verify:javascript": "node solutions/javascript/verify.mjs"
+    "verify:javascript": "node solutions/javascript/verify.mjs",
+    "modules": "node ./scripts/modules.mjs"
   },
   "dependencies": {
     "@slidev/cli": "52.8.0",

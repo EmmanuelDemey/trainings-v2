@@ -1,4 +1,4 @@
-# JavaScript workshops — 11 autonomous TPs
+# JavaScript workshops — 11 autonomous TPs (+ 3 optional)
 
 One folder per workshop. **Each folder is self-contained**: no `npm install`, no
 build step, no dependency on the other workshops. Open the folder and start.
@@ -16,6 +16,36 @@ build step, no dependency on the other workshops. Open the folder and start.
 | 9 | `09_password_generator` | 8 - Guided practice, mini-project 2 | 3 | 1h15 |
 | 10 | `10_staff_directory` | 8 - Guided practice, mini-project 3 | 3 | 1h15 |
 | 11 | `11_social_network` | 8 - Guided practice, mini-project 4 | 3 | 1h30 |
+
+## Optional modules
+
+Three extra chapters exist, **off by default**. They are not part of the three
+days: they are turned on for a group that asks for them, and they each come with
+their own workshop.
+
+| # | Folder | Chapter | Roughly |
+|---|--------|---------|---------|
+| 12 | `12_fetch` | 9 - Talking to a server | 1h15 |
+| 13 | `13_es_modules` | 10 - ES Modules | 1h |
+| 14 | `14_storage` | 11 - Local & Session Storage | 1h |
+
+While a module is off, its folder is prefixed with an underscore
+(`_12_fetch`) — which keeps it out of the slides, out of this site and out of
+the printed handbook. Switch one on from `training/`:
+
+```bash
+pnpm run modules              # what exists, and what is on
+pnpm run modules fetch on
+pnpm run modules storage off
+pnpm run modules all on
+```
+
+**These three need a real `http://` origin** — `fetch`, ES modules and
+`localStorage` are all refused on `file://`:
+
+```bash
+npx serve chapters/javascript/tp/12_fetch
+```
 
 ## How to run a workshop
 
@@ -61,7 +91,7 @@ solutions can be pointed at **your** work:
 ```bash
 pnpm exec playwright install chromium                        # once
 
-pnpm run verify:javascript --dir chapters/javascript/tp           # all 11
+pnpm run verify:javascript --dir chapters/javascript/tp           # every workshop
 pnpm run verify:javascript --dir chapters/javascript/tp --tp 08   # just one
 ```
 

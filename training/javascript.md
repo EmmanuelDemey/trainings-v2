@@ -85,3 +85,32 @@ hide: false
 src: ./chapters/javascript/08_guided_practice.md
 hide: false
 ---
+
+---
+# ---------------------------------------------------------------------------
+# Optional modules — NOT part of the standard three days.
+#
+# Each one is a chapter plus its own workshop, disabled by default. To turn one
+# on (and with it its workshop, on the site and in the printed handbook):
+#
+#     pnpm run modules            # from training/ — lists what exists
+#     pnpm run modules fetch on
+#     pnpm run modules fetch off
+#     pnpm run modules all on
+#
+# The script only flips the `hide:` flags below and renames the matching
+# tp/ + solutions/ folders. Doing it by hand works just as well.
+# ---------------------------------------------------------------------------
+src: ./chapters/javascript/09_fetch.md
+hide: true
+---
+
+---
+src: ./chapters/javascript/10_modules.md
+hide: true
+---
+
+---
+src: ./chapters/javascript/11_storage.md
+hide: true
+---

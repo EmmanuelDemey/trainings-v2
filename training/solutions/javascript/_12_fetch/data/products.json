@@ -1,0 +1,6 @@
+[
+  { "id": "p1", "name": "Mug", "price": 12, "stock": 8 },
+  { "id": "p2", "name": "Poster", "price": 8.5, "stock": 0 },
+  { "id": "p3", "name": "Sticker", "price": 1.5, "stock": 120 },
+  { "id": "p4", "name": "T-shirt", "price": 24, "stock": 3 }
+]

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TP 12 - Talking to a server</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>The shop, from the server</h1>
+      <p class="subtitle">
+        The products are no longer in the file: they are in
+        <code>data/products.json</code>, fetched over HTTP.
+      </p>
+
+      <section>
+        <h2>Catalogue</h2>
+        <div class="toolbar">
+          <button id="reload" type="button" class="primary">Reload</button>
+          <button id="load-missing" type="button">Load a missing file</button>
+        </div>
+
+        <p id="loading" class="hidden">Loading…</p>
+        <p id="error" class="error hidden"></p>
+        <ul id="products"></ul>
+        <p id="summary"></p>
+      </section>
+
+      <section>
+        <h2>Bonus — search</h2>
+        <input id="search" type="search" placeholder="Type to filter…" />
+        <p id="search-status" class="muted"></p>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script src="checker.js" defer></script>
+    <script src="check.js" defer></script>
+  </body>
+</html>
