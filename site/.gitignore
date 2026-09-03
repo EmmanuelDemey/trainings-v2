@@ -24,3 +24,4 @@ pnpm-debug.log*
 # training/chapters/*/tp/, never these files.
 src/content/docs/javascript/
 src/content/docs/vuejs-advanced/
+src/content/docs/angular/
