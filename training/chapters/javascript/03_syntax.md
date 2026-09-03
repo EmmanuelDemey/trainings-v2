@@ -125,6 +125,115 @@ twice(() => console.log('hi')); // callback
 
 ---
 
+# Objects
+
+- A **bag of named values**. An array indexes by position, an object by **name**
+
+```javascript
+const user = {
+  name: 'Ada',
+  age: 36,
+};
+
+user.age = 37;          // modify
+user.email = 'a@b.io';  // add — the key did not have to exist
+delete user.email;      // remove
+
+const key = 'name';
+user[key];              // 'Ada' — brackets when the key is in a variable
+```
+
+- **Shorthand**: when the variable and the key have the same name, write it once
+
+```javascript
+const author = 'Ada';
+const message = { author, likes: 0 }; // same as { author: author, likes: 0 }
+```
+
+> An object is the shape of nearly everything from Day 2 on: an event, a DOM
+> element, a message in a feed.
+
+---
+
+# Objects - destructuring
+
+- Pulling properties out into variables, in one line
+
+```javascript
+const user = { name: 'Ada', age: 36, city: 'London' };
+
+const { name, age } = user;        // name = 'Ada', age = 36
+const { city: town } = user;       // rename: town = 'London'
+const { email = 'none' } = user;   // default when the key is missing
+
+const { length } = 'Ada Lovelace'; // anything with properties → 12
+```
+
+- Very common **on a parameter**: the signature says what the function uses
+
+```javascript
+function label({ name, role }) {
+  return `${name} — ${role}`;
+}
+
+label({ name: 'Ada', role: 'Engineer', age: 36 }); // 'Ada — Engineer'
+```
+
+- Arrays destructure too, **by position**: `const [first, second] = fruits;`
+
+---
+
+# Objects - copying and updating
+
+- `=` copies the **wire**, not the bag — both names point at the same object
+
+```javascript
+const a = { likes: 0 };
+const b = a;
+b.likes = 1;
+a.likes;              // 1   ❌ same object
+
+const c = { ...a };   // spread: a NEW object with the same properties
+c.likes = 99;
+a.likes;              // 1   ✅ untouched
+```
+
+- The **update pattern** of Day 3: copy, then override one property
+
+```javascript
+const liked = { ...message, likes: message.likes + 1 };
+```
+
+> The spread copy is **shallow**: a nested object is still shared. Enough for a
+> flat state — which is exactly why the states of Day 3 are kept flat.
+
+---
+
+# Objects - going through them
+
+```javascript
+const scores = { ada: 12, grace: 9, linus: 20 };
+
+Object.keys(scores);    // ['ada', 'grace', 'linus']
+Object.values(scores);  // [12, 9, 20]
+Object.entries(scores); // [['ada', 12], ['grace', 9], ['linus', 20]]
+
+for (const [name, score] of Object.entries(scores)) {
+  console.log(`${name}: ${score}`);
+}
+
+'ada' in scores;        // true      — the key exists
+scores.zoe;             // undefined — a missing key never throws
+```
+
+- `Object.*` hands you an **array** ➜ every array method below applies to it
+
+```javascript
+Object.values(scores).reduce((total, score) => total + score, 0); // 41
+```
+
+---
+
 # Arrays
 
 - An **ordered list** of values, index starts at **0**
@@ -210,6 +319,33 @@ users.sort((a, b) => a.name.localeCompare(b.name)); // Émile, Emma
 
 ---
 
+# Arrays of objects - the three moves
+
+- A list on screen needs these three, and always **by id**
+
+```javascript
+let messages = [
+  { id: 'a1', text: 'hello', likes: 0 },
+  { id: 'b2', text: 'hi', likes: 3 },
+];
+
+// read one
+messages.find((message) => message.id === 'a1');
+
+// update one — a new array, with a new object in place of the old one
+messages = messages.map((message) =>
+  message.id === 'a1' ? { ...message, likes: message.likes + 1 } : message,
+);
+
+// remove one
+messages = messages.filter((message) => message.id !== 'a1');
+```
+
+> By **id**, never by index: an index shifts as soon as something is removed
+> above it. This is the backbone of Day 3 — you will write it four times.
+
+---
+
 # Strings - the essential methods
 
 ```javascript
@@ -228,7 +364,31 @@ String(7).padStart(2, '0')   // '07'    — the countdown of Day 3
 ```
 
 - Strings are **immutable**: every method returns a **new** string
-- Template literals interpolate: `` `Hello ${name}, ${1 + 1} messages` ``
+
+---
+
+# Template literals
+
+- Backticks and `${}`: the string is assembled for you
+
+```javascript
+const name = 'Ada';
+const count = 3;
+
+`Hello ${name}, ${count} messages`;        // 'Hello Ada, 3 messages'
+`${count} message${count > 1 ? 's' : ''}`; // any expression fits in ${}
+`Total: ${(12.3456).toFixed(2)} €`;
+
+// they span several lines, exactly as written
+`Dear ${name},
+See you tomorrow.`;
+```
+
+- Prefer them to `'Hello ' + name + ', ' + count + ' messages'`
+- `${}` runs `String()` on what you give it — an object comes out as
+  `[object Object]`, the sign that you meant one of its properties
+
+> ⚠️ Backticks, not quotes: `'Hello ${name}'` is that literal text, unchanged.
 
 ---
 
@@ -258,12 +418,14 @@ Number('hello')            // NaN
 
 ## Workshop 3 - Functions and arrays
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/03_syntax/</code> — ⏱ ~1h15 — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/03_syntax/</code> — ⏱ ~1h45 — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - Write a function `isEven(n)` and use it in a `filter`
 - Write a `celsiusToFahrenheit(c)` function and convert an array of temperatures with `map`
 - Compute the total price of a shopping cart with `reduce`
 - FizzBuzz: loop from 1 to 100, print `Fizz` / `Buzz` / `FizzBuzz`
+- Destructure a `{ name, role }` parameter and build the line with a template literal
+- `withLike(messages, id)` and `removeById(messages, id)` — the two moves of Day 3
 
 ---
 layout: cover
@@ -280,6 +442,9 @@ layout: cover
 - Choose between `const` and `let`, and say what `const` really protects
 - Write a function, give it a default parameter, pass it to another function
 - Transform an array with `map`, `filter`, `reduce`, `sort` instead of a loop
+- Read, build and **copy** an object, and update one of its properties without
+  touching the original
+- Find, update and remove one item of an array of objects, **by id**
 
 <br />
 

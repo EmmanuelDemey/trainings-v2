@@ -173,6 +173,55 @@ export default {
       answer: 'B',
       explanation: 'There is no `return`. A function that returns nothing returns `undefined`.',
     },
+    {
+      code: {
+        language: 'javascript',
+        source:
+          "const a = { likes: 0 };\nconst b = { ...a };\nb.likes = 5;\nconsole.log(a.likes);",
+      },
+      prompt: 'What is logged?',
+      options: [
+        { letter: 'A', text: '`5`' },
+        { letter: 'B', text: '`0`' },
+        { letter: 'C', text: '`undefined`' },
+        { letter: 'D', text: '`TypeError`, `a` is a `const`' },
+      ],
+      answer: 'B',
+      explanation:
+        '`{ ...a }` builds a **new** object with the same properties. Writing to `b` cannot reach `a`. With `const b = a;` the answer would be `5` — same object, two names.',
+    },
+    {
+      code: {
+        language: 'javascript',
+        source:
+          "const items = [{ id: 1, done: false }, { id: 2, done: false }];\n// mark item 2 as done, WITHOUT touching `items`",
+      },
+      prompt: 'Which line does it?',
+      options: [
+        { letter: 'A', text: '`items.find((i) => i.id === 2).done = true;`' },
+        { letter: 'B', text: '`items[1].done = true;`' },
+        {
+          letter: 'C',
+          text: '`items.map((i) => (i.id === 2 ? { ...i, done: true } : i));`',
+        },
+        { letter: 'D', text: '`items.filter((i) => i.id === 2).done = true;`' },
+      ],
+      answer: 'C',
+      explanation:
+        'A and B write into the original objects. C rebuilds the array and replaces only the matching item with a copy — the update pattern of Day 3.',
+    },
+    {
+      prompt: 'What does `const { role = \'none\' } = { name: \'Ada\', role: \'\' };` give `role`?',
+      options: [
+        { letter: 'A', text: "`'none'`" },
+        { letter: 'B', text: "`''`" },
+        { letter: 'C', text: '`undefined`' },
+        { letter: 'D', text: 'a `SyntaxError`' },
+      ],
+      answer: 'B',
+      explanation:
+        'A destructuring default fires only on `undefined` — a missing key. An empty string is a value, so it wins. Use `||` if you want to replace the falsy ones too.',
+    },
   ],
 
   // Chapter 4 — The window

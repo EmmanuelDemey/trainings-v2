@@ -1,12 +1,13 @@
 # TP 3 — Functions and arrays
 
-> Autonomous workshop — chapter 3 (JS syntax). ~1h15.
+> Autonomous workshop — chapter 3 (JS syntax). ~1h45.
 
 ## Goal
 
-Write functions, and drive arrays with `map` / `filter` / `reduce` / `sort`
-instead of hand-rolled loops. This is the workshop that makes Day 2 and Day 3
-possible: every project of Day 3 is "an array, a transformation, a render".
+Write functions, and drive arrays **of objects** with `map` / `filter` /
+`reduce` / `sort` instead of hand-rolled loops. This is the workshop that makes
+Day 2 and Day 3 possible: every project of Day 3 is "an array of objects, a
+transformation, a render".
 
 ## Setup
 
@@ -31,10 +32,21 @@ over your functions and prints ✅ / ❌ per task, then a score.
    slicing, and `Math.random()`. Day 3's password generator is built on these.
 7. **Chaining** — `adultNames(users)`: filter the adults, then map to their
    names, in one expression.
+8. **`summary(person)`** *(prepares Day 3)* — destructure `{ name, role }` in
+   the signature, give `role` a default, and build the string with a template
+   literal.
+9. **`withLike(messages, id)`** *(prepares Day 3)* — one more like on one
+   message, **without touching** the array you were given: `map`, and
+   `{ ...message, likes: ... }` for the one that matches. This exact function is
+   in mini-project 4.
+10. **`removeById(messages, id)`** — the same list, minus one, **by id**.
+11. **`bestScorer(scores)`** — an object `{ ada: 12, ... }` in, the winning name
+    out. `Object.entries` turns it back into an array, and everything above
+    applies again.
 
 ## Checking your work
 
-The console ends with `20/20 tests passing`. A ❌ prints what your function
+The console ends with `29/29 tests passing`. A ❌ prints what your function
 returned next to what was expected.
 
 ## Going further
@@ -45,3 +57,7 @@ returned next to what was expected.
 - `toSorted()` is the non-mutating `sort()` — check its browser support, then
   decide whether you can use it in the projects.
 - What does `[10, 9, 1].sort()` return, and why is that the correct behaviour?
+- Write `countByTeam(people)`: an array of `{ name, team }` in, an object
+  `{ core: 3, design: 1 }` out. `reduce` with an object as the accumulator.
+- In task 9, replace the spread with `message.likes++` on the found item. Which
+  test breaks, and why is that test the whole point?

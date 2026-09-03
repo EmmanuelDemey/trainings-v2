@@ -83,6 +83,35 @@
   ];
   test('adultNames', () => adultNames(users), ['Ada', 'Grace']);
 
+  // 8 — summary (destructuring + template literal)
+  test('summary uses the role given', () =>
+    summary({ name: 'Ada', role: 'Engineer' }), 'Ada — Engineer');
+  test("summary falls back to 'unknown'", () =>
+    summary({ name: 'Zoé' }), 'Zoé — unknown');
+
+  // 9 — withLike (copy, then override)
+  const feed = [
+    { id: 'a1', text: 'hello', likes: 0 },
+    { id: 'b2', text: 'hi', likes: 3 },
+  ];
+  test('withLike increments the right message', () =>
+    withLike(feed, 'a1').map((m) => m.likes), [1, 3]);
+  test('withLike leaves the others alone', () =>
+    withLike(feed, 'a1')[1].text, 'hi');
+  test('withLike does not mutate its input', () =>
+    feed.map((m) => m.likes), [0, 3]);
+
+  // 10 — removeById
+  test('removeById drops one message', () =>
+    removeById(feed, 'a1').map((m) => m.id), ['b2']);
+  test('removeById on an unknown id changes nothing', () =>
+    removeById(feed, 'zz').length, 2);
+
+  // 11 — bestScorer (Object.entries)
+  test('bestScorer finds the highest', () =>
+    bestScorer({ ada: 12, grace: 9, linus: 20 }), 'linus');
+  test('bestScorer with a single entry', () => bestScorer({ zoe: 4 }), 'zoe');
+
   console.log(
     `%c${passed}/${total} tests passing`,
     `font-weight: bold; color: ${passed === total ? '#1f9d55' : '#d33a3a'}`,

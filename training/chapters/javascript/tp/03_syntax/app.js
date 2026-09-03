@@ -50,3 +50,29 @@ function randomItem(list) {}
 // TODO: from an array of { name, age }, return the names of the 18+, in order.
 //   One expression: filter then map.
 function adultNames(users) {}
+
+// --- 8. Objects: destructuring (prepares Day 3) ----------------------------
+// TODO: from a { name, role } object, return 'Ada — Engineer'.
+//   Destructure the parameter, and give `role` the default value 'unknown'
+//   so that summary({ name: 'Zoé' }) returns 'Zoé — unknown'.
+//   The dash is an em dash: —
+function summary(person) {}
+
+// --- 9. Objects: copy, then override (prepares Day 3) ----------------------
+// TODO: return a NEW array where the message with this id has one more like.
+//   The others come back untouched, and `messages` itself must NOT change:
+//   map over it, and for the matching one build { ...message, likes: ... }.
+//   This is THE pattern of Day 3 — the third test is the one that matters.
+function withLike(messages, id) {}
+
+// --- 10. Objects in an array: remove by id ---------------------------------
+// TODO: return a NEW array without the message carrying this id.
+//   By id, never by index: splice(index, 1) is how you delete the wrong one.
+function removeById(messages, id) {}
+
+// --- 11. Going through an object -------------------------------------------
+// TODO: scores looks like { ada: 12, grace: 9, linus: 20 }.
+//   Return the NAME with the highest score -> 'linus'.
+//   Hint: Object.entries gives you [['ada', 12], ...] — an array again, so
+//   reduce (or a for...of) works on it.
+function bestScorer(scores) {}

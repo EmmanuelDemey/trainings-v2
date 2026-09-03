@@ -7,7 +7,7 @@ build step, no dependency on the other workshops. Open the folder and start.
 |---|--------|---------|-----|---------|
 | 1 | `01_introduction` | 1 - Introduction | 1 | 30 min |
 | 2 | `02_mental_model` | 2 - Mental model | 1 | 45 min |
-| 3 | `03_syntax` | 3 - JS syntax | 1 | 1h15 |
+| 3 | `03_syntax` | 3 - JS syntax | 1 | 1h45 |
 | 4 | `04_window` | 4 - The window | 2 | 45 min |
 | 5 | `05_dom` | 5 - The DOM | 2 | 1h |
 | 6 | `06_events` | 6 - Event-driven programming | 2 | 1h15 |

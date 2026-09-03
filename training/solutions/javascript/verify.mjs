@@ -71,7 +71,7 @@ if (!skip('03_syntax')) {
   console.log('TP3 syntax');
   const { page, logs } = await open('03_syntax');
   await page.waitForTimeout(200);
-  ok('20/20 tests passing', logs.some((l) => l.includes('20/20')), logs.filter(l=>l.startsWith('❌')).join('|'));
+  ok('29/29 tests passing', logs.some((l) => l.includes('29/29')), logs.filter(l=>l.startsWith('❌')).join('|'));
   await page.close();
 }
 

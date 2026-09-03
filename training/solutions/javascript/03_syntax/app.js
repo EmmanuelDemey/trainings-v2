@@ -96,3 +96,59 @@ function randomItem(list) {
 function adultNames(users) {
   return users.filter((user) => user.age >= 18).map((user) => user.name);
 }
+
+// --- 8. Objects: destructuring (prepares Day 3) ----------------------------
+// Destructuring in the signature: the function announces the two properties it
+// reads. Passing a person with ten other keys changes nothing here — and the
+// reader does not have to go hunting through the body to find out what is used.
+// `= 'unknown'` fires on a MISSING key (undefined), not on an empty string.
+function summary({ name, role = 'unknown' }) {
+  return `${name} — ${role}`;
+}
+// Without destructuring: `return person.name + ' — ' + (person.role ?? 'unknown')`.
+// Same result, and every added property means another `person.` to read.
+
+// --- 9. Objects: copy, then override (prepares Day 3) ----------------------
+// map rebuilds the array; the ternary decides, per item, between a new object
+// and the original one. `{ ...message, likes: ... }` copies every property,
+// then the later key wins — order matters, the override goes last.
+function withLike(messages, id) {
+  return messages.map((message) =>
+    message.id === id ? { ...message, likes: message.likes + 1 } : message,
+  );
+}
+// Why not `message.likes++` on the item found? It works, and it silently edits
+// the array the caller handed us — the third test catches exactly that. Copying
+// is also what React and Vue rely on to notice a change: they compare
+// references, and a mutated object is still the same reference.
+//
+// The copy is SHALLOW: `{ ...message }` shares any nested object. Keeping the
+// state flat, as Day 3 does, is what makes that a non-issue.
+
+// --- 10. Objects in an array: remove by id ---------------------------------
+function removeById(messages, id) {
+  return messages.filter((message) => message.id !== id);
+}
+// filter, not splice: splice mutates, and it takes an index. An index is only
+// true until something above it is removed — which is precisely what a delete
+// button does. The id stays true whatever happens to the list.
+
+// --- 11. Going through an object -------------------------------------------
+// Object.entries turns { ada: 12 } into [['ada', 12]] — an array, so every
+// method of task 1 to 7 applies again. The pair is destructured by position in
+// the parameters: [name, score].
+function bestScorer(scores) {
+  return Object.entries(scores).reduce(
+    (best, [name, score]) => (score > scores[best] ? name : best),
+    Object.keys(scores)[0],
+  );
+}
+// The initial value is the first key, not '' — comparing against scores[''] is
+// undefined, and every comparison with undefined is false, so the reduce would
+// return '' for good.
+// Readable alternative, if reduce still hurts:
+//   let best = Object.keys(scores)[0];
+//   for (const [name, score] of Object.entries(scores)) {
+//     if (score > scores[best]) best = name;
+//   }
+//   return best;
