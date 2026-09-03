@@ -120,14 +120,17 @@ await mkdir(outDir, { recursive: true });
 // training/ is a pnpm project; the CI host only knows about the root, so pnpm is
 // fetched on demand rather than assumed to be installed. It is needed by the
 // decks AND by the workshop handbooks, which run out of training/scripts/.
+// `pnpm@12` only bootstraps the right major: the exact version is the one that
+// training/package.json pins in `packageManager`, which pnpm downloads and hands
+// over to when the one npx fetched is not it.
 if (buildSlides || withPdf) {
-  install(trainingDir, 'npx', ['--yes', 'pnpm@10', 'install', '--frozen-lockfile']);
+  install(trainingDir, 'npx', ['--yes', 'pnpm@12', 'install', '--frozen-lockfile']);
 }
 
 // Both PDF exports need a browser. SLIDEV_CHROME skips the download when one is
 // already on the machine — which is the normal case locally, and never on CI.
 if (withPdf && !localChrome) {
-  run('npx', ['--yes', 'pnpm@10', 'exec', 'playwright', 'install', 'chromium'], trainingDir);
+  run('npx', ['--yes', 'pnpm@12', 'exec', 'playwright', 'install', 'chromium'], trainingDir);
 }
 
 // --- 1. The decks (Slidev) --------------------------------------------------
@@ -146,7 +149,7 @@ if (buildSlides) {
       'npx',
       [
         '--yes',
-        'pnpm@10',
+        'pnpm@12',
         'exec',
         'slidev',
         'build',

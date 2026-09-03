@@ -1,6 +1,7 @@
 {
   "name": "training",
   "private": true,
+  "packageManager": "pnpm@12.3.1",
   "scripts": {
     "build": "slidev build",
     "dev": "slidev --open",

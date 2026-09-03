@@ -1,0 +1,14 @@
+# pnpm reads .npmrc for auth and registries only, since v11 — every other
+# setting lives here. These two came from training/.npmrc.
+shamefullyHoist: true
+autoInstallPeers: true
+
+# strictDepBuilds is on by default since v11: a dependency that has a build
+# script and is neither allowed nor denied fails the install. These three were
+# already skipped under pnpm 10 (`ignoredBuilds` in node_modules/.modules.yaml)
+# — the decks build without them, and the Chromium the PDF export needs is
+# installed explicitly by scripts/build-all.mjs.
+allowBuilds:
+  esbuild: false
+  playwright-chromium: false
+  puppeteer: false
