@@ -1154,3 +1154,99 @@ spec:
 cd .kubernetes
 kubectl apply -f .
 ```
+
+## PW23 - React Doctor
+
+:::note
+Afin de finaliser cette mise en pratique, voici quelques liens qui pourraient être utiles :
+
+- [React Doctor](https://www.react.doctor/)
+- [CLI Reference](https://www.react.doctor/docs/reference/cli-reference)
+- [Config files](https://www.react.doctor/docs/configuration/config-files)
+  :::
+
+Nous allons auditer l'application développée durant cette formation.
+
+### Premier scan
+
+À la racine du projet, exécuter :
+
+```shell
+npx react-doctor@latest
+```
+
+Noter le score obtenu, puis relancer le scan en mode détaillé afin d'obtenir les fichiers et les lignes concernés :
+
+```shell
+npx react-doctor@latest --verbose
+```
+
+### Analyser les résultats
+
+- Lister les catégories remontées par le rapport, en commençant par les plus critiques :
+
+```shell
+npx react-doctor@latest --verbose --category Security
+npx react-doctor@latest --verbose --category Performance
+```
+
+- Choisir un diagnostic et demander son explication :
+
+```shell
+npx react-doctor@latest rules explain react-doctor/no-array-index-key
+```
+
+### Corriger
+
+Corriger au moins trois problèmes remontés par l'outil, par exemple :
+
+- une clé de liste basée sur l'index du tableau (`no-array-index-key`) ;
+- un `useEffect` qui recopie une prop dans un état local (`no-derived-state-effect`) ;
+- une valeur de `Context` reconstruite à chaque rendu (`jsx-no-constructed-context-values`) ;
+- un problème d'accessibilité sur le formulaire de recherche (`label-has-associated-control`).
+
+Relancer le scan après chaque correction et vérifier que le score augmente.
+
+### Configurer l'outil
+
+Jusqu'ici l'outil a été exécuté via `npx`, sans être installé. Pour la configuration et le script
+npm, nous allons l'ajouter aux dépendances de développement :
+
+```shell
+npm install -D react-doctor
+```
+
+Créer un fichier `doctor.config.ts` à la racine du projet afin de :
+
+- ignorer les fichiers générés (`src/**/*.stories.tsx`, les tests, ...) ;
+- passer une règle qui ne vous concerne pas en `off` ;
+- passer la catégorie `Maintainability` en `warn`.
+
+```typescript
+import { defineConfig } from 'react-doctor/api';
+
+export default defineConfig({
+  categories: {
+    Maintainability: 'warn'
+  },
+  ignore: {
+    files: ['src/**/*.stories.tsx']
+  }
+});
+```
+
+### Ajouter un script
+
+Ajouter un script dans le fichier `package.json` :
+
+```json
+{
+  "scripts": {
+    "doctor": "react-doctor --blocking error -y"
+  }
+}
+```
+
+:::note
+L'option `--scope changed --base main` est celle à privilégier sur un projet existant : seuls les problèmes **introduits** par votre branche sont remontés.
+:::

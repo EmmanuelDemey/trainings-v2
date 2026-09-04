@@ -162,6 +162,11 @@ hide: false
 ---
 
 ---
-src: ./chapters/react/23_react_news.md
+src: ./chapters/react/23_react_doctor.md
+hide: false
+---
+
+---
+src: ./chapters/react/24_react_news.md
 hide: false
 ---

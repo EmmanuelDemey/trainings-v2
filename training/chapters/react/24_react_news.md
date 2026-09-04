@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 23 - Actus React
+# 24 - Actus React
 
 ---
 
