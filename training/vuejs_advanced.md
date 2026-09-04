@@ -92,6 +92,12 @@ hide: false
 ---
 
 ---
+src: ./chapters/vuejs_advanced/03quater_component_architecture.md
+title: 3quater - Component architecture & duplication
+hide: false
+---
+
+---
 src: ./chapters/vuejs_advanced/retro.md
 title: Retro - Day 1
 hide: false
