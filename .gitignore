@@ -15,3 +15,7 @@ training/dist/
 training/index.html
 # Unified build output (scripts/build-all.mjs)
 build/
+
+# Vitest 5 centralises its artifacts (blob reports, attachments, failure
+# screenshots) in one folder per project.
+.vitest/

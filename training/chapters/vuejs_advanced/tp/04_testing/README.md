@@ -308,10 +308,13 @@ Nothing to fill in here — the four tests are written and green. What to look a
   dataset moved to `tests/fixtures.ts` so both worlds import it from one place; the
   browser equivalent is `setupWorker` from `msw/browser`, plus `npx msw init public/`
   to install its service worker.
-- The workshop runs **Vitest 4**, so `vitest-browser-vue` is on **2.x** and the browser
+- The workshop runs **Vitest 5**, so `vitest-browser-vue` is on **3.x** and the browser
   provider lives in its own package: `@vitest/browser-webdriverio`. `provider` takes the
   imported `webdriverio()` factory, not the string `'webdriverio'`, and the Chrome
   `capabilities` are passed to that factory (see `vitest.browser.config.ts`).
+- Two Vitest 5 details show up in the spec: `page` is imported from **`vitest/browser`**
+  (`@vitest/browser/context` was the Vitest 4 path), and `render()` is **async** — forget
+  the `await` and the locators run against an empty document.
 - `tests/setup.browser.ts` imports `src/style.css`. In jsdom that import is pointless
   — nothing applies the stylesheet. Here it is what makes the assertions possible.
 

@@ -2,7 +2,7 @@
 
 Hands-on exercises for the **Advanced Vue.js** training, based on **Vue 3.5**,
 **Vite 8**, **Vue Router 5**, **Pinia 4**, **Zod 3**, **VeeValidate 4**,
-**Vitest 4** and **Cypress 15**.
+**Vitest 5** and **Cypress 15**.
 
 Each workshop is a **standalone project**: it has its own `package.json`,
 `tsconfig.json`, `.nvmrc` and `README.md`, and it **does not depend on any other
@@ -61,11 +61,16 @@ package. Three deliberate pins, each with a reason that will lift on its own:
 | `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. `10_final_project` could take Zod 4 on its own, but teaching two Zod dialects in one training is worse than being one major behind. |
 | `webdriverio` **9.x** | Latest; listed here only because Vitest 4 moved the browser provider into `@vitest/browser-webdriverio`, which is now a dependency of workshop 4. |
 
-Two migrations changed workshop code, not just versions:
+Three migrations changed workshop code, not just versions:
 
 - **Vitest 4** — `browser.provider` is now a factory imported from its own
   package, not the string `'webdriverio'` (`vitest.browser.config.ts`, and the
   chapter 8 slides).
+- **Vitest 5** — browser mode moved its public entry point from
+  `@vitest/browser/context` to **`vitest/browser`**, and `render()` from
+  `vitest-browser-vue@3` now returns a **promise**: it has to be awaited
+  (`tests/InvoiceChart.browser.spec.ts`, and the chapter 8 slides). Two defaults
+  also flipped: `clearMocks` is **on**, and locators match text **exactly**.
 - **Vite 8 / Rolldown** — `build.rollupOptions.output.manualChunks` only accepts
   the **function** form. The `{ vue: ['vue', 'vue-router'] }` object form every
   article shows now fails with `TypeError: manualChunks is not a function`

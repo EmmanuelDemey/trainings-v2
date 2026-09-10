@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from 'vitest-browser-vue';
-import { page } from '@vitest/browser/context';
+import { page } from 'vitest/browser';
 import InvoiceChart from '@/components/InvoiceChart.vue';
 import { invoices } from './fixtures';
 
@@ -18,7 +18,7 @@ describe('InvoiceChart — in a real browser', () => {
   const total = invoices.reduce((n, i) => n + i.total, 0);
 
   it('measures a real width, where jsdom always reported 0', async () => {
-    render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
+    await render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
 
     const chart = page.getByTestId('invoice-chart');
     await expect.element(chart).toBeVisible();
@@ -29,7 +29,7 @@ describe('InvoiceChart — in a real browser', () => {
   });
 
   it('sizes every bar in proportion to its invoice', async () => {
-    render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
+    await render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
     await expect.element(page.getByTestId('invoice-chart')).toBeVisible();
 
     const heights = [...document.querySelectorAll('.bar')].map(
@@ -47,7 +47,7 @@ describe('InvoiceChart — in a real browser', () => {
   });
 
   it('paints the bars with the accent colour from the CSS custom property', async () => {
-    render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
+    await render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
     await expect.element(page.getByTestId('invoice-chart')).toBeVisible();
 
     const bar = document.querySelector('.bar') as HTMLElement;
@@ -59,7 +59,7 @@ describe('InvoiceChart — in a real browser', () => {
   });
 
   it('renders the formatted total next to the bars', async () => {
-    render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
+    await render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
 
     // A locator RETRIES until the timeout, unlike `wrapper.text()`, which reads
     // the DOM once — no `flushPromises()` and no `await nextTick()` here.

@@ -174,7 +174,7 @@ layout: cover
 <br />
 
 > This training is based on **Vue 3.5**, **Vite 8**, **Vue Router 5**, **Pinia 4**,
-> **Zod 3**, **VeeValidate 4**, **Vitest 4** and **Cypress 15**.
+> **Zod 3**, **VeeValidate 4**, **Vitest 5** and **Cypress 15**.
 
 ---
 

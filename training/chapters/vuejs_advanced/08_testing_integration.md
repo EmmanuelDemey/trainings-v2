@@ -340,7 +340,7 @@ export default defineConfig({
   the browser job on its own
 - `extends: true` inherits the root `plugins` and `resolve.alias` — no duplication
 - The `exclude` is **not** optional: otherwise the jsdom project collects the browser
-  specs and they die on `import { page } from '@vitest/browser/context'`
+  specs and they die on `import { page } from 'vitest/browser'`
 
 <style>
 .slidev-layout {
@@ -356,10 +356,10 @@ ul { font-size: 0.82em; }
 
 ```ts
 import { render } from 'vitest-browser-vue';
-import { page } from '@vitest/browser/context';
+import { page } from 'vitest/browser';
 
 it('sizes every bar in proportion to its invoice', async () => {
-  render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
+  await render(InvoiceChart, { props: { invoices, currency: 'EUR' } });
 
   await expect.element(page.getByTestId('invoice-chart')).toBeVisible();
 
@@ -373,6 +373,8 @@ it('sizes every bar in proportion to its invoice', async () => {
 
 - `render()` from **`vitest-browser-vue`** mounts into the real document and unmounts
   after each test — `mount()` from test-utils also works, with `attachTo: document.body`
+- Since **Vitest 5** it is **async**: `await render(...)`, and the entry point is
+  `vitest/browser`, not `@vitest/browser/context`
 - No `flushPromises()` and no `nextTick()`: `expect.element(...)` **retries** the whole
   assertion until the timeout, the way `.should()` does in Cypress
 - This is the demo in TP 4/8 — `npm run test:browser`
@@ -393,10 +395,10 @@ ul { font-size: 0.8em; }
 await page.getByLabelText('Email').fill('ada@example.com');
 await page.getByRole('button', { name: 'Sign in' }).click();
 
-await expect.element(page.getByRole('alert')).toHaveTextContent('Invalid');
+await expect.element(page.getByRole('alert')).toMatchTextContent('Invalid');
 
 // Lower level, when a locator method is not enough
-import { userEvent } from '@vitest/browser/context';
+import { userEvent } from 'vitest/browser';
 await userEvent.tripleClick(page.getByLabelText('Email'));
 await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
 ```
@@ -406,7 +408,12 @@ await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
 - Events go through the **driver**, not through `dispatchEvent`: a click on a disabled
   button, or on an element hidden behind an overlay, genuinely does nothing.
   In jsdom, `trigger('click')` happily fires either way
-- `page.screenshot()` on demand — and a failing test drops one in `__screenshots__/`
+- Since **Vitest 5** locators match text **exactly** and case-sensitively
+  (`browser.locators.exact: false` restores the old behaviour), and
+  `toHaveTextContent` is a strict equality — the partial match above is
+  `toMatchTextContent`
+- `page.screenshot()` on demand — and a failing test drops one in
+  `.vitest/attachments/failure-screenshots/`
 
 <style>
 .slidev-layout {
