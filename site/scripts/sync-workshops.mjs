@@ -244,6 +244,7 @@ for (const training of TRAININGS) {
   const pdf = `${training.slug}-slides.pdf`;
   const handbook = `${training.slug}-workshops.pdf`;
   const zipFile = `${training.slug}-solutions.zip`;
+  const kit = `${training.slug}-participants.zip`;
 
   await writeFile(
     join(outDir, 'resources.md'),
@@ -259,6 +260,16 @@ for (const training of TRAININGS) {
       '  label: "Resources"',
       '---',
       '',
+      // The one link to hand out on day one. No "not produced" line when it is
+      // missing: the sections below already say which of its parts are.
+      ...(downloadable(kit)
+        ? [
+            '## Everything in one download',
+            '',
+            `- **[Download the participant kit (ZIP)](/downloads/${kit})** — the slides and the handbook as PDFs, plus the workshop folders to work in. No solutions inside.`,
+            '',
+          ]
+        : []),
       '## Slides',
       '',
       `- **[Read the deck online](/slides/${training.slug}/)** — press <kbd>f</kbd> for fullscreen, <kbd>o</kbd> for the slide overview.`,

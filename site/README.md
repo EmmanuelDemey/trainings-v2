@@ -27,9 +27,10 @@ It also generates, per training:
 - an **Overview** page: a table linking to every workshop, followed by whatever
   the training's own `tp/README.md` says. The index comes first so the overview
   never reads as "all the workshops dumped on one page";
-- a **Resources** page (last in the sidebar): the deck online, the deck as a PDF,
-  the workshops as one printable handbook (PDF), and the worked solutions as a
-  ZIP. Those three files are produced by `scripts/build-all.mjs` into
+- a **Resources** page (last in the sidebar): the participant kit (a ZIP of both
+  PDFs and the workshop folders, without the solutions), the deck online, the deck
+  as a PDF, the workshops as one printable handbook (PDF), and the worked
+  solutions as a ZIP. Those four files are produced by `scripts/build-all.mjs` into
   `build/downloads/`, and **a link is only rendered if the file is actually
   there** — the PDF export of a very large deck can fail without that taking the
   deploy down.

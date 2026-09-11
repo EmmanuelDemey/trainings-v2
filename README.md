@@ -35,6 +35,7 @@ build/
     javascript-slides.pdf       the deck, exported
     javascript-workshops.pdf    the TPs, as one printable handbook
     javascript-solutions.zip    the worked answers
+    javascript-participants.zip the two PDFs + the workshop folders, no solutions
   _redirects          SPA fallback, one rule per deck
 ```
 
@@ -51,7 +52,7 @@ SLIDEV_CHROME=~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome pnpm run b
 ```
 
 Both are **non-fatal**: a deck that fails to export simply loses its PDF link on
-the Resources page.
+the Resources page, and the participant kit ships without it.
 
 ## Adding a training to the site
 

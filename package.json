@@ -8,7 +8,8 @@
     "build": "node scripts/build-all.mjs",
     "build:site": "node scripts/build-all.mjs --only site",
     "build:slides": "node scripts/build-all.mjs --only slides",
-    "preview": "pnpm dlx serve build"
+    "preview": "pnpm dlx serve build",
+    "test": "node --test \"scripts/**/*.test.mjs\""
   },
   "dependencies": {
     "archiver": "^7.0.1"
