@@ -101,6 +101,55 @@ const double = (n) => n * 2; // implicit return
 
 ---
 
+# Functions - `function` or arrow?
+
+```javascript
+add(2, 3);                   // ✅ 5 — a declaration is hoisted to the top
+function add(a, b) {
+  return a + b;
+}
+
+double(4);                   // ❌ ReferenceError — it is a const, like any other
+const double = (n) => n * 2;
+
+const toUser = (name) => ({ name }); // an object: wrap it in (), or {} is the body
+```
+
+| | `function add() {}` | `const add = () => {}` |
+|---|---|---|
+| Usable **before** its line | ✅ | ❌ |
+| Its own `this`, `new`, `arguments` | ✅ | ❌ borrows the surrounding `this` |
+
+- The convention of these three days: **named functions** with `function`,
+  **callbacks** with an arrow
+
+> `this` stays out of the three days: in a listener, read `event.currentTarget`
+> instead — the same element, whichever syntax you picked.
+
+---
+
+# Functions - `this`, `new`, `arguments`
+
+- Before 2015, a `function` was also a **method** and a **constructor**: `this` = the object **before the dot**
+
+```javascript
+const timer = {
+  seconds: 0,
+  start: function () {
+    setInterval(function () { this.seconds++; }, 1000); // ❌ this = window
+    setInterval(() => { this.seconds++; }, 1000);       // ✅ this = timer
+  },
+};
+```
+
+| An arrow has no | because | use instead |
+|---|---|---|
+| own `this` | callbacks kept losing it | `event.currentTarget` |
+| `new` | a constructor needs its own `this` | `class` |
+| `arguments` | not a real array | `(...numbers) =>` |
+
+---
+
 # Functions - parameters and return
 
 ```javascript
