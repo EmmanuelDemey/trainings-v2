@@ -1,4 +1,4 @@
-// TP 2 - Sketching snippets
+// TP 2 - Predicting snippets
 // Replace every PREDICT_ME with the value you expect, THEN reload.
 
 console.group('Snippets');

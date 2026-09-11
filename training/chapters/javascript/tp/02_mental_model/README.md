@@ -1,30 +1,28 @@
-# TP 2 — Sketching snippets
+# TP 2 — Predicting snippets
 
 > Autonomous workshop — chapter 2 (Mental model). ~45 minutes.
 
 ## Goal
 
 Stop *running* code to know what it does, and start **predicting** it. You will
-draw the wires-and-values diagram of eight snippets, write down your prediction,
-and only then let the browser tell you whether you were right.
+write down what you expect each of eight snippets to produce, and only then let
+the browser tell you whether you were right.
 
 ## Setup
 
 Open `index.html`. The page itself is deliberately empty: everything happens in
-the console. Have paper (or a whiteboard) next to you.
+the console.
 
 ## Steps
 
-1. **Draw first.** For each snippet in `app.js`, draw the diagram: one box per
-   value, one arrow per variable. Move the arrows as the code runs.
-2. **Predict.** Replace each `PREDICT_ME` with the value you expect. The page
+1. **Predict.** Replace each `PREDICT_ME` with the value you expect. The page
    compares your prediction with reality and prints ✅ or ❌ per snippet.
-3. **Only then, run.** Reload the page and read the console.
-4. **Explain the failures out loud.** A ❌ is the useful part of this workshop:
+2. **Only then, run.** Reload the page and read the console.
+3. **Explain the failures out loud.** A ❌ is the useful part of this workshop:
    say why the value is what it is before you fix your prediction.
-5. **`{} === {}`** — snippet 6. Answer the question in the comment: two objects
+4. **`{} === {}`** — snippet 6. Answer the question in the comment: two objects
    that look identical, why are they not equal?
-6. **Truthy / falsy** — implement `isTruthy(value)` at the bottom **without
+5. **Truthy / falsy** — implement `isTruthy(value)` at the bottom **without
    using `Boolean()`**, then let the checker run it over 12 values.
 
 ## Checking your work

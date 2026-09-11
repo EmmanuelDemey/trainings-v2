@@ -127,11 +127,11 @@ user.email.length  // ❌ TypeError: cannot read 'length' of undefined
 
 # Hands-on
 
-## Workshop 2 - Sketching snippets
+## Workshop 2 - Predicting snippets
 
 <div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/02_mental_model/</code> — ⏱ ~45 min — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
-- Draw the diagram (variables ➜ wires ➜ values) of simple snippets
-- Predict the output before running the code in the console
-- Explain why `{} === {}` is `false` with a diagram
+- Predict the value of eight snippets before running them in the console
+- Watch a shared object change through two variables at once
+- Explain why `{} === {}` is `false`
 - Classify a list of values as truthy or falsy

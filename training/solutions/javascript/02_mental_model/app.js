@@ -1,7 +1,7 @@
-// TP 2 - Sketching snippets — solution
+// TP 2 - Predicting snippets — solution
 //
-// The point of this workshop is the diagram, not the answer. Each comment below
-// is what should be said out loud while drawing it on the board.
+// The point of this workshop is the reasoning, not the answer. Each comment below
+// is what should be said out loud when a prediction turns out wrong.
 
 console.group('Snippets');
 
@@ -15,7 +15,7 @@ a = 20;
 predict('b', b, 10);
 
 // --- Snippet 2 — objects are shared -------------------------------------
-// Same diagram, one crucial difference: the value both wires point at is a
+// Same shape, one crucial difference: the value both wires point at is a
 // single object. `admin.name = 'Grace'` does not move a wire, it edits the
 // value at the end of it — and `user` is looking at that same value.
 // This is THE source of "why did my other variable change?" bugs.
@@ -49,8 +49,8 @@ predict('NaN === NaN', NaN === NaN, false);
 predict('{} === {}', {} === {}, false);
 // Answer: each `{}` literal creates a NEW object, so there are two values here,
 // at two different places in memory. `===` on objects asks "is it the same
-// value?", never "do they look alike?" — there are two boxes on the diagram, so
-// the answer is false. (Comparing content is a function you write yourself, or
+// value?", never "do they look alike?" — there are two values here, so the
+// answer is false. (Comparing content is a function you write yourself, or
 // a JSON.stringify hack, or structuredClone-era deep-equal helpers.)
 
 console.groupEnd();
