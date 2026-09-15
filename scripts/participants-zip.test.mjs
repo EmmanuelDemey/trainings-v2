@@ -53,7 +53,7 @@ test('leaves out an optional module that is turned off', async () => {
     'downloads/demo-slides.pdf',
     'downloads/demo-workshops.pdf',
     'tp/01_intro/README.md',
-    'tp/_12_fetch/README.md',
+    'tp/_13_fetch/README.md',
   ]);
 
   await participantsZip(demo);

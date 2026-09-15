@@ -6,19 +6,19 @@ of the starter with every `// TODO` implemented: `npm install` and it runs.
 
 ```
 solutions/
-  javascript/         ← chapters/javascript/tp/      (JavaScript, 11 workshops)
+  javascript/         ← chapters/javascript/tp/      (JavaScript, 12 workshops)
   node/               ← chapters/node/tp/            (Advanced Node.js, 12 workshops)
   vuejs_advanced/     ← chapters/vuejs_advanced/tp/  (Advanced Vue.js, 8 workshops)
 ```
 
 The JavaScript ones are the exception to the `npm install`: they are plain
 HTML/CSS/JS with no build step. Open the `index.html` of a folder, or serve it
-with `npx serve solutions/javascript/05_dom`.
+with `npx serve solutions/javascript/06_dom`.
 
 ## Using them
 
 ```bash
-open solutions/javascript/08_countdown/index.html   # JavaScript: nothing to install
+open solutions/javascript/09_countdown/index.html   # JavaScript: nothing to install
 
 cd solutions/vuejs_advanced/06_pinia
 npm install
@@ -56,7 +56,7 @@ Every solution was run, not just written:
 
 | Suite | Verified with |
 |---|---|
-| JavaScript 01–11 | `pnpm run verify:javascript` — 91 assertions in a real Chromium, plus the in-page `check.js` of workshops 2, 3, 4, 5, 7 and 10 |
+| JavaScript 01–12 | `pnpm run verify:javascript` — 93 assertions in a real Chromium, plus the in-page `check.js` of workshops 2, 3, 4, 5, 6, 8 and 11 |
 | Node 01–12 | `npm run typecheck`, plus each workshop's own entry point |
 | Node 04 | the API driven end to end with `curl` (401 / 403 / 404 / 201, helmet + rate-limit headers) |
 | Node 06 | `npm test` — 4 tests |
@@ -82,7 +82,7 @@ npx playwright install chromium     # once
 pnpm run verify:javascript
 ```
 
-It drives the 11 pages: the countdown really counts down and stops, the password
+It drives the 12 pages: the countdown really counts down and stops, the password
 generator really produces a digit-only password when only digits are ticked, the
 `<img src=x onerror=...>` posted in the social feed is really displayed as text
 and not executed. Set `PW_CHROME=/path/to/chrome` to reuse a Chromium you

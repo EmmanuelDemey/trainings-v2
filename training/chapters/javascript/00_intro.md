@@ -16,6 +16,7 @@ layout: cover
                     <li>Introduction (developer tools, history)</li>
                     <li>Mental model (variables, values, equality, properties)</li>
                     <li>JS syntax (const/let, loops, conditions, functions, arrays)</li>
+                    <li>Classes (fields, getters, private fields, inheritance)</li>
                 </ul>
             </li>
             <li>Day 2 - JavaScript in the browser
@@ -51,6 +52,7 @@ layout: cover
 - Understand the **core concepts** of JavaScript (variables, equality, conditions, loops)
 - Be able to **write and use simple functions**
 - Manipulate **arrays** and their most common methods
+- Model data with **classes**, and protect it with **private fields**
 - Dynamically modify the content of a web page with the **DOM**
 - Handle user events with **event-driven programming**
 - Build **interactive interfaces** with simple JavaScript scripts
@@ -80,7 +82,7 @@ step, no `npm install` for the whole training.
 
 - Open a workshop by double-clicking its `index.html`
 - The instructions are in the `README.md` of the folder
-- Optional, for a real `http://` origin: `npx serve chapters/javascript/tp/05_dom`
+- Optional, for a real `http://` origin: `npx serve chapters/javascript/tp/06_dom`
 
 > Keep the console open (**F12**) at all times. Every workshop logs there,
 > and every mistake shows up there first.
@@ -89,7 +91,7 @@ step, no `npm install` for the whole training.
 
 # How the three days run
 
-- **~40%** slides, **~60%** keyboard time — 11 workshops in total
+- **~40%** slides, **~60%** keyboard time — 12 workshops in total
 - Every chapter ends with its own **autonomous workshop**, in its own folder
 - A **worked solution** exists for each one, handed out **after** the correction
 
@@ -97,9 +99,9 @@ step, no `npm install` for the whole training.
 
 | Day | Slides | Workshops | Roughly |
 |-----|--------|-----------|---------|
-| Day 1 | Ch. 1 to 3 | TP 1, 2, 3 | 3h of practice |
-| Day 2 | Ch. 4 to 7 | TP 4, 5, 6, 7 | 3h30 of practice |
-| Day 3 | Ch. 8 | TP 8, 9, 10, 11 | the whole day |
+| Day 1 | Ch. 1 to 4 | TP 1, 2, 3, 4 | 4h30 of practice |
+| Day 2 | Ch. 5 to 8 | TP 5, 6, 7, 8 | 3h30 of practice |
+| Day 3 | Ch. 9 | TP 9, 10, 11, 12 | the whole day |
 
 > Falling behind on a workshop is normal — the "going further" sections are
 > there to keep the fast ones busy, not to be finished by everyone.

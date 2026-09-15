@@ -123,8 +123,8 @@ const toUser = (name) => ({ name }); // an object: wrap it in (), or {} is the b
 - The convention of these three days: **named functions** with `function`,
   **callbacks** with an arrow
 
-> `this` stays out of the three days: in a listener, read `event.currentTarget`
-> instead — the same element, whichever syntax you picked.
+> `this` comes back in the next chapter, inside class methods. In a listener,
+> read `event.currentTarget` instead — the same element, whichever syntax you picked.
 
 ---
 
@@ -145,7 +145,7 @@ const timer = {
 | An arrow has no | because | use instead |
 |---|---|---|
 | own `this` | callbacks kept losing it | `event.currentTarget` |
-| `new` | a constructor needs its own `this` | `class` |
+| `new` | a constructor needs its own `this` | `class` — next chapter |
 | `arguments` | not a real array | `(...numbers) =>` |
 
 ---
@@ -475,32 +475,3 @@ Number('hello')            // NaN
 - FizzBuzz: loop from 1 to 100, print `Fizz` / `Buzz` / `FizzBuzz`
 - Destructure a `{ name, role }` parameter and build the line with a template literal
 - `withLike(messages, id)` and `removeById(messages, id)` — the two moves of Day 3
-
----
-layout: cover
----
-
-# End of Day 1
-
----
-
-# What you can do now
-
-- Read a snippet and **predict** what it does, without running it
-- Explain why `{} === {}` is `false`, and why `'2' === 2` is too
-- Choose between `const` and `let`, and say what `const` really protects
-- Write a function, give it a default parameter, pass it to another function
-- Transform an array with `map`, `filter`, `reduce`, `sort` instead of a loop
-- Read, build and **copy** an object, and update one of its properties without
-  touching the original
-- Find, update and remove one item of an array of objects, **by id**
-
-<br />
-
-## Tomorrow
-
-The browser: `window`, the **DOM**, **events**, and responsive behaviour —
-everything that turns the code you just wrote into an interface.
-
-> If one of the five points above is still fuzzy, say so tomorrow morning.
-> Day 2 builds directly on top of them.

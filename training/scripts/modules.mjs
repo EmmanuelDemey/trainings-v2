@@ -7,7 +7,7 @@
 //
 // An optional module is a chapter plus its workshop. Turning it on:
 //   - flips `hide: true` to `hide: false` in javascript.md, so Slidev renders it
-//   - renames tp/_12_fetch to tp/12_fetch, and the same under solutions/
+//   - renames tp/_13_fetch to tp/13_fetch, and the same under solutions/
 //
 // That second half matters: the site (site/scripts/sync-workshops.mjs) and the
 // printed handbook (scripts/workshops-pdf.mjs) both only pick up folders whose
@@ -25,9 +25,9 @@ const WORKSHOPS = 'chapters/javascript/tp';
 const SOLUTIONS = 'solutions/javascript';
 
 const MODULES = [
-  { key: 'fetch', chapter: '09_fetch.md', workshop: '12_fetch', label: 'Talking to a server (fetch)' },
-  { key: 'modules', chapter: '10_modules.md', workshop: '13_es_modules', label: 'ES Modules' },
-  { key: 'storage', chapter: '11_storage.md', workshop: '14_storage', label: 'Local & Session Storage' },
+  { key: 'fetch', chapter: '10_fetch.md', workshop: '13_fetch', label: 'Talking to a server (fetch)' },
+  { key: 'modules', chapter: '11_modules.md', workshop: '14_es_modules', label: 'ES Modules' },
+  { key: 'storage', chapter: '12_storage.md', workshop: '15_storage', label: 'Local & Session Storage' },
 ];
 
 const deckPath = join(trainingRoot, DECK);

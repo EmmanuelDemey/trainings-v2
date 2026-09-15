@@ -100,7 +100,7 @@ Two things to know before relying on it:
 
 - the correction page is **public** and its URL is guessable. This is a warm-up,
   not an exam — a static site has nowhere to hide an answer key;
-- the Netlify free plan caps form submissions. One class going through eleven
+- the Netlify free plan caps form submissions. One class going through twelve
   workshops is over a hundred submissions.
 
 ## The feedback form

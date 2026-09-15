@@ -49,9 +49,9 @@ async function open(folder, viewport) {
 }
 
 // --- the optional workshops ------------------------------------------------
-// 12, 13 and 14 need a real origin: fetch, ES modules and localStorage are all
+// 13, 14 and 15 need a real origin: fetch, ES modules and localStorage are all
 // refused on file://. They also only exist when their module is switched on
-// (`pnpm run modules fetch on`) — off, the folder is named `_12_fetch`.
+// (`pnpm run modules fetch on`) — off, the folder is named `_13_fetch`.
 const rootDir = dir ? resolve(process.cwd(), dir) : fileURLToPath(new URL('.', import.meta.url));
 const present = (folder) => existsSync(join(rootDir, folder));
 
@@ -128,9 +128,19 @@ if (!skip('03_syntax')) {
 }
 
 // --- TP4 -------------------------------------------------------------------
-if (!skip('04_window')) {
-  console.log('TP4 window');
-  const { page } = await open('04_window', { width: 1000, height: 700 });
+if (!skip('04_classes')) {
+  console.log('TP4 classes');
+  const { page, logs } = await open('04_classes');
+  await page.waitForTimeout(200);
+  ok('32/32 tests passing', logs.some((l) => l.includes('32/32')), logs.filter((l) => l.startsWith('❌')).join('|'));
+  ok('no error in the page', !logs.some((l) => l.startsWith('PAGEERROR')), logs.filter((l) => l.startsWith('PAGEERROR')).join('|'));
+  await page.close();
+}
+
+// --- TP5 -------------------------------------------------------------------
+if (!skip('05_window')) {
+  console.log('TP5 window');
+  const { page } = await open('05_window', { width: 1000, height: 700 });
   ok('viewport shown', (await page.textContent('#viewport')).includes('1000 x'));
   ok('url shown', (await page.textContent('#url')).includes('index.html'));
   ok('language shown', (await page.textContent('#language')).length > 1);
@@ -146,10 +156,10 @@ if (!skip('04_window')) {
   await page.close();
 }
 
-// --- TP5 -------------------------------------------------------------------
-if (!skip('05_dom')) {
-  console.log('TP5 dom');
-  const { page } = await open('05_dom');
+// --- TP6 -------------------------------------------------------------------
+if (!skip('06_dom')) {
+  console.log('TP6 dom');
+  const { page } = await open('06_dom');
   ok('title changed', (await page.textContent('h1')) === 'My store');
   ok('4 products rendered', (await page.locator('#products li').count()) === 4);
   ok('summary computed', (await page.textContent('#summary')).includes('4 product(s), total 46.00'), await page.textContent('#summary'));
@@ -163,10 +173,10 @@ if (!skip('05_dom')) {
   await page.close();
 }
 
-// --- TP6 -------------------------------------------------------------------
-if (!skip('06_events')) {
-  console.log('TP6 events');
-  const { page } = await open('06_events');
+// --- TP7 -------------------------------------------------------------------
+if (!skip('07_events')) {
+  console.log('TP7 events');
+  const { page } = await open('07_events');
   ok('minus disabled at 0', await page.locator('#decrement').isDisabled());
   await page.click('#increment'); await page.click('#increment');
   ok('count = 2', (await page.textContent('#count')) === '2');
@@ -206,10 +216,10 @@ if (!skip('06_events')) {
   await page.close();
 }
 
-// --- TP7 -------------------------------------------------------------------
-if (!skip('07_responsive')) {
-  console.log('TP7 responsive');
-  const { page } = await open('07_responsive', { width: 500, height: 700 });
+// --- TP8 -------------------------------------------------------------------
+if (!skip('08_responsive')) {
+  console.log('TP8 responsive');
+  const { page } = await open('08_responsive', { width: 500, height: 700 });
   ok('mobile mode', (await page.textContent('#mode')) === 'mobile');
   ok('body.mobile', await page.locator('body.mobile').count() === 1);
   ok('burger visible', await page.locator('#burger').isVisible());
@@ -228,10 +238,10 @@ if (!skip('07_responsive')) {
   await page.close();
 }
 
-// --- TP8 -------------------------------------------------------------------
-if (!skip('08_countdown')) {
-  console.log('TP8 countdown');
-  const { page } = await open('08_countdown');
+// --- TP9 -------------------------------------------------------------------
+if (!skip('09_countdown')) {
+  console.log('TP9 countdown');
+  const { page } = await open('09_countdown');
   await page.fill('#duration', '3');
   await page.click('#start');
   await page.click('#start'); // double start must not speed it up
@@ -263,10 +273,10 @@ if (!skip('08_countdown')) {
   await page.close();
 }
 
-// --- TP9 -------------------------------------------------------------------
-if (!skip('09_password_generator')) {
-  console.log('TP9 password');
-  const { page } = await open('09_password_generator');
+// --- TP10 -------------------------------------------------------------------
+if (!skip('10_password_generator')) {
+  console.log('TP10 password');
+  const { page } = await open('10_password_generator');
   await page.click('#generate');
   const p1 = await page.textContent('#password');
   ok('length 16', p1.length === 16, p1);
@@ -295,10 +305,10 @@ if (!skip('09_password_generator')) {
   await page.close();
 }
 
-// --- TP10 ------------------------------------------------------------------
-if (!skip('10_staff_directory')) {
-  console.log('TP10 directory');
-  const { page } = await open('10_staff_directory');
+// --- TP11 ------------------------------------------------------------------
+if (!skip('11_staff_directory')) {
+  console.log('TP11 directory');
+  const { page } = await open('11_staff_directory');
   ok('12 cards', (await page.locator('.card').count()) === 12);
   ok('sorted by name, Ada first', (await page.textContent('.card:first-child h3')) === 'Ada Lovelace');
   await page.fill('#search', 'dev');
@@ -318,10 +328,10 @@ if (!skip('10_staff_directory')) {
   await page.close();
 }
 
-// --- TP11 ------------------------------------------------------------------
-if (!skip('11_social_network')) {
-  console.log('TP11 social');
-  const { page } = await open('11_social_network');
+// --- TP12 ------------------------------------------------------------------
+if (!skip('12_social_network')) {
+  console.log('TP12 social');
+  const { page } = await open('12_social_network');
   ok('empty feed message', (await page.textContent('#empty-feed')).includes('Nothing here yet'));
   ok('publish disabled when empty', await page.locator('#publish').isDisabled());
   await page.fill('#author', 'Ada');
@@ -353,10 +363,10 @@ if (!skip('11_social_network')) {
   await page.close();
 }
 
-// --- TP12 (optional module: fetch) -----------------------------------------
-if (!skip('12_fetch') && present('12_fetch')) {
-  console.log('TP12 fetch');
-  const { page, logs } = await openHttp('12_fetch');
+// --- TP13 (optional module: fetch) -----------------------------------------
+if (!skip('13_fetch') && present('13_fetch')) {
+  console.log('TP13 fetch');
+  const { page, logs } = await openHttp('13_fetch');
   await page.waitForTimeout(600);
   ok('4 products rendered', (await page.locator('#products li').count()) === 4);
   ok('prices formatted', /12[.,]00/.test(await textOf(page, '#products li:first-child')));
@@ -378,10 +388,10 @@ if (!skip('12_fetch') && present('12_fetch')) {
   await page.close();
 }
 
-// --- TP13 (optional module: ES modules) ------------------------------------
-if (!skip('13_es_modules') && present('13_es_modules')) {
-  console.log('TP13 es modules');
-  const { page } = await openHttp('13_es_modules');
+// --- TP14 (optional module: ES modules) ------------------------------------
+if (!skip('14_es_modules') && present('14_es_modules')) {
+  console.log('TP14 es modules');
+  const { page } = await openHttp('14_es_modules');
   await page.waitForTimeout(300);
   const loaded = () => page.evaluate(() =>
     performance.getEntriesByType('resource').map((entry) => entry.name));
@@ -409,10 +419,10 @@ if (!skip('13_es_modules') && present('13_es_modules')) {
   await page.close();
 }
 
-// --- TP14 (optional module: storage) ---------------------------------------
-if (!skip('14_storage') && present('14_storage')) {
-  console.log('TP14 storage');
-  const { page } = await openHttp('14_storage');
+// --- TP15 (optional module: storage) ---------------------------------------
+if (!skip('15_storage') && present('15_storage')) {
+  console.log('TP15 storage');
+  const { page } = await openHttp('15_storage');
   await page.fill('#task', 'buy milk');
   await page.click('#add-form button[type=submit]');
   ok('the task is rendered', (await page.locator('#todos li').count()) === 1);

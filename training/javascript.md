@@ -62,27 +62,32 @@ hide: false
 ---
 
 ---
-src: ./chapters/javascript/04_window.md
+src: ./chapters/javascript/04_classes.md
 hide: false
 ---
 
 ---
-src: ./chapters/javascript/05_dom.md
+src: ./chapters/javascript/05_window.md
 hide: false
 ---
 
 ---
-src: ./chapters/javascript/06_events.md
+src: ./chapters/javascript/06_dom.md
 hide: false
 ---
 
 ---
-src: ./chapters/javascript/07_responsive.md
+src: ./chapters/javascript/07_events.md
 hide: false
 ---
 
 ---
-src: ./chapters/javascript/08_guided_practice.md
+src: ./chapters/javascript/08_responsive.md
+hide: false
+---
+
+---
+src: ./chapters/javascript/09_guided_practice.md
 hide: false
 ---
 
@@ -101,16 +106,16 @@ hide: false
 # The script only flips the `hide:` flags below and renames the matching
 # tp/ + solutions/ folders. Doing it by hand works just as well.
 # ---------------------------------------------------------------------------
-src: ./chapters/javascript/09_fetch.md
+src: ./chapters/javascript/10_fetch.md
 hide: true
 ---
 
 ---
-src: ./chapters/javascript/10_modules.md
+src: ./chapters/javascript/11_modules.md
 hide: true
 ---
 
 ---
-src: ./chapters/javascript/11_storage.md
+src: ./chapters/javascript/12_storage.md
 hide: true
 ---

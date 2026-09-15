@@ -107,5 +107,5 @@ enabled for the project in the Netlify UI:
 - an end-of-training **feedback form**, one per training.
 
 Both are described in [`site/README.md`](site/README.md#the-theory-quiz). Mind
-the free plan's cap on submissions: a class of ten going through the eleven
+the free plan's cap on submissions: a class of ten going through the twelve
 JavaScript workshops is over a hundred of them.

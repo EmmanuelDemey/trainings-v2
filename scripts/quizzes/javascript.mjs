@@ -3,7 +3,7 @@
 // The Advanced Vue.js chapters end with their own quiz slides, which are parsed
 // straight out of the deck (see ./index.mjs). The JavaScript deck has none, so
 // its questions are written here — each one recalls the chapter the workshop
-// follows, and several are the traps chapter 8 warns about by name.
+// follows, and several are the traps chapter 9 warns about by name.
 //
 // Same shape as a parsed slide: a prompt, an optional snippet, four options, the
 // letter of the right one, and why it is the right one.
@@ -224,8 +224,66 @@ export default {
     },
   ],
 
-  // Chapter 4 — The window
-  '04_window': [
+  // Chapter 4 — Classes
+  '04_classes': [
+    {
+      prompt: 'What does `new Account(\'Ada\')` do?',
+      options: [
+        { letter: 'A', text: 'It copies the class into a new variable' },
+        { letter: 'B', text: 'It creates an empty object, runs `constructor` with `this` on it, and returns it' },
+        { letter: 'C', text: 'It calls `Account` like any function — `new` is optional' },
+        { letter: 'D', text: 'It creates a new class that inherits from `Account`' },
+      ],
+      answer: 'B',
+      explanation:
+        'The methods are not copied: every instance finds them on `Account.prototype`. And `new` is not optional — calling a class without it is a `TypeError`.',
+    },
+    {
+      code: { language: 'javascript', source: 'const ada = new Account(\'Ada\', 100);\nconsole.log(ada.#balance);' },
+      prompt: 'This line sits outside the class. What happens?',
+      options: [
+        { letter: 'A', text: 'It prints `undefined`' },
+        { letter: 'B', text: 'It prints `100` — privacy is only a convention' },
+        { letter: 'C', text: 'A `SyntaxError`: the file refuses to run at all, not only this line' },
+        { letter: 'D', text: 'A `TypeError`, when the line runs' },
+      ],
+      answer: 'C',
+      explanation:
+        'A `#name` only exists inside the body of the class that declares it. It is checked when the file is parsed — which is also why a typo like `this.#balanse` cannot go unnoticed.',
+    },
+    {
+      prompt: 'What does `#balance` give you that `_balance` does not?',
+      options: [
+        { letter: 'A', text: 'Nothing — both are naming conventions' },
+        { letter: 'B', text: 'Better performance' },
+        { letter: 'C', text: 'Code outside the class cannot read or write it, and it stays out of `Object.keys`, JSON and spread' },
+        { letter: 'D', text: 'It is hidden from the devtools as well' },
+      ],
+      answer: 'C',
+      explanation:
+        '`_balance` is a polite request anyone can ignore. `#balance` is enforced by the language — though the devtools still show it, for debugging.',
+    },
+    {
+      code: {
+        language: 'javascript',
+        source:
+          'class SavingsAccount extends Account {\n  constructor(owner, rate) {\n    this.rate = rate;\n    super(owner);\n  }\n}',
+      },
+      prompt: 'What happens on `new SavingsAccount(\'Ada\', 0.02)`?',
+      options: [
+        { letter: 'A', text: 'It works: the order of the lines does not matter' },
+        { letter: 'B', text: 'A `ReferenceError`: `this` does not exist until `super()` has run' },
+        { letter: 'C', text: '`rate` is set, then erased by the parent constructor' },
+        { letter: 'D', text: 'The parent constructor is skipped' },
+      ],
+      answer: 'B',
+      explanation:
+        'In a subclass, the parent builds the object. Before `super(...)` there is no object yet, so touching `this` throws "Must call super constructor… before accessing this".',
+    },
+  ],
+
+  // Chapter 5 — The window
+  '05_window': [
     {
       prompt: 'What does the delay passed to `setTimeout` guarantee?',
       options: [
@@ -279,8 +337,8 @@ export default {
     },
   ],
 
-  // Chapter 5 — The DOM
-  '05_dom': [
+  // Chapter 6 — The DOM
+  '06_dom': [
     {
       prompt: 'What does `document.querySelector(\'#nope\')` return when nothing matches?',
       options: [
@@ -330,8 +388,8 @@ export default {
     },
   ],
 
-  // Chapter 6 — Event-driven programming
-  '06_events': [
+  // Chapter 7 — Event-driven programming
+  '07_events': [
     {
       prompt: 'Why can a listener written as an inline arrow function never be removed?',
       options: [
@@ -382,8 +440,8 @@ export default {
     },
   ],
 
-  // Chapter 7 — JavaScript and responsive design
-  '07_responsive': [
+  // Chapter 8 — JavaScript and responsive design
+  '08_responsive': [
     {
       prompt: 'When should JavaScript take over from CSS media queries?',
       options: [
@@ -434,8 +492,8 @@ export default {
     },
   ],
 
-  // Chapter 8 — Guided practice, project 1
-  '08_countdown': [
+  // Chapter 9 — Guided practice, project 1
+  '09_countdown': [
     {
       prompt: 'In the state ➜ render ➜ events pattern, where does the truth live?',
       options: [
@@ -485,8 +543,8 @@ export default {
     },
   ],
 
-  // Chapter 8 — Guided practice, project 2
-  '09_password_generator': [
+  // Chapter 9 — Guided practice, project 2
+  '10_password_generator': [
     {
       prompt: 'What does `Math.random()` return?',
       options: [
@@ -537,8 +595,8 @@ export default {
     },
   ],
 
-  // Chapter 8 — Guided practice, project 3
-  '10_staff_directory': [
+  // Chapter 9 — Guided practice, project 3
+  '11_staff_directory': [
     {
       prompt: 'A search field and a sort dropdown. Where should the filtered list live?',
       options: [
@@ -588,8 +646,8 @@ export default {
     },
   ],
 
-  // Chapter 8 — Guided practice, project 4
-  '11_social_network': [
+  // Chapter 9 — Guided practice, project 4
+  '12_social_network': [
     {
       code: { language: 'javascript', source: "likeButton.textContent = '♥ ' + (count + 1);" },
       prompt: 'It works on screen. Why is it a bug?',
@@ -642,10 +700,10 @@ export default {
 
   // --- Optional modules -----------------------------------------------------
   // Only reachable when the module is switched on (`pnpm run modules fetch on`);
-  // while it is off, the folder is `_12_fetch` and nothing here is ever read.
+  // while it is off, the folder is `_13_fetch` and nothing here is ever read.
 
-  // Chapter 9 — Talking to a server
-  '12_fetch': [
+  // Chapter 10 — Talking to a server
+  '13_fetch': [
     {
       code: { language: 'javascript', source: "const data = fetch('/products');" },
       prompt: 'What does `data` hold on the very next line?',
@@ -709,8 +767,8 @@ export default {
     },
   ],
 
-  // Chapter 10 — ES Modules
-  '13_es_modules': [
+  // Chapter 11 — ES Modules
+  '14_es_modules': [
     {
       prompt: 'Two classic `<script>` files each declare `const total`. What happens?',
       options: [
@@ -775,8 +833,8 @@ export default {
     },
   ],
 
-  // Chapter 11 — Local & Session Storage
-  '14_storage': [
+  // Chapter 12 — Local & Session Storage
+  '15_storage': [
     {
       code: { language: 'javascript', source: "localStorage.setItem('count', 3);\nlocalStorage.getItem('count') + 1;" },
       prompt: 'What is the second line worth?',

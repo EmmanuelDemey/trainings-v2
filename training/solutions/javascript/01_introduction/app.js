@@ -4,7 +4,7 @@
 console.log('Hello world!');
 
 // TODO 2 — `document` is provided by the browser, not by the language.
-//   Everything the page exposes hangs off it (chapter 5).
+//   Everything the page exposes hangs off it (chapter 6).
 console.log('Page title:', document.title);
 
 const languages = [
