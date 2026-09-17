@@ -27,10 +27,6 @@ function applyLayout() {}
 //   Then compare the two counters while resizing.
 
 // --- 4 & 5. Burger menu -----------------------------------------------------
-// TODO: clicking #burger toggles the `open` class on #menu, keeps `menuOpen` in
-//   sync, and updates aria-expanded.
+// TODO: clicking #burger toggles the `open` class on #menu and keeps `menuOpen`
+//   in sync.
 // TODO: when leaving mobile, close the menu (step 5).
-
-// --- 6. Reduced motion ------------------------------------------------------
-// TODO: log whether the user asked for reduced motion.
-//   Hint: matchMedia('(prefers-reduced-motion: reduce)').matches

@@ -53,7 +53,6 @@ function createMessage(message) {
   const avatar = document.createElement('div');
   avatar.className = 'avatar';
   avatar.textContent = initials(message.author);
-  avatar.setAttribute('aria-hidden', 'true');
 
   const body = document.createElement('div');
   body.className = 'body';

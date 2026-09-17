@@ -53,5 +53,3 @@ const intervalId = setInterval(() => {
 onClick('back-to-top', () => {
   scrollTo({ top: 0, behavior: 'smooth' });
 });
-// `behavior: 'smooth'` is ignored for users who asked for reduced motion in
-// their OS — the browser does that for us. One less accessibility bug.

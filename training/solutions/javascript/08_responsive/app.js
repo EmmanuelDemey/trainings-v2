@@ -64,6 +64,10 @@ mobileQuery.addEventListener('change', (event) => {
 // Note the 767px in the query, against `< 768` in applyLayout: `max-width: 768px`
 // would INCLUDE 768 and put the two rules one pixel out of step. Off-by-one at
 // the breakpoint is a real bug, and it is always this one.
+//
+// matchMedia is not only about width: it reads any media query — orientation,
+// prefers-color-scheme, pointer: coarse. It is the general bridge between a CSS
+// condition and a JS behaviour.
 
 // --- 4 & 5. Burger menu -----------------------------------------------------
 burger.addEventListener('click', () => {
@@ -78,20 +82,6 @@ function closeMenu() {
 
 function renderMenu() {
   menu.classList.toggle('open', menuOpen);
-  // aria-expanded is what tells a screen reader that this button controls
-  // something, and whether that something is currently open. Two lines, and the
-  // menu goes from unusable to usable without a mouse.
-  burger.setAttribute('aria-expanded', String(menuOpen));
 }
 
 renderMenu();
-
-// --- 6. Reduced motion ------------------------------------------------------
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-console.log('reduced motion requested:', reducedMotion.matches);
-
-// Use it to decide a behaviour, not only a style:
-//   scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
-// matchMedia reads any media query — width, orientation, prefers-color-scheme,
-// pointer: coarse. It is the general bridge between CSS conditions and JS
-// behaviour, not just a width helper.

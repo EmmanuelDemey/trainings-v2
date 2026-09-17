@@ -46,7 +46,7 @@ docLink.href = 'https://developer.mozilla.org';
 docLink.target = '_blank';
 docLink.rel = 'noopener'; // without it, the opened page can reach back via window.opener
 // docLink.setAttribute('href', ...) does the same for standard attributes.
-// setAttribute is only mandatory for non-standard ones (aria-*, data-*, custom).
+// setAttribute is only mandatory for non-standard ones (data-*, custom).
 
 // --- 6 & 7. Render an array, and remove -------------------------------------
 const list = document.querySelector('#products');

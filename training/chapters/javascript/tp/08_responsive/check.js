@@ -8,8 +8,6 @@ function runChecks() {
     document.querySelector('#mode').textContent.trim() === (isMobile ? 'mobile' : 'desktop'));
   check('the `mobile` class on <body> matches the width', () =>
     document.body.classList.contains('mobile') === isMobile);
-  check('aria-expanded is set on the burger', () =>
-    ['true', 'false'].includes(document.querySelector('#burger').getAttribute('aria-expanded')));
   check('the menu is not left open outside mobile', () =>
     isMobile || !document.querySelector('#menu').classList.contains('open'));
   checkReport();

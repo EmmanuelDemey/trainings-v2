@@ -226,7 +226,6 @@ if (!skip('08_responsive')) {
   ok('menu hidden', await page.locator('#menu').isHidden());
   await page.click('#burger');
   ok('menu opened', await page.locator('#menu').isVisible());
-  ok('aria-expanded true', (await page.getAttribute('#burger', 'aria-expanded')) === 'true');
   await page.setViewportSize({ width: 1000, height: 700 });
   await page.waitForTimeout(150);
   ok('desktop mode', (await page.textContent('#mode')) === 'desktop');

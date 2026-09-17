@@ -151,13 +151,12 @@ list.addEventListener('click', (event) => {
 
 # Accessible interactions
 
-Four reflexes that cost one line each, and decide whether your interface is
+Three reflexes that cost one line each, and decide whether your interface is
 usable without a mouse.
 
 ```javascript
 button.disabled = true;              // greyed out AND announced as unavailable
 input.focus();                       // give the focus back after an action
-burger.setAttribute('aria-expanded', 'true');   // "this opens something, it is open"
 errorZone.textContent = 'Email is required';    // the error IN the page, not in an alert
 ```
 

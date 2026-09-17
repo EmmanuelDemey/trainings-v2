@@ -32,9 +32,6 @@ the devtools, `Ctrl+Shift+M`). Keep the console open.
    window past 768px, then narrow it again. If the menu reopens by itself, your
    *"is it open"* state and your *"are we on mobile"* state are fighting. Fix it
    by closing the menu when leaving mobile.
-6. **`prefers-reduced-motion`** — `matchMedia` is not only about width. Log
-   whether the user asked for reduced motion, and use it to decide between
-   `behavior: 'smooth'` and `'auto'`.
 
 ## Checking your work
 
@@ -53,5 +50,3 @@ the devtools, `Ctrl+Shift+M`). Keep the console open.
   Two sources of truth is how a burger menu ends up half-broken at 767px.
 - `ResizeObserver` — when it is the *element* and not the *window* whose size
   matters (a resizable panel, a chart in a flexible column).
-- Give the ☰ button an `aria-expanded` attribute and keep it in sync. That is
-  what makes the menu usable with a screen reader.

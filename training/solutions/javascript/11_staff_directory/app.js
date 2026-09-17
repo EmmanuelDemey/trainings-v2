@@ -72,9 +72,6 @@ function createCard(person) {
   const avatar = document.createElement('div');
   avatar.className = 'avatar';
   avatar.textContent = initials(person.name);
-  // Decorative: the name is right next to it, a screen reader should not read
-  // "AL" out loud as if it were information.
-  avatar.setAttribute('aria-hidden', 'true');
 
   const body = document.createElement('div');
 
