@@ -1,0 +1,83 @@
+name: Vue.js advanced workshops
+
+# The same guarantee as `javascript-workshops.yml`, workshop by workshop:
+# the solution passes the given specs, and the starter must NOT.
+#
+# Each workshop is a standalone npm project, so there is one job per workshop
+# rather than one install for the lot.
+#
+# `04_testing` is deliberately absent: it is the workshop where the learner
+# writes the tests, so its starter ships specs that already pass. "The starter
+# must fail" is meaningless there.
+
+on:
+  push:
+    paths:
+      - 'training/chapters/vuejs_advanced/tp/**'
+      - 'training/solutions/vuejs_advanced/**'
+      - '.github/workflows/vuejs-advanced-workshops.yml'
+  pull_request:
+    paths:
+      - 'training/chapters/vuejs_advanced/tp/**'
+      - 'training/solutions/vuejs_advanced/**'
+  workflow_dispatch:
+
+jobs:
+  workshop:
+    name: ${{ matrix.workshop }}
+    runs-on: ubuntu-latest
+    strategy:
+      # One broken workshop must not hide the state of the other six.
+      fail-fast: false
+      matrix:
+        workshop:
+          - 02_advanced_components
+          - 03_composables_directives
+          - 05_router
+          - 06_pinia
+          - 07_forms
+          - 09_production
+          - 10_final_project
+
+    env:
+      SOLUTION: training/solutions/vuejs_advanced/${{ matrix.workshop }}
+      STARTER: training/chapters/vuejs_advanced/tp/${{ matrix.workshop }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: training/chapters/vuejs_advanced/tp/${{ matrix.workshop }}/.nvmrc
+
+      - name: Install the solution
+        run: npm ci
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: The solution passes its own specs
+        run: npm test
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: The solution typechecks
+        run: npm run typecheck
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: Install the starter
+        run: npm ci
+        working-directory: ${{ env.STARTER }}
+
+      # The specs are part of the typecheck program, so this also proves they
+      # only reference symbols the skeleton already exposes. A spec that fails
+      # to COMPILE would be a broken exercise, not a red test.
+      - name: The starter still typechecks
+        run: npm run typecheck
+        working-directory: ${{ env.STARTER }}
+
+      - name: The starter must still be unsolved
+        working-directory: ${{ env.STARTER }}
+        run: |
+          if npm test; then
+            echo "::error::The starter passes the given specs — an answer leaked into ${{ env.STARTER }}"
+            exit 1
+          fi
+          echo "Starter fails as expected."
