@@ -26,7 +26,18 @@ Chapter 7 — Build the same registration form twice, on one Zod schema:
 npm install
 npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
+npm test             # vitest run
+npm run test:watch   # vitest, in watch mode
 ```
+
+Steps 1, 2 and 5 come with their specs already written:
+**`tests/registration.spec.ts`** is the rule list below, written down — every
+message, the `age` that arrives as a string and leaves as a number, the mismatch
+that has to land on `confirm`, and the server error that must display like any
+other. It is red on the skeleton; keep `npm run test:watch` in a second terminal.
+
+It stops at the edge of the DOM on purpose: the focus management and the `aria-*`
+wiring of step 6 are checked in the browser, where they mean something.
 
 The app has two tabs — the hand-rolled form and the VeeValidate one — and a
 footer showing the fake API's call counters. The "server" knows three registered
@@ -109,6 +120,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
+- [ ] `npm test` exits 0 — the schema messages, the `age` conversion and `useZodForm`
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src | grep -vi bonus` returns nothing
 - [ ] No Vue or VeeValidate warning in the browser console

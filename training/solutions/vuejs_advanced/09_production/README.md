@@ -32,7 +32,19 @@ npm install
 npm run dev          # http://localhost:5173
 npm run build        # ← run this FIRST and write the numbers down
 npm run preview      # http://localhost:4173
+npm test             # vitest run
 ```
+
+Step 4 comes with its specs already written: **`tests/config.spec.ts`** pins the
+two bugs that step exists to prevent — a missing variable that must fail loudly,
+and the string `'false'` that must not enable a feature. They are red on the
+skeleton.
+
+They are the only specs here, deliberately. The rest of this workshop is checked
+by the command it is about — `npm run build`, `npm run size`,
+`npm run verify:serving`. A test asserting that `nginx.conf` *contains* a line
+would prove nothing about how your server actually answers, which is the very
+mistake step 5bis exists to cure.
 
 ## Step 0 — The baseline
 
@@ -200,6 +212,8 @@ counts.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
+- [ ] `npm test` exits 0 — the missing variable fails loudly, and `'false'` disables
+      the feature
 - [ ] `npm run build` succeeds
 - [ ] `npm run size` passes against a `.size-limit.json` you **lowered** to fit your
       optimized build

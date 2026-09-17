@@ -29,7 +29,20 @@ each of them actually buys you:
 npm install
 npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
+npm test             # vitest run
+npm run test:watch   # vitest, in watch mode
 ```
+
+Steps 2, 3 and 5 come with their specs already written:
+**`tests/components.spec.ts`** covers the `Suspense` fallback and its `:key`, the
+error of a rejected async `setup()`, both slots of the headless table, and the
+dialog that escapes the clipping panel without losing what you typed. It is red
+on the skeleton.
+
+Steps 1 and 4 are **not** in there, deliberately. "The chart is not in the entry
+chunk" is a claim about the *bundle*, which jsdom cannot see — a green test would
+prove nothing about what a user downloads. And step 4 is judged on the four
+measurements you write down. Those two live in the Network tab and in your notes.
 
 Keep the **Network tab** (filtered on JS) and the **Vue Devtools** open: most of
 this workshop is about observing, not just writing.
@@ -109,6 +122,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
+- [ ] `npm test` exits 0 — `Suspense`, the scoped slots and the `Teleport`
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src | grep -v bonus` returns nothing
 - [ ] No Vue warning or error in the browser console while you exercise the four panels

@@ -31,7 +31,19 @@ Chapter 5 — Turn a set of unprotected pages into a real application:
 npm install
 npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
+npm test             # vitest run
+npm run test:watch   # vitest, in watch mode
 ```
+
+Steps 3 to 6 come with their specs already written: **`tests/router.spec.ts`** is
+the guard contract of this README, written down — the `?redirect` round trip and
+its two open-redirect traps, the role check, the cold start, `document.title`, and
+`scrollBehavior` called as the pure function it is. It is red on the skeleton;
+keep `npm run test:watch` in a second terminal and make it go green.
+
+What it deliberately leaves alone needs a real browser: the transitions, the
+actual scroll *position*, and the dirty-form `confirm`. Those stay below as checks
+you run by hand.
 
 ## Steps
 
@@ -90,6 +102,8 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
+- [ ] `npm test` exits 0 — the guard, the redirect validation, `document.title` and
+      `scrollBehavior`
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src | grep -v bonus` returns nothing
 - [ ] No Vue Router warning in the browser console during a full navigation tour

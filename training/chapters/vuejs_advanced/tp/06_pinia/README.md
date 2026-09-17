@@ -26,7 +26,21 @@ Chapter 6 — Take a working "god store" and turn it into something that scales:
 npm install
 npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
+npm test             # vitest run
+npm run test:watch   # vitest, in watch mode
 ```
+
+Steps 4 and 6 come with their specs already written: **`tests/stores.spec.ts`**
+covers the two plugins — what the cart persists and what it must not, a corrupted
+entry that cannot take startup down, and the log of a successful **and** of a
+failed action. It is red on the skeleton; keep `npm run test:watch` in a second
+terminal.
+
+It drives the panels rather than the stores, on purpose: the three stores of step
+1 do not exist yet, so a spec importing `useCatalogStore` would fail to *load*
+rather than fail an assertion. The measurements — `shallowRef`, the `byId` index,
+the render counters — stay where they belong, in the browser with the numbers
+written down.
 
 Every panel displays its own **render counter** and the app displays the cost of
 the catalog assignment. Write the numbers down before each change.
@@ -92,6 +106,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
+- [ ] `npm test` exits 0 — the persistence plugin and the action log
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src | grep -v bonus` returns nothing
 - [ ] No Pinia or Vue warning in the browser console

@@ -11,6 +11,8 @@
     "build:staging": "vue-tsc --noEmit && vite build --mode staging",
     "preview": "vite preview --port 4173",
     "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "analyze": "ANALYZE=1 vite build",
     "size": "size-limit",
     "serve:local": "docker compose -f docker/compose.yml up -d",
@@ -29,6 +31,7 @@
     "size-limit": "^13.0.3",
     "typescript": "^6.0.3",
     "vite": "^8.2.2",
+    "vitest": "^5.0.1",
     "vue-tsc": "^3.3.10"
   }
 }

@@ -49,6 +49,10 @@ export const useShopStore = defineStore('shop', () => {
     } catch (e) {
       error.value = e as Error;
       status.value = 'error';
+      // TODO 6.4: rethrow here. `$onAction`'s `onError` only fires when the
+      //   action actually rejects, so an error swallowed at this line is an
+      //   error your logger can never record — and the DoD box about failed
+      //   actions stays out of reach.
     }
   }
 

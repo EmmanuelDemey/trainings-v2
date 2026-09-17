@@ -52,6 +52,16 @@ export function useZodForm<S extends ZodType>(schema: S, initial: input<S>) {
   }
 
   /**
+   * TODO 2.5: the server validates again, and answers a 422 with one message per
+   *           field path. Merge `fieldErrors` into `errors.value` so they display
+   *           like any other error, and mark those fields touched — otherwise
+   *           `errorFor` stays quiet on a field the user never visited.
+   */
+  function setErrors(fieldErrors: Record<string, string>): void {
+    void fieldErrors;
+  }
+
+  /**
    * TODO 2.4: wrap the submit.
    *
    *   - prevent the default, increment `submitCount`
@@ -88,6 +98,7 @@ export function useZodForm<S extends ZodType>(schema: S, initial: input<S>) {
     validate,
     handleBlur,
     errorFor,
+    setErrors,
     handleSubmit,
     resetForm,
   };
