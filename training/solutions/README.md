@@ -20,7 +20,7 @@ with `npx serve solutions/javascript/06_dom`.
 ```bash
 open solutions/javascript/09_countdown/index.html   # JavaScript: nothing to install
 
-cd solutions/vuejs_advanced/06_pinia
+cd solutions/vuejs_advanced/09_pinia
 npm install
 npm run dev            # or npm test / npm run build, per workshop
 ```
@@ -28,13 +28,13 @@ npm run dev            # or npm test / npm run build, per workshop
 To diff a solution against the starter a learner is working from:
 
 ```bash
-diff -ru chapters/vuejs_advanced/tp/06_pinia/src solutions/vuejs_advanced/06_pinia/src
+diff -ru chapters/vuejs_advanced/tp/09_pinia/src solutions/vuejs_advanced/09_pinia/src
 ```
 
 The `package.json`, `tsconfig.json` and configuration files are identical to the
-starter's unless a step asked for them to change (`vite.config.ts` in workshop 9,
+starter's unless a step asked for them to change (`vite.config.ts` in workshop 16,
 `eslint.config.js` in Node workshop 10, `vitest.browser.config.ts` in Vue
-workshop 4). So a diff shows the exercise, and nothing else.
+workshop 3). So a diff shows the exercise, and nothing else.
 
 ## What is in the comments
 
@@ -64,15 +64,15 @@ Every solution was run, not just written:
 | Node 09 | RabbitMQ + Redis via `docker compose`, ack/nack and fan-out observed |
 | Node 10 | `npm run lint` clean, request-id propagation checked in the logs |
 | Node 12 | addon compiled with `node-gyp`, benchmarked against the TS version |
-| Vue 02–10 | `npm run typecheck` + `npm run build` |
-| Vue 03 | `npm test` — the 10 given `useFetch` specs |
-| Vue 04 | `npm test` — 21 tests — and `npx cypress run` — 5 e2e tests |
-| Vue 09 | `npm run verify:serving` green on nginx **and** Caddy, in Docker |
-| Vue 10 | `npm test` — 14 tests, including the 8 given `useAsyncData` specs |
+| Vue 02–17 | `npm run typecheck` + `npm run build` |
+| Vue 02 | `npm test` — the 10 given `useFetch` specs |
+| Vue 03 | `npm test` — 21 tests — and `npx cypress run` — 5 e2e tests |
+| Vue 16 | `npm run verify:serving` green on nginx **and** Caddy, in Docker |
+| Vue 17 | `npm test` — 14 tests, including the 8 given `useAsyncData` specs |
 
 Two things could not be run on the machine that produced these and are marked as
-such in the report: Vitest **browser mode** (Vue 04, `npm run test:browser` — no
-system Chrome available) and a real Netlify/Vercel **deploy** (Vue 09 step 5,
+such in the report: Vitest **browser mode** (Vue 03, `npm run test:browser` — no
+system Chrome available) and a real Netlify/Vercel **deploy** (Vue 16 step 5,
 replaced by the local Docker plan B, which is verified).
 
 ## Re-running the JavaScript checks

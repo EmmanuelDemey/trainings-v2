@@ -9,15 +9,7 @@
 - Lire — https://pinia.vuejs.org
 - Lire — https://vite.dev/guide/
 
-## 1. Fondamentaux & réactivité
-
-- Lire — https://vuejs.org/guide/extras/reactivity-in-depth.html
-- Lire — https://vuejs.org/guide/extras/rendering-mechanism.html
-- Lire — https://vuejs.org/guide/typescript/composition-api.html
-- Lire — https://github.com/vuejs/core/tree/main/packages/reactivity/src
-- Regarder — https://www.vuemastery.com/courses (💰 — "Vue 3 Deep Dive with Evan You")
-
-## 2. Composants avancés
+## 7. Composants avancés
 
 - Lire — https://vuejs.org/guide/components/async.html
 - Lire — https://vuejs.org/guide/built-ins/suspense.html
@@ -27,17 +19,7 @@
 - Lire — https://github.com/unovue/reka-ui
 - Regarder — https://antfu.me/talks
 
-## 2bis. Render functions & JSX
-
-- Lire — https://vuejs.org/guide/extras/render-function.html
-- Lire — https://vuejs.org/api/render-function.html
-- Lire — https://vuejs.org/guide/extras/rendering-mechanism.html
-- Lire — https://github.com/vuejs/babel-plugin-jsx
-- Lire — https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue-jsx
-- Lire — https://github.com/vuejs/core/blob/main/packages/runtime-core/src/h.ts
-- Essayer — https://play.vuejs.org (onglet « Compiled » pour lire le render généré)
-
-## 2ter. Transition & TransitionGroup
+## 10. Transition & TransitionGroup
 
 - Lire — https://vuejs.org/guide/built-ins/transition.html
 - Lire — https://vuejs.org/guide/built-ins/transition-group.html
@@ -49,7 +31,7 @@
 - Lire — https://gsap.com/docs/v3/
 - Essayer — https://play.vuejs.org (tester une transition sans monter un projet)
 
-## 3. Composables & directives
+## 2. Composables & directives
 
 - Lire — https://vuejs.org/guide/reusability/composables.html
 - Lire — https://vuejs.org/guide/reusability/custom-directives.html
@@ -59,7 +41,7 @@
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
 - Écouter — https://deja-vue.io
 
-## 3bis. Plugins
+## 4. Plugins
 
 - Lire — https://vuejs.org/guide/reusability/plugins.html
 - Lire — https://vuejs.org/api/application.html
@@ -69,7 +51,7 @@
 - Lire — https://github.com/vuejs/devtools/tree/main/packages/devtools-api
 - Lire — https://vite.dev/guide/build.html#library-mode
 
-## 3ter. Une lib de composables d'équipe
+## 5. Une lib de composables d'équipe
 
 - Lire — https://vuejs.org/guide/reusability/composables.html#conventions-and-best-practices
 - Lire — https://github.com/vueuse/vueuse/blob/main/CONTRIBUTING.md (leurs conventions, écrites)
@@ -84,7 +66,7 @@
 - Outil — https://github.com/ai/size-limit
 - Outil — https://histoire.dev (ou https://vitepress.dev pour la doc + démos)
 
-## 4. Tests — fondamentaux
+## 3. Tests — fondamentaux
 
 - Lire — https://vuejs.org/guide/scaling-up/testing.html
 - Lire — https://test-utils.vuejs.org
@@ -96,7 +78,7 @@
 - Lire — https://lachlan-miller.me
 - Écouter — https://frontendfirst.fm
 
-## 5. Vue Router
+## 6. Vue Router
 
 - Lire — https://router.vuejs.org/guide/advanced/navigation-guards.html
 - Lire — https://router.vuejs.org/guide/advanced/transitions.html
@@ -106,7 +88,7 @@
 - Lire — https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
 - Lire — https://developer.chrome.com/docs/web-platform/view-transitions/
 
-## 5bis. Écosystème unplugin-*
+## 8. Écosystème unplugin-*
 
 - Lire — https://unplugin.unjs.io
 - Lire — https://github.com/unjs/unplugin
@@ -123,7 +105,7 @@
 - Lire — https://nuxt.com/docs/guide/concepts/auto-imports (la même idée, intégrée)
 - Regarder — https://antfu.me/talks
 
-## 6. Pinia
+## 9. Pinia
 
 - Lire — https://pinia.vuejs.org/core-concepts/plugins.html
 - Lire — https://pinia.vuejs.org/cookbook/composing-stores.html
@@ -136,7 +118,7 @@
 - Lire — https://tanstack.com/query/latest/docs/framework/vue/overview
 - Lire — https://uvr.esm.is/data-loaders/
 
-## 7. Formulaires & validation
+## 11. Formulaires & validation
 
 - Lire — https://zod.dev
 - Lire — https://zod.dev/v4 (nouveautés, `treeifyError`, `prettifyError`)
@@ -149,7 +131,7 @@
 - Lire — https://adamsilver.io/blog/ (design de formulaires)
 - Lire — https://valibot.dev (l'alternative légère à Zod)
 
-## 8. Tests — intégration & e2e
+## 12. Tests — intégration & e2e
 
 - Lire — https://test-utils.vuejs.org/guide/advanced/vue-router.html
 - Lire — https://pinia.vuejs.org/cookbook/testing.html
@@ -164,7 +146,7 @@
 - Lire — https://docs.cypress.io/api/commands/intercept
 - Lire — https://github.com/cypress-io/github-action
 
-## 8bis. Erreurs & observabilité
+## 13. Erreurs & observabilité
 
 - Lire — https://vuejs.org/api/composition-api-lifecycle.html#onerrorcaptured
 - Lire — https://vuejs.org/api/application.html#app-config-errorhandler
@@ -179,7 +161,7 @@
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event
 - Lire — https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event (« Script error. » et CORS)
 
-## 8ter. Internationalisation (vue-i18n)
+## 15. Internationalisation (vue-i18n)
 
 - Lire — https://vue-i18n.intlify.dev/guide/introduction.html
 - Lire — https://vue-i18n.intlify.dev/guide/essentials/pluralization.html
@@ -197,7 +179,7 @@
 - Lire — https://formatjs.io/docs/core-concepts/icu-syntax (l'alternative ICU)
 - Lire — https://www.w3.org/International/questions/qa-html-language-declarations (`<html lang>`)
 
-## 9. Production & déploiement
+## 16. Production & déploiement
 
 - Lire — https://vite.dev/config/build-options.html
 - Lire — https://vite.dev/guide/env-and-mode.html
@@ -264,7 +246,7 @@ La formation est 100 % Composition API ; le QCM peut porter sur les deux.
 
 ### Événements & liaisons de formulaire
 
-Le chapitre 7 couvre la validation et l'accessibilité ; les bases de `v-model`
+Le chapitre 11 couvre la validation et l'accessibilité ; les bases de `v-model`
 sur chaque type de contrôle restent à réviser.
 
 - Lire — https://vuejs.org/guide/essentials/event-handling.html

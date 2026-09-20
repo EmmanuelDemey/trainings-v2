@@ -23,7 +23,7 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
  * Where each workshop's questions come from, per training slug then per workshop
  * folder. `chapters` are parsed; `questions` are taken as they are.
  *
- * A workshop absent from this map simply gets no quiz — `10_final_project`
+ * A workshop absent from this map simply gets no quiz — `17_final_project`
  * teaches nothing new, so there is nothing to recall.
  */
 export const QUIZ_SOURCES = {
@@ -31,14 +31,22 @@ export const QUIZ_SOURCES = {
     Object.entries(JAVASCRIPT_QUESTIONS).map(([folder, questions]) => [folder, { questions }]),
   ),
   'vuejs-advanced': {
-    '02_advanced_components': { chapters: ['02_advanced_components.md'] },
-    '03_composables_directives': { chapters: ['03_composables_directives.md'] },
-    // "TP 4 & 8 — Testing" covers both testing chapters, so it asks both quizzes.
-    '04_testing': { chapters: ['04_testing_fundamentals.md', '08_testing_integration.md'] },
-    '05_router': { chapters: ['05_router.md'] },
-    '06_pinia': { chapters: ['06_pinia.md'] },
-    '07_forms': { chapters: ['07_forms.md'] },
-    '09_production': { chapters: ['09_production.md'] },
+    '01_devtools': { chapters: ['01_devtools.md'] },
+    '02_composables_directives': { chapters: ['02_composables_directives.md'] },
+    '03_testing': { chapters: ['03_testing_fundamentals.md'] },
+    '04_plugins': { chapters: ['04_plugins.md'] },
+    '05_composables_library': { chapters: ['05_composables_library.md'] },
+    '06_router': { chapters: ['06_router.md'] },
+    '07_advanced_components': { chapters: ['07_advanced_components.md'] },
+    '08_unplugin': { chapters: ['08_unplugin.md'] },
+    '09_pinia': { chapters: ['09_pinia.md'] },
+    '10_transitions': { chapters: ['10_transitions.md'] },
+    '11_forms': { chapters: ['11_forms.md'] },
+    '12_testing_integration': { chapters: ['12_testing_integration.md'] },
+    '13_error_handling': { chapters: ['13_error_handling.md'] },
+    '14_component_architecture': { chapters: ['14_component_architecture.md'] },
+    '15_i18n': { chapters: ['15_i18n.md'] },
+    '16_production': { chapters: ['16_production.md'] },
   },
 };
 

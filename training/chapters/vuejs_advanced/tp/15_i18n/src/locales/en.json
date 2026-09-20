@@ -1,0 +1,21 @@
+{
+  "app": {
+    "title": "Shop",
+    "greeting": "Hello {name}",
+    "openingRange": "Open from {0} to {1}"
+  },
+  "legal": {
+    "tos": "terms and conditions",
+    "accept": "I accept the @:{'legal.tos'}.",
+    "shout": "@.upper:legal.tos",
+    "currencyNote": "Prices are shown in {'{'}currency{'}'}"
+  },
+  "cart": {
+    "items": "no item | one item | {count} items",
+    "empty": "Your cart is empty"
+  },
+  "catalog": {
+    "discount": "{rate} off",
+    "views": "{count} views"
+  }
+}

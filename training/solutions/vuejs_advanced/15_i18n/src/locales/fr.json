@@ -1,0 +1,21 @@
+{
+  "app": {
+    "title": "Boutique",
+    "greeting": "Bonjour {name}",
+    "openingRange": "Ouvert du {0} au {1}"
+  },
+  "legal": {
+    "tos": "conditions générales",
+    "accept": "J'accepte les @:{'legal.tos'}.",
+    "shout": "@.upper:legal.tos",
+    "currencyNote": "Les prix sont exprimés en {'{'}devise{'}'}"
+  },
+  "cart": {
+    "items": "article | articles",
+    "empty": "Votre panier est vide"
+  },
+  "catalog": {
+    "discount": "Remise de {rate}",
+    "views": "{count} vues"
+  }
+}

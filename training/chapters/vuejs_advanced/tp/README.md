@@ -4,14 +4,15 @@ Hands-on exercises for the **Advanced Vue.js** training, based on **Vue 3.5**,
 **Vite 8**, **Vue Router 5**, **Pinia 4**, **Zod 3**, **VeeValidate 4**,
 **Vitest 5** and **Cypress 15**.
 
-Each workshop is a **standalone project**: it has its own `package.json`,
-`tsconfig.json`, `.nvmrc` and `README.md`, and it **does not depend on any other
-workshop**. You can start with any of them in any order.
+**One workshop per chapter**, and each one is a **standalone project**: its own
+`package.json`, `tsconfig.json`, `.nvmrc` and `README.md`, its own `npm install`,
+and not a single import from another workshop. Take them in any order, skip the
+ones your group does not need, and nothing breaks.
 
 All code is **TypeScript**, checked with `vue-tsc` (which understands `.vue` files):
 
 ```bash
-cd 02_advanced_components
+cd 07_advanced_components
 npm install
 npm run dev          # http://localhost:5173
 npm run typecheck    # vue-tsc --noEmit
@@ -28,11 +29,11 @@ node check-env.mjs
 It has no dependency to install: if it does not even start, Node.js is missing or too
 old — and that is already the first thing to fix. It checks Node.js and npm versions,
 Git, Docker, free disk space, the ports the training binds (5173 / 4173 for Vite,
-8080 / 8081 for the local deployment of workshop 9), and whether your network lets
+8080 / 8081 for the local deployment of workshop 16), and whether your network lets
 you reach the npm registry and the Cypress CDN (the two things a corporate proxy
 usually blocks).
 
-Docker is reported as a **warning**, never a blocker: it is only used by workshop 9,
+Docker is reported as a **warning**, never a blocker: it is only used by workshop 16,
 whose last step deploys the build to a local nginx or Caddy container when you do not
 have a Netlify/Vercel account.
 
@@ -58,23 +59,23 @@ package. Three deliberate pins, each with a reason that will lift on its own:
 | Pin | Why |
 |---|---|
 | `typescript` **6.0.3**, not 7.x | `vue-tsc@3` patches TypeScript's `lib/tsc`, which TypeScript 7 (the native port) no longer exposes: `npm run typecheck` fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`. |
-| `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. `10_final_project` could take Zod 4 on its own, but teaching two Zod dialects in one training is worse than being one major behind. |
-| `webdriverio` **9.x** | Latest; listed here only because Vitest 4 moved the browser provider into `@vitest/browser-webdriverio`, which is now a dependency of workshop 4. |
+| `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. `17_final_project` could take Zod 4 on its own, but teaching two Zod dialects in one training is worse than being one major behind. |
+| `webdriverio` **9.x** | Latest; listed here only because Vitest 4 moved the browser provider into `@vitest/browser-webdriverio`, which is now a dependency of workshop 3. |
 
 Three migrations changed workshop code, not just versions:
 
 - **Vitest 4** — `browser.provider` is now a factory imported from its own
   package, not the string `'webdriverio'` (`vitest.browser.config.ts`, and the
-  chapter 8 slides).
+  chapter 12 slides).
 - **Vitest 5** — browser mode moved its public entry point from
   `@vitest/browser/context` to **`vitest/browser`**, and `render()` from
   `vitest-browser-vue@3` now returns a **promise**: it has to be awaited
-  (`tests/InvoiceChart.browser.spec.ts`, and the chapter 8 slides). Two defaults
+  (`tests/InvoiceChart.browser.spec.ts`, and the chapter 12 slides). Two defaults
   also flipped: `clearMocks` is **on**, and locators match text **exactly**.
 - **Vite 8 / Rolldown** — `build.rollupOptions.output.manualChunks` only accepts
   the **function** form. The `{ vue: ['vue', 'vue-router'] }` object form every
   article shows now fails with `TypeError: manualChunks is not a function`
-  (workshop 9).
+  (workshop 16).
 
 The worked answer to every workshop lives in `solutions/vuejs_advanced/`, one
 runnable folder per workshop. Do not hand it out before the exercise.
@@ -83,20 +84,28 @@ runnable folder per workshop. Do not hand it out before the exercise.
 
 | Chapter | Folder | Topic | Extra requirements |
 |---|--------|-------|--------------------|
-| 2 | `02_advanced_components/` | Async components, `Suspense`, scoped slots, `v-memo` | — |
-| 3 | `03_composables_directives/` | `useFetch`, `useLocalStorage`, `v-lazy-img` directive | — |
-| 4 | `04_testing/` — **part 1** | test-utils, queries, stubs, spies, fake timers | — |
-| 5 | `05_router/` | Transitions, guards, auth flow, scroll behaviour | — |
-| 6 | `06_pinia/` | Store splitting, indexes, `shallowRef`, plugins | — |
-| 7 | `07_forms/` | Zod schema, `useZodForm`, VeeValidate, a11y | — |
-| 8 | `04_testing/` — **part 2** | Router & Pinia in tests, MSW, Cypress | Cypress downloads a browser |
-| 9 | `09_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) — or Docker for the local plan B |
-| 10 | `10_final_project/` — **optional** | Everything above, in one slice — then a cross-review round | A second pair |
+| 1 | `01_devtools/` | Timeline, render counters, wasted re-renders, prop identity | The Vue Devtools extension |
+| 2 | `02_composables_directives/` | `useFetch`, `useLocalStorage`, `v-lazy-img` directive | — |
+| 3 | `03_testing/` — **part 1** | test-utils, queries, stubs, spies, fake timers | — |
+| 4 | `04_plugins/` | `createXxx` factory, `InjectionKey`, `useXxx`, global property | — |
+| 5 | `05_composables_library/` | `MaybeRefOrGetter`, object of refs, `onScopeDispose` | — |
+| 6 | `06_router/` | Transitions, guards, auth flow, scroll behaviour | — |
+| 7 | `07_advanced_components/` | Async components, `Suspense`, scoped slots, `v-memo` | — |
+| 8 | `08_unplugin/` | File-based routing, auto-imports, auto-components | — |
+| 9 | `09_pinia/` | Store splitting, indexes, `shallowRef`, plugins | — |
+| 10 | `10_transitions/` | The six classes, `out-in`, `TransitionGroup`, `v-move`, keys | A browser — half of it is checked with your eyes |
+| 11 | `11_forms/` | Zod schema, `useZodForm`, VeeValidate, a11y | — |
+| 12 | `12_testing_integration/` | Real router, `createTestingPinia`, MSW, Cypress | Cypress downloads a browser |
+| 13 | `13_error_handling/` | `<ErrorBoundary>`, `errorHandler`, the `window` net | — |
+| 14 | `14_component_architecture/` | The dependency rule as a test, feature-first, slots | — |
+| 15 | `15_i18n/` | Messages, plural rules, `n()`, lazy-loaded locales | — |
+| 16 | `16_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) — or Docker for the local plan B |
+| 17 | `17_final_project/` — **optional** | Everything above, in one slice — then a cross-review round | A second pair |
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
 
-`03_composables_directives/` also ships the spec of its first step:
+`02_composables_directives/` also ships the spec of its first step:
 `tests/useFetch.spec.ts` is red on the skeleton, and `npm test` (Vitest) is the
 fastest way to know whether your `useFetch` really aborts, really re-runs on a
 getter, and really keeps `loading` straight when a request is cancelled.
@@ -104,14 +113,21 @@ getter, and really keeps `loading` straight when a request is cancelled.
 Every workshop README ends with a **Definition of Done** — a checklist of criteria
 you can verify yourself (a command that exits 0, something observable in the browser,
 a question you can answer). Steps marked *(Bonus)* and the "Going further" section are
-deliberately **outside** it: the DoD is the floor, not the ceiling. `04_testing/` has
+deliberately **outside** it: the DoD is the floor, not the ceiling. `03_testing/` has
 one DoD per part.
 
-**Chapters 4 and 8 share the same project** (`04_testing/`): part 1 tests
-components and composables in isolation, part 2 comes back to it once the router
-and Pinia chapters are done. There is no `08_` folder.
+**`03_testing/` and `12_testing_integration/` are the two workshops where the
+LEARNER writes the tests**, so their starters ship specs that already pass plus a
+list of `it.todo`s. That also means the CI guard below does not apply to them —
+"the starter must fail" is meaningless when the failing tests are the exercise.
 
-`10_final_project/` is the **optional** half-day that closes the training. It is
+`03_testing/` still carries an optional **part 2** on the same project, for a
+group that prefers one codebase end to end. `12_testing_integration/` is the
+chapter-12 workshop of record: a different app, already unit-tested, that you
+attack with the router, Pinia, MSW and Cypress without needing part 1.
+
+`17_final_project/` is the **optional** 90-minute session that closes the training
+— a half-day in the follow-up format described in its `TRAINER.md`. It is
 run **in pairs**, and it is the only workshop whose second half is not code: at
 the freeze you hand your work to another pair, they run it before they read it,
 and each side leaves with three findings written on someone else's code. Its
@@ -126,10 +142,14 @@ pick up the version from its `.nvmrc`.
 
 ## A note on the API
 
-`02_advanced_components/`, `03_composables_directives/`, `05_router/`,
-`06_pinia/` and `07_forms/` use an **in-memory fake API**
+`01_devtools/`, `02_composables_directives/`, `05_composables_library/`,
+`06_router/`, `07_advanced_components/`, `08_unplugin/`, `09_pinia/`,
+`10_transitions/`, `11_forms/` and `14_component_architecture/` use an
+**in-memory fake API**
 (`src/api/fakeApi.ts`) with an artificial latency, so nothing has to be installed
 or running besides Vite.
-`04_testing/` mocks the network explicitly (MSW, `cy.intercept`).
-`10_final_project/` uses a fake API too — with `AbortSignal` support on the reads
+`03_testing/` and `12_testing_integration/` mock the network explicitly
+(MSW, `cy.intercept`). `04_plugins/`, `13_error_handling/` and `15_i18n/` need no
+API at all.
+`17_final_project/` uses a fake API too — with `AbortSignal` support on the reads
 and a switch, in the app header, that makes every write fail.

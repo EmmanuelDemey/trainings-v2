@@ -1,0 +1,23 @@
+/*
+ * The six classes, twice, plus the one `<TransitionGroup>` adds.
+ *
+ * TODO 1: `fade` — for the tab switcher. The `transition` declaration goes on
+ *   `*-enter-active` / `*-leave-active`; `*-enter-from` and `*-leave-to` carry
+ *   the invisible state.
+ *
+ * TODO 2: `list` — for the release list. Same shape, plus:
+ *     - `.list-move` so a reordered row slides to its new place (FLIP)
+ *     - `position: absolute` on `.list-leave-active`, or the leaving row keeps
+ *       its space and nothing slides
+ *
+ * TODO 3: `slide` — for the detail panel, sliding in from the right.
+ *
+ * Keep the durations long enough to SEE (0.4s is a good teaching value), then
+ * shorten them at the end.
+ */
+
+/* --- fade: the tab switcher ------------------------------------------- */
+
+/* --- list: the release list ------------------------------------------- */
+
+/* --- slide: the detail panel ------------------------------------------ */

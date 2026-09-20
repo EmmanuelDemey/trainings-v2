@@ -6,9 +6,9 @@ name: Vue.js advanced workshops
 # Each workshop is a standalone npm project, so there is one job per workshop
 # rather than one install for the lot.
 #
-# `04_testing` is deliberately absent: it is the workshop where the learner
-# writes the tests, so its starter ships specs that already pass. "The starter
-# must fail" is meaningless there.
+# `03_testing` and `12_testing_integration` are deliberately absent: they are the
+# workshops where the LEARNER writes the tests, so their starters ship specs that
+# already pass (plus `it.todo`s). "The starter must fail" is meaningless there.
 
 on:
   push:
@@ -27,17 +27,25 @@ jobs:
     name: ${{ matrix.workshop }}
     runs-on: ubuntu-latest
     strategy:
-      # One broken workshop must not hide the state of the other six.
+      # One broken workshop must not hide the state of the others.
       fail-fast: false
       matrix:
         workshop:
-          - 02_advanced_components
-          - 03_composables_directives
-          - 05_router
-          - 06_pinia
-          - 07_forms
-          - 09_production
-          - 10_final_project
+          - 01_devtools
+          - 02_composables_directives
+          - 04_plugins
+          - 05_composables_library
+          - 06_router
+          - 07_advanced_components
+          - 08_unplugin
+          - 09_pinia
+          - 10_transitions
+          - 11_forms
+          - 13_error_handling
+          - 14_component_architecture
+          - 15_i18n
+          - 16_production
+          - 17_final_project
 
     env:
       SOLUTION: training/solutions/vuejs_advanced/${{ matrix.workshop }}

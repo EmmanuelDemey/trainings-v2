@@ -1,0 +1,59 @@
+/*
+ * The six classes, three times over.
+ *
+ * `*-from` is the starting state, `*-to` the ending one, and `*-active` covers
+ * the whole phase — which is why the `transition` declaration lives there, and
+ * only there.
+ *
+ * The durations are deliberately slow enough to watch. Divide them by four when
+ * you are done reading them.
+ */
+
+/* --- fade: the tab switcher ------------------------------------------- */
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* --- list: the release list ------------------------------------------- */
+
+.list-enter-active,
+.list-leave-active,
+.list-move {
+  transition: all 0.4s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/*
+ * Without this, the leaving row keeps its space until the very last frame and
+ * the rows below have nothing to slide into — `list-move` becomes invisible.
+ */
+.list-leave-active {
+  position: absolute;
+  width: 100%;
+}
+
+/* --- slide: the detail panel ------------------------------------------ */
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}

@@ -18,8 +18,8 @@ every workshop and generates one Starlight page per workshop:
 ```
 training/chapters/javascript/tp/03_syntax/README.md
    ➜ src/content/docs/javascript/03-syntax.md
-training/chapters/vuejs_advanced/tp/06_pinia/README.md
-   ➜ src/content/docs/vuejs-advanced/06-pinia.md
+training/chapters/vuejs_advanced/tp/09_pinia/README.md
+   ➜ src/content/docs/vuejs-advanced/09-pinia.md
 ```
 
 It also generates, per training:

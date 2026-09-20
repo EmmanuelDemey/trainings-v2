@@ -28,9 +28,9 @@ const MIN_NPM = [10, 0, 0];
 const PORTS = [
   { port: 5173, usedBy: 'vite dev', hint: 'Free it before the session, or Vite will silently move to another port.' },
   { port: 4173, usedBy: 'vite preview', hint: 'Free it before the session, or Vite will silently move to another port.' },
-  // Workshop 9 serves its build from a local nginx/Caddy container (step 5bis).
-  { port: 8080, usedBy: 'nginx, TP 9', hint: 'Only needed for the local deployment of workshop 9; edit `docker/compose.yml` if it is taken.' },
-  { port: 8081, usedBy: 'Caddy, TP 9', hint: 'Only needed for the local deployment of workshop 9; edit `docker/compose.yml` if it is taken.' },
+  // Workshop 17 serves its build from a local nginx/Caddy container (step 5bis).
+  { port: 8080, usedBy: 'nginx, TP 16', hint: 'Only needed for the local deployment of workshop 16; edit `docker/compose.yml` if it is taken.' },
+  { port: 8081, usedBy: 'Caddy, TP 16', hint: 'Only needed for the local deployment of workshop 16; edit `docker/compose.yml` if it is taken.' },
 ];
 const ENDPOINTS = [
   {
@@ -43,7 +43,7 @@ const ENDPOINTS = [
     label: 'Cypress CDN',
     url: 'https://download.cypress.io/desktop.json',
     required: true,
-    hint: 'Chapters 4 & 7 install Cypress, which downloads its own browser binary.',
+    hint: 'Chapters 3 & 12 install Cypress, which downloads its own browser binary.',
   },
   {
     label: 'GitHub',
@@ -160,7 +160,7 @@ async function checkGit() {
     return warn(
       'Git',
       'not found',
-      'Not strictly required, but chapter 9 (CI/CD) assumes a Git repository.',
+      'Not strictly required, but chapter 16 (CI/CD) assumes a Git repository.',
     );
   }
   return ok('Git', output.replace(/^git version /, 'v'));
@@ -220,7 +220,7 @@ function checkPort({ port, usedBy, hint }) {
 }
 
 /**
- * Optional: workshop 9 deploys its build to a local nginx/Caddy container when
+ * Optional: workshop 16 deploys its build to a local nginx/Caddy container when
  * you do not have (or do not want) a Netlify/Vercel account. Everything else in
  * the training runs without it, so a missing Docker is a warning, never a failure.
  */
@@ -230,7 +230,7 @@ async function checkDocker() {
     return warn(
       'Docker',
       'not found',
-      'Optional — only workshop 9 step 5bis (deploying the build locally) uses it. Podman with `podman compose` works too.',
+      'Optional — only workshop 16 step 5bis (deploying the build locally) uses it. Podman with `podman compose` works too.',
     );
   }
   const compose = await run('docker', ['compose', 'version']);

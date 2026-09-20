@@ -1,0 +1,21 @@
+{
+  "app": {
+    "title": "Laden",
+    "greeting": "Hallo {name}",
+    "openingRange": "Geöffnet von {0} bis {1}"
+  },
+  "legal": {
+    "tos": "Allgemeine Geschäftsbedingungen",
+    "accept": "Ich akzeptiere die @:{'legal.tos'}.",
+    "shout": "@.upper:legal.tos",
+    "currencyNote": "Preise werden in {'{'}Währung{'}'} angegeben"
+  },
+  "cart": {
+    "items": "kein Artikel | ein Artikel | {count} Artikel",
+    "empty": "Ihr Warenkorb ist leer"
+  },
+  "catalog": {
+    "discount": "{rate} Rabatt",
+    "views": "{count} Aufrufe"
+  }
+}
