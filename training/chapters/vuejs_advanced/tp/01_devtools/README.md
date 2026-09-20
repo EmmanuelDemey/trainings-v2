@@ -44,6 +44,19 @@ render counts and DOM — the same two things the panel shows you. Keep
 The app displays its own **render counters** at the bottom, with a **Reset**
 button. That panel is the scoreboard: reset it, do one thing, read it.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Turn Vue's tracing on, and find its marks in the Performance panel | `src/createDashboardApp.ts` | You have the widest render bar's duration written down |
+| 2 | Move the ticking clock out of the root component | `src/App.vue` → a new `src/components/ClockBadge.vue` | Five idle seconds move **one** counter, not three |
+| 3 | Stop the stats panel re-rendering on every keystroke | `src/App.vue` + `src/components/StatsPanel.vue` | Typing moves `TicketList` and **not** `StatsPanel` |
+| 4 | Render the empty state you reached from the panel | `src/components/TicketList.vue` | A filter matching nothing renders the message and no `<table>` |
+| 5 | Read the component tree, and answer | nothing to edit | You can answer the three questions without running anything |
+
+Steps 2, 3 and 4 are the ones `npm test` grades. Steps 1 and 5 are graded by
+what you can say out loud, with the panel open.
+
 ## Steps
 
 ### 1. Turn the instrument on — `src/createDashboardApp.ts`
@@ -57,7 +70,10 @@ One line, guarded by `import.meta.env.DEV`. Then:
 3. Answer: why is this guarded by `DEV`, and what does the Vue panel show on a
    production build?
 
-### 2. Find the render nobody asked for — the clock
+→ **Done when** the Vue marks are visible in the Performance panel and you have
+the widest render duration written down.
+
+### 2. Find the render nobody asked for — the clock (`src/App.vue`)
 
 1. In the Vue panel, open the **Timeline**, start recording, and **do nothing at
    all** for five seconds.
@@ -71,7 +87,10 @@ One line, guarded by `import.meta.env.DEV`. Then:
 **Measure it**: reset the counters, wait five seconds, read them again. Before,
 three counters moved; after, one does.
 
-### 3. Find the second one — the keystroke
+→ **Done when** `ClockBadge.vue` owns the interval and clears it on unmount, and
+five idle seconds move that one counter alone.
+
+### 3. Find the second one — the keystroke (`src/App.vue` + `StatsPanel.vue`)
 
 1. Record again, and this time type `billing` in the filter.
 2. `StatsPanel` re-renders on every keystroke. It counts *every* ticket of the
@@ -87,7 +106,10 @@ three counters moved; after, one does.
 > The lesson is **prop identity**: Vue skips a child whose props are identical.
 > A literal in a template is never identical to the one before it.
 
-### 4. Reproduce a state without typing it
+→ **Done when** `StatsPanel` takes `tickets: Ticket[]`, six keystrokes move
+`TicketList` only, and you have the counters before and after.
+
+### 4. Reproduce a state without typing it — `src/components/TicketList.vue`
 
 1. Select the `App` component in the panel, find the `filter` ref, and **edit it
    from the panel** to `kangaroo`.
@@ -97,7 +119,10 @@ three counters moved; after, one does.
 3. *(Bonus)* Set `filter` to a value with an accent (`é`) and check what
    `matches()` does with it.
 
-### 5. Read the tree
+→ **Done when** a filter matching nothing renders the `data-testid="empty"`
+message, with no `<table>` left in the DOM.
+
+### 5. Read the tree — nothing to edit
 
 Without running anything, answer from the **Components** tab alone:
 
@@ -105,6 +130,8 @@ Without running anything, answer from the **Components** tab alone:
 - What are `StatsPanel`'s props *now*, and what were they before step 3?
 - Which of these components would disappear from the panel on a production
   build, and why?
+
+→ **Done when** you can answer the three out loud, from the tree alone.
 
 ## Definition of Done
 

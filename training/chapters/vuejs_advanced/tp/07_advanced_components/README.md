@@ -47,6 +47,20 @@ measurements you write down. Those two live in the Network tab and in your notes
 Keep the **Network tab** (filtered on JS) and the **Vue Devtools** open: most of
 this workshop is about observing, not just writing.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Load a heavy panel on demand, with a loading, error and retry path | `src/components/ChartPanel.vue` | A new chunk appears in the Network tab on "Show" |
+| 2 | One fallback for a subtree that awaits — and the error it will not catch | `src/components/ProfilePanel.vue` | A rejected async `setup()` shows an error, not a stuck skeleton |
+| 3 | A headless table whose cells the parent renders | `src/components/DataTable.vue` + `InvoiceTablePanel.vue` | The panel formats currency and badges **without** touching `DataTable` |
+| 4 | Four optimizations on a 2 000-row list, measured one at a time | `src/components/BigListPanel.vue` | You have the four numbers, in order |
+| 5 | A modal that escapes a clipping ancestor | `src/components/AppModal.vue` | The dialog is centred again, with no CSS change |
+
+`npm test` grades steps 2, 3 and 5. Steps 1 and 4 are claims about the *bundle*
+and about *time* — jsdom can see neither, so they are graded in the Network tab
+and in your notes.
+
 ## Steps
 
 ### 1. Async component — `src/components/ChartPanel.vue`
@@ -61,6 +75,9 @@ this workshop is about observing, not just writing.
 4. Throttle to "Slow 3G" and check the ordering: nothing for 200 ms, then the
    skeleton, then the chart.
 
+→ **Done when** the chart arrives in its own chunk, the skeleton appears only
+past 200 ms, and a chunk error retries once before giving up.
+
 ### 2. `Suspense` — `src/components/ProfilePanel.vue`
 
 1. Wrap `UserProfile` in a `<Suspense>` with `ProfileSkeleton` as `#fallback`.
@@ -69,6 +86,10 @@ this workshop is about observing, not just writing.
    rejected async `setup` does **not** show the fallback. Test with
    `failureSwitch.profile = true`.
 4. *(Bonus)* Use `@pending` / `@resolve` to disable the button while loading.
+
+→ **Done when** switching user shows the fallback again, and
+`failureSwitch.profile = true` produces an error rather than a skeleton that
+never leaves.
 
 ### 3. Scoped slots — `src/components/DataTable.vue` + `InvoiceTablePanel.vue`
 
@@ -79,6 +100,9 @@ this workshop is about observing, not just writing.
 4. In the panel, format `total` as a currency and render `status` as a coloured
    badge — **without touching `DataTable`**.
 5. Check the typing: inside the slot, `row` must be `Invoice`, not `any`.
+
+→ **Done when** the panel renders currency and badges with `DataTable`
+untouched, and `row` is typed `Invoice` inside the slot.
 
 ### 4. Rendering performance — `src/components/BigListPanel.vue`
 
@@ -92,6 +116,9 @@ this workshop is about observing, not just writing.
 
 Write the four numbers down. The point of this step is the **ordering** of the
 optimizations, not the final figure.
+
+→ **Done when** you have the four measurements, in order, and you have seen the
+stale UI a wrong `v-memo` array produces.
 
 ### 5. `Teleport` — `src/components/AppModal.vue`
 
@@ -113,6 +140,9 @@ is the point of departure.
    *inside* the teleport (rather than on it) make the problem visible?
 5. *(Bonus)* Close on `Escape` and focus the dialog on open — `Teleport` moves
    the DOM, never the focus.
+
+→ **Done when** the dialog is centred with no CSS change, `:disabled` brings it
+back without losing what you typed, and `defer` silences the warning.
 
 ## Definition of Done
 

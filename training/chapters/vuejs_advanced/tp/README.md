@@ -110,11 +110,14 @@ runnable folder per workshop. Do not hand it out before the exercise.
 fastest way to know whether your `useFetch` really aborts, really re-runs on a
 getter, and really keeps `loading` straight when a request is cancelled.
 
-Every workshop README ends with a **Definition of Done** — a checklist of criteria
-you can verify yourself (a command that exits 0, something observable in the browser,
-a question you can answer). Steps marked *(Bonus)* and the "Going further" section are
-deliberately **outside** it: the DoD is the floor, not the ceiling. `03_testing/` has
-one DoD per part.
+Every workshop README opens with **The workshop at a glance** — one row per step,
+naming what you do, the file you open and how you know it worked — and ends with a
+**Definition of Done**, a checklist of criteria you can verify yourself (a command
+that exits 0, something observable in the browser, a question you can answer). In
+between, each step closes on a `→ **Done when**` line: the exit condition for that
+step alone, so you never have to read ahead to know whether you can move on. Steps
+marked *(Bonus)* and the "Going further" section are deliberately **outside** the
+DoD: it is the floor, not the ceiling. `03_testing/` has one DoD per part.
 
 **`03_testing/` and `12_testing_integration/` are the two workshops where the
 LEARNER writes the tests**, so their starters ship specs that already pass plus a

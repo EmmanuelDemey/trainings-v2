@@ -75,9 +75,25 @@ cypress/                              STEPS 4 & 5 — to write
 Read `tests/TicketTable.spec.ts` first. It is the contract the specs you write
 must **not** duplicate: nothing below is about rendering a row.
 
+## The workshop at a glance
+
+| # | What you write | Where | Done when |
+|---|---|---|---|
+| 1a | The guard, exercised by a real memory router | `tests/router.spec.ts` | Signed out, `/tickets` lands on login with `query.redirect` |
+| 1b | The sign-in round trip, and the wrong-password path | `tests/router.spec.ts` | Signing in ends on the queue; a bad password stays put |
+| 1c | The same view with the router replaced by two stubs | `tests/loginView.mockedRouter.spec.ts` | You can name what 1a catches and this cannot |
+| 2 | A store-connected badge, on seeded state and spied actions | `tests/session.spec.ts` | The assertions survive `stubActions` being flipped, and you chose one |
+| 3 | The network, intercepted below your own `fetch` | `tests/tickets.spec.ts` | Happy path, empty, 500 and a write — with no stale rows on the error |
+| 4 | A sign-in command the next spec can restore | `cypress/support/commands.ts` | The runner shows the form filled **once** across two tests |
+| 5 | The whole journey, on the built app | `cypress/e2e/triage.cy.ts` | `npm run e2e` is green, with not one `cy.wait(number)` in the file |
+
+**`npm test` starts green here** — the specs you have to write are `it.todo`s,
+and an empty test is a passing test. What tells you the suite is worth anything
+is step 6: sabotage the source and watch the right test, and only it, go red.
+
 ## Steps
 
-### 1. The router, twice
+### 1. The router, twice — `tests/router.spec.ts` + `tests/loginView.mockedRouter.spec.ts`
 
 **1a — the guard, for real.** `freshRouter()` gives you a router on
 `createMemoryHistory()`: the real guard runs, and there is no browser URL to
@@ -102,6 +118,9 @@ vi.mock('vue-router', () => ({
 file. Then answer, in the Definition of Done: **what does the real-router
 version catch that this one cannot?**
 
+→ **Done when** the guard, the round trip and the mocked version are all green,
+and you can state what the mocked one stopped covering.
+
 ### 2. Pinia — `tests/session.spec.ts`
 
 ```ts
@@ -119,6 +138,9 @@ const pinia = createTestingPinia({
    of the two you want here, and why.
 4. `LoginView` hands `signIn(email, password)` the credentials exactly as typed.
 
+→ **Done when** the badge is driven by `initialState` alone, the sign-out spy is
+asserted, and you have run the same test both ways.
+
 ### 3. The network — `tests/tickets.spec.ts`
 
 MSW intercepts the request itself, so your own `fetch` code runs: the URL, the
@@ -133,6 +155,9 @@ would have skipped all of it.
 5. Delete a handler and read the failure: `onUnhandledRequest: 'error'` is what
    turns "the test hangs" into "you forgot a handler".
 
+→ **Done when** the four cases are covered through MSW overrides, and the 500
+leaves **no** stale rows on screen.
+
 ### 4. The Cypress command — `cypress/support/commands.ts`
 
 `cy.signIn()` takes an agent through the form once. Intercept
@@ -141,6 +166,9 @@ would have skipped all of it.
 again — which works here because the store persists its token to
 `localStorage`.
 
+→ **Done when** the command waits on its alias, never on a number, and the
+runner shows the form filled once across two tests.
+
 ### 5. The journey — `cypress/e2e/triage.cy.ts`
 
 Sign in, read the queue, open a ticket, close one, and check the error state.
@@ -148,6 +176,9 @@ Serve the list from `cypress/fixtures/tickets.json`.
 
 > **Not one `cy.wait(number)` in the file.** A fixed wait is either flaky or
 > slow, usually both. Wait on an alias, or on an assertion.
+
+→ **Done when** `npm run e2e` is green against `npm run preview` on the built
+app, with no numeric wait anywhere in `cypress/`.
 
 ### 6. *(Bonus)* Sabotage
 

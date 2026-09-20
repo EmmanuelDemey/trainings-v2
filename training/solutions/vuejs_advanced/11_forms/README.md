@@ -44,6 +44,23 @@ footer showing the fake API's call counters. The "server" knows three registered
 emails (`ada@lovelace.dev`, `grace@hopper.dev`, `alan@turing.dev`), rejects any
 attendee named `Bob`, and requires a company on the `pro` plan.
 
+## The workshop at a glance
+
+The TODO markers are numbered by step, so `TODO 4.2` belongs to step 4 wherever
+it lives. `grep -rn "TODO 4\." src` finds a step's work in one command.
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Write the validation rules, and let the types fall out of them | `src/schemas/registration.ts` | `z.input` and `z.output` genuinely differ on `age` |
+| 2 | Wire a schema to a form by hand, once, to see the plumbing | `src/composables/useZodForm.ts` | A nested error reaches `attendees[0].name`, not the form |
+| 3 | The same form on VeeValidate | `src/components/VeeForm.vue` | Both tabs behave the same, and you can say what you gave up |
+| 4 | A repeatable row, and an async rule that hits the server | `VeeForm.vue` + `registration.ts` | Removing the middle row moves no value; the call counter stays low |
+| 5 | Make a server-side error land on its field | `src/components/VeeForm.vue` | The `Bob` rejection shows under the attendee's name |
+| 6 | Make the form usable without a mouse | `TextField.vue` + `ErrorSummary.vue` | A failed submit moves the focus to the summary, whose links reach the inputs |
+
+`npm test` grades steps 1, 2 and 5. Steps 3, 4 and 6 are graded in the browser —
+the last one with the keyboard only.
+
 ## Steps
 
 ### 1. The schema — `src/schemas/registration.ts`
@@ -62,6 +79,9 @@ Two of them are worth slowing down on:
 **Check it**: `npm run typecheck` stays green, and `emptyRegistration` still
 compiles.
 
+→ **Done when** every rule carries its own message, `age` comes out a number,
+and the mismatch error lands on `confirm`.
+
 ### 2. The hand-rolled form — `src/composables/useZodForm.ts`
 
 Fill in `TODO 2.1` to `TODO 2.5`. `HandRolledForm.vue` is already wired to the
@@ -75,6 +95,9 @@ never reach their field.
 inside the attendee row. Then type in a field: its error clears as you fix it,
 and *no* error appears on a field you have not visited yet.
 
+→ **Done when** a nested error reaches `attendees[0].name`, and an untouched
+field shows nothing.
+
 ### 3. The same form with VeeValidate — `src/components/VeeForm.vue`
 
 Fill in `TODO 3.1` to `TODO 3.3` and use `<TextField>` for every text input.
@@ -82,7 +105,10 @@ Fill in `TODO 3.1` to `TODO 3.3` and use `<TextField>` for every text input.
 Compare the two files when you are done: what disappeared, and what did you
 have to give up?
 
-### 4. Arrays and async — `TODO 4.1` to `TODO 4.3`
+→ **Done when** both tabs validate identically, and you can name what the
+library took over and what it took away.
+
+### 4. Arrays and async — `src/components/VeeForm.vue` + `src/schemas/registration.ts`
 
 1. `useFieldArray('attendees')`, keyed by **`field.key`**. Fill three rows,
    remove the middle one, and check that no value moved up. Then try `:key="idx"`
@@ -90,16 +116,24 @@ have to give up?
 2. The availability check: an async `.refine()` on the schema. Get it working
    first, *then* look at the call counter and bring it down.
 
-### 5. Server errors — `TODO 5.1`
+→ **Done when** removing the middle row leaves the other two untouched, and the
+availability counter no longer moves on every keystroke.
+
+### 5. Server errors — `src/components/VeeForm.vue`
 
 Register with an attendee named `Bob`: the server answers `422` with
 `attendees[0].name`. The message must appear under that input, not in a banner.
 
-### 6. Accessibility — `TODO 6.1` to `TODO 6.6`
+→ **Done when** the server's message displays exactly like a client-side one.
+
+### 6. Accessibility — `src/components/TextField.vue` + `src/components/ErrorSummary.vue`
 
 In `TextField.vue` and `ErrorSummary.vue`. Test it with the keyboard only: `Tab`
 to every field, submit with `Enter`, and check that the focus lands on the
 summary — and that its links take you to the faulty inputs.
+
+→ **Done when** you have filled and submitted the whole form without touching
+the mouse once.
 
 ### 7. *(Bonus)* Zod 4
 

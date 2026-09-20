@@ -38,6 +38,20 @@ the classes Vue applies and the order it applies them in — which is exactly wh
 and every position in jsdom is zero. Those checks are in the Definition of Done,
 in a browser, with the durations turned up.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Write the three sets of transition classes | `src/transitions.css` | Each set has an `-enter-active` / `-leave-active` **and** the invisible states |
+| 2 | Cross-fade the tab panels, one at a time | `src/components/TabsPanel.vue` | Switching tabs no longer makes the page below jump |
+| 3 | Animate a list that reorders | `src/components/ReleaseList.vue` | Sorting by votes makes the rows **slide** to their new place |
+| 4 | Fix the bug an index key hides | `src/components/ReleaseList.vue` | A note typed in a row follows its row through a sort |
+| 5 | Let the drawer finish leaving before it is emptied | `src/App.vue` | The panel slides out with its content still in it |
+
+`npm test` grades the classes Vue applies and the order it applies them in.
+It cannot grade what anything **looks** like — jsdom runs no CSS, and every
+position in it is zero. Half of this workshop is checked with your eyes, at 0.4s.
+
 ## Steps
 
 ### 1. The classes — `src/transitions.css`
@@ -49,6 +63,9 @@ Write three sets: `fade`, `list`, `slide`. For each one:
 
 Use **0.4s** while you work. You are trying to see them, not to ship them.
 
+→ **Done when** the three sets exist, each with its active declaration and its
+invisible from/to states.
+
 ### 2. The tab switcher — `src/components/TabsPanel.vue`
 
 Wrap the `<component :is>` in a `<Transition name="fade" mode="out-in" appear>`.
@@ -57,6 +74,9 @@ Then take the mode off and switch tabs again: for a moment both panels are in
 the DOM, they stack, and everything below jumps. Put it back.
 
 > `out-in` costs you the **sum** of the two durations. That is the trade.
+
+→ **Done when** the first paint fades in (`appear`), and switching tabs never
+puts two panels in the DOM at once.
 
 ### 3. The list — `src/components/ReleaseList.vue`
 
@@ -67,7 +87,10 @@ the DOM, they stack, and everything below jumps. Put it back.
    a leaving row stops holding its space. Remove a row before and after that one
    line and compare.
 
-### 4. The `key` — the bug you can type into
+→ **Done when** sorting by votes slides the rows, and removing one makes its
+neighbours close the gap instead of jumping.
+
+### 4. The `key` — the bug you can type into (`src/components/ReleaseList.vue`)
 
 1. Type a note into the row of *Offline draft recovery*.
 2. Sort by votes. The note stays where it was, on a different release.
@@ -78,6 +101,9 @@ the DOM, they stack, and everything below jumps. Put it back.
 > This is also why `<TransitionGroup>` **requires** a key: it has to know which
 > child moved in order to animate the move.
 
+→ **Done when** a note typed into a row is still on that same release after you
+sort.
+
 ### 5. The drawer — `src/App.vue`
 
 Closing wipes `selected` in the same tick, so the panel goes blank before it has
@@ -87,6 +113,9 @@ moved a pixel. Split the two:
 - wrap the panel in `<Transition name="slide" @after-leave="forget">`
 - `forget()` is where `selected` goes back to `null` — and where the counter is
   incremented
+
+→ **Done when** the drawer slides out with its content still visible, and the
+counter increments once the animation is over, not before.
 
 ### 6. *(Bonus)* Tune it
 

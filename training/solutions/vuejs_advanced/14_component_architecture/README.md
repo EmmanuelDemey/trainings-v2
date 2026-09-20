@@ -61,9 +61,27 @@ src/
   views/
 ```
 
+## The workshop at a glance
+
+This one is a **refactor**: the app works on arrival and must keep working at
+every step. `tests/views.spec.ts` is the net — keep `npm run test:watch` open and
+never let it go red.
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Give each domain its own folder, with one door | `src/types.ts`, `stores/`, `api/` → `src/features/*/` | `architecture.spec.ts` is green: nothing imports past an `index.ts` |
+| 2 | Take the domain back out of the generic components | `src/ui/AppButton.vue`, `src/ui/Badge.vue` | Neither file imports a store or a domain type |
+| 3 | Write the one table both domains will use | `src/ui/DataTable.vue` | `dataTable.spec.ts` is green, and no domain type reached the file |
+| 4 | Unify the real duplication, and leave the rest alone | `InvoiceTable.vue`, `PaymentTable.vue` → rows + `utils/money.ts` | Both table files are gone, both rows survive |
+| 5 | Let the views compose the pieces | `src/views/*.vue` | The app behaves exactly as it did on arrival |
+
+Steps 1 and 3 are graded by the two red spec files. Steps 2, 4 and 5 are graded
+by the green one staying green — and by step 6, which deletes a whole feature to
+see what falls over.
+
 ## Steps
 
-### 1. Split what is shared by two domains that share nothing
+### 1. Split what is shared by two domains that share nothing — `src/features/`
 
 `types.ts`, `stores/` and `api/` each serve invoicing **and** payments. Move each
 half into its own feature:
@@ -77,7 +95,10 @@ src/features/payments/    types.ts  api.ts  stores/payments.ts  components/  ind
 never a file inside it. That is what makes the internals free to move — and what
 the last architecture spec checks.
 
-### 2. Clean out `ui/`
+→ **Done when** `architecture.spec.ts` is green and `views.spec.ts` never went
+red on the way.
+
+### 2. Clean out `ui/` — `src/ui/AppButton.vue`, `src/ui/Badge.vue`
 
 Ask it out loud, file by file: *could I copy this into a different product?*
 
@@ -90,6 +111,9 @@ Ask it out loud, file by file: *could I copy this into a different product?*
 > Eight props was eight callers refusing to do that mapping themselves. That is
 > the wrong abstraction, caught early — at 23 props it would have been a rewrite.
 
+→ **Done when** nothing in `src/ui/` imports a store or a domain type, and the
+badges still show the right colours.
+
 ### 3. Build the one table — `src/ui/DataTable.vue`
 
 ```vue
@@ -101,6 +125,9 @@ It owns iteration, sorting and the empty state. It takes `rows: T[]` and
 `#empty`. A sortable header sorts ascending, then descending.
 
 No domain type ever reaches this file.
+
+→ **Done when** `dataTable.spec.ts` is green: the three slots, the empty state,
+and a header that sorts one way then the other.
 
 ### 4. Unify what is truly duplicated — and only that
 
@@ -119,10 +146,16 @@ Then delete both table files and have the views call `DataTable` with their own
 > The question is never *"is this code identical?"*. It is **"will these two
 > change together, always?"** If the answer is "probably", wait.
 
-### 5. Wire the views
+→ **Done when** `InvoiceTable.vue` and `PaymentTable.vue` are deleted, the two
+row components exist separately, and `euros()` lives in exactly one place.
+
+### 5. Wire the views — `src/views/InvoicesView.vue`, `PaymentsView.vue`
 
 A view is the only layer allowed to know several layers at once. It composes the
 `ui/` table with the feature's row and toolbar — and that is all it does.
+
+→ **Done when** all three spec files are green and the app behaves exactly as it
+did before you started.
 
 ### 6. *(Bonus)* Prove the layout
 

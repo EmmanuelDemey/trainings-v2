@@ -39,6 +39,23 @@ spec.
 
 Two buttons at the top break a panel on purpose. Use them constantly.
 
+## The workshop at a glance
+
+The four layers below are cumulative: each one catches what the previous cannot.
+Step 3 writes no code — it is the five minutes that explain why step 1 had to be
+a wrapper component.
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Write the boundary that catches a subtree's error | `src/components/ErrorBoundary.vue` | A broken panel shows a fallback instead of blanking the page |
+| 2 | Choose the granularity, panel by panel | `src/App.vue` | Breaking one panel leaves its neighbour working |
+| 3 | See why a component cannot catch **itself** | `SelfHealingPanel.vue` (read only) | You can quote the line of `runtime-core` that decides it |
+| 4 | The app-level net, for everything no boundary wraps | `src/createOpsApp.ts` | A report lands with `source: 'app'` |
+| 5 | The `window` net, for what left Vue's pipeline entirely | `src/observability/windowNet.ts` | "Throw from a timer" and "Reject a promise" both get reported |
+
+The incident-log panel is the scoreboard: every step above is a question about
+what shows up in it, which is also what the specs assert.
+
 ## Steps
 
 ### 1. The boundary — `src/components/ErrorBoundary.vue`
@@ -55,6 +72,9 @@ Two buttons at the top break a panel on purpose. Use them constantly.
 > `app.config.errorHandler` from ever hearing about it — the boundary decides
 > what the *user* sees, `errorHandler` what *you* see.
 
+→ **Done when** a broken child renders the fallback with its phase, Retry clears
+it, and the incident log shows the report with `source: 'boundary'`.
+
 ### 2. Wrap the panels — `src/App.vue`
 
 One boundary **per panel**, each with its own `label`. Then break the totals and
@@ -63,7 +83,10 @@ check that the self-healing panel next to it is untouched.
 > The granularity of a boundary is a product decision, not a technical one: what
 > is the smallest thing this user can afford to lose?
 
-### 3. Watch a component fail to catch itself
+→ **Done when** breaking the totals leaves every other panel usable, and each
+report carries its own `label`.
+
+### 3. Watch a component fail to catch itself — `SelfHealingPanel.vue` (nothing to write)
 
 `SelfHealingPanel.vue` registers `onErrorCaptured` **and** throws. Break it and
 read the incident log: its own hook never ran.
@@ -76,6 +99,9 @@ while (cur) { /* … */ }
 
 That line is the entire reason boundaries are a wrapper component. Write it down.
 
+→ **Done when** you have seen its own hook *not* run, and can say why in one
+sentence.
+
 ### 4. The last-resort net — `src/createOpsApp.ts`
 
 Wire `app.config.errorHandler` to `capture(err, { info, source: 'app' })`. Then
@@ -84,6 +110,9 @@ break a panel **outside** any boundary and watch the report land with
 
 > Never let this function throw. Vue catches it — `info: 'app errorHandler'` —
 > and the original error is gone.
+
+→ **Done when** an error outside every boundary lands in the log with
+`source: 'app'`.
 
 ### 5. Outside the pipeline — `src/observability/windowNet.ts`
 
@@ -98,6 +127,9 @@ Install two listeners on `window`:
 
 Return an **uninstaller**: a net that cannot be removed is a leak in a test suite
 and a duplicate after a hot reload.
+
+→ **Done when** both buttons report something, and calling the uninstaller stops
+them reporting again.
 
 ### 6. *(Bonus)* The rest of the map
 

@@ -47,6 +47,18 @@ src/composables/       three app-local composables, the company's Nth copy
 src/components/        three consumers that destructure, like every consumer does
 ```
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Write the debounce composable to the three conventions | `src/packages/acme/useDebounced.ts` | It follows a value, a `ref` **and** a getter, and dies with its scope |
+| 2 | Write the polling composable, idempotent and re-schedulable | `src/packages/acme/usePolling.ts` | `start()` twice does not stack two intervals |
+| 3 | Migrate the two consumers and delete their local copies | `SearchPanel.vue`, `FleetPanel.vue` | A burst of keystrokes is **one** search call |
+| 4 | Fix the one composable that must **not** move | `src/composables/useSortedRows.ts` | The table still updates after the consumer destructures it |
+
+Step 4 is the one people skip: its point is the decision, not the code. Nothing
+moves to the library just because it could.
+
 ## Steps
 
 ### 1. `useDebounced` — `src/packages/acme/useDebounced.ts`
@@ -58,6 +70,9 @@ src/components/        three consumers that destructure, like every consumer doe
 3. Cancel the pending timer on every change, then schedule a new one. `pending`
    is true in between; `flush()` publishes now; `cancel()` drops the wait.
 4. `onScopeDispose(cancel, true)` — the pending timer must not outlive the scope.
+
+→ **Done when** it follows a plain value, a `ref` and a getter, `{ delay: 1000 }`
+is honoured, and disposing a bare `effectScope()` cancels the pending timer.
 
 ### 2. `usePolling` — `src/packages/acme/usePolling.ts`
 
@@ -74,7 +89,11 @@ src/components/        three consumers that destructure, like every consumer doe
 > there — which is exactly why a composable built on it cannot be called from a
 > Pinia store.
 
-### 3. Migrate the two consumers
+→ **Done when** `start()` twice does not stack two intervals, a reactive
+`interval` re-schedules without losing the tick count, and calling it outside any
+scope warns.
+
+### 3. Migrate the two consumers — `SearchPanel.vue`, `FleetPanel.vue`
 
 1. `SearchPanel.vue` — use `useDebounced(query)`, delete
    `src/composables/useSearchDebounce.ts`.
@@ -86,7 +105,10 @@ src/components/        three consumers that destructure, like every consumer doe
 **Check it**: `apiCalls.search` goes from one-per-keystroke to one-per-burst, and
 changing the interval takes effect without a reload.
 
-### 4. Decide what does **not** go in — `useSortedRows`
+→ **Done when** `src/composables/useSearchDebounce.ts` and `useAutoRefresh.ts`
+are deleted and the two panels still behave.
+
+### 4. Decide what does **not** go in — `src/composables/useSortedRows.ts`
 
 It knows what a `Vehicle` is. The next app will sort something else. It stays in
 `src/composables/`, and you fix it where it is:
@@ -99,6 +121,9 @@ It knows what a `Vehicle` is. The next app will sort something else. It stays in
 > Promotion rule the team agreed on: something moves to the library on its
 > **third** real usage, with a named owner per folder — and anything VueUse
 > already does well is not our plumbing to reinvent.
+
+→ **Done when** the fleet table re-sorts with the consumer still destructuring,
+and you can say why this one stayed out of the library.
 
 ### 5. *(Bonus)* Call the library from outside a component
 

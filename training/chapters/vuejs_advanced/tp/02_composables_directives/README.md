@@ -39,6 +39,19 @@ second terminal and make it go green; the other steps are checked in the browser
 There is **no backend to start**: `installFakeBackend()` patches `window.fetch`
 for `/api/*` with a 700 ms artificial latency that honours `AbortSignal`.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | A fetch composable that follows a reactive URL and cancels itself | `src/composables/useFetch.ts` | `npm test` — the ten given specs are green |
+| 2 | A ref kept in sync with `localStorage`, corrupted data included | `src/composables/useLocalStorage.ts` | `{{{` in the storage key does not take the app down |
+| 3 | Compose the two, and decide per-instance vs shared state | `src/composables/useFavorites.ts` | The counter and the catalog agree on the same number |
+| 4 | A directive that loads images only when they are seen | `src/directives/lazyImg.ts` | The "images actually loaded" counter stays low on first paint |
+| 5 | Register the directive app-wide | `src/directives/index.ts` | `GalleryPanel` has no local `directives` option left |
+
+Only step 1 is graded by `npm test`. Steps 2 to 5 are graded in the browser —
+the panels are instrumented for exactly that.
+
 ## Steps
 
 ### 1. `useFetch` — `src/composables/useFetch.ts`
@@ -56,6 +69,9 @@ run must **not** hand `loading` back while its replacement is still in flight.
 Then switch categories quickly in the browser: exactly one request must resolve,
 the others show as cancelled in the Network tab.
 
+→ **Done when** the ten specs are green and a cancelled request shows no error
+to the user.
+
 ### 2. `useLocalStorage` — `src/composables/useLocalStorage.ts`
 
 1. Read and `JSON.parse` the stored value in a `try` / `catch`; on a parse error,
@@ -67,6 +83,9 @@ the others show as cancelled in the Network tab.
 **Check it**: write `{{{` into the `tp2:favorites` key from the devtools
 Application tab and reload. The app must survive.
 
+→ **Done when** the app starts normally after that reload, and the corrupted
+entry is gone.
+
 ### 3. `useFavorites` — `src/composables/useFavorites.ts`
 
 1. Implement `isFavorite`, `toggle` and `clear`.
@@ -76,7 +95,10 @@ Application tab and reload. The app must survive.
 3. Build a `Set` index in a `computed` for `isFavorite`, and explain at what
    scale it starts to matter.
 
-### 4. `v-lazy-img` — `src/directives/lazyImg.ts`
+→ **Done when** the favourites counter and the catalog show the same number, and
+`isFavorite` goes through the `Set` and not an array scan.
+
+### 4. `v-lazy-img` — `src/directives/lazyImg.ts` (used by `GalleryPanel.vue`)
 
 1. `mounted`: set the placeholder and a one-shot `error` listener swapping in the
    fallback image.
@@ -89,10 +111,16 @@ Application tab and reload. The app must survive.
 Then swap the static `:src` in `GalleryPanel.vue` for the directive and watch the
 "images actually loaded" counter as you scroll.
 
+→ **Done when** images load as they enter the viewport, a broken URL swaps in
+the fallback, "Shuffle photos" re-observes, and unmounting stops everything.
+
 ### 5. The plugin — `src/directives/index.ts`
 
 1. Register `vLazyImg` globally as `lazy-img`.
 2. *(Bonus)* Add a `v-autofocus` directive and use it on the catalog filter.
+
+→ **Done when** `GalleryPanel` uses `v-lazy-img` through the plugin, with no
+local `directives` option left.
 
 ## Definition of Done
 

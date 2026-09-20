@@ -79,6 +79,16 @@ pair goes next; steps 4 to 7 are where the slice goes **on your own, after the
 session**. Doing two steps properly beats doing seven halfway, and the review
 will show it either way.
 
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | The fetch composable, with the stale-response problem solved | `src/composables/useAsyncData.ts` | The eight given tests are green |
+| 2 | The store: an index, two getters, an optimistic write | `src/stores/invoices.ts` | A failed status change rolls back **and** says so |
+| 3 | Lazy, guarded, role-aware routes | `src/router/index.ts`, `src/views/LoginView.vue` | Alan cannot reach `/invoices/new`; a hard refresh keeps you signed in |
+| 4 | An awaiting component, its fallback and its boundary | `src/views/InvoiceView.vue` | `/invoices/999` shows an error, not a blank app |
+| 5 | The form: schema, field errors, no double submit | `src/schemas/invoice.ts`, `src/views/InvoiceFormView.vue` | The server's message lands under **Reference** |
+| 6 | Two tests of your own, on what would hurt most | `tests/` | Each one fails when you break the behaviour on purpose |
+| 7 | The build a reviewer will run | `npm run build` | `npm run review` exits 0 |
+
 ### 1. `useAsyncData` — the composable (`src/composables/useAsyncData.ts`)
 
 The only spec you are given: `tests/useAsyncData.spec.ts`, red on the skeleton.
@@ -87,6 +97,9 @@ Cancellation, out-of-order responses, `loading` that belongs to the last request
 
 > Two `refresh()` in a row must leave exactly one winner. That is the whole
 > chapter-3 lesson, written as a test.
+
+→ **Done when** the eight tests are green and `loading` ends `false` after two
+quick refreshes.
 
 ### 2. The invoices store (`src/stores/invoices.ts`)
 
@@ -97,6 +110,9 @@ Cancellation, out-of-order responses, `loading` that belongs to the last request
 Flip **"Simulate a server error"** in the header and change a status. The row
 must move immediately, come back to its previous value, and the user must be
 told. A rollback nobody is told about looks exactly like a bug.
+
+→ **Done when** `find()` no longer scans the collection, the two getters are
+right, and a failed write rolls back visibly.
 
 ### 3. Routing (`src/router/index.ts`, `src/views/LoginView.vue`)
 
@@ -112,12 +128,18 @@ Two journeys prove it: `/invoices` while signed out, and a **hard refresh** on
 `/invoices` while signed in. Alan (`alan@example.com` / `user`) must not reach
 `/invoices/new`.
 
+→ **Done when** both journeys work, an absolute `?redirect=` is refused, and
+Alan is turned away where Ada gets in.
+
 ### 4. Async component, Suspense, boundary (`src/views/InvoiceView.vue`)
 
 `InvoiceDetail.vue` has a top-level `await`: it cannot mount without a
 `<Suspense>`. Load it with `defineAsyncComponent`, give the fallback a real
 skeleton, and make `/invoices/999` land in the error boundary instead of blanking
 the app (TODO 4.1 → 4.4).
+
+→ **Done when** a real invoice shows its skeleton then its detail, and
+`/invoices/999` shows the boundary with the rest of the app still alive.
 
 ### 5. The form (`src/schemas/invoice.ts`, `src/views/InvoiceFormView.vue`)
 
@@ -132,6 +154,10 @@ the app (TODO 4.1 → 4.4).
 
 `TextField` and `ErrorSummary` are given and accessible. Keep them that way.
 
+→ **Done when** an invalid submit shows the summary, takes the focus there and
+makes **no** API call — and `INV-1001` twice puts the server's message under the
+Reference field.
+
 ### 6. Your own tests (`tests/`)
 
 Two tests, chosen by you, on the two behaviours that would hurt most if they
@@ -144,6 +170,9 @@ broke. The obvious candidates:
 Name them after the behaviour, not after the function. Your reviewers will read
 the test names before they read the code.
 
+→ **Done when** both are green, named after the behaviour, and each one has been
+seen to fail once.
+
 ### 7. Ship it
 
 ```bash
@@ -153,6 +182,9 @@ npm run build
 - every route except the entry point is its own chunk — count them
 - `grep -rn TODO src` returns nothing you left behind on purpose
 - `grep -r "sk_live" dist/` — run it, then decide what to do about what you find
+
+→ **Done when** `npm run review` exits 0 — which is the first command your
+reviewers will run.
 
 ## Definition of Done
 

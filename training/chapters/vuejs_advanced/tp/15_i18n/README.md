@@ -42,6 +42,19 @@ npm run test:watch   # vitest, in watch mode
 Three catalogues are provided: `fr`, `en`, `de`. The English and German ones are
 already correct — read them when a French message will not behave.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Configure the plugin: fallback, number formats, French plurals | `src/i18n/index.ts` | `0` takes the **singular** in French, as it should |
+| 2 | Move the four panels onto `t()` / `n()` | the four components, then delete `src/i18n/naive.ts` | No hand-rolled dictionary is left in the app |
+| 3 | Fix the two French messages that render wrong | `src/locales/fr.json` | Neither one shows a raw key or a missing word |
+| 4 | Load a locale on demand, without the four usual holes | `src/i18n/setLocale.ts` + `LocaleSwitcher.vue` | Switching twice fast lands on the locale you asked for **last** |
+| 5 | Read what the build produced | `npm run build` | One chunk per lazily-loaded locale, and you can explain the `fr.json` warning |
+
+`npm test` grades steps 1 to 4 — twenty of the twenty-four specs are red on
+arrival. Step 5 is graded by the build output.
+
 ## Steps
 
 ### 1. Configure the plugin — `src/i18n/index.ts`
@@ -66,7 +79,10 @@ already correct — read them when a French message will not behave.
 > `legacy: false` is not optional: the default is still `true`, and Legacy mode
 > has none of the Composition API surface used below.
 
-### 2. Use it — the four components
+→ **Done when** the three number formats exist per locale, and `0` article
+renders in the French **singular**.
+
+### 2. Use it — the four components of `src/components/`
 
 Replace `naiveT` / `naiveEuros` with `useI18n()` (or `$t` / `$n`, which
 `globalInjection` already provides), then delete `src/i18n/naive.ts`:
@@ -76,6 +92,9 @@ Replace `naiveT` / `naiveEuros` with `useI18n()` (or `$t` / `$n`, which
   as both `count` and `n`
 - `LegalPanel` — the named, list, linked and escaped messages
 - `LocaleSwitcher` — see step 4
+
+→ **Done when** `src/i18n/naive.ts` is deleted and every panel still renders the
+same French text it did before.
 
 ### 3. Fix the two broken French messages — `src/locales/fr.json`
 
@@ -94,6 +113,9 @@ Wrap it: `@:{'legal.tos'}`.
 
 `{` and `}` are syntax. To print them, escape them: `{'{'}devise{'}'}`. (`@` too:
 `{'@'}`.)
+
+→ **Done when** the legal panel shows neither a raw key nor a missing word, in
+both locales.
 
 ### 4. Lazy-load a locale — `src/i18n/setLocale.ts`
 
@@ -116,7 +138,11 @@ Then wire the switcher. `locale` is a **ref**: `i18n.global.locale = 'en'` witho
 `.value` is the single most common vue-i18n bug — nothing throws, nothing
 re-renders.
 
-### 5. Read the build
+→ **Done when** a locale already loaded is not fetched twice, switching twice
+fast lands on the last one you asked for, `<html lang>` follows, and the API
+answers in the new language.
+
+### 5. Read the build — `npm run build`
 
 ```bash
 npm run build
@@ -125,6 +151,9 @@ npm run build
 You should see one chunk per lazily-loaded locale (`en-*.js`, `de-*.js`) — and a
 warning that `fr.json` is both statically and dynamically imported. That one is
 **expected**: French ships with the bundle because it is the startup locale.
+
+→ **Done when** you have seen one chunk per lazily-loaded locale, and can say
+why the `fr.json` warning is not a bug.
 
 ### 6. *(Bonus)* The languages the default rule cannot express
 

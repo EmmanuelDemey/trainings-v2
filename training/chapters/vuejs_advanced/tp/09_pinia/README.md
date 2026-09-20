@@ -45,9 +45,24 @@ written down.
 Every panel displays its own **render counter** and the app displays the cost of
 the catalog assignment. Write the numbers down before each change.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Split the god store into three domain stores | `src/stores/shop.ts` → `catalog.ts`, `cart.ts`, `ui.ts` | Reloading the catalog stops moving `ThemePanel`'s counter |
+| 2 | Stop making a big payload deeply reactive | `src/stores/catalog.ts` | The assignment duration drops on a 30 000-product catalog |
+| 3 | Replace a getter-with-an-argument by an index | `src/stores/catalog.ts` + `CartPanel.vue` | The "last update" timing drops |
+| 4 | Write the persistence plugin | `src/plugins/persist.ts` + `pinia.d.ts` | `npm test` — the cart survives a reload, the catalog does not |
+| 5 | Keep your state across a hot reload | the three store files | Editing a store file leaves the cart filled |
+| 6 | Write the observability plugin | `src/plugins/logger.ts` | `npm test` — a successful *and* a failed action are logged |
+
+Steps 4 and 6 are the ones `npm test` grades. Steps 1, 2 and 3 are graded by the
+render counters and the timings in the browser — which is why you write the
+numbers down.
+
 ## Steps
 
-### 1. Split the store — `src/stores/shop.ts`
+### 1. Split the store — `src/stores/shop.ts` → three files
 
 1. Extract `useCatalogStore`, `useCartStore` and `useUiStore` into three files.
    `useCartStore` gets the catalog by calling `useCatalogStore()` inside its
@@ -59,7 +74,10 @@ the catalog assignment. Write the numbers down before each change.
 **Baseline to beat**: load a 10 000-product catalog and note how many times
 `ThemePanel` re-rendered.
 
-### 2. `shallowRef` — the catalog
+→ **Done when** the app still works, nothing imports `src/stores/shop.ts` any
+more, and reloading the catalog leaves `ThemePanel`'s counter still.
+
+### 2. `shallowRef` — `src/stores/catalog.ts`
 
 Switch `products` to `shallowRef` and reload a 30 000-product catalog. Compare
 the "assignment" duration displayed in the panel.
@@ -67,14 +85,20 @@ the "assignment" duration displayed in the panel.
 Then answer: what would break if some code mutated `products.value[0].price`
 directly, and how would you make it work anyway?
 
-### 3. Index instead of a getter with an argument
+→ **Done when** you have the assignment duration before and after, measured on
+the same 30 000-product catalog.
+
+### 3. Index instead of a getter with an argument — `src/stores/catalog.ts` + `CartPanel.vue`
 
 1. Replace `productById` with a cached `byId` computed returning a `Map`.
 2. Update `CartPanel` to use it.
 3. With a 30 000-product catalog and a dozen cart lines, compare the "last
    update" timing before and after.
 
-### 4. The persistence plugin — `src/plugins/persist.ts`
+→ **Done when** `CartPanel` reads its products through the `Map`, and you have
+the "last update" timing before and after.
+
+### 4. The persistence plugin — `src/plugins/persist.ts` + `src/plugins/pinia.d.ts`
 
 1. Bail out when `options.persist` is falsy.
 2. Restore the state from `localStorage` on creation, guarding the JSON parse.
@@ -85,10 +109,15 @@ directly, and how would you make it work anyway?
 **Check it**: fill the cart, reload the page, and confirm it comes back — while
 the catalog does **not** (it is not marked `persist`).
 
-### 5. HMR
+→ **Done when** the persistence specs are green and no cast is left in
+`persist.ts`.
+
+### 5. HMR — the three store files
 
 Add `acceptHMRUpdate` to every store. Fill the cart, edit a label in a store
 file, and confirm the cart survives.
+
+→ **Done when** editing a store file leaves the cart filled instead of emptying it.
 
 ### 6. The logger plugin — `src/plugins/logger.ts`
 
@@ -97,6 +126,9 @@ file, and confirm the cart survives.
 2. Log the mutation type with `$subscribe`, then convert `addToCart` to `$patch`
    and watch the type change.
 3. *(Bonus)* Expose the log on every store as `$actionLog` and type it.
+
+→ **Done when** the action-log specs are green: a successful **and** a failed
+action, each with a duration.
 
 ## Definition of Done
 

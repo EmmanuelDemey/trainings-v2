@@ -82,6 +82,29 @@ suite owns the whole network, `POST /api/login` included.
 > The MSW server is already wired in `tests/setup.ts` and serves the happy path.
 > In part 1 you just benefit from it; in part 2 you override it per test.
 
+## The workshop at a glance
+
+The step numbers run `1a`, `1b`, `2`, `3` … `8` in one single pass through the
+project. Part 1 takes the ones chapter 3 covers, part 2 the ones chapter 12 does
+— which is why each part's numbers have holes in them. Read the table by
+**Part** column first, not by number.
+
+| # | Part | What you write | Where | Done when |
+|---|---|---|---|---|
+| 1a | 1 | The loading state, then the data state | `tests/InvoiceList.spec.ts` | The loading assertion runs with **no** `await`, and adding one breaks it |
+| 3 | 1 | A custom stub, and assertions on the props it receives | `tests/InvoiceChart.stub.spec.ts` | You can name what the stub stopped testing |
+| 5 | 1 | Fake timers and a `using` spy | `tests/useDebouncedSearch.spec.ts` | Three keystrokes provably produce one call |
+| 7 | 1 | Four mutations of the source, one at a time | `src/` | Each one turned the expected test red, and `git diff src/` is empty again |
+| 1b | 2 | The empty and error states, through MSW overrides | `tests/InvoiceList.spec.ts` | The retry test fails if the button becomes a no-op |
+| 2 | 2 | The same form tested with a real router, then a mocked one | `tests/LoginForm.spec.ts` | Both suites are green, and you picked one to keep |
+| 4 | 2 | A store-connected component on `createTestingPinia` | `tests/CartSummary.spec.ts` | The assertions go through the **real** getters |
+| 6 | 2 | Custom commands, `cy.session`, intercepts and a fixture | `cypress/` | The runner shows the login flow ran once across two tests |
+| 8 | 2 | Four more mutations, including one on the e2e layer | `src/`, `cypress/` | Each one turned the expected test red, and `git diff` is empty again |
+
+Nothing here is graded by a green `npm test` alone: every spec in this project
+**starts green and asserts nothing**. Steps 7 and 8 are what tell you whether the
+tests you wrote in between are worth anything.
+
 ---
 
 # Part 1 — after chapter 3 (fundamentals)
@@ -94,11 +117,18 @@ Query with `data-testid`, never with CSS classes.
 
 Leave the *empty* and *error* tests for part 2.
 
+→ **Done when** the loading assertion runs on the first render with no `await`,
+the data assertion runs after `flushPromises()`, and every lookup goes through
+`[data-testid=…]`.
+
 ### Step 3. Stubbing — `tests/InvoiceChart.stub.spec.ts`
 
 Stub `InvoiceChart` with a custom stub declaring its props, assert on those
 props, then mount without the stub and note what changes. Write down what the
 stub made you stop testing.
+
+→ **Done when** the spec asserts on the props `InvoiceChart` receives, and you
+have mounted the same component **without** the stub to see the difference.
 
 ### Step 5. Timers and spies — `tests/useDebouncedSearch.spec.ts`
 
@@ -106,6 +136,9 @@ Prove that three keystrokes produce one call, using
 `vi.advanceTimersByTimeAsync`. Then write a test using `using` for a spy.
 `useDebouncedSearch` takes its `search` function as an argument — no HTTP mock
 needed, just a `vi.fn()`.
+
+→ **Done when** three keystrokes provably produce **one** call, and at least one
+spy is declared with `using` and has no `mockRestore()` left beside it.
 
 ### Step 7. Sabotage — check that the tests can fail
 
@@ -135,6 +168,9 @@ mutation in place until it is red, then revert it.
 > This is mutation testing, done by hand — Stryker automates it over a whole
 > project. What matters here is the reflex: a test is not finished until you have
 > seen it fail.
+
+→ **Done when** the four mutations each turned the expected test red, for the
+expected reason, and `git diff src/` is empty again.
 
 ## Definition of Done — part 1
 
@@ -189,6 +225,9 @@ return an empty list, then a 500. Make the retry test prove the button actually
 re-fetches — `resetHandlers()` in `tests/setup.ts` undoes the override
 afterwards.
 
+→ **Done when** the empty and error states come from `server.use(...)` and the
+retry test fails if you make the click a no-op.
+
 ### Step 2. The router, two ways — `tests/LoginForm.spec.ts`
 
 1. With a **real memory router**: disabled submit, redirect to `?redirect=`,
@@ -197,10 +236,16 @@ afterwards.
    argument. Mind the hoisting of `vi.mock`.
 3. Decide which one you keep, and why.
 
+→ **Done when** both suites are green, the real-router one covers the four cases
+above, and you have written down which approach you keep.
+
 ### Step 4. Pinia — `tests/CartSummary.spec.ts`
 
 Seed the state with `createTestingPinia`, assert on the real getters, spy on the
 actions, then compare with `stubActions: false`.
+
+→ **Done when** the assertions go through the **real** getters, and you have run
+the same test with `stubActions: false` and noted what changed.
 
 ### Step 6. End-to-end — `cypress/`
 
@@ -212,6 +257,9 @@ actions, then compare with `stubActions: false`.
 
 To make `cy.session` actually useful, you will need to persist the token in
 `localStorage` in `src/stores/auth.ts`. Do it, and be able to explain why.
+
+→ **Done when** `npm run e2e` is green against the **built** app, and the runner
+shows the login flow ran once across the two tests.
 
 ### Step 8. Sabotage, round 2 — `src/`, `cypress/`
 
@@ -239,6 +287,9 @@ Two checks the Definitions of Done already ask for belong to the same family:
 adding an `await` to the loading test (part 1), and removing `resetHandlers()`
 from `tests/setup.ts` (part 2). Same reflex, aimed at the harness instead of at
 the source.
+
+→ **Done when** the four mutations each turned the expected test red — the
+Cypress one included — and `git diff src/ cypress/` is empty again.
 
 ## Definition of Done — part 2
 

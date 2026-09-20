@@ -59,12 +59,36 @@ Run `npm run build` and record, from the Vite output:
 Everything below is measured against this table. A change you cannot measure is
 a change you cannot justify.
 
+## The workshop at a glance
+
+Step 5 and step 5bis are the **same** step, twice: the three serving rules, once
+on a real host and once in a container on your machine. Do 5bis whichever way you
+go — it is the only version where you see what a host does for you.
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 0 | Write down the baseline you will be judged against | `npm run build` | The table above is filled in |
+| 1 | See what is actually in the entry chunk | `vite.config.ts` | You can name its three biggest contributors |
+| 2 | Split by route, prefetch on intent, defer a heavy import | `src/router/`, `src/App.vue` | The entry chunk dropped, and you can state the drop as a percentage |
+| 3 | Group the framework into one chunk | `vite.config.ts` | You answered whether the **total** went up, and whether it is worth it |
+| 4 | Type and validate the environment | `src/config/index.ts`, `env.d.ts` | `npm test` — a missing variable fails loudly, `'false'` disables |
+| 5 | Serve the SPA correctly | `netlify.toml` / `vercel.json` | A hard refresh on a deep link returns the app |
+| 5bis | The same three rules, on nginx or Caddy, locally | `docker/nginx.conf` / `docker/Caddyfile` | `npm run verify:serving` exits 0 |
+| 6 | Catch what the users hit | `src/main.ts` | An error thrown from a component reaches the handler |
+| 7 | Build once, test the artifact, deploy the artifact | `.github/workflows/ci.yml` | The `e2e` and `deploy` jobs **download** the build, never rebuild |
+
+Only step 4 has specs. Everything else is graded by the command it is about —
+`npm run build`, `npm run analyze`, `npm run size`, `npm run verify:serving` —
+and by the numbers you wrote down in step 0.
+
 ## Steps
 
 ### 1. Analyze — `vite.config.ts`
 
 Add `rollup-plugin-visualizer` behind an `ANALYZE=1` guard, run `npm run analyze`
 and name the three biggest contributors to the entry chunk.
+
+→ **Done when** the treemap opens and you can name those three out loud.
 
 ### 2. Split the code
 
@@ -77,12 +101,19 @@ and name the three biggest contributors to the entry chunk.
 
 Update the baseline table. The entry chunk should have dropped substantially.
 
+→ **Done when** the chunk count went up, the entry chunk went down — you can
+state the drop as a percentage — hovering a link fetches its chunk before the
+click, and `heavyReport` arrives on the export click.
+
 ### 3. `manualChunks`
 
 Group `vue`, `vue-router` and `pinia` into one chunk. Rebuild and compare.
 
 Then answer honestly: did the **total** size go up? Why? Is the trade-off worth
 it here, and what would make it not worth it?
+
+→ **Done when** the three libraries sit in one chunk and you have answered both
+questions with the numbers in front of you.
 
 ### 4. Environments — `src/config/index.ts` + `env.d.ts`
 
@@ -95,6 +126,9 @@ it here, and what would make it not worth it?
    `dist/assets/*.js`. Then answer, with that evidence in hand: can a `VITE_`
    variable hold a secret?
 
+→ **Done when** `npm test` exits 0, `import.meta.env.VITE_API_URL` is `string`
+and not `any`, and you have grepped that staging URL out of the build yourself.
+
 ### 5. Serving — `netlify.toml` (or `vercel.json`)
 
 1. Add the history-mode fallback.
@@ -104,6 +138,9 @@ it here, and what would make it not worth it?
 4. *(Bonus)* Add the security headers and a CSP, in report-only first.
 
 No account? Do step 5bis instead — same three rules, same verification, no signup.
+
+→ **Done when** the fallback, the two cache rules and the hard-refresh test all
+hold on your deployment.
 
 ### 5bis. Plan B — deploy it on your own machine
 
@@ -173,6 +210,10 @@ directly and you get nginx's own 404 page. That is your production, minus the CD
    that declares one header drops every header inherited from `server`.
 7. Stop everything with `npm run serve:local:stop`.
 
+→ **Done when** `npm run verify:serving` exits 0 against `:8080`, a missing
+asset returns a real **404**, and you can name the two checks that fail on
+`vite preview` and why the others pass there for free.
+
 Then read `docker/Dockerfile`: the image copies `dist/` in and never rebuilds it —
 the same "build once" rule as step 7, applied to the container.
 
@@ -192,6 +233,9 @@ npm run verify:serving -- https://my-app.netlify.app
 
 Add `app.config.errorHandler`, and *(bonus)* report the web vitals.
 
+→ **Done when** an error thrown from a component reaches the handler instead of
+the console alone.
+
 ### 7. The pipeline — `.github/workflows/ci.yml`
 
 1. Build and upload `dist/` as an artifact.
@@ -201,6 +245,9 @@ Add `app.config.errorHandler`, and *(bonus)* report the web vitals.
 4. Add a `deploy` job, on the default branch only, consuming the **same**
    artifact.
 5. Write down your rollback procedure — and test it.
+
+→ **Done when** `e2e` and `deploy` both **download** the artifact `quality`
+uploaded, `npm run size` can fail the build, and you have run your rollback once.
 
 ## Definition of Done
 

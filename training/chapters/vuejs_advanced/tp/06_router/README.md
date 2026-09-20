@@ -45,12 +45,30 @@ What it deliberately leaves alone needs a real browser: the transitions, the
 actual scroll *position*, and the dirty-form `confirm`. Those stay below as checks
 you run by hand.
 
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Type the three `meta` fields every guard below reads | `src/router/types.d.ts` | A typo in `meta.rols` is a **compile error** |
+| 2 | Animate the view swap, driven by `meta` | `src/App.vue` | The transition name follows `route.meta.transition` |
+| 3 | The auth guard, the `?redirect` round trip, and its traps | `src/router/index.ts` + `src/views/LoginView.vue` | A hard refresh on `/invoices` keeps you there |
+| 4 | The role check | `src/router/index.ts` | `alan@` lands on `/forbidden`, `ada@` gets in |
+| 5 | Scroll restoration and a handled `NavigationFailure` | `src/router/index.ts` + `src/views/InvoiceView.vue` | Back restores the position; "Next invoice" on the last id does not throw |
+| 6 | `document.title`, and a dirty form that refuses to be left | `src/router/index.ts` + `src/views/InvoiceFormView.vue` | Leaving a dirty form asks; a successful submit does not |
+
+`npm test` grades steps 3 to 6. Steps 1 and 2, the scroll **position** and the
+dirty-form `confirm` need your eyes and a real browser — they are the checks
+written out under each step.
+
 ## Steps
 
 ### 1. Type the `meta` fields — `src/router/types.d.ts`
 
 Add `requiresAuth`, `roles` and `transition` to the `RouteMeta` interface. Every
 guard you write next depends on this being right.
+
+→ **Done when** `meta: { rols: true }` and `roles: 'admin'` are both compile
+errors rather than silent no-ops.
 
 ### 2. Route transitions — `src/App.vue`
 
@@ -59,6 +77,9 @@ guard you write next depends on this being right.
 2. Drive the transition name from `route.meta.transition`, defaulting to `fade`.
 3. *(Bonus)* Add `<KeepAlive :include="['InvoicesView']">` and check that the
    filter and the scroll position survive a round trip.
+
+→ **Done when** navigating animates, and the name comes from
+`route.meta.transition` with `fade` as the fallback.
 
 ### 3. Authentication — `src/router/index.ts` + `src/views/LoginView.vue`
 
@@ -73,26 +94,39 @@ guard you write next depends on this being right.
 `/invoices` after signing in. Then sign in and **hard-refresh** `/invoices`: you
 must stay there (that is what `restoreSession` buys you).
 
+→ **Done when** the round trip works, a hard refresh keeps you signed in, and
+both `?redirect=https://example.com` and `?redirect=//example.com` are refused.
+
 ### 4. Roles — `src/router/index.ts`
 
 1. Add `meta: { requiresAuth: true, roles: ['admin'] }` to `/admin`.
 2. Extend the guard to redirect to `{ name: 'forbidden' }` when the role check
    fails. Verify with both accounts.
 
-### 5. Navigation and history
+→ **Done when** `alan@example.com` on `/admin` lands on `/forbidden` and
+`ada@example.com` gets in.
+
+### 5. Navigation and history — `src/router/index.ts` + `src/views/InvoiceView.vue`
 
 1. Implement `scrollBehavior`: restore `savedPosition`, honour `to.hash`, and
    otherwise scroll to the top. Test on the long `/invoices` page.
 2. In `InvoiceView`, handle the `NavigationFailure` returned by `router.push`
    (click "Next invoice" twice on the last id).
 
-### 6. The remaining guards
+→ **Done when** back restores the scroll position on the long list, a new route
+starts at the top, a `#hash` scrolls to its anchor, and "Next invoice" on the
+last id shows something instead of throwing.
+
+### 6. The remaining guards — `src/router/index.ts` + `src/views/InvoiceFormView.vue`
 
 1. `afterEach`: set `document.title` from `to.meta.title`.
 2. *(Bonus)* Direction-aware transitions: compare path depths in `afterEach` and
    set `to.meta.transition` to `slide-left` / `slide-right`.
 3. In `InvoiceFormView`, block navigation away from a dirty form with
    `onBeforeRouteLeave` — and do **not** block right after a successful submit.
+
+→ **Done when** `document.title` changes on every navigation, leaving a dirty
+form asks for confirmation, and a successful submit navigates without asking.
 
 ## Definition of Done
 
