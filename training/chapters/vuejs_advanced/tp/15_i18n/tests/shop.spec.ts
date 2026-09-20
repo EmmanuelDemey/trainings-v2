@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { setLocale } from '@/i18n/setLocale';
 import { mountShop, normalizeSpaces, resetLocale } from './helpers';
 
@@ -43,10 +43,14 @@ describe('switching locale from the UI', () => {
     using shop = mountShop();
 
     await shop.wrapper.get('[data-testid="locale-en"]').trigger('click');
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    await shop.wrapper.vm.$nextTick();
 
-    expect(shop.wrapper.get('[data-testid="product-price"]').text()).toBe('$1,234.50');
+    // The click handler cannot be awaited — `pick()` fires `setLocale()` and
+    // returns. Behind it is a real `import()`, which takes an unknown number of
+    // ticks: waiting a fixed one passes on a warm machine and fails on a cold
+    // CI runner. Wait for the outcome instead.
+    await vi.waitFor(() =>
+      expect(shop.wrapper.get('[data-testid="product-price"]').text()).toBe('$1,234.50'),
+    );
     expect(shop.wrapper.get('[data-testid="cart-items"]').text()).toBe('0 no item');
     expect(shop.wrapper.get('[data-testid="accept"]').text()).toBe(
       'I accept the terms and conditions.',
@@ -57,10 +61,10 @@ describe('switching locale from the UI', () => {
     using shop = mountShop();
 
     await shop.wrapper.get('[data-testid="locale-de"]').trigger('click');
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    await shop.wrapper.vm.$nextTick();
 
-    expect(shop.wrapper.get('[data-testid="locale-de"]').attributes('aria-pressed')).toBe('true');
+    await vi.waitFor(() =>
+      expect(shop.wrapper.get('[data-testid="locale-de"]').attributes('aria-pressed')).toBe('true'),
+    );
     expect(shop.wrapper.get('[data-testid="locale-fr"]').attributes('aria-pressed')).toBe('false');
   });
 });
