@@ -128,8 +128,8 @@ for (const training of TRAININGS) {
     const sourcePath = `${training.workshops}/${folder}`;
     const href = `/${training.slug}/${toSlug(folder)}/`;
 
-    // The theory questions that open the workshop. A workshop without any — the
-    // Vue final project teaches nothing new — simply keeps its README as it is.
+    // The theory questions that open the workshop. A workshop without any simply
+    // keeps its README as it is.
     const questions = await quizFor(training.slug, folder);
     const quiz = questions
       ? [

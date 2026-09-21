@@ -45,7 +45,6 @@ jobs:
           - 14_component_architecture
           - 15_i18n
           - 16_production
-          - 17_final_project
 
     env:
       SOLUTION: training/solutions/vuejs_advanced/${{ matrix.workshop }}

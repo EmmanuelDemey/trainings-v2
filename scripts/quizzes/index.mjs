@@ -23,8 +23,7 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
  * Where each workshop's questions come from, per training slug then per workshop
  * folder. `chapters` are parsed; `questions` are taken as they are.
  *
- * A workshop absent from this map simply gets no quiz — `17_final_project`
- * teaches nothing new, so there is nothing to recall.
+ * A workshop absent from this map simply gets no quiz.
  */
 export const QUIZ_SOURCES = {
   javascript: Object.fromEntries(

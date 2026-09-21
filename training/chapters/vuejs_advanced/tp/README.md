@@ -59,7 +59,7 @@ package. Three deliberate pins, each with a reason that will lift on its own:
 | Pin | Why |
 |---|---|
 | `typescript` **6.0.3**, not 7.x | `vue-tsc@3` patches TypeScript's `lib/tsc`, which TypeScript 7 (the native port) no longer exposes: `npm run typecheck` fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`. |
-| `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. `17_final_project` could take Zod 4 on its own, but teaching two Zod dialects in one training is worse than being one major behind. |
+| `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. Teaching two Zod dialects in one training would be worse than being one major behind. |
 | `webdriverio` **9.x** | Latest; listed here only because Vitest 4 moved the browser provider into `@vitest/browser-webdriverio`, which is now a dependency of workshop 3. |
 
 Three migrations changed workshop code, not just versions:
@@ -100,7 +100,6 @@ runnable folder per workshop. Do not hand it out before the exercise.
 | 14 | `14_component_architecture/` | The dependency rule as a test, feature-first, slots | — |
 | 15 | `15_i18n/` | Messages, plural rules, `n()`, lazy-loaded locales | — |
 | 16 | `16_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) — or Docker for the local plan B |
-| 17 | `17_final_project/` — **optional** | Everything above, in one slice — then a cross-review round | A second pair |
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
@@ -129,14 +128,6 @@ group that prefers one codebase end to end. `12_testing_integration/` is the
 chapter-12 workshop of record: a different app, already unit-tested, that you
 attack with the router, Pinia, MSW and Cypress without needing part 1.
 
-`17_final_project/` is the **optional** 90-minute session that closes the training
-— a half-day in the follow-up format described in its `TRAINER.md`. It is
-run **in pairs**, and it is the only workshop whose second half is not code: at
-the freeze you hand your work to another pair, they run it before they read it,
-and each side leaves with three findings written on someone else's code. Its
-`README.md` carries the timetable, the review grid and the rules; `REVIEW.md` is
-the sheet the reviewers fill in.
-
 ## Node version
 
 Every workshop targets **Node.js >= 22.22.2** (24.15+ recommended, and what
@@ -154,5 +145,3 @@ or running besides Vite.
 `03_testing/` and `12_testing_integration/` mock the network explicitly
 (MSW, `cy.intercept`). `04_plugins/`, `13_error_handling/` and `15_i18n/` need no
 API at all.
-`17_final_project/` uses a fake API too — with `AbortSignal` support on the reads
-and a switch, in the app header, that makes every write fail.

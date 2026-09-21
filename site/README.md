@@ -88,8 +88,7 @@ The questions come from two places, resolved by
 - **JavaScript** — the deck has no quiz slides, so the questions are written in
   `../scripts/quizzes/javascript.mjs`, against the chapter each workshop follows.
 
-A workshop absent from `QUIZ_SOURCES` simply gets no quiz and no correction page
-— the Vue final project teaches nothing new, so there is nothing to recall.
+A workshop absent from `QUIZ_SOURCES` simply gets no quiz and no correction page.
 
 The form is emitted as **raw HTML inside a Markdown page**
 ([`scripts/quiz-render.mjs`](scripts/quiz-render.mjs)), which forbids a blank

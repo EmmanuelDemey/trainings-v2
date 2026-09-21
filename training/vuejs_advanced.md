@@ -156,12 +156,6 @@ hide: false
 ---
 
 ---
-src: ./chapters/vuejs_advanced/17_final_project.md
-title: 17 - Final project & cross-review (optional)
-hide: false
----
-
----
 src: ./chapters/vuejs_advanced/retro.md
 title: Retro - Day 3
 hide: false
@@ -273,8 +267,3 @@ title: Annexe 16 - Production & deployment
 hide: false
 ---
 
----
-src: ./chapters/vuejs_advanced/annexes/17_final_project.md
-title: Annexe 17 - Final project & cross-review
-hide: false
----

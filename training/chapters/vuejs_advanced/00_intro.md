@@ -185,13 +185,6 @@ layout: cover
                     <li>Continuous deployment pipeline</li>
                 </ul>
             </li>
-            <li>17 - Final project &amp; cross-review <em>(optional)</em>
-                <ul>
-                    <li>One vertical slice, seven steps, in pairs</li>
-                    <li>Freeze, then review another pair's code</li>
-                    <li>Three findings each, then the debrief</li>
-                </ul>
-            </li>
         </ul>
     </td>
  </tr>
@@ -244,7 +237,7 @@ Duration: **3 days**
 |---|---|---|
 | **Day 1** | 0 → 5 — devtools, composables, testing, plugins, shared library | Guided tour · TP 2 · TP 3 |
 | **Day 2** | 6 → 10 — router, advanced components, unplugin, Pinia, transitions | TP 6 · TP 7 · TP 9 |
-| **Day 3** | 11 → 17 — forms, integration testing, errors, architecture, i18n, production | TP 11 · TP 16 · final project |
+| **Day 3** | 11 → 16 — forms, integration testing, errors, architecture, i18n, production | TP 11 · TP 16 |
 
 <br />
 
