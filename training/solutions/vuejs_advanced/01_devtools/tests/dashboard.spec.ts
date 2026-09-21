@@ -65,15 +65,3 @@ describe('step 3 — typing only re-renders what depends on the filter', () => {
     expect(dashboard.wrapper.get('[data-testid="open-count"]').text()).toBe(open);
   });
 });
-
-describe('step 4 — the empty state', () => {
-  it('explains itself when no ticket matches, instead of showing a bare header', async () => {
-    using dashboard = mountDashboard();
-
-    await dashboard.wrapper.get('[data-testid="filter"]').setValue('kangaroo');
-
-    expect(dashboard.wrapper.findAll('[data-testid="ticket-row"]')).toHaveLength(0);
-    expect(dashboard.wrapper.find('[data-testid="empty"]').exists()).toBe(true);
-    expect(dashboard.wrapper.find('table').exists()).toBe(false);
-  });
-});

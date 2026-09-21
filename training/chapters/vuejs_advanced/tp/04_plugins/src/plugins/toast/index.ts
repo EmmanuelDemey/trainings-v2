@@ -6,27 +6,23 @@ import type { ToastOptions } from './types';
  * all converged on this shape, for one reason: the state belongs to the app that
  * installed it, never to this module.
  *
+ * Already done for you: `createToastQueue()` in `queue.ts` — `notify`, `dismiss`
+ * by id, the `max`, and each toast's own auto-dismiss timer.
+ *
  * TODO 1: resolve the options **once**, here, with defaults —
  *   `position = 'top-right'`, `duration = 4000`, `max = 3`. Not on every call.
- *
- * TODO 2: hold the state in this closure: a `ref<Toast[]>`, a `Map` of pending
- *   timers, and an id counter. Build the `ToastApi`:
+ *   Then create the queue **in this closure** — not at module scope — and build
+ *   the `ToastApi` on top of it:
  *   - `toasts` — a `computed` read-only view, so a consumer cannot push
- *   - `notify(message, level = 'info')` — appends a toast, returns its id
- *   - `dismiss(id)` — removes it AND clears its pending timer
- *   - `clear()` — removes every toast and every timer
+ *   - `position`, and the queue's `notify`, `dismiss` and `clear`
+ *   Finally, in `install`: `app.provide(toastKey, api)`.
  *
- * TODO 3: past `max` toasts on screen, drop the **oldest** — timer included.
+ * TODO 2: in `install`, register `ToastHost` as a **global component** so a
+ *   consumer never imports it. Then declare it in `augmentations.d.ts`.
  *
- * TODO 4: each toast dismisses itself after `duration` ms. Keep the handle in
- *   the `Map`, so `dismiss()` can cancel it and nothing fires on a toast that is
- *   already gone.
- *
- * TODO 5: in `install`, (a) `app.provide(toastKey, api)`, (b) register
- *   `ToastHost` as a **global component** so a consumer never imports it, and
- *   (c) expose `notify` as the `$toast` global property — the one exception
- *   worth spending, because it is typed in templates all day. Then declare it in
- *   `globalProperties.d.ts`.
+ * TODO 3: in `install`, expose `notify` as the `$toast` global property — the
+ *   one exception worth spending, because it is typed in templates all day. Then
+ *   declare it in `augmentations.d.ts`.
  */
 export function createToast(options: ToastOptions = {}): Plugin {
   return {

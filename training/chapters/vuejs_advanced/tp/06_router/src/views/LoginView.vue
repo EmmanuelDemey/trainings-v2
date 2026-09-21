@@ -18,11 +18,11 @@ async function onSubmit(): Promise<void> {
   try {
     await auth.login(email.value, password.value);
 
-    // TODO 3.3: honour the `?redirect=` query set by the guard, and fall back to
+    // TODO 2.3: honour the `?redirect=` query set by the guard, and fall back to
     //   { name: 'home' }. Use `router.replace`, not `push` — the login page must
     //   not stay in the history.
     //
-    // TODO 3.4 (security): `redirect` comes from the URL, so it is user input.
+    // TODO 2.4 (security): `redirect` comes from the URL, so it is user input.
     //   Only accept a value starting with a single '/' — otherwise you have
     //   built an open redirect. Try `?redirect=https://example.com` once you
     //   have implemented 3.3 without the check, and see what happens.

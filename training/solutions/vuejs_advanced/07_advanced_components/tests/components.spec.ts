@@ -8,18 +8,18 @@ import InvoiceTablePanel from '@/components/InvoiceTablePanel.vue';
 import DataTable from '@/components/DataTable.vue';
 
 /**
- * The executable half of steps 2, 3 and 5.
+ * The executable half of steps 2, 3 and 4.
  *
  * These specs are given and they are red on the skeleton:
  *
  *   npm run test:watch
  *
- * Step 1 (async components) and step 4 (rendering performance) are NOT here, and
- * that is the honest answer rather than a gap. "The chart is not in the entry
+ * Step 1 (async components) and the given rendering-performance panel are NOT
+ * here, and that is the honest answer rather than a gap. "The chart is not in the entry
  * chunk" is a claim about the BUNDLE: jsdom inlines every module, so a passing
  * test would prove nothing about what a user downloads — you check that one in
  * the Network tab. And `shallowRef`, the stable `key` and `v-memo` are judged on
- * the four measurements you write down, which no assertion can take for you.
+ * measurements, which no assertion can take for you.
  */
 
 /**

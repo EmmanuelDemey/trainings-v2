@@ -33,7 +33,7 @@ export const useCatalogStore = defineStore('catalog', () => {
   const loadDurationMs = ref(0);
 
   /**
-   * STEP 3 — an index, not a getter with an argument.
+   * An index, not a getter with an argument — shipped with the starter.
    *
    * `productById(id)` was a getter RETURNING a function: Vue caches the
    * function, never the lookup. Ten cart lines × 30 000 products = 300 000

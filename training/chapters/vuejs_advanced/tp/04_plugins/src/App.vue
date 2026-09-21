@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * TODO 7b (last step): once `ToastHost` is registered globally by `install()`
- *   and declared in `augmentations.d.ts`, delete this import. A consumer of the
- *   plugin should never have to know the host component exists.
+ * TODO 2: once `ToastHost` is registered globally by `install()` and declared
+ *   in `augmentations.d.ts`, delete this import. A consumer of the plugin should
+ *   never have to know the host component exists.
  */
 import ToastHost from './plugins/toast/ToastHost.vue';
 import CheckoutPanel from './components/CheckoutPanel.vue';

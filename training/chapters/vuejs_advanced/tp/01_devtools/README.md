@@ -51,11 +51,10 @@ button. That panel is the scoreboard: reset it, do one thing, read it.
 | 1 | Turn Vue's tracing on, and find its marks in the Performance panel | `src/createDashboardApp.ts` | You have the widest render bar's duration written down |
 | 2 | Move the ticking clock out of the root component | `src/App.vue` → a new `src/components/ClockBadge.vue` | Five idle seconds move **one** counter, not three |
 | 3 | Stop the stats panel re-rendering on every keystroke | `src/App.vue` + `src/components/StatsPanel.vue` | Typing moves `TicketList` and **not** `StatsPanel` |
-| 4 | Render the empty state you reached from the panel | `src/components/TicketList.vue` | A filter matching nothing renders the message and no `<table>` |
-| 5 | Read the component tree, and answer | nothing to edit | You can answer the three questions without running anything |
+| 4 | Drive `filter` from the panel, then read the tree | nothing to edit | You reached the empty table without typing, and can answer the two questions |
 
-Steps 2, 3 and 4 are the ones `npm test` grades. Steps 1 and 5 are graded by
-what you can say out loud, with the panel open.
+`npm test` grades the code of steps 1 to 3. The measurements, and step 4, are
+graded by what you can say out loud, with the panel open.
 
 ## Steps
 
@@ -109,29 +108,17 @@ five idle seconds move that one counter alone.
 → **Done when** `StatsPanel` takes `tickets: Ticket[]`, six keystrokes move
 `TicketList` only, and you have the counters before and after.
 
-### 4. Reproduce a state without typing it — `src/components/TicketList.vue`
+### 4. Drive the panel, then read the tree — nothing to edit
 
 1. Select the `App` component in the panel, find the `filter` ref, and **edit it
-   from the panel** to `kangaroo`.
-2. The table renders a header and no row — the app looks broken rather than
-   empty. Fix `TicketList.vue`: render a message in an element carrying
-   `data-testid="empty"`, and keep the table out of the DOM in that case.
-3. *(Bonus)* Set `filter` to a value with an accent (`é`) and check what
-   `matches()` does with it.
+   from the panel** to `kangaroo`. The table renders a header and no row: an
+   edge case reached without touching the keyboard.
+2. Without running anything else, answer from the **Components** tab alone:
+   - Which component owns `filter`, and which ones merely receive it?
+   - What are `StatsPanel`'s props *now*, and what were they before step 3?
 
-→ **Done when** a filter matching nothing renders the `data-testid="empty"`
-message, with no `<table>` left in the DOM.
-
-### 5. Read the tree — nothing to edit
-
-Without running anything, answer from the **Components** tab alone:
-
-- Which component owns `filter`, and which ones merely receive it?
-- What are `StatsPanel`'s props *now*, and what were they before step 3?
-- Which of these components would disappear from the panel on a production
-  build, and why?
-
-→ **Done when** you can answer the three out loud, from the tree alone.
+→ **Done when** you reached the empty table from the panel, and can answer the
+two questions out loud, from the tree alone.
 
 ## Definition of Done
 
@@ -141,7 +128,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
-- [ ] `npm test` exits 0 — the five specs
+- [ ] `npm test` exits 0 — the four specs
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src` returns nothing
 - [ ] No Vue warning in the browser console
@@ -154,13 +141,13 @@ section are **not** part of this list.
 - [ ] Typing in the filter moves `TicketList` and **not** `StatsPanel`
 - [ ] `StatsPanel` takes `tickets: Ticket[]` and the desk-wide counts do not change
       when a filter is applied
-- [ ] A filter matching nothing renders the empty message, and no `<table>`
 
 **You measured it**
 
 - [ ] You have the widest render duration from the Performance panel, written down
 - [ ] You have the counters before and after step 2, written down
 - [ ] You have the counters before and after step 3, written down
+- [ ] You set `filter` from the Components tab, not from the keyboard
 
 **You can explain**
 

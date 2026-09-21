@@ -1,21 +1,19 @@
-import { fileURLToPath, URL } from 'node:url';
-import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
+import { defineConfig, mergeConfig } from 'vitest/config';
+import viteConfig from './vite.config.ts';
 
 /**
- * TODO 2: Vitest reads THIS file, not `vite.config.ts` — the plugins do not come
- *   for free. Wire the same three here, or the specs will never see a generated
- *   route. (Worth knowing: `mergeConfig` from `vite` can share one list between
- *   the two files. Do it once you have them working.)
+ * Vitest reads THIS file, not `vite.config.ts` — the plugins do not come for
+ * free. Rather than keeping two lists in sync, merge the one that already
+ * exists: the specs then see the same generated routes, auto-imports and
+ * components as the app.
  */
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
-  },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    include: ['tests/**/*.spec.ts'],
-  },
-});
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      environment: 'jsdom',
+      globals: true,
+      include: ['tests/**/*.spec.ts'],
+    },
+  }),
+);

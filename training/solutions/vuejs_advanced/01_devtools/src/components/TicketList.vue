@@ -1,10 +1,6 @@
 <script setup lang="ts">
 /**
  * The only component that legitimately re-renders when the filter changes.
- *
- * The empty state is a branch, not a styling detail: a table with a header and
- * no row reads as a bug, and it is the state you reached by setting `filter`
- * straight from the Components tab.
  */
 import { onUpdated } from 'vue';
 import type { Ticket } from '../api/fakeApi';
@@ -19,11 +15,7 @@ onUpdated(() => countRender('TicketList'));
   <section>
     <h2>Tickets</h2>
 
-    <p v-if="tickets.length === 0" class="muted" data-testid="empty">
-      No ticket matches this filter. Clear it to see the whole desk again.
-    </p>
-
-    <table v-else>
+    <table>
       <thead>
         <tr>
           <th>#</th>

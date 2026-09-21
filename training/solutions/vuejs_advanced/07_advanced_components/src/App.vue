@@ -20,7 +20,7 @@ import ModalPanel from './components/ModalPanel.vue';
   <ModalPanel />
 
   <!--
-    Teleport target for step 5. It is rendered by the app, AFTER the panels:
+    Teleport target for step 4. It is rendered by the app, AFTER the panels:
     a `<Teleport to="#modal-root">` mounted above cannot see it yet — that is
     what the `defer` prop is for. Do not move it to `index.html`.
   -->

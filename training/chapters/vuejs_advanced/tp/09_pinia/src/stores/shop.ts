@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { acceptHMRUpdate, defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { fetchProducts, type Product } from '@/api/fakeApi';
 
@@ -15,10 +15,8 @@ export interface CartLine {
  *
  * Problems to find and fix:
  *   - a component reading `theme` re-renders when the CATALOG changes
- *   - `productById` is O(n) and is called once per cart line, on every render
  *   - `products` is deeply reactive for 10 000 items that are never mutated
- *   - nothing is persisted
- *   - no HMR: editing this file full-reloads the page and drops your cart
+ *   - nothing is persisted, and nothing is observed
  *
  * TODO 1.1: split this store into three: `useCatalogStore`, `useCartStore` and
  *   `useUiStore`, in three files. `useCartStore` reads the catalog by calling
@@ -49,20 +47,18 @@ export const useShopStore = defineStore('shop', () => {
     } catch (e) {
       error.value = e as Error;
       status.value = 'error';
-      // TODO 6.4: rethrow here. `$onAction`'s `onError` only fires when the
+      // TODO 4.4: rethrow here. `$onAction`'s `onError` only fires when the
       //   action actually rejects, so an error swallowed at this line is an
       //   error your logger can never record — and the DoD box about failed
       //   actions stays out of reach.
     }
   }
 
-  // TODO 3.1: this getter is O(n) and is re-run for EVERY cart line on EVERY
-  //   render, because a getter taking an argument cannot be cached.
-  //   Replace it with a cached `Map` index:
-  //     const byId = computed(() => new Map(products.value.map((p) => [p.id, p])));
-  //   and expose `byId` instead. Update the components accordingly.
-  const productById = computed(() => (id: number): Product | undefined =>
-    products.value.find((p) => p.id === id));
+  // Already done for you: an index, not a getter with an argument. A getter
+  //   returning `(id) => products.find(...)` caches the function, never the
+  //   lookup — O(n) per cart line, on every render. A `computed` holding a `Map`
+  //   is rebuilt only when `products` changes, and each lookup is O(1).
+  const byId = computed(() => new Map(products.value.map((p) => [p.id, p])));
 
   const categories = computed(() =>
     [...new Set(products.value.map((p) => p.category))].sort());
@@ -73,7 +69,7 @@ export const useShopStore = defineStore('shop', () => {
   const cartCount = computed(() => lines.value.reduce((n, l) => n + l.qty, 0));
 
   const cartTotal = computed(() =>
-    lines.value.reduce((n, l) => n + (productById.value(l.productId)?.price ?? 0) * l.qty, 0));
+    lines.value.reduce((n, l) => n + (byId.value.get(l.productId)?.price ?? 0) * l.qty, 0));
 
   function addToCart(productId: number): void {
     const line = lines.value.find((l) => l.productId === productId);
@@ -98,19 +94,15 @@ export const useShopStore = defineStore('shop', () => {
   }
 
   return {
-    products, status, error, loadDurationMs, loadProducts, productById, categories,
+    products, status, error, loadDurationMs, loadProducts, byId, categories,
     lines, cartCount, cartTotal, addToCart, removeFromCart, clearCart,
     theme, search, toggleTheme,
   };
 });
 
-// TODO 5.1: enable Hot Module Replacement on this store (and on every store you
-//   extract from it):
-//
-//   import { acceptHMRUpdate } from 'pinia';
-//   if (import.meta.hot) {
-//     import.meta.hot.accept(acceptHMRUpdate(useShopStore, import.meta.hot));
-//   }
-//
-//   Check it: add something to the cart, edit a label in this file, and see
-//   whether the cart survives.
+// Already done for you: Hot Module Replacement. Editing this file swaps the
+//   store in place instead of reloading the page — the cart survives. Every
+//   store you extract needs its own copy of these three lines.
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useShopStore, import.meta.hot));
+}

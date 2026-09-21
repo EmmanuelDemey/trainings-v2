@@ -14,16 +14,14 @@ Chapter 16 — Take a working Vue app all the way to a deployment you would defe
 - **Configure** the environments, with typing and validation
 - **Serve** the SPA correctly: fallback, cache headers, security headers
 - **Automate**: lint → typecheck → build once → test the artifact → deploy
-- **Observe**: error handler and web vitals
 
 ## Prerequisites
 
 - **Node.js >= 22.22.2** (24.15+ recommended) — run `nvm use` to pick up the version from `.nvmrc`
-- *(Optional)* A **Netlify** or **Vercel** account for the deployment step.
-- **No account?** Step 5bis is the plan B: you deploy to an nginx or Caddy
-  container on your own machine and verify the exact same three rules. It needs
-  **Docker** (Docker Desktop, Colima, Podman with `podman compose`…) and nothing
-  else. Everything else in this workshop runs locally either way.
+- **Docker** (Docker Desktop, Colima, Podman with `podman compose`…) for step 5:
+  you serve the build from an nginx or Caddy container on your own machine.
+- *(Optional)* A **Netlify** or **Vercel** account — nothing in the Definition of
+  Done needs one.
 
 ## Setup
 
@@ -44,7 +42,7 @@ They are the only specs here, deliberately. The rest of this workshop is checked
 by the command it is about — `npm run build`, `npm run size`,
 `npm run verify:serving`. A test asserting that `nginx.conf` *contains* a line
 would prove nothing about how your server actually answers, which is the very
-mistake step 5bis exists to cure.
+mistake step 5 exists to cure.
 
 ## Step 0 — The baseline
 
@@ -61,10 +59,6 @@ a change you cannot justify.
 
 ## The workshop at a glance
 
-Step 5 and step 5bis are the **same** step, twice: the three serving rules, once
-on a real host and once in a container on your machine. Do 5bis whichever way you
-go — it is the only version where you see what a host does for you.
-
 | # | What you do | Where | Done when |
 |---|---|---|---|
 | 0 | Write down the baseline you will be judged against | `npm run build` | The table above is filled in |
@@ -72,10 +66,14 @@ go — it is the only version where you see what a host does for you.
 | 2 | Split by route, prefetch on intent, defer a heavy import | `src/router/`, `src/App.vue` | The entry chunk dropped, and you can state the drop as a percentage |
 | 3 | Group the framework into one chunk | `vite.config.ts` | You answered whether the **total** went up, and whether it is worth it |
 | 4 | Type and validate the environment | `src/config/index.ts`, `env.d.ts` | `npm test` — a missing variable fails loudly, `'false'` disables |
-| 5 | Serve the SPA correctly | `netlify.toml` / `vercel.json` | A hard refresh on a deep link returns the app |
-| 5bis | The same three rules, on nginx or Caddy, locally | `docker/nginx.conf` / `docker/Caddyfile` | `npm run verify:serving` exits 0 |
-| 6 | Catch what the users hit | `src/main.ts` | An error thrown from a component reaches the handler |
-| 7 | Build once, test the artifact, deploy the artifact | `.github/workflows/ci.yml` | The `e2e` and `deploy` jobs **download** the build, never rebuild |
+| 5 | Serve the SPA correctly, on nginx or Caddy, locally | `docker/nginx.conf` / `docker/Caddyfile` | `npm run verify:serving` exits 0 |
+| 6 | Deploy the artifact the pipeline built once | `.github/workflows/ci.yml` | The `e2e` and `deploy` jobs **download** the build, never rebuild |
+
+> **Already done for you:** the host configs (`netlify.toml`, `vercel.json` —
+> the same three serving rules you write for nginx in step 5), the production
+> `define` flags in `vite.config.ts`, the error handler in `src/main.ts` (you
+> wrote one in TP 13), and the `quality` job of the pipeline, which builds once,
+> uploads `dist/` and runs `npm run size`.
 
 Only step 4 has specs. Everything else is graded by the command it is about —
 `npm run build`, `npm run analyze`, `npm run size`, `npm run verify:serving` —
@@ -129,24 +127,12 @@ questions with the numbers in front of you.
 → **Done when** `npm test` exits 0, `import.meta.env.VITE_API_URL` is `string`
 and not `any`, and you have grepped that staging URL out of the build yourself.
 
-### 5. Serving — `netlify.toml` (or `vercel.json`)
+### 5. Serving — `docker/nginx.conf` (or `docker/Caddyfile`)
 
-1. Add the history-mode fallback.
-2. Add the cache headers: immutable for `/assets/*`, `no-cache` for `index.html`.
-3. Deploy, open a deep link, and **hard-refresh** it. That single test catches
-   the most common production bug in this whole chapter.
-4. *(Bonus)* Add the security headers and a CSP, in report-only first.
-
-No account? Do step 5bis instead — same three rules, same verification, no signup.
-
-→ **Done when** the fallback, the two cache rules and the hard-refresh test all
-hold on your deployment.
-
-### 5bis. Plan B — deploy it on your own machine
-
-> Do this step **even if you have a Netlify account**: it takes five minutes and
-> it is the only version of step 5 where you can see *what the host was doing for
-> you*.
+A host does three things for a SPA that `vite build` cannot: the history-mode
+fallback, the cache headers, and keeping missing assets out of that fallback.
+`netlify.toml` already holds them — read it *after* you are done. Here you write
+them yourself, and see *what the host was doing for you*.
 
 Start with the measurement that motivates the whole step. Serve the build the way
 you have been serving it all along, and check it:
@@ -200,9 +186,9 @@ directly and you get nginx's own 404 page. That is your production, minus the CD
 
    Without B3 you get `200 OK` and `Content-Type: text/html` — the fallback served
    the app in place of a JavaScript file, and the browser reports
-   `Uncaught SyntaxError: Unexpected token '<'`. This is the same catch-all
-   rewrite you just wrote into `netlify.toml`, so **the trap is not
-   nginx-specific**: it is a property of "rewrite everything to index.html".
+   `Uncaught SyntaxError: Unexpected token '<'`. `netlify.toml` has the same
+   catch-all rewrite — and the same `/assets/*` escape — because **the trap is
+   not nginx-specific**: it is a property of "rewrite everything to index.html".
 5. Get `npm run verify:serving` to exit 0, then do the manual test anyway: open
    <http://localhost:8080/invoices> and press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>.
 6. *(Bonus)* B4 — the security headers. The script reports them but never fails on
@@ -215,7 +201,7 @@ asset returns a real **404**, and you can name the two checks that fail on
 `vite preview` and why the others pass there for free.
 
 Then read `docker/Dockerfile`: the image copies `dist/` in and never rebuilds it —
-the same "build once" rule as step 7, applied to the container.
+the same "build once" rule as step 6, applied to the container.
 
 ```bash
 docker build -f docker/Dockerfile -t tp16-production .
@@ -229,31 +215,24 @@ command grades it:
 npm run verify:serving -- https://my-app.netlify.app
 ```
 
-### 6. Observability — `src/main.ts`
+### 6. The pipeline — `.github/workflows/ci.yml`
 
-Add `app.config.errorHandler`, and *(bonus)* report the web vitals.
+The `quality` job already builds once, uploads `dist/` and runs `npm run size`.
 
-→ **Done when** an error thrown from a component reaches the handler instead of
-the console alone.
-
-### 7. The pipeline — `.github/workflows/ci.yml`
-
-1. Build and upload `dist/` as an artifact.
-2. Enforce the size budget with `npm run size` (adjust `.size-limit.json` to a
-   limit your optimized build actually meets — then lower it).
-3. Add an `e2e` job that downloads the artifact and tests it via `vite preview`.
-4. Add a `deploy` job, on the default branch only, consuming the **same**
+1. Adjust `.size-limit.json` to a limit your optimized build actually meets —
+   then lower it, and watch `npm run size` fail.
+2. Add an `e2e` job that downloads the artifact and tests it via `vite preview`.
+3. Add a `deploy` job, on the default branch only, consuming the **same**
    artifact.
-5. Write down your rollback procedure — and test it.
 
 → **Done when** `e2e` and `deploy` both **download** the artifact `quality`
-uploaded, `npm run size` can fail the build, and you have run your rollback once.
+uploaded, and `npm run size` can fail the build.
 
 ## Definition of Done
 
 Tick every box before moving on. Steps marked *(Bonus)* and the "Going further"
 section are **not** part of this list. Every box is reachable without a Netlify or
-Vercel account: wherever one says "your deployment", the container from step 5bis
+Vercel account: wherever one says "your deployment", the container from step 5
 counts.
 
 **It builds and runs**
@@ -291,9 +270,9 @@ counts.
       is handled)
 - [ ] You grepped the staging URL out of `dist/assets/*.js` and answered, with that
       evidence, whether a `VITE_` variable can hold a secret
-- [ ] The host config has the history-mode fallback, `immutable` caching for
-      `/assets/*` and `no-cache` for `index.html`
-- [ ] `npm run verify:serving` exits 0 against your deployment — the step 5bis
+- [ ] Your nginx (or Caddy) config has the history-mode fallback, `immutable`
+      caching for `/assets/*` and `no-cache` for `index.html`
+- [ ] `npm run verify:serving` exits 0 against your deployment — the step 5
       container, or your Netlify/Vercel URL if you have one
 - [ ] A **hard refresh** on a deep link returns the app, not a 404
 - [ ] A request for an asset that does not exist returns **404**, not `index.html`
@@ -301,16 +280,13 @@ counts.
       when it does not
 - [ ] You can name the two checks `npm run verify:serving -- http://localhost:4173`
       fails on `vite preview`, and why the others pass there for free
-- [ ] `app.config.errorHandler` is wired and catches an error thrown from a component
 
 **The pipeline is real**
 
-- [ ] The `quality` job builds and uploads `dist/` as an artifact
 - [ ] The `e2e` job `needs: quality`, **downloads** the artifact and serves it with
       `vite preview` — it never rebuilds
 - [ ] The `deploy` job `needs: e2e`, consumes the **same** artifact and runs on the
       default branch only
-- [ ] Your rollback procedure is written down **and** you have run it once
 
 **You can explain**
 
@@ -328,7 +304,7 @@ counts.
   production. You now have the container: add an entrypoint that rewrites the
   placeholder in `index.html` before nginx starts, and deploy the *same* image
   twice with two different `API_URL` values. Is it worth it for this app?
-- Add a `serve` job to `ci.yml` that runs the step 5bis container and calls
+- Add a `serve` job to `ci.yml` that runs the step 5 container and calls
   `bash docker/verify-serving.sh` against it. The serving rules are the one part
   of this workshop nothing in the pipeline currently tests.
 - Add `treosh/lighthouse-ci-action` with assertions on LCP, CLS and TBT, and make

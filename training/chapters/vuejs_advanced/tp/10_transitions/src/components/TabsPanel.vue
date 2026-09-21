@@ -3,8 +3,8 @@
  * Three tabs, one slot of screen. Switching them today is instant and the layout
  * jumps: for one frame the two panels are in the DOM together.
  *
- * TODO 4: wrap the `<component :is>` in a `<Transition>`:
- *   - `name="fade"`, so the six classes are the ones you wrote in
+ * TODO 1: wrap the `<component :is>` in a `<Transition>`:
+ *   - `name="fade"`, so the six classes are the `fade` set in
  *     `transitions.css`
  *   - `mode="out-in"`, so the old panel leaves BEFORE the new one enters —
  *     without it, the two stack and the layout jumps

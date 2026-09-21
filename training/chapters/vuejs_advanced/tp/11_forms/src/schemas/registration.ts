@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isEmailAvailable } from '@/api/fakeApi';
 
 /**
  * STEP 1 — The schema is the source of truth.
@@ -7,8 +8,8 @@ import { z } from 'zod';
  * and — through `z.input` / `z.output` — the types. Both forms of this workshop
  * (`HandRolledForm.vue` and `VeeForm.vue`) read this one file.
  *
- * Shipped as a shape with no rule at all, so the app boots. Your job is to make
- * it say something.
+ * Shipped as a shape with a single rule (`company`, at the bottom), so the app
+ * boots. Your job is to make it say something.
  */
 
 export const attendeeSchema = z.object({
@@ -52,28 +53,59 @@ export const registrationSchema = z
     //           narrows it to `true`, which no longer accepts `false` as an initial
     //           value. Pick the one that keeps `emptyRegistration` below compiling.
     consent: z.boolean(),
+  })
+  // TODO 1.9: `confirm` must equal `password`.
+  //           Message: 'Passwords do not match', attached to the `confirm` field.
+  //           Hint: a `.refine()` on the object, with `path`. Without `path`, the
+  //           error lands on the form and no field ever displays it — the rule
+  //           below is the pattern.
+  /**
+   * Already done for you: `company` is optional in the shape and required on
+   * the pro plan. A discriminated union would encode that in the TYPE, which is
+   * stricter — at the cost of two `emptyRegistration` variants and a `v-if` on
+   * the union tag in every consumer. On a form this size, the refine is the one
+   * you would maintain.
+   */
+  .refine((values) => values.plan !== 'pro' || Boolean(values.company?.trim()), {
+    message: 'A company is required on the pro plan',
+    path: ['company'],
   });
-// TODO 1.9: `confirm` must equal `password`.
-//           Message: 'Passwords do not match', attached to the `confirm` field.
-//           Hint: a `.refine()` on the object, with `path`. Without `path`, the
-//           error lands on the form and no field ever displays it.
 
 /**
  * STEP 4 — The asynchronous rule.
  *
- * TODO 4.2: add a `.refine()` that asks `isEmailAvailable(values.email)`, with
+ * Already done for you: `checkAvailability` caches one answer per email, so
+ * re-validating the form (which happens on every field's change) does not
+ * re-ask the server.
+ */
+const availabilityCache = new Map<string, boolean>();
+
+async function checkAvailability(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+
+  const cached = availabilityCache.get(normalized);
+  if (cached !== undefined) return cached;
+
+  const available = await isEmailAvailable(normalized);
+  availabilityCache.set(normalized, available);
+  return available;
+}
+
+/**
+ * TODO 4.2: add a `.refine()` that asks `checkAvailability(values.email)`, with
  *           the message 'This email is already registered' on `path: ['email']`.
  *
  *   - it makes the schema **async**: only `safeParseAsync` can run it, which is
  *     what `toTypedSchema` uses — and why the hand-rolled form keeps the
  *     synchronous `registrationSchema` above
  *   - the form re-validates on every keystroke of every field: skip the call
- *     when the value is not an email yet, and remember the answer per email.
- *     Watch the "availability calls" counter in the footer while you type
+ *     when the value is not an email yet. Watch the "availability calls"
+ *     counter in the footer while you type
  *   - VeeValidate ignores field-level rules as soon as the form has a schema:
  *     this rule has to live here, at the object level
  */
 export const registrationSchemaWithAvailability = registrationSchema;
+void checkAvailability;
 
 export type Attendee = z.output<typeof attendeeSchema>;
 

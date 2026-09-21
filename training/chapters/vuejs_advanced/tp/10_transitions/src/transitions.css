@@ -1,23 +1,44 @@
 /*
- * The six classes, twice, plus the one `<TransitionGroup>` adds.
+ * The six classes, three times over.
  *
- * TODO 1: `fade` — for the tab switcher. The `transition` declaration goes on
- *   `*-enter-active` / `*-leave-active`; `*-enter-from` and `*-leave-to` carry
- *   the invisible state.
- *
- * TODO 2: `list` — for the release list. Same shape, plus:
- *     - `.list-move` so a reordered row slides to its new place (FLIP)
- *     - `position: absolute` on `.list-leave-active`, or the leaving row keeps
- *       its space and nothing slides
- *
- * TODO 3: `slide` — for the detail panel, sliding in from the right.
+ * `*-from` is the starting state, `*-to` the ending one, and `*-active` covers
+ * the whole phase — which is why the `transition` declaration lives there, and
+ * only there. `fade` and `slide` are written for you: read them, then write
+ * `list` in the same shape.
  *
  * Keep the durations long enough to SEE (0.4s is a good teaching value), then
  * shorten them at the end.
  */
 
 /* --- fade: the tab switcher ------------------------------------------- */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
+}
 
 /* --- list: the release list ------------------------------------------- */
+/*
+ * TODO 2: `list` — the same shape as `fade`, plus:
+ *     - `.list-move` so a reordered row slides to its new place (FLIP)
+ *     - `position: absolute` on `.list-leave-active`, or the leaving row keeps
+ *       its space and nothing slides
+ */
 
 /* --- slide: the detail panel ------------------------------------------ */
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}

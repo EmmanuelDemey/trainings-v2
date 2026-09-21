@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { loadInvoices } from '../api/fakeApi';
 import type { Invoice } from '../types';
 
-/** TODO 2: this belongs to the invoicing feature — `features/invoicing/stores/`. */
+/** TODO 1: this belongs to the invoicing feature — `features/invoicing/stores/`. */
 export const useInvoicesStore = defineStore('invoices', () => {
   const invoices = ref<Invoice[]>(loadInvoices());
   const onlyLate = ref(false);

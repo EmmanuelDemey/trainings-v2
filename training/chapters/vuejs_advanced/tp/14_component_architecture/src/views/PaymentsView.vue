@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PaymentTable from '../components/PaymentTable.vue';
-import { usePaymentsStore } from '../stores/payments';
+import { usePaymentsStore } from '@/features/payments';
 
 const payments = usePaymentsStore();
 </script>

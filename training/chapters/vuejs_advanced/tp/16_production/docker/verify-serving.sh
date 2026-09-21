@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# PLAN B — the checks a "deploy, refresh, looks fine" never runs.
+# STEP 5 — the checks a "deploy, refresh, looks fine" never runs.
 #
 # Usage:  bash docker/verify-serving.sh [base-url]      (default: http://localhost:8080)
 #

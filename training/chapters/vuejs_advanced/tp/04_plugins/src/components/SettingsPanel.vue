@@ -2,8 +2,8 @@
 /**
  * The other way to reach the plugin.
  *
- * TODO 8: once `$toast` is declared (TODO 7a), add a button here that calls it
- *   **straight from the template** — no import, no composable:
+ * TODO 3: once `$toast` is declared in `augmentations.d.ts`, add a button here
+ *   that calls it **straight from the template** — no import, no composable:
  *
  *     <button type="button" data-testid="global-toast" @click="$toast('Settings saved', 'success')">
  *

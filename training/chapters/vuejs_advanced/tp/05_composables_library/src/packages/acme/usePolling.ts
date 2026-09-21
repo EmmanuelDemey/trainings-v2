@@ -1,4 +1,12 @@
-import { ref, type MaybeRefOrGetter, type Ref } from 'vue';
+import {
+  getCurrentScope,
+  onScopeDispose,
+  ref,
+  toValue,
+  watch,
+  type MaybeRefOrGetter,
+  type Ref,
+} from 'vue';
 
 export interface UsePollingOptions {
   /** Reactive on purpose: a settings panel may change it while polling runs. */
@@ -18,31 +26,68 @@ export interface UsePollingReturn {
 /**
  * Runs `task` every `interval` ms for as long as the owning scope lives.
  *
- * TODO 5: schedule the task, count the ticks, and flip `isActive`. `start()`
- *   on an already-active poll must not stack two timers.
- *
- * TODO 6: `interval` is a `MaybeRefOrGetter`. `watch` its `toValue()` and
- *   re-schedule when it changes — while active, without losing a tick count.
- *
- * TODO 7: cleanup. `onScopeDispose(stop, true)` rather than `onUnmounted`: a
- *   component's `setup` IS a scope, so this covers the component case AND keeps
- *   working inside a store, a plugin or a bare `effectScope()`.
- *
- * TODO 8: when there is no owning scope at all, nobody will ever call the
- *   cleanup. Detect it with `getCurrentScope()` and `console.warn` that the
- *   caller has to `stop()` by hand — do not leak in silence.
+ * The interval is a reactive input, so a change re-schedules without losing the
+ * tick count. `start()` on an active poll is a no-op — stacking two intervals is
+ * the bug that makes a dashboard hammer its backend after a few navigations.
  */
 export function usePolling(
   task: () => void | Promise<void>,
   options: UsePollingOptions = {},
 ): UsePollingReturn {
+  const { interval = 5000, immediate = false } = options;
+
   const isActive = ref(false);
   const ticks = ref(0);
 
-  return {
-    isActive,
-    ticks,
-    start: () => {},
-    stop: () => {},
-  };
+  let timer: ReturnType<typeof setInterval> | undefined;
+
+  function run(): void {
+    ticks.value += 1;
+    void task();
+  }
+
+  function clear(): void {
+    if (timer !== undefined) {
+      clearInterval(timer);
+      timer = undefined;
+    }
+  }
+
+  function schedule(): void {
+    clear();
+    timer = setInterval(run, toValue(interval));
+  }
+
+  function start(): void {
+    if (isActive.value) return;
+    isActive.value = true;
+    schedule();
+  }
+
+  function stop(): void {
+    isActive.value = false;
+    clear();
+  }
+
+  watch(
+    () => toValue(interval),
+    () => {
+      if (isActive.value) schedule();
+    },
+  );
+
+  if (getCurrentScope()) {
+    onScopeDispose(stop);
+  } else {
+    // No owner means nobody will ever clean up after us. Say so, loudly, rather
+    // than leaking an interval for the lifetime of the page.
+    console.warn(
+      '[acme] usePolling was called outside an effect scope — nothing will clean it up, call stop() yourself',
+    );
+  }
+
+  start();
+  if (immediate) run();
+
+  return { isActive, ticks, start, stop };
 }

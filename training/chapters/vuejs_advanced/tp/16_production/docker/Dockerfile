@@ -1,7 +1,7 @@
-# PLAN B — the image you would actually ship.
+# STEP 5 — the image you would actually ship.
 #
 # Note what is NOT here: no `npm ci`, no `vite build`. The artifact was built
-# once, by the CI job, and this image only copies it in — the same rule as step 7
+# once, by the CI job, and this image only copies it in — the same rule as step 6
 # of the workshop. A Dockerfile that rebuilds the app ships something no test
 # ever ran against.
 #

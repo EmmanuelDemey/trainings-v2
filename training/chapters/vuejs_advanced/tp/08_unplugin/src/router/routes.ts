@@ -6,7 +6,7 @@ import type { RouteRecordRaw } from 'vue-router';
  * It has already drifted — two views under `src/views/` have no URL at all, the
  * users layout is not used, and every `name` is something somebody invented.
  *
- * TODO 3: delete this file. Move the views into `src/pages/`, named after the
+ * TODO 2: delete this file. Move the views into `src/pages/`, named after the
  *   URL they serve, and let the plugin generate the array:
  *
  *     src/pages/index.vue            →  /

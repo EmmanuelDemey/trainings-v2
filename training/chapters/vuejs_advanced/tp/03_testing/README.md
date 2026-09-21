@@ -94,16 +94,17 @@ project. Part 1 takes the ones chapter 3 covers, part 2 the ones chapter 12 does
 | 1a | 1 | The loading state, then the data state | `tests/InvoiceList.spec.ts` | The loading assertion runs with **no** `await`, and adding one breaks it |
 | 3 | 1 | A custom stub, and assertions on the props it receives | `tests/InvoiceChart.stub.spec.ts` | You can name what the stub stopped testing |
 | 5 | 1 | Fake timers and a `using` spy | `tests/useDebouncedSearch.spec.ts` | Three keystrokes provably produce one call |
-| 7 | 1 | Four mutations of the source, one at a time | `src/` | Each one turned the expected test red, and `git diff src/` is empty again |
+| 7 | 1 | Three mutations of the source, one at a time | `src/` | Each one turned the expected test red, and `git diff src/` is empty again |
 | 1b | 2 | The empty and error states, through MSW overrides | `tests/InvoiceList.spec.ts` | The retry test fails if the button becomes a no-op |
 | 2 | 2 | The same form tested with a real router, then a mocked one | `tests/LoginForm.spec.ts` | Both suites are green, and you picked one to keep |
 | 4 | 2 | A store-connected component on `createTestingPinia` | `tests/CartSummary.spec.ts` | The assertions go through the **real** getters |
 | 6 | 2 | Custom commands, `cy.session`, intercepts and a fixture | `cypress/` | The runner shows the login flow ran once across two tests |
 | 8 | 2 | Four more mutations, including one on the e2e layer | `src/`, `cypress/` | Each one turned the expected test red, and `git diff` is empty again |
 
-Nothing here is graded by a green `npm test` alone: every spec in this project
-**starts green and asserts nothing**. Steps 7 and 8 are what tell you whether the
-tests you wrote in between are worth anything.
+Nothing here is graded by a green `npm test` alone: every spec you have to write
+**starts green and asserts nothing** (the few tests marked *given* are already
+written, as worked examples). Steps 7 and 8 are what tell you whether the tests
+you wrote in between are worth anything.
 
 ---
 
@@ -123,19 +124,20 @@ the data assertion runs after `flushPromises()`, and every lookup goes through
 
 ### Step 3. Stubbing — `tests/InvoiceChart.stub.spec.ts`
 
-Stub `InvoiceChart` with a custom stub declaring its props, assert on those
-props, then mount without the stub and note what changes. Write down what the
-stub made you stop testing.
+Stub `InvoiceChart` with a custom stub declaring its props, and assert on those
+props. The second test — the same mount **without** the stub — is given: read it,
+and its comment, for what the stub made you stop testing.
 
 → **Done when** the spec asserts on the props `InvoiceChart` receives, and you
-have mounted the same component **without** the stub to see the difference.
+can say what the given no-stub test shows.
 
 ### Step 5. Timers and spies — `tests/useDebouncedSearch.spec.ts`
 
 Prove that three keystrokes produce one call, using
 `vi.advanceTimersByTimeAsync`. Then write a test using `using` for a spy.
 `useDebouncedSearch` takes its `search` function as an argument — no HTTP mock
-needed, just a `vi.fn()`.
+needed, just a `vi.fn()`. The "clears the results" test in between is given, as a
+second example of the same timer dance.
 
 → **Done when** three keystrokes provably produce **one** call, and at least one
 spy is declared with `using` and has no `mockRestore()` left beside it.
@@ -153,7 +155,6 @@ before the next — `git diff src/` must be empty when you are done.
 | Break this | Where | What must go red |
 |---|---|---|
 | `loading` starts at `false` instead of `true` | `src/components/InvoiceList.vue` | the loading test |
-| keep one invoice: `.slice(0, 1)` on the `await api.getInvoices()` result | `src/components/InvoiceList.vue` | the data test, on the row count |
 | pass `:currency="'USD'"` to `<InvoiceChart>` | `src/components/InvoiceList.vue` | the stub test, on `props('currency')` |
 | delete the `clearTimeout(timer)` line | `src/composables/useDebouncedSearch.ts` | the debounce test — three calls instead of one |
 
@@ -169,7 +170,7 @@ mutation in place until it is red, then revert it.
 > project. What matters here is the reflex: a test is not finished until you have
 > seen it fail.
 
-→ **Done when** the four mutations each turned the expected test red, for the
+→ **Done when** the three mutations each turned the expected test red, for the
 expected reason, and `git diff src/` is empty again.
 
 ## Definition of Done — part 1
@@ -194,13 +195,13 @@ section are **not** part of this list.
       `wrapper.find('.some-class')` and no tag selector left in your specs
 - [ ] The stub test declares the stub's props and asserts on the props
       `InvoiceChart` receives
-- [ ] You mounted the same component **without** the stub and wrote down what the stub
-      made you stop testing
+- [ ] You read the given no-stub test and can say what the stub made you stop
+      testing
 - [ ] The debounce test proves three keystrokes produce **one** call, via
       `vi.advanceTimersByTimeAsync`
 - [ ] At least one spy is declared with `using`, and it has no matching
       `mockRestore()` / `afterEach` cleanup left
-- [ ] You ran the four mutations of step 7, one at a time: each one turned the
+- [ ] You ran the three mutations of step 7, one at a time: each one turned the
       expected test red, for the expected reason — and `git diff src/` is empty again
 
 **You can explain**

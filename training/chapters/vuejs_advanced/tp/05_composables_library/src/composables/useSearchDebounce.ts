@@ -3,7 +3,7 @@
  * to cancel the pending timer, so six keystrokes are six requests — the
  * behaviour a debounce exists to prevent.
  *
- * TODO 9: delete this file and call `useDebounced` from `@/packages/acme`
+ * TODO 5: delete this file and call `useDebounced` from `@/packages/acme`
  *   instead. Then look at what you lose by deleting it: nothing.
  */
 import { ref, watch, type Ref } from 'vue';

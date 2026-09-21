@@ -15,9 +15,8 @@
  *   - assert on what the agent sees, not on the store
  *
  * TODO 5a: the journey — sign in, land on the queue, open a ticket, come back.
- * TODO 5b: close a ticket and assert the row says so.
- * TODO 5c: the unhappy path — a 500 on `GET /api/tickets` shows the error state.
- * TODO 5d: serve the list from `cypress/fixtures/tickets.json` with
+ * TODO 5b: the unhappy path — a 500 on `GET /api/tickets` shows the error state.
+ * TODO 5c: serve the list from `cypress/fixtures/tickets.json` with
  *   `cy.intercept('GET', '/api/tickets', { fixture: 'tickets.json' })`, and say
  *   in the Definition of Done when a fixture beats a live backend.
  */

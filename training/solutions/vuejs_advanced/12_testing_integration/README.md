@@ -66,7 +66,7 @@ tests/TicketTable.spec.ts             GIVEN, green — the unit level, already d
 tests/helpers.ts                      freshRouter(), mountApp(), mountStandalone()
 tests/msw.ts + tests/setup.ts         the happy path, reset after every test
 tests/router.spec.ts                  STEP 1  — to write
-tests/loginView.mockedRouter.spec.ts  STEP 1c — to write
+tests/loginView.mockedRouter.spec.ts  STEP 1b — to write
 tests/session.spec.ts                 STEP 2  — to write
 tests/tickets.spec.ts                 STEP 3  — to write
 cypress/                              STEPS 4 & 5 — to write
@@ -80,8 +80,7 @@ must **not** duplicate: nothing below is about rendering a row.
 | # | What you write | Where | Done when |
 |---|---|---|---|
 | 1a | The guard, exercised by a real memory router | `tests/router.spec.ts` | Signed out, `/tickets` lands on login with `query.redirect` |
-| 1b | The sign-in round trip, and the wrong-password path | `tests/router.spec.ts` | Signing in ends on the queue; a bad password stays put |
-| 1c | The same view with the router replaced by two stubs | `tests/loginView.mockedRouter.spec.ts` | You can name what 1a catches and this cannot |
+| 1b | The login view with the router replaced by two stubs | `tests/loginView.mockedRouter.spec.ts` | You can name what 1a catches and this cannot |
 | 2 | A store-connected badge, on seeded state and spied actions | `tests/session.spec.ts` | The assertions survive `stubActions` being flipped, and you chose one |
 | 3 | The network, intercepted below your own `fetch` | `tests/tickets.spec.ts` | Happy path, empty, 500 and a write — with no stale rows on the error |
 | 4 | A sign-in command the next spec can restore | `cypress/support/commands.ts` | The runner shows the form filled **once** across two tests |
@@ -100,10 +99,7 @@ is step 6: sabotage the source and watch the right test, and only it, go red.
 reset between tests. Assert that `/tickets` while signed out lands on `login`
 with `query.redirect`, and that a signed-in agent goes straight through.
 
-**1b — the round trip.** From `/login`, signing in ends on the queue; wrong
-credentials stay put and show the error.
-
-**1c — the mocked router** (`tests/loginView.mockedRouter.spec.ts`).
+**1b — the mocked router** (`tests/loginView.mockedRouter.spec.ts`).
 `LoginView` only calls `useRouter().push()` and reads `route.query`, so two stubs
 replace the whole router:
 
@@ -118,8 +114,8 @@ vi.mock('vue-router', () => ({
 file. Then answer, in the Definition of Done: **what does the real-router
 version catch that this one cannot?**
 
-→ **Done when** the guard, the round trip and the mocked version are all green,
-and you can state what the mocked one stopped covering.
+→ **Done when** the guard and the mocked version are both green, and you can
+state what the mocked one stopped covering.
 
 ### 2. Pinia — `tests/session.spec.ts`
 
@@ -136,7 +132,6 @@ const pinia = createTestingPinia({
    default, so the state does **not** change. Assert both.
 3. Do it again with `stubActions: false` and watch the real action run. Say which
    of the two you want here, and why.
-4. `LoginView` hands `signIn(email, password)` the credentials exactly as typed.
 
 → **Done when** the badge is driven by `initialState` alone, the sign-out spy is
 asserted, and you have run the same test both ways.
@@ -171,8 +166,8 @@ runner shows the form filled once across two tests.
 
 ### 5. The journey — `cypress/e2e/triage.cy.ts`
 
-Sign in, read the queue, open a ticket, close one, and check the error state.
-Serve the list from `cypress/fixtures/tickets.json`.
+Sign in, read the queue, open a ticket, and check the error state. Serve the
+list from `cypress/fixtures/tickets.json`.
 
 > **Not one `cy.wait(number)` in the file.** A fixed wait is either flaky or
 > slow, usually both. Wait on an alias, or on an assertion.
@@ -208,7 +203,6 @@ section are **not** part of this list.
 
 - [ ] A signed-out visit to `/tickets` lands on `login`, with `redirect` in the query
 - [ ] A signed-in agent goes through
-- [ ] Signing in lands on the queue; failing to stays on the login page
 - [ ] The mocked-router spec lives in its own file, and you can say what it misses
 
 **Pinia**
@@ -216,7 +210,6 @@ section are **not** part of this list.
 - [ ] `SessionBadge` is driven by `initialState`, with no network
 - [ ] The default stubbed action is asserted **on the spy**, and the state does not move
 - [ ] The `stubActions: false` variant shows the state moving, and you chose between them
-- [ ] `LoginView` is asserted on the call it makes, not on what the store then does
 
 **The network**
 

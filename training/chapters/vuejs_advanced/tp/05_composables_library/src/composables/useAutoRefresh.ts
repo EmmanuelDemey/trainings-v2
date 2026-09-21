@@ -3,7 +3,7 @@
  * `onUnmounted` ties it to a component — call it from a Pinia store and it never
  * cleans up.
  *
- * TODO 10: delete this file and call `usePolling` from `@/packages/acme`
+ * TODO 6: delete this file and call `usePolling` from `@/packages/acme`
  *   instead, wiring the panel's interval selector to its `interval` option.
  */
 import { onUnmounted, ref, type Ref } from 'vue';

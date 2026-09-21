@@ -22,7 +22,7 @@ vi.mock('@/components/renderStats', () => ({
 }));
 
 /**
- * The executable half of steps 4 and 6 — the two plugins.
+ * The executable half of steps 3 and 4 — the two plugins.
  *
  * These specs are given, and they are red on the skeleton. Keep them running
  * while you write `persistPlugin` and `loggerPlugin`:
@@ -35,9 +35,9 @@ vi.mock('@/components/renderStats', () => ({
  * would fail to load instead of failing an assertion. The panels, on the other
  * hand, exist before and after the split, and so do the two plugins.
  *
- * What is therefore NOT here: `shallowRef`, the `byId` index and the render
- * counters. Those are measurements you take in the browser, with the numbers
- * written down — which is what their Definition of Done boxes ask for.
+ * What is therefore NOT here: `shallowRef` and the render counters. Those are
+ * measurements you take in the browser, with the numbers written down — which
+ * is what their Definition of Done boxes ask for.
  */
 
 /**

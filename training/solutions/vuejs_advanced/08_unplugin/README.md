@@ -42,18 +42,21 @@ one names a page the app should serve and does not. They assert on the routes
 the app *has*, never on how they got there: a hand-written array and a generated
 one are interchangeable — except that one of them drifts.
 
+**Already done for you:** `vitest.config.ts` merges `vite.config.ts` with
+`mergeConfig`. Vitest reads its own config, so a plugin wired only in
+`vite.config.ts` would be invisible to the specs — here, every plugin you add
+reaches them too.
+
 ## The workshop at a glance
 
 | # | What you do | Where | Done when |
 |---|---|---|---|
 | 1 | Generate the routes from the file tree | `vite.config.ts` + `src/views/` → `src/pages/` + `src/router/index.ts` | The six red specs name pages the app now serves |
-| 2 | Make the specs see the same plugins the app does | `vitest.config.ts` | `vue-router/auto-routes` resolves under Vitest too |
-| 3 | Stop importing what every file imports | `vite.config.ts`, then the pages | The pages have no `ref` / `useRoute` import left |
-| 4 | Stop importing components by hand | `vite.config.ts`, then the pages | `<UiButton>` works with no import |
-| 5 | Decide what to do with the three generated `.d.ts` | `tsconfig.json` + git | `npm run typecheck` is green **on a fresh clone** |
-| 6 | Cash in the typed routes | the pages | `useRoute('/users/[oops]')` is a compile error |
+| 2 | Stop importing what every file imports | `vite.config.ts`, then the pages | The pages have no `ref` / `useRoute` import left |
+| 3 | Stop importing components by hand | `vite.config.ts`, then the pages | `<UiButton>` works with no import |
+| 4 | Cash in the typed routes | `tsconfig.json`, then the pages | `useRoute('/users/[oops]')` is a compile error |
 
-Steps 1 and 2 are what `npm test` grades. Steps 3 to 6 are graded by `npm run
+Step 1 is what `npm test` grades. Steps 2 to 4 are graded by `npm run
 typecheck` and by what disappears from the top of your files.
 
 ## Steps
@@ -94,18 +97,10 @@ import { routes } from 'vue-router/auto-routes';
 > URL without nesting the UI.
 
 → **Done when** `src/router/routes.ts` is gone, every URL above still works in
-the browser, and the six red specs name a page the app now serves.
-
-### 2. The specs need the plugins too — `vitest.config.ts`
-
-Vitest reads its own config: a plugin added to `vite.config.ts` is invisible to
-it, and `vue-router/auto-routes` resolves to nothing. Wire them there as
-well — then replace the duplication with `mergeConfig(viteConfig, …)`.
-
-→ **Done when** `npm test` exits 0 — the ten specs — with no route array
+the browser, and `npm test` exits 0 — the ten specs — with no route array
 hand-written anywhere.
 
-### 3. Auto-imports — `vite.config.ts`, then the pages
+### 2. Auto-imports — `vite.config.ts`, then the pages
 
 ```ts
 AutoImport({
@@ -122,7 +117,7 @@ Then strip the imports from the pages: `ref`, `computed`, `useRoute`,
 → **Done when** no page imports `ref`, `computed`, `useRoute` or `useUsers` any
 more, and `npm run typecheck` is still green.
 
-### 4. Auto-registered components — `vite.config.ts`, then the pages
+### 3. Auto-registered components — `vite.config.ts`, then the pages
 
 ```ts
 Components({
@@ -139,17 +134,11 @@ from the pages.
 → **Done when** `<UiButton>` and `<UserCard>` render with no import statement
 left behind them.
 
-### 5. Commit the generated types — `tsconfig.json`
+### 4. Cash in the typed routes — `tsconfig.json`, then the pages
 
-The three plugins write `typed-router.d.ts`, `src/auto-imports.d.ts` and
-`src/components.d.ts` **during a build**. `npm run build` runs `vue-tsc`
-**first**, so a CI that has never built cannot typecheck: **commit them**, and
-add `typed-router.d.ts` to `tsconfig.json`'s `include`.
-
-→ **Done when** `npm run typecheck` passes on a clone that has never run a
-build, and you can justify the choice you made.
-
-### 6. Cash in the typed routes — the pages
+The router plugin writes `typed-router.d.ts` at the root. It is **committed**
+(`npm run build` runs `vue-tsc` *before* any plugin has had a chance to write
+it), but TypeScript does not see it yet: add it to `tsconfig.json`'s `include`.
 
 `useRoute()` now returns a **union** of every page's params, so `route.params.id`
 no longer compiles — which is the feature. Narrow it per page:
@@ -163,7 +152,7 @@ Then try `useRoute('/users/[oops]')` and read the error.
 → **Done when** `route.params.id` is typed on the user page and a path that does
 not exist is a **compile error**.
 
-### 7. *(Bonus)* HMR on the routes
+### 5. *(Bonus)* HMR on the routes
 
 In `main.ts`, behind `import.meta.hot`, call `handleHotUpdate(router)` from
 `vue-router/auto-routes`. Rename a page file with the app open and watch the URL
@@ -192,14 +181,13 @@ section are **not** part of this list.
 - [ ] An unknown URL renders the not-found page, with the path in its params
 - [ ] The route names are the generated ones — `/users/[id]`, `/users.create`,
       `/[...path]`
-- [ ] `vitest.config.ts` shares its plugins with `vite.config.ts`
 
 **The imports are generated**
 
 - [ ] No page imports `ref`, `computed` or `useRoute`
 - [ ] No page imports a component from `src/components`
 - [ ] `<UiButton>` resolves through `directoryAsNamespace`
-- [ ] The three generated `.d.ts` are committed and in `tsconfig.json`
+- [ ] `typed-router.d.ts` is in `tsconfig.json`'s `include`
 
 **You can explain**
 

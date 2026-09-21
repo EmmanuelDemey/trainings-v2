@@ -1,4 +1,4 @@
-import type { Invoice, Payment } from '../types';
+import type { Invoice } from '../types';
 
 export function loadInvoices(): Invoice[] {
   return [
@@ -6,13 +6,5 @@ export function loadInvoices(): Invoice[] {
     { id: 2, reference: 'INV-2042', client: 'Aperture', amountCents: 38_050, status: 'sent' },
     { id: 3, reference: 'INV-2043', client: 'Monolith', amountCents: 612_500, status: 'paid' },
     { id: 4, reference: 'INV-2044', client: 'Enigma', amountCents: 9_900, status: 'draft' },
-  ];
-}
-
-export function loadPayments(): Payment[] {
-  return [
-    { id: 11, reference: 'PAY-7781', method: 'card', amountCents: 38_050, settled: true },
-    { id: 12, reference: 'PAY-7782', method: 'transfer', amountCents: 612_500, settled: true },
-    { id: 13, reference: 'PAY-7783', method: 'direct-debit', amountCents: 124_000, settled: false },
   ];
 }

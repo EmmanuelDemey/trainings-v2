@@ -1,34 +1,57 @@
-import { ref, watch, type Ref } from 'vue';
+import { onScopeDispose, ref, watch, type Ref } from 'vue';
 
 /**
- * STEP 2 — A ref synchronised with `localStorage`.
+ * Already done for you — a ref synchronised with `localStorage`. Read it before
+ * step 2: `useFavorites` is built on top of it.
  *
- * Requirements:
  *  - read the stored value on creation, fall back to `initial` when absent
- *  - a corrupted entry must NOT crash the app (try it: write `{{{` by hand in
- *    the devtools Application tab, then reload)
- *  - write back on every change, deeply
- *  - stay in sync across tabs via the `storage` event (bonus)
+ *  - a corrupted entry must NOT crash the app
+ *  - write back on every change
+ *  - stay in sync across tabs via the `storage` event
  */
 export function useLocalStorage<T>(key: string, initial: T): Ref<T> {
   const value = ref(initial) as Ref<T>;
 
-  // TODO 2.1: read `localStorage.getItem(key)`. If it exists, `JSON.parse` it
-  //   inside a try/catch and assign it to `value`. On a parse error, remove the
-  //   corrupted entry and keep `initial`.
+  /** Reads the key, and treats an unparseable entry as "no entry". */
+  function read(raw: string | null): void {
+    if (raw === null) return;
+    try {
+      value.value = JSON.parse(raw) as T;
+    } catch {
+      // Anything can end up in localStorage: another version of the app, a
+      // browser extension, a user with the devtools open. Crashing the whole app
+      // on a bad JSON string is not an option — drop it and move on.
+      localStorage.removeItem(key);
+    }
+  }
 
-  // TODO 2.2: watch `value` with `{ deep: true }` and write
-  //   `localStorage.setItem(key, JSON.stringify(value.value))`.
-  //   Note the trap: `deep: true` is required because callers will push into an
-  //   array rather than reassign it.
+  read(localStorage.getItem(key));
 
-  // TODO 2.3 (bonus): listen to the `storage` event on `window` to stay in sync
-  //   across tabs, and remove the listener on unmount. Open the app in two tabs
-  //   to verify.
-  //   Which composable from the slides would you reuse here?
+  watch(
+    value,
+    (current) => {
+      localStorage.setItem(key, JSON.stringify(current));
+    },
+  );
 
-  void key;
-  void watch;
+  /**
+   * Cross-tab sync. The `storage` event fires in every OTHER tab of the same
+   * origin — never in the one that wrote, which is exactly what stops this from
+   * being an infinite loop.
+   */
+  function onStorage(event: StorageEvent): void {
+    if (event.key !== key) return;
+    read(event.newValue);
+  }
+
+  window.addEventListener('storage', onStorage);
+
+  // `onScopeDispose` rather than `onUnmounted`: this composable can legitimately
+  // be called from a module-scope `effectScope` (see `useFavorites`), where
+  // there is no component to unmount and `onUnmounted` would warn and no-op.
+  onScopeDispose(() => {
+    window.removeEventListener('storage', onStorage);
+  }, true);
 
   return value;
 }

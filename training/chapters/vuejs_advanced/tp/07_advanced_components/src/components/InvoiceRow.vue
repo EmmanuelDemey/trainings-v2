@@ -4,7 +4,7 @@
  * render, which makes wasted re-renders measurable.
  *
  * `onUpdated` fires every time this component re-renders — that is exactly the
- * number step 4 is trying to bring down.
+ * number the optimizations of `BigListPanel` bring down.
  */
 import { computed, onUpdated } from 'vue';
 import type { Invoice } from '@/api/fakeApi';

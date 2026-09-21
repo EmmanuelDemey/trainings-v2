@@ -1,11 +1,6 @@
 <script setup lang="ts">
 /**
  * The only component that legitimately re-renders when the filter changes.
- *
- * TODO 4: when the list it receives is empty, this table renders a header and
- *   nothing else — the app looks broken rather than empty. Render a message
- *   instead, in an element carrying `data-testid="empty"`, and keep the table
- *   out of the DOM in that case.
  */
 import { onUpdated } from 'vue';
 import type { Ticket } from '../api/fakeApi';

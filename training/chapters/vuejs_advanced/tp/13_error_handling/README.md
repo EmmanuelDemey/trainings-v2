@@ -30,7 +30,7 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-`tests/errors.spec.ts` is given and **nine of its thirteen specs are red**.
+`tests/errors.spec.ts` is given and **ten of its thirteen specs are red**.
 
 The app ships a **reporter** (`src/observability/reporter.ts`) standing in for
 Sentry, and an **incident log** panel that renders it. That is what turns "did
@@ -41,17 +41,18 @@ Two buttons at the top break a panel on purpose. Use them constantly.
 
 ## The workshop at a glance
 
-The four layers below are cumulative: each one catches what the previous cannot.
-Step 3 writes no code — it is the five minutes that explain why step 1 had to be
-a wrapper component.
+The three layers below are cumulative: each one catches what the previous cannot.
+
+Already done for you: `App.vue` wraps each panel in its **own** `<ErrorBoundary>`,
+with a `label`. One boundary around both would degrade two panels for one
+failure — the granularity of a boundary is a product decision, not a technical
+one: what is the smallest thing this user can afford to lose?
 
 | # | What you do | Where | Done when |
 |---|---|---|---|
-| 1 | Write the boundary that catches a subtree's error | `src/components/ErrorBoundary.vue` | A broken panel shows a fallback instead of blanking the page |
-| 2 | Choose the granularity, panel by panel | `src/App.vue` | Breaking one panel leaves its neighbour working |
-| 3 | See why a component cannot catch **itself** | `SelfHealingPanel.vue` (read only) | You can quote the line of `runtime-core` that decides it |
-| 4 | The app-level net, for everything no boundary wraps | `src/createOpsApp.ts` | A report lands with `source: 'app'` |
-| 5 | The `window` net, for what left Vue's pipeline entirely | `src/observability/windowNet.ts` | "Throw from a timer" and "Reject a promise" both get reported |
+| 1 | Write the boundary that catches a subtree's error | `src/components/ErrorBoundary.vue` | A broken panel shows a fallback, and its neighbour keeps working |
+| 2 | The app-level net, for everything no boundary wraps | `src/createOpsApp.ts` | A report lands with `source: 'app'` |
+| 3 | The `window` net, for what left Vue's pipeline entirely | `src/observability/windowNet.ts` | "Throw from a timer" and "Reject a promise" both get reported |
 
 The incident-log panel is the scoreboard: every step above is a question about
 what shows up in it, which is also what the specs assert.
@@ -60,36 +61,23 @@ what shows up in it, which is also what the specs assert.
 
 ### 1. The boundary — `src/components/ErrorBoundary.vue`
 
-1. Hold the error in a **`shallowRef`**. An `Error` is not data: deep reactivity
-   buys nothing and trips on exotic error objects.
-2. `onErrorCaptured((err, instance, info) => …)` — keep the error **and** `info`,
+The error and the phase already live in two **`shallowRef`**s (an `Error` is
+not data: deep reactivity buys nothing and trips on exotic error objects), and
+the template already renders the fallback from them. What is missing is what
+fills them:
+
+1. `onErrorCaptured((err, instance, info) => …)` — keep the error **and** `info`,
    report both with `capture(err, { info, source: 'boundary' })`, and
    `return false`.
-3. Render the fallback instead of the slot: the message, the phase, and a
-   **Retry** that clears the error.
+2. `retry()` clears them, so the subtree gets a second chance.
 
 > Report **before** you return `false`. Stopping the walk also stops
 > `app.config.errorHandler` from ever hearing about it — the boundary decides
 > what the *user* sees, `errorHandler` what *you* see.
 
-→ **Done when** a broken child renders the fallback with its phase, Retry clears
-it, and the incident log shows the report with `source: 'boundary'`.
-
-### 2. Wrap the panels — `src/App.vue`
-
-One boundary **per panel**, each with its own `label`. Then break the totals and
-check that the self-healing panel next to it is untouched.
-
-> The granularity of a boundary is a product decision, not a technical one: what
-> is the smallest thing this user can afford to lose?
-
-→ **Done when** breaking the totals leaves every other panel usable, and each
-report carries its own `label`.
-
-### 3. Watch a component fail to catch itself — `SelfHealingPanel.vue` (nothing to write)
-
-`SelfHealingPanel.vue` registers `onErrorCaptured` **and** throws. Break it and
-read the incident log: its own hook never ran.
+Then break the totals, and check that the self-healing panel next to it is
+untouched. Break the self-healing panel too: it registers `onErrorCaptured`
+**and** throws — read the incident log, its own hook never ran.
 
 ```js
 // runtime-core, handleError()
@@ -97,12 +85,13 @@ let cur = instance.parent;     // ⬅ not `instance`
 while (cur) { /* … */ }
 ```
 
-That line is the entire reason boundaries are a wrapper component. Write it down.
+That line is the entire reason boundaries are a wrapper component.
 
-→ **Done when** you have seen its own hook *not* run, and can say why in one
-sentence.
+→ **Done when** a broken child renders the fallback with its phase, Retry clears
+it, breaking the totals leaves every other panel usable, and the incident log
+shows the report with `source: 'boundary'`.
 
-### 4. The last-resort net — `src/createOpsApp.ts`
+### 2. The last-resort net — `src/createOpsApp.ts`
 
 Wire `app.config.errorHandler` to `capture(err, { info, source: 'app' })`. Then
 break a panel **outside** any boundary and watch the report land with
@@ -114,7 +103,7 @@ break a panel **outside** any boundary and watch the report land with
 → **Done when** an error outside every boundary lands in the log with
 `source: 'app'`.
 
-### 5. Outside the pipeline — `src/observability/windowNet.ts`
+### 3. Outside the pipeline — `src/observability/windowNet.ts`
 
 Click "Throw from a timer" and "Reject a promise" before you start: nothing is
 reported. Vue only wraps the functions **it** calls; a callback handed to
@@ -131,7 +120,7 @@ and a duplicate after a hot reload.
 → **Done when** both buttons report something, and calling the uninstaller stops
 them reporting again.
 
-### 6. *(Bonus)* The rest of the map
+### 4. *(Bonus)* The rest of the map
 
 One line each, and worth doing now rather than after the first incident:
 

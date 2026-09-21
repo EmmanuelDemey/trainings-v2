@@ -7,7 +7,7 @@ const total = ref('');
 /** A form is "dirty" as soon as the user typed something. */
 const isDirty = computed(() => customer.value !== '' || total.value !== '');
 
-// TODO 6.3: block navigation away from a dirty form with `onBeforeRouteLeave`.
+// TODO 5.3: block navigation away from a dirty form with `onBeforeRouteLeave`.
 //   - import it from 'vue-router'
 //   - return `false` when the user cancels the confirm dialog
 //   - do NOT block when the form was just submitted (add a `saved` flag)

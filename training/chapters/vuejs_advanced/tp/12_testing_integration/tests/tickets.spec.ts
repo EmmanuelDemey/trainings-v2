@@ -20,8 +20,7 @@ import { describe, it } from 'vitest';
  *   that the previous tickets are gone rather than left on screen.
  *
  * TODO 3d: closing a ticket goes through the network too. Close one and assert
- *   the row's status changed, then override the close handler with a 500 and
- *   decide what the app *should* do. Write what you decide in the README.
+ *   the row's status changed.
  *
  * TODO 3e: take a handler away entirely and read the failure. `onUnhandledRequest:
  *   'error'` is what turns "the test hangs" into "you forgot a handler".

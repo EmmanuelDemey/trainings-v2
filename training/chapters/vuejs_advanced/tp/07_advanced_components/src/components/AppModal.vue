@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * STEP 5 — Teleport
+ * STEP 4 — Teleport
  *
  * This dialog is declared inside a panel that creates a clipping AND a
  * containing block (`overflow: hidden` + `transform`). As long as its DOM nodes
@@ -26,17 +26,17 @@ function close(): void {
 
 <template>
   <!--
-    TODO 5.1: wrap the whole backdrop in a `<Teleport to="body">`.
+    TODO 4.1: wrap the whole backdrop in a `<Teleport to="body">`.
       Open the modal, then look at the Elements tab: the nodes must sit at the
       end of `<body>`, no longer inside `<section>`. The dialog is centred on the
       viewport again — without touching a single line of CSS.
 
-    TODO 5.2: bind `:disabled="inline"` on the teleport. The checkbox below then
+    TODO 4.2: bind `:disabled="inline"` on the teleport. The checkbox below then
       puts the dialog back inside the panel, WITHOUT closing it: type something in
       the "Reason" field first, then toggle. The nodes move, the typed value
       survives — a teleport moves DOM nodes, it does not re-create anything.
 
-    TODO 5.3: point the teleport at `#modal-root` (rendered by `App.vue`, AFTER
+    TODO 4.3: point the teleport at `#modal-root` (rendered by `App.vue`, AFTER
       the panels) instead of `body`. Reload: Vue warns that the target cannot be
       found and nothing renders — `to` is resolved when the teleport MOUNTS, and
       at that moment the app has not rendered `#modal-root` yet.
@@ -46,7 +46,7 @@ function close(): void {
       the `<Teleport>` itself would delay the mount until the first click, and
       you would never see the problem `defer` solves.
 
-    TODO 5.4 (bonus): close the dialog on `Escape` and move the focus into it on
+    TODO 4.4 (bonus): close the dialog on `Escape` and move the focus into it on
       open (`onMounted` + a `ref` on the dialog). Teleport moves the nodes, not
       the focus: accessibility stays YOUR job.
   -->

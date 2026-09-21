@@ -45,31 +45,6 @@ describe('triaging the queue', () => {
     cy.get('[data-testid="ticket-subject"]').should('contain', 'Card declined on renewal');
   });
 
-  it('closes a ticket', () => {
-    cy.signIn();
-
-    cy.intercept('POST', '/api/tickets/1/close', {
-      body: {
-        id: 1,
-        subject: 'Card declined on renewal',
-        requester: 'ada@northwind.io',
-        priority: 'urgent',
-        status: 'closed',
-      },
-    }).as('close');
-
-    cy.visit('/tickets');
-    cy.wait('@tickets');
-
-    cy.get('[data-testid="close-ticket"]').first().click();
-    cy.wait('@close');
-
-    cy.get('[data-testid="ticket-row"]')
-      .first()
-      .find('[data-testid="ticket-status"]')
-      .should('contain', 'closed');
-  });
-
   it('shows the error state when the queue cannot be loaded', () => {
     cy.signIn();
 
@@ -80,12 +55,5 @@ describe('triaging the queue', () => {
 
     cy.get('[data-testid="error"]').should('be.visible');
     cy.get('[data-testid="ticket-row"]').should('not.exist');
-  });
-
-  it('sends a signed-out visitor to the login page', () => {
-    cy.visit('/tickets');
-
-    cy.location('pathname').should('eq', '/login');
-    cy.location('search').should('contain', 'redirect=/tickets');
   });
 });

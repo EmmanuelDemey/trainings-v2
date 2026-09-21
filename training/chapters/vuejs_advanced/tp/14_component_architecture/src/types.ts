@@ -1,10 +1,9 @@
 /**
- * Two domains in one file. Invoicing and payments are different teams with
- * different roadmaps — and their types share nothing but a shape.
+ * What is left of the shared types file once payments moved out. A shared types
+ * file is how two features start changing together for no reason.
  *
- * TODO 1: split this into `features/invoicing/types.ts` and
- *   `features/payments/types.ts`. A shared types file is how two features start
- *   changing together for no reason.
+ * TODO 1: move this to `features/invoicing/types.ts` — `features/payments/`
+ *   shows the way.
  */
 
 export interface Invoice {
@@ -13,12 +12,4 @@ export interface Invoice {
   client: string;
   amountCents: number;
   status: 'draft' | 'sent' | 'paid' | 'late';
-}
-
-export interface Payment {
-  id: number;
-  reference: string;
-  method: 'card' | 'transfer' | 'direct-debit';
-  amountCents: number;
-  settled: boolean;
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * STEP 5 — Teleport
+ * STEP 4 — Teleport
  *
  * This dialog is declared inside a panel that creates a clipping AND a
  * containing block (`overflow: hidden` + `transform`). As long as its DOM nodes

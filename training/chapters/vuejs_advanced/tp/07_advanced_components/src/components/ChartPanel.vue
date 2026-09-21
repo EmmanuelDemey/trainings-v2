@@ -21,11 +21,10 @@ import SalesChart from './SalesChart.vue';
 //     (below 200 ms of loading, no skeleton at all — no spinner flash)
 //   - `errorComponent: ChartError` with `timeout: 5000`
 //
-// TODO 1.3: add an `onError(error, retry, fail, attempts)` handler that retries
-//   once on a chunk-loading error, and calls `fail()` otherwise.
-//   Test it: in `src/api/fakeApi.ts`, flip `failureSwitch.chart` to `true`.
+//   Test the error path: in `src/api/fakeApi.ts`, flip `failureSwitch.chart` to
+//   `true`.
 //
-// TODO 1.4 (bonus): throttle your connection to "Slow 3G" in the Network tab and
+// TODO 1.3 (bonus): throttle your connection to "Slow 3G" in the Network tab and
 //   check that the skeleton, then the chart, appear in the right order.
 
 const shown = ref(false);

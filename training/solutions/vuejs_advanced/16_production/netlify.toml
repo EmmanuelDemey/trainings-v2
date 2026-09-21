@@ -1,8 +1,8 @@
-# STEP 5 — Serving the SPA correctly.
+# Serving the SPA correctly — already done for you.
 #
-# Three rules, and the same three you had to write by hand in `docker/nginx.conf`
-# for step 5bis. Read them side by side once: nothing here is Netlify-specific
-# except the syntax.
+# Three rules, and the same three you write by hand in `docker/nginx.conf` in
+# step 5. Read them side by side once: nothing here is Netlify-specific except
+# the syntax.
 
 [build]
   command = "npm run build"

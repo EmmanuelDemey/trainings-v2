@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { useSessionStore } from '@/stores/session';
 import { session } from './fixtures';
-import { flushPromises, freshRouter, mountApp } from './helpers';
+import { freshRouter } from './helpers';
 
 /**
  * The router, for real: `createMemoryHistory()` gives the actual guard, the
@@ -30,30 +30,5 @@ describe('the auth guard', () => {
     await router.push('/tickets');
 
     expect(router.currentRoute.value.name).toBe('tickets');
-  });
-});
-
-describe('signing in', () => {
-  it('lands on the queue once the credentials are accepted', async () => {
-    using app = await mountApp('/login');
-
-    await app.wrapper.get('[data-testid="email"]').setValue('ada@acme.dev');
-    await app.wrapper.get('[data-testid="password"]').setValue('secret');
-    await app.wrapper.get('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
-
-    expect(app.router.currentRoute.value.name).toBe('tickets');
-  });
-
-  it('stays on the login page when they are not', async () => {
-    using app = await mountApp('/login');
-
-    await app.wrapper.get('[data-testid="email"]').setValue('ada@acme.dev');
-    await app.wrapper.get('[data-testid="password"]').setValue('nope');
-    await app.wrapper.get('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
-
-    expect(app.router.currentRoute.value.name).toBe('login');
-    expect(app.wrapper.get('[data-testid="login-error"]').text()).toContain('do not match');
   });
 });

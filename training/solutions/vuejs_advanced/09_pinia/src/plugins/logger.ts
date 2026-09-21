@@ -7,7 +7,7 @@ export const actionLog = reactive<
 >([]);
 
 /**
- * STEP 6 — An observability plugin.
+ * STEP 4 — An observability plugin.
  *
  * Fifteen lines here replace a `console.time` in every action of every store —
  * and, unlike those, they cannot be forgotten in the one action that turns out

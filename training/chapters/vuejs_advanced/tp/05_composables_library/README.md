@@ -2,8 +2,8 @@
 
 > This TP is **autonomous**: it does not depend on any other TP. The dashboard
 > works — badly, in the three ways a copy-pasted composable always works badly.
-> You will extract two of them into a shared library, and deliberately leave the
-> third where it is.
+> Two of them move into a shared library — one you write, one already written —
+> and you deliberately leave the third where it is.
 
 ## Goal
 
@@ -42,21 +42,26 @@ Two spec files, both given, both **red**:
 ## What you are handed
 
 ```
-src/packages/acme/     the shared library — interfaces given, bodies to write
+src/packages/acme/     the shared library — `usePolling` written, `useDebounced` to write
 src/composables/       three app-local composables, the company's Nth copy
 src/components/        three consumers that destructure, like every consumer does
 ```
+
+**Already done for you:** `src/packages/acme/usePolling.ts` is the library's
+reference implementation — idempotent `start()`, a reactive `interval` that
+re-schedules without losing the tick count, `onScopeDispose(stop)`, and a
+`console.warn` when there is no scope to clean up after it. Its specs are green
+from the start. Read it before step 1: it is the three conventions, applied.
 
 ## The workshop at a glance
 
 | # | What you do | Where | Done when |
 |---|---|---|---|
 | 1 | Write the debounce composable to the three conventions | `src/packages/acme/useDebounced.ts` | It follows a value, a `ref` **and** a getter, and dies with its scope |
-| 2 | Write the polling composable, idempotent and re-schedulable | `src/packages/acme/usePolling.ts` | `start()` twice does not stack two intervals |
-| 3 | Migrate the two consumers and delete their local copies | `SearchPanel.vue`, `FleetPanel.vue` | A burst of keystrokes is **one** search call |
-| 4 | Fix the one composable that must **not** move | `src/composables/useSortedRows.ts` | The table still updates after the consumer destructures it |
+| 2 | Migrate the two consumers and delete their local copies | `SearchPanel.vue`, `FleetPanel.vue` | A burst of keystrokes is **one** search call |
+| 3 | Fix the one composable that must **not** move | `src/composables/useSortedRows.ts` | The table still updates after the consumer destructures it |
 
-Step 4 is the one people skip: its point is the decision, not the code. Nothing
+Step 3 is the one people skip: its point is the decision, not the code. Nothing
 moves to the library just because it could.
 
 ## Steps
@@ -74,26 +79,7 @@ moves to the library just because it could.
 → **Done when** it follows a plain value, a `ref` and a getter, `{ delay: 1000 }`
 is honoured, and disposing a bare `effectScope()` cancels the pending timer.
 
-### 2. `usePolling` — `src/packages/acme/usePolling.ts`
-
-1. Schedule `task`, count the ticks, flip `isActive`. `start()` on an active poll
-   is a **no-op**: stacking two intervals is how a dashboard ends up hammering
-   its backend after three navigations.
-2. `interval` is a `MaybeRefOrGetter`: `watch` its `toValue()` and re-schedule
-   when it changes, without losing the tick count.
-3. `onScopeDispose(stop)` rather than `onUnmounted`.
-4. No scope at all? Nobody will ever clean up. Detect it with `getCurrentScope()`
-   and `console.warn` that the caller has to `stop()` by hand.
-
-> Test it the way the specs do: inside `effectScope()`. `onUnmounted` never fires
-> there — which is exactly why a composable built on it cannot be called from a
-> Pinia store.
-
-→ **Done when** `start()` twice does not stack two intervals, a reactive
-`interval` re-schedules without losing the tick count, and calling it outside any
-scope warns.
-
-### 3. Migrate the two consumers — `SearchPanel.vue`, `FleetPanel.vue`
+### 2. Migrate the two consumers — `SearchPanel.vue`, `FleetPanel.vue`
 
 1. `SearchPanel.vue` — use `useDebounced(query)`, delete
    `src/composables/useSearchDebounce.ts`.
@@ -108,7 +94,7 @@ changing the interval takes effect without a reload.
 → **Done when** `src/composables/useSearchDebounce.ts` and `useAutoRefresh.ts`
 are deleted and the two panels still behave.
 
-### 4. Decide what does **not** go in — `src/composables/useSortedRows.ts`
+### 3. Decide what does **not** go in — `src/composables/useSortedRows.ts`
 
 It knows what a `Vehicle` is. The next app will sort something else. It stays in
 `src/composables/`, and you fix it where it is:
@@ -125,7 +111,7 @@ It knows what a `Vehicle` is. The next app will sort something else. It stays in
 → **Done when** the fleet table re-sorts with the consumer still destructuring,
 and you can say why this one stayed out of the library.
 
-### 5. *(Bonus)* Call the library from outside a component
+### 4. *(Bonus)* Call the library from outside a component
 
 In `main.ts`, call `usePolling` at module scope — no component, no scope. Read
 the warning, then wrap it in `effectScope()` and watch it disappear.
@@ -148,11 +134,9 @@ section are **not** part of this list.
 - [ ] `useDebounced` accepts a value, a `ref` and a getter, and follows all three
 - [ ] Its `delay` default is resolved once, and `{ delay: 1000 }` is honoured
 - [ ] `flush()` and `cancel()` do what their names say
-- [ ] `usePolling` re-schedules when a reactive `interval` changes
-- [ ] `start()` twice does not stack two intervals
-- [ ] Both stop themselves when a bare `effectScope()` is disposed — not only on unmount
-- [ ] `usePolling` outside any scope warns, naming `stop()`
-- [ ] Both return types are exported by name, and `Readonly` refs are refused by
+- [ ] It cancels its pending timer when a bare `effectScope()` is disposed — not
+      only on unmount
+- [ ] Its return type is exported by name, and its `Readonly` refs are refused by
       the compiler when you try to write them
 
 **The app got better**

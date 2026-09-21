@@ -19,7 +19,7 @@ const favorites = useFavorites();
 
 <template>
   <section>
-    <h2>1 &amp; 3 — useFetch + useFavorites</h2>
+    <h2>1 &amp; 2 — useFetch + useFavorites</h2>
 
     <div class="row" style="margin-bottom: 0.75rem">
       <select v-model="category" v-autofocus data-testid="category">

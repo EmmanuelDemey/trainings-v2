@@ -27,22 +27,6 @@ const SalesChart = defineAsyncComponent({
   // failed and `errorComponent` is rendered, instead of a skeleton that spins
   // for ever on a dead network.
   timeout: 5000,
-
-  /**
-   * One retry, then give up.
-   *
-   * A chunk that 404s is the classic case: the user's tab was open across a
-   * deploy and the hashed file name no longer exists. Retrying once costs
-   * nothing and fixes the transient half; retrying for ever turns a bad deploy
-   * into a self-inflicted DDoS.
-   */
-  onError(error, retry, fail, attempts) {
-    if (attempts <= 1 && /dynamically imported module|Failed to fetch/i.test(error.message)) {
-      retry();
-      return;
-    }
-    fail();
-  },
 });
 
 const shown = ref(false);

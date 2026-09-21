@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// TODO 4: once auto-import and auto-components are wired, every import in this
+// TODO 3: once auto-import and auto-components are wired, every import in this
 //   file is derivable. Delete them, one by one, and watch the app keep working.
 import { computed, ref } from 'vue';
 import { RouterLink } from 'vue-router';

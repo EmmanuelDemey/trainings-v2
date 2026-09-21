@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 import type { Directive } from 'vue';
 
 /**
- * STEP 4 — The `v-lazy-img` directive.
+ * STEP 3 — The `v-lazy-img` directive.
  *
  * Usage:
  *   <img v-lazy-img="product.photo" />

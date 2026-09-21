@@ -4,7 +4,7 @@ import { useField } from 'vee-validate';
 import { fieldId } from '@/utils/fieldId';
 
 /**
- * STEP 3 & 6 — The field component you write once and reuse everywhere.
+ * STEP 3 & 5 — The field component you write once and reuse everywhere.
  *
  * `useField` finds the parent form by injection: no prop drilling, no events.
  * Every accessibility rule of the chapter lives here — get it right once, and

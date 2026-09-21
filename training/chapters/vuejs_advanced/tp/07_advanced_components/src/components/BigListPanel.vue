@@ -1,23 +1,40 @@
 <script setup lang="ts">
 /**
- * STEP 4 — Measure, then optimize
+ * GIVEN — Measure, then optimize
  *
- * 2 000 rows. Selecting one row changes a single prop on a single row, yet
- * every row re-renders. Fix that — but only after you have the numbers.
+ * 2 000 rows. Selecting one row changes a single prop on a single row, yet the
+ * naive version re-renders every one of them.
+ *
+ * The four measurements, in order, on a mid-range laptop:
+ *
+ *   1. baseline (ref + index key)          ~2000 rows re-rendered   ~180 ms
+ *   2. + shallowRef                        ~2000 rows re-rendered   ~150 ms
+ *   3. + stable :key="invoice.id"          ~2000 rows re-rendered   ~150 ms
+ *   4. + v-memo="[invoice.id === selectedId]"     2 rows            ~5 ms
+ *
+ * Read that table before reading the code. Only the LAST change moves the
+ * number that matters, and that is the lesson:
+ *
+ *  - `shallowRef` removes the cost of making 2 000 objects deeply reactive at
+ *    load time. It does nothing for the update, because the update was never
+ *    about deep reactivity. It is still correct here — this list is replaced,
+ *    never mutated in place.
+ *  - a stable `:key` does not change the count either, because nothing is
+ *    reordered. It matters the day you sort or filter: with an index key, Vue
+ *    patches row 3 into row 7's content instead of moving the node, and any
+ *    component state (an open row, a focused input) follows the WRONG row.
+ *  - `v-memo` is what actually cuts the re-renders — and it is last on purpose.
+ *    It is the only one of the three you can get WRONG (see below).
  */
-import { ref, nextTick } from 'vue';
+import { ref, shallowRef, nextTick } from 'vue';
 import InvoiceRow from './InvoiceRow.vue';
 import { renderStats, reset } from './renderStats';
 import { makeInvoices, type Invoice } from '@/api/fakeApi';
 
-// TODO 4.1: measure first. Click a few rows and write down `updates` and the
-//   duration. That is your baseline — you will compare every change against it.
-
-// TODO 4.2: this list is loaded once and never mutated in place. Switch it to
-//   `shallowRef` and check the numbers again.
-//   import { shallowRef } from 'vue';
-//   const invoices = shallowRef<Invoice[]>(makeInvoices(2000));
-const invoices = ref<Invoice[]>(makeInvoices(2000));
+// The list is loaded once and replaced wholesale, never mutated in place:
+// `shallowRef` skips making 2 000 nested objects reactive for nothing.
+// Switch it back to `ref` and watch the FIRST render get slower.
+const invoices = shallowRef<Invoice[]>(makeInvoices(2000));
 
 const selectedId = ref<number | null>(null);
 
@@ -31,25 +48,21 @@ async function select(id: number): Promise<void> {
   renderStats.lastDurationMs = Math.round(performance.now() - start);
 }
 
-// TODO 4.3: the `:key` below uses the array index. Replace it with `invoice.id`
-//   and explain what changes when the list is sorted or filtered.
-
-// TODO 4.4: add `v-memo` on the `v-for` element so a row only re-renders when
-//   its own selection state changes:
-//     v-memo="[invoice.id === selectedId]"
-//   Measure again. How many rows re-render now?
-//
-//   Then deliberately break it: add a `:status` binding that depends on another
-//   reactive value WITHOUT listing it in the `v-memo` array, and watch the UI go
-//   stale. This is the trap the slides warned about.
-
-// TODO 4.5 (discussion): at what list size does `v-memo` stop being the right
-//   answer, and what would you reach for instead?
+/**
+ * Where `v-memo` stops being the answer.
+ *
+ * `v-memo` still creates 2 000 vnodes and walks 2 000 rows on every update —
+ * it only skips the patch. Past ~10 000 rows the walk itself is the cost, and
+ * the fix is to stop rendering rows nobody can see: virtual scrolling
+ * (`vue-virtual-scroller`, TanStack Virtual), or server-side pagination. The
+ * rule of thumb: `v-memo` makes a big list cheaper to UPDATE, virtualisation
+ * makes it cheaper to EXIST.
+ */
 </script>
 
 <template>
   <section>
-    <h2>4 — Rendering performance</h2>
+    <h2>Rendering performance (given)</h2>
 
     <div class="row" style="margin-bottom: 0.75rem">
       <span>{{ invoices.length }} rows</span>
@@ -58,9 +71,25 @@ async function select(id: number): Promise<void> {
     </div>
 
     <div class="list">
+      <!--
+        `:key="invoice.id"` — a stable identity, so Vue moves nodes instead of
+        patching content into the wrong row when the list is sorted or filtered.
+
+        `v-memo="[invoice.id === selectedId]"` — re-render this row only when its
+        own selection state flips. Two rows change on a click (the one leaving
+        the selection and the one entering it), so the count drops from 2 000
+        to 2.
+
+        THE TRAP: the array must list every reactive value the row's output
+        depends on. Bind something else here — say `:dimmed="filterActive"` —
+        without adding `filterActive` to the array, and the row keeps rendering
+        the stale value with no warning, no error, nothing. That silence is why
+        `v-memo` is the last optimization you reach for, not the first.
+      -->
       <div
-        v-for="(invoice, index) in invoices"
-        :key="index"
+        v-for="invoice in invoices"
+        :key="invoice.id"
+        v-memo="[invoice.id === selectedId]"
         @click="select(invoice.id)"
       >
         <InvoiceRow :invoice="invoice" :selected="invoice.id === selectedId" />

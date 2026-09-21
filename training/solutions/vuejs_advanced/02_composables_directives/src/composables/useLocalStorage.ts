@@ -1,11 +1,12 @@
 import { onScopeDispose, ref, watch, type Ref } from 'vue';
 
 /**
- * STEP 2 — A ref synchronised with `localStorage`.
+ * Already done for you — a ref synchronised with `localStorage`. Read it before
+ * step 2: `useFavorites` is built on top of it.
  *
  *  - read the stored value on creation, fall back to `initial` when absent
  *  - a corrupted entry must NOT crash the app
- *  - write back on every change, deeply
+ *  - write back on every change
  *  - stay in sync across tabs via the `storage` event
  */
 export function useLocalStorage<T>(key: string, initial: T): Ref<T> {
@@ -26,14 +27,11 @@ export function useLocalStorage<T>(key: string, initial: T): Ref<T> {
 
   read(localStorage.getItem(key));
 
-  // `deep: true` is required, not optional: callers push into the array rather
-  // than reassign it, and a shallow watcher never fires on `ids.value.push(id)`.
   watch(
     value,
     (current) => {
       localStorage.setItem(key, JSON.stringify(current));
     },
-    { deep: true },
   );
 
   /**
@@ -53,7 +51,7 @@ export function useLocalStorage<T>(key: string, initial: T): Ref<T> {
   // there is no component to unmount and `onUnmounted` would warn and no-op.
   onScopeDispose(() => {
     window.removeEventListener('storage', onStorage);
-  });
+  }, true);
 
   return value;
 }

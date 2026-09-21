@@ -14,7 +14,7 @@ const deleted = ref(0);
 
 <template>
   <section class="clipping-context">
-    <h2>5 — Teleport</h2>
+    <h2>4 — Teleport</h2>
     <p class="muted">
       This panel has <code>overflow: hidden</code> and a <code>transform</code>, like
       any animated card. A dialog rendered inside it is clipped and mis-centred,

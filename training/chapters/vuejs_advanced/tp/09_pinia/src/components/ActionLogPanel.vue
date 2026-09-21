@@ -7,7 +7,7 @@ import { actionLog } from '@/plugins/logger';
     <h2>6 — Plugins: observability</h2>
 
     <p v-if="actionLog.length === 0" class="muted" data-testid="empty-log">
-      Nothing logged yet. Implement <code>loggerPlugin</code> (TODO 6.1) and this
+      Nothing logged yet. Implement <code>loggerPlugin</code> (TODO 4.1) and this
       table fills up on every action call.
     </p>
 

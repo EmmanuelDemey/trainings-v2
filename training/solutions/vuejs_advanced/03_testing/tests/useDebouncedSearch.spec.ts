@@ -87,7 +87,7 @@ describe('useDebouncedSearch', () => {
   });
 
   /**
-   * A spy with `using` (step 5.4). `MockInstance` implements `Symbol.dispose`,
+   * A spy with `using` (step 5.3). `MockInstance` implements `Symbol.dispose`,
    * so `mockRestore()` runs at the end of the scope — no `afterEach`, and no way
    * to leak a patched `console.warn` into the next test by forgetting one.
    */

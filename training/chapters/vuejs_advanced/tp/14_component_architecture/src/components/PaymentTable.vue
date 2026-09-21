@@ -6,7 +6,7 @@
  */
 import { computed, ref } from 'vue';
 import Badge from '../ui/Badge.vue';
-import type { Payment } from '../types';
+import type { Payment } from '@/features/payments';
 
 const props = defineProps<{ payments: Payment[] }>();
 

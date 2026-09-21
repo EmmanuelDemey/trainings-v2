@@ -13,8 +13,7 @@ import vue from '@vitejs/plugin-vue';
  *   c) `unplugin-vue-components/vite` — `dirs: ['src/components']`,
  *      `directoryAsNamespace: true`, and a `dts` path.
  *
- * Then add the three generated `.d.ts` files to `tsconfig.json`'s `include`,
- * and to `.gitignore`: they are build output, not source.
+ * `vitest.config.ts` already merges this file: the specs see whatever you add.
  */
 export default defineConfig({
   plugins: [vue()],

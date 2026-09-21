@@ -1,20 +1,33 @@
-import type { App, Plugin } from 'vue';
+import type { App, Directive, Plugin } from 'vue';
 import { vLazyImg } from './lazyImg';
 
 /**
- * STEP 5 — Package the directives as an app plugin.
+ * Focuses the element on mount.
  *
- * TODO 5.1: register `vLazyImg` globally under the name `lazy-img`, so
- *   `<img v-lazy-img="...">` works in every component without importing it.
+ * The `focus` check keeps it safe on any element: bind it to a `<div>` by
+ * mistake and it does nothing, instead of throwing at runtime.
+ */
+export const vAutofocus: Directive<HTMLElement> = {
+  mounted(el) {
+    if (typeof el.focus === 'function') el.focus();
+  },
+};
+
+/**
+ * Already done for you — the directives, packaged as an app plugin.
  *
- * TODO 5.2 (bonus): add a second directive, `v-autofocus`, that focuses the
- *   element on mount — but only when a `focus` method exists, so it is safe on
- *   any element.
+ * Registering here rather than importing `vLazyImg` in every component is the
+ * trade-off a plugin makes: one line in `main.ts` buys global availability, and
+ * costs you the ability to see, from a component file, where `v-lazy-img` comes
+ * from. Worth it for a handful of app-wide primitives; not worth it for a
+ * directive two components use.
+ *
+ * Note the kebab-case name: `app.directive('lazy-img', …)` is what makes
+ * `v-lazy-img` resolve in a template.
  */
 export const directivesPlugin: Plugin = {
   install(app: App): void {
-    void app;
-    void vLazyImg;
-    // TODO 5.1: app.directive('lazy-img', vLazyImg);
+    app.directive('lazy-img', vLazyImg);
+    app.directive('autofocus', vAutofocus);
   },
 };

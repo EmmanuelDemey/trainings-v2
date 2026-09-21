@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { ADMIN_TOKEN, USER_TOKEN, freshRouter } from './helpers';
 
 /**
- * The executable half of steps 3, 4, 5 and 6.
+ * The executable half of steps 2, 3, 4 and 5.
  *
  * These specs are given: they are the guard contract the README describes,
  * written down. They are red on the skeleton. Keep them running while you fill

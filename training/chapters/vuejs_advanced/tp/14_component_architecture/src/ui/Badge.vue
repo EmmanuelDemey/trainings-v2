@@ -6,13 +6,14 @@
  * payments needed a method, then someone needed both at once — and every new
  * caller added a prop and a `v-if` on the previous one.
  *
- * TODO 4: bring it back to what it actually is: a coloured label. One `tone`
+ * TODO 2: bring it back to what it actually is: a coloured label. One `tone`
  *   prop (`neutral | info | success | danger`) and a slot. The **caller** maps
  *   its own domain value to a tone — a new variant then becomes a new caller
  *   rather than a new prop. And `ui/` stops importing `Invoice`.
  */
 import { computed } from 'vue';
-import type { Invoice, Payment } from '../types';
+import type { Invoice } from '../types';
+import type { Payment } from '../features/payments';
 
 const props = defineProps<{
   invoiceStatus?: Invoice['status'];

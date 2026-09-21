@@ -4,7 +4,7 @@ import type { RegistrationInput } from '@/schemas/registration';
 import { useZodForm } from '@/composables/useZodForm';
 
 /**
- * The executable half of steps 1, 2 and 5.
+ * The executable half of steps 1 and 2.
  *
  * These specs are given: they are the rules this README states, written down.
  * They are red on the skeleton — the schema ships as a shape with no rule, and

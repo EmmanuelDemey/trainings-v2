@@ -51,9 +51,9 @@ export const useCartStore = defineStore(
 
     return { lines, count, total, addToCart, removeFromCart, clearCart };
   },
-  // Only `lines` is persisted. The rest is derived, and persisting a getter is
-  // how you end up restoring a total that disagrees with its own cart.
-  { persist: { paths: ['lines'] } },
+  // Only the state is persisted — `lines`. `count` and `total` are getters,
+  // derived again on restore, so they can never disagree with their own cart.
+  { persist: true },
 );
 
 if (import.meta.hot) {

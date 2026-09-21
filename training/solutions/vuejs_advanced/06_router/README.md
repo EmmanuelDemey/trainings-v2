@@ -1,15 +1,15 @@
 # TP 6 — Advanced routing with Vue Router
 
 > This TP is **autonomous**: it does not depend on any other TP. The views, the
-> fake backend and the auth store are provided and working; your job is to write
-> the routing layer around them.
+> fake backend, the auth store and the view transitions are provided and working;
+> your job is to write the routing layer around them.
 
 ## Goal
 
 Chapter 6 — Turn a set of unprotected pages into a real application:
 
 - **Typed `meta`** so the router refactors safely
-- **Route transitions**, including a direction-aware one
+- **Route transitions**, driven by `meta` — given, and a direction-aware one as a bonus
 - **Guards**: authentication, roles, and blocking navigation away from a dirty form
 - **Programmatic navigation**: redirects, `NavigationFailure`, history
 - **Scroll behaviour** that restores position on back/forward
@@ -35,28 +35,37 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-Steps 3 to 6 come with their specs already written: **`tests/router.spec.ts`** is
+Steps 2 to 5 come with their specs already written: **`tests/router.spec.ts`** is
 the guard contract of this README, written down — the `?redirect` round trip and
 its two open-redirect traps, the role check, the cold start, `document.title`, and
 `scrollBehavior` called as the pure function it is. It is red on the skeleton;
 keep `npm run test:watch` in a second terminal and make it go green.
 
-What it deliberately leaves alone needs a real browser: the transitions, the
-actual scroll *position*, and the dirty-form `confirm`. Those stay below as checks
-you run by hand.
+What it deliberately leaves alone needs a real browser: the actual scroll
+*position* and the dirty-form `confirm`. Those stay below as checks you run by
+hand.
+
+**Already done for you:**
+
+- `src/App.vue` — the `<RouterView v-slot>` wrapped in a `<Transition>` whose
+  name comes from `route.meta.transition` (fallback `fade`), with a `:key` and a
+  `<KeepAlive :include="['InvoicesView']">`. Read its comment: your `meta` typing
+  and the bonus of step 5 both feed it.
+- `src/views/InvoiceView.vue` — "Next invoice" handles the `NavigationFailure`
+  that `router.push` **resolves** with (it does not throw). Click it on the last
+  id and read `next()`: it is the programmatic-navigation trap of the chapter.
 
 ## The workshop at a glance
 
 | # | What you do | Where | Done when |
 |---|---|---|---|
 | 1 | Type the three `meta` fields every guard below reads | `src/router/types.d.ts` | A typo in `meta.rols` is a **compile error** |
-| 2 | Animate the view swap, driven by `meta` | `src/App.vue` | The transition name follows `route.meta.transition` |
-| 3 | The auth guard, the `?redirect` round trip, and its traps | `src/router/index.ts` + `src/views/LoginView.vue` | A hard refresh on `/invoices` keeps you there |
-| 4 | The role check | `src/router/index.ts` | `alan@` lands on `/forbidden`, `ada@` gets in |
-| 5 | Scroll restoration and a handled `NavigationFailure` | `src/router/index.ts` + `src/views/InvoiceView.vue` | Back restores the position; "Next invoice" on the last id does not throw |
-| 6 | `document.title`, and a dirty form that refuses to be left | `src/router/index.ts` + `src/views/InvoiceFormView.vue` | Leaving a dirty form asks; a successful submit does not |
+| 2 | The auth guard, the `?redirect` round trip, and its traps | `src/router/index.ts` + `src/views/LoginView.vue` | A hard refresh on `/invoices` keeps you there |
+| 3 | The role check | `src/router/index.ts` | `alan@` lands on `/forbidden`, `ada@` gets in |
+| 4 | Scroll restoration | `src/router/index.ts` | Back restores the position on the long list |
+| 5 | `document.title`, and a dirty form that refuses to be left | `src/router/index.ts` + `src/views/InvoiceFormView.vue` | Leaving a dirty form asks; a successful submit does not |
 
-`npm test` grades steps 3 to 6. Steps 1 and 2, the scroll **position** and the
+`npm test` grades steps 2 to 5. Step 1, the scroll **position** and the
 dirty-form `confirm` need your eyes and a real browser — they are the checks
 written out under each step.
 
@@ -70,18 +79,7 @@ guard you write next depends on this being right.
 → **Done when** `meta: { rols: true }` and `roles: 'admin'` are both compile
 errors rather than silent no-ops.
 
-### 2. Route transitions — `src/App.vue`
-
-1. Switch `<RouterView>` to its `v-slot` form and wrap the component in a
-   `<Transition name="fade" mode="out-in">`.
-2. Drive the transition name from `route.meta.transition`, defaulting to `fade`.
-3. *(Bonus)* Add `<KeepAlive :include="['InvoicesView']">` and check that the
-   filter and the scroll position survive a round trip.
-
-→ **Done when** navigating animates, and the name comes from
-`route.meta.transition` with `fade` as the fallback.
-
-### 3. Authentication — `src/router/index.ts` + `src/views/LoginView.vue`
+### 2. Authentication — `src/router/index.ts` + `src/views/LoginView.vue`
 
 1. Flag `/invoices` and `/invoices/:id` with `meta.requiresAuth`.
 2. Write the global `beforeEach`: restore the session, redirect anonymous users
@@ -97,7 +95,7 @@ must stay there (that is what `restoreSession` buys you).
 → **Done when** the round trip works, a hard refresh keeps you signed in, and
 both `?redirect=https://example.com` and `?redirect=//example.com` are refused.
 
-### 4. Roles — `src/router/index.ts`
+### 3. Roles — `src/router/index.ts`
 
 1. Add `meta: { requiresAuth: true, roles: ['admin'] }` to `/admin`.
 2. Extend the guard to redirect to `{ name: 'forbidden' }` when the role check
@@ -106,22 +104,19 @@ both `?redirect=https://example.com` and `?redirect=//example.com` are refused.
 → **Done when** `alan@example.com` on `/admin` lands on `/forbidden` and
 `ada@example.com` gets in.
 
-### 5. Navigation and history — `src/router/index.ts` + `src/views/InvoiceView.vue`
+### 4. Scroll restoration — `src/router/index.ts`
 
-1. Implement `scrollBehavior`: restore `savedPosition`, honour `to.hash`, and
-   otherwise scroll to the top. Test on the long `/invoices` page.
-2. In `InvoiceView`, handle the `NavigationFailure` returned by `router.push`
-   (click "Next invoice" twice on the last id).
+Implement `scrollBehavior`: restore `savedPosition`, honour `to.hash`, and
+otherwise scroll to the top. Test on the long `/invoices` page.
 
 → **Done when** back restores the scroll position on the long list, a new route
-starts at the top, a `#hash` scrolls to its anchor, and "Next invoice" on the
-last id shows something instead of throwing.
+starts at the top, and a `#hash` scrolls to its anchor.
 
-### 6. The remaining guards — `src/router/index.ts` + `src/views/InvoiceFormView.vue`
+### 5. The remaining guards — `src/router/index.ts` + `src/views/InvoiceFormView.vue`
 
 1. `afterEach`: set `document.title` from `to.meta.title`.
 2. *(Bonus)* Direction-aware transitions: compare path depths in `afterEach` and
-   set `to.meta.transition` to `slide-left` / `slide-right`.
+   set `to.meta.transition` to `slide-left` / `slide-right` — `App.vue` picks it up.
 3. In `InvoiceFormView`, block navigation away from a dirty form with
    `onBeforeRouteLeave` — and do **not** block right after a successful submit.
 
@@ -152,11 +147,8 @@ section are **not** part of this list.
 - [ ] `?redirect=https://example.com` and `?redirect=//example.com` are both refused
 - [ ] A signed-in user opening `/login` is bounced away
 - [ ] `alan@example.com` on `/admin` lands on `/forbidden`; `ada@example.com` gets in
-- [ ] The transition name comes from `route.meta.transition`, falling back to `fade`
 - [ ] Back from an invoice restores the scroll position on the long `/invoices` page; a
       brand-new route starts at the top; a link with a `#hash` scrolls to the anchor
-- [ ] "Next invoice" on the last id does **not** throw: the `NavigationFailure` is
-      handled and something is shown to the user
 - [ ] `document.title` changes on every navigation
 - [ ] Editing the form then navigating away asks for confirmation — and a **successful
       submit** navigates without asking

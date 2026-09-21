@@ -10,14 +10,14 @@ Chapter 7 — Get hands-on with the four tools of the chapter, and **measure** w
 each of them actually buys you:
 
 - **Async components** — split a heavy panel out of the entry chunk, with a
-  loading state, an error state and a retry strategy
+  loading state and an error state
 - **`Suspense`** — one fallback for a subtree that awaits, plus the error path
   `Suspense` does *not* handle
 - **Scoped slots** — a headless `DataTable` whose cells are rendered by the parent
 - **`Teleport`** — a modal that escapes a clipping ancestor, `:disabled` to bring
   it back, and `defer` for a target rendered by the app itself
 - **Rendering performance** — a 2 000-row list: baseline, `shallowRef`, stable
-  `key`, then `v-memo`
+  `key`, then `v-memo` — given, to read and measure
 
 ## Prerequisites
 
@@ -33,33 +33,36 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-Steps 2, 3 and 5 come with their specs already written:
+Steps 2, 3 and 4 come with their specs already written:
 **`tests/components.spec.ts`** covers the `Suspense` fallback and its `:key`, the
 error of a rejected async `setup()`, both slots of the headless table, and the
 dialog that escapes the clipping panel without losing what you typed. It is red
 on the skeleton.
 
-Steps 1 and 4 are **not** in there, deliberately. "The chart is not in the entry
-chunk" is a claim about the *bundle*, which jsdom cannot see — a green test would
-prove nothing about what a user downloads. And step 4 is judged on the four
-measurements you write down. Those two live in the Network tab and in your notes.
+Step 1 is **not** in there, deliberately. "The chart is not in the entry chunk"
+is a claim about the *bundle*, which jsdom cannot see — a green test would prove
+nothing about what a user downloads. That one lives in the Network tab.
 
 Keep the **Network tab** (filtered on JS) and the **Vue Devtools** open: most of
 this workshop is about observing, not just writing.
+
+**Already done for you:** `src/components/BigListPanel.vue`, the 2 000-row list,
+already optimized — `shallowRef`, a stable `:key`, then `v-memo`. Read its header:
+it holds the four measurements, in order, and why only the last one moves the
+number. Click a row (2 rows re-rendered), delete the `v-memo` line and click again
+(2 000). That is the whole lesson: `v-memo` last, and only with a complete array.
 
 ## The workshop at a glance
 
 | # | What you do | Where | Done when |
 |---|---|---|---|
-| 1 | Load a heavy panel on demand, with a loading, error and retry path | `src/components/ChartPanel.vue` | A new chunk appears in the Network tab on "Show" |
+| 1 | Load a heavy panel on demand, with a loading and an error path | `src/components/ChartPanel.vue` | A new chunk appears in the Network tab on "Show" |
 | 2 | One fallback for a subtree that awaits — and the error it will not catch | `src/components/ProfilePanel.vue` | A rejected async `setup()` shows an error, not a stuck skeleton |
 | 3 | A headless table whose cells the parent renders | `src/components/DataTable.vue` + `InvoiceTablePanel.vue` | The panel formats currency and badges **without** touching `DataTable` |
-| 4 | Four optimizations on a 2 000-row list, measured one at a time | `src/components/BigListPanel.vue` | You have the four numbers, in order |
-| 5 | A modal that escapes a clipping ancestor | `src/components/AppModal.vue` | The dialog is centred again, with no CSS change |
+| 4 | A modal that escapes a clipping ancestor | `src/components/AppModal.vue` | The dialog is centred again, with no CSS change |
 
-`npm test` grades steps 2, 3 and 5. Steps 1 and 4 are claims about the *bundle*
-and about *time* — jsdom can see neither, so they are graded in the Network tab
-and in your notes.
+`npm test` grades steps 2, 3 and 4. Step 1 is a claim about the *bundle* — jsdom
+cannot see it, so it is graded in the Network tab.
 
 ## Steps
 
@@ -69,14 +72,13 @@ and in your notes.
    with the Network tab open and confirm a **new chunk** is fetched on "Show".
 2. Switch to the object syntax: `loadingComponent: ChartSkeleton` with
    `delay: 200`, `errorComponent: ChartError` with `timeout: 5000`.
-3. Add `onError(error, retry, fail, attempts)`: retry **once** on a chunk-loading
-   error, `fail()` otherwise. To trigger the error path, set
-   `failureSwitch.chart = true` in `src/api/fakeApi.ts`.
+3. Trigger the error path: set `failureSwitch.chart = true` in
+   `src/api/fakeApi.ts` and check that `ChartError` is rendered.
 4. Throttle to "Slow 3G" and check the ordering: nothing for 200 ms, then the
    skeleton, then the chart.
 
 → **Done when** the chart arrives in its own chunk, the skeleton appears only
-past 200 ms, and a chunk error retries once before giving up.
+past 200 ms, and a loading error renders `ChartError`.
 
 ### 2. `Suspense` — `src/components/ProfilePanel.vue`
 
@@ -104,23 +106,7 @@ never leaves.
 → **Done when** the panel renders currency and badges with `DataTable`
 untouched, and `row` is typed `Invoice` inside the slot.
 
-### 4. Rendering performance — `src/components/BigListPanel.vue`
-
-1. **Measure the baseline**: click a few rows, note the re-render count and the
-   duration displayed in the panel.
-2. Switch `invoices` to `shallowRef`. Measure again.
-3. Replace the index `:key` with `invoice.id`. Measure again.
-4. Add `v-memo="[invoice.id === selectedId]"`. Measure again.
-5. Deliberately break the `v-memo` array by using a reactive value you did not
-   list, and observe the stale UI.
-
-Write the four numbers down. The point of this step is the **ordering** of the
-optimizations, not the final figure.
-
-→ **Done when** you have the four measurements, in order, and you have seen the
-stale UI a wrong `v-memo` array produces.
-
-### 5. `Teleport` — `src/components/AppModal.vue`
+### 4. `Teleport` — `src/components/AppModal.vue`
 
 The panel of this step carries `overflow: hidden` **and** a `transform`: the
 dialog is clipped, and its `position: fixed` is resolved against the panel
@@ -161,8 +147,8 @@ section are **not** part of this list.
 
 - [ ] `SalesChart` is **not** in the entry chunk: its chunk is fetched on "Show" only
 - [ ] Throttled to Slow 3G: nothing for 200 ms, then the skeleton, then the chart
-- [ ] With `failureSwitch.chart = true`: the Network tab shows **two** load attempts
-      (one retry), then `ChartError` is rendered
+- [ ] With `failureSwitch.chart = true`: `ChartError` is rendered, not a skeleton
+      that never leaves
 - [ ] The `Suspense` fallback shows while the profile loads, and re-shows when you
       switch user (thanks to `:key`)
 - [ ] With `failureSwitch.profile = true`: an error is rendered by `onErrorCaptured` —
@@ -172,8 +158,6 @@ section are **not** part of this list.
 - [ ] The `empty` slot renders on an empty list, and the table still works when the
       parent provides no `empty` slot
 - [ ] Inside the `cell` slot, `row` is typed `Invoice` — `row.nope` is a compile error
-- [ ] The four measurements of step 4 are written down, in order: baseline →
-      `shallowRef` → stable `key` → `v-memo`
 - [ ] The open modal is a child of `#modal-root` in the Elements tab, is centred on
       the viewport and is not clipped by the panel
 - [ ] Toggling `:disabled` while the modal is open moves the nodes **without**

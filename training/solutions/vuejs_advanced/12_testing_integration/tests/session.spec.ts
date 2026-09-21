@@ -2,10 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import SessionBadge from '@/components/SessionBadge.vue';
-import LoginView from '@/views/LoginView.vue';
 import { useSessionStore } from '@/stores/session';
 import { session } from './fixtures';
-import { flushPromises } from './helpers';
 
 /**
  * `createTestingPinia` puts the component in front of a store it fully controls:
@@ -69,25 +67,5 @@ describe('SessionBadge', () => {
 
     expect(store.signOut).toHaveBeenCalledOnce();
     expect(wrapper.get('[data-testid="anonymous"]').text()).toContain('Not signed in');
-  });
-});
-
-describe('LoginView', () => {
-  it('hands the credentials to the store, exactly as typed', async () => {
-    const wrapper = mount(LoginView, {
-      global: {
-        plugins: [pinia()],
-        stubs: { RouterLink: true },
-        mocks: { $route: { query: {} } },
-      },
-    });
-    const store = useSessionStore();
-
-    await wrapper.get('[data-testid="email"]').setValue('ada@acme.dev');
-    await wrapper.get('[data-testid="password"]').setValue('secret');
-    await wrapper.get('[data-testid="login-form"]').trigger('submit');
-    await flushPromises();
-
-    expect(store.signIn).toHaveBeenCalledWith('ada@acme.dev', 'secret');
   });
 });

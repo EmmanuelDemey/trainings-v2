@@ -2,7 +2,7 @@
  * This one is NOT a library candidate: it knows what a `Vehicle` is, and the
  * next app will sort something else. It stays here — fixed, not promoted.
  *
- * TODO 11: it returns a `reactive()`, so `const { sorted } = useSortedRows(...)`
+ * TODO 7: it returns a `reactive()`, so `const { sorted } = useSortedRows(...)`
  *   hands the caller a plain array and the panel stops updating. Return an
  *   **object of refs** instead, so destructuring keeps working, and mark
  *   `Readonly` what the caller has no business writing.

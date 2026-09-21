@@ -41,9 +41,10 @@ export default defineConfig({
     //   say whether the trade-off is worth it here.
   },
 
-  // TODO 5.3: strip the production devtools and hydration-mismatch details:
-  //   define: {
-  //     __VUE_PROD_DEVTOOLS__: 'false',
-  //     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
-  //   },
+  // Strips the production devtools hook and the hydration-mismatch messages —
+  // a few kB, and one fewer thing exposing your component tree in production.
+  define: {
+    __VUE_PROD_DEVTOOLS__: 'false',
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+  },
 });

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * TODO 7: closing the drawer wipes `selected` in the same tick, so the panel
+ * TODO 5: closing the drawer wipes `selected` in the same tick, so the panel
  *   goes blank before it has moved a pixel. Split the two:
  *
  *   - keep `v-if` on `isOpen` alone, and let the close button only flip that

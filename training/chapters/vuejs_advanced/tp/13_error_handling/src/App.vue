@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
- * The ops console. Every panel below can be broken on purpose, and today
- * breaking one of them takes the whole page with it.
+ * The ops console. Every panel can be broken on purpose, and one broken panel
+ * now costs exactly one panel.
  *
- * TODO 6: wrap `TotalsPanel` and `SelfHealingPanel` — each in its **own**
- *   `<ErrorBoundary>`, with a `label`. One boundary around both would degrade
- *   two panels for one failure; the granularity of a boundary is a product
- *   decision, not a technical one.
+ * Each gets its **own** boundary. One boundary around both would degrade two
+ * panels for one failure — the granularity of a boundary is a product decision,
+ * not a technical one: it answers "what is the smallest thing this user can
+ * afford to lose?".
  */
 import { ref } from 'vue';
 import ErrorBoundary from './components/ErrorBoundary.vue';
@@ -42,12 +42,16 @@ const brokenSelf = ref(false);
 
   <section>
     <h2>Totals</h2>
-    <TotalsPanel :rows="brokenTotals ? null : ROWS" />
+    <ErrorBoundary label="Totals">
+      <TotalsPanel :rows="brokenTotals ? null : ROWS" />
+    </ErrorBoundary>
   </section>
 
   <section>
     <h2>Self-healing panel</h2>
-    <SelfHealingPanel :broken="brokenSelf" />
+    <ErrorBoundary label="Self-healing panel">
+      <SelfHealingPanel :broken="brokenSelf" />
+    </ErrorBoundary>
   </section>
 
   <section>

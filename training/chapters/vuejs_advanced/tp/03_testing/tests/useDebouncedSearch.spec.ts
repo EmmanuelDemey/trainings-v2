@@ -36,21 +36,31 @@ describe('useDebouncedSearch', () => {
     expect(search).toBeDefined();
   });
 
+  // GIVEN — the same timer dance, on the way back to an empty query.
   it('clears the results when the query is emptied', async () => {
     const search = vi.fn(async () => ['whatever']);
     const [{ query, results }, app] = withSetup(() => useDebouncedSearch(search, 300));
 
-    // TODO 5.3: type something, let the debounce elapse, then set the query back
-    //   to '' and assert `results` is empty AND that no further call was made.
-    void query;
-    void results;
+    query.value = 'vue';
+    await nextTick();
+    await vi.advanceTimersByTimeAsync(300);
+    expect(results.value).toEqual(['whatever']);
+
+    query.value = '';
+    await nextTick();
+
+    // Cleared synchronously — an empty query is not a search worth debouncing.
+    expect(results.value).toEqual([]);
+
+    await vi.advanceTimersByTimeAsync(300);
+    expect(search).toHaveBeenCalledOnce(); // still one: the empty query fired nothing
 
     app.unmount();
   });
 });
 
 /**
- * TODO 5.4: write a test using `using` for a spy:
+ * TODO 5.3: write a test using `using` for a spy:
  *
  *   it('warns on an invalid input', () => {
  *     using warn = vi.spyOn(console, 'warn').mockImplementation(() => {});

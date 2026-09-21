@@ -1,9 +1,9 @@
 # TP 15 — Internationalization with vue-i18n
 
-> This TP is **autonomous**: it does not depend on any other TP. The shop works
-> and it speaks French, through a hand-rolled dictionary — the version that works
-> for about a week. It also ships two broken messages and a plural rule that is
-> wrong for the only language it supports.
+> This TP is **autonomous**: it does not depend on any other TP. The shop's
+> panels already call `t()` and `n()` — but the plugin behind them is bare: no
+> number formats, no fallback, a plural rule that is wrong for French, two broken
+> messages, and a language switcher that does nothing.
 
 ## Goal
 
@@ -31,7 +31,7 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-`tests/` is given, and **twenty of its twenty-four specs are red**:
+`tests/` is given, and **nineteen of its twenty-four specs are red**:
 
 | File | What it holds |
 |---|---|
@@ -47,13 +47,18 @@ already correct — read them when a French message will not behave.
 | # | What you do | Where | Done when |
 |---|---|---|---|
 | 1 | Configure the plugin: fallback, number formats, French plurals | `src/i18n/index.ts` | `0` takes the **singular** in French, as it should |
-| 2 | Move the four panels onto `t()` / `n()` | the four components, then delete `src/i18n/naive.ts` | No hand-rolled dictionary is left in the app |
-| 3 | Fix the two French messages that render wrong | `src/locales/fr.json` | Neither one shows a raw key or a missing word |
-| 4 | Load a locale on demand, without the four usual holes | `src/i18n/setLocale.ts` + `LocaleSwitcher.vue` | Switching twice fast lands on the locale you asked for **last** |
-| 5 | Read what the build produced | `npm run build` | One chunk per lazily-loaded locale, and you can explain the `fr.json` warning |
+| 2 | Fix the two French messages that render wrong | `src/locales/fr.json` | Neither one shows a raw key or a missing word |
+| 3 | Load a locale on demand, without the four usual holes | `src/i18n/setLocale.ts` + `LocaleSwitcher.vue` | Switching twice fast lands on the locale you asked for **last** |
 
-`npm test` grades steps 1 to 4 — twenty of the twenty-four specs are red on
-arrival. Step 5 is graded by the build output.
+`npm test` grades the three steps — nineteen of the twenty-four specs are red on
+arrival.
+
+> **Already done for you:** the three panels of `src/components/` are on
+> `useI18n()`. Read them before step 1 — `CatalogPanel` calls
+> `n(price, 'currency')`, `n(rate, 'percent')` and `n(views, 'compact')`, formats
+> that do not exist yet; `CartPanel` calls `t('cart.items', count)`, and the
+> number is injected into the message as both `count` and `n`; `LegalPanel` uses
+> the named, list, linked and escaped forms.
 
 ## Steps
 
@@ -77,26 +82,12 @@ arrival. Step 5 is graded by the build output.
    Write the French rule.
 
 > `legacy: false` is not optional: the default is still `true`, and Legacy mode
-> has none of the Composition API surface used below.
+> has none of the Composition API surface the panels use.
 
 → **Done when** the three number formats exist per locale, and `0` article
 renders in the French **singular**.
 
-### 2. Use it — the four components of `src/components/`
-
-Replace `naiveT` / `naiveEuros` with `useI18n()` (or `$t` / `$n`, which
-`globalInjection` already provides), then delete `src/i18n/naive.ts`:
-
-- `CatalogPanel` — `n(price, 'currency')`, `n(rate, 'percent')`, `n(views, 'compact')`
-- `CartPanel` — `t('cart.items', count)`; the number is injected into the message
-  as both `count` and `n`
-- `LegalPanel` — the named, list, linked and escaped messages
-- `LocaleSwitcher` — see step 4
-
-→ **Done when** `src/i18n/naive.ts` is deleted and every panel still renders the
-same French text it did before.
-
-### 3. Fix the two broken French messages — `src/locales/fr.json`
+### 2. Fix the two broken French messages — `src/locales/fr.json`
 
 Both fail the same way on screen: the raw key, or a word that never arrives.
 
@@ -117,7 +108,7 @@ Wrap it: `@:{'legal.tos'}`.
 → **Done when** the legal panel shows neither a raw key nor a missing word, in
 both locales.
 
-### 4. Lazy-load a locale — `src/i18n/setLocale.ts`
+### 3. Lazy-load a locale — `src/i18n/setLocale.ts`
 
 The naive version is four lines and misses four things. Write the one that ships:
 
@@ -142,20 +133,7 @@ re-renders.
 fast lands on the last one you asked for, `<html lang>` follows, and the API
 answers in the new language.
 
-### 5. Read the build — `npm run build`
-
-```bash
-npm run build
-```
-
-You should see one chunk per lazily-loaded locale (`en-*.js`, `de-*.js`) — and a
-warning that `fr.json` is both statically and dynamically imported. That one is
-**expected**: French ships with the bundle because it is the startup locale.
-
-→ **Done when** you have seen one chunk per lazily-loaded locale, and can say
-why the `fr.json` warning is not a bug.
-
-### 6. *(Bonus)* The languages the default rule cannot express
+### 4. *(Bonus)* The languages the default rule cannot express
 
 Add a `ru` catalogue with `cart.items` in three forms and write its plural rule:
 Russian picks on the **last digits**, not on the value — 1, 21, 31 take one form,
@@ -170,9 +148,7 @@ section are **not** part of this list.
 
 - [ ] `npm run typecheck` exits 0
 - [ ] `npm test` exits 0 — the twenty-four specs
-- [ ] `npm run build` succeeds, with **one chunk per lazily-loaded locale**
 - [ ] `grep -rn TODO src` returns nothing
-- [ ] `src/i18n/naive.ts` is gone
 
 **The messages**
 
@@ -203,7 +179,6 @@ section are **not** part of this list.
 - [ ] Why a lookup table is not enough, in three sentences
 - [ ] What `choicesLength === 2` does to French, and to Russian
 - [ ] Why the variable in a dynamic `import()` must sit in the last path segment
-- [ ] Why the build warns about `fr.json`, and why that warning is fine here
 
 ## Going further
 

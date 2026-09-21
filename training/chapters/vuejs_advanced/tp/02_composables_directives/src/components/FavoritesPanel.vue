@@ -4,7 +4,7 @@
  *
  * As long as `useFavorites` creates its state inside the function, this panel
  * and `CatalogPanel` keep two independent lists and disagree — that is the bug
- * TODO 3.2 asks you to fix.
+ * TODO 2.2 asks you to fix.
  */
 import { useFavorites } from '@/composables/useFavorites';
 import { products } from '@/api/fakeApi';
@@ -17,7 +17,7 @@ const nameOf = (id: number): string =>
 
 <template>
   <section>
-    <h2>3 — Shared state</h2>
+    <h2>2 — Shared state</h2>
 
     <div class="row">
       <strong data-testid="favorites-count">{{ count }} favourite(s)</strong>
@@ -30,7 +30,7 @@ const nameOf = (id: number): string =>
 
     <p class="muted">
       Reload the page: the list must survive (that is <code>useLocalStorage</code>).
-      Open a second tab: it should follow along too, once you have done TODO 2.3.
+      Open a second tab: it follows along, through the <code>storage</code> event.
     </p>
   </section>
 </template>

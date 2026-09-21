@@ -68,7 +68,7 @@ section {
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); }
 
-/* Step 5 — a deliberately hostile ancestor for the modal: `overflow` clips it,
+/* Step 4 — a deliberately hostile ancestor for the modal: `overflow` clips it,
    and `transform` makes it the containing block of `position: fixed`. */
 .clipping-context {
   overflow: hidden;

@@ -17,7 +17,7 @@ const nameOf = (id: number): string =>
 
 <template>
   <section>
-    <h2>3 — Shared state</h2>
+    <h2>2 — Shared state</h2>
 
     <div class="row">
       <strong data-testid="favorites-count">{{ count }} favourite(s)</strong>

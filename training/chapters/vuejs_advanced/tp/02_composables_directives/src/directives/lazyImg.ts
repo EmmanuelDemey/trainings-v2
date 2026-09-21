@@ -2,20 +2,20 @@ import { reactive } from 'vue';
 import type { Directive } from 'vue';
 
 /**
- * STEP 4 — The `v-lazy-img` directive.
+ * STEP 3 — The `v-lazy-img` directive.
  *
  * Usage:
  *   <img v-lazy-img="product.photo" />
  *   <img v-lazy-img.eager="product.photo" />   <!-- 400px root margin -->
  *
  * Requirements:
- *   1. show a lightweight placeholder immediately
- *   2. observe the element with an `IntersectionObserver`
- *   3. swap in the real `src` when it becomes visible, then stop observing
- *   4. fall back to `FALLBACK` if the image fails to load
- *   5. re-observe when the bound value changes (`updated`)
- *   6. disconnect on `unmounted` — a leaked observer keeps the element alive
- *   7. degrade gracefully when `IntersectionObserver` is unavailable
+ *   1. show a lightweight placeholder immediately              (done for you)
+ *   2. fall back to `FALLBACK` if the image fails to load       (done for you)
+ *   3. degrade gracefully when `IntersectionObserver` is unavailable (done for you)
+ *   4. observe the element with an `IntersectionObserver`
+ *   5. swap in the real `src` when it becomes visible, then stop observing
+ *   6. re-observe when the bound value changes (`updated`)
+ *   7. disconnect on `unmounted` — a leaked observer keeps the element alive
  */
 
 const PLACEHOLDER =
@@ -43,7 +43,7 @@ const observers = new WeakMap<HTMLImageElement, IntersectionObserver>();
 export const lazyStats = reactive({ loaded: 0 });
 
 function observe(el: HTMLImageElement, src: string, rootMargin: string): void {
-  // TODO 4.2: disconnect any observer already attached to this element, then
+  // TODO 3.2: disconnect any observer already attached to this element, then
   //   create a new `IntersectionObserver` with `{ rootMargin }`.
   //   When the entry intersects:
   //     - set `el.src = src`
@@ -57,29 +57,40 @@ function observe(el: HTMLImageElement, src: string, rootMargin: string): void {
 
 export const vLazyImg: Directive<HTMLImageElement, string> = {
   mounted(el, binding) {
-    // TODO 4.1: set the placeholder, and register a one-shot `error` listener
-    //   that swaps in `FALLBACK`.
-    //     el.src = PLACEHOLDER;
-    //     el.addEventListener('error', ..., { once: true });
-    //
-    // TODO 4.5: if `IntersectionObserver` is not in `window`, assign
-    //   `binding.value` directly and return — progressive enhancement.
-    //
-    // Then call `observe()` with a root margin of '400px' when the `eager`
-    // modifier is present, '0px' otherwise.
-    void el;
-    void binding;
+    el.src = PLACEHOLDER;
+
+    // `{ once: true }` — the listener removes itself, so a broken FALLBACK
+    // cannot loop, and there is nothing left to clean up in `unmounted`.
+    el.addEventListener(
+      'error',
+      () => {
+        el.src = FALLBACK;
+      },
+      { once: true },
+    );
+
+    // Progressive enhancement: no IntersectionObserver (old browser, jsdom in a
+    // unit test, a bot) means every image loads eagerly. Degraded, never broken.
+    if (!('IntersectionObserver' in window)) {
+      el.src = binding.value;
+      return;
+    }
+
+    // TODO 3.1: call `observe()` with a root margin of '400px' when the `eager`
+    //   modifier is present, '0px' otherwise.
   },
 
   updated(el, binding) {
-    // TODO 4.3: do nothing when `binding.value === binding.oldValue`, otherwise
-    //   re-observe with the new URL. Test it with the "Shuffle photos" button.
+    // TODO 3.3: do nothing when `binding.value === binding.oldValue`. Otherwise
+    //   degrade like `mounted` does when there is no `IntersectionObserver`, or
+    //   put the placeholder back and re-observe with the new URL. Test it with
+    //   the "Shuffle photos" button.
     void el;
     void binding;
   },
 
   unmounted(el) {
-    // TODO 4.4: disconnect and forget the observer.
+    // TODO 3.4: disconnect and forget the observer.
     void el;
   },
 };

@@ -10,7 +10,7 @@ export interface UseFavoritesReturn {
 }
 
 /**
- * STEP 3 — Compose composables, and share the state.
+ * STEP 2 — Compose composables, and share the state.
  *
  * The state lives at MODULE scope, so every caller gets the same list: clicking
  * a heart in the catalog updates the counter in the other panel immediately.
@@ -32,9 +32,9 @@ export interface UseFavoritesReturn {
  * inside `useLocalStorage` has no component to attach to here, and without a
  * scope Vue warns about an effect created outside an active one.
  */
-const scope = effectScope(true);
+//const scope = effectScope();
 
-const ids = scope.run(() => useLocalStorage<number[]>('tp2:favorites', []))!;
+const ids = useLocalStorage<number[]>('tp2:favorites', [])
 
 /**
  * The `Set` index.

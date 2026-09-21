@@ -3,7 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue';
 import { fieldId } from '@/utils/fieldId';
 
 /**
- * STEP 6 — The error summary.
+ * STEP 5 — The error summary.
  *
  * On an invalid submit, a sighted user scans the page for the red bits. Everyone
  * else needs this: one list, at the top, with a link per error, and the focus

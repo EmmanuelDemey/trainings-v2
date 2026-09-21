@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 
 /**
  * Counts how many rows actually re-rendered since the last `reset()`.
- * This is the number the optimizations of step 4 are supposed to bring down.
+ * This is the number the optimizations of `BigListPanel` bring down.
  */
 export const renderStats = reactive({
   updates: 0,

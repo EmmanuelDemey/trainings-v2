@@ -1,8 +1,8 @@
 # TP 2 — Composables & custom directives
 
 > This TP is **autonomous**: it does not depend on any other TP. The UI, the fake
-> backend and the panels are provided and working; your job is to write the
-> composables and the directive behind them.
+> backend, the panels, `useLocalStorage` and the directives plugin are provided
+> and working; your job is to write the composables and the directive behind them.
 
 ## Goal
 
@@ -10,12 +10,10 @@ Chapter 2 — Build the two reuse mechanisms of Vue 3 from scratch, and understa
 when each one is the right tool:
 
 - **`useFetch`** — reactive URL, abort-on-change, real error handling
-- **`useLocalStorage`** — a ref synced with storage, resilient to corrupted data
-- **`useFavorites`** — composing composables, and the per-instance vs shared
-  state decision
-- **`v-lazy-img`** — a custom directive with `IntersectionObserver`, an error
-  fallback, value updates and proper cleanup
-- **A directives plugin** — registering them app-wide
+- **`useFavorites`** — composing composables (on top of the provided
+  `useLocalStorage`), and the per-instance vs shared state decision
+- **`v-lazy-img`** — a custom directive with `IntersectionObserver`, value
+  updates and proper cleanup
 
 ## Prerequisites
 
@@ -36,6 +34,13 @@ the whole contract of `useFetch` — abort on change, error handling, `ref` **an
 getter URLs. It is red on the skeleton. Keep `npm run test:watch` running in a
 second terminal and make it go green; the other steps are checked in the browser.
 
+**Already done for you** — read them, you build on both:
+
+- `src/composables/useLocalStorage.ts`: a ref synced with `localStorage`, which
+  survives a corrupted entry and follows the other tabs through the `storage` event.
+- `src/directives/index.ts`: `directivesPlugin`, already installed in `main.ts`,
+  registers `v-lazy-img` (and a small `v-autofocus`) app-wide.
+
 There is **no backend to start**: `installFakeBackend()` patches `window.fetch`
 for `/api/*` with a 700 ms artificial latency that honours `AbortSignal`.
 
@@ -44,12 +49,10 @@ for `/api/*` with a 700 ms artificial latency that honours `AbortSignal`.
 | # | What you do | Where | Done when |
 |---|---|---|---|
 | 1 | A fetch composable that follows a reactive URL and cancels itself | `src/composables/useFetch.ts` | `npm test` — the ten given specs are green |
-| 2 | A ref kept in sync with `localStorage`, corrupted data included | `src/composables/useLocalStorage.ts` | `{{{` in the storage key does not take the app down |
-| 3 | Compose the two, and decide per-instance vs shared state | `src/composables/useFavorites.ts` | The counter and the catalog agree on the same number |
-| 4 | A directive that loads images only when they are seen | `src/directives/lazyImg.ts` | The "images actually loaded" counter stays low on first paint |
-| 5 | Register the directive app-wide | `src/directives/index.ts` | `GalleryPanel` has no local `directives` option left |
+| 2 | Compose `useLocalStorage`, and decide per-instance vs shared state | `src/composables/useFavorites.ts` | The counter and the catalog agree on the same number |
+| 3 | A directive that loads images only when they are seen | `src/directives/lazyImg.ts` | The "images actually loaded" counter stays low on first paint |
 
-Only step 1 is graded by `npm test`. Steps 2 to 5 are graded in the browser —
+Only step 1 is graded by `npm test`. Steps 2 and 3 are graded in the browser —
 the panels are instrumented for exactly that.
 
 ## Steps
@@ -72,21 +75,7 @@ the others show as cancelled in the Network tab.
 → **Done when** the ten specs are green and a cancelled request shows no error
 to the user.
 
-### 2. `useLocalStorage` — `src/composables/useLocalStorage.ts`
-
-1. Read and `JSON.parse` the stored value in a `try` / `catch`; on a parse error,
-   drop the corrupted entry and keep the initial value.
-2. Watch the ref **deeply** and write it back.
-3. *(Bonus)* Sync across tabs with the `storage` event, and remove the listener
-   on unmount.
-
-**Check it**: write `{{{` into the `tp2:favorites` key from the devtools
-Application tab and reload. The app must survive.
-
-→ **Done when** the app starts normally after that reload, and the corrupted
-entry is gone.
-
-### 3. `useFavorites` — `src/composables/useFavorites.ts`
+### 2. `useFavorites` — `src/composables/useFavorites.ts`
 
 1. Implement `isFavorite`, `toggle` and `clear`.
 2. The counter panel and the catalog disagree, because each caller gets its own
@@ -98,29 +87,22 @@ entry is gone.
 → **Done when** the favourites counter and the catalog show the same number, and
 `isFavorite` goes through the `Set` and not an array scan.
 
-### 4. `v-lazy-img` — `src/directives/lazyImg.ts` (used by `GalleryPanel.vue`)
+### 3. `v-lazy-img` — `src/directives/lazyImg.ts` (used by `GalleryPanel.vue`)
 
-1. `mounted`: set the placeholder and a one-shot `error` listener swapping in the
-   fallback image.
+The placeholder, the `error` fallback and the no-`IntersectionObserver` branch of
+`mounted` are already written.
+
+1. `mounted`: call `observe()`, with a `400px` root margin under `.eager`.
 2. Implement `observe()`: one `IntersectionObserver` per element, swap the `src`
    on intersection, then disconnect.
 3. `updated`: re-observe when the value changed (test with "Shuffle photos").
 4. `unmounted`: disconnect and forget the observer.
-5. Degrade gracefully when `IntersectionObserver` is unavailable.
 
 Then swap the static `:src` in `GalleryPanel.vue` for the directive and watch the
 "images actually loaded" counter as you scroll.
 
-→ **Done when** images load as they enter the viewport, a broken URL swaps in
-the fallback, "Shuffle photos" re-observes, and unmounting stops everything.
-
-### 5. The plugin — `src/directives/index.ts`
-
-1. Register `vLazyImg` globally as `lazy-img`.
-2. *(Bonus)* Add a `v-autofocus` directive and use it on the catalog filter.
-
-→ **Done when** `GalleryPanel` uses `v-lazy-img` through the plugin, with no
-local `directives` option left.
+→ **Done when** images load as they enter the viewport, "Shuffle photos"
+re-observes, and unmounting stops everything.
 
 ## Definition of Done
 
@@ -132,7 +114,7 @@ section are **not** part of this list.
 - [ ] `npm run typecheck` exits 0
 - [ ] `npm test` exits 0 — the ten `useFetch` specs pass
 - [ ] `npm run build` succeeds
-- [ ] `grep -rn TODO src | grep -v bonus` returns nothing
+- [ ] `grep -rn TODO src` returns nothing
 - [ ] No Vue warning or error in the browser console while you exercise the panels
 
 **The behaviour is there**
@@ -143,19 +125,13 @@ section are **not** part of this list.
 - [ ] With `failureSwitch.products = true`: the error state is displayed, and it clears
       when you switch to a working category
 - [ ] `useFetch` re-runs when the URL is a `ref` **and** when it is a getter
-- [ ] Writing `{{{` into the `tp2:favorites` key then reloading: the app starts
-      normally and the corrupted entry is gone
 - [ ] The favourites counter and the catalog agree — one shared state, not one per caller
 - [ ] `isFavorite` goes through the `computed` `Set`, not an array scan
 - [ ] Images load only as they enter the viewport: the "images actually loaded"
       counter stays well below the number of items on first paint
-- [ ] A broken image URL swaps in the fallback image
 - [ ] "Shuffle photos" re-observes the changed elements (new images do load)
 - [ ] Navigating away disconnects the observers — nothing keeps firing after unmount
-- [ ] With `IntersectionObserver` stubbed out (`delete window.IntersectionObserver`
-      before mount), the images still display
-- [ ] `GalleryPanel` uses `v-lazy-img` through the globally registered plugin, with no
-      local `directives` option left
+- [ ] `GalleryPanel` uses `v-lazy-img` — no static `:src` left on its images
 
 **You can explain**
 
@@ -171,7 +147,7 @@ section are **not** part of this list.
 - Rewrite the lazy loading as a **composable** (`useLazyImage`) using a template
   ref, and list what you gained and what you lost versus the directive.
 - Read the source of `useLocalStorage` and `useIntersectionObserver` in VueUse —
-  compare their edge-case handling with yours.
+  compare their edge-case handling with this project's.
 
 ## Later in the training
 
@@ -183,7 +159,7 @@ training order.
 
 ### Chapter 4 — From directives to a real plugin (30 min)
 
-Continue in this project, on top of step 5:
+Continue in this project, on top of the provided `directivesPlugin`:
 
 1. Turn `directivesPlugin` into a **factory** `createDirectivesPlugin(options)`
    taking `{ rootMargin, fallbackSrc }`, with defaults resolved once
@@ -201,7 +177,7 @@ its own configuration and its own stats.
 
 ### Chapter 5 — Extracting the library (45 min)
 
-Continue in this project, on top of steps 1–5:
+Continue in this project, on top of steps 1–3:
 
 1. Move `useFetch`, `useLocalStorage` and `vLazyImg` into
    `src/lib/composables/`, **one folder each** (`index.ts`, `index.test.ts`,

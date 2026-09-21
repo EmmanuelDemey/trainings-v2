@@ -31,24 +31,26 @@ async function logout(): Promise<void> {
 
   <main>
     <!--
-      TODO 2.1: wrap the view in a `<Transition name="fade" mode="out-in">` using
-        the `v-slot` form of `<RouterView>`:
+      `mode="out-in"` matters: without it the leaving and entering views are in
+      the DOM at the same time and the page jumps. With it, the old one finishes
+      leaving before the new one starts.
 
-        <RouterView v-slot="{ Component, route }">
-          <Transition name="fade" mode="out-in">
-            <component :is="Component" :key="route.path" />
-          </Transition>
-        </RouterView>
+      `:key="route.path"` is what makes /invoices/1 -> /invoices/2 animate at
+      all: same route record, same component, so Vue would otherwise patch the
+      existing instance and no transition would ever trigger.
 
-      TODO 2.2: make the transition name come from `route.meta.transition`, with
-        'fade' as the default. The CSS for `fade`, `slide-left` and `slide-right`
-        is already in this file.
-
-      TODO 2.3 (bonus): add a `<KeepAlive :include="['InvoicesView']">` between
-        the transition and the component, and check that the scroll position and
-        the filter of the invoices list survive a round trip.
+      `<KeepAlive :include="['InvoicesView']">` caches that one view by its
+      `name` (set with `defineOptions`), so its filter and scroll position
+      survive a round trip. Deliberately a whitelist: caching everything means
+      caching every stale fetch and every leaked timer along with it.
     -->
-    <RouterView />
+    <RouterView v-slot="{ Component, route }">
+      <Transition :name="(route.meta.transition as string) ?? 'fade'" mode="out-in">
+        <KeepAlive :include="['InvoicesView']">
+          <component :is="Component" :key="route.path" />
+        </KeepAlive>
+      </Transition>
+    </RouterView>
   </main>
 </template>
 

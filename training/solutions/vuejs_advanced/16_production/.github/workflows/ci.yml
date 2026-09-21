@@ -1,4 +1,4 @@
-# STEP 7 — The pipeline.
+# STEP 6 — The pipeline.
 #
 # One rule governs the whole file: BUILD ONCE, then have every later job consume
 # that exact artifact. A job that rebuilds before deploying ships something no
@@ -103,25 +103,3 @@ jobs:
       # what turns "the deploy succeeded" into "the deploy works".
       - name: Verify the deployed site
         run: bash docker/verify-serving.sh "${{ vars.PRODUCTION_URL }}"
-
-# STEP 7.5 — The rollback procedure.
-#
-# Netlify keeps every deploy immutable and addressable, so a rollback is a
-# promotion, not a rebuild:
-#
-#   npx netlify-cli api listSiteDeploys --data '{"site_id":"<id>"}' | jq '.[0:5]'
-#   npx netlify-cli api restoreSiteDeploy --data '{"site_id":"<id>","deploy_id":"<previous>"}'
-#
-# Two properties make it trustworthy, and both are consequences of choices made
-# earlier in this file:
-#
-#  - the previous deploy is the exact artifact that passed CI, still stored —
-#    nothing is rebuilt, so nothing can build differently;
-#  - `index.html` is served `no-cache` (step 5.2), so clients pick up the
-#    restored manifest on their next navigation instead of on cache expiry.
-#    Had we cached index.html for a year, the rollback would be invisible to
-#    everyone who had already loaded the broken version.
-#
-# And the part that is not automatable: TEST IT. Deploy something deliberately
-# broken to a staging site, roll it back, and time yourself. An untested
-# rollback is not a rollback — it is a paragraph in a runbook.

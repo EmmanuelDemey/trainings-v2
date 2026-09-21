@@ -30,14 +30,14 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-Steps 1, 2 and 5 come with their specs already written:
+Steps 1 and 2 come with their specs already written:
 **`tests/registration.spec.ts`** is the rule list below, written down — every
 message, the `age` that arrives as a string and leaves as a number, the mismatch
 that has to land on `confirm`, and the server error that must display like any
 other. It is red on the skeleton; keep `npm run test:watch` in a second terminal.
 
 It stops at the edge of the DOM on purpose: the focus management and the `aria-*`
-wiring of step 6 are checked in the browser, where they mean something.
+wiring of step 5 are checked in the browser, where they mean something.
 
 The app has two tabs — the hand-rolled form and the VeeValidate one — and a
 footer showing the fake API's call counters. The "server" knows three registered
@@ -53,13 +53,12 @@ it lives. `grep -rn "TODO 4\." src` finds a step's work in one command.
 |---|---|---|---|
 | 1 | Write the validation rules, and let the types fall out of them | `src/schemas/registration.ts` | `z.input` and `z.output` genuinely differ on `age` |
 | 2 | Wire a schema to a form by hand, once, to see the plumbing | `src/composables/useZodForm.ts` | A nested error reaches `attendees[0].name`, not the form |
-| 3 | The same form on VeeValidate | `src/components/VeeForm.vue` | Both tabs behave the same, and you can say what you gave up |
+| 3 | Submit the VeeValidate form, server errors included | `src/components/VeeForm.vue` | The `Bob` rejection shows under the attendee's name |
 | 4 | A repeatable row, and an async rule that hits the server | `VeeForm.vue` + `registration.ts` | Removing the middle row moves no value; the call counter stays low |
-| 5 | Make a server-side error land on its field | `src/components/VeeForm.vue` | The `Bob` rejection shows under the attendee's name |
-| 6 | Make the form usable without a mouse | `TextField.vue` + `ErrorSummary.vue` | A failed submit moves the focus to the summary, whose links reach the inputs |
+| 5 | Make the form usable without a mouse | `TextField.vue` + `ErrorSummary.vue` | A failed submit moves the focus to the summary, whose links reach the inputs |
 
-`npm test` grades steps 1, 2 and 5. Steps 3, 4 and 6 are graded in the browser —
-the last one with the keyboard only.
+`npm test` grades steps 1 and 2. Steps 3 to 5 are graded in the browser — the
+last one with the keyboard only.
 
 ## Steps
 
@@ -100,42 +99,44 @@ field shows nothing.
 
 ### 3. The same form with VeeValidate — `src/components/VeeForm.vue`
 
-Fill in `TODO 3.1` to `TODO 3.3` and use `<TextField>` for every text input.
+Already done for you: every field is on the page — one `<TextField>` per text
+input, and `plan`, `company` and `consent` bound by hand with `defineField` —
+and the schema requires `company` on the pro plan. Read the file once.
 
-Compare the two files when you are done: what disappeared, and what did you
-have to give up?
+Fill in `TODO 3.1` and `TODO 3.2`: the real submit, then the server's answer.
+Register with an attendee named `Bob`: the server answers `422` with
+`attendees[0].name`, and the message must appear under that input, not in a
+banner.
 
-→ **Done when** both tabs validate identically, and you can name what the
-library took over and what it took away.
+Compare the file with `HandRolledForm.vue` when you are done: what disappeared,
+and what did you have to give up?
+
+→ **Done when** the success message says the age was sent as a `number`, and
+the server's message displays exactly like a client-side one.
 
 ### 4. Arrays and async — `src/components/VeeForm.vue` + `src/schemas/registration.ts`
 
 1. `useFieldArray('attendees')`, keyed by **`field.key`**. Fill three rows,
    remove the middle one, and check that no value moved up. Then try `:key="idx"`
    and watch it break.
-2. The availability check: an async `.refine()` on the schema. Get it working
-   first, *then* look at the call counter and bring it down.
+2. The availability check: an async `.refine()` on the schema, built on the
+   `checkAvailability` helper that is already there (it caches one answer per
+   email). Get it working first, *then* look at the call counter and bring it
+   down.
 
 → **Done when** removing the middle row leaves the other two untouched, and the
 availability counter no longer moves on every keystroke.
 
-### 5. Server errors — `src/components/VeeForm.vue`
+### 5. Accessibility — `src/components/TextField.vue` + `src/components/ErrorSummary.vue`
 
-Register with an attendee named `Bob`: the server answers `422` with
-`attendees[0].name`. The message must appear under that input, not in a banner.
-
-→ **Done when** the server's message displays exactly like a client-side one.
-
-### 6. Accessibility — `src/components/TextField.vue` + `src/components/ErrorSummary.vue`
-
-In `TextField.vue` and `ErrorSummary.vue`. Test it with the keyboard only: `Tab`
+Fill in `TODO 5.1` to `TODO 5.5`. Test it with the keyboard only: `Tab`
 to every field, submit with `Enter`, and check that the focus lands on the
 summary — and that its links take you to the faulty inputs.
 
 → **Done when** you have filled and submitted the whole form without touching
 the mouse once.
 
-### 7. *(Bonus)* Zod 4
+### 6. *(Bonus)* Zod 4
 
 `@vee-validate/zod` is a **Zod 3** package: it reads internals that no longer
 exist in Zod 4. The `zod` package installed here ships both — `zod` is v3,

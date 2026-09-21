@@ -14,7 +14,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * it is about: `npm run build`, `npm run size`, and `npm run verify:serving`
  * against your deployment. A test asserting that `nginx.conf` *contains* a line
  * would prove nothing about how the server actually answers, which is exactly
- * the mistake step 5bis is there to cure.
+ * the mistake step 5 is there to cure.
  *
  * `config` reads `import.meta.env` at module load, so each case stubs the
  * environment first, then imports the module fresh — hence `vi.resetModules()`.

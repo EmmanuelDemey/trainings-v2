@@ -1,4 +1,4 @@
-# PLAN B — serving the SPA yourself, with Caddy.
+# STEP 5 — serving the SPA yourself, with Caddy.
 #
 # The same three rules as `nginx.conf`, in the other syntax. Read both and
 # notice how little of this is nginx-specific.

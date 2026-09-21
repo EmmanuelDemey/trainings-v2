@@ -3,7 +3,7 @@
  * Copy #1 of the table. Iteration, sorting, empty state — and the invoice row,
  * all in one file.
  *
- * TODO 6: the sorting and the empty state are **true** duplication with
+ * TODO 4: the sorting and the empty state are **true** duplication with
  *   `PaymentTable.vue`: same markup, same reason to change. They move to
  *   `ui/DataTable.vue`.
  *

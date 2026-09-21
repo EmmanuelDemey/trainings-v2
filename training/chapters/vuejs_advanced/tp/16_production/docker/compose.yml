@@ -1,4 +1,4 @@
-# PLAN B — the deploy target that needs no account.
+# STEP 5 — the deploy target that needs no account.
 #
 # Both services mount `dist/` read-only instead of baking it into an image: you
 # rebuild the app, you hit refresh. Use `docker/Dockerfile` when you want the

@@ -8,7 +8,7 @@ import './style.css';
 const app = createApp(App);
 
 /**
- * STEP 6 — The last-resort error handler.
+ * The last-resort error handler — already done for you (you wrote one in TP 13).
  *
  * Vue swallows errors thrown in render functions, lifecycle hooks and watchers:
  * without this, the component subtree disappears and the only trace is a line in

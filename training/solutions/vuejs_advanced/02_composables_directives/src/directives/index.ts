@@ -14,7 +14,7 @@ export const vAutofocus: Directive<HTMLElement> = {
 };
 
 /**
- * STEP 5 — The directives, packaged as an app plugin.
+ * Already done for you — the directives, packaged as an app plugin.
  *
  * Registering here rather than importing `vLazyImg` in every component is the
  * trade-off a plugin makes: one line in `main.ts` buys global availability, and

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * STEP 4 — Measure, then optimize
+ * GIVEN — Measure, then optimize
  *
  * 2 000 rows. Selecting one row changes a single prop on a single row, yet the
  * naive version re-renders every one of them.
@@ -62,7 +62,7 @@ async function select(id: number): Promise<void> {
 
 <template>
   <section>
-    <h2>4 — Rendering performance</h2>
+    <h2>Rendering performance (given)</h2>
 
     <div class="row" style="margin-bottom: 0.75rem">
       <span>{{ invoices.length }} rows</span>

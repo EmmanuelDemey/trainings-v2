@@ -1,11 +1,9 @@
 <script setup lang="ts">
 /**
- * Every line calls `productById(...)`, which is an O(n) `find` over the whole
- * catalog. With 30 000 products and 10 lines, that is 300 000 comparisons on
- * every render — for a lookup that could be O(1).
- *
- * TODO 3.2: once the store exposes a `byId` Map (TODO 3.1), replace the calls
- *   below with `catalog.byId.get(line.productId)` and measure again.
+ * Each line costs ONE `Map.get` instead of a `find` over the whole catalog.
+ * With 30 000 products and 10 lines that is 10 lookups instead of 300 000
+ * comparisons — and the `Map` itself is rebuilt only when the catalog changes,
+ * not on every render.
  */
 import { onUpdated, ref, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -47,7 +45,7 @@ onUpdated(() => countRender('CartPanel'));
 
     <ul v-else class="lines">
       <li v-for="line in lines" :key="line.productId">
-        <span>{{ shop.productById(line.productId)?.name ?? `#${line.productId}` }}</span>
+        <span>{{ shop.byId.get(line.productId)?.name ?? `#${line.productId}` }}</span>
         <span class="muted">× {{ line.qty }}</span>
         <button
           type="button"
@@ -61,7 +59,7 @@ onUpdated(() => countRender('CartPanel'));
 
     <p class="muted">
       Re-renders: <strong>{{ renderStats.CartPanel }}</strong> —
-      the cart must survive a reload once the persistence plugin works (TODO 4).
+      the cart must survive a reload once the persistence plugin works (TODO 3).
     </p>
   </section>
 </template>

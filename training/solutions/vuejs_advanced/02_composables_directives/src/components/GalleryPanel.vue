@@ -21,7 +21,7 @@ function shuffle(): void {
 
 <template>
   <section>
-    <h2>4 &amp; 5 — v-lazy-img</h2>
+    <h2>3 — v-lazy-img</h2>
 
     <div class="row" style="margin-bottom: 0.75rem">
       <button type="button" data-testid="shuffle" @click="shuffle">Shuffle photos</button>

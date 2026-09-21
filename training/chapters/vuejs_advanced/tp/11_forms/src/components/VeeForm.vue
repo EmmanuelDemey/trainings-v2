@@ -19,29 +19,30 @@ const { defineField, errors, values, meta, handleSubmit, setErrors, isSubmitting
   useForm({
     // TODO 4.3: once the async rule exists, swap this for
     //           `registrationSchemaWithAvailability`, then cut the number of
-    //           requests down. Two levers, and you want to understand both:
+    //           requests down: the schema already caches one answer per email,
+    //           the other lever is
     //           `useField(name, undefined, { validateOnValueUpdate: false })` in
-    //           `TextField` (validate on blur), and a cache in the schema
-    //           (one answer per email). Watch the counter in the footer.
+    //           `TextField` (validate on blur). Watch the counter in the footer.
     validationSchema: toTypedSchema(registrationSchema),
     initialValues: emptyRegistration,
   });
 
 // A worked example: a plain <input>, bound by hand.
 const [plan, planAttrs] = defineField('plan');
+const [company, companyAttrs] = defineField('company');
 const [consent, consentAttrs] = defineField('consent');
 
 const formError = ref('');
 const success = ref('');
 
 /**
- * TODO 3.3: replace this with the real submit.
+ * TODO 3.1: replace this with the real submit.
  *
  *   - call `register(data)` and show the returned id, then `resetForm()`
  *   - `data` is the schema *output*: check `typeof data.age` in the message,
  *     it proves you are sending the parsed output and not the raw model
  *
- * TODO 5.1: the server validates again, and answers `422` with paths.
+ * TODO 3.2: the server validates again, and answers `422` with paths.
  *
  *   - catch `ApiValidationError` and hand `error.fieldErrors` to `setErrors`
  *   - anything else is a form-level failure: `formError`
@@ -60,18 +61,29 @@ const onSubmit = handleSubmit(async (data) => {
 
 <template>
   <form class="form" novalidate @submit="onSubmit">
-    <!-- STEP 6: the summary is already here; it needs focus management. -->
+    <!-- STEP 5: the summary is already here; it needs focus management. -->
     <ErrorSummary :errors="errors" :submit-count="submitCount" />
 
     <p v-if="formError" class="banner banner--error" role="alert">{{ formError }}</p>
     <p v-if="success" class="banner banner--ok" role="status">{{ success }}</p>
 
-    <!-- STEP 3: one <TextField> per field. The component gets everything from
+    <!-- One <TextField> per field. The component gets everything from
          `useField`, so there is no v-model and no error prop to pass down. -->
     <TextField name="email" label="Email" type="email" autocomplete="email" />
-
-    <!-- TODO 3.1: add the missing fields — password, confirm, fullName, age.
-         `age` deserves an `inputmode="numeric"` and a hint. -->
+    <TextField name="password" label="Password" type="password" autocomplete="new-password" />
+    <TextField
+      name="confirm"
+      label="Confirm password"
+      type="password"
+      autocomplete="new-password"
+    />
+    <TextField name="fullName" label="Full name" autocomplete="name" />
+    <TextField
+      name="age"
+      label="Age"
+      inputmode="numeric"
+      hint="You must be 18 or over. The input holds a string; the API receives a number."
+    />
 
     <div class="field">
       <label :for="fieldId('plan')">Plan</label>
@@ -79,13 +91,26 @@ const onSubmit = handleSubmit(async (data) => {
         <option value="free">Free</option>
         <option value="pro">Pro</option>
       </select>
-      <p v-if="errors.plan" class="error">{{ errors.plan }}</p>
+      <p v-if="errors.plan" class="error" role="alert">{{ errors.plan }}</p>
     </div>
 
-    <!-- TODO 3.2: `company` is optional on the free plan and required by the
-         server on the pro plan. Show it only when `values.plan === 'pro'`, and
-         make the schema require it in that case (`.superRefine`, or a
-         discriminated union — try both and keep the one you would maintain). -->
+    <!-- Optional on the free plan, required by the server on the pro plan. The
+         schema enforces the same rule with a `.refine()` on the object, so the
+         two cannot drift apart. -->
+    <div v-if="values.plan === 'pro'" class="field">
+      <label :for="fieldId('company')">Company</label>
+      <input
+        :id="fieldId('company')"
+        v-model="company"
+        v-bind="companyAttrs"
+        :aria-describedby="errors.company ? `${fieldId('company')}-error` : undefined"
+        :aria-invalid="errors.company ? 'true' : undefined"
+        autocomplete="organization"
+      />
+      <p v-if="errors.company" :id="`${fieldId('company')}-error`" class="error" role="alert">
+        {{ errors.company }}
+      </p>
+    </div>
 
     <fieldset class="attendees">
       <legend>Attendees</legend>
@@ -103,10 +128,19 @@ const onSubmit = handleSubmit(async (data) => {
     </fieldset>
 
     <div class="field field--inline">
-      <input :id="fieldId('consent')" v-model="consent" v-bind="consentAttrs" type="checkbox" />
+      <input
+        :id="fieldId('consent')"
+        v-model="consent"
+        v-bind="consentAttrs"
+        type="checkbox"
+        :aria-describedby="errors.consent ? `${fieldId('consent')}-error` : undefined"
+        :aria-invalid="errors.consent ? 'true' : undefined"
+      />
       <label :for="fieldId('consent')">I accept the terms</label>
     </div>
-    <p v-if="errors.consent" class="error">{{ errors.consent }}</p>
+    <p v-if="errors.consent" :id="`${fieldId('consent')}-error`" class="error" role="alert">
+      {{ errors.consent }}
+    </p>
 
     <footer class="actions">
       <button type="submit" :disabled="isSubmitting || meta.pending">

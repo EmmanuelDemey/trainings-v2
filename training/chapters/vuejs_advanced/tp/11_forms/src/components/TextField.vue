@@ -4,7 +4,7 @@ import { useField } from 'vee-validate';
 import { fieldId } from '@/utils/fieldId';
 
 /**
- * STEP 3 & 6 — The field component you write once and reuse everywhere.
+ * STEP 3 & 5 — The field component you write once and reuse everywhere.
  *
  * `useField` finds the parent form by injection: no prop drilling, no events.
  * Every accessibility rule of the chapter lives here — get it right once, and
@@ -28,7 +28,7 @@ const errorId = computed(() => `${id.value}-error`);
 const hintId = computed(() => `${id.value}-hint`);
 
 const describedBy = computed(() => {
-  // TODO 6.1: point the input at its message *and* its hint, when they exist.
+  // TODO 5.1: point the input at its message *and* its hint, when they exist.
   //           Returning `undefined` when there is nothing to describe matters:
   //           `aria-describedby=""` is not the same as no attribute at all.
   return undefined as string | undefined;
@@ -37,7 +37,7 @@ const describedBy = computed(() => {
 
 <template>
   <div class="field">
-    <!-- TODO 6.2: the label must be tied to the input (`for` / `id`). A
+    <!-- TODO 5.2: the label must be tied to the input (`for` / `id`). A
          placeholder is not a label. -->
     <label>{{ label }}</label>
 
@@ -51,12 +51,12 @@ const describedBy = computed(() => {
       @blur="handleBlur"
       @change="handleChange"
     />
-    <!-- TODO 6.3: add `aria-invalid` so a screen reader announces the field as
+    <!-- TODO 5.3: add `aria-invalid` so a screen reader announces the field as
          invalid — a red border says nothing to it. -->
 
     <p v-if="hint" :id="hintId" class="hint">{{ hint }}</p>
 
-    <!-- TODO 6.4: an error appearing after the fact has to be announced.
+    <!-- TODO 5.4: an error appearing after the fact has to be announced.
          Which ARIA role does that? -->
     <p v-if="errorMessage" :id="errorId" class="error">{{ errorMessage }}</p>
 

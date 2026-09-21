@@ -2,7 +2,7 @@
 /**
  * The message syntax, on one screen: named, list, linked, modifier, escaped.
  *
- * Two of these were broken in the French catalogue, and both failures look the
+ * Two of these are easy to break in a catalogue, and both failures look the
  * same on screen — the raw key, or a missing word:
  *
  *   "@:legal.tos."        a linked key runs until a SPACE: the dot was part of it

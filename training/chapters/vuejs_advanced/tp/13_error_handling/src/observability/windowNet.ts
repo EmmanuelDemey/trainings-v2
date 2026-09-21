@@ -5,7 +5,7 @@
  * to `addEventListener`, to an `IntersectionObserver` — or let a promise reject
  * with nobody awaiting it — and the pipeline never sees it.
  *
- * TODO 4: install two listeners on `window` and route both to `capture()`:
+ * TODO 3: install two listeners on `window` and route both to `capture()`:
  *
  *   - `'error'` — an `ErrorEvent`; the thrown value is on `event.error`, and
  *     `event.message` is the fallback when there is no error object. Report it

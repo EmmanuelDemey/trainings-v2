@@ -2,7 +2,7 @@
 /**
  * The shared table. Empty on purpose — nothing imports it yet.
  *
- * TODO 5: make this the ONE table of the app. It owns iteration, sorting and the
+ * TODO 3: make this the ONE table of the app. It owns iteration, sorting and the
  *   empty state; it knows nothing about invoices or payments.
  *
  *   - `columns: Column[]` where `Column = { key: string; label: string; sortable?: boolean }`
@@ -14,7 +14,7 @@
  *   Use `generic="T extends { id: number }"` on `<script setup>` so `#row` is
  *   typed at every call site.
  *
- * TODO 6: then delete `components/InvoiceTable.vue` and `components/PaymentTable.vue`
+ * TODO 4: then delete `components/InvoiceTable.vue` and `components/PaymentTable.vue`
  *   and have both views call this one. That is **true** duplication — same
  *   markup, same reason to change.
  */

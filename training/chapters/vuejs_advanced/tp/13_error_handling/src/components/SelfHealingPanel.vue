@@ -6,10 +6,13 @@
  * this hook is not even consulted — the error goes straight past it, to whatever
  * is wrapping this component.
  *
- * TODO 3: leave this file alone. Run it, watch its own hook do nothing, then
- *   wrap it in `<ErrorBoundary>` in `App.vue` and watch that one catch it.
- *   Write down, in the Definition of Done, the line of `runtime-core` that
- *   explains why.
+ * Nothing was changed here, and nothing needed to be: the fix was to wrap it.
+ *
+ *   // runtime-core, handleError()
+ *   let cur = instance.parent;   // ⬅ not `instance`
+ *
+ * That one line is the whole story — and the reason error boundaries are a
+ * wrapper component in Vue as in React.
  */
 import { onErrorCaptured } from 'vue';
 import { capture } from '../observability/reporter';

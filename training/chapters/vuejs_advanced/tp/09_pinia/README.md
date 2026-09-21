@@ -10,9 +10,7 @@ Chapter 9 — Take a working "god store" and turn it into something that scales:
 
 - **Split** one store into three, by domain, and watch wasted re-renders disappear
 - **`shallowRef`** for a large payload that is never mutated in place
-- **Index with a `Map`** instead of an O(n) getter taking an argument
 - **A persistence plugin** with an opt-in, typed store option
-- **HMR** so editing a store no longer drops your state
 - **An observability plugin** built on `$onAction` and `$subscribe`
 
 ## Prerequisites
@@ -30,7 +28,7 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-Steps 4 and 6 come with their specs already written: **`tests/stores.spec.ts`**
+Steps 3 and 4 come with their specs already written: **`tests/stores.spec.ts`**
 covers the two plugins — what the cart persists and what it must not, a corrupted
 entry that cannot take startup down, and the log of a successful **and** of a
 failed action. It is red on the skeleton; keep `npm run test:watch` in a second
@@ -38,12 +36,19 @@ terminal.
 
 It drives the panels rather than the stores, on purpose: the three stores of step
 1 do not exist yet, so a spec importing `useCatalogStore` would fail to *load*
-rather than fail an assertion. The measurements — `shallowRef`, the `byId` index,
-the render counters — stay where they belong, in the browser with the numbers
-written down.
+rather than fail an assertion. The measurements — `shallowRef` and the render
+counters — stay where they belong, in the browser with the numbers written down.
 
 Every panel displays its own **render counter** and the app displays the cost of
 the catalog assignment. Write the numbers down before each change.
+
+**Already done for you** in `src/stores/shop.ts`, so that you carry them over
+when you split it rather than write them:
+
+- **A `Map` index** — `byId` is a `computed` returning a `Map`, where a getter
+  taking an argument (`productById(id)`) was O(n) per cart line and never cached.
+- **HMR** — `acceptHMRUpdate` below the store: editing a store file swaps it in
+  place and keeps the cart filled.
 
 ## The workshop at a glance
 
@@ -51,12 +56,10 @@ the catalog assignment. Write the numbers down before each change.
 |---|---|---|---|
 | 1 | Split the god store into three domain stores | `src/stores/shop.ts` → `catalog.ts`, `cart.ts`, `ui.ts` | Reloading the catalog stops moving `ThemePanel`'s counter |
 | 2 | Stop making a big payload deeply reactive | `src/stores/catalog.ts` | The assignment duration drops on a 30 000-product catalog |
-| 3 | Replace a getter-with-an-argument by an index | `src/stores/catalog.ts` + `CartPanel.vue` | The "last update" timing drops |
-| 4 | Write the persistence plugin | `src/plugins/persist.ts` + `pinia.d.ts` | `npm test` — the cart survives a reload, the catalog does not |
-| 5 | Keep your state across a hot reload | the three store files | Editing a store file leaves the cart filled |
-| 6 | Write the observability plugin | `src/plugins/logger.ts` | `npm test` — a successful *and* a failed action are logged |
+| 3 | Write the persistence plugin | `src/plugins/persist.ts` + `pinia.d.ts` | `npm test` — the cart survives a reload, the catalog does not |
+| 4 | Write the observability plugin | `src/plugins/logger.ts` | `npm test` — a successful *and* a failed action are logged |
 
-Steps 4 and 6 are the ones `npm test` grades. Steps 1, 2 and 3 are graded by the
+Steps 3 and 4 are the ones `npm test` grades. Steps 1 and 2 are graded by the
 render counters and the timings in the browser — which is why you write the
 numbers down.
 
@@ -66,7 +69,8 @@ numbers down.
 
 1. Extract `useCatalogStore`, `useCartStore` and `useUiStore` into three files.
    `useCartStore` gets the catalog by calling `useCatalogStore()` inside its
-   setup function.
+   setup function. `byId` goes to the catalog, and each store keeps its own
+   `acceptHMRUpdate` block.
 2. Keep the app working as you go — update the components' imports.
 3. Point `ThemePanel` at `useUiStore` and confirm its render counter stops moving
    when you reload the catalog.
@@ -88,23 +92,12 @@ directly, and how would you make it work anyway?
 → **Done when** you have the assignment duration before and after, measured on
 the same 30 000-product catalog.
 
-### 3. Index instead of a getter with an argument — `src/stores/catalog.ts` + `CartPanel.vue`
-
-1. Replace `productById` with a cached `byId` computed returning a `Map`.
-2. Update `CartPanel` to use it.
-3. With a 30 000-product catalog and a dozen cart lines, compare the "last
-   update" timing before and after.
-
-→ **Done when** `CartPanel` reads its products through the `Map`, and you have
-the "last update" timing before and after.
-
-### 4. The persistence plugin — `src/plugins/persist.ts` + `src/plugins/pinia.d.ts`
+### 3. The persistence plugin — `src/plugins/persist.ts` + `src/plugins/pinia.d.ts`
 
 1. Bail out when `options.persist` is falsy.
 2. Restore the state from `localStorage` on creation, guarding the JSON parse.
 3. Persist on every mutation with `$subscribe`.
-4. Support `persist: { paths: ['lines'] }` to persist only some keys.
-5. Type the custom option in `src/plugins/pinia.d.ts` and remove every cast.
+4. Type the custom option in `src/plugins/pinia.d.ts` and remove every cast.
 
 **Check it**: fill the cart, reload the page, and confirm it comes back — while
 the catalog does **not** (it is not marked `persist`).
@@ -112,14 +105,7 @@ the catalog does **not** (it is not marked `persist`).
 → **Done when** the persistence specs are green and no cast is left in
 `persist.ts`.
 
-### 5. HMR — the three store files
-
-Add `acceptHMRUpdate` to every store. Fill the cart, edit a label in a store
-file, and confirm the cart survives.
-
-→ **Done when** editing a store file leaves the cart filled instead of emptying it.
-
-### 6. The logger plugin — `src/plugins/logger.ts`
+### 4. The logger plugin — `src/plugins/logger.ts`
 
 1. Measure every action with `$onAction`, recording both success and failure.
    Trigger a failure with `failureSwitch.products = true`.
@@ -152,15 +138,12 @@ section are **not** part of this list.
       the before/after numbers written down
 - [ ] `products` is a `shallowRef`, and you have the assignment duration for a
       30 000-product catalog before and after
-- [ ] `productById` is replaced by a cached `byId` `Map` computed, `CartPanel` uses it,
-      and you have the "last update" timing before and after
 - [ ] Filling the cart and reloading brings the cart back — and the catalog **does not**
-- [ ] `persist: { paths: ['lines'] }` persists only `lines`
 - [ ] A corrupted `localStorage` entry does not break app startup
 - [ ] `src/plugins/pinia.d.ts` declares `DefineStoreOptionsBase.persist`, so
-      `options.persist` is typed inside the plugin and `persist: { path: [] }` (typo) is
-      a compile error — with no `as any` / `as never` left in `persist.ts`
-- [ ] Every store has `acceptHMRUpdate`: editing a store file keeps the cart filled
+      `options.persist` is typed inside the plugin and `persist: 'yes'` is a compile
+      error — with no `as any` / `as never` left in `persist.ts`
+- [ ] Every store kept its `acceptHMRUpdate`: editing a store file keeps the cart filled
 - [ ] The logger records **both** successful and failed actions with a duration —
       checked with `failureSwitch.products = true`
 - [ ] Converting `addToCart` to `$patch` changes the mutation type in the log, and you
@@ -168,8 +151,6 @@ section are **not** part of this list.
 
 **You can explain**
 
-- [ ] Why a getter taking an argument cannot be cached, and what the `Map` index
-      replaces it with
 - [ ] What breaks with `shallowRef` if some code mutates `products.value[0].price`, and
       how you would support that anyway
 - [ ] Why splitting the store reduced re-renders — which dependency disappeared

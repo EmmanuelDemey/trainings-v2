@@ -8,7 +8,7 @@ declare module 'pinia' {
    * typed inside the plugin instead of `unknown`.
    */
   export interface DefineStoreOptionsBase<S, Store> {
-    persist?: boolean | { paths: string[] };
+    persist?: boolean;
   }
 
   /** Properties the logger plugin adds to EVERY store. */

@@ -30,11 +30,34 @@ describe('InvoiceList — chart integration', () => {
     const chart = wrapper.findComponent(InvoiceChart);
     expect(chart.exists()).toBe(true);
 
-    // TODO 3.3: mount the same component WITHOUT the stub and observe what
-    //   breaks (or silently reports 0). Write down, in a comment, what the stub
-    //   made you stop testing — every stub is a piece of reality you gave up.
-
-    // TODO 3.4 (bonus): compare with `shallowMount`. Which children get stubbed,
-    //   and what does that cost you here?
   });
+
+  /**
+   * GIVEN — the same mount WITHOUT the stub. It does not throw — and that is the
+   * problem: jsdom answers every `getBoundingClientRect()` with zeros, so the
+   * chart renders bars of width 0 and any assertion on its geometry would be
+   * asserting on a fiction.
+   *
+   * What the stub made us stop testing:
+   *  - that the chart renders one bar per invoice
+   *  - that the bar heights are proportional to the totals
+   *  - that the currency actually appears in the axis labels
+   *
+   * None of those can be tested honestly in jsdom. They belong in browser mode
+   * (`npm run test:browser`, see `tests/InvoiceChart.browser.spec.ts`), where a
+   * real layout engine gives real numbers. Every stub is a piece of reality you
+   * traded away — the discipline is knowing WHICH piece, and where you test it
+   * instead.
+   */
+  it('mounts without the stub, but can assert nothing about the geometry', async () => {
+    const wrapper = mount(InvoiceList);
+    await flushPromises();
+
+    const chart = wrapper.findComponent(InvoiceChart);
+    expect(chart.exists()).toBe(true);
+    expect(chart.element.getBoundingClientRect().width).toBe(0); // jsdom, always
+  });
+
+  // TODO 3.3 (bonus): compare with `shallowMount`. Which children get stubbed,
+  //   and what does that cost you here?
 });

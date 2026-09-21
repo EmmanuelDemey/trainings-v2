@@ -2,7 +2,7 @@ import { createApp, type App as VueApp } from 'vue';
 import App from './App.vue';
 
 /**
- * TODO 5: wire `app.config.errorHandler` — the **last** stop before the console.
+ * TODO 2: wire `app.config.errorHandler` — the **last** stop before the console.
  *   Everything no boundary stopped lands here, and this is where the reporting
  *   for the rest belongs: `capture(err, { info, source: 'app' })`.
  *
