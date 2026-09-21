@@ -206,8 +206,7 @@ line each:
 <br />
 
 > Wire them on day one of a project — retro-fitting observability after the first
-> incident is how you find out that nothing was recorded. The annex takes the six
-> remaining channels, and the reporting behind them, one by one.
+> incident is how you find out that nothing was recorded.
 
 ---
 
@@ -221,7 +220,7 @@ line each:
 | `<ErrorBoundary>` | A degraded subtree | Only as a **wrapper**, never from inside |
 | `app.config.errorHandler` | What **you** see | Never let it throw |
 | Timers, listeners, promises | Nothing, until you route them | `await`, `try/catch`, or a `window` net |
-| The six other channels | Router, store, chunks, `window` | One line each — see the annex |
+| The six other channels | Router, store, chunks, `window` | One line each, wired on day one |
 
 <br />
 
