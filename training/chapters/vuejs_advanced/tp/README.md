@@ -54,24 +54,17 @@ workshop below assumes the panel is open next to the app.
 ## Toolchain versions
 
 Dependencies were last refreshed on **2026-08-20**, to the latest release of every
-package. Three deliberate pins, each with a reason that will lift on its own:
+package. Two deliberate pins, each with a reason that will lift on its own:
 
 | Pin | Why |
 |---|---|
 | `typescript` **6.0.3**, not 7.x | `vue-tsc@3` patches TypeScript's `lib/tsc`, which TypeScript 7 (the native port) no longer exposes: `npm run typecheck` fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`. |
 | `zod` **3.25**, not 4.x | `@vee-validate/zod@4.15` peers `zod@^3.24`, and no release supports Zod 4. Teaching two Zod dialects in one training would be worse than being one major behind. |
-| `webdriverio` **9.x** | Latest; listed here only because Vitest 4 moved the browser provider into `@vitest/browser-webdriverio`, which is now a dependency of workshop 3. |
 
-Three migrations changed workshop code, not just versions:
+Two migrations changed workshop code, not just versions:
 
-- **Vitest 4** — `browser.provider` is now a factory imported from its own
-  package, not the string `'webdriverio'` (`vitest.browser.config.ts`, and the
-  chapter 12 slides).
-- **Vitest 5** — browser mode moved its public entry point from
-  `@vitest/browser/context` to **`vitest/browser`**, and `render()` from
-  `vitest-browser-vue@3` now returns a **promise**: it has to be awaited
-  (`tests/InvoiceChart.browser.spec.ts`, and the chapter 12 slides). Two defaults
-  also flipped: `clearMocks` is **on**, and locators match text **exactly**.
+- **Vitest 5** — two defaults flipped: `clearMocks` is **on**, and locators match
+  text **exactly**.
 - **Vite 8 / Rolldown** — `build.rollupOptions.output.manualChunks` only accepts
   the **function** form. The `{ vue: ['vue', 'vue-router'] }` object form every
   article shows now fails with `TypeError: manualChunks is not a function`
@@ -86,7 +79,7 @@ runnable folder per workshop. Do not hand it out before the exercise.
 |---|--------|-------|--------------------|
 | 1 | `01_devtools/` | Timeline, render counters, wasted re-renders, prop identity | The Vue Devtools extension |
 | 2 | `02_composables_directives/` | `useFetch`, `useLocalStorage`, `v-lazy-img` directive | — |
-| 3 | `03_testing/` — **part 1** | test-utils, queries, stubs, spies, fake timers | — |
+| 3 | `03_testing/` | test-utils, queries, stubs, spies, fake timers | — |
 | 4 | `04_plugins/` | `createXxx` factory, `InjectionKey`, `useXxx`, global property | — |
 | 5 | `05_composables_library/` | `MaybeRefOrGetter`, object of refs, `onScopeDispose` | — |
 | 6 | `06_router/` | Transitions, guards, auth flow, scroll behaviour | — |
@@ -116,17 +109,15 @@ that exits 0, something observable in the browser, a question you can answer). I
 between, each step closes on a `→ **Done when**` line: the exit condition for that
 step alone, so you never have to read ahead to know whether you can move on. Steps
 marked *(Bonus)* and the "Going further" section are deliberately **outside** the
-DoD: it is the floor, not the ceiling. `03_testing/` has one DoD per part.
+DoD: it is the floor, not the ceiling.
 
 **`03_testing/` and `12_testing_integration/` are the two workshops where the
 LEARNER writes the tests**, so their starters ship specs that already pass plus a
 list of `it.todo`s. That also means the CI guard below does not apply to them —
 "the starter must fail" is meaningless when the failing tests are the exercise.
 
-`03_testing/` still carries an optional **part 2** on the same project, for a
-group that prefers one codebase end to end. `12_testing_integration/` is the
-chapter-12 workshop of record: a different app, already unit-tested, that you
-attack with the router, Pinia, MSW and Cypress without needing part 1.
+`12_testing_integration/` does not build on `03_testing/`: it is a different app,
+already unit-tested, that you attack with the router, Pinia, MSW and Cypress.
 
 ## Node version
 
@@ -143,5 +134,5 @@ pick up the version from its `.nvmrc`.
 (`src/api/fakeApi.ts`) with an artificial latency, so nothing has to be installed
 or running besides Vite.
 `03_testing/` and `12_testing_integration/` mock the network explicitly
-(MSW, `cy.intercept`). `04_plugins/`, `13_error_handling/` and `15_i18n/` need no
+(MSW, plus `cy.intercept` in `12_testing_integration/`). `04_plugins/`, `13_error_handling/` and `15_i18n/` need no
 API at all.

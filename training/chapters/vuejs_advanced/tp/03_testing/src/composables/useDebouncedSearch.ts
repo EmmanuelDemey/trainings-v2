@@ -7,7 +7,7 @@ export interface UseDebouncedSearchReturn {
 }
 
 /**
- * Debounces the query before calling `search`. Step 5 tests it with fake timers:
+ * Debounces the query before calling `search`. Step 3 tests it with fake timers:
  * three keystrokes must produce exactly ONE call.
  */
 export function useDebouncedSearch(

@@ -43,7 +43,7 @@ const ENDPOINTS = [
     label: 'Cypress CDN',
     url: 'https://download.cypress.io/desktop.json',
     required: true,
-    hint: 'Chapters 3 & 12 install Cypress, which downloads its own browser binary.',
+    hint: 'Chapter 12 installs Cypress, which downloads its own browser binary.',
   },
   {
     label: 'GitHub',

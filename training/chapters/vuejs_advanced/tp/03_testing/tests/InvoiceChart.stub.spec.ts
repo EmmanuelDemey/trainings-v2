@@ -4,7 +4,7 @@ import InvoiceList from '@/components/InvoiceList.vue';
 import InvoiceChart from '@/components/InvoiceChart.vue';
 
 /**
- * STEP 3 (PART 1 — chapter 3) — Stubbing a heavy child.
+ * STEP 2 — Stubbing a heavy child.
  *
  * `InvoiceChart` relies on `getBoundingClientRect`, which jsdom always answers
  * with zeros. Rather than testing what it renders, stub it and assert on the
@@ -15,7 +15,7 @@ describe('InvoiceList — chart integration', () => {
     const wrapper = mount(InvoiceList, {
       global: {
         stubs: {
-          // TODO 3.1: replace `true` with a custom stub declaring the props, so
+          // TODO 2.1: replace `true` with a custom stub declaring the props, so
           //   you can read them back:
           //     InvoiceChart: { props: ['invoices', 'currency'], template: '<div data-testid="chart-stub" />' }
           InvoiceChart: true,
@@ -25,7 +25,7 @@ describe('InvoiceList — chart integration', () => {
 
     await flushPromises();
 
-    // TODO 3.2: get the stub with `wrapper.findComponent(InvoiceChart)` and
+    // TODO 2.2: get the stub with `wrapper.findComponent(InvoiceChart)` and
     //   assert `props('invoices')` has 3 entries and `props('currency')` is 'EUR'.
     const chart = wrapper.findComponent(InvoiceChart);
     expect(chart.exists()).toBe(true);
@@ -43,11 +43,10 @@ describe('InvoiceList — chart integration', () => {
    *  - that the bar heights are proportional to the totals
    *  - that the currency actually appears in the axis labels
    *
-   * None of those can be tested honestly in jsdom. They belong in browser mode
-   * (`npm run test:browser`, see `tests/InvoiceChart.browser.spec.ts`), where a
-   * real layout engine gives real numbers. Every stub is a piece of reality you
-   * traded away — the discipline is knowing WHICH piece, and where you test it
-   * instead.
+   * None of those can be tested honestly in jsdom. They belong in a test that
+   * runs in a real browser, where a real layout engine gives real numbers. Every
+   * stub is a piece of reality you traded away — the discipline is knowing WHICH
+   * piece, and where you test it instead.
    */
   it('mounts without the stub, but can assert nothing about the geometry', async () => {
     const wrapper = mount(InvoiceList);
@@ -58,6 +57,6 @@ describe('InvoiceList — chart integration', () => {
     expect(chart.element.getBoundingClientRect().width).toBe(0); // jsdom, always
   });
 
-  // TODO 3.3 (bonus): compare with `shallowMount`. Which children get stubbed,
+  // TODO 2.3 (bonus): compare with `shallowMount`. Which children get stubbed,
   //   and what does that cost you here?
 });

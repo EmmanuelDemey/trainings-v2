@@ -4,7 +4,7 @@ import { useDebouncedSearch } from '@/composables/useDebouncedSearch';
 import { withSetup } from './helpers';
 
 /**
- * STEP 5 — Fake timers and spies.
+ * STEP 3 — Fake timers and spies.
  *
  * Three keystrokes must produce exactly ONE search call. Without fake timers
  * this test would either be slow (a real 300 ms wait per case) or flaky (a
@@ -68,7 +68,7 @@ describe('useDebouncedSearch', () => {
    *
    * The fix is one `onScopeDispose(() => clearTimeout(timer))` in the composable
    * — and the reason this test asserts `toHaveBeenCalledOnce()` instead is that
-   * the workshop's sabotage step (7) mutates this exact source file. Add the
+   * the workshop's sabotage step (4) mutates this exact source file. Add the
    * cleanup, flip this assertion to `not.toHaveBeenCalled()`, and you have done
    * the most useful thing a test suite can do: turn a latent bug into a
    * regression test.
@@ -87,7 +87,7 @@ describe('useDebouncedSearch', () => {
   });
 
   /**
-   * A spy with `using` (step 5.3). `MockInstance` implements `Symbol.dispose`,
+   * A spy with `using` (step 3.3). `MockInstance` implements `Symbol.dispose`,
    * so `mockRestore()` runs at the end of the scope — no `afterEach`, and no way
    * to leak a patched `console.warn` into the next test by forgetting one.
    */

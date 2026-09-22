@@ -5,7 +5,7 @@ import InvoiceChart from '@/components/InvoiceChart.vue';
 import { invoices } from './msw';
 
 /**
- * STEP 3 — Stubbing a heavy child.
+ * STEP 2 — Stubbing a heavy child.
  *
  * `InvoiceChart` relies on `getBoundingClientRect`, which jsdom always answers
  * with zeros. Rather than testing what it renders, stub it and assert on the
@@ -47,11 +47,10 @@ describe('InvoiceList — chart integration', () => {
    *  - that the bar heights are proportional to the totals
    *  - that the currency actually appears in the axis labels
    *
-   * None of those can be tested honestly in jsdom. They belong in browser mode
-   * (`npm run test:browser`, see `tests/InvoiceChart.browser.spec.ts`), where a
-   * real layout engine gives real numbers. Every stub is a piece of reality you
-   * traded away — the discipline is knowing WHICH piece, and where you test it
-   * instead.
+   * None of those can be tested honestly in jsdom. They belong in a test that
+   * runs in a real browser, where a real layout engine gives real numbers. Every
+   * stub is a piece of reality you traded away — the discipline is knowing WHICH
+   * piece, and where you test it instead.
    */
   it('mounts without the stub, but can assert nothing about the geometry', async () => {
     const wrapper = mount(InvoiceList);

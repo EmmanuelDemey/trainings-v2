@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Stands in for a real charting component: it touches layout APIs jsdom does not
- * implement well, so tests stub it. Step 3 asserts on the PROPS it receives
+ * implement well, so tests stub it. Step 2 asserts on the PROPS it receives
  * rather than on what it renders.
  */
 import { computed, onMounted, ref } from 'vue';

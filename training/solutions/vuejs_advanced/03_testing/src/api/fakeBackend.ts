@@ -2,8 +2,7 @@ import type { Invoice } from './client';
 
 /**
  * Browser-side fake backend, used by `npm run dev` and `npm run preview` only.
- * Vitest uses MSW instead, and Cypress uses `cy.intercept` — three mechanisms,
- * one contract.
+ * Vitest uses MSW instead (`tests/msw.ts`) — two mechanisms, one contract.
  */
 const INVOICES: Invoice[] = [
   { id: 1, customer: 'Acme', total: 1240.5, status: 'paid' },
@@ -34,14 +33,6 @@ export function installFakeBackend(): void {
       const id = Number(url.split('/').pop());
       const invoice = INVOICES.find((i) => i.id === id);
       return invoice ? json(invoice) : new Response(null, { status: 404 });
-    }
-
-    if (url === '/api/login') {
-      const body = JSON.parse(String(init?.body ?? '{}')) as { email: string; password: string };
-      if (body.email === 'ada@example.com' && body.password === 'secret') {
-        return json({ token: 'token-1', user: { id: 1, name: 'Ada Lovelace' } });
-      }
-      return new Response(null, { status: 401 });
     }
 
     return new Response(null, { status: 404 });

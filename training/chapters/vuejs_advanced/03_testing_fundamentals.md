@@ -311,4 +311,4 @@ layout: cover
 
 # Hands-on
 
-## Workshop 3 - Testing fundamentals (part 1 of the testing workshop)
+## Workshop 3 - Testing fundamentals

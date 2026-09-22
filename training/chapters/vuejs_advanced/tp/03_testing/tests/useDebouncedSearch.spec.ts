@@ -4,7 +4,7 @@ import { useDebouncedSearch } from '@/composables/useDebouncedSearch';
 import { withSetup } from './helpers';
 
 /**
- * STEP 5 (PART 1 — chapter 3) — Fake timers and spies.
+ * STEP 3 — Fake timers and spies.
  *
  * Three keystrokes must produce exactly ONE search call. Without fake timers
  * this test would either be slow or flaky.
@@ -24,9 +24,9 @@ describe('useDebouncedSearch', () => {
     query.value = 'vue';
     await nextTick();
 
-    // TODO 5.1: assert `search` has NOT been called yet.
+    // TODO 3.1: assert `search` has NOT been called yet.
 
-    // TODO 5.2: advance the timers past the debounce with
+    // TODO 3.2: advance the timers past the debounce with
     //   `await vi.advanceTimersByTimeAsync(300)` — the async variant also flushes
     //   the promises the timer resolved. Then assert `search` was called exactly
     //   once, with 'vue', and that `results` holds the returned value.
@@ -60,7 +60,7 @@ describe('useDebouncedSearch', () => {
 });
 
 /**
- * TODO 5.3: write a test using `using` for a spy:
+ * TODO 3.3: write a test using `using` for a spy:
  *
  *   it('warns on an invalid input', () => {
  *     using warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
