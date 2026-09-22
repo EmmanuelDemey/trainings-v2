@@ -126,10 +126,17 @@ app.use(createToast({ duration: 6000 }));
 # `provide` / `inject` vs `globalProperties`
 
 ```ts
-// 1. app.provide + a typed InjectionKey — the modern default
+// plugins/toast/index.ts — the plugin provides the API under a typed key
 export const toastKey: InjectionKey<ToastApi> = Symbol('toast');
-app.provide(toastKey, api);
 
+export function createToast(options: ToastOptions = {}): Plugin {
+  // ... build `api` from the options
+  return { install(app) { app.provide(toastKey, api); } };
+}
+```
+
+```ts
+// plugins/toast/useToast.ts — the composable components call
 export function useToast(): ToastApi {
   const api = inject(toastKey);
   if (!api) throw new Error('[toast] missing plugin — did you app.use(createToast())?');
