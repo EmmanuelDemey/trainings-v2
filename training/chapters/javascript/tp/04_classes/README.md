@@ -1,6 +1,6 @@
 # TP 4 — Modelling a bank account
 
-> Autonomous workshop — chapter 4 (Classes). ~1h30.
+> Autonomous workshop — chapter 4 (Classes).
 
 ## Goal
 

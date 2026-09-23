@@ -1,6 +1,6 @@
 # TP 9 — Mini-project 1: Countdown
 
-> Day 3, guided practice. ~1h.
+> Day 3, guided practice.
 
 ## Goal
 

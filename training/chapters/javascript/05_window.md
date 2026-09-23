@@ -242,7 +242,7 @@ setInterval(() => {
 
 ## Workshop 5 - The window
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/05_window/</code> — ⏱ ~45 min — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/05_window/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - Log the viewport size and the current URL in the console
 - Display a message 2 seconds after page load with `setTimeout`

@@ -468,12 +468,12 @@ layout: cover
 
 <br />
 
-| Project | Roughly | Difficulty |
-|---------|---------|-----------|
-| 1 - Countdown | 1h | the pattern, on the smallest possible state |
-| 2 - Password generator | 1h15 | strings, arrays, randomness |
-| 3 - Staff directory | 1h15 | two controls, one derived list |
-| 4 - Mini social network | 1h30 | everything |
+| Project | Difficulty |
+|---------|-----------|
+| 1 - Countdown | the pattern, on the smallest possible state |
+| 2 - Password generator | strings, arrays, randomness |
+| 3 - Staff directory | two controls, one derived list |
+| 4 - Mini social network | everything |
 
 ---
 

@@ -161,7 +161,7 @@ button.addEventListener('click', async () => {
 
 ## Workshop 14 - Splitting an application
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/14_es_modules/</code> — ⏱ ~1h — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/14_es_modules/</code> — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
 
 - Split a working single-file app into `format.js`, `store.js` and `app.js`
 - Export named functions, import them, make the page work again

@@ -3,20 +3,20 @@
 One folder per workshop. **Each folder is self-contained**: no `npm install`, no
 build step, no dependency on the other workshops. Open the folder and start.
 
-| # | Folder | Chapter | Day | Roughly |
-|---|--------|---------|-----|---------|
-| 1 | `01_introduction` | 1 - Introduction | 1 | 30 min |
-| 2 | `02_mental_model` | 2 - Mental model | 1 | 45 min |
-| 3 | `03_syntax` | 3 - JS syntax | 1 | 1h45 |
-| 4 | `04_classes` | 4 - Classes | 1 | 1h30 |
-| 5 | `05_window` | 5 - The window | 2 | 45 min |
-| 6 | `06_dom` | 6 - The DOM | 2 | 1h |
-| 7 | `07_events` | 7 - Event-driven programming | 2 | 1h15 |
-| 8 | `08_responsive` | 8 - JavaScript and responsive design | 2 | 45 min |
-| 9 | `09_countdown` | 9 - Guided practice, mini-project 1 | 3 | 1h |
-| 10 | `10_password_generator` | 9 - Guided practice, mini-project 2 | 3 | 1h15 |
-| 11 | `11_staff_directory` | 9 - Guided practice, mini-project 3 | 3 | 1h15 |
-| 12 | `12_social_network` | 9 - Guided practice, mini-project 4 | 3 | 1h30 |
+| # | Folder | Chapter | Day |
+|---|--------|---------|-----|
+| 1 | `01_introduction` | 1 - Introduction | 1 |
+| 2 | `02_mental_model` | 2 - Mental model | 1 |
+| 3 | `03_syntax` | 3 - JS syntax | 1 |
+| 4 | `04_classes` | 4 - Classes | 1 |
+| 5 | `05_window` | 5 - The window | 2 |
+| 6 | `06_dom` | 6 - The DOM | 2 |
+| 7 | `07_events` | 7 - Event-driven programming | 2 |
+| 8 | `08_responsive` | 8 - JavaScript and responsive design | 2 |
+| 9 | `09_countdown` | 9 - Guided practice, mini-project 1 | 3 |
+| 10 | `10_password_generator` | 9 - Guided practice, mini-project 2 | 3 |
+| 11 | `11_staff_directory` | 9 - Guided practice, mini-project 3 | 3 |
+| 12 | `12_social_network` | 9 - Guided practice, mini-project 4 | 3 |
 
 ## Optional modules
 
@@ -24,11 +24,11 @@ Three extra chapters exist, **off by default**. They are not part of the three
 days: they are turned on for a group that asks for them, and they each come with
 their own workshop.
 
-| # | Folder | Chapter | Roughly |
-|---|--------|---------|---------|
-| 13 | `13_fetch` | 10 - Talking to a server | 1h15 |
-| 14 | `14_es_modules` | 11 - ES Modules | 1h |
-| 15 | `15_storage` | 12 - Local & Session Storage | 1h |
+| # | Folder | Chapter |
+|---|--------|---------|
+| 13 | `13_fetch` | 10 - Talking to a server |
+| 14 | `14_es_modules` | 11 - ES Modules |
+| 15 | `15_storage` | 12 - Local & Session Storage |
 
 While a module is off, its folder is prefixed with an underscore
 (`_13_fetch`) — which keeps it out of the slides, out of this site and out of

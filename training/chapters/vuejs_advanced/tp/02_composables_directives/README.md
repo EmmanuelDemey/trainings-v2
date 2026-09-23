@@ -157,7 +157,7 @@ these two are yours to do **on your own, after the session**. Each has its own
 *Done when*, and each builds on the state the previous left behind — follow the
 training order.
 
-### Chapter 4 — From directives to a real plugin (30 min)
+### Chapter 4 — From directives to a real plugin
 
 Continue in this project, on top of the provided `directivesPlugin`:
 
@@ -175,7 +175,7 @@ Continue in this project, on top of the provided `directivesPlugin`:
 **Done when** you can install the plugin twice, on two apps, and each one keeps
 its own configuration and its own stats.
 
-### Chapter 5 — Extracting the library (45 min)
+### Chapter 5 — Extracting the library
 
 Continue in this project, on top of steps 1–3:
 

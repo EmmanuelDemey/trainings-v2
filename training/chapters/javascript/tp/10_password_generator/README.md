@@ -1,6 +1,6 @@
 # TP 10 — Mini-project 2: Password generator
 
-> Day 3, guided practice. ~1h15.
+> Day 3, guided practice.
 
 ## Goal
 

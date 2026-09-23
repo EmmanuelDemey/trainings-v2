@@ -258,7 +258,7 @@ ada instanceof Account;                            // true
 
 ## Workshop 4 - Modelling a bank account
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/04_classes/</code> — ⏱ ~1h30 — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/04_classes/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - A `Counter`: a public field, two methods, `new`
 - A `BankAccount` whose balance is **private**, read through a getter

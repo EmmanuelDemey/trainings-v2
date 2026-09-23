@@ -1,6 +1,6 @@
 # TP 1 — First steps
 
-> Autonomous workshop — chapter 1 (Introduction). ~30 minutes.
+> Autonomous workshop — chapter 1 (Introduction).
 
 ## Goal
 

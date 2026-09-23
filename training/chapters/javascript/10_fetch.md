@@ -254,7 +254,7 @@ npx serve chapters/javascript/tp/13_fetch     # then open the printed http://…
 
 ## Workshop 13 - Talking to a server
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/13_fetch/</code> — ⏱ ~1h15 — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/13_fetch/</code> — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
 
 - Load a JSON file with `fetch` and render it as a list
 - Handle the three states: loading, error, data

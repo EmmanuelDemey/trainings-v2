@@ -1,6 +1,6 @@
 # TP 5 — The router
 
-> Deck section **Router**. ~1h. Continues the project of workshop 4.
+> Deck section **Router**. Continues the project of workshop 4.
 
 ## Goal
 

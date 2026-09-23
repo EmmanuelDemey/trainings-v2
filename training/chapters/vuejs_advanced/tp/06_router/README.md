@@ -176,7 +176,7 @@ these three are yours to do **on your own, after the session**. Each has its own
 *Done when*, and each builds on the state the previous left behind — follow the
 training order.
 
-### Chapter 8 — File-based, typed routing (45 min)
+### Chapter 8 — File-based, typed routing
 
 Continue in this project, on top of the finished auth flow:
 
@@ -195,7 +195,7 @@ Continue in this project, on top of the finished auth flow:
 **Done when** `npm run typecheck` is green **on a fresh clone** — decide, and be
 able to justify, whether the three `.d.ts` files are committed.
 
-### Chapter 13 — Error handling & observability (45 min)
+### Chapter 13 — Error handling & observability
 
 Continue in this project, on the invoices application:
 
@@ -220,7 +220,7 @@ Continue in this project, on the invoices application:
 **Done when** no failure can produce a blank page, and every one of them shows up
 in the reporter — exactly once.
 
-### Chapter 15 — Internationalizing the invoices app (45 min)
+### Chapter 15 — Internationalizing the invoices app
 
 Continue in this project, on the invoices application:
 

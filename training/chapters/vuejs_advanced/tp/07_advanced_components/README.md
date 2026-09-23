@@ -181,7 +181,7 @@ these two are yours to do **on your own, after the session**. Each has its own
 *Done when*, and each builds on the state the previous left behind — follow the
 training order.
 
-### Chapter 10 — Transition & TransitionGroup (45 min)
+### Chapter 10 — Transition & TransitionGroup
 
 Continue in this project, on top of the `Teleport` modal and the invoice table:
 
@@ -203,7 +203,7 @@ Continue in this project, on top of the `Teleport` modal and the invoice table:
 **Done when** every animation is reversible mid-flight, and disabling motion
 leaves the application fully usable.
 
-### Chapter 14 — Architecture & duplication (45 min)
+### Chapter 14 — Architecture & duplication
 
 Work in this project, whose components all sit flat in `src/components/`:
 

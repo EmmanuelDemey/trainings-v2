@@ -1,6 +1,6 @@
 # TP 15 — Remembering
 
-> Optional workshop — chapter 12 (Local & Session Storage). ~1h.
+> Optional workshop — chapter 12 (Local & Session Storage).
 > **Must be served over HTTP** — the command is in *Setup* below.
 
 ## Goal

@@ -1,6 +1,6 @@
 # TP 14 — Splitting an application
 
-> Optional workshop — chapter 11 (ES Modules). ~1h.
+> Optional workshop — chapter 11 (ES Modules).
 > **Must be served over HTTP** — the command is in *Setup* below.
 
 ## Goal

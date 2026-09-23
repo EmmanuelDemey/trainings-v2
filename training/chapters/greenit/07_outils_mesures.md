@@ -278,22 +278,22 @@ ecoindex-cli analyze https://example.com
 
 # Exercice pratique
 
-## 🔧 Atelier manipulation (20 minutes)
+## 🔧 Atelier manipulation
 
 **Objectif:** Prendre en main GreenIT-Analysis
 
-**Exercice 1: Installation et première analyse (5 min)**
+**Exercice 1: Installation et première analyse**
 1. Installer l'extension GreenIT-Analysis
 2. Analyser une page de votre choix
 3. Observer le score global et les catégories
 
-**Exercice 2: Analyse détaillée (10 min)**
+**Exercice 2: Analyse détaillée**
 1. Analyser votre site/projet actuel
 2. Identifier les 3 règles les plus problématiques
 3. Lire les recommandations associées
 4. Noter les actions prioritaires
 
-**Exercice 3: Comparaison (5 min)**
+**Exercice 3: Comparaison**
 1. Analyser un site reconnu éco-conçu (ex: [lowtechlab.org](https://lowtechlab.org))
 2. Comparer avec votre analyse précédente
 3. Identifier les bonnes pratiques à reproduire
@@ -325,7 +325,7 @@ ecoindex-cli analyze https://example.com
 
 # Retour d'expérience
 
-## Débrief collectif (10 min)
+## Débrief collectif
 
 **Questions à partager:**
 

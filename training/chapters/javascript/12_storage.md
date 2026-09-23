@@ -157,7 +157,7 @@ window.addEventListener('storage', (event) => {
 
 ## Workshop 15 - Remembering
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/15_storage/</code> — ⏱ ~1h — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/15_storage/</code> — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
 
 - Persist a to-do list in `localStorage` and survive a reload
 - `JSON.stringify` in, `JSON.parse` out, with a default and a `try` / `catch`

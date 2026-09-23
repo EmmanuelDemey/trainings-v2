@@ -1,6 +1,6 @@
 # TP 11 — Mini-project 3: Staff directory
 
-> Day 3, guided practice. ~1h15.
+> Day 3, guided practice.
 
 ## Goal
 

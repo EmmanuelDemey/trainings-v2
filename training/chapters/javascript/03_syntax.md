@@ -467,7 +467,7 @@ Number('hello')            // NaN
 
 ## Workshop 3 - Functions and arrays
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/03_syntax/</code> — ⏱ ~1h45 — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/03_syntax/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - Write a function `isEven(n)` and use it in a `filter`
 - Write a `celsiusToFahrenheit(c)` function and convert an array of temperatures with `map`

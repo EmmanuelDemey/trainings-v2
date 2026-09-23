@@ -129,7 +129,7 @@ user.email.length  // ❌ TypeError: cannot read 'length' of undefined
 
 ## Workshop 2 - Predicting snippets
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/02_mental_model/</code> — ⏱ ~45 min — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/02_mental_model/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - Predict the value of eight snippets before running them in the console
 - Watch a shared object change through two variables at once

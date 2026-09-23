@@ -1,6 +1,6 @@
 # TP 2 — Dynamic templates
 
-> Deck section **Dynamisation HTML**. ~45 min. Continues the project of workshop 1.
+> Deck section **Dynamisation HTML**. Continues the project of workshop 1.
 
 ## Goal
 

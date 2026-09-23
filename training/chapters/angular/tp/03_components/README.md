@@ -1,6 +1,6 @@
 # TP 3 — Components and communication
 
-> Deck section **Composants**. ~1h. Continues the project of workshop 2.
+> Deck section **Composants**. Continues the project of workshop 2.
 
 ## Goal
 

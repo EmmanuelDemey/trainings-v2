@@ -1,6 +1,6 @@
 # TP 8 — Responsive behaviour
 
-> Autonomous workshop — chapter 8 (JavaScript and responsive design). ~45 min.
+> Autonomous workshop — chapter 8 (JavaScript and responsive design).
 
 ## Goal
 

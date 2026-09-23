@@ -171,7 +171,7 @@ errorZone.textContent = 'Email is required';    // the error IN the page, not in
 
 ## Workshop 7 - Interactive interfaces
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/07_events/</code> — ⏱ ~1h15 — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/07_events/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - A counter with `+` / `-` buttons that updates a displayed number
 - A character counter under a text field (`input` event)

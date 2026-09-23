@@ -1,6 +1,6 @@
 # TP 3 — Functions and arrays
 
-> Autonomous workshop — chapter 3 (JS syntax). ~1h45.
+> Autonomous workshop — chapter 3 (JS syntax).
 
 ## Goal
 

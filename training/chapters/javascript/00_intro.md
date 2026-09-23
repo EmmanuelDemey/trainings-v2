@@ -97,11 +97,11 @@ step, no `npm install` for the whole training.
 
 <br />
 
-| Day | Slides | Workshops | Roughly |
-|-----|--------|-----------|---------|
-| Day 1 | Ch. 1 to 4 | TP 1, 2, 3, 4 | 4h30 of practice |
-| Day 2 | Ch. 5 to 8 | TP 5, 6, 7, 8 | 3h30 of practice |
-| Day 3 | Ch. 9 | TP 9, 10, 11, 12 | the whole day |
+| Day | Slides | Workshops |
+|-----|--------|-----------|
+| Day 1 | Ch. 1 to 4 | TP 1, 2, 3, 4 |
+| Day 2 | Ch. 5 to 8 | TP 5, 6, 7, 8 |
+| Day 3 | Ch. 9 | TP 9, 10, 11, 12 |
 
 > Falling behind on a workshop is normal — the "going further" sections are
 > there to keep the fast ones busy, not to be finished by everyone.

@@ -1,6 +1,6 @@
 # TP 2 — Predicting snippets
 
-> Autonomous workshop — chapter 2 (Mental model). ~45 minutes.
+> Autonomous workshop — chapter 2 (Mental model).
 
 ## Goal
 

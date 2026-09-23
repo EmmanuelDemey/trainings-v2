@@ -1,6 +1,6 @@
 # TP 6 — Manipulating the page
 
-> Autonomous workshop — chapter 6 (The DOM). ~1h.
+> Autonomous workshop — chapter 6 (The DOM).
 
 ## Goal
 

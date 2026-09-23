@@ -1,6 +1,6 @@
 # TP 5 — The window
 
-> Autonomous workshop — chapter 5 (The window). ~45 minutes.
+> Autonomous workshop — chapter 5 (The window).
 
 ## Goal
 

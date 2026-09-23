@@ -1,6 +1,6 @@
 # TP 12 — Mini-project 4: Mini social network
 
-> Day 3, guided practice. ~1h30 — the final project.
+> Day 3, guided practice — the final project.
 
 ## Goal
 

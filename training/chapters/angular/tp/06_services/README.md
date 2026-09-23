@@ -1,6 +1,6 @@
 # TP 6 — Services and dependency injection
 
-> Deck section **Services**. ~1h. Continues the project of workshop 5, and closes
+> Deck section **Services**. Continues the project of workshop 5, and closes
 > the training.
 
 ## Goal

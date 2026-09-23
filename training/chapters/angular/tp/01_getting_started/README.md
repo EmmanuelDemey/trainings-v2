@@ -1,6 +1,6 @@
 # TP 1 — Getting started
 
-> The toolchain, before the deck starts. ~45 min. This is the **first** workshop:
+> The toolchain, before the deck starts. This is the **first** workshop:
 > it creates the project that the five that follow all build on.
 
 ## Goal

@@ -1,6 +1,6 @@
 # TP 7 — Interactive interfaces
 
-> Autonomous workshop — chapter 7 (Event-driven programming). ~1h15.
+> Autonomous workshop — chapter 7 (Event-driven programming).
 
 ## Goal
 

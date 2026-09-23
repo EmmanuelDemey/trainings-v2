@@ -1,6 +1,6 @@
 # TP 4 — RxJS and HTTP
 
-> Deck sections **RxJS** and **Http**. ~1h15. Continues the project of
+> Deck sections **RxJS** and **Http**. Continues the project of
 > workshop 3.
 
 ## Goal

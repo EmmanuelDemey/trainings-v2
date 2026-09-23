@@ -1,6 +1,6 @@
 # TP 13 — Talking to a server
 
-> Optional workshop — chapter 10 (Talking to a server). ~1h15.
+> Optional workshop — chapter 10 (Talking to a server).
 > **Must be served over HTTP** — the command is in *Setup* below.
 
 ## Goal

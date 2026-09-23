@@ -86,7 +86,7 @@ mobileQuery.addEventListener('change', apply); // fires ONLY when crossing the b
 
 ## Workshop 8 - Responsive behavior
 
-<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/08_responsive/</code> — ⏱ ~45 min — open <code>index.html</code>, steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>chapters/javascript/tp/08_responsive/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
 
 - Display the viewport width live in the page while resizing
 - Toggle a `mobile` class on `<body>` under 768px (via `resize`)
