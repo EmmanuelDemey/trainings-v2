@@ -14,12 +14,10 @@ import DataTable from '@/components/DataTable.vue';
  *
  *   npm run test:watch
  *
- * Step 1 (async components) and the given rendering-performance panel are NOT
- * here, and that is the honest answer rather than a gap. "The chart is not in the entry
- * chunk" is a claim about the BUNDLE: jsdom inlines every module, so a passing
- * test would prove nothing about what a user downloads — you check that one in
- * the Network tab. And `shallowRef`, the stable `key` and `v-memo` are judged on
- * measurements, which no assertion can take for you.
+ * Step 1 (async components) is NOT here, and that is the honest answer rather
+ * than a gap. "The chart is not in the entry chunk" is a claim about the BUNDLE:
+ * jsdom inlines every module, so a passing test would prove nothing about what a
+ * user downloads — you check that one in the Network tab.
  */
 
 /**

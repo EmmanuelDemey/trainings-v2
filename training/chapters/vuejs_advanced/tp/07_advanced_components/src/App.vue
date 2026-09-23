@@ -2,7 +2,6 @@
 import ChartPanel from './components/ChartPanel.vue';
 import ProfilePanel from './components/ProfilePanel.vue';
 import InvoiceTablePanel from './components/InvoiceTablePanel.vue';
-import BigListPanel from './components/BigListPanel.vue';
 import ModalPanel from './components/ModalPanel.vue';
 </script>
 
@@ -16,7 +15,6 @@ import ModalPanel from './components/ModalPanel.vue';
   <ChartPanel />
   <ProfilePanel />
   <InvoiceTablePanel />
-  <BigListPanel />
   <ModalPanel />
 
   <!--

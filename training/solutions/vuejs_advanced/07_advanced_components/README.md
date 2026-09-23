@@ -16,8 +16,6 @@ each of them actually buys you:
 - **Scoped slots** — a headless `DataTable` whose cells are rendered by the parent
 - **`Teleport`** — a modal that escapes a clipping ancestor, `:disabled` to bring
   it back, and `defer` for a target rendered by the app itself
-- **Rendering performance** — a 2 000-row list: baseline, `shallowRef`, stable
-  `key`, then `v-memo` — given, to read and measure
 
 ## Prerequisites
 
@@ -45,12 +43,6 @@ nothing about what a user downloads. That one lives in the Network tab.
 
 Keep the **Network tab** (filtered on JS) and the **Vue Devtools** open: most of
 this workshop is about observing, not just writing.
-
-**Already done for you:** `src/components/BigListPanel.vue`, the 2 000-row list,
-already optimized — `shallowRef`, a stable `:key`, then `v-memo`. Read its header:
-it holds the four measurements, in order, and why only the last one moves the
-number. Click a row (2 rows re-rendered), delete the `v-memo` line and click again
-(2 000). That is the whole lesson: `v-memo` last, and only with a complete array.
 
 ## The workshop at a glance
 
@@ -171,15 +163,12 @@ section are **not** part of this list.
       `timeout` each protect against
 - [ ] Why a rejected async `setup()` does not show the `#fallback`
 - [ ] What removing `:key` on the `Suspense` boundary changes
-- [ ] Why an incomplete `v-memo` array produces a stale UI — and why that makes
-      `v-memo` the *last* optimization you reach for
 - [ ] When a `Teleport` resolves its `to` target, and what `defer` changes
 
 ## Going further
 
 - Add `hydrate: hydrateOnVisible()` to the async chart and read the Vue 3.5 lazy
   hydration docs — it only takes effect under SSR, but the API is worth knowing.
-- Replace the manual list with `vue-virtual-scroller` and compare with `v-memo`.
 - Rewrite the modal on top of the native `<dialog>` element (`showModal()` gives
   you the top layer, the backdrop and the focus trap for free) and decide whether
   the teleport is still needed.
@@ -190,7 +179,7 @@ section are **not** part of this list.
 
 ### Chapter 10 — Transition & TransitionGroup (45 min)
 
-Continue in this project, on top of the `Teleport` modal and the row list:
+Continue in this project, on top of the `Teleport` modal and the invoice table:
 
 1. Animate the modal: **backdrop fading**, panel **scaling in** — and check in the
    Devtools that the six classes appear in the expected order
@@ -198,7 +187,7 @@ Continue in this project, on top of the `Teleport` modal and the row list:
    with a symmetric version. Which one feels faster?
 3. Wrap it as a reusable `<ModalTransition>` forwarding `$attrs`, and use it in
    two places
-4. Turn the row list into a **`<TransitionGroup>`**: add, remove and shuffle rows,
+4. Turn the table rows into a **`<TransitionGroup>`**: add, remove and shuffle rows,
    then make the reordering slide with `*-move` and `position: absolute`
 5. Replace the CSS with **JS hooks + `:css="false"`** and stagger the entering
    rows by their index — cancel the running animation in `@enter-cancelled`
@@ -215,7 +204,7 @@ leaves the application fully usable.
 Work in this project, whose components all sit flat in `src/components/`:
 
 1. Create `src/ui/`, `src/features/invoicing/` and `src/views/`, then move each
-   existing component into the layer its **imports** dictate — `InvoiceRow.vue`
+   existing component into the layer its **imports** dictate — `InvoiceTablePanel.vue`
    imports `Invoice`, so it is not `ui/`
 2. Add the `no-restricted-imports` rule for `src/ui/**` and run ESLint. Fix every
    violation by **passing data in**, not by relaxing the rule
