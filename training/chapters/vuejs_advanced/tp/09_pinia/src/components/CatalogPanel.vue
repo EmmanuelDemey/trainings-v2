@@ -21,7 +21,7 @@ onUpdated(() => countRender('CatalogPanel'));
 
 <template>
   <section>
-    <h2>2 &amp; 3 — Reactivity cost and indexes</h2>
+    <h2>2 — Reactivity cost</h2>
 
     <div class="row" style="margin-bottom: 0.75rem">
       <label>

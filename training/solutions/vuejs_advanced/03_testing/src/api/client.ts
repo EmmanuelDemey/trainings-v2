@@ -10,11 +10,8 @@ export interface Invoice {
  * either THIS module (fast, coupled to our abstraction) or the NETWORK it uses
  * (slower, closer to reality) — this workshop mocks the network, with MSW.
  */
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  });
+async function request<T>(url: string): Promise<T> {
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
@@ -24,6 +21,4 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   getInvoices: (): Promise<Invoice[]> => request<Invoice[]>('/api/invoices'),
-
-  getInvoice: (id: number): Promise<Invoice> => request<Invoice>(`/api/invoices/${id}`),
 };

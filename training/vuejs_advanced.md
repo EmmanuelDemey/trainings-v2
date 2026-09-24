@@ -161,13 +161,3 @@ title: Retro - Day 3
 hide: false
 ---
 
----
-src: ./chapters/vuejs_advanced/annexes/00_intro.md
-title: Annexe 0 - Introduction
-hide: false
-# The appendices start here. Everything below is out of the 3-day run: the deep
-# dives, the long case studies and the packaging corners each chapter used to
-# carry inline. They stay in the deck — and so in the exported PDF — so the
-# trainer can jump to one on demand, and the room can read the rest later.
----
-

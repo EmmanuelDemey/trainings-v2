@@ -114,5 +114,3 @@ export const vLazyImg: Directive<HTMLImageElement, string> = {
     stopObserving(el);
   },
 };
-
-export { PLACEHOLDER, FALLBACK };

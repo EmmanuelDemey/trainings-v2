@@ -158,9 +158,9 @@ section are **not** part of this list.
 
 ## Going further
 
-- Install `vite-plugin-vue-devtools` in this project and compare it with the
-  extension: which tabs do you gain, and what does open-in-editor change in your
-  loop?
+- `vite-plugin-vue-devtools` is already installed: open its in-page panel and
+  compare it with the extension. Which tabs do you gain, and what does
+  open-in-editor change in your loop?
 - Put `filter` in a `provide()` at the app level and look at the Components tab
   again: where does an injected value show up, and on which component?
 - Add a second `createApp()` to `main.ts` mounting a tiny widget, and find the

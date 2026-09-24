@@ -3,8 +3,8 @@ import { describe, it } from 'vitest';
 /**
  * STEP 1 — the router, tested twice.
  *
- * `tests/helpers.ts` gives you `mountApp(path)` and `freshRouter()`: a **real**
- * router on `createMemoryHistory()`, with the real guard, and no browser URL to
+ * `tests/helpers.ts` gives you `freshRouter()`: a **real** router on
+ * `createMemoryHistory()`, with the real guard, and no browser URL to
  * reset between tests.
  *
  * TODO 1a: the guard. Visiting `/tickets` while signed out lands on `/login`,

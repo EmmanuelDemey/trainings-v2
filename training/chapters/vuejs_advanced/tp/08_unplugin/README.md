@@ -171,7 +171,7 @@ section are **not** part of this list.
 - [ ] `npm run typecheck` exits 0
 - [ ] `npm test` exits 0 — the ten specs
 - [ ] `npm run build` succeeds
-- [ ] `grep -rn TODO src vite.config.ts vitest.config.ts` returns nothing
+- [ ] `grep -rn TODO src vite.config.ts` returns nothing
 - [ ] `src/router/routes.ts` and `src/views/` are **gone**
 
 **The routes are generated**

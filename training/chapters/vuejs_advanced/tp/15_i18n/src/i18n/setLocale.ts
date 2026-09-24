@@ -7,7 +7,7 @@ import type { SupportedLocale } from './supported';
  *   i18n.global.setLocaleMessage(locale, messages.default);
  *   i18n.global.locale.value = locale;
  *
- * TODO 4: write the version that ships. Four holes to close:
+ * TODO 3.1: write the version that ships. Four holes to close:
  *
  *   a) **Re-downloading.** Check `i18n.global.availableLocales` before loading.
  *   b) **The race.** Switch to `de`, then to `en` before `de` resolves, and

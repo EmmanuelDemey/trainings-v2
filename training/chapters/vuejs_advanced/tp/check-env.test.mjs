@@ -1,7 +1,7 @@
 /**
  * Unit tests for the pure helpers of check-env.mjs.
  *
- *   node --test chapters/vuejs_advanced/tp/
+ *   node --test chapters/vuejs_advanced/tp/check-env.test.mjs
  *
  * No dependency, no test framework to install: Node's built-in runner.
  */

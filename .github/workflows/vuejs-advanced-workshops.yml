@@ -7,8 +7,10 @@ name: Vue.js advanced workshops
 # rather than one install for the lot.
 #
 # `03_testing` and `12_testing_integration` are deliberately absent: they are the
-# workshops where the LEARNER writes the tests, so their starters ship specs that
-# already pass (plus `it.todo`s). "The starter must fail" is meaningless there.
+# workshops where the LEARNER writes the tests, so their starters are green from
+# the start: `03_testing` ships empty tests that assert nothing, next to a few
+# given worked examples, and `12_testing_integration` ships `it.todo`s. "The
+# starter must fail" is meaningless there.
 
 on:
   push:

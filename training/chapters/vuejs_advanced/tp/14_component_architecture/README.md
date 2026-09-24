@@ -81,7 +81,7 @@ over.
 
 ## Steps
 
-### 1. Split what is shared by two domains that share nothing — `src/features/`
+### 1. Give invoicing its own feature, with one door — `src/features/`
 
 Already done for you: `features/payments/` — its `types.ts`, `api.ts`, store
 and `index.ts`. `types.ts`, `stores/` and `api/` now only hold the invoicing

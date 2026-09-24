@@ -223,6 +223,28 @@ layout: cover
 
 ---
 
+# TypeScript in this training
+
+- **All code snippets are written in TypeScript** — closer to real-world projects
+- Vue's Composition API was designed with type inference in mind:
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+const count = ref(0);                       // Ref<number>, inferred
+const double = computed(() => count.value * 2);  // ComputedRef<number>
+</script>
+```
+
+- Type-check a Vue project with **`vue-tsc`**, not `tsc`:
+
+```bash
+vue-tsc --noEmit      # understands .vue single-file components
+```
+
+---
+
 # Target audience
 
 - Developers
@@ -241,12 +263,9 @@ Duration: **3 days**
 
 <br />
 
-- **Nine hands-on sessions**, on eight standalone projects — roughly half the time
+- **Eight hands-on sessions**, each on its own standalone project — roughly half
+  the time
 - Each chapter closes with a **quiz** corrected together, each day with a **retro**
-- The deck also carries **appendices**: the deep dives, long case studies and
-  packaging corners each chapter used to hold inline. They sit **outside** the
-  three days on purpose — read them afterwards, or ask for one if the room wants
-  to push further
 
 ---
 
@@ -270,8 +289,9 @@ Duration: **3 days**
 
 # The workshop projects
 
-- **Eight standalone workshops** under `chapters/vuejs_advanced/tp/`, each its own
-  Vite project — no dependency between them:
+- **Sixteen standalone workshops**, one per chapter, under
+  `chapters/vuejs_advanced/tp/`, each its own Vite project — no dependency
+  between them:
 
 ```bash
 cd 02_composables_directives

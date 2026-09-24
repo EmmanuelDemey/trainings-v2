@@ -13,7 +13,7 @@ Chapter 16 — Take a working Vue app all the way to a deployment you would defe
 - **Prefetch** on intent
 - **Configure** the environments, with typing and validation
 - **Serve** the SPA correctly: fallback, cache headers, security headers
-- **Automate**: lint → typecheck → build once → test the artifact → deploy
+- **Automate**: typecheck → build once → test the artifact → deploy
 
 ## Prerequisites
 
@@ -243,8 +243,8 @@ counts.
 - [ ] `npm run build` succeeds
 - [ ] `npm run size` passes against a `.size-limit.json` you **lowered** to fit your
       optimized build
-- [ ] `grep -rn TODO src vite.config.ts env.d.ts netlify.toml vercel.json .github
-      docker/nginx.conf docker/Caddyfile | grep -v bonus` returns nothing
+- [ ] `grep -rn TODO src vite.config.ts env.d.ts .github docker/nginx.conf
+      docker/Caddyfile | grep -v bonus` returns nothing
 
 **The numbers moved, and you have them**
 

@@ -1,6 +1,6 @@
 {
   "$comment": [
-    "The Vercel equivalent of netlify.toml — pick ONE of the two for the workshop.",
+    "The Vercel equivalent of netlify.toml — pick ONE of the two when you deploy.",
     "Same three rules: SPA rewrite, cache headers, security headers.",
     "The /assets/(.*) rewrite is listed FIRST so a missing chunk 404s instead of",
     "being swallowed by the catch-all and returned as index.html — which the",

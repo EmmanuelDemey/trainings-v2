@@ -13,7 +13,7 @@ Cover one small application with unit tests:
 - **Queries and states**: drive a component through its loading and data states
 - **Stubbing** a heavy child and asserting on the props it receives
 - **Fake timers** and `using` spies for a debounced composable
-- **MSW** to mock the network for Vitest
+- **MSW** answering the network for Vitest, so no test mocks our own code
 - **Sabotage**: break the source on purpose, and check that the right test — and
   only it — goes red
 
@@ -42,8 +42,9 @@ Two mechanisms, **one contract**. If you change a response shape, both have to
 agree — which is exactly the kind of drift these tests are meant to catch.
 
 > The MSW server is already wired in `tests/setup.ts` and serves the happy path:
-> you just benefit from it. A test that needs another answer overrides it with
-> `server.use(...)`, and `resetHandlers()` undoes the override after each test.
+> you just benefit from it. Every test in this workshop relies on that default;
+> a test that one day needs another answer can swap a handler with `server.use(...)`,
+> and the `resetHandlers()` already in the setup undoes it after that test.
 
 ## The workshop at a glance
 
@@ -95,7 +96,7 @@ spy is declared with `using` and has no `mockRestore()` left beside it.
 
 ### Step 4. Sabotage — check that the tests can fail
 
-Every spec in this project starts green, with no assertion in it. A test that
+Every spec you write starts green, with no assertion in it. A test that
 asserts nothing and a test that asserts something look exactly alike in the
 runner: a green dot. The only way to tell them apart is to **break the source on
 purpose** and watch the runner go red.

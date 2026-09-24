@@ -34,8 +34,7 @@ you reach the npm registry and the Cypress CDN (the two things a corporate proxy
 usually blocks).
 
 Docker is reported as a **warning**, never a blocker: it is only used by workshop 16,
-whose last step deploys the build to a local nginx or Caddy container when you do not
-have a Netlify/Vercel account.
+whose step 5 serves the build from a local nginx or Caddy container.
 
 ```bash
 node check-env.mjs --install    # also run `npm install` in every workshop
@@ -78,12 +77,12 @@ runnable folder per workshop. Do not hand it out before the exercise.
 | Chapter | Folder | Topic | Extra requirements |
 |---|--------|-------|--------------------|
 | 1 | `01_devtools/` | Timeline, render counters, wasted re-renders, prop identity | The Vue Devtools extension |
-| 2 | `02_composables_directives/` | `useFetch`, `useLocalStorage`, `v-lazy-img` directive | — |
+| 2 | `02_composables_directives/` | `useFetch`, `useFavorites` (shared state), `v-lazy-img` directive | — |
 | 3 | `03_testing/` | test-utils, queries, stubs, spies, fake timers | — |
 | 4 | `04_plugins/` | `createXxx` factory, `InjectionKey`, `useXxx`, global property | — |
 | 5 | `05_composables_library/` | `MaybeRefOrGetter`, object of refs, `onScopeDispose` | — |
 | 6 | `06_router/` | Transitions, guards, auth flow, scroll behaviour | — |
-| 7 | `07_advanced_components/` | Async components, `Suspense`, scoped slots, `v-memo` | — |
+| 7 | `07_advanced_components/` | Async components, `Suspense`, scoped slots, `Teleport` | — |
 | 8 | `08_unplugin/` | File-based routing, auto-imports, auto-components | — |
 | 9 | `09_pinia/` | Store splitting, indexes, `shallowRef`, plugins | — |
 | 10 | `10_transitions/` | The six classes, `out-in`, `TransitionGroup`, `v-move`, keys | A browser — half of it is checked with your eyes |
@@ -92,7 +91,7 @@ runnable folder per workshop. Do not hand it out before the exercise.
 | 13 | `13_error_handling/` | `<ErrorBoundary>`, `errorHandler`, the `window` net | — |
 | 14 | `14_component_architecture/` | The dependency rule as a test, feature-first, slots | — |
 | 15 | `15_i18n/` | Messages, plural rules, `n()`, lazy-loaded locales | — |
-| 16 | `16_production/` | Bundle analysis, code-splitting, env config, CI/CD | Netlify or Vercel account (optional) — or Docker for the local plan B |
+| 16 | `16_production/` | Bundle analysis, code-splitting, env config, CI/CD | Docker (nginx/Caddy container); a Netlify/Vercel account is optional |
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
@@ -112,9 +111,12 @@ marked *(Bonus)* and the "Going further" section are deliberately **outside** th
 DoD: it is the floor, not the ceiling.
 
 **`03_testing/` and `12_testing_integration/` are the two workshops where the
-LEARNER writes the tests**, so their starters ship specs that already pass plus a
-list of `it.todo`s. That also means the CI guard below does not apply to them —
-"the starter must fail" is meaningless when the failing tests are the exercise.
+LEARNER writes the tests**, so their starters are green from the start:
+`03_testing/` ships empty tests that assert nothing, next to a few *given* worked
+examples, and `12_testing_integration/` ships a list of `it.todo`s. That is also
+why the CI guard (`.github/workflows/vuejs-advanced-workshops.yml`, at the root of
+the repository) leaves them out — "the starter must fail" is meaningless when the
+failing tests are the exercise.
 
 `12_testing_integration/` does not build on `03_testing/`: it is a different app,
 already unit-tested, that you attack with the router, Pinia, MSW and Cypress.
@@ -130,9 +132,10 @@ pick up the version from its `.nvmrc`.
 `01_devtools/`, `02_composables_directives/`, `05_composables_library/`,
 `06_router/`, `07_advanced_components/`, `08_unplugin/`, `09_pinia/`,
 `10_transitions/`, `11_forms/` and `14_component_architecture/` use an
-**in-memory fake API**
-(`src/api/fakeApi.ts`) with an artificial latency, so nothing has to be installed
-or running besides Vite.
+**in-memory fake API** (`src/api/fakeApi.ts`), so nothing has to be installed or
+running besides Vite. `02_composables_directives/`, `06_router/`,
+`07_advanced_components/`, `09_pinia/` and `11_forms/` add an artificial latency
+to it, so loading states are visible.
 `03_testing/` and `12_testing_integration/` mock the network explicitly
-(MSW, plus `cy.intercept` in `12_testing_integration/`). `04_plugins/`, `13_error_handling/` and `15_i18n/` need no
-API at all.
+(MSW, plus `cy.intercept` in `12_testing_integration/`). `04_plugins/`,
+`13_error_handling/`, `15_i18n/` and `16_production/` need no API at all.

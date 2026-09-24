@@ -7,7 +7,7 @@
  *   spec ever repeats those four lines. Intercept `POST /api/session`, fill the
  *   form, and wait on the alias — never on a fixed number of milliseconds.
  *
- * TODO 4b: *(Bonus)* wrap it in `cy.session('agent', ...)` so the second spec
+ * TODO 4b: wrap it in `cy.session('agent', ...)` so the second spec
  *   restores the session instead of logging in again.
  */
 declare global {

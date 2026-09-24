@@ -47,8 +47,9 @@ export function useLocalStorage<T>(key: string, initial: T): Ref<T> {
   window.addEventListener('storage', onStorage);
 
   // `onScopeDispose` rather than `onUnmounted`: this composable can legitimately
-  // be called from a module-scope `effectScope` (see `useFavorites`), where
-  // there is no component to unmount and `onUnmounted` would warn and no-op.
+  // run outside a component — at module scope (see `useFavorites`) or inside an
+  // `effectScope` — where there is nothing to unmount and `onUnmounted` would
+  // warn and no-op. The `true` silences the warning when there is no scope at all.
   onScopeDispose(() => {
     window.removeEventListener('storage', onStorage);
   }, true);

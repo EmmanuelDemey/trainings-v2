@@ -21,7 +21,6 @@ const toast = useToast();
       <button
         type="button"
         aria-label="Dismiss"
-        data-testid="dismiss-toast"
         @click="toast.dismiss(item.id)"
       >
         ×

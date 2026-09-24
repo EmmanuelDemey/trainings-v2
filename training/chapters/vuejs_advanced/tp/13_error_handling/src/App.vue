@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * The ops console. Every panel can be broken on purpose, and one broken panel
- * now costs exactly one panel.
+ * The ops console. Every panel can be broken on purpose, and each panel gets its
+ * own boundary: once ErrorBoundary works, one broken panel costs one panel.
  *
- * Each gets its **own** boundary. One boundary around both would degrade two
+ * One boundary around both would degrade two
  * panels for one failure — the granularity of a boundary is a product decision,
  * not a technical one: it answers "what is the smallest thing this user can
  * afford to lose?".

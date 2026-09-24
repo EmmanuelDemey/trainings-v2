@@ -94,5 +94,3 @@ export const vLazyImg: Directive<HTMLImageElement, string> = {
     void el;
   },
 };
-
-export { PLACEHOLDER, FALLBACK };

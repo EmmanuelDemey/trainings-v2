@@ -24,7 +24,7 @@
 
 /* --- list: the release list ------------------------------------------- */
 /*
- * TODO 2: `list` — the same shape as `fade`, plus:
+ * TODO 2.1: `list` — the same shape as `fade`, plus:
  *     - `.list-move` so a reordered row slides to its new place (FLIP)
  *     - `position: absolute` on `.list-leave-active`, or the leaving row keeps
  *       its space and nothing slides

@@ -10,16 +10,11 @@ export const invoices: Invoice[] = [
 ];
 
 /**
- * The DEFAULT handlers: the happy path. A test that needs another answer
- * overrides them with `server.use(...)`.
+ * The DEFAULT handlers: the happy path, which every test in this workshop
+ * relies on.
  */
 export const handlers = [
   http.get('/api/invoices', () => HttpResponse.json(invoices)),
-
-  http.get('/api/invoices/:id', ({ params }) => {
-    const invoice = invoices.find((i) => i.id === Number(params.id));
-    return invoice ? HttpResponse.json(invoice) : new HttpResponse(null, { status: 404 });
-  }),
 ];
 
 export const server = setupServer(...handlers);

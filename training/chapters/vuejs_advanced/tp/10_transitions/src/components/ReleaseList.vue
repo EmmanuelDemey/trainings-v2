@@ -4,12 +4,12 @@
  * type into a row stays at its **position** when the list is sorted, because of
  * the `:key` below.
  *
- * TODO 3: turn the `<ul>` into a `<TransitionGroup name="list" tag="ul">`.
+ * TODO 2.2: turn the `<ul>` into a `<TransitionGroup name="list" tag="ul">`.
  *   It renders no wrapper of its own unless you ask for one with `tag`, it has
  *   no `mode`, and it applies the six classes to **each child** — plus
  *   `list-move` to every child whose position changed.
  *
- * TODO 4: `:key="index"` is the bug the spec hunts. Vue patches by key, so an
+ * TODO 2.3: `:key="index"` is the bug the spec hunts. Vue patches by key, so an
  *   index key tells it "the row at position 2 is still the row at position 2" —
  *   it reuses the DOM node for a different release, and any state living in that
  *   node (the note field below, an open menu, a focused input) stays behind.

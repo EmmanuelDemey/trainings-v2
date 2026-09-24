@@ -1,4 +1,4 @@
-import { computed, effectScope, type ComputedRef, type Ref } from 'vue';
+import { computed, type ComputedRef, type Ref } from 'vue';
 import { useLocalStorage } from './useLocalStorage';
 
 export interface UseFavoritesReturn {
@@ -27,14 +27,8 @@ export interface UseFavoritesReturn {
  *    fail depending on their order. You need an explicit reset in `beforeEach`
  *    (`clear()` plus `localStorage.clear()`) — and remembering that reset is a
  *    tax you pay on every new spec file.
- *
- * `effectScope` is what makes the module-level state disposable: the `watch`
- * inside `useLocalStorage` has no component to attach to here, and without a
- * scope Vue warns about an effect created outside an active one.
  */
-//const scope = effectScope();
-
-const ids = useLocalStorage<number[]>('tp2:favorites', [])
+const ids = useLocalStorage<number[]>('tp2:favorites', []);
 
 /**
  * The `Set` index.

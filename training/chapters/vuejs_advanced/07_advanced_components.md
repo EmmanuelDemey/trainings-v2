@@ -346,7 +346,7 @@ onErrorCaptured((err) => { error.value = err; return false; });
 
 > ✅ **D** — `v-memo` must sit on the `v-for` element, its array must have a
 > **constant length**, and forgetting one dependency ships silently stale UI.
-> `v-memo="[]"` is just `v-once`, so **C** would freeze a changing subtree.
+> `v-memo="[]"` is just `v-once`, so **B** would freeze a changing subtree.
 
 </v-click>
 

@@ -148,6 +148,7 @@ section are **not** part of this list.
 
 - [ ] `npm run typecheck` exits 0
 - [ ] `npm test` exits 0 — the twenty-four specs
+- [ ] `npm run build` succeeds, with **one chunk per lazily-loaded locale**
 - [ ] `grep -rn TODO src` returns nothing
 
 **The messages**

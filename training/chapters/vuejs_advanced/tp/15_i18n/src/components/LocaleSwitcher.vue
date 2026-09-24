@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * TODO 5: wire these buttons to `setLocale()`, and mark the active one. Today
+ * TODO 3.2: wire these buttons to `setLocale()`, and mark the active one. Today
  *   they do nothing, so the app is stuck in the one language it was built in.
  */
 import { LOCALE_LABELS, SUPPORTED, type SupportedLocale } from '../i18n/supported';

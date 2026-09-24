@@ -8,7 +8,7 @@ of the starter with every `// TODO` implemented: `npm install` and it runs.
 solutions/
   javascript/         ← chapters/javascript/tp/      (JavaScript, 12 workshops)
   node/               ← chapters/node/tp/            (Advanced Node.js, 12 workshops)
-  vuejs_advanced/     ← chapters/vuejs_advanced/tp/  (Advanced Vue.js, 8 workshops)
+  vuejs_advanced/     ← chapters/vuejs_advanced/tp/  (Advanced Vue.js, 16 workshops)
 ```
 
 The JavaScript ones are the exception to the `npm install`: they are plain
@@ -32,17 +32,17 @@ diff -ru chapters/vuejs_advanced/tp/09_pinia/src solutions/vuejs_advanced/09_pin
 ```
 
 The `package.json`, `tsconfig.json` and configuration files are identical to the
-starter's unless a step asked for them to change (`vite.config.ts` in workshop 16,
-`eslint.config.js` in Node workshop 10, `vitest.browser.config.ts` in Vue
-workshop 3). So a diff shows the exercise, and nothing else.
+starter's unless a step asked for them to change (`vite.config.ts` and
+`tsconfig.json` in Vue workshop 8, `vite.config.ts` and `env.d.ts` in Vue
+workshop 16, `eslint.config.js` in Node workshop 10). So a diff shows the
+exercise, and nothing else.
 
 ## What is in the comments
 
 The code is commented for a **trainer**, not for a linter. Where a step had a
 defensible alternative, the comment says which one was picked and what the other
-one costs — the `v-memo` trap, `shallowRef` vs `ref`, `Suspense` vs
-`useAsyncData`, a discriminated union vs a `.refine()`, `manualChunks` and the
-total-size question. Those are the paragraphs to read out loud during a
+one costs — `shallowRef` vs `ref`, a discriminated union vs a `.refine()`,
+`manualChunks` and the total-size question. Those are the paragraphs to read out loud during a
 correction; the implementations themselves are rarely the interesting part.
 
 Deliberate "wrong" versions are kept next to the right ones where a workshop
@@ -64,16 +64,16 @@ Every solution was run, not just written:
 | Node 09 | RabbitMQ + Redis via `docker compose`, ack/nack and fan-out observed |
 | Node 10 | `npm run lint` clean, request-id propagation checked in the logs |
 | Node 12 | addon compiled with `node-gyp`, benchmarked against the TS version |
-| Vue 02–17 | `npm run typecheck` + `npm run build` |
+| Vue 01–16 | `npm run typecheck` + `npm run build` |
+| Vue 01–16, except 03 and 12 | `npm test` green on the solution **and red on the starter**, in CI (`.github/workflows/vuejs-advanced-workshops.yml`) |
 | Vue 02 | `npm test` — the 10 given `useFetch` specs |
-| Vue 03 | `npm test` — 21 tests — and `npx cypress run` — 5 e2e tests |
+| Vue 03 | `npm test` — 9 tests, the ones the learner writes |
 | Vue 16 | `npm run verify:serving` green on nginx **and** Caddy, in Docker |
-| Vue 17 | `npm test` — 14 tests, including the 8 given `useAsyncData` specs |
 
-Two things could not be run on the machine that produced these and are marked as
-such in the report: Vitest **browser mode** (Vue 03, `npm run test:browser` — no
-system Chrome available) and a real Netlify/Vercel **deploy** (Vue 16 step 5,
-replaced by the local Docker plan B, which is verified).
+One thing could not be run on the machine that produced these, and is marked as
+such in the report: a real Netlify/Vercel **deploy** (Vue 16). The workshop does
+not need one — step 5 serves the build from a local nginx or Caddy container, and
+that is verified.
 
 ## Re-running the JavaScript checks
 

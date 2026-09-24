@@ -25,7 +25,7 @@ describe('InvoiceList', () => {
 
     // TODO 1.2: assert there are 3 `li` elements, and that the text contains
     //   'Acme'. Then assert the loading state is gone.
-    //   Hint: `wrapper.findAll('[data-testid^="invoice-"]')`.
+    //   Hint: `wrapper.findAll('[data-testid="invoice-list"] li')`.
     expect(invoices).toHaveLength(3);
     void wrapper;
   });

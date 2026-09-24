@@ -118,6 +118,10 @@ the catalog does **not** (it is not marked `persist`).
 2. Log the mutation type with `$subscribe`, then convert `addToCart` to `$patch`
    and watch the type change.
 3. *(Bonus)* Expose the log on every store as `$actionLog` and type it.
+4. Make `loadProducts` rethrow in its `catch`, after setting `error` and
+   `status` — the starter swallows the error in `shop.ts`, so carry the rethrow
+   over to `catalog.ts`. `onError` only fires when the action actually rejects:
+   an error caught and kept is a failure your logger never records.
 
 → **Done when** the action-log specs are green: a successful **and** a failed
 action, each with a duration.

@@ -29,12 +29,6 @@ export function installFakeBackend(): void {
 
     if (url === '/api/invoices') return json(INVOICES);
 
-    if (url.startsWith('/api/invoices/')) {
-      const id = Number(url.split('/').pop());
-      const invoice = INVOICES.find((i) => i.id === id);
-      return invoice ? json(invoice) : new Response(null, { status: 404 });
-    }
-
     return new Response(null, { status: 404 });
   };
 }

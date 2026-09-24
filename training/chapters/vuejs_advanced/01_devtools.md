@@ -52,8 +52,8 @@ That sentence comes back three times over the next three days:
 <br />
 
 > Devtools **7** only supports **Vue 3**. A Vue 2 codebase needs the legacy v6 build.
-> The workshops of this training run on the **browser extension** — nothing to install
-> in the projects.
+> The workshops of this training run on the **browser extension**. Workshop 1 also ships
+> the **Vite plugin**, so you can compare the two.
 
 ---
 
@@ -116,7 +116,7 @@ app.mount('#app');
 - Method: record a profile → find the Vue marks → look for the **widest render bar**,
   then ask why that component rendered at all
 
-> This is the number you write in the before/after table of workshops 6, 7 and 11.
+> In workshop 1 you write this number down next to the render counters.
 
 ---
 
@@ -207,4 +207,4 @@ layout: cover
 
 # Hands-on
 
-## Guided tour - 15 min
+## Guided tour

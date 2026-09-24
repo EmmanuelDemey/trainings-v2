@@ -1,8 +1,9 @@
 # TP 11 — Forms & validation
 
 > This TP is **autonomous**: it does not depend on any other TP. The app runs as
-> shipped — it simply never shows an error, because the schema has no rule and
-> the composable validates nothing. Your job is to make it say something.
+> shipped — it simply never shows an error: the schema has a single rule, on
+> `company`, and the composable validates nothing. Your job is to make it say
+> something.
 
 ## Goal
 

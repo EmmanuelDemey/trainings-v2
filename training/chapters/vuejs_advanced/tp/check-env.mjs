@@ -28,7 +28,7 @@ const MIN_NPM = [10, 0, 0];
 const PORTS = [
   { port: 5173, usedBy: 'vite dev', hint: 'Free it before the session, or Vite will silently move to another port.' },
   { port: 4173, usedBy: 'vite preview', hint: 'Free it before the session, or Vite will silently move to another port.' },
-  // Workshop 17 serves its build from a local nginx/Caddy container (step 5bis).
+  // Workshop 16 serves its build from a local nginx/Caddy container (step 5).
   { port: 8080, usedBy: 'nginx, TP 16', hint: 'Only needed for the local deployment of workshop 16; edit `docker/compose.yml` if it is taken.' },
   { port: 8081, usedBy: 'Caddy, TP 16', hint: 'Only needed for the local deployment of workshop 16; edit `docker/compose.yml` if it is taken.' },
 ];
@@ -220,9 +220,9 @@ function checkPort({ port, usedBy, hint }) {
 }
 
 /**
- * Optional: workshop 16 deploys its build to a local nginx/Caddy container when
- * you do not have (or do not want) a Netlify/Vercel account. Everything else in
- * the training runs without it, so a missing Docker is a warning, never a failure.
+ * Workshop 16 step 5 serves its build from a local nginx/Caddy container.
+ * Everything else in the training runs without it, so a missing Docker is a
+ * warning, never a failure.
  */
 async function checkDocker() {
   const output = await run('docker', ['--version']);
@@ -230,7 +230,7 @@ async function checkDocker() {
     return warn(
       'Docker',
       'not found',
-      'Optional — only workshop 16 step 5bis (deploying the build locally) uses it. Podman with `podman compose` works too.',
+      'Only workshop 16 step 5 (serving the build locally) uses it. Podman with `podman compose` works too.',
     );
   }
   const compose = await run('docker', ['compose', 'version']);

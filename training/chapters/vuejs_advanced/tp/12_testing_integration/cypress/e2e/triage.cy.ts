@@ -17,8 +17,8 @@
  * TODO 5a: the journey — sign in, land on the queue, open a ticket, come back.
  * TODO 5b: the unhappy path — a 500 on `GET /api/tickets` shows the error state.
  * TODO 5c: serve the list from `cypress/fixtures/tickets.json` with
- *   `cy.intercept('GET', '/api/tickets', { fixture: 'tickets.json' })`, and say
- *   in the Definition of Done when a fixture beats a live backend.
+ *   `cy.intercept('GET', '/api/tickets', { fixture: 'tickets.json' })`, and note
+ *   in your own words when a fixture beats a live backend.
  */
 
 describe('triaging the queue', () => {

@@ -5,22 +5,13 @@
  * comparisons — and the `Map` itself is rebuilt only when the catalog changes,
  * not on every render.
  */
-import { onUpdated, ref, nextTick } from 'vue';
+import { onUpdated } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useShopStore } from '@/stores/shop';
 import { renderStats, countRender } from './renderStats';
 
 const shop = useShopStore();
 const { lines, cartCount, cartTotal } = storeToRefs(shop);
-
-const lastRenderMs = ref(0);
-
-async function measure(fn: () => void): Promise<void> {
-  const start = performance.now();
-  fn();
-  await nextTick();
-  lastRenderMs.value = Math.round((performance.now() - start) * 100) / 100;
-}
 
 onUpdated(() => countRender('CartPanel'));
 </script>
@@ -32,15 +23,13 @@ onUpdated(() => countRender('CartPanel'));
     <div class="row" style="margin-bottom: 0.75rem">
       <strong data-testid="cart-count">{{ cartCount }} item(s)</strong>
       <strong data-testid="cart-total">{{ cartTotal.toFixed(2) }} €</strong>
-      <span class="muted">last update: {{ lastRenderMs }} ms</span>
-      <button type="button" data-testid="clear-cart" @click="measure(() => shop.clearCart())">
+      <button type="button" data-testid="clear-cart" @click="shop.clearCart()">
         Clear
       </button>
     </div>
 
     <p v-if="lines.length === 0" class="muted">
-      Empty. Add a few products above, then load a 30 000-product catalog and add
-      more: the update time is dominated by the O(n) lookup, not by the rendering.
+      Empty. Add a few products from the catalog above.
     </p>
 
     <ul v-else class="lines">
@@ -50,7 +39,7 @@ onUpdated(() => countRender('CartPanel'));
         <button
           type="button"
           :data-testid="`remove-${line.productId}`"
-          @click="measure(() => shop.removeFromCart(line.productId))"
+          @click="shop.removeFromCart(line.productId)"
         >
           Remove
         </button>

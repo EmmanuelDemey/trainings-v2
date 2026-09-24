@@ -1,6 +1,8 @@
 <script setup lang="ts">
-// TODO 3: once auto-import and auto-components are wired, every import in this
-//   file is derivable. Delete them, one by one, and watch the app keep working.
+// TODO 2.2: once auto-import is wired (step 2), the `vue` and composable
+//   imports below are derivable — and `RouterLink` is already global, registered
+//   by `app.use(router)`. Delete them, one by one, and watch the app keep working.
+// TODO 3.2: once auto-components are wired (step 3), so is the `Button` import.
 import { computed, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import Button from '../components/ui/Button.vue';

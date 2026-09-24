@@ -7,8 +7,8 @@ import { mountAt } from './helpers';
  * how they got there. That is the point: the hand-written array and the
  * generated one are interchangeable, except that one of them drifts.
  *
- * Four of these are red on the skeleton, and each one names a view that exists
- * in `src/views/` and that no URL reaches.
+ * Six of these are red on the skeleton, and each one names a page the app should
+ * serve and does not.
  */
 
 describe('the routes that already work', () => {

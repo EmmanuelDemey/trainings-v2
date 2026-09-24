@@ -4,7 +4,7 @@
  *
  * As long as `useFavorites` creates its state inside the function, this panel
  * and `CatalogPanel` keep two independent lists and disagree — that is the bug
- * TODO 2.2 asks you to fix.
+ * step 2 asks you to fix.
  */
 import { useFavorites } from '@/composables/useFavorites';
 import { products } from '@/api/fakeApi';

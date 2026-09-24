@@ -7,8 +7,8 @@ import { useZodForm } from '@/composables/useZodForm';
  * The executable half of steps 1 and 2.
  *
  * These specs are given: they are the rules this README states, written down.
- * They are red on the skeleton — the schema ships as a shape with no rule, and
- * `validate()` returns `true` no matter what. Keep them running while you fill
+ * They are red on the skeleton — the schema ships as a shape with a single
+ * rule, on `company`, and `validate()` returns `true` no matter what. Keep them running while you fill
  * both in:
  *
  *   npm run test:watch

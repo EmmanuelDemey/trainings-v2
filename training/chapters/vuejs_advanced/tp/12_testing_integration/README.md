@@ -65,7 +65,7 @@ fails with *"No request ever occurred"*, because none did.
 tests/TicketTable.spec.ts             GIVEN, green — the unit level, already done
 tests/helpers.ts                      freshRouter(), mountApp(), mountStandalone()
 tests/msw.ts + tests/setup.ts         the happy path, reset after every test
-tests/router.spec.ts                  STEP 1  — to write
+tests/router.spec.ts                  STEP 1a — to write
 tests/loginView.mockedRouter.spec.ts  STEP 1b — to write
 tests/session.spec.ts                 STEP 2  — to write
 tests/tickets.spec.ts                 STEP 3  — to write

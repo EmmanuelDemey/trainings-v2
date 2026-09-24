@@ -315,4 +315,4 @@ layout: cover
 
 # Hands-on
 
-## Workshop 11 - Forms & validation — 60 min
+## Workshop 11 - Forms & validation
