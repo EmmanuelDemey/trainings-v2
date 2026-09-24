@@ -45,11 +45,13 @@ jobs:
       - name: Size budget
         run: npm run size
 
-  # TODO 6.1: add an `e2e` job that `needs: quality`, downloads the `dist`
-  #   artifact, serves it with `npx vite preview --port 4173` and runs the
-  #   Cypress suite against it. Test the BUILT app, not the dev server.
+  # TODO 6.2: add an `e2e` job that `needs: quality`, downloads the `dist`
+  #   artifact, serves it with `npx vite preview --port 4173` and tests it —
+  #   this workshop ships no e2e suite, so a `curl` smoke test of the page is
+  #   enough; your real suite plugs in here. Test the BUILT app, not the dev
+  #   server.
 
-  # TODO 6.2: add a `deploy` job that `needs: e2e`, runs only on the default
+  # TODO 6.3: add a `deploy` job that `needs: e2e`, runs only on the default
   #   branch (`if: github.ref == 'refs/heads/main'`), downloads the same
   #   artifact and deploys it:
   #

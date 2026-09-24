@@ -66,19 +66,15 @@ jobs:
       # Serve the BUILT app, not the dev server: minification, the production
       # Vue build and the real chunk splitting are all things the dev server
       # does not do, and all things that break differently.
-      - name: Run the e2e suite against the build
+      #
+      # This workshop ships no e2e suite, so this is a smoke test: the built
+      # page is served and holds the mount point. A real suite (Playwright,
+      # Cypress…) runs here, against the same URL.
+      - name: Smoke-test the build
         run: |
           npx vite preview --port 4173 &
-          npx wait-on http://localhost:4173 --timeout 60000
-          npx cypress run
-
-      - if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: cypress-artifacts
-          path: |
-            cypress/screenshots
-            cypress/videos
+          curl -fsS --retry 30 --retry-delay 1 --retry-connrefused \
+            http://localhost:4173/ | grep -q '<div id="app">'
 
   deploy:
     needs: e2e
@@ -88,6 +84,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      # Only for `docker/verify-serving.sh` below — the app itself is never
+      # rebuilt from these sources.
+      - uses: actions/checkout@v7
+
       - uses: actions/download-artifact@v8
         with:
           name: dist
