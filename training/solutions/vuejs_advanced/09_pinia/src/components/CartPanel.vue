@@ -60,8 +60,8 @@ onUpdated(() => countRender('CartPanel'));
     </ul>
 
     <p class="muted">
-      Re-renders: <strong>{{ renderStats.CartPanel }}</strong> —
-      the cart survives a reload — that is the persistence plugin, and the
+      <!-- Re-renders: <strong>{{ renderStats.CartPanel }}</strong> — -->
+      The cart survives a reload — that is the persistence plugin, and the
       catalog above does <em>not</em> come back, because it is not marked
       <code>persist</code>.
     </p>

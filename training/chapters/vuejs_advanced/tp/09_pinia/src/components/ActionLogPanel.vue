@@ -4,7 +4,7 @@ import { actionLog } from '@/plugins/logger';
 
 <template>
   <section>
-    <h2>6 — Plugins: observability</h2>
+    <h2>4 — The logger plugin</h2>
 
     <p v-if="actionLog.length === 0" class="muted" data-testid="empty-log">
       Nothing logged yet. Implement <code>loggerPlugin</code> (TODO 4.1) and this

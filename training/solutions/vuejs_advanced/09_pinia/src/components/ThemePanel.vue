@@ -24,15 +24,16 @@ onUpdated(() => countRender('ThemePanel'));
       <button type="button" data-testid="toggle-theme" @click="ui.toggleTheme()">
         Theme: {{ theme }}
       </button>
-      <span class="muted">
+
+      <!-- <span class="muted">
         This panel re-rendered <strong data-testid="theme-renders">{{ renderStats.ThemePanel }}</strong>
         time(s)
-      </span>
+      </span> -->
     </div>
 
     <p class="muted">
-      Reload the catalog below and watch this counter. It should not move: this
-      component does not care about products.
+      Reload the catalog below and watch the console. <code>ThemePanel</code>
+      should not appear: this component does not care about products.
     </p>
   </section>
 </template>

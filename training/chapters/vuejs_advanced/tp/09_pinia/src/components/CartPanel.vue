@@ -58,8 +58,9 @@ onUpdated(() => countRender('CartPanel'));
     </ul>
 
     <p class="muted">
-      Re-renders: <strong>{{ renderStats.CartPanel }}</strong> —
-      the cart must survive a reload once the persistence plugin works (TODO 3).
+      <!-- Counter disabled — see the note in ThemePanel.vue; counts go to the console. -->
+      <!-- Re-renders: <strong>{{ renderStats.CartPanel }}</strong> — -->
+      The cart must survive a reload once the persistence plugin works (TODO 3).
     </p>
   </section>
 </template>

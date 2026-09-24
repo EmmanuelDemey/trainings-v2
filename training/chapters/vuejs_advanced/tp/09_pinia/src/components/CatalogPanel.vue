@@ -66,7 +66,8 @@ onUpdated(() => countRender('CatalogPanel'));
 
     <p class="muted">
       {{ products.length }} products loaded — showing the first {{ visible.length }}.
-      Re-renders: <strong>{{ renderStats.CatalogPanel }}</strong>
+      <!-- Counter disabled — see the note in ThemePanel.vue; counts go to the console. -->
+      <!-- Re-renders: <strong>{{ renderStats.CatalogPanel }}</strong> -->
     </p>
   </section>
 </template>

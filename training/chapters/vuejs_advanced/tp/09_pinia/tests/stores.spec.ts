@@ -10,11 +10,8 @@ import CartPanel from '@/components/CartPanel.vue';
 
 /**
  * The render counters are an instrument of this workshop, not a subject of these
- * specs. They are `reactive` AND read from the very templates whose `onUpdated`
- * increments them, so the first update re-renders, which increments again — Vue
- * gives up with "Maximum recursive updates exceeded". A plain, non-reactive
- * stand-in keeps the panels rendering normally here; the real counters are what
- * you read in the browser.
+ * specs. A plain, non-reactive stand-in keeps them out of the way — no counting,
+ * no console noise; the real counters are what you read in the browser.
  */
 vi.mock('@/components/renderStats', () => ({
   renderStats: { ThemePanel: 0, CatalogPanel: 0, CartPanel: 0 },

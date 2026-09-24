@@ -11,7 +11,7 @@ Chapter 9 — Take a working "god store" and turn it into something that scales:
 - **Split** one store into three, by domain, and watch wasted re-renders disappear
 - **`shallowRef`** for a large payload that is never mutated in place
 - **A persistence plugin** with an opt-in, typed store option
-- **An observability plugin** built on `$onAction` and `$subscribe`
+- **A logger plugin** built on `$onAction` and `$subscribe`
 
 ## Prerequisites
 
@@ -39,8 +39,14 @@ It drives the panels rather than the stores, on purpose: the three stores of ste
 rather than fail an assertion. The measurements — `shallowRef` and the render
 counters — stay where they belong, in the browser with the numbers written down.
 
-Every panel displays its own **render counter** and the app displays the cost of
-the catalog assignment. Write the numbers down before each change.
+Every panel logs its own **render counter** to the browser console
+(`[renders] ThemePanel: 3`) and the app displays the cost of the catalog
+assignment. Write the numbers down before each change.
+
+> The counters are logged rather than displayed on the page on purpose: a
+> component that renders its own counter reads the reactive value its `onUpdated`
+> writes, so each update schedules the next one and Vue stops it with "Maximum
+> recursive updates exceeded". The markup is still in the panels, commented out.
 
 **Already done for you** in `src/stores/shop.ts`, so that you carry them over
 when you split it rather than write them:
@@ -57,7 +63,7 @@ when you split it rather than write them:
 | 1 | Split the god store into three domain stores | `src/stores/shop.ts` → `catalog.ts`, `cart.ts`, `ui.ts` | Reloading the catalog stops moving `ThemePanel`'s counter |
 | 2 | Stop making a big payload deeply reactive | `src/stores/catalog.ts` | The assignment duration drops on a 30 000-product catalog |
 | 3 | Write the persistence plugin | `src/plugins/persist.ts` + `pinia.d.ts` | `npm test` — the cart survives a reload, the catalog does not |
-| 4 | Write the observability plugin | `src/plugins/logger.ts` | `npm test` — a successful *and* a failed action are logged |
+| 4 | Write the logger plugin | `src/plugins/logger.ts` | `npm test` — a successful *and* a failed action are logged |
 
 Steps 3 and 4 are the ones `npm test` grades. Steps 1 and 2 are graded by the
 render counters and the timings in the browser — which is why you write the
@@ -72,8 +78,8 @@ numbers down.
    setup function. `byId` goes to the catalog, and each store keeps its own
    `acceptHMRUpdate` block.
 2. Keep the app working as you go — update the components' imports.
-3. Point `ThemePanel` at `useUiStore` and confirm its render counter stops moving
-   when you reload the catalog.
+3. Point `ThemePanel` at `useUiStore` and confirm it stops being logged when you
+   reload the catalog.
 
 **Baseline to beat**: load a 10 000-product catalog and note how many times
 `ThemePanel` re-rendered.

@@ -5,7 +5,7 @@ import type { PiniaPluginContext } from 'pinia';
 export const actionLog = reactive<Array<{ store: string; name: string; durationMs: number; failed: boolean }>>([]);
 
 /**
- * STEP 4 — An observability plugin.
+ * STEP 4 — The logger plugin.
  *
  * TODO 4.1: use `store.$onAction(({ name, args, after, onError }) => ...)` to
  *   measure how long every action takes, and push an entry into `actionLog`.

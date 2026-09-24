@@ -73,7 +73,7 @@ onUpdated(() => countRender('CatalogPanel'));
 
     <p class="muted">
       {{ products.length }} products loaded — showing the first {{ visible.length }}.
-      Re-renders: <strong>{{ renderStats.CatalogPanel }}</strong>
+      <!-- Re-renders: <strong>{{ renderStats.CatalogPanel }}</strong> -->
     </p>
   </section>
 </template>

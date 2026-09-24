@@ -3,8 +3,8 @@
  * This component only cares about the theme. Yet it re-renders whenever the
  * catalog is reloaded, because it reads a store that owns everything.
  *
- * TODO 1.3: once `useUiStore` exists, point this component at it and watch its
- *   render counter stop moving when you reload the catalog.
+ * TODO 1.3: once `useUiStore` exists, point this component at it and watch the
+ *   console stop logging `ThemePanel` when you reload the catalog.
  */
 import { onUpdated } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -25,15 +25,22 @@ onUpdated(() => countRender('ThemePanel'));
       <button type="button" data-testid="toggle-theme" @click="shop.toggleTheme()">
         Theme: {{ theme }}
       </button>
-      <span class="muted">
+      <!--
+        Disabled on purpose: a component cannot display its own render counter.
+        `renderStats` is reactive, `onUpdated` writes to it and this template
+        reads it, so every update schedules another one — Vue gives up with
+        "Maximum recursive updates exceeded" on the first theme toggle. The
+        counters go to the console instead; see `renderStats.ts`.
+      -->
+      <!-- <span class="muted">
         This panel re-rendered <strong data-testid="theme-renders">{{ renderStats.ThemePanel }}</strong>
         time(s)
-      </span>
+      </span> -->
     </div>
 
     <p class="muted">
-      Reload the catalog below and watch this counter. It should not move: this
-      component does not care about products.
+      Reload the catalog below and watch the console. <code>ThemePanel</code>
+      should not appear: this component does not care about products.
     </p>
   </section>
 </template>
