@@ -27,7 +27,7 @@ css: unocss
 
 # Advanced Vue.js
 
-<div style="opacity: 0.75; font-size: 0.9em;">Composables, testing, Vue Router, Pinia, forms and deployment</div>
+<div style="opacity: 0.75; font-size: 0.9em;">Composables, testing, Vue Router, Pinia, TanStack Query, forms and deployment</div>
 
 <br />
 <br />
@@ -152,6 +152,12 @@ hide: false
 ---
 src: ./chapters/vuejs_advanced/16_production.md
 title: 16 - Production & deployment
+hide: false
+---
+
+---
+src: ./chapters/vuejs_advanced/17_tanstack_query.md
+title: 17 - Server state with TanStack Query
 hide: false
 ---
 

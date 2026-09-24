@@ -84,7 +84,8 @@
 - Lire — https://router.vuejs.org/guide/advanced/transitions.html
 - Lire — https://router.vuejs.org/guide/advanced/scroll-behavior.html
 - Lire — https://github.com/vuejs/router
-- Lire — https://github.com/posva/unplugin-vue-router
+- Lire — https://router.vuejs.org/file-based-routing/
+- Lire — https://router.vuejs.org/guide/migration/v4-to-v5.html
 - Lire — https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
 - Lire — https://developer.chrome.com/docs/web-platform/view-transitions/
 
@@ -194,6 +195,16 @@
 - Lire — https://github.com/GoogleChrome/lighthouse-ci
 - Regarder — https://www.youtube.com/@ChromeDevs
 - Écouter — https://syntax.fm
+
+## 17. TanStack Query
+
+- Lire — https://tanstack.com/query/latest/docs/framework/vue/overview
+- Lire — https://tanstack.com/query/latest/docs/framework/vue/guides/query-keys
+- Lire — https://tanstack.com/query/latest/docs/framework/vue/guides/query-options
+- Lire — https://tanstack.com/query/latest/docs/framework/vue/guides/optimistic-updates
+- Lire — https://tkdodo.eu/blog/practical-react-query (la série de TkDodo, mainteneur — les principes valent pour Vue)
+- Lire — https://tkdodo.eu/blog/effective-react-query-keys
+- Lire — https://tkdodo.eu/blog/mastering-mutations-in-react-query
 
 ## Veille
 

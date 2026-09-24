@@ -1,8 +1,8 @@
 # Advanced Vue.js — Workshops (TP)
 
 Hands-on exercises for the **Advanced Vue.js** training, based on **Vue 3.5**,
-**Vite 8**, **Vue Router 5**, **Pinia 4**, **Zod 3**, **VeeValidate 4**,
-**Vitest 5** and **Cypress 15**.
+**Vite 8**, **Vue Router 5**, **Pinia 4**, **TanStack Query 5**, **Zod 3**,
+**VeeValidate 4**, **Vitest 5** and **Cypress 15**.
 
 **One workshop per chapter**, and each one is a **standalone project**: its own
 `package.json`, `tsconfig.json`, `.nvmrc` and `README.md`, its own `npm install`,
@@ -92,6 +92,7 @@ runnable folder per workshop. Do not hand it out before the exercise.
 | 14 | `14_component_architecture/` | The dependency rule as a test, feature-first, slots | — |
 | 15 | `15_i18n/` | Messages, plural rules, `n()`, lazy-loaded locales | — |
 | 16 | `16_production/` | Bundle analysis, code-splitting, env config, CI/CD | Docker (nginx/Caddy container); a Netlify/Vercel account is optional |
+| 17 | `17_tanstack_query/` | `useQuery`, key factory, `staleTime`, mutations, optimistic updates | — |
 
 > Each folder is a starter skeleton: implement the `// TODO` markers following the
 > steps in its own `README.md`.
@@ -131,11 +132,13 @@ pick up the version from its `.nvmrc`.
 
 `01_devtools/`, `02_composables_directives/`, `05_composables_library/`,
 `06_router/`, `07_advanced_components/`, `08_unplugin/`, `09_pinia/`,
-`10_transitions/`, `11_forms/` and `14_component_architecture/` use an
+`10_transitions/`, `11_forms/`, `14_component_architecture/` and
+`17_tanstack_query/` use an
 **in-memory fake API** (`src/api/fakeApi.ts`), so nothing has to be installed or
 running besides Vite. `02_composables_directives/`, `06_router/`,
-`07_advanced_components/`, `09_pinia/` and `11_forms/` add an artificial latency
-to it, so loading states are visible.
+`07_advanced_components/`, `09_pinia/`, `11_forms/` and `17_tanstack_query/` add an
+artificial latency to it, so loading states are visible — and `17_tanstack_query/`
+also logs every request it receives, so you can count them.
 `03_testing/` and `12_testing_integration/` mock the network explicitly
 (MSW, plus `cy.intercept` in `12_testing_integration/`). `04_plugins/`,
 `13_error_handling/`, `15_i18n/` and `16_production/` need no API at all.

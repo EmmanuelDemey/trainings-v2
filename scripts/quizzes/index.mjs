@@ -46,6 +46,7 @@ export const QUIZ_SOURCES = {
     '14_component_architecture': { chapters: ['14_component_architecture.md'] },
     '15_i18n': { chapters: ['15_i18n.md'] },
     '16_production': { chapters: ['16_production.md'] },
+    '17_tanstack_query': { chapters: ['17_tanstack_query.md'] },
   },
 };
 

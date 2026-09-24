@@ -185,6 +185,13 @@ layout: cover
                     <li>Continuous deployment pipeline</li>
                 </ul>
             </li>
+            <li>17 - Server state with TanStack Query
+                <ul>
+                    <li>Query keys, <code>queryOptions</code>, <code>staleTime</code></li>
+                    <li>Mutations and invalidation</li>
+                    <li>Optimistic updates, and their rollback</li>
+                </ul>
+            </li>
         </ul>
     </td>
  </tr>
@@ -201,14 +208,15 @@ layout: cover
   `Suspense`, scoped slots
 - Master **routing and navigation** with Vue Router, up to **file-based typed
   routes**
-- Efficiently manage application state with **Pinia**
+- Efficiently manage application state with **Pinia**, and server state with
+  **TanStack Query**
 - Build **typed, validated and accessible forms** with Zod and VeeValidate
 - **Ship to production** and deploy Vue.js applications following best practices
 
 <br />
 
 > This training is based on **Vue 3.5**, **Vite 8**, **Vue Router 5**, **Pinia 4**,
-> **Zod 3**, **VeeValidate 4**, **Vitest 5** and **Cypress 15**.
+> **TanStack Query 5**, **Zod 3**, **VeeValidate 4**, **Vitest 5** and **Cypress 15**.
 
 ---
 
@@ -259,11 +267,11 @@ Duration: **3 days**
 |---|---|---|
 | **Day 1** | 0 → 5 — devtools, composables, testing, plugins, shared library | Guided tour · TP 2 · TP 3 |
 | **Day 2** | 6 → 10 — router, advanced components, unplugin, Pinia, transitions | TP 6 · TP 7 · TP 9 |
-| **Day 3** | 11 → 16 — forms, integration testing, errors, architecture, i18n, production | TP 11 · TP 16 |
+| **Day 3** | 11 → 17 — forms, integration testing, errors, architecture, i18n, production, TanStack Query | TP 11 · TP 16 · TP 17 |
 
 <br />
 
-- **Eight hands-on sessions**, each on its own standalone project — roughly half
+- **Nine hands-on sessions**, each on its own standalone project — roughly half
   the time
 - Each chapter closes with a **quiz** corrected together, each day with a **retro**
 
@@ -289,7 +297,7 @@ Duration: **3 days**
 
 # The workshop projects
 
-- **Sixteen standalone workshops**, one per chapter, under
+- **Seventeen standalone workshops**, one per chapter, under
   `chapters/vuejs_advanced/tp/`, each its own Vite project — no dependency
   between them:
 

@@ -17,6 +17,8 @@ At the end of this chapter, you will be able to:
 - **Cut** the reactivity cost of large payloads with `shallowRef` and `markRaw`
 - **Group** mutations with `$patch`, and give a setup store the `$reset` it does
   not have
+- **Observe** a store: its state changes with `$subscribe`, its actions with
+  `$onAction`
 - **Write** a typed Pinia plugin, and an async action that owns its `status`, its
   `error` and the cancellation of the previous request
 
@@ -193,6 +195,70 @@ function $reset(): void { state.value = initial(); }
 
 ---
 
+# Reacting to state changes: `$subscribe`
+
+```ts
+const cart = useCartStore();
+
+const unsubscribe = cart.$subscribe((mutation, state) => {
+  mutation.type;     // 'direct' | 'patch object' | 'patch function'
+  mutation.storeId;  // 'cart'
+  localStorage.setItem('cart', JSON.stringify(state));   // state after the change
+});
+```
+
+| Mutation | `mutation.type` |
+| --- | --- |
+| `cart.coupon = 'SPARKS'`, or a ref assigned inside an action | `'direct'` |
+| `cart.$patch({ coupon: 'SPARKS' })` | `'patch object'` (+ `mutation.payload`) |
+| `cart.$patch((state) => { ... })` | `'patch function'` |
+
+- Like a deep `watch` on the store's state, with one difference: a `$patch` gives **one**
+  notification
+- Called in a component, the subscription stops at **unmount**. Pass
+  `{ detached: true }` to keep it, and call `unsubscribe()` yourself
+
+<style>
+ul, table { font-size: 0.85em; }
+</style>
+
+---
+
+# Intercepting actions: `$onAction`
+
+```ts
+const unsubscribe = cart.$onAction(({ name, store, args, after, onError }) => {
+  const start = performance.now();                 // runs BEFORE the action
+
+  after(() => {                                    // action returned — or its promise resolved
+    console.log(`${store.$id}.${name}(${args.join(', ')})`, performance.now() - start);
+  });
+  onError((error) => {                             // action threw — or its promise rejected
+    console.error(`${store.$id}.${name} failed`, error);
+  });
+});
+```
+
+- `after` waits for the promise of an **async** action: you measure the whole request
+- `onError` fires only if the action **rejects**. An error caught and swallowed
+  inside the action never reaches it
+- Stops at unmount too. Pass `true` as the second argument to detach it
+
+| | `$subscribe` | `$onAction` |
+| --- | --- | --- |
+| Sees | **State** changes, even from outside an action | **Action** calls, even when they change nothing |
+| Knows | *how* the state changed (`type`, `payload`) | *who* ran and *with what* (`name`, `args`), how long it took, whether it failed |
+
+<style>
+.slidev-layout {
+  --slidev-code-font-size: 11px;
+  --slidev-code-line-height: 1.25;
+}
+ul, table { font-size: 0.8em; }
+</style>
+
+---
+
 # Pinia plugins
 
 ```ts
@@ -211,7 +277,8 @@ const pinia = createPinia();
 pinia.use(loggerPlugin);
 ```
 
-- A plugin runs **once per store**, at creation time
+- A plugin runs **once per store**, at creation time — the place for a `$onAction` or a
+  `$subscribe` that must cover **every** store
 - `context` gives you `pinia`, `app`, `store` and the store's `options`
 
 ---
@@ -257,11 +324,14 @@ export const useInvoicesStore = defineStore('invoices', () => {
 - `shallowRef` / `markRaw` for large or non-reactive payloads
 - `$patch` for bulk updates, one trigger instead of N; a setup store needs its own
   `$reset`
+- `$subscribe` reports **state changes** (and how: `direct`, `patch object`,
+  `patch function`); `$onAction` reports **action calls**, with `after` and `onError`
+  once they settle
 - **Plugins** run once per store, at creation — `$onAction` there gives you logging
   and error reporting across every store at once
 - An async action carries its own `status`, `error` and `AbortController`. That is
   the honest floor for a handful of endpoints — the first branch of the decision
-  tree is where you hand the rest to a query layer
+  tree is where you hand the rest to a query layer (chapter 17)
 
 ---
 
