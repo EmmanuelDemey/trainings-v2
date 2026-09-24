@@ -38,6 +38,9 @@ const INVOICES: Invoice[] = [
   { id: 5, customer: 'Hooli', total: 78, status: 'pending' },
 ];
 
+/** There is no invoice after this one: "Next invoice" stops here. */
+export const LAST_INVOICE_ID = INVOICES[INVOICES.length - 1]!.id;
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

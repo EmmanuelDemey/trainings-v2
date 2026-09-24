@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { NavigationFailureType, isNavigationFailure, useRouter } from 'vue-router';
-import { fetchInvoice, type Invoice } from '@/api/fakeApi';
+import { LAST_INVOICE_ID, fetchInvoice, type Invoice } from '@/api/fakeApi';
 
 // `props: true` on the route record: the id arrives as a prop, so this view can
 // be mounted in a test without a router at all.
@@ -34,9 +34,9 @@ watch(
  * navigation that silently did not happen looks exactly like one that did.
  *
  * Two failures are worth distinguishing:
- *  - `duplicated`: you are already there (click "Next invoice" on the last id,
- *    where the guard-less push resolves to the same route). Harmless, but the
- *    UI should not pretend something happened.
+ *  - `duplicated`: you are already there (click "Next invoice" on the last id:
+ *    the target is clamped to that id, so the push resolves to the current
+ *    route). Harmless, but the UI should not pretend something happened.
  *  - `aborted`: a guard returned `false` — e.g. the dirty-form guard in
  *    `InvoiceFormView`. The user chose to stay; say so rather than doing nothing.
  */
@@ -45,7 +45,7 @@ async function next(): Promise<void> {
 
   const failure = await router.push({
     name: 'invoice',
-    params: { id: String(Number(props.id) + 1) },
+    params: { id: String(Math.min(Number(props.id) + 1, LAST_INVOICE_ID)) },
   });
 
   if (isNavigationFailure(failure, NavigationFailureType.duplicated)) {

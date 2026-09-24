@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 import { computed, ref } from 'vue';
 import { login as apiLogin, me as apiMe, type User } from '@/api/fakeApi';
 
-const TOKEN_KEY = 'tp4:token';
+const TOKEN_KEY = 'tp6:token';
 
 /**
  * The auth store is provided and working — the exercise is in the router, not

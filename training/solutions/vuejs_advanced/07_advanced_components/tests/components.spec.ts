@@ -2,22 +2,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { failureSwitch } from '@/api/fakeApi';
 import type { Column } from '@/components/table';
+import ChartPanel from '@/components/ChartPanel.vue';
 import ProfilePanel from '@/components/ProfilePanel.vue';
 import ModalPanel from '@/components/ModalPanel.vue';
 import InvoiceTablePanel from '@/components/InvoiceTablePanel.vue';
 import DataTable from '@/components/DataTable.vue';
 
 /**
- * The executable half of steps 2, 3 and 4.
+ * The executable half of steps 2, 3 and 4, plus the error path of step 1.
  *
  * These specs are given and they are red on the skeleton:
  *
  *   npm run test:watch
  *
- * Step 1 (async components) is NOT here, and that is the honest answer rather
- * than a gap. "The chart is not in the entry chunk" is a claim about the BUNDLE:
- * jsdom inlines every module, so a passing test would prove nothing about what a
- * user downloads — you check that one in the Network tab.
+ * The rest of step 1 (async components) is NOT here, and that is the honest
+ * answer rather than a gap. "The chart is not in the entry chunk" is a claim
+ * about the BUNDLE: jsdom inlines every module, so a passing test would prove
+ * nothing about what a user downloads — you check that one in the Network tab.
  */
 
 /**
@@ -41,6 +42,24 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
+});
+
+describe('the async chart', () => {
+  it('renders ChartError when the chart chunk fails to load', async () => {
+    const wrapper = mount(ChartPanel);
+
+    // Flipped AFTER the panel is mounted: the switch only bites when the chart's
+    // module is evaluated — on "Show", once it is really loaded on demand.
+    failureSwitch.chart = true;
+    await wrapper.get('[data-testid="toggle-chart"]').trigger('click');
+
+    // `errorComponent` covers the LOADER failing — a chunk that does not arrive.
+    // An error thrown later, inside the loaded component, is not its business.
+    await vi.waitFor(() => expect(wrapper.find('[data-testid="chart-error"]').exists()).toBe(true), {
+      timeout: 2000,
+    });
+    expect(wrapper.find('[data-testid="sales-chart"]').exists()).toBe(false);
+  });
 });
 
 describe('Suspense', () => {

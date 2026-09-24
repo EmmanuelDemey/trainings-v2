@@ -11,7 +11,7 @@ Chapter 6 — Turn a set of unprotected pages into a real application:
 - **Typed `meta`** so the router refactors safely
 - **Route transitions**, driven by `meta` — given, and a direction-aware one as a bonus
 - **Guards**: authentication, roles, and blocking navigation away from a dirty form
-- **Programmatic navigation**: redirects, `NavigationFailure`, history
+- **Programmatic navigation**: redirects, `NavigationFailure`, history — given
 - **Scroll behaviour** that restores position on back/forward
 
 ## Accounts
@@ -53,7 +53,10 @@ hand.
   and the bonus of step 5 both feed it.
 - `src/views/InvoiceView.vue` — "Next invoice" handles the `NavigationFailure`
   that `router.push` **resolves** with (it does not throw). Click it on the last
-  id and read `next()`: it is the programmatic-navigation trap of the chapter.
+  id — `next()` clamps to it, so the push targets the route you are already on
+  and resolves with a `duplicated` failure: it is the programmatic-navigation
+  trap of the chapter, and `tests/invoice-view.spec.ts` pins it down (green from
+  the start).
 
 ## The workshop at a glance
 
@@ -114,7 +117,8 @@ starts at the top, and a `#hash` scrolls to its anchor.
 
 ### 5. The remaining guards — `src/router/index.ts` + `src/views/InvoiceFormView.vue`
 
-1. `afterEach`: set `document.title` from `to.meta.title`.
+1. `afterEach`: set `document.title` to `` `${to.meta.title} — TP 6` `` (just
+   `TP 6` when a route has no title) — the specs assert that exact string.
 2. *(Bonus)* Direction-aware transitions: compare path depths in `afterEach` and
    set `to.meta.transition` to `slide-left` / `slide-right` — `App.vue` picks it up.
 3. In `InvoiceFormView`, block navigation away from a dirty form with

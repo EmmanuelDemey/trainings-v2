@@ -6,8 +6,8 @@
 
 ## Goal
 
-Chapter 7 — Get hands-on with the four tools of the chapter, and **measure** what
-each of them actually buys you:
+Chapter 7 — Get hands-on with the four tools of the chapter, and **observe** in
+the Network tab, the Elements tab and the Devtools what each of them changes:
 
 - **Async components** — split a heavy panel out of the entry chunk, with a
   loading state and an error state
@@ -37,9 +37,11 @@ error of a rejected async `setup()`, both slots of the headless table, and the
 dialog that escapes the clipping panel without losing what you typed. It is red
 on the skeleton.
 
-Step 1 is **not** in there, deliberately. "The chart is not in the entry chunk"
-is a claim about the *bundle*, which jsdom cannot see — a green test would prove
-nothing about what a user downloads. That one lives in the Network tab.
+Of step 1, only the error path is in there: a chunk that fails to load must
+render `ChartError`. The step's main claim, "the chart is not in the entry
+chunk", is **not**, deliberately: it is a claim about the *bundle*, which jsdom
+cannot see — a green test would prove nothing about what a user downloads. That
+one lives in the Network tab.
 
 Keep the **Network tab** (filtered on JS) and the **Vue Devtools** open: most of
 this workshop is about observing, not just writing.
@@ -53,8 +55,9 @@ this workshop is about observing, not just writing.
 | 3 | A headless table whose cells the parent renders | `src/components/DataTable.vue` + `InvoiceTablePanel.vue` | The panel formats currency and badges **without** touching `DataTable` |
 | 4 | A modal that escapes a clipping ancestor | `src/components/AppModal.vue` | The dialog is centred again, with no CSS change |
 
-`npm test` grades steps 2, 3 and 4. Step 1 is a claim about the *bundle* — jsdom
-cannot see it, so it is graded in the Network tab.
+`npm test` grades steps 2, 3 and 4, plus the error path of step 1. The rest of
+step 1 is a claim about the *bundle* — jsdom cannot see it, so it is graded in
+the Network tab.
 
 ## Steps
 
@@ -65,7 +68,8 @@ cannot see it, so it is graded in the Network tab.
 2. Switch to the object syntax: `loadingComponent: ChartSkeleton` with
    `delay: 200`, `errorComponent: ChartError` with `timeout: 5000`.
 3. Trigger the error path: set `failureSwitch.chart = true` in
-   `src/api/fakeApi.ts` and check that `ChartError` is rendered.
+   `src/api/fakeApi.ts` — the `SalesChart` chunk now fails to load — and check
+   that `ChartError` is rendered. Set it back to `false` afterwards.
 4. Throttle to "Slow 3G" and check the ordering: nothing for 200 ms, then the
    skeleton, then the chart.
 
@@ -93,7 +97,9 @@ never leaves.
    `{ row, column, value }`, keeping the raw value as fallback content.
 4. In the panel, format `total` as a currency and render `status` as a coloured
    badge — **without touching `DataTable`**.
-5. Check the typing: inside the slot, `row` must be `Invoice`, not `any`.
+5. Still in the panel, fill the `empty` slot with a "No invoice matches this
+   filter" message.
+6. Check the typing: inside the slot, `row` must be `Invoice`, not `any`.
 
 → **Done when** the panel renders currency and badges with `DataTable`
 untouched, and `row` is typed `Invoice` inside the slot.
@@ -113,10 +119,10 @@ is the point of departure.
    the panel, and the input keeps its value.
 3. Retarget the teleport at `#modal-root` — the container `App.vue` renders
    *after* the panels. Reload: Vue warns that the target cannot be found. Add the
-   `defer` prop (Vue 3.5) and reload again.
-4. Explain the warning: when is `to` resolved, and why does keeping the `v-if`
-   *inside* the teleport (rather than on it) make the problem visible?
-5. *(Bonus)* Close on `Escape` and focus the dialog on open — `Teleport` moves
+   `defer` prop (Vue 3.5) and reload again. Then explain the warning: when is `to`
+   resolved, and why does keeping the `v-if` *inside* the teleport (rather than
+   on it) make the problem visible?
+4. *(Bonus)* Close on `Escape` and focus the dialog on open — `Teleport` moves
    the DOM, never the focus.
 
 → **Done when** the dialog is centred with no CSS change, `:disabled` brings it
@@ -130,7 +136,8 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
-- [ ] `npm test` exits 0 — `Suspense`, the scoped slots and the `Teleport`
+- [ ] `npm test` exits 0 — the chart's error path, `Suspense`, the scoped slots
+      and the `Teleport`
 - [ ] `npm run build` succeeds
 - [ ] `grep -rn TODO src | grep -v bonus` returns nothing
 - [ ] No Vue warning or error in the browser console while you exercise the four panels
@@ -197,8 +204,9 @@ Continue in this project, on top of the `Teleport` modal and the invoice table:
    rows by their index — cancel the running animation in `@enter-cancelled`
 6. Add a `prefers-reduced-motion` block, toggle the preference in the Devtools
    rendering panel, and verify **nothing gets stuck** in the DOM
-7. *(Bonus)* Measure the FLIP cost on 500 rows in the Performance panel, then on
-   50 — and decide where your limit is
+7. *(Bonus)* Make the panel call `fetchInvoices(500)` instead of `12`, measure
+   the FLIP cost in the Performance panel, then on 50 rows — and decide where your
+   limit is
 
 **Done when** every animation is reversible mid-flight, and disabling motion
 leaves the application fully usable.

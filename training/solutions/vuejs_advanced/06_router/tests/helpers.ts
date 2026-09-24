@@ -8,7 +8,7 @@ import type { Router } from 'vue-router';
  * so it is repeated here — and a test that seeds it must do so BEFORE the first
  * `useAuthStore()` call, because the token is read at store creation.
  */
-export const TOKEN_KEY = 'tp4:token';
+export const TOKEN_KEY = 'tp6:token';
 
 /** Ada Lovelace — `['admin', 'user']`. */
 export const ADMIN_TOKEN = 'token-1';

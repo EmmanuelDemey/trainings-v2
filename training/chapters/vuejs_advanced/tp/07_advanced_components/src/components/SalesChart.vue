@@ -1,3 +1,15 @@
+<script lang="ts">
+import { failureSwitch } from '@/api/fakeApi';
+
+// A plain `<script>` runs ONCE, when this module is evaluated — i.e. when the
+// chunk is loaded — not per instance like `<script setup>`. Throwing here makes
+// the `import()` itself reject, exactly like a chunk that never arrives: that is
+// the failure `defineAsyncComponent`'s `errorComponent` is there for.
+if (failureSwitch.chart) {
+  throw new Error('Failed to fetch dynamically imported module');
+}
+</script>
+
 <script setup lang="ts">
 /**
  * Stands in for a real charting component: it is deliberately "heavy" (it pulls

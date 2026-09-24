@@ -36,7 +36,7 @@ function pseudoRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
-export function makeInvoices(count: number): Invoice[] {
+function makeInvoices(count: number): Invoice[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
     customer: CUSTOMERS[i % CUSTOMERS.length]!,
@@ -46,12 +46,15 @@ export function makeInvoices(count: number): Invoice[] {
   }));
 }
 
-/** Flip to `true` in the devtools console to exercise the error components. */
+/**
+ * Flip to `true` to exercise the error components. `chart` makes the
+ * `SalesChart` chunk fail to load (see its plain `<script>` block); `profile`
+ * makes `fetchUser` reject.
+ */
 export const failureSwitch = { chart: false, profile: false };
 
 export async function fetchSales(): Promise<SalesPoint[]> {
   await delay(900);
-  if (failureSwitch.chart) throw new Error('Failed to fetch dynamically imported module');
 
   return Array.from({ length: 12 }, (_, i) => ({
     month: new Date(2025, i, 1).toLocaleString('en', { month: 'short' }),
