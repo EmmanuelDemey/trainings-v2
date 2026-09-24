@@ -82,10 +82,13 @@ jobs:
         run: npm run typecheck
         working-directory: ${{ env.STARTER }}
 
+      # `--reporter=default` drops the `github-actions` reporter Vitest adds on
+      # its own under CI: every red spec here is expected, and would otherwise
+      # surface as an error annotation on a green run.
       - name: The starter must still be unsolved
         working-directory: ${{ env.STARTER }}
         run: |
-          if npm test; then
+          if npm test -- --reporter=default; then
             echo "::error::The starter passes the given specs — an answer leaked into ${{ env.STARTER }}"
             exit 1
           fi
