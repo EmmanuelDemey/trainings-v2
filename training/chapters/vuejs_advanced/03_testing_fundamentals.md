@@ -257,13 +257,13 @@ it('debounces the search', async () => {
 **What is the number one cause of flaky Vue component tests?**
 
 - **A.** Using jsdom instead of a real browser
-- **B.** A missing `await` on `trigger()` / `setValue()`
-- **C.** Querying with `data-testid` instead of CSS selectors
-- **D.** Using `mount` instead of `shallowMount`
+- **B.** Querying with `data-testid` instead of CSS selectors
+- **C.** Using `mount` instead of `shallowMount`
+- **D.** A missing `await` on `trigger()` / `setValue()`
 
 <v-click>
 
-> ✅ **B** — Both return `nextTick()`. Without the `await`, you assert on the DOM
+> ✅ **D** — Both return `nextTick()`. Without the `await`, you assert on the DOM
 > **before** Vue has re-rendered — and it passes or fails depending on timing.
 
 </v-click>
@@ -275,13 +275,13 @@ it('debounces the search', async () => {
 **What is the real risk of `shallowMount`?**
 
 - **A.** It is slower than `mount`
-- **B.** It cannot render slots at all
-- **C.** Every child is stubbed, so a test can stay green while the real app breaks
+- **B.** Every child is stubbed, so a test can stay green while the real app breaks
+- **C.** It cannot render slots at all
 - **D.** It disables the reactivity system
 
 <v-click>
 
-> ✅ **C** — Every stub is a piece of reality you stop testing. Default to `mount`,
+> ✅ **B** — Every stub is a piece of reality you stop testing. Default to `mount`,
 > and stub only what is heavy (charts, maps) or hostile to jsdom.
 
 </v-click>
@@ -292,14 +292,14 @@ it('debounces the search', async () => {
 
 **When do you actually need a `withSetup` helper to test a composable?**
 
-- **A.** Always — a composable cannot run outside a component
-- **B.** Only when it registers lifecycle hooks or calls `inject`
+- **A.** Only when it registers lifecycle hooks or calls `inject`
+- **B.** Always — a composable cannot run outside a component
 - **C.** Only when it returns `computed` values
 - **D.** Only when the app is server-rendered
 
 <v-click>
 
-> ✅ **B** — A pure composable is a plain function: call it directly. The wrapper
+> ✅ **A** — A pure composable is a plain function: call it directly. The wrapper
 > exists to provide a component instance — and `app.unmount()` is what proves your
 > teardown runs.
 

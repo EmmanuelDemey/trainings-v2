@@ -318,15 +318,15 @@ const vTooltip: Directive<HTMLElement, string> = {
 
 **What do `MaybeRefOrGetter` and `toValue` buy you?**
 
-- **A.** Deep reactivity on plain objects
-- **B.** Automatic cleanup of the watchers you create
-- **C.** Callers may pass a plain value, a ref or a getter — the composable handles
+- **A.** Callers may pass a plain value, a ref or a getter — the composable handles
   all three
+- **B.** Deep reactivity on plain objects
+- **C.** Automatic cleanup of the watchers you create
 - **D.** SSR-safe access to `window`
 
 <v-click>
 
-> ✅ **C** — One signature, three call styles: `useTitle('Home')`,
+> ✅ **A** — One signature, three call styles: `useTitle('Home')`,
 > `useTitle(pageTitle)`, `useTitle(() => user.value.name)`. `toValue` unwraps
 > whichever one you got.
 
@@ -340,13 +340,13 @@ const vTooltip: Directive<HTMLElement, string> = {
 
 - **A.** Nothing — that is the recommended way to share state
 - **B.** Every caller gets an independent copy
-- **C.** The state is no longer reactive
-- **D.** It becomes an app-wide singleton: SSR leaks it between requests and tests
+- **C.** It becomes an app-wide singleton: SSR leaks it between requests and tests
   become order-dependent
+- **D.** The state is no longer reactive
 
 <v-click>
 
-> ✅ **D** — Convenient for a theme toggle in a client-only app, dangerous
+> ✅ **C** — Convenient for a theme toggle in a client-only app, dangerous
 > everywhere else. For real application state, use **Pinia** (chapter 9).
 
 </v-click>

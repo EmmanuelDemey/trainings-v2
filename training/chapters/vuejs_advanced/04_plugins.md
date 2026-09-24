@@ -204,13 +204,13 @@ export function useToast(): ToastApi {
 **`app.use(createToast())` is called twice, in two different files. What happens?**
 
 - **A.** Nothing — Vue deduplicates plugins, the second call is ignored
-- **B.** The plugin installs twice: `createToast()` returns a new object each time
-- **C.** A runtime error: a plugin can only be installed once
-- **D.** The second call silently overwrites the first
+- **B.** A runtime error: a plugin can only be installed once
+- **C.** The second call silently overwrites the first
+- **D.** The plugin installs twice: `createToast()` returns a new object each time
 
 <v-click>
 
-> ✅ **B** — Deduplication is a `Set` keyed by the **plugin object**. A factory
+> ✅ **D** — Deduplication is a `Set` keyed by the **plugin object**. A factory
 > returns a fresh one on every call, so `app.use()` sees two different plugins and
 > installs both. The dev warning only shows if you pass the *same* object twice.
 
@@ -224,13 +224,13 @@ export function useToast(): ToastApi {
 you reach for?**
 
 - **A.** `app.config.globalProperties.$api`
-- **B.** `app.mixin({ created() { this.$api = api } })`
-- **C.** `app.provide(apiKey, api)` with a typed `InjectionKey`, plus a `useApi()`
+- **B.** `app.provide(apiKey, api)` with a typed `InjectionKey`, plus a `useApi()`
+- **C.** `app.mixin({ created() { this.$api = api } })`
 - **D.** A module-scope export, imported directly
 
 <v-click>
 
-> ✅ **C** — `globalProperties` needs `getCurrentInstance()` in `<script setup>`
+> ✅ **B** — `globalProperties` needs `getCurrentInstance()` in `<script setup>`
 > and manual module augmentation to be typed. A typed `InjectionKey` gives full
 > inference, one instance per app, and lets a subtree override it.
 

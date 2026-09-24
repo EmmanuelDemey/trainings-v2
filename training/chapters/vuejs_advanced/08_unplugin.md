@@ -267,15 +267,15 @@ Components({
 **Why is `unplugin-vue-components` a better default than
 `app.component('AppButton', AppButton)`?**
 
-- **A.** It registers components faster at runtime
-- **B.** It rewrites the SFC to add a real `import`, so unused components are
+- **A.** It rewrites the SFC to add a real `import`, so unused components are
   tree-shaken out of the bundle
+- **B.** It registers components faster at runtime
 - **C.** It gives components a `<script setup>` scope
 - **D.** It avoids name collisions
 
 <v-click>
 
-> ✅ **B** — A global registration is a runtime side effect: the bundler sees a
+> ✅ **A** — A global registration is a runtime side effect: the bundler sees a
 > reference to the module and must keep it, used or not. The unplugin produces
 > ordinary imports, and ordinary imports are analysable.
 

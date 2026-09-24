@@ -252,14 +252,14 @@ const onSubmit = handleSubmit(async (data, { setErrors }) => {
 **Your schema uses `z.coerce.number()` for `age`. In `handleSubmit((data) => …)`,
 what is the type of `data.age`?**
 
-- **A.** `string`, like the `<input>` value
-- **B.** `number` — `handleSubmit` receives the schema's parsed **output**
+- **A.** `number` — `handleSubmit` receives the schema's parsed **output**
+- **B.** `string`, like the `<input>` value
 - **C.** `unknown`, until you cast it
 - **D.** `string | number`, depending on the browser
 
 <v-click>
 
-> ✅ **B** — `values` holds `z.input` (what the DOM gives you), `handleSubmit`
+> ✅ **A** — `values` holds `z.input` (what the DOM gives you), `handleSubmit`
 > hands you `z.output` (what the parse produced). Coercions, defaults and
 > transforms only exist on the output side. This is also why you send `data` to
 > the API, never `values`.
@@ -275,13 +275,13 @@ up next to the confirmation field. Why?**
 
 - **A.** `.refine()` cannot compare two fields — use `.superRefine()`
 - **B.** VeeValidate ignores refinements
-- **C.** The refinement has no `path`, so the issue is attached to the form, not
+- **C.** The two fields must be in a nested object
+- **D.** The refinement has no `path`, so the issue is attached to the form, not
   to a field
-- **D.** The two fields must be in a nested object
 
 <v-click>
 
-> ✅ **C** — An issue with an empty `path` is a form-level error. Add
+> ✅ **D** — An issue with an empty `path` is a form-level error. Add
 > `{ path: ['confirm'] }` and the adapter keys it under `confirm`, where
 > `errors.confirm` and `<ErrorMessage name="confirm" />` can find it.
 

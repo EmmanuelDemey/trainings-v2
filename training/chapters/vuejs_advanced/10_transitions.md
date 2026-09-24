@@ -179,13 +179,13 @@ views stack and the page height jumps. What is missing?**
 items snap to their new position instead of sliding. What is wrong?**
 
 - **A.** `mode="out-in"` is missing
-- **B.** No `v-move` transition, or the leaving item still occupies the flow
-- **C.** The `tag` prop is missing
-- **D.** The children need `appear`
+- **B.** The `tag` prop is missing
+- **C.** The children need `appear`
+- **D.** No `v-move` transition, or the leaving item still occupies the flow
 
 <v-click>
 
-> ✅ **B** — Sliding needs a `transition` on the `*-move` class **and** a leaving
+> ✅ **D** — Sliding needs a `transition` on the `*-move` class **and** a leaving
 > element removed from the flow (`position: absolute` on `*-leave-active`), so the
 > others can move before the leave animation ends. And FLIP needs a stable `key` on
 > every child. **A** is impossible: `<TransitionGroup>` does not support `mode`.

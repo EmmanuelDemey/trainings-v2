@@ -179,14 +179,14 @@ describe('Checkout', () => {
 
 **Why build a fresh router and a fresh Pinia in every test?**
 
-- **A.** To make the suite run faster
-- **B.** Because both hold global state that leaks from one test to the next
+- **A.** Because both hold global state that leaks from one test to the next
+- **B.** To make the suite run faster
 - **C.** Because `mount` mutates the `plugins` array
 - **D.** Because `createMemoryHistory` can only be used once per process
 
 <v-click>
 
-> ✅ **B** — Navigation state and store state survive the component. A test that
+> ✅ **A** — Navigation state and store state survive the component. A test that
 > passes alone and fails in the suite (or vice-versa) is almost always this.
 
 </v-click>
@@ -199,13 +199,13 @@ describe('Checkout', () => {
 calls `cart.clear()`?**
 
 - **A.** The real action runs, and is also recorded by a spy
-- **B.** The action is replaced by a spy and does not execute
-- **C.** The action throws until you provide an `initialState`
+- **B.** The action throws until you provide an `initialState`
+- **C.** The action is replaced by a spy and does not execute
 - **D.** The action runs, but the state is reset after each test
 
 <v-click>
 
-> ✅ **B** — `stubActions: true` is the default: you assert on the **call**, not on
+> ✅ **C** — `stubActions: true` is the default: you assert on the **call**, not on
 > its effect. Pass `stubActions: false` when you want integration-style behaviour.
 
 </v-click>
@@ -217,14 +217,14 @@ calls `cart.clear()`?**
 **What does MSW give you that `vi.mock('@/api/client')` does not?**
 
 - **A.** Faster tests
-- **B.** Interception at the network layer — the same handlers serve Vitest,
+- **B.** No need to call `flushPromises()`
+- **C.** Automatic typing of the responses
+- **D.** Interception at the network layer — the same handlers serve Vitest,
   Cypress and the dev server
-- **C.** No need to call `flushPromises()`
-- **D.** Automatic typing of the responses
 
 <v-click>
 
-> ✅ **B** — A module mock tests your own abstraction; MSW tests the code path that
+> ✅ **D** — A module mock tests your own abstraction; MSW tests the code path that
 > really runs in production, `fetch` / `axios` included. Set
 > `onUnhandledRequest: 'error'` so a forgotten handler fails loudly.
 

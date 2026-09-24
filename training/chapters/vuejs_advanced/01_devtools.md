@@ -147,13 +147,13 @@ define: {
 while it works locally. What happened?**
 
 - **A.** The extension needs to be re-authorized for the domain
-- **B.** Nothing — production builds ship without the Devtools hooks by default
-- **C.** The app was built with the wrong `base` URL
+- **B.** The app was built with the wrong `base` URL
+- **C.** Nothing — production builds ship without the Devtools hooks by default
 - **D.** `app.config.performance` was left to `false`
 
 <v-click>
 
-> ✅ **B** — The Devtools interface is stripped from production builds. You can
+> ✅ **C** — The Devtools interface is stripped from production builds. You can
 > re-enable it with `__VUE_PROD_DEVTOOLS__: 'true'`, which you only ever do on a
 > **private** staging build: it exposes your component tree and your store state.
 
@@ -166,14 +166,14 @@ while it works locally. What happened?**
 **You want the duration of a single component's render, in milliseconds. Where do
 you look?**
 
-- **A.** The Components tab, on the selected node
-- **B.** The Graph tab
-- **C.** `app.config.performance = true`, then the browser's Performance panel
+- **A.** `app.config.performance = true`, then the browser's Performance panel
+- **B.** The Components tab, on the selected node
+- **C.** The Graph tab
 - **D.** The Assets tab
 
 <v-click>
 
-> ✅ **C** — `app.config.performance` emits init / compile / render / patch marks
+> ✅ **A** — `app.config.performance` emits init / compile / render / patch marks
 > that the **browser's** Performance panel renders as a timeline. It works in
 > development mode only. The Vue Timeline tells you *what* rendered; these marks
 > tell you *how long* it took.
@@ -188,13 +188,13 @@ you look?**
 likely cause?**
 
 - **A.** The Devtools are double-counting because the panel is open
-- **B.** A component subscribed to more state than it displays
-- **C.** Vue is missing a `key` on a `v-for`
-- **D.** The build is not tree-shaking
+- **B.** Vue is missing a `key` on a `v-for`
+- **C.** The build is not tree-shaking
+- **D.** A component subscribed to more state than it displays
 
 <v-click>
 
-> ✅ **B** — Reading a whole collection where a single getter would do subscribes
+> ✅ **D** — Reading a whole collection where a single getter would do subscribes
 > the component to every change in it. That is the exact problem chapter 9 attacks
 > with `storeToRefs` and per-domain stores — and the Timeline is how you prove the
 > fix worked.

@@ -238,12 +238,12 @@ jobs:
 
 - **A.** Only the build server
 - **B.** Only code guarded by `import.meta.env.PROD`
-- **C.** Anyone — `VITE_*` values are inlined into the shipped JavaScript
-- **D.** Nobody, Vite encrypts the value at build time
+- **C.** Nobody, Vite encrypts the value at build time
+- **D.** Anyone — `VITE_*` values are inlined into the shipped JavaScript
 
 <v-click>
 
-> ✅ **C** — Drop the prefix and the variable simply never reaches the bundle. A
+> ✅ **D** — Drop the prefix and the variable simply never reaches the bundle. A
 > frontend build can never hold a secret: it belongs on the server, behind an
 > endpoint.
 
@@ -274,14 +274,14 @@ jobs:
 
 **Which optimization pays the most in a typical SPA?**
 
-- **A.** `manualChunks` splitting every dependency into its own file
-- **B.** Route-level `import()`, so each route ships its own chunk
+- **A.** Route-level `import()`, so each route ships its own chunk
+- **B.** `manualChunks` splitting every dependency into its own file
 - **C.** Pre-compressing the assets with brotli
 - **D.** Setting `build.target` to `es2022`
 
 <v-click>
 
-> ✅ **B** — Users pay for what they render. The others are real but marginal, and
+> ✅ **A** — Users pay for what they render. The others are real but marginal, and
 > over-splitting with `manualChunks` actively hurts: more requests, worse
 > compression.
 

@@ -171,14 +171,14 @@ The failure mode of an over-eager `ui/` layer:
 
 **Which question best decides where a component belongs?**
 
-- **A.** How many DOM elements does it render?
-- **B.** What is this file allowed to import?
+- **A.** What is this file allowed to import?
+- **B.** How many DOM elements does it render?
 - **C.** How many times is it reused today?
 - **D.** Does the designer call it a molecule?
 
 <v-click>
 
-> ✅ **B** — Imports are objective, stable across redesigns, and checkable by a
+> ✅ **A** — Imports are objective, stable across redesigns, and checkable by a
 > linter. Size (**A**, **D**) is an opinion that changes with the next mock-up, and
 > reuse count (**C**) tells you *if* it is shared, not what it may depend on.
 
@@ -192,13 +192,13 @@ The failure mode of an over-eager `ui/` layer:
 completely differently. What do you extract?**
 
 - **A.** A parent component they both wrap
-- **B.** A composable
-- **C.** A renderless component with a default slot
+- **B.** A renderless component with a default slot
+- **C.** A composable
 - **D.** Nothing — 40 lines is under the threshold
 
 <v-click>
 
-> ✅ **B** — What repeats is behaviour, so extract behaviour. **C** works but adds a
+> ✅ **C** — What repeats is behaviour, so extract behaviour. **C** works but adds a
 > component instance for nothing when no markup is shared, and **A** forces a
 > rendering contract on two things that have none in common.
 
@@ -211,14 +211,14 @@ completely differently. What do you extract?**
 **`InvoiceRow` and `PaymentRow` are nearly identical, but invoicing and payments
 are two teams with two roadmaps. What is the right move?**
 
-- **A.** Unify them into `TransactionRow` with a `type` prop
-- **B.** Keep both, and share only the `ui/` pieces they use
+- **A.** Keep both, and share only the `ui/` pieces they use
+- **B.** Unify them into `TransactionRow` with a `type` prop
 - **C.** Copy whichever changes first back over the other
 - **D.** Unify, and add props as the two diverge
 
 <v-click>
 
-> ✅ **B** — Same shape, different reasons to change: that is shape-only
+> ✅ **A** — Same shape, different reasons to change: that is shape-only
 > duplication. **A** and **D** are how a component reaches 23 props — every
 > divergence becomes a prop and a `v-if` in a file two teams now share.
 

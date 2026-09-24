@@ -300,14 +300,14 @@ onErrorCaptured((err) => { error.value = err; return false; });
 
 **When is the chunk of a `defineAsyncComponent` actually downloaded?**
 
-- **A.** When the module declaring it is imported
-- **B.** During `createApp()`, with the rest of the entry chunk
-- **C.** The first time the component is rendered
+- **A.** The first time the component is rendered
+- **B.** When the module declaring it is imported
+- **C.** During `createApp()`, with the rest of the entry chunk
 - **D.** As soon as the browser goes idle
 
 <v-click>
 
-> ✅ **C** — The loader is called on the first render, not on import. Declaring an
+> ✅ **A** — The loader is called on the first render, not on import. Declaring an
 > async component at the top of a file costs nothing until something renders it.
 
 </v-click>
@@ -338,13 +338,13 @@ onErrorCaptured((err) => { error.value = err; return false; });
 **Which `v-memo` usage is correct?**
 
 - **A.** On a child element of the element carrying `v-for`
-- **B.** On the same element as `v-for`, listing every reactive value the subtree reads
-- **C.** `v-memo="[]"` on a subtree that changes on every render
-- **D.** With a dependency array whose length varies between renders
+- **B.** `v-memo="[]"` on a subtree that changes on every render
+- **C.** With a dependency array whose length varies between renders
+- **D.** On the same element as `v-for`, listing every reactive value the subtree reads
 
 <v-click>
 
-> ✅ **B** — `v-memo` must sit on the `v-for` element, its array must have a
+> ✅ **D** — `v-memo` must sit on the `v-for` element, its array must have a
 > **constant length**, and forgetting one dependency ships silently stale UI.
 > `v-memo="[]"` is just `v-once`, so **C** would freeze a changing subtree.
 

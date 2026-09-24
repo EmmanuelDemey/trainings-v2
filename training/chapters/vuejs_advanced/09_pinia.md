@@ -297,13 +297,13 @@ const itemById = computed(() => (id: number) => items.value.find((i) => i.id ===
 **What is the problem with this getter?**
 
 - **A.** It cannot be typed properly
-- **B.** It returns a function, so nothing is cached — every call re-runs the lookup
-- **C.** It breaks `$subscribe`
-- **D.** It makes the store non-serializable
+- **B.** It breaks `$subscribe`
+- **C.** It makes the store non-serializable
+- **D.** It returns a function, so nothing is cached — every call re-runs the lookup
 
 <v-click>
 
-> ✅ **B** — The `computed` caches the *function*, not its results. Build the index
+> ✅ **D** — The `computed` caches the *function*, not its results. Build the index
 > instead: `const byId = computed(() => new Map(items.value.map(i => [i.id, i])))`,
 > then `byId.get(42)` in O(1).
 
@@ -317,13 +317,13 @@ const itemById = computed(() => (id: number) => items.value.find((i) => i.id ===
 two separate assignments?**
 
 - **A.** Nothing, it is only nicer syntax
-- **B.** It triggers reactivity once instead of twice
-- **C.** It bypasses `$subscribe`
+- **B.** It bypasses `$subscribe`
+- **C.** It triggers reactivity once instead of twice
 - **D.** It is the only legal way to mutate state outside an action
 
 <v-click>
 
-> ✅ **B** — One mutation, one notification, one re-render. `$subscribe` still fires,
+> ✅ **C** — One mutation, one notification, one re-render. `$subscribe` still fires,
 > with `mutation.type === 'patch object'`. Use the function form when you need to
 > push into an array.
 

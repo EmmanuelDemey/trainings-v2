@@ -13,12 +13,12 @@ layout: cover
 
 <v-clicks>
 
-- A) To encrypt data in transit
-- B) To direct documents to a specific shard in order to optimize searches ✅
+- A) To direct documents to a specific shard in order to optimize searches ✅
+- B) To encrypt data in transit
 - C) To configure cluster network rules
 - D) To define the replication order
 
-**Answer: B** — Routing allows storing and searching documents on a specific shard, avoiding fan-out across all shards. This is very useful in multi-tenant architectures.
+**Answer: A** — Routing allows storing and searching documents on a specific shard, avoiding fan-out across all shards. This is very useful in multi-tenant architectures.
 
 </v-clicks>
 
@@ -47,12 +47,12 @@ layout: cover
 
 <v-clicks>
 
-- A) `value_count`
-- B) `terms`
-- C) `cardinality` ✅
+- A) `cardinality` ✅
+- B) `value_count`
+- C) `terms`
 - D) `stats`
 
-**Answer: C** — The `cardinality` aggregation uses the HyperLogLog++ algorithm to estimate the number of unique values of a field, with a small margin of error.
+**Answer: A** — The `cardinality` aggregation uses the HyperLogLog++ algorithm to estimate the number of unique values of a field, with a small margin of error.
 
 </v-clicks>
 
@@ -65,11 +65,11 @@ layout: cover
 <v-clicks>
 
 - A) They speed up queries by 10x
-- B) They decouple the application from physical indices and enable zero-downtime reindexing ✅
-- C) They automatically double the number of replicas
+- B) They automatically double the number of replicas
+- C) They decouple the application from physical indices and enable zero-downtime reindexing ✅
 - D) They compress stored data
 
-**Answer: B** — Aliases provide a level of indirection: the application points to an alias, allowing you to switch between indices (reindexing, migration) transparently and without downtime.
+**Answer: C** — Aliases provide a level of indirection: the application points to an alias, allowing you to switch between indices (reindexing, migration) transparently and without downtime.
 
 </v-clicks>
 
@@ -83,10 +83,10 @@ layout: cover
 
 - A) `set`
 - B) `lowercase`
-- C) `grok` ✅
-- D) `split`
+- C) `split`
+- D) `grok` ✅
 
-**Answer: C** — The `grok` processor uses patterns (named regular expressions) to extract structured fields from unstructured text, such as Apache or Nginx log lines.
+**Answer: D** — The `grok` processor uses patterns (named regular expressions) to extract structured fields from unstructured text, such as Apache or Nginx log lines.
 
 </v-clicks>
 
@@ -116,10 +116,10 @@ layout: cover
 <v-clicks>
 
 - A) 1-5 GB
-- B) 20-50 GB ✅
-- C) 100-200 GB
+- B) 100-200 GB
+- C) 20-50 GB ✅
 - D) Size does not matter
 
-**Answer: B** — Elastic recommends shards between 20 and 50 GB. Shards that are too small create excessive management overhead, while shards that are too large slow down recovery and rebalancing.
+**Answer: C** — Elastic recommends shards between 20 and 50 GB. Shards that are too small create excessive management overhead, while shards that are too large slow down recovery and rebalancing.
 
 </v-clicks>

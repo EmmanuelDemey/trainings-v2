@@ -14,11 +14,11 @@ layout: cover
 <v-clicks>
 
 - A) A B+ tree
-- B) A hash table
-- C) An inverted index ✅
+- B) An inverted index ✅
+- C) A hash table
 - D) A directed graph
 
-**Answer: C** — The inverted index maps each term to the list of documents that contain it, enabling ultra-fast full-text searches.
+**Answer: B** — The inverted index maps each term to the list of documents that contain it, enabling ultra-fast full-text searches.
 
 </v-clicks>
 
@@ -30,12 +30,12 @@ layout: cover
 
 <v-clicks>
 
-- A) 5601
-- B) 9300
-- C) 8080
-- D) 9200 ✅
+- A) 9200 ✅
+- B) 5601
+- C) 9300
+- D) 8080
 
-**Answer: D** — Port 9200 is the default port for the HTTP REST API. Port 5601 is used by Kibana, and 9300 is used for inter-node transport communication.
+**Answer: A** — Port 9200 is the default port for the HTTP REST API. Port 5601 is used by Kibana, and 9300 is used for inter-node transport communication.
 
 </v-clicks>
 
@@ -66,10 +66,10 @@ layout: cover
 
 - A) The `_search` API
 - B) The `_doc` API, one document at a time
-- C) The `_bulk` API ✅
-- D) The `_reindex` API
+- C) The `_reindex` API
+- D) The `_bulk` API ✅
 
-**Answer: C** — The `_bulk` API allows sending multiple operations (index, update, delete) in a single HTTP request, significantly reducing network overhead.
+**Answer: D** — The `_bulk` API allows sending multiple operations (index, update, delete) in a single HTTP request, significantly reducing network overhead.
 
 </v-clicks>
 
@@ -82,11 +82,11 @@ layout: cover
 <v-clicks>
 
 - A) `text` is for numbers, `keyword` is for strings
-- B) `text` is analyzed (tokenized) for full-text search, `keyword` is stored as-is for exact matching ✅
-- C) `keyword` is more performant than `text` in all cases
+- B) `keyword` is more performant than `text` in all cases
+- C) `text` is analyzed (tokenized) for full-text search, `keyword` is stored as-is for exact matching ✅
 - D) There is no difference
 
-**Answer: B** — A `text` field goes through an analyzer (tokenization, filters) for full-text search. A `keyword` field is indexed without transformation for exact filters, sorting, and aggregations.
+**Answer: C** — A `text` field goes through an analyzer (tokenization, filters) for full-text search. A `keyword` field is indexed without transformation for exact filters, sorting, and aggregations.
 
 </v-clicks>
 
@@ -99,11 +99,11 @@ layout: cover
 <v-clicks>
 
 - A) Optimize the cluster's network performance
-- B) Transform text into tokens during indexing and search ✅
-- C) Manage shard replication
-- D) Compress data on disk
+- B) Manage shard replication
+- C) Compress data on disk
+- D) Transform text into tokens during indexing and search ✅
 
-**Answer: B** — An analyzer consists of a tokenizer and filters (lowercase, stemming, stop words, etc.) that transform raw text into indexable tokens.
+**Answer: D** — An analyzer consists of a tokenizer and filters (lowercase, stemming, stop words, etc.) that transform raw text into indexable tokens.
 
 </v-clicks>
 
@@ -117,10 +117,10 @@ layout: cover
 
 - A) `must`
 - B) `should`
-- C) `must_not`
-- D) `filter` ✅
+- C) `filter` ✅
+- D) `must_not`
 
-**Answer: D** — The `filter` clause applies a binary (yes/no) filter without computing a score. It is also cached for better performance.
+**Answer: C** — The `filter` clause applies a binary (yes/no) filter without computing a score. It is also cached for better performance.
 
 </v-clicks>
 
@@ -133,10 +133,10 @@ layout: cover
 <v-clicks>
 
 - A) TF/IDF
-- B) PageRank
-- C) BM25 ✅
+- B) BM25 ✅
+- C) PageRank
 - D) Cosine Similarity
 
-**Answer: C** — BM25 (Best Matching 25) has been the default algorithm since Elasticsearch 5.x. It is an evolution of TF/IDF that better handles saturation of frequent terms.
+**Answer: B** — BM25 (Best Matching 25) has been the default algorithm since Elasticsearch 5.x. It is an evolution of TF/IDF that better handles saturation of frequent terms.
 
 </v-clicks>

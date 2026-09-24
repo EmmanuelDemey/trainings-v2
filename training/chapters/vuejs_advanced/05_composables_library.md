@@ -164,15 +164,15 @@ export function useAcmeFetch<T>(url: MaybeRefOrGetter<string>) {
 
 **Why is `onScopeDispose` preferred to `onUnmounted` in a library composable?**
 
-- **A.** It runs earlier, before the DOM is removed
-- **B.** It is the only one that works in production builds
-- **C.** It works in a component *and* in any `effectScope` — a store, a plugin, a
+- **A.** It works in a component *and* in any `effectScope` — a store, a plugin, a
   guard — where `onUnmounted` only warns
+- **B.** It runs earlier, before the DOM is removed
+- **C.** It is the only one that works in production builds
 - **D.** `onUnmounted` is deprecated since Vue 3.5
 
 <v-click>
 
-> ✅ **C** — A component's `setup` is itself an effect scope, so `onScopeDispose`
+> ✅ **A** — A component's `setup` is itself an effect scope, so `onScopeDispose`
 > covers the component case for free and keeps working everywhere else. Since Vue
 > 3.5 its second argument silences the "no active scope" warning when there is
 > legitimately no owner.
@@ -187,13 +187,13 @@ export function useAcmeFetch<T>(url: MaybeRefOrGetter<string>) {
 does it go?**
 
 - **A.** In the shared library, so the next app can reuse it
-- **B.** In the application, until a third real usage justifies promoting it
-- **C.** In the shared library, marked `@experimental`
+- **B.** In the shared library, marked `@experimental`
+- **C.** In the application, until a third real usage justifies promoting it
 - **D.** In `_internal/`, exported from the barrel
 
 <v-click>
 
-> ✅ **B** — Promoting on speculation buys a permanent maintenance cost against a
+> ✅ **C** — Promoting on speculation buys a permanent maintenance cost against a
 > hypothetical reuse, and freezes an API before you have seen a second real use
 > case. Move it up on the third call site — that is when you can see what is
 > actually generic.

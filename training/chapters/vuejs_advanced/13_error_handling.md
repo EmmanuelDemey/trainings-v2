@@ -254,13 +254,13 @@ function throws. What happens?**
 handler sees it?**
 
 - **A.** The nearest `onErrorCaptured` — it was thrown from a lifecycle hook
-- **B.** `app.config.errorHandler`
-- **C.** Neither — only a `window.onerror` listener
+- **B.** Neither — only a `window.onerror` listener
+- **C.** `app.config.errorHandler`
 - **D.** `router.onError`
 
 <v-click>
 
-> ✅ **C** — Vue wraps `onMounted` itself, but the callback runs 100 ms later, from
+> ✅ **B** — Vue wraps `onMounted` itself, but the callback runs 100 ms later, from
 > the browser's timer queue, on a stack Vue knows nothing about. Everything you
 > hand to the platform — timers, listeners, observers — leaves the pipeline. Hence
 > the `window.onerror` / `unhandledrejection` net.

@@ -261,12 +261,12 @@ onBeforeRouteUpdate(async (to) => {
 
 - **A.** `onMounted`, so loading the data there is enough
 - **B.** `beforeEnter`, so the route-level guard can reload the data
-- **C.** Neither — the instance is reused; watch the param or key the view
-- **D.** The component is unmounted and remounted automatically
+- **C.** The component is unmounted and remounted automatically
+- **D.** Neither — the instance is reused; watch the param or key the view
 
 <v-click>
 
-> ✅ **C** — `beforeEnter` only fires when *entering* the route. Use
+> ✅ **D** — `beforeEnter` only fires when *entering* the route. Use
 > `watch(() => route.params.id, load, { immediate: true })`, `onBeforeRouteUpdate`,
 > or force a new instance with `:key="route.fullPath"`.
 
@@ -279,13 +279,13 @@ onBeforeRouteUpdate(async (to) => {
 **Which guard cannot change the outcome of a navigation?**
 
 - **A.** `beforeEach`
-- **B.** `beforeEnter`
-- **C.** `onBeforeRouteLeave`
-- **D.** `afterEach`
+- **B.** `afterEach`
+- **C.** `beforeEnter`
+- **D.** `onBeforeRouteLeave`
 
 <v-click>
 
-> ✅ **D** — `afterEach` runs once the navigation is confirmed: it is for side
+> ✅ **B** — `afterEach` runs once the navigation is confirmed: it is for side
 > effects only (page title, analytics). Returning a location from it does nothing.
 
 </v-click>
