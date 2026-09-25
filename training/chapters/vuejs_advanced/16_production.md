@@ -17,7 +17,8 @@ At the end of this chapter, you will be able to:
 - **Serve** an SPA correctly: history fallback, immutable assets, uncached
   `index.html`
 - **Deploy** to Netlify from a `netlify.toml`, and **build** a CI pipeline that
-  lints, typechecks, tests, builds and uploads the artifact
+  lints, typechecks (`vue-tsc`), hunts dead code (`knip`) and duplication
+  (`jscpd`), tests, builds and uploads the artifact
 
 ---
 
@@ -207,6 +208,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck          # vue-tsc --noEmit
+      - run: npm run knip               # unused files, exports, deps
+      - run: npm run cpd                # jscpd: copy/paste detection
       - run: npm run test:unit -- --coverage
       - run: npm run build
       - uses: actions/upload-artifact@v4
@@ -215,6 +218,38 @@ jobs:
 
 - Every step must be runnable **locally** with the same command
 - Cache `node_modules` via `setup-node`, not a hand-rolled cache step
+
+---
+
+# Static checks: `vue-tsc`, `knip`, `jscpd`
+
+```json
+{
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit",
+    "knip": "knip",
+    "cpd": "jscpd src"
+  }
+}
+```
+
+```json
+// .jscpd.json
+{
+  "threshold": 2,
+  "minTokens": 50,
+  "reporters": ["console"],
+  "ignore": ["**/*.spec.ts", "**/__snapshots__/**"]
+}
+```
+
+- **`vue-tsc`** — `tsc` does not understand `.vue` files: `vue-tsc` typechecks
+  `<script setup>` **and** the templates (props, emits, slots). Vite only strips
+  types, it never checks them
+- **`knip`** — finds unused files, exports and dependencies; its Vue/Vite/Vitest
+  plugins read the configs, so entry points need no manual setup
+- **`jscpd`** — detects copy/paste across `.ts` and `.vue` files; fails the job
+  above `threshold` percent — a hint to extract a composable or a component
 
 ---
 
@@ -227,8 +262,8 @@ jobs:
 - Three server rules: SPA fallback, immutable assets, uncached `index.html`
 - One `netlify.toml` carries the build, the redirect and the headers — plus a
   **deploy preview** per pull request
-- Pipeline: lint ➜ typecheck ➜ unit ➜ build ➜ upload the artifact, every step
-  runnable locally
+- Pipeline: lint ➜ typecheck (`vue-tsc`) ➜ dead code (`knip`) ➜ duplication
+  (`jscpd`) ➜ unit ➜ build ➜ upload the artifact, every step runnable locally
 
 ---
 
