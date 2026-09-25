@@ -12,8 +12,9 @@ At the end of this chapter, you will be able to:
 
 - **Distinguish** a **Vue plugin** (runtime, `app.use`) from an **unplugin**
   (build time, `vite.config.ts`), and name the bundlers one transform covers
-- **Generate** your `routes` array from `src/pages/` with
-  **`unplugin-vue-router`**, wired in the right plugin order
+- **Generate** your `routes` array from `src/pages/` with the file-based routing
+  plugin built into **Vue Router 5** (`vue-router/vite`, formerly
+  `unplugin-vue-router`), wired in the right plugin order
 - **Read** the file-name conventions off a folder listing: `index.vue`, `[id]`,
   `[[id]]`, `[slugs]+`, `[...path]`
 - **Explain** the file *beside* the folder — nested layouts, and `users.create.vue`
@@ -64,30 +65,30 @@ import AppButton from '@/components/ui/AppButton.vue';
 - Hence the import path convention: the package name, then the bundler
 
 ```ts
-import VueRouter from 'unplugin-vue-router/vite';
-import VueRouter from 'unplugin-vue-router/webpack';
-import VueRouter from 'unplugin-vue-router/rollup';
+import AutoImport from 'unplugin-auto-import/vite';
+import AutoImport from 'unplugin-auto-import/webpack';
+import AutoImport from 'unplugin-auto-import/rollup';
 ```
 
 <br />
 
 | Package | Version | What it generates |
 |---|---|---|
-| `unplugin-vue-router` | 0.19 | the `routes` array + route types |
+| `vue-router/vite` (ex-`unplugin-vue-router`) | 5 | the `routes` array + route types |
 | `unplugin-auto-import` | 21 | `import` statements for APIs |
 | `unplugin-vue-components` | 32 | `import` statements for components |
 
 ---
 
-# `unplugin-vue-router` — wiring
+# File-based routing — wiring
 
 ```bash
-npm i -D unplugin-vue-router
+npm i vue-router@5        # nothing else to install: the plugin ships with the router
 ```
 
 ```ts
 // vite.config.ts
-import VueRouter from 'unplugin-vue-router/vite';
+import VueRouter from 'vue-router/vite';
 import Vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
@@ -110,14 +111,12 @@ import { routes } from 'vue-router/auto-routes';   // virtual module
 export const router = createRouter({ history: createWebHistory(), routes });
 ```
 
-> ⚠️ **Since Vue Router 5, this is built in.** `unplugin-vue-router` has been
-> merged into the router and is deprecated: the plugin is now
-> `vue-router/vite`, and the virtual module is still `vue-router/auto-routes`.
-> The options, the file conventions and the generated names are unchanged — only
-> the import path moves. This training runs on Vue Router 5, so
-> `tp/08_unplugin/` uses the built-in one.
->
-> On Vue Router 4 (>= 4.4), the standalone `unplugin-vue-router` is still the way.
+> **Since Vue Router 5, this is built in.** The standalone `unplugin-vue-router`
+> was merged into the router and is deprecated. Migrating is an import-path
+> change: `unplugin-vue-router/vite` → `vue-router/vite`, other bundlers →
+> `vue-router/unplugin` (`VueRouter.webpack()`, `.rollup()`…). Options, file
+> conventions and generated names are unchanged. Still on Vue Router 4 (>= 4.4)?
+> The standalone package is the way.
 
 ---
 
@@ -173,7 +172,7 @@ src/pages/
 ```ts
 // vite.config.ts
 import AutoImport from 'unplugin-auto-import/vite';
-import { VueRouterAutoImports } from 'unplugin-vue-router';
+import { VueRouterAutoImports } from 'vue-router/unplugin';
 
 AutoImport({
   imports: [
@@ -191,7 +190,7 @@ AutoImport({
 ```
 
 > Use `VueRouterAutoImports` rather than the plain `'vue-router'` preset: it also
-> registers the runtime helpers `unplugin-vue-router` needs.
+> registers the file-based routing helpers (`definePage`…).
 
 ---
 
@@ -227,7 +226,8 @@ Components({
 
 - `unplugin` = one plugin, every bundler; a **build-time** transform, not an
   `app.use()`
-- `unplugin-vue-router`: `src/pages/` → `routes`, plus `typed-router.d.ts` — and
+- `vue-router/vite` (ex-`unplugin-vue-router`, built into Vue Router 5):
+  `src/pages/` → `routes`, plus `typed-router.d.ts` — and
   `Vue()` must come **after** it
 - Conventions worth memorising: `index.vue` (lowercase), `[id]`, `[[id]]`,
   `[slugs]+`, `[...path]`, `users_[id].vue`

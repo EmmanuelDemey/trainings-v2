@@ -184,8 +184,8 @@ training order.
 
 Continue in this project, on top of the finished auth flow:
 
-1. Install `unplugin-vue-router`, move `src/views/` to `src/pages/` and delete the
-   `routes` array — the app must still work, guards included
+1. Add `vue-router/vite` to `vite.config.ts` (built into Vue Router 5), move
+   `src/views/` to `src/pages/` and delete the `routes` array — the app must still work, guards included
 2. Rebuild the URLs with the conventions: `[id]`, a `(group)`, a `users.vue`
    layout and a `[...path].vue` 404
 3. Move `meta.requiresAuth` / `meta.roles` into `definePage()`, and make

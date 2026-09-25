@@ -70,8 +70,8 @@ declare module 'vue-router' {
 - Now `to.meta.requiresAuth` is **typed everywhere**, guards included
 - A typo in a `meta` key becomes a compile error
 
-> Vue Router 4.5 also ships **typed routes** (route names and params inferred)
-> via `unplugin-vue-router`.
+> Vue Router 5 also ships **typed routes** (route names and params inferred)
+> through its built-in file-based routing plugin, `vue-router/vite` — see chapter 8.
 
 ---
 
