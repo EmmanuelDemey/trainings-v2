@@ -15,6 +15,28 @@ export const TRAININGS = [
     deck: 'javascript.md',
     /** Worked answers, zipped for download on the Resources page. */
     solutions: 'training/solutions/javascript',
+    /**
+     * Opt-in: each workshop page gets an editor running in the browser
+     * (StackBlitz WebContainers), loaded with the workshop folder — see
+     * scripts/playground.mjs. These starters have no package.json: the online
+     * copy gets one that serves the folder over http://, which is also what
+     * `fetch`, ES modules and localStorage need.
+     */
+    playground: {
+      template: 'node',
+      openFile: ['app.js', 'index.html'],
+      extraFiles: {
+        'package.json': `${JSON.stringify(
+          {
+            private: true,
+            scripts: { dev: 'serve --no-clipboard .' },
+            devDependencies: { serve: '^14.2.6' },
+          },
+          null,
+          2,
+        )}\n`,
+      },
+    },
   },
   {
     slug: 'vuejs-advanced',
@@ -22,6 +44,16 @@ export const TRAININGS = [
     workshops: 'training/chapters/vuejs_advanced/tp',
     deck: 'vuejs_advanced.md',
     solutions: 'training/solutions/vuejs_advanced',
+    // `node` boots a WebContainer: `npm install`, then `npm run dev`, with a
+    // terminal for `npm test` and `npm run typecheck`.
+    playground: {
+      template: 'node',
+      openFile: ['README.md', 'src/App.vue'],
+      limits:
+        'Runs in Chrome, Edge or Firefox. What needs more than Node.js stays on your machine: ' +
+        'the Vue Devtools browser extension (the in-page devtools of `vite-plugin-vue-devtools` ' +
+        'do work), Cypress and Docker.',
+    },
   },
   {
     slug: 'angular',

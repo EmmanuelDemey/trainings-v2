@@ -25,3 +25,5 @@ pnpm-debug.log*
 src/content/docs/javascript/
 src/content/docs/vuejs-advanced/
 src/content/docs/angular/
+# The workshop folders packed for the online editor, by the same script.
+public/playgrounds/
