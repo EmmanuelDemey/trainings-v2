@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "packages/training-kit": {
+      "entry": ["test/**/*.test.mjs"],
+      "project": ["bin/**/*.mjs", "src/**/*.mjs", "test/**/*.mjs"]
+    },
+    "packages/create-training-kit": {
+      "entry": ["test/**/*.test.mjs"],
+      "project": ["src/**/*.mjs", "test/**/*.mjs"]
+    }
+  },
+  "ignoreBinaries": ["zipinfo"]
+}

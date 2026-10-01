@@ -1,0 +1,7 @@
+# Installed at the repository root by `pnpm install` in framework/ (its
+# `prepare` script), so it runs on every commit of the repository: it only
+# checks the framework, and only when the commit touches it.
+git diff --cached --name-only | grep -q '^framework/' || exit 0
+
+cd framework
+pnpm run check

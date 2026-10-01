@@ -1,0 +1,25 @@
+{
+  "name": "training-kit-framework",
+  "private": true,
+  "description": "training-kit and create-training-kit: turn a folder of numbered slides and a folder of numbered workshops into a deck, a workshops site, PDFs and ZIPs",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "lint": "oxlint --deny-warnings",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "knip": "knip",
+    "cpd": "jscpd",
+    "check": "pnpm run format:check && pnpm run lint && pnpm run knip && pnpm run cpd && pnpm run test",
+    "prepare": "cd .. && husky framework/.husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "jscpd": "^5.4.0",
+    "knip": "^6.39.0",
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
+    "vitest": "^5.0.3"
+  },
+  "packageManager": "pnpm@12.3.1"
+}
