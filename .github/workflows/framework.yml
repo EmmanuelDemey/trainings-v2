@@ -1,0 +1,127 @@
+name: Framework (training-kit)
+
+# The two packages of framework/ — @emmanueldemey/training-kit and
+# create-training-kit. The same checks as the pre-commit hook, one job each so a
+# red PR says which one failed, then the end-to-end proof: a training scaffolded
+# by create-training-kit installs and builds with the training-kit of this commit.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'framework/**'
+      - '.github/workflows/framework.yml'
+  pull_request:
+    paths:
+      - 'framework/**'
+      - '.github/workflows/framework.yml'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: framework
+
+jobs:
+  check:
+    name: ${{ matrix.check.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      # One failing check must not hide the state of the others.
+      fail-fast: false
+      matrix:
+        check:
+          - { name: Format (oxfmt), run: pnpm run format:check }
+          - { name: Lint (oxlint), run: pnpm run lint }
+          - { name: Dead code (knip), run: pnpm run knip }
+          - { name: Duplication (jscpd), run: pnpm run cpd }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: framework/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: framework/.nvmrc
+          cache: pnpm
+          cache-dependency-path: framework/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: ${{ matrix.check.run }}
+
+  test:
+    name: Tests (Vitest) — ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [training-kit, create-training-kit]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: framework/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: framework/.nvmrc
+          cache: pnpm
+          cache-dependency-path: framework/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # Vitest adds its `github-actions` reporter on its own under CI: a failing
+      # spec shows up as an annotation on the PR.
+      - run: pnpm exec vitest run --project ${{ matrix.package }}
+
+  scaffold:
+    name: A scaffolded training builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: framework/package.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: framework/.nvmrc
+          cache: pnpm
+          cache-dependency-path: framework/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+
+      # `--kit file:` points the new training at the training-kit of this
+      # commit, not at the one on the registry. npm, as most users will.
+      - name: Scaffold a training
+        run: |
+          node packages/create-training-kit/index.mjs "$RUNNER_TEMP/demo" --yes \
+            --title "CI Demo" --author "CI" \
+            --kit "file:$GITHUB_WORKSPACE/framework/packages/training-kit"
+
+      - name: Install it
+        working-directory: ${{ runner.temp }}/demo
+        run: npm install --no-audit --no-fund
+
+      - name: List what the numbering picks up
+        working-directory: ${{ runner.temp }}/demo
+        run: npm run list
+
+      # Without the PDF exports: they need a Chromium download and minutes, and
+      # are non-fatal by design — the deck, the site and the ZIPs are not.
+      - name: Build it
+        working-directory: ${{ runner.temp }}/demo
+        run: npm run build:fast
+
+      - name: Every part is in build/
+        working-directory: ${{ runner.temp }}/demo
+        run: |
+          for file in \
+            build/index.html \
+            build/workshops/1-first-steps/index.html \
+            build/slides/index.html \
+            build/_redirects \
+            build/_headers \
+            build/downloads/ci-demo-participants.zip \
+            build/downloads/ci-demo-solutions.zip \
+            build/downloads/tp/1-first-steps-starter.zip \
+            build/downloads/tp/1-first-steps-solution.zip
+          do
+            test -f "$file" || { echo "::error::$file was not built"; exit 1; }
+          done
+          grep -q '/downloads/tp/1-first-steps-starter.zip' build/workshops/1-first-steps/index.html \
+            || { echo "::error::the workshop page does not link its starter ZIP"; exit 1; }
+          echo "All parts built."
