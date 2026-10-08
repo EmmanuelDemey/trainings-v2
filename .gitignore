@@ -1,6 +1,6 @@
 # Local Netlify folder
 .netlify
-specs
+/specs
 .claude
 *.pdf
 .specify
