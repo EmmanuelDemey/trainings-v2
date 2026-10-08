@@ -1,5 +1,5 @@
-// What .github/workflows/workshops.yml checks in a training — read by its
-// `plan` job.
+// What scripts/check-workshops.mjs checks in a training — read by it, and by
+// the `Workshops` job of .github/workflows/training.yml.
 //
 //   node scripts/workshops-ci.mjs <training dir>
 //

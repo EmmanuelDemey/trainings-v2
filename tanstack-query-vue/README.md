@@ -95,4 +95,4 @@ deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 Each workshop is its own npm project. The CI syncs the shared files, installs
 each workshop, and checks that the solution passes its spec and typechecks, and
 that the starter typechecks and does **not** pass:
-[`workshops.yml`](../.github/workflows/workshops.yml), configured by [`workshops.ci.mjs`](workshops.ci.mjs).
+[`check-workshops.mjs`](../scripts/check-workshops.mjs), run by the CI before each deploy and configured by [`workshops.ci.mjs`](workshops.ci.mjs).

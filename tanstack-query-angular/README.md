@@ -95,4 +95,4 @@ Each workshop is its own npm project (an Angular CLI workspace). The CI syncs
 the shared files, installs each workshop, and checks that the solution passes
 the shared spec, typechecks and builds — and that the starter typechecks but
 does **not** pass the spec:
-[`workshops.yml`](../.github/workflows/workshops.yml), configured by [`workshops.ci.mjs`](workshops.ci.mjs).
+[`check-workshops.mjs`](../scripts/check-workshops.mjs), run by the CI before each deploy and configured by [`workshops.ci.mjs`](workshops.ci.mjs).

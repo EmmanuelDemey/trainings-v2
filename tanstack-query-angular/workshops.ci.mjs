@@ -1,4 +1,4 @@
-// What .github/workflows/workshops.yml checks here — see scripts/workshops-ci.mjs.
+// What the CI checks in these workshops before each deploy — see scripts/workshops-ci.mjs.
 export default {
   // The fake API (`src/api/`) and the spec (`src/tests/shared/`) of every
   // workshop are gitignored copies of tanstack-query-common/: write them before

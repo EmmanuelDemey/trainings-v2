@@ -60,4 +60,4 @@ reading are in [`RESSOURCES.md`](RESSOURCES.md).
 
 Each workshop is its own npm project. The CI installs each one, checks that the
 solution passes its specs and that the starter does not:
-[`workshops.yml`](../.github/workflows/workshops.yml), configured by [`workshops.ci.mjs`](workshops.ci.mjs).
+[`check-workshops.mjs`](../scripts/check-workshops.mjs), run by the CI before each deploy and configured by [`workshops.ci.mjs`](workshops.ci.mjs).

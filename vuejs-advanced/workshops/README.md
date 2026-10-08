@@ -115,7 +115,7 @@ DoD: it is the floor, not the ceiling.
 LEARNER writes the tests**, so their starters are green from the start:
 `03_testing/` ships empty tests that assert nothing, next to a few *given* worked
 examples, and `12_testing_integration/` ships a list of `it.todo`s. That is also
-why the CI guard (`.github/workflows/workshops.yml`, at the root of
+why the CI guard (`scripts/check-workshops.mjs`, at the root of
 the repository) leaves them out — "the starter must fail" is meaningless when the
 failing tests are the exercise.
 

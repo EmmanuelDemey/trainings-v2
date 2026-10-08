@@ -65,7 +65,7 @@ Every solution was run, not just written:
 | Node 10 | `npm run lint` clean, request-id propagation checked in the logs |
 | Node 12 | addon compiled with `node-gyp`, benchmarked against the TS version |
 | Vue 01–16 | `npm run typecheck` + `npm run build` |
-| Vue 01–16, except 03 and 12 | `npm test` green on the solution **and red on the starter**, in CI (`.github/workflows/workshops.yml`) |
+| Vue 01–16, except 03 and 12 | `npm test` green on the solution **and red on the starter**, in CI (`scripts/check-workshops.mjs`) |
 | Vue 02 | `npm test` — the 10 given `useFetch` specs |
 | Vue 03 | `npm test` — 9 tests, the ones the learner writes |
 | Vue 16 | `npm run verify:serving` green on nginx **and** Caddy, in Docker |
@@ -96,7 +96,7 @@ pnpm run verify:javascript --dir chapters/javascript/tp --tp 09
 ```
 
 It runs in CI before each deploy of the training
-(`.github/workflows/workshops.yml`), so a solution cannot regress
+(`.github/workflows/training.yml`), so a solution cannot regress
 quietly when a starter is edited.
 
 ## Do not hand these out on day 1

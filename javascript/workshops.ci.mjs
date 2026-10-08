@@ -1,4 +1,4 @@
-// What .github/workflows/workshops.yml checks here — see scripts/workshops-ci.mjs.
+// What the CI checks in these workshops before each deploy — see scripts/workshops-ci.mjs.
 //
 // The workshops are plain HTML with no package.json: scripts/verify.mjs runs
 // the suite of every workshop against the solutions (they must pass) and

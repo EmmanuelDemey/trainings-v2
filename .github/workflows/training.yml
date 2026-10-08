@@ -1,8 +1,8 @@
 name: Training
 
 # Checks then deploys ONE training, called by deploy-trainings.yml once per
-# training to deploy: the deploy waits for the training's workshops to be green,
-# and a broken training holds back its own deploy only.
+# training to deploy: two jobs, the deploy waiting for the workshops to be
+# green, so a broken training holds back its own deploy only.
 
 on:
   workflow_call:
@@ -20,11 +20,76 @@ on:
         required: false
 
 jobs:
+  # One job for all the workshops of the training — not one per workshop:
+  # scripts/check-workshops.mjs runs them side by side, prints the log of each
+  # in its own collapsible group, and sums them up in the job summary. What it
+  # checks, and what a training configures in its workshops.ci.mjs, is described
+  # in scripts/workshops-ci.mjs.
   workshops:
     name: Workshops
-    uses: ./.github/workflows/workshops.yml
-    with:
-      training: ${{ inputs.dir }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The runner's own Node is enough to read the plan.
+      - id: plan
+        env:
+          TRAINING: ${{ inputs.dir }}
+        run: |
+          node scripts/workshops-ci.mjs "$TRAINING" > "$RUNNER_TEMP/plan.json"
+          cat "$RUNNER_TEMP/plan.json"
+          node -p "'workshops=' + JSON.stringify(require(process.env.RUNNER_TEMP + '/plan.json').workshops)" >> "$GITHUB_OUTPUT"
+          node -p "'verify-script=' + require(process.env.RUNNER_TEMP + '/plan.json').verifyScript" >> "$GITHUB_OUTPUT"
+
+      # Workshops that are npm projects: every one of them, side by side.
+      - uses: actions/setup-node@v7
+        if: steps.plan.outputs.workshops != '[]'
+        with:
+          node-version-file: ${{ inputs.dir }}/.nvmrc
+          cache: npm
+          cache-dependency-path: ${{ inputs.dir }}/*/*/package-lock.json
+
+      - name: Check the workshops
+        if: steps.plan.outputs.workshops != '[]'
+        env:
+          TRAINING: ${{ inputs.dir }}
+        run: node scripts/check-workshops.mjs "$TRAINING"
+
+      # A training whose workshops are not npm projects checks them all at once
+      # with its own `verify` script.
+      - uses: pnpm/action-setup@v6
+        if: steps.plan.outputs.verify-script == 'true'
+        with:
+          # The version comes from the `packageManager` field of the training's
+          # package.json, so pnpm is pinned in exactly one place.
+          package_json_file: ${{ inputs.dir }}/package.json
+
+      - uses: actions/setup-node@v7
+        if: steps.plan.outputs.verify-script == 'true'
+        with:
+          node-version-file: ${{ inputs.dir }}/.nvmrc
+          cache: pnpm
+          cache-dependency-path: ${{ inputs.dir }}/pnpm-lock.yaml
+
+      - name: Verify the workshop solutions
+        if: steps.plan.outputs.verify-script == 'true'
+        working-directory: ${{ inputs.dir }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          pnpm run verify
+
+      - name: The starters must still be unsolved
+        if: steps.plan.outputs.verify-script == 'true'
+        working-directory: ${{ inputs.dir }}
+        env:
+          TRAINING: ${{ inputs.dir }}
+        run: |
+          if pnpm run verify --dir workshops; then
+            echo "::error::The starters pass the solution suite — an answer leaked into $TRAINING/workshops/"
+            exit 1
+          fi
+          echo "Starters fail as expected."
 
   deploy:
     name: Deploy

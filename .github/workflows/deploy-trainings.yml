@@ -21,7 +21,7 @@ name: Deploy the trainings
 # each training's netlify.toml still apply: the CLI reads it from the folder it
 # deploys from.
 #
-# Before its deploy, the workshops of each training are checked (workshops.yml):
+# Before its deploy, the workshops of each training are checked (training.yml):
 # a training whose workshops are red is not deployed.
 
 on:

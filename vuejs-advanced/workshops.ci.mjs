@@ -1,4 +1,4 @@
-// What .github/workflows/workshops.yml checks here — see scripts/workshops-ci.mjs.
+// What the CI checks in these workshops before each deploy — see scripts/workshops-ci.mjs.
 export default {
   // The workshops where the LEARNER writes the tests, so their starters are
   // green from the start: `03_testing` ships empty tests that assert nothing,
