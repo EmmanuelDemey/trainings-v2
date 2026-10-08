@@ -1,6 +1,7 @@
 # Deploys the workshops site (at the root) and the slide decks (under /slides/).
-# JavaScript and Advanced Vue.js are not part of it: each has its own Netlify
-# site, configured by javascript/netlify.toml and vuejs-advanced/netlify.toml.
+# The training-kit projects — every folder holding a training.config.mjs — are
+# not part of it: each has its own Netlify site, deployed by
+# .github/workflows/deploy-trainings.yml.
 #
 # Netlify must be configured with an EMPTY base directory, so that this file is
 # the one that is read — training/netlify.toml is a leftover of an older setup
@@ -9,9 +10,11 @@
 [build]
   command = "node scripts/build-all.mjs"
   publish = "build"
-  # A change that only touches the two trainings deployed elsewhere does not
+  # A change that only touches the trainings deployed elsewhere — any folder
+  # with a training.config.mjs, found at build time so a new training needs no
+  # edit here —, the folder the TanStack Query ones share, or the CI, does not
   # rebuild this site.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!javascript' ':!vuejs-advanced'"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . $(for f in */training.config.mjs; do printf \":!%s \" \"${f%%/*}\"; done) ':!tanstack-query-common' ':!.github'"
 
 [build.environment]
   NODE_VERSION = "24"

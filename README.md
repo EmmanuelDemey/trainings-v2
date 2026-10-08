@@ -90,17 +90,27 @@ Resources page drops the ZIP link on its own.
 
 ## Deploying
 
-Three Netlify sites share this repository:
+**The training-kit projects** — every top-level folder holding a
+`training.config.mjs` — each get their own Netlify site, built and deployed from
+GitHub Actions by [`deploy-trainings.yml`](.github/workflows/deploy-trainings.yml).
+There is no list to maintain: [`scripts/trainings-to-deploy.mjs`](scripts/trainings-to-deploy.mjs)
+finds the trainings a push touched (their folder, or a sibling folder their
+`package.json` scripts reach with `../`, like `tanstack-query-common/`), and the
+site — named `$NETLIFY_SITE_PREFIX<slug>` — is created on its first deploy. A new
+training is online as soon as its folder is pushed to `main`; a pull request gets
+preview deploys, linked from the run summary. Run the workflow by hand to
+redeploy them all.
 
-| Site            | Base directory   | Configuration                                                |
-| --------------- | ---------------- | ------------------------------------------------------------ |
-| JavaScript      | `javascript`     | [`javascript/netlify.toml`](javascript/netlify.toml)         |
-| Advanced Vue.js | `vuejs-advanced` | [`vuejs-advanced/netlify.toml`](vuejs-advanced/netlify.toml) |
-| The others      | _(empty)_        | [`netlify.toml`](netlify.toml)                               |
+One-time setup, in the repository settings: the `NETLIFY_AUTH_TOKEN` secret (a
+Netlify personal access token), the `NETLIFY_SITE_PREFIX` variable (site names
+are global on Netlify) and, with several Netlify teams, `NETLIFY_TEAM`. These
+sites must **not** be linked to the repository in the Netlify UI, or each push
+would deploy twice.
 
-Each one skips its deploy when a commit does not touch it.
-
-The rest of this section is about the last one, from the repository root.
+**The other trainings** share one Netlify site, built by Netlify itself from
+[`netlify.toml`](netlify.toml) at the repository root. It skips its deploy when a
+commit only touches the training-kit projects. The rest of this section is
+about that site.
 `training/netlify.toml` is a leftover of an older setup and only applies if the
 Netlify *base directory* is set to `training` — it must be left empty.
 

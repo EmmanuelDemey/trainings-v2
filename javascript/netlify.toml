@@ -1,13 +1,11 @@
-# One Netlify site per training. In the Netlify UI, set the BASE DIRECTORY of
-# this site to the folder holding this file: Netlify then reads this file, runs
-# the build from here, and publishes build/ — the workshops site at the root, the
-# deck under /slides/, the PDFs and ZIPs under /downloads/.
+# One Netlify site per training, built and deployed by
+# .github/workflows/deploy-trainings.yml — the site is created on its first
+# deploy, nothing to set up in the Netlify UI. It publishes build/: the workshops
+# site at the root, the deck under /slides/, the PDFs and ZIPs under /downloads/.
+# The CLI reads this file from the folder it deploys from: the headers below apply.
 [build]
   command = "pnpm run build"
   publish = "build"
-  # Skip the deploy when nothing changed in this training: the other training
-  # lives in the same repository and must not rebuild this one.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ."
 
 [build.environment]
   # pnpm, from the `packageManager` field of package.json and pnpm-lock.yaml.

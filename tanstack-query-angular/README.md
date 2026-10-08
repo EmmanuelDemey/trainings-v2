@@ -83,9 +83,11 @@ of downloading Playwright's, set `TRAINING_KIT_CHROME` to its path.
 
 ## Deploy
 
-A Netlify site of its own: in the Netlify UI, set its **base directory** to
-`tanstack-query-angular`. [`netlify.toml`](netlify.toml) does the rest, and skips
-the deploy when a commit touches neither this folder nor the shared one.
+A Netlify site of its own, built and deployed by
+[`deploy-trainings.yml`](../.github/workflows/deploy-trainings.yml): every push to
+`main` that touches this folder or `tanstack-query-common/` deploys it, and a pull request gets
+a preview. Nothing to set up in the Netlify UI — the site is created on its first
+deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 
 ## Checking the workshops
 
