@@ -22,6 +22,4 @@ pnpm-debug.log*
 
 # Generated from the workshop READMEs by `npm run sync` — the source of truth is
 # training/chapters/*/tp/, never these files.
-src/content/docs/javascript/
-src/content/docs/vuejs-advanced/
 src/content/docs/angular/

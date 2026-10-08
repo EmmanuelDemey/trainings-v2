@@ -5,28 +5,16 @@
 export const REPO_URL = 'https://github.com/EmmanuelDemey/trainings-v2';
 export const BRANCH = 'main';
 
+// JavaScript and Advanced Vue.js are no longer here: each is its own
+// training-kit project, in javascript/ and vuejs-advanced/, deployed to its own
+// Netlify site.
 export const TRAININGS = [
-  {
-    slug: 'javascript',
-    label: 'JavaScript',
-    /** Folder holding one sub-folder per workshop, each with a README.md. */
-    workshops: 'training/chapters/javascript/tp',
-    /** Slidev entry point, relative to training/. */
-    deck: 'javascript.md',
-    /** Worked answers, zipped for download on the Resources page. */
-    solutions: 'training/solutions/javascript',
-  },
-  {
-    slug: 'vuejs-advanced',
-    label: 'Advanced Vue.js',
-    workshops: 'training/chapters/vuejs_advanced/tp',
-    deck: 'vuejs_advanced.md',
-    solutions: 'training/solutions/vuejs_advanced',
-  },
   {
     slug: 'angular',
     label: 'Angular',
+    /** Folder holding one sub-folder per workshop, each with a README.md. */
     workshops: 'training/chapters/angular/tp',
+    /** Slidev entry point, relative to training/. */
     deck: 'angular.md',
     // No `solutions`: the six workshops build one project, created by the learner
     // with `ng new` in workshop 1 — there is nothing to hand out per exercise. The

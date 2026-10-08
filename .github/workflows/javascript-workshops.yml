@@ -3,13 +3,15 @@ name: JavaScript workshops
 on:
   push:
     paths:
-      - 'training/chapters/javascript/tp/**'
-      - 'training/solutions/javascript/**'
+      - 'javascript/workshops/**'
+      - 'javascript/solutions/**'
+      - 'javascript/scripts/verify.mjs'
       - '.github/workflows/javascript-workshops.yml'
   pull_request:
     paths:
-      - 'training/chapters/javascript/tp/**'
-      - 'training/solutions/javascript/**'
+      - 'javascript/workshops/**'
+      - 'javascript/solutions/**'
+      - 'javascript/scripts/verify.mjs'
   workflow_dispatch:
 
 jobs:
@@ -18,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: training
+        working-directory: javascript
 
     steps:
       - uses: actions/checkout@v7
@@ -26,14 +28,14 @@ jobs:
       - uses: pnpm/action-setup@v6
         with:
           # The version comes from the `packageManager` field of
-          # training/package.json, so pnpm is pinned in exactly one place.
-          package_json_file: training/package.json
+          # javascript/package.json, so pnpm is pinned in exactly one place.
+          package_json_file: javascript/package.json
 
       - uses: actions/setup-node@v7
         with:
-          node-version-file: training/.nvmrc
+          node-version-file: javascript/.nvmrc
           cache: pnpm
-          cache-dependency-path: training/pnpm-lock.yaml
+          cache-dependency-path: javascript/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -42,13 +44,13 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Verify the workshop solutions
-        run: pnpm run verify:javascript
+        run: pnpm run verify
 
       - name: The starters must still be unsolved
         # A starter that passes the suite means a solution leaked into it.
         run: |
-          if pnpm run verify:javascript -- --dir chapters/javascript/tp; then
-            echo "::error::The starters pass the solution suite — an answer leaked into chapters/javascript/tp/"
+          if pnpm run verify --dir workshops; then
+            echo "::error::The starters pass the solution suite — an answer leaked into javascript/workshops/"
             exit 1
           fi
           echo "Starters fail as expected."

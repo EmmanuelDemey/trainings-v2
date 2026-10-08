@@ -1,4 +1,6 @@
 # Deploys the workshops site (at the root) and the slide decks (under /slides/).
+# JavaScript and Advanced Vue.js are not part of it: each has its own Netlify
+# site, configured by javascript/netlify.toml and vuejs-advanced/netlify.toml.
 #
 # Netlify must be configured with an EMPTY base directory, so that this file is
 # the one that is read — training/netlify.toml is a leftover of an older setup
@@ -7,6 +9,9 @@
 [build]
   command = "node scripts/build-all.mjs"
   publish = "build"
+  # A change that only touches the two trainings deployed elsewhere does not
+  # rebuild this site.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':!javascript' ':!vuejs-advanced'"
 
 [build.environment]
   NODE_VERSION = "24"
@@ -92,12 +97,6 @@
   # The home page — the training picker.
   [[plugins.inputs.audits]]
     path = ""
-
-  [[plugins.inputs.audits]]
-    path = "javascript"
-
-  [[plugins.inputs.audits]]
-    path = "vuejs-advanced"
 
   [[plugins.inputs.audits]]
     path = "angular"

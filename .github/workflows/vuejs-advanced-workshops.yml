@@ -15,13 +15,13 @@ name: Vue.js advanced workshops
 on:
   push:
     paths:
-      - 'training/chapters/vuejs_advanced/tp/**'
-      - 'training/solutions/vuejs_advanced/**'
+      - 'vuejs-advanced/workshops/**'
+      - 'vuejs-advanced/solutions/**'
       - '.github/workflows/vuejs-advanced-workshops.yml'
   pull_request:
     paths:
-      - 'training/chapters/vuejs_advanced/tp/**'
-      - 'training/solutions/vuejs_advanced/**'
+      - 'vuejs-advanced/workshops/**'
+      - 'vuejs-advanced/solutions/**'
   workflow_dispatch:
 
 jobs:
@@ -50,15 +50,15 @@ jobs:
           - 17_tanstack_query
 
     env:
-      SOLUTION: training/solutions/vuejs_advanced/${{ matrix.workshop }}
-      STARTER: training/chapters/vuejs_advanced/tp/${{ matrix.workshop }}
+      SOLUTION: vuejs-advanced/solutions/${{ matrix.workshop }}
+      STARTER: vuejs-advanced/workshops/${{ matrix.workshop }}
 
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
         with:
-          node-version-file: training/chapters/vuejs_advanced/tp/${{ matrix.workshop }}/.nvmrc
+          node-version-file: vuejs-advanced/workshops/${{ matrix.workshop }}/.nvmrc
 
       - name: Install the solution
         run: npm ci
