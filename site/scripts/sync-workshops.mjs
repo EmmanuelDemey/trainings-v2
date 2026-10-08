@@ -14,10 +14,14 @@ import { fileURLToPath } from 'node:url';
 import { TRAININGS, REPO_URL, BRANCH } from '../../scripts/trainings.mjs';
 import { quizFor } from '../../scripts/quizzes/index.mjs';
 import { renderQuizForm, renderAnswersBody } from './quiz-render.mjs';
+import { playgroundProject } from '../../scripts/playground.mjs';
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(siteRoot, '..');
 const outRoot = join(siteRoot, 'src/content/docs');
+// One JSON per workshop, fetched by the page only when the learner opens the
+// editor — see src/components/MarkdownContent.astro.
+const playgroundRoot = join(siteRoot, 'public/playgrounds');
 // scripts/build-all.mjs fills this before building the site, so the Resources
 // pages can only offer links to files that were actually produced.
 const downloadsDir = join(repoRoot, 'build/downloads');
@@ -77,6 +81,29 @@ function shortLabel(title) {
 
 const yaml = (value) => JSON.stringify(value); // valid YAML double-quoted scalar
 
+const escapeHtml = (text) =>
+  String(text).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+
+/**
+ * The "work online" block of a workshop page: two buttons and the slot the
+ * editor is embedded into. Raw HTML in Markdown, so no blank line inside —
+ * it would close the HTML block (same rule as quiz-render.mjs).
+ */
+function renderPlayground({ src, openFile, limits }) {
+  return [
+    `<div class="playground" data-playground="${escapeHtml(src)}"${openFile ? ` data-open-file="${escapeHtml(openFile)}"` : ''}>`,
+    '<p class="playground__intro"><strong>No setup?</strong> Work on this workshop in an editor that runs in your browser — your changes stay in that tab until you fork the project on StackBlitz.</p>',
+    ...(limits ? [`<p class="playground__limits">${escapeHtml(limits).replace(/`([^`]+)`/g, '<code>$1</code>')}</p>`] : []),
+    '<p class="playground__actions">',
+    '<button type="button" class="playground__button" data-action="embed">Open the online editor here</button>',
+    '<button type="button" class="playground__button playground__button--secondary" data-action="open">Open it in a new tab</button>',
+    '</p>',
+    '<p class="playground__status" role="status" aria-live="polite"></p>',
+    '<div class="playground__frame"></div>',
+    '</div>',
+  ].join('\n');
+}
+
 function page({ title, description, order, label, sourcePath, body, note }) {
   return `---
 title: ${yaml(title)}
@@ -105,6 +132,10 @@ for (const training of TRAININGS) {
   const outDir = join(outRoot, training.slug);
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
+
+  const playgroundDir = join(playgroundRoot, training.slug);
+  await rm(playgroundDir, { recursive: true, force: true });
+  if (training.playground) await mkdir(playgroundDir, { recursive: true });
 
   // 1. One page per workshop. The meta is kept so that the overview can link to
   //    them without re-reading anything.
@@ -151,6 +182,27 @@ for (const training of TRAININGS) {
         ].join('\n')
       : '';
 
+    let playground = '';
+    if (training.playground) {
+      const { project, openFile, skipped } = await playgroundProject({
+        dir: join(sourceDir, folder),
+        title: `${training.label} — ${title}`,
+        description,
+        template: training.playground.template,
+        openFile: training.playground.openFile,
+        extraFiles: training.playground.extraFiles,
+      });
+      if (skipped.length) {
+        console.warn(`⚠ ${sourcePath}: not in the online editor (binary or too big): ${skipped.join(', ')}`);
+      }
+      await writeFile(join(playgroundDir, `${toSlug(folder)}.json`), JSON.stringify(project));
+      playground = renderPlayground({
+        src: `/playgrounds/${training.slug}/${toSlug(folder)}.json`,
+        openFile,
+        limits: training.playground.limits,
+      });
+    }
+
     await writeFile(
       join(outDir, `${toSlug(folder)}.md`),
       page({
@@ -165,6 +217,7 @@ for (const training of TRAININGS) {
           `Open \`${sourcePath}/\` —`,
           `[browse the folder on GitHub](${REPO_URL}/tree/${BRANCH}/${sourcePath}).`,
           ':::',
+          ...(playground ? ['', playground] : []),
         ].join('\n'),
       }),
     );

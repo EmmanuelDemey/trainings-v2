@@ -267,6 +267,20 @@ const redirects = TRAININGS.map(
 ).join('\n');
 await writeFile(join(outDir, '_redirects'), `${redirects}\n`);
 
+// --- 5. Cross-origin isolation for the online editor ------------------------
+// The editor embedded in the workshop pages (StackBlitz WebContainers) runs
+// Node.js on SharedArrayBuffer, which the browser only grants to a page that is
+// cross-origin isolated. Scoped to the trainings that have a `playground`: the
+// headers make the page refuse any cross-origin resource that does not opt in,
+// and the other pages have no reason to take that risk.
+const isolated = TRAININGS.filter((training) => training.playground).map(
+  (training) =>
+    `/${training.slug}/*\n  Cross-Origin-Opener-Policy: same-origin\n  Cross-Origin-Embedder-Policy: require-corp`,
+);
+if (isolated.length) {
+  await writeFile(join(outDir, '_headers'), `${isolated.join('\n\n')}\n`);
+}
+
 console.log('\n─────────────────────────────────────────');
 console.log(`build/            ${await directorySize(outDir)}`);
 console.log('  /               the workshops site');

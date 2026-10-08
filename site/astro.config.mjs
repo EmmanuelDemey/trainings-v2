@@ -20,6 +20,15 @@ export default defineConfig({
   // It also means a preview points its canonical at production, which is what you
   // want anyway — a preview should never be the canonical of anything.
   site: process.env.URL || process.env.DEPLOY_PRIME_URL || undefined,
+  // The same cross-origin isolation as scripts/build-all.mjs writes into
+  // build/_headers for the deploy, so that the online editor of the workshop
+  // pages also embeds under `astro dev` and `astro preview`.
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
   // The site is served from the domain root — the decks live under /slides/.
   // Set `base` only if you move it into a sub-path.
   integrations: [
@@ -49,6 +58,10 @@ export default defineConfig({
       })),
       routeMiddleware: './src/starlightRouteData.js',
       customCss: ['./src/styles/custom.css'],
+      // Adds the script of the "work online" block of the workshop pages.
+      components: {
+        MarkdownContent: './src/components/MarkdownContent.astro',
+      },
     }),
   ],
 });

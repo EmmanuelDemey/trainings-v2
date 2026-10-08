@@ -23,3 +23,5 @@ pnpm-debug.log*
 # Generated from the workshop READMEs by `npm run sync` — the source of truth is
 # training/chapters/*/tp/, never these files.
 src/content/docs/angular/
+# The workshop folders packed for the online editor, by the same script.
+public/playgrounds/

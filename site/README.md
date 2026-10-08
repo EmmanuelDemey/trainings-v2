@@ -102,6 +102,35 @@ Two things to know before relying on it:
 - the Netlify free plan caps form submissions. One class going through twelve
   workshops is over a hundred submissions.
 
+## Working online
+
+A training that declares a `playground` in `scripts/trainings.mjs` (JavaScript and
+Advanced Vue.js for now) gets a **"work online"** block at the top of each
+workshop page: a VS Code-like editor with a terminal, running in the browser on
+[StackBlitz WebContainers](https://webcontainers.io). Nothing to install on the
+learner's machine — `npm install`, `npm run dev`, `npm test` all run in the tab.
+
+- `scripts/sync-workshops.mjs` packs each workshop folder into
+  `public/playgrounds/<training>/<workshop>.json` (gitignored), through
+  `scripts/playground.mjs` at the root. The files come from the checkout, not
+  from GitHub, so a deploy preview opens the starter of its own branch.
+  `node_modules`, `dist` and binaries are left out.
+- The JavaScript starters have no `package.json`: the online copy gets one that
+  serves the folder with `serve` (`extraFiles` in `scripts/trainings.mjs`). The
+  repository is not changed.
+- `src/components/MarkdownContent.astro` (a Starlight override) holds the script.
+  Nothing is downloaded until the learner clicks: **Open the online editor
+  here** embeds it in the page, **Open it in a new tab** opens stackblitz.com.
+- The embed needs the page to be **cross-origin isolated**:
+  `scripts/build-all.mjs` writes `Cross-Origin-Opener-Policy` and
+  `Cross-Origin-Embedder-Policy` into `build/_headers` for those trainings only,
+  and `astro.config.mjs` sends the same headers under `astro dev`. Where the page
+  is not isolated (Safari, another host), only the new-tab button is shown.
+  With `require-corp`, those pages cannot load a cross-origin image or script
+  that does not opt in — keep workshop READMEs on local assets.
+- Changes live in the learner's browser tab. To keep them, they fork the project
+  on StackBlitz (free account) or copy the files back.
+
 ## The feedback form
 
 `src/components/FeedbackForm.astro`, placed by the generated `feedback.mdx` of
