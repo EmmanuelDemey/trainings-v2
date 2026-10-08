@@ -33,7 +33,7 @@ POST /movies/_doc
 
 * Here is the response to the previous request.
 
-```
+```text
 {
   "_index" : "movies",
   "_type" : "_doc",
@@ -81,7 +81,7 @@ POST /movies/_doc/myId
 GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```
 
-```
+```text
 {
   "_index" : "movies",
   "_type" : "_doc",
@@ -109,7 +109,7 @@ PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 }
 ```
 
-```
+```text
 {
   "_index" : "movies",
   "_type" : "_doc",
@@ -152,7 +152,7 @@ POST movies/_update/mQ6jknEBOjsOKzV3MVdi
 DELETE /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```
 
-```
+```text
 {
   "_index" : "movies",
   "_type" : "_doc",
@@ -187,7 +187,7 @@ DELETE /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 POST /movies/_search?q=titanic
 ```
 
-```
+```text
 {
   "took" : 1536,
   "timed_out" : false,
@@ -375,7 +375,7 @@ GET /_cluster/health
 
 # Cluster Status
 
-```
+```text
 {
   "cluster_name" : "testcluster",
   "status" : "yellow",
@@ -514,10 +514,6 @@ PUT products/_settings
 }
 ```
 
----
-src: ./chapters/aliases.md
-hide: false
----
 
 ---
 layout: cover

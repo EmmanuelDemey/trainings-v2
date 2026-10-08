@@ -219,7 +219,7 @@ POST /movies/_doc
 
 * Elasticsearch translates this structure into a new representation.
 
-```
+```text
 {
     "directors.firstName": ["Charlie", "Buster"],
     "directors.lastName": ["Chaplin", "Keaton"],

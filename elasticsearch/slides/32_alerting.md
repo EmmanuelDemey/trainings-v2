@@ -46,7 +46,7 @@ PUT _watcher/watch/log_error_watch
 
 # Trigger
 
-```
+```text
 {
     "trigger" : {
         "schedule" : {
@@ -62,7 +62,7 @@ PUT _watcher/watch/log_error_watch
 
 * Can be of type `simple`, `search`, `http`, or `chain`
 
-```
+```text
 {
   "input" : {
     "search" : {
@@ -84,7 +84,7 @@ PUT _watcher/watch/log_error_watch
 
 * Can be of type `always`, `never`, `compare`, `array_compare`, or `script`
 
-```
+```text
 {
   "condition" : {
     "compare" : { "ctx.payload.hits.total" : { "gt" : 5 }}
@@ -98,7 +98,7 @@ PUT _watcher/watch/log_error_watch
 
 * Can be of type `email`, `webhook`, `index`, `logging`, `slack`, `pagerduty`, or `jira`
 
-```
+```text
 {
   "actions" : {
     "my_webhook" : {

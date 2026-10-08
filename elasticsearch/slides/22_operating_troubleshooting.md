@@ -87,7 +87,7 @@ PUT movies/_settings
 }
 ```
 
-```
+```text
 [instance-0000000000] [movies/C2OBwoduS9SA_1EZ9ds4ow]
   took[746.5micros], took_millis[0], type[_doc], id[2], routing[],
   source[{"title":"Titanic"}]
@@ -140,7 +140,7 @@ GET /_nodes/nodeId1,nodeId2/_all
 
 # Node info API
 
-```
+```text
 {
   "_nodes": ...
   "cluster_name": "elasticsearch",
@@ -191,7 +191,7 @@ GET /_nodes/nodeId1,nodeId2/_all
 GET /_cluster/stats?human&pretty
 ```
 
-```
+```text
 {
    "_nodes" : {
       "total" : 1,

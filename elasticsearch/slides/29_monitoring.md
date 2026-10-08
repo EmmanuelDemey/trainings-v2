@@ -18,7 +18,7 @@ GET /_cluster/health/
 
 # Cluster Health APIs
 
-```
+```text
 {
   "cluster_name" : "xxx",
   "status" : "red",
@@ -108,7 +108,7 @@ GET _cluster/allocation/explain
 
 * Here is the result of the previous request
 
-```
+```text
 {
   "index": "filebeat-7.9.3-2022.01.07-000015",
   "shard": 1,
@@ -204,7 +204,7 @@ GET /_cluster/stats/nodes/<node_filter>
 
 # Node Info API
 
-```
+```text
 {
   "_nodes": ...
   "cluster_name": "elasticsearch",
@@ -510,7 +510,7 @@ PUT /my-index-000001/_settings
 
 # slowlog
 
-```
+```text
 [instance-0000000000] [movies/C2OBwoduS9SA_1EZ9ds4ow]
   took[746.5micros], took_millis[0], type[_doc], id[2], routing[],
   source[{"title":"Titanic"}]

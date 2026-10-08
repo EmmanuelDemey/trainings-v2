@@ -101,7 +101,7 @@ POST /notes/_search?size=0
 
 # AVG Aggregations
 
-```
+```text
 {
     ...
     "aggregations": {
@@ -143,7 +143,7 @@ POST /sales/_search?size=0
 
 # Date Aggregations
 
-```
+```text
 {
     ...
     "aggregations": {
@@ -194,7 +194,7 @@ POST logs/_search
 
 # Filters Aggregations
 
-```
+```text
 {
   "took": 9,
   "timed_out": false,
@@ -238,7 +238,7 @@ POST /movies/_search
 
 * Here's the returned result.
 
-```
+```text
 {
     ...
     "aggregations" : {
@@ -291,7 +291,7 @@ POST /museums/_search?size=0
 
 # Geo_distance Aggregations
 
-```
+```text
 {
     ...
     "aggregations": {
@@ -386,7 +386,7 @@ POST /sales/_search
 
 # Pipeline Aggregations
 
-```
+```text
 {
    "took": 11,
    "timed_out": false,

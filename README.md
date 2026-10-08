@@ -7,6 +7,7 @@ workshops** (plain folders, one per exercise), plus the site that publishes them
 javascript/          the JavaScript training — a training-kit project, its own Netlify site
 vuejs-advanced/      the Advanced Vue.js training — a training-kit project, its own Netlify site
 zod/                 the Zod training, half a day — a training-kit project, its own Netlify site
+elasticsearch/       the Elasticsearch training, 3 days — a training-kit project, its own Netlify site
 tanstack-query-react/     React Query, 1 day — a training-kit project, its own Netlify site
 tanstack-query-angular/   TanStack Query for Angular, 1 day — same
 tanstack-query-vue/       TanStack Query for Vue, 1 day — same
@@ -18,7 +19,7 @@ site/                the workshops site of the other trainings (Astro + Starligh
 scripts/             the build that assembles it
 ```
 
-`javascript/`, `vuejs-advanced/`, `zod/` and the three `tanstack-query-*/` trainings are
+`javascript/`, `vuejs-advanced/`, `zod/`, `elasticsearch/` and the three `tanstack-query-*/` trainings are
 built by [training-kit](https://www.npmjs.com/package/@emmanueldemey/training-kit):
 each folder is self-contained (its own `package.json`, lockfile and
 `netlify.toml`), and its README says how to write, build and deploy it. The three

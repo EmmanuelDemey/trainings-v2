@@ -93,7 +93,7 @@ GET /_cluster/health
 
 # Cluster Status
 
-```
+```text
 {
   "cluster_name" : "testcluster",
   "status" : "yellow",
