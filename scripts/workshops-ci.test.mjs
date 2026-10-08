@@ -79,3 +79,9 @@ test('a training checked by its own verify script has no npm workshops', async (
   const { workshops, verifyScript } = await workshopChecks(dir);
   assert.deepEqual({ workshops, verifyScript }, { workshops: [], verifyScript: true });
 });
+
+test('a training without solutions has no workshops to check', async () => {
+  const dir = await training({ 'workshops/01_indexing/README.md': '# Indexing\n' });
+
+  assert.deepEqual((await workshopChecks(dir)).workshops, []);
+});

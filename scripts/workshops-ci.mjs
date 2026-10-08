@@ -40,8 +40,10 @@ export async function workshopChecks(dir) {
   const config = existsSync(configFile) ? (await import(pathToFileURL(configFile))).default : {};
   const { setup, build, quietTest, learnerWritesTests, skip, verifyScript } = { ...DEFAULTS, ...config };
 
-  const workshops = (await readdir(join(dir, 'solutions'), { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory() && existsSync(join(dir, 'solutions', entry.name, 'package.json')))
+  // A training without solutions (guided workshops, nothing to run) has nothing to check.
+  const solutions = join(dir, 'solutions');
+  const workshops = (existsSync(solutions) ? await readdir(solutions, { withFileTypes: true }) : [])
+    .filter((entry) => entry.isDirectory() && existsSync(join(solutions, entry.name, 'package.json')))
     .map((entry) => entry.name)
     .filter((name) => !skip.includes(name))
     .sort()
