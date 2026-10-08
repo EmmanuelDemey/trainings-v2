@@ -101,6 +101,6 @@ line. Steps marked *(Bonus)* and the "Going further" section are deliberately
 
 **`06_testing/` is the workshop where YOU write the tests**: it has no shared
 spec, and its starter ships `it.todo`s — green from the start. That is also why
-the CI (`.github/workflows/tanstack-query-vue-workshops.yml`, at the root of the
+the CI (`.github/workflows/workshops.yml`, at the root of the
 repository) checks it the other way round: the solution's tests pass, and the
 starter stays green.

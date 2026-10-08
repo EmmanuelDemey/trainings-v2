@@ -98,4 +98,4 @@ deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 Each workshop is its own npm project. The CI syncs the shared files, installs
 each workshop, and checks that the solution passes its spec and that the starter
 does not:
-[`tanstack-query-react-workshops.yml`](../.github/workflows/tanstack-query-react-workshops.yml).
+[`workshops.yml`](../.github/workflows/workshops.yml), configured by [`workshops.ci.mjs`](workshops.ci.mjs).

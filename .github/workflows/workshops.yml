@@ -1,0 +1,177 @@
+name: Workshops
+
+# The workshops of ONE training still teach what they claim to, called by
+# training.yml before it deploys that training: the solution of each workshop
+# passes its given specs and typechecks, and the starter typechecks but must NOT
+# pass them — a starter that does means an answer leaked into it.
+#
+# Nothing to configure here: scripts/workshops-ci.mjs lists the workshops (every
+# folder of solutions/ holding a package.json) and reads what differs in the
+# training's optional workshops.ci.mjs — a setup command, a build, the workshops
+# where the learner writes the tests (their starter must be GREEN), those to skip,
+# or a training checked by its own `verify` script.
+
+on:
+  workflow_call:
+    inputs:
+      training:
+        description: The training folder, e.g. tanstack-query-react
+        required: true
+        type: string
+
+jobs:
+  plan:
+    name: Workshops to check
+    runs-on: ubuntu-latest
+    outputs:
+      workshops: ${{ steps.plan.outputs.workshops }}
+      setup: ${{ steps.plan.outputs.setup }}
+      build: ${{ steps.plan.outputs.build }}
+      quiet-test: ${{ steps.plan.outputs.quietTest }}
+      verify-script: ${{ steps.plan.outputs.verifyScript }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - id: plan
+        env:
+          TRAINING: ${{ inputs.training }}
+        run: |
+          node scripts/workshops-ci.mjs "$TRAINING" > "$RUNNER_TEMP/plan.json"
+          cat "$RUNNER_TEMP/plan.json"
+          node -e "
+            const plan = require(process.env.RUNNER_TEMP + '/plan.json');
+            for (const [key, value] of Object.entries(plan))
+              console.log(key + '=' + (typeof value === 'string' ? value : JSON.stringify(value)));
+          " >> "$GITHUB_OUTPUT"
+
+  # Each workshop is a standalone npm project, so there is one job per workshop
+  # rather than one install for the lot.
+  workshop:
+    name: ${{ matrix.workshop.name }}
+    needs: plan
+    if: needs.plan.outputs.workshops != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      # One broken workshop must not hide the state of the others.
+      fail-fast: false
+      matrix:
+        workshop: ${{ fromJSON(needs.plan.outputs.workshops) }}
+
+    env:
+      SOLUTION: ${{ inputs.training }}/solutions/${{ matrix.workshop.name }}
+      STARTER: ${{ inputs.training }}/workshops/${{ matrix.workshop.name }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ${{ inputs.training }}/workshops/${{ matrix.workshop.name }}/.nvmrc
+
+      # E.g. the sync of the files the TanStack Query trainings share, which are
+      # gitignored copies in every workshop.
+      - name: Setup
+        if: needs.plan.outputs.setup != ''
+        working-directory: ${{ inputs.training }}
+        env:
+          SETUP: ${{ needs.plan.outputs.setup }}
+        run: eval "$SETUP"
+
+      - name: Install the solution
+        run: npm ci
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: The solution passes its specs
+        run: npm test
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: The solution typechecks
+        run: npm run typecheck
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: The solution builds
+        if: needs.plan.outputs.build == 'true'
+        run: npm run build
+        working-directory: ${{ env.SOLUTION }}
+
+      - name: Install the starter
+        run: npm ci
+        working-directory: ${{ env.STARTER }}
+
+      # The specs are part of the typecheck program, so this also proves they
+      # only reference what the starter already exposes. A spec that fails to
+      # COMPILE would be a broken exercise, not a red test.
+      - name: The starter still typechecks
+        run: npm run typecheck
+        working-directory: ${{ env.STARTER }}
+
+      # The quiet-test argument drops the `github-actions` reporter Vitest adds
+      # on its own under CI: every red spec here is expected, and would otherwise
+      # surface as an error annotation on a green run.
+      - name: The starter must still be unsolved
+        if: matrix.workshop.starter == 'red'
+        working-directory: ${{ env.STARTER }}
+        env:
+          QUIET_TEST: ${{ needs.plan.outputs.quiet-test }}
+        run: |
+          if npm test -- "$QUIET_TEST"; then
+            echo "::error::The starter passes the given specs — an answer leaked into $STARTER"
+            exit 1
+          fi
+          echo "Starter fails as expected."
+
+      # The learner writes the tests of this workshop: its starter ships todos,
+      # and a learner never starts from a red suite.
+      - name: The starter is green — nothing but todos
+        if: matrix.workshop.starter == 'green'
+        run: npm test
+        working-directory: ${{ env.STARTER }}
+
+  # A training whose workshops are not npm projects checks them all at once
+  # with its own `verify` script.
+  verify:
+    name: Workshops verify script
+    needs: plan
+    if: needs.plan.outputs.verify-script == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.training }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          # The version comes from the `packageManager` field of the training's
+          # package.json, so pnpm is pinned in exactly one place.
+          package_json_file: ${{ inputs.training }}/package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ${{ inputs.training }}/.nvmrc
+          cache: pnpm
+          cache-dependency-path: ${{ inputs.training }}/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify the workshop solutions
+        run: pnpm run verify
+
+      - name: The starters must still be unsolved
+        env:
+          TRAINING: ${{ inputs.training }}
+        run: |
+          if pnpm run verify --dir workshops; then
+            echo "::error::The starters pass the solution suite — an answer leaked into $TRAINING/workshops/"
+            exit 1
+          fi
+          echo "Starters fail as expected."

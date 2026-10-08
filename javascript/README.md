@@ -66,4 +66,4 @@ pnpm run verify                         # the solutions must pass
 pnpm run verify --dir workshops         # the starters must not
 ```
 
-The CI runs both: [`javascript-workshops.yml`](../.github/workflows/javascript-workshops.yml).
+The CI runs both: [`workshops.yml`](../.github/workflows/workshops.yml), configured by [`workshops.ci.mjs`](workshops.ci.mjs).

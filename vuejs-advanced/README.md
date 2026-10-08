@@ -60,4 +60,4 @@ reading are in [`RESSOURCES.md`](RESSOURCES.md).
 
 Each workshop is its own npm project. The CI installs each one, checks that the
 solution passes its specs and that the starter does not:
-[`vuejs-advanced-workshops.yml`](../.github/workflows/vuejs-advanced-workshops.yml).
+[`workshops.yml`](../.github/workflows/workshops.yml), configured by [`workshops.ci.mjs`](workshops.ci.mjs).

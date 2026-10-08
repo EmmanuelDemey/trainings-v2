@@ -100,7 +100,7 @@ further" section are deliberately **outside** the DoD.
 
 **`06_testing/` is the workshop where you write the tests**, so its starter is
 green from the start: a list of `it.todo`s, and no shared spec. That is also why
-the CI checks it differently (`.github/workflows/tanstack-query-angular-workshops.yml`).
+the CI checks it differently (`.github/workflows/workshops.yml`).
 
 The worked answer to every workshop lives in `../solutions/`, one runnable folder
 per workshop. Do not hand it out before the exercise.

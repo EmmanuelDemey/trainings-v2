@@ -1,0 +1,76 @@
+name: Training
+
+# Checks then deploys ONE training, called by deploy-trainings.yml once per
+# training to deploy: the deploy waits for the training's workshops to be green,
+# and a broken training holds back its own deploy only.
+
+on:
+  workflow_call:
+    inputs:
+      dir:
+        description: The training folder, e.g. tanstack-query-react
+        required: true
+        type: string
+      slug:
+        description: The `slug` of its training.config.mjs
+        required: true
+        type: string
+    secrets:
+      NETLIFY_AUTH_TOKEN:
+        required: false
+
+jobs:
+  workshops:
+    name: Workshops
+    uses: ./.github/workflows/workshops.yml
+    with:
+      training: ${{ inputs.dir }}
+
+  deploy:
+    name: Deploy
+    needs: workshops
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.dir }}
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      SITE: ${{ vars.NETLIFY_SITE_PREFIX }}${{ inputs.slug }}
+      # The PDF exports print with the Chrome the runner ships, rather than
+      # downloading a Chromium on every run.
+      TRAINING_KIT_CHROME: /usr/bin/google-chrome
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: ${{ inputs.dir }}/package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ${{ inputs.dir }}/.nvmrc
+          cache: pnpm
+          cache-dependency-path: ${{ inputs.dir }}/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      # A PR from a fork gets no secrets: the build above still proves it builds.
+      - name: Deploy
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        env:
+          TEAM: ${{ vars.NETLIFY_TEAM }}
+          PROD: ${{ github.event_name != 'pull_request' }}
+          ALIAS: pr-${{ github.event.pull_request.number }}
+        run: |
+          args=(--dir build --no-build --site-name "$SITE" --json --message "$GITHUB_SHA")
+          if [ -n "$TEAM" ]; then args+=(--team "$TEAM"); fi
+          if [ "$PROD" = true ]; then args+=(--prod); else args+=(--alias "$ALIAS"); fi
+
+          npx --yes netlify-cli@27.11.2 deploy "${args[@]}" > "$RUNNER_TEMP/deploy.json"
+          url=$(node -p "const d = require(process.env.RUNNER_TEMP + '/deploy.json'); process.env.PROD === 'true' ? d.url : d.deploy_url")
+          echo "### ${{ inputs.slug }}: $url" >> "$GITHUB_STEP_SUMMARY"

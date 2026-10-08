@@ -20,6 +20,9 @@ name: Deploy the trainings
 # repository in the Netlify UI, or each push would deploy twice. The headers of
 # each training's netlify.toml still apply: the CLI reads it from the folder it
 # deploys from.
+#
+# Before its deploy, the workshops of each training are checked (workshops.yml):
+# a training whose workshops are red is not deployed.
 
 on:
   push:
@@ -60,57 +63,20 @@ jobs:
           echo "trainings=$trainings" >> "$GITHUB_OUTPUT"
           echo "Trainings to deploy: $trainings"
 
-  deploy:
+  # Per training: its workshops are checked, then it is deployed — see
+  # training.yml.
+  training:
     name: ${{ matrix.training.slug }}
     needs: detect
     if: needs.detect.outputs.trainings != '[]'
-    runs-on: ubuntu-latest
     strategy:
       # One broken training must not hold back the deploy of the others.
       fail-fast: false
       matrix:
         training: ${{ fromJSON(needs.detect.outputs.trainings) }}
-    defaults:
-      run:
-        working-directory: ${{ matrix.training.dir }}
-    env:
+    uses: ./.github/workflows/training.yml
+    with:
+      dir: ${{ matrix.training.dir }}
+      slug: ${{ matrix.training.slug }}
+    secrets:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      SITE: ${{ vars.NETLIFY_SITE_PREFIX }}${{ matrix.training.slug }}
-      # The PDF exports print with the Chrome the runner ships, rather than
-      # downloading a Chromium on every run.
-      TRAINING_KIT_CHROME: /usr/bin/google-chrome
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: pnpm/action-setup@v6
-        with:
-          package_json_file: ${{ matrix.training.dir }}/package.json
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: ${{ matrix.training.dir }}/.nvmrc
-          cache: pnpm
-          cache-dependency-path: ${{ matrix.training.dir }}/pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm run build
-
-      # A PR from a fork gets no secrets: the build above still proves it builds.
-      - name: Deploy
-        if: env.NETLIFY_AUTH_TOKEN != ''
-        env:
-          TEAM: ${{ vars.NETLIFY_TEAM }}
-          PROD: ${{ github.event_name != 'pull_request' }}
-          ALIAS: pr-${{ github.event.pull_request.number }}
-        run: |
-          args=(--dir build --no-build --site-name "$SITE" --json --message "$GITHUB_SHA")
-          if [ -n "$TEAM" ]; then args+=(--team "$TEAM"); fi
-          if [ "$PROD" = true ]; then args+=(--prod); else args+=(--alias "$ALIAS"); fi
-
-          npx --yes netlify-cli@27.11.2 deploy "${args[@]}" > "$RUNNER_TEMP/deploy.json"
-          url=$(node -p "const d = require(process.env.RUNNER_TEMP + '/deploy.json'); process.env.PROD === 'true' ? d.url : d.deploy_url")
-          echo "### ${{ matrix.training.slug }}: $url" >> "$GITHUB_STEP_SUMMARY"
