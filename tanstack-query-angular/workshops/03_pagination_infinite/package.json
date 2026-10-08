@@ -1,0 +1,36 @@
+{
+  "name": "tp-03-pagination-infinite",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  },
+  "scripts": {
+    "dev": "ng serve",
+    "build": "ng build",
+    "typecheck": "ngc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
+    "test": "ng test --watch=false",
+    "test:watch": "ng test"
+  },
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@tanstack/angular-query-experimental": "5.104.1",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.2",
+    "@angular/cli": "^22.2.2",
+    "@angular/compiler-cli": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@testing-library/angular": "^19.5.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/user-event": "^14.6.7",
+    "jsdom": "^30.1.2",
+    "typescript": "~6.0.2",
+    "vitest": "^5.0.3"
+  }
+}

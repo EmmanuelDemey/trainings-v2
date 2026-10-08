@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": []
+  },
+  "include": ["src/**/*.ts"],
+  // The specs and their helpers are compiled by tsconfig.spec.json.
+  "exclude": ["src/**/*.spec.ts", "src/tests/**"]
+}

@@ -1,0 +1,66 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #42b883;
+  --danger: #dc2626;
+
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1b1f;
+    --fg: #f3f4f6;
+    --muted: #9ca3af;
+    --border: #2f2f35;
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* The Network panel is fixed to the bottom of the page and pads the body: the
+   app only has to stay narrow enough to read above it. */
+body { margin: 0; background: var(--bg); color: var(--fg); }
+#app { max-width: 960px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+
+h1 { font-size: 1.4rem; margin: 0; }
+h2 { font-size: 1.1rem; margin: 0 0 0.75rem; }
+
+button, input {
+  font: inherit;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+}
+button { cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+section { border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+
+.row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.spread { justify-content: space-between; }
+.muted { color: var(--muted); font-size: 0.9em; }
+.error { color: var(--danger); }
+.badge { padding: 0.15rem 0.7rem; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; }
+
+.issues { list-style: none; padding: 0; margin: 0.75rem 0 0; }
+.issues li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.closed { text-decoration: line-through; color: var(--muted); }
+[aria-pressed='true'] { border-color: var(--accent); font-weight: 600; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.25rem; align-items: start; }
+@media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+.selected { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+h3 { font-size: 1rem; margin: 0 0 0.25rem; }
+td { padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--border); }
+.dimmed { opacity: 0.5; transition: opacity 0.15s; }
+.feed { list-style: none; padding: 0; margin: 0 0 0.75rem; }
+.feed li { padding: 0.25rem 0; border-bottom: 1px solid var(--border); }
+.feed time { display: block; }

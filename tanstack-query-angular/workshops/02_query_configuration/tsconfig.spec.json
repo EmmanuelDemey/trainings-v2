@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // `describe`, `it`, `expect`, `vi` as globals — the specs also import them
+    // from 'vitest', which works too.
+    "types": ["vitest/globals"]
+  },
+  // `ng test` picks up every `src/**/*.spec.ts`: the shared spec in
+  // src/tests/shared/, and your own.
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts", "src/tests/**/*.ts"]
+}
