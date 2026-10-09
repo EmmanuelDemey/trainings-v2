@@ -134,7 +134,7 @@ bq.add(new TermQuery(new Term("id", id), BooleanClause.Occur.MUST_NOT);
     * GCP, AWS, Clevercloud Marketplace, etc.
 
 ```shell
-docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:9.2.0
+docker run -p 9200:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:9.5.5
 ```
 
 ---
@@ -177,11 +177,13 @@ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elas
 
 # Configuration
 
-* To verify that your Elasticsearch cluster is functional
+* To verify that your Elasticsearch cluster is functional, from Kibana Dev Tools
 
 ```shell
-GET http://localhost:9200/
+GET /
 ```
+
+* or from a terminal: `curl -u elastic https://localhost:9200/` (security is on by default since 8.0)
 
 ---
 
@@ -191,19 +193,19 @@ GET http://localhost:9200/
 
 ```json
 {
-  "name": "Emmanuel",
+  "name": "node-1",
   "cluster_name": "elasticsearch",
-  "cluster_uuid": "p4rcLtCjQW6s3FRyT3lo1A",
+  "cluster_uuid": "cC-bQZPGQi-D7XAOR-7zvg",
   "version": {
-    "number": "8.12.0",
+    "number": "9.5.5",
     "build_flavor": "default",
     "build_type": "tar",
-    "build_hash": "801fed82df74dbe537f89b71b098ccaff88d2c56",
-    "build_date": "2022-07-23T19:30:09.227964828Z",
+    "build_hash": "48acba663b09e70b115dd879329141506c377890",
+    "build_date": "2026-09-30T22:12:03.984586187Z",
     "build_snapshot": false,
-    "lucene_version": "9.2.0",
-    "minimum_wire_compatibility_version": "7.17.0",
-    "minimum_index_compatibility_version": "7.0.0"
+    "lucene_version": "10.5.1",
+    "minimum_wire_compatibility_version": "8.19.0",
+    "minimum_index_compatibility_version": "8.0.0"
   },
   "tagline": "You Know, for Search"
 }

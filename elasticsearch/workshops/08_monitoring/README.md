@@ -30,10 +30,17 @@ PUT /health-test
 GET /_cluster/health
 ```
 
+Le statut du cluster est le **pire** statut de ses index. Les compteurs (`active_shards`…) incluent aussi les index système (`.security`, `.kibana`…) : leur nombre varie d'un cluster à l'autre.
+
+Concentrez-vous sur l'index du TP:
+
+```bash
+GET /_cluster/health/health-test
+```
+
 **Résultat attendu (cluster à 1 nœud)**:
 ```json
 {
-  "cluster_name": "elasticsearch",
   "status": "yellow",
   "number_of_nodes": 1,
   "number_of_data_nodes": 1,
@@ -46,7 +53,7 @@ GET /_cluster/health
 
 **Interprétation**:
 - `status: "yellow"`: Au moins un replica shard non alloué
-- `unassigned_shards: 2`: Replicas ne peuvent pas être alloués sur 1 nœud
+- `unassigned_shards: 2`: Replicas ne peuvent pas être alloués sur 1 nœud (un replica n'est jamais sur le même nœud que son primaire)
 
 ### Étape 2: Obtenir des détails par index
 
@@ -64,9 +71,9 @@ GET /_cat/shards/health-test?v&h=index,shard,prirep,state,unassigned.reason
 ```
 index       shard prirep state      unassigned.reason
 health-test 0     p      STARTED
-health-test 0     r      UNASSIGNED NODE_LEFT
+health-test 0     r      UNASSIGNED INDEX_CREATED
 health-test 1     p      STARTED
-health-test 1     r      UNASSIGNED NODE_LEFT
+health-test 1     r      UNASSIGNED INDEX_CREATED
 ```
 
 ### Étape 4: Comprendre les couleurs de statut
@@ -91,8 +98,9 @@ GET /_cluster/allocation/explain
 ### Étape 6: Utiliser les paramètres de l'API
 
 ```bash
-# Attendre le statut green (timeout 30s)
-GET /_cluster/health?wait_for_status=green&timeout=30s
+# Attendre au moins le statut yellow (timeout 30s). Avec wait_for_status=green,
+# un cluster à 1 nœud répond 408 au bout de 30s: ses replicas ne seront jamais alloués.
+GET /_cluster/health?wait_for_status=yellow&timeout=30s
 
 # Filtrer un index spécifique
 GET /_cluster/health/health-test
@@ -196,8 +204,7 @@ PUT /slowlog-test/_settings
   "index.search.slowlog.threshold.query.warn": "500ms",
   "index.search.slowlog.threshold.query.info": "250ms",
   "index.search.slowlog.threshold.query.debug": "100ms",
-  "index.search.slowlog.threshold.query.trace": "50ms",
-  "index.search.slowlog.level": "info"
+  "index.search.slowlog.threshold.query.trace": "50ms"
 }
 ```
 
@@ -209,10 +216,14 @@ PUT /slowlog-test/_settings
 
 ### Étape 2: Localiser les fichiers de slow logs
 
+Les slow logs sont écrits au format JSON (ECS):
+
 ```
-/var/log/elasticsearch/<cluster_name>_index_search_slowlog.log
-/var/log/elasticsearch/<cluster_name>_index_indexing_slowlog.log
+/var/log/elasticsearch/<cluster_name>_index_search_slowlog.json
+/var/log/elasticsearch/<cluster_name>_index_indexing_slowlog.json
 ```
+
+Avec l'image Docker, tous les logs partent sur la sortie standard: `docker logs <conteneur> | grep slowlog`.
 
 ### Étape 3: Exécuter une requête lente
 

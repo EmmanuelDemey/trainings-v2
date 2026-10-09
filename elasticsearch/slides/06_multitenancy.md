@@ -25,13 +25,13 @@ Aliases, multi-index, cross-index queries, and data streams
 * This is useful for cross-tenant or cross-application searches.
 
 ```json
-POST /logs-app-a,logs-app-b/_search
+POST /logs-app_a,logs-app_b/_search
 {
   "query": { "match_all": {} }
 }
 ```
 
-* Wildcard patterns are also supported:
+* Wildcard patterns are also supported (`logs-*` matches `logs-app_a`, `logs-2025.01`…):
 
 ```json
 POST /logs-*/_search
@@ -55,7 +55,7 @@ POST /logs-*/_search
 POST /_aliases
 {
   "actions": [
-    { "add": { "index": "logs-2025-01", "alias": "logs-current" } }
+    { "add": { "index": "logs-2025.01", "alias": "logs-current" } }
   ]
 }
 ```
@@ -79,7 +79,7 @@ POST /logs-current/_search
 POST /_aliases
 {
   "actions": [
-    { "add": { "index": "logs-2025-02", "alias": "logs-current" } }
+    { "add": { "index": "logs-2025.02", "alias": "logs-current" } }
   ]
 }
 ```
@@ -90,7 +90,7 @@ POST /_aliases
 POST /_aliases
 {
   "actions": [
-    { "remove": { "index": "logs-2025-01", "alias": "logs-current" } }
+    { "remove": { "index": "logs-2025.01", "alias": "logs-current" } }
   ]
 }
 ```
@@ -101,8 +101,8 @@ POST /_aliases
 POST /_aliases
 {
   "actions": [
-    { "remove": { "index": "logs-2025-01", "alias": "logs-current" } },
-    { "add": { "index": "logs-2025-02", "alias": "logs-current" } }
+    { "remove": { "index": "logs-2025.01", "alias": "logs-current" } },
+    { "add": { "index": "logs-2025.02", "alias": "logs-current" } }
   ]
 }
 ```
@@ -120,7 +120,7 @@ POST /_aliases
   "actions": [
     {
       "add": {
-        "index": "logs",
+        "index": "logs-shared",
         "alias": "logs-tenant-a",
         "filter": {
           "term": { "tenant": "A" }
@@ -129,7 +129,7 @@ POST /_aliases
     },
     {
       "add": {
-        "index": "logs",
+        "index": "logs-shared",
         "alias": "logs-tenant-b",
         "filter": {
           "term": { "tenant": "B" }
@@ -153,9 +153,9 @@ POST /_aliases
 POST /_aliases
 {
   "actions": [
-    { "add": { "index": "logs-2025-01", "alias": "logs-all" } },
-    { "add": { "index": "logs-2025-02", "alias": "logs-all" } },
-    { "add": { "index": "logs-2025-03", "alias": "logs-all" } }
+    { "add": { "index": "logs-2025.01", "alias": "logs-all" } },
+    { "add": { "index": "logs-2025.02", "alias": "logs-all" } },
+    { "add": { "index": "logs-2025.03", "alias": "logs-all" } }
   ]
 }
 ```
@@ -172,13 +172,13 @@ POST /_aliases
 POST /_aliases
 {
   "actions": [
-    { "add": { "index": "logs-2025-01", "alias": "logs", "is_write_index": false } },
-    { "add": { "index": "logs-2025-02", "alias": "logs", "is_write_index": true } }
+    { "add": { "index": "logs-2025.01", "alias": "logs", "is_write_index": false } },
+    { "add": { "index": "logs-2025.02", "alias": "logs", "is_write_index": true } }
   ]
 }
 ```
 
-* Indexing via `POST /logs/_doc` writes to `logs-2025-02`.
+* Indexing via `POST /logs/_doc` writes to `logs-2025.02`.
 * Searching via `POST /logs/_search` queries both indices.
 
 ---
@@ -186,12 +186,12 @@ POST /_aliases
 # Cross-Index Queries
 
 * Beyond multi-index search, Elasticsearch supports:
-    * **Index patterns**: `logs-*`, `metrics-2025-*`
-    * **Exclude patterns**: `logs-*,-logs-debug-*`
+    * **Index patterns**: `logs-*`, `metrics-2025.*`
+    * **Exclude patterns**: `logs-*,-logs-debug*`
     * **All indices**: `_all` or `*`
 
 ```json
-POST /logs-*,-logs-debug-*/_search
+POST /logs-*,-logs-debug*/_search
 {
   "query": {
     "match": { "level": "ERROR" }
@@ -200,6 +200,7 @@ POST /logs-*,-logs-debug-*/_search
 ```
 
 * **Performance tip**: Be specific with patterns to avoid querying too many shards.
+* **Naming tip**: `logs-*-*`, `metrics-*-*` and `traces-*-*` are reserved by built-in data stream templates (Elastic Agent): a plain index such as `logs-2025-01` is refused there.
 
 ---
 
@@ -210,10 +211,11 @@ POST /logs-*,-logs-debug-*/_search
 * Documents must have a `@timestamp` field.
 
 ```json
-PUT /_index_template/logs-template
+PUT /_index_template/app-logs-template
 {
-  "index_patterns": ["logs-*"],
+  "index_patterns": ["app-logs*"],
   "data_stream": {},
+  "priority": 500,
   "template": {
     "settings": {
       "number_of_shards": 1,
@@ -236,7 +238,7 @@ PUT /_index_template/logs-template
 * **Index documents** (append-only):
 
 ```json
-POST /logs-app/_doc
+POST /app-logs/_doc
 {
   "@timestamp": "2025-01-15T10:00:00",
   "message": "Application started",
@@ -247,7 +249,7 @@ POST /logs-app/_doc
 * **Search** (transparently queries all backing indices):
 
 ```json
-POST /logs-app/_search
+POST /app-logs/_search
 {
   "query": {
     "range": {

@@ -52,5 +52,30 @@ A Netlify site of its own, built and deployed by
 a preview. Nothing to set up in the Netlify UI — the site is created on its first
 deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 
-With no `solutions/`, the CI has no workshop to check
-([`workshops-ci.mjs`](../scripts/workshops-ci.mjs)) and goes straight to the deploy.
+## Tested against Elasticsearch
+
+Before each deploy, the CI replays **every request** of the workshops and of the
+slides against a real Elasticsearch — the one of [`ci/Dockerfile`](ci/Dockerfile),
+the only place its version is written
+([`check-console.mjs`](../scripts/check-console.mjs)). A request that fails, or a
+response that does not hold the workshop's « Résultat attendu » JSON, holds back
+the deploy.
+
+```bash
+docker build -t training-es ci && docker run -d --rm --name training-es -p 9200:9200 training-es
+ES_PASSWORD=training node ../scripts/check-console.mjs .            # everything
+ES_PASSWORD=training node ../scripts/check-console.mjs . 07_ilm     # one file
+```
+
+- A comment before a block tunes its check: `<!-- ci: skip -->` (several nodes, a
+  restart, a placeholder…), `<!-- ci: expect-error -->`, `<!-- ci: retry -->`
+  (what settles in the background), `<!-- ci: no-compare -->`, and
+  `<!-- ci: skip-start -->` … `<!-- ci: skip-end -->`.
+- A chapter whose examples need data has a fixture,
+  `ci/fixtures/<chapter without its number>.md`, replayed before it.
+- Each file runs on its own, on a wiped cluster.
+
+Staying on the latest release: Dependabot ([`dependabot.yml`](../.github/dependabot.yml))
+opens a pull request for each new Elasticsearch image, whose CI replays everything
+on it; and every Monday, [`elasticsearch-latest.yml`](../.github/workflows/elasticsearch-latest.yml)
+replays everything on the latest release, whatever the pin.

@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # The Elasticsearch the workshops of the elasticsearch training are replayed
+  # against (elasticsearch/ci/Dockerfile): a pull request for each new release,
+  # whose CI replays every workshop on it — see scripts/check-console.mjs.
+  - package-ecosystem: docker
+    directory: /elasticsearch/ci
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci

@@ -194,7 +194,7 @@ GET /_analyze
 * You can define custom analyzers in index settings.
 
 ```
-PUT /movies
+PUT /articles
 {
   "settings": {
     "analysis": {
@@ -221,24 +221,15 @@ PUT /movies
 
 # Using Custom Analyzer
 
-* Apply your custom analyzer to a field in the mapping.
+* Apply your custom analyzer to a field in the mapping of the **same index**.
 
 ```
-PUT /movies
+PUT /articles/_mapping
 {
-  "settings": {
-    "analysis": {
-      "analyzer": {
-        "my_custom_analyzer": { ... }
-      }
-    }
-  },
-  "mappings": {
-    "properties": {
-      "description": {
-        "type": "text",
-        "analyzer": "my_custom_analyzer"
-      }
+  "properties": {
+    "description": {
+      "type": "text",
+      "analyzer": "my_custom_analyzer"
     }
   }
 }
@@ -252,8 +243,19 @@ PUT /movies
 * Useful for autocomplete with `edge_ngram`.
 
 ```
-PUT /movies
+PUT /movies_autocomplete
 {
+  "settings": {
+    "analysis": {
+      "filter": {
+        "prefixes": { "type": "edge_ngram", "min_gram": 2, "max_gram": 10 }
+      },
+      "analyzer": {
+        "autocomplete_index": { "tokenizer": "standard", "filter": ["lowercase", "prefixes"] },
+        "autocomplete_search": { "tokenizer": "standard", "filter": ["lowercase"] }
+      }
+    }
+  },
   "mappings": {
     "properties": {
       "title": {
@@ -341,8 +343,7 @@ PUT /products
             "analyzer": "standard"
           },
           "suggest": {
-            "type": "text",
-            "analyzer": "autocomplete"
+            "type": "search_as_you_type"
           }
         }
       }

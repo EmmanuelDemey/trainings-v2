@@ -13,7 +13,11 @@ Les exercices pratiques de la formation **Elasticsearch**. Chaque TP est
   7, 9 et 11) et aux appels `curl`.
 
 Un seul nœud suffit pour la plupart des TP (statut `yellow` accepté) ; le TP 4
-en monte plusieurs.
+en monte plusieurs. Le TP 13 demande une licence **trial** (modèles de machine
+learning) et un accès Internet pour télécharger les modèles.
+
+Tous les TP sont rejoués par la CI sur la dernière version d'Elasticsearch
+(9.5.5) : les requêtes passent, et les réponses ont la forme annoncée.
 
 ## Les TP
 
@@ -30,3 +34,6 @@ en monte plusieurs.
 | 9 | `09_snapshots/` | Repositories, snapshots et restaurations |
 | 10 | `10_alerting_rbac/` | Kibana Rules, webhooks, utilisateurs et rôles |
 | 11 | `11_production_architecture/` | Allocation awareness, SLM, Field-Level Security |
+| 12 | `12_esql/` | ES\|QL: filtrer, agréger, `LOOKUP JOIN`, plein texte |
+| 13 | `13_vector_search/` | `dense_vector`, kNN, recherche hybride (RRF), `semantic_text`, reranking |
+| 14 | `14_data_streams/` | LogsDB, data stream lifecycle, failure store, TSDS |

@@ -19,6 +19,9 @@
 //   verifyScript        the training checks all its workshops at once with its
 //                       own `pnpm run verify` (solutions) and
 //                       `pnpm run verify --dir workshops` (starters)
+//   elasticsearch       guided workshops, run in Kibana Dev Tools: the folder of the
+//                       Dockerfile of the Elasticsearch their README requests are
+//                       replayed against (scripts/check-console.mjs)
 
 import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
@@ -32,13 +35,14 @@ const DEFAULTS = {
   learnerWritesTests: [],
   skip: [],
   verifyScript: false,
+  elasticsearch: '',
 };
 
 /** The checks of the training in `dir`. */
 export async function workshopChecks(dir) {
   const configFile = join(dir, 'workshops.ci.mjs');
   const config = existsSync(configFile) ? (await import(pathToFileURL(configFile))).default : {};
-  const { setup, build, quietTest, learnerWritesTests, skip, verifyScript } = { ...DEFAULTS, ...config };
+  const { setup, build, quietTest, learnerWritesTests, skip, verifyScript, elasticsearch } = { ...DEFAULTS, ...config };
 
   // A training without solutions (guided workshops, nothing to run) has nothing to check.
   const solutions = join(dir, 'solutions');
@@ -49,7 +53,7 @@ export async function workshopChecks(dir) {
     .sort()
     .map((name) => ({ name, starter: learnerWritesTests.includes(name) ? 'green' : 'red' }));
 
-  return { workshops, setup, build, quietTest, verifyScript };
+  return { workshops, setup, build, quietTest, verifyScript, elasticsearch };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

@@ -71,6 +71,7 @@ ip           heap.percent ram.percent cpu load_1m node.role master name
 
 ### Étape 5: Vérifier le statut du cluster
 
+<!-- ci: no-compare -->
 ```bash
 GET /_cluster/health
 ```

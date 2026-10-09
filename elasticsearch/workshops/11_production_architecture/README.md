@@ -45,6 +45,10 @@ node-az2  zone  az2
 node-az3  zone  az3
 ```
 
+<!-- ci: skip-start -->
+
+Les étapes 2 à 6 demandent un cluster dont les nœuds portent l'attribut `zone`. Sur un nœud qui ne l'a pas, la forced awareness empêche d'allouer le moindre shard: le cluster passe au rouge.
+
 ### Étape 2: Activer la shard allocation awareness
 
 ```bash
@@ -136,6 +140,22 @@ PUT /_cluster/settings
 }
 ```
 
+<!-- ci: skip-end -->
+
+### Étape 7: Désactiver l'awareness avant la suite
+
+Les parties suivantes n'ont pas besoin de zones. Retirez les réglages de la partie A, sans quoi un cluster sans attribut `zone` ne pourrait plus allouer les nouveaux index:
+
+```bash
+PUT /_cluster/settings
+{
+  "persistent": {
+    "cluster.routing.allocation.awareness.attributes": null,
+    "cluster.routing.allocation.awareness.force.zone.values": null
+  }
+}
+```
+
 ## Partie B: Snapshot Lifecycle Management (SLM)
 
 ### Objectif
@@ -144,8 +164,9 @@ Automatiser la création et le nettoyage de snapshots avec des politiques SLM, i
 
 ### Setup de cette partie
 
-Vérifiez qu'un repository existe:
+Vérifiez qu'un repository existe (créé au TP 9):
 
+<!-- ci: skip -->
 ```bash
 GET /_snapshot/my_backup
 ```
@@ -170,7 +191,7 @@ PUT /orders-2024-01
 PUT /orders-2024-02
 PUT /payments-2024-01
 PUT /analytics-2024-q1
-PUT /logs-2024-01-15
+PUT /logs-2024.01.15
 
 POST /orders-2024-01/_bulk
 {"index":{"_id":"1"}}
@@ -181,7 +202,7 @@ POST /orders-2024-01/_bulk
 POST /analytics-2024-q1/_doc
 {"metric":"revenue","value":50000,"period":"Q1"}
 
-POST /logs-2024-01-15/_bulk
+POST /logs-2024.01.15/_bulk
 {"index":{}}
 {"timestamp":"2024-01-15T10:00:00Z","level":"INFO","message":"Application started"}
 {"index":{}}
@@ -201,7 +222,6 @@ PUT /_slm/policy/daily-critical-backup
     "ignore_unavailable": false,
     "include_global_state": false,
     "metadata": {
-      "policy": "daily-critical-backup",
       "criticality": "high",
       "team": "finance"
     }
@@ -217,6 +237,7 @@ PUT /_slm/policy/daily-critical-backup
 **Explication**:
 - `schedule: "0 0 2 * * ?"`: Expression cron pour 2h00 tous les jours
 - `name: "<critical-{now/d}>"`: Template générant `critical-2024-01-15`
+- `metadata`: libre, recopiée dans chaque snapshot — sauf la clé `policy`, réservée: SLM y écrit lui-même le nom de la politique
 - `expire_after: "90d"`: Supprimer les snapshots de plus de 90 jours
 - `min_count: 30`: Toujours garder au moins 30 snapshots
 - `max_count: 120`: Ne jamais dépasser 120 snapshots
@@ -234,7 +255,6 @@ PUT /_slm/policy/weekly-analytics-backup
     "ignore_unavailable": true,
     "include_global_state": false,
     "metadata": {
-      "policy": "weekly-analytics-backup",
       "criticality": "medium",
       "team": "data-science"
     }
@@ -261,7 +281,6 @@ PUT /_slm/policy/daily-logs-backup
     "include_global_state": false,
     "partial": true,
     "metadata": {
-      "policy": "daily-logs-backup",
       "criticality": "low",
       "team": "ops"
     }
@@ -409,18 +428,7 @@ POST /_security/role/hr_team_view
       "names": ["employees_full"],
       "privileges": ["read", "write"],
       "field_security": {
-        "grant": [
-          "employee_id",
-          "name",
-          "department",
-          "position",
-          "hire_date",
-          "email_*",
-          "phone_*",
-          "address.*",
-          "salary",
-          "performance_review.*"
-        ],
+        "grant": ["*"],
         "except": [
           "ssn",
           "disciplinary_notes"
@@ -431,10 +439,11 @@ POST /_security/role/hr_team_view
 }
 ```
 
-**Utilisation de wildcards**:
-- `email_*`: Accorde `email_corporate` ET `email_personal`
-- `address.*`: Accorde tous les sous-champs de `address`
-- `except`: Exclut explicitement `ssn` et `disciplinary_notes`
+**`grant` + `except`**:
+- `grant: ["*"]`: tous les champs…
+- `except`: …sauf `ssn` et `disciplinary_notes`
+- `except` doit être **inclus dans** `grant`: avec un `grant` qui ne liste pas `ssn`, l'exclure serait refusé (« Exceptions for field permissions must be a subset of the granted fields »)
+- Les wildcards marchent dans les deux listes: `email_*` couvre `email_corporate` ET `email_personal`, `address.*` tous les sous-champs de `address`
 
 ### Étape 4: Créer un Rôle "HR Manager" avec Accès Complet
 
@@ -589,6 +598,18 @@ COLD TIER (Searchable Snapshots, 53 jours)
 
 ### Configuration ILM Policy de Production
 
+En production, `s3_backup` est un dépôt S3 (`"type": "s3"`, plugin intégré depuis la 8.0). Pour essayer les requêtes de cette partie sur votre cluster de TP, créez un dépôt `fs` du même nom:
+
+```bash
+PUT /_snapshot/s3_backup
+{
+  "type": "fs",
+  "settings": {
+    "location": "/usr/share/elasticsearch/backups/s3_backup"
+  }
+}
+```
+
 ```bash
 PUT _ilm/policy/logs-lifecycle
 {
@@ -641,15 +662,15 @@ PUT _ilm/policy/logs-lifecycle
 ### Configuration Index Template de Production
 
 ```bash
-PUT _index_template/logs-template
+PUT _index_template/logs-myapp-template
 {
-  "index_patterns": ["logs-*"],
+  "index_patterns": ["logs-myapp-*"],
+  "data_stream": {},
   "template": {
     "settings": {
       "number_of_shards": 3,
       "number_of_replicas": 1,
-      "index.lifecycle.name": "logs-lifecycle",
-      "index.lifecycle.rollover_alias": "logs-write"
+      "index.lifecycle.name": "logs-lifecycle"
     },
     "mappings": {
       "properties": {
@@ -664,6 +685,8 @@ PUT _index_template/logs-template
   "priority": 500
 }
 ```
+
+**Pourquoi `logs-myapp-*` et pas `logs-*` ?** Elasticsearch fournit un template `logs` sur `logs-*-*` (priorité 100), utilisé par Elastic Agent et qui active LogsDB. Un template `logs-*` de priorité 500 le masquerait pour **toutes** les sources de logs. On suit plutôt la convention `logs-<dataset>-<namespace>`: `logs-myapp-production`, `logs-myapp-staging`… Et plus d'alias de rollover: c'est un data stream.
 
 ### Configuration SLM de Production
 

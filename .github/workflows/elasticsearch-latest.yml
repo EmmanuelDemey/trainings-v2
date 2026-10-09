@@ -1,0 +1,41 @@
+name: Elasticsearch latest
+
+# Every week, the workshops of the elasticsearch training are replayed against
+# the LATEST Elasticsearch release, whatever elasticsearch/ci/Dockerfile pins: a
+# release that breaks a workshop shows up here even before the Dependabot pull
+# request that bumps the pin (.github/dependabot.yml).
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  replay:
+    name: Workshops on the latest Elasticsearch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Start the latest Elasticsearch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(gh release view --repo elastic/elasticsearch --json tagName --jq '.tagName | ltrimstr("v")')
+          echo "### Elasticsearch $version" >> "$GITHUB_STEP_SUMMARY"
+          # A copy: the material must keep showing the pinned version, which the
+          # replay checks against elasticsearch/ci/Dockerfile.
+          cp -r elasticsearch/ci "$RUNNER_TEMP/es"
+          sed -i -E "s#^FROM (docker.elastic.co/elasticsearch/elasticsearch):.*#FROM \1:$version#" "$RUNNER_TEMP/es/Dockerfile"
+          docker build -t training-es "$RUNNER_TEMP/es"
+          docker run -d --name training-es -p 9200:9200 training-es
+
+      - name: Replay the workshops
+        env:
+          ES_URL: http://localhost:9200
+          ES_PASSWORD: training
+        run: node scripts/check-console.mjs elasticsearch
+
+      - name: Elasticsearch logs
+        if: failure()
+        run: docker logs training-es 2>&1 | tail -200

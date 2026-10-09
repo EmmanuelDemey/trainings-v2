@@ -114,6 +114,8 @@ PUT movies
 * For performance and disk space usage reasons, you can disable this object.
 
 ```
+DELETE movies
+
 PUT movies
 {
   "mappings": {
@@ -140,9 +142,11 @@ PUT movies
 
 # The Fields Property
 
-* To do this, we will define `fields`.
+* To do this, we will define `fields` (a mapping change: the index is recreated).
 
 ```
+DELETE movies
+
 PUT movies
 {
   "mappings": {
@@ -181,14 +185,16 @@ POST movies/_search?q=directors.keyword:"Charlie Chaplin"
 * It is possible to define properties of type `Object`.
 
 ```
+DELETE movies
+
 PUT movies
 {
   "mappings": {
     "properties": {
       "directors": {
         "properties": {
-            "firstName" : { ... },
-            "lastName" : { ... }
+            "firstName" : { "type": "keyword" },
+            "lastName" : { "type": "keyword" }
         }
       }
     }
@@ -208,7 +214,7 @@ POST /movies/_doc
 {
     "directors": [
         {"firstName": "Charlie", "lastName": "Chaplin"},
-        {"firstName": "Buster", "lastName": "Keaton"},
+        {"firstName": "Buster", "lastName": "Keaton"}
     ]
 }
 ```
@@ -222,7 +228,7 @@ POST /movies/_doc
 ```text
 {
     "directors.firstName": ["Charlie", "Buster"],
-    "directors.lastName": ["Chaplin", "Keaton"],
+    "directors.lastName": ["Chaplin", "Keaton"]
 }
 ```
 
@@ -245,6 +251,8 @@ POST movies/_search?q=directors.firstName:Charlie AND directors.lastName:Keaton
 * To avoid losing these relationships, we can use the `nested` type.
 
 ```
+DELETE movies
+
 PUT movies
 {
   "mappings": {
@@ -252,8 +260,8 @@ PUT movies
       "directors": {
         "type": "nested",
         "properties": {
-            "firstName" : { ... },
-            "lastName" : { ... }
+            "firstName" : { "type": "keyword" },
+            "lastName" : { "type": "keyword" }
         }
       }
     }
@@ -271,6 +279,8 @@ PUT movies
 * Use dynamic templates cautiously and validate the generated mappings.
 
 ```
+DELETE movies
+
 PUT movies
 {
   "mappings": {
@@ -328,8 +338,7 @@ PUT _index_template/template_1
     "aliases": {
       "mydata": { }
     }
-  },
-  "composed_of": ["component_template1"],
+  }
 }
 ```
 
@@ -367,9 +376,9 @@ PUT _index_template/template_1
 {
   "index_patterns": ["te*", "bar*"],
   "template": {
-    
+    "settings": { "number_of_shards": 1 }
   },
-  "composed_of": ["component_template1"],
+  "composed_of": ["component_template1"]
 }
 ```
 

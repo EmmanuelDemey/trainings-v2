@@ -26,11 +26,12 @@ POST /movies-*/_search
 * The entire query is defined in the URL.
 * Only to be used for very simple queries.
 * These queries are hard to maintain and do not allow the full use of Elasticsearch DSL.
+* Spaces in the URL are written `+`.
 
 ```
 GET /movies/_search?q=titanic
 GET /movies/_search?q=title:titanic
-GET /movies/_search?q=title:titanic AND (year:[1990 TO 2000])
+GET /movies/_search?q=title:titanic+AND+year:[1990+TO+2000]
 ```
 
 ---
@@ -42,7 +43,7 @@ GET /movies/_search?q=title:titanic AND (year:[1990 TO 2000])
     * pagination
 
 ```
-GET /movies/_search?q=titanic&sort=year:desc&size:100&from=101
+GET /movies/_search?q=titanic&sort=year:desc&size=100&from=100
 ```
 
 ---
@@ -55,9 +56,7 @@ GET /movies/_search?q=titanic&sort=year:desc&size:100&from=101
 POST /movies/_search
 {
   "query": {
-    "match_all": {
-      ...
-    }
+    "match_all": {}
   }
 }
 ```
@@ -209,7 +208,7 @@ POST /movies/_search
     "query": {
         "range" : {
             "timestamp" : {
-                "gte": "2020-01-01T00:00:00",
+                "gte": "2020-01-01T00:00:00"
             }
         }
     }
@@ -314,13 +313,11 @@ POST /movies/_search
     * `geo_shape`
 
 ```
-PUT /movies
+PUT /movies/_mapping
 {
-    "mappings": {
-        "properties": {
-            "location": {
-                "type": "geo_point"
-            }
+    "properties": {
+        "location": {
+            "type": "geo_point"
         }
     }
 }
@@ -364,7 +361,7 @@ POST /movies/_search
   "query": {
     "bool" : {
       "must" : {
-        "term" : { "title" : "Titanic" },
+        "match" : { "title" : "Titanic" }
       },
       "must_not" : {
         "range" : {
@@ -404,13 +401,13 @@ POST /movies/_search
 
 - **Sorting by a Single Field:**
   - Sort search results by a specific field in ascending or descending order.
-  - Example: Sorting by `date` field in descending order.
+  - Example: Sorting by `year` field in descending order.
 
 ```json
-GET /_search
+GET /movies/_search
 {
     "sort": [
-        { "date": { "order": "desc" } }
+        { "year": { "order": "desc" } }
     ],
     "query": {
         "match_all": {}
@@ -424,14 +421,14 @@ GET /_search
 
 - **Multi-Field Sorting:**
   - Sort results by multiple criteria for fine-grained control.
-  - Example: First sort by `status` (ascending), then by `date` (descending).
+  - Example: First sort by `category` (ascending), then by `year` (descending).
 
 ```json
-GET /_search
+GET /movies/_search
 {
     "sort": [
-        { "status": { "order": "asc" } },
-        { "date": { "order": "desc" } }
+        { "category": { "order": "asc" } },
+        { "year": { "order": "desc" } }
     ],
     "query": {
         "match_all": {}
@@ -448,7 +445,7 @@ GET /_search
   - Example: Sorting by a script that calculates a score based on multiple fields.
 
 ```json
-GET /_search
+GET /movies/_search
 {
     "sort": {
         "_script": {
@@ -519,7 +516,7 @@ GET /restaurants/_search
 * The Scroll API returns a cursor.
 
 ```
-POST /movies?scroll=1m
+POST /movies/_search?scroll=1m
 {
     "size": 100,
     "query": {
@@ -547,6 +544,7 @@ POST /movies?scroll=1m
 
 # Pagination
 
+<!-- ci: skip -->
 ```
 POST /_search/scroll
 {
@@ -563,6 +561,29 @@ POST /_search/scroll
 * Use of **search_after** with a PIT
 * Approach now recommended by Elastic
 * Preserves the index state while traversing different pages.
+
+```
+POST /movies/_pit?keep_alive=1m
+```
+
+---
+
+# Pagination
+
+* Each page: the PIT id, and the sort values of the last hit of the previous page
+
+<!-- ci: skip -->
+```
+POST /_search
+{
+  "size": 100,
+  "pit": { "id": "46ToAwMDaWR5BXV1aWQy...", "keep_alive": "1m" },
+  "sort": [{ "year": "desc" }],
+  "search_after": [1997, 4294967298]
+}
+```
+
+* Close it when done: `DELETE /_pit` with `{ "id": "…" }`
 
 ---
 
@@ -595,11 +616,11 @@ POST /_search/scroll
 - Boost the score of documents based on a numeric field (e.g., `popularity`).
 
 ```json
-GET /_search
+GET /movies/_search
 {
     "query": {
         "function_score": {
-            "query": { "match": { "title": "elasticsearch" } },
+            "query": { "match": { "title": "titanic" } },
             "functions": [
                 {
                     "field_value_factor": {
@@ -681,7 +702,7 @@ GET /_search
 PUT /_cluster/settings 
 { 
     "persistent": { 
-        "cluster.remote.my_remote_cluster.seeds": ["host1:port", "host2:port"] 
+        "cluster.remote.my_remote_cluster.seeds": ["host1:9300", "host2:9300"] 
     } 
 }
 ```

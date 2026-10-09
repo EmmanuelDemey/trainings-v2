@@ -91,6 +91,7 @@ PUT /my_custom_index
 # Advanced Custom Analyzer Example
 
 - Demonstrating a complex analyzer setup for nuanced text processing.
+- Configured char filters and token filters are **named** in `char_filter` / `filter`, then referenced by the analyzer (inline definitions only work with `_analyze`).
  
 ```json
 PUT /advanced_custom_index
@@ -100,10 +101,16 @@ PUT /advanced_custom_index
       "analyzer": {
         "advanced_custom_analyzer": {
           "type": "custom",
-          "char_filter": ["html_strip", { "type": "mapping", "mappings": ["&=>and"] }],
+          "char_filter": ["html_strip", "ampersand_to_and"],
           "tokenizer": "standard",
-          "filter": ["lowercase", "asciifolding", "stop", { "type": "synonym", "synonyms": ["quick,fast"] }]
+          "filter": ["lowercase", "asciifolding", "stop", "quick_synonyms"]
         }
+      },
+      "char_filter": {
+        "ampersand_to_and": { "type": "mapping", "mappings": ["&=>and"] }
+      },
+      "filter": {
+        "quick_synonyms": { "type": "synonym", "synonyms": ["quick,fast"] }
       }
     }
   }
@@ -118,7 +125,7 @@ PUT /advanced_custom_index
 - Example Test: Analyzing custom token filters.
 - **Example Request**:
   ```json
-  POST /_analyze
+  POST /my_custom_index/_analyze
   {
     "analyzer": "my_custom_analyzer",
     "text": "The <b>Quick</b> Brown Foxes & Hares."
@@ -127,11 +134,25 @@ PUT /advanced_custom_index
 
 ---
 
-# Configue Analyzer for a field
+# Configure Analyzer for a field
+
+* An analyzer is defined in the settings **of the index** that uses it
 
 ```
-PUT movies
+PUT movies_v2
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip"],
+          "tokenizer": "whitespace",
+          "filter": ["lowercase", "asciifolding", "stop"]
+        }
+      }
+    }
+  },
   "mappings": {
     "properties": {
       "title": {
@@ -238,8 +259,9 @@ POST _reindex
 # Reindex API
 
 * We're not limited to indexes within the same cluster
-* We can reindex data from a remote cluster
+* We can reindex data from a remote cluster (listed in `reindex.remote.whitelist`)
 
+<!-- ci: skip -->
 ```
 POST _reindex
 {

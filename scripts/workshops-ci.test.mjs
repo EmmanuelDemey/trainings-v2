@@ -34,6 +34,7 @@ test('every solution that is an npm project is a workshop whose starter must fai
     build: false,
     quietTest: '--reporter=default',
     verifyScript: false,
+    elasticsearch: '',
   });
 });
 
@@ -84,4 +85,14 @@ test('a training without solutions has no workshops to check', async () => {
   const dir = await training({ 'workshops/01_indexing/README.md': '# Indexing\n' });
 
   assert.deepEqual((await workshopChecks(dir)).workshops, []);
+});
+
+test('a training whose guided workshops are replayed against Elasticsearch names the folder of its image', async () => {
+  const dir = await training({
+    'workshops/01_indexing/README.md': '# Indexing\n',
+    'workshops.ci.mjs': config({ elasticsearch: 'ci' }),
+  });
+
+  const { workshops, elasticsearch } = await workshopChecks(dir);
+  assert.deepEqual({ workshops, elasticsearch }, { workshops: [], elasticsearch: 'ci' });
 });

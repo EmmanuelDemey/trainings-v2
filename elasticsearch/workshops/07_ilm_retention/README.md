@@ -17,14 +17,14 @@ Votre cluster stocke des logs avec des patterns d'accès variables: les logs ré
 GET /_cluster/health
 ```
 
-## Partie 1: Configurer les node attributes pour les tiers
+## Partie 1: Configurer les data tiers
 
-Définissez un attribut `data_tier` sur chaque nœud dans `elasticsearch.yml`:
+Depuis Elasticsearch 7.10, les tiers ne sont plus des attributs maison (`node.attr.data: warm`) mais des **rôles de nœud**. Déclarez-les dans `elasticsearch.yml`:
 
 ```yaml
 # Nœuds HOT (haute performance)
 node.name: hot-node-1
-node.roles: [ data_hot ]
+node.roles: [ data_hot, data_content ]
 
 # Nœuds WARM (performance moyenne)
 node.name: warm-node-1
@@ -41,17 +41,31 @@ Redémarrez les nœuds et vérifiez:
 GET /_cat/nodes?v&h=name,node.role
 ```
 
-**Résultat attendu**:
+**Résultat attendu** (cluster à 3 nœuds):
 ```
 name         node.role
-hot-node-1   h
+hot-node-1   hs
 warm-node-1  w
 cold-node-1  c
 ```
 
+Sur un cluster à 1 nœud (Docker), ce nœud porte tous les rôles: tout le TP fonctionne, les données changent simplement de phase sans changer de nœud.
+
 ## Partie 2: Créer une policy ILM
 
-Définissez une policy qui transition hot→warm→cold→delete:
+La phase `cold` convertit les index en **searchable snapshots**: il faut un dépôt de snapshots. Le chemin doit être déclaré dans `path.repo` (`-e path.repo=/usr/share/elasticsearch/backups` avec Docker):
+
+```bash
+PUT /_snapshot/my-repository
+{
+  "type": "fs",
+  "settings": {
+    "location": "/usr/share/elasticsearch/backups/ilm"
+  }
+}
+```
+
+Définissez une policy qui fait passer les données de hot à warm, puis cold, puis delete:
 
 ```bash
 PUT /_ilm/policy/logs-policy
@@ -61,9 +75,8 @@ PUT /_ilm/policy/logs-policy
       "hot": {
         "actions": {
           "rollover": {
-            "max_size": "50GB",
-            "max_age": "1d",
-            "max_docs": 10000000
+            "max_primary_shard_size": "50gb",
+            "max_age": "1d"
           },
           "set_priority": {
             "priority": 100
@@ -81,11 +94,6 @@ PUT /_ilm/policy/logs-policy
           },
           "set_priority": {
             "priority": 50
-          },
-          "allocate": {
-            "require": {
-              "data": "warm"
-            }
           }
         }
       },
@@ -112,56 +120,77 @@ PUT /_ilm/policy/logs-policy
 ```
 
 **Explication des phases**:
-- **hot** (0-7j): Rollover automatique quand 50GB ou 1 jour atteint
-- **warm** (7-30j): Shrink à 1 shard, force merge, déplace vers nœuds warm
-- **cold** (30-90j): Convert to searchable snapshot
+- **hot** (0-7j): Rollover automatique quand un shard primaire atteint 50 Go ou que l'index a 1 jour
+- **warm** (7-30j): Shrink à 1 shard, force merge
+- **cold** (30-90j): Conversion en searchable snapshot
 - **delete** (>90j): Suppression automatique
 
-## Partie 3: Créer un index template avec ILM
+Pas besoin d'action `allocate` pour changer de nœud: ILM ajoute de lui-même une action **`migrate`** dans les phases warm et cold, qui déplace les shards vers le tier correspondant (`data_warm`, puis `data_cold`).
+
+`max_primary_shard_size` est préférable à `max_size` (taille totale de l'index, replicas exclus): c'est la taille d'un shard que l'on cherche à maîtriser (10-50 Go).
+
+## Partie 3: Créer un index template de data stream
+
+Un **data stream** est la façon moderne de stocker des données horodatées: un seul nom pour écrire et lire, des index cachés (`.ds-…`) derrière, et un rollover géré par ILM sans alias à configurer.
 
 ```bash
-PUT /_index_template/logs-template
+PUT /_index_template/app-logs-template
 {
-  "index_patterns": ["logs-*"],
+  "index_patterns": ["app-logs*"],
   "data_stream": {},
+  "priority": 500,
   "template": {
     "settings": {
       "number_of_shards": 2,
       "number_of_replicas": 1,
-      "index.lifecycle.name": "logs-policy",
-      "index.lifecycle.rollover_alias": "logs"
+      "index.lifecycle.name": "logs-policy"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "message": { "type": "text" }
+      }
     }
   }
 }
 ```
 
-## Partie 4: Créer le premier index et l'alias
+**Attention au nom**: Elasticsearch fournit déjà un template `logs` sur `logs-*-*` (priorité 100), utilisé par Elastic Agent. Un template à vous sur `logs-*` entrerait en concurrence avec lui; d'où le nom `app-logs` et une priorité explicite.
+
+## Partie 4: Créer le data stream
+
+Il est créé automatiquement au premier document indexé, ou explicitement:
 
 ```bash
-PUT /logs-000001
+PUT /_data_stream/app-logs
+
+GET /_data_stream/app-logs
+```
+
+La réponse liste la backing index (`.ds-app-logs-<date>-000001`), le template et la policy ILM.
+
+**Ancienne méthode — ne plus l'utiliser**: créer `logs-000001` à la main avec un alias `is_write_index` et le setting `index.lifecycle.rollover_alias`. Avec un template de data stream, Elasticsearch le refuse:
+
+<!-- ci: expect-error -->
+```bash
+PUT /app-logs-000001
 {
-  "settings": {
-    "number_of_shards": 2,
-    "number_of_replicas": 1,
-    "index.lifecycle.name": "logs-policy",
-    "index.lifecycle.rollover_alias": "logs"
-  },
   "aliases": {
-    "logs": {
-      "is_write_index": true
-    }
+    "app-logs-alias": { "is_write_index": true }
   }
 }
 ```
+
+**Résultat attendu**: `cannot create index with name [app-logs-000001], because it matches with template [app-logs-template] that creates data streams only, use create data stream api instead`
 
 ## Partie 5: Tester le rollover
 
-Indexez des données via l'alias:
+Indexez des données. Un data stream n'accepte que des créations (pas de mise à jour par `_id`), et chaque document doit avoir un `@timestamp`:
 
 ```bash
-POST /logs/_doc
+POST /app-logs/_doc
 {
-  "timestamp": "2023-11-10T10:00:00",
+  "@timestamp": "2026-10-08T10:00:00Z",
   "message": "Test log entry"
 }
 ```
@@ -169,25 +198,39 @@ POST /logs/_doc
 Forcez un rollover manuel (pour test):
 
 ```bash
-POST /logs/_rollover
+POST /app-logs/_rollover
+```
+
+**Résultat attendu** (extrait):
+```json
 {
-  "conditions": {
-    "max_age": "1d",
-    "max_docs": 1000,
-    "max_size": "5GB"
-  }
+  "acknowledged": true,
+  "rolled_over": true
 }
 ```
 
-Vérifiez les index créés:
+Vérifiez les backing indices: il y en a maintenant deux, et seule la plus récente reçoit les écritures.
 
 ```bash
-GET /_cat/indices/logs-*?v&h=index,health,status,docs.count,store.size
+GET /_data_stream/app-logs
+
+GET /_cat/indices/.ds-app-logs-*?v&h=index,health,status,docs.count,store.size
 ```
 
 ## Partie 6: Simuler les transitions de phase
 
-Modifiez temporairement les délais pour voir les transitions:
+ILM n'évalue les policies que toutes les 10 minutes (`indices.lifecycle.poll_interval`). Pour le TP, réduisez cet intervalle:
+
+```bash
+PUT /_cluster/settings
+{
+  "persistent": {
+    "indices.lifecycle.poll_interval": "10s"
+  }
+}
+```
+
+Puis modifiez la policy pour raccourcir les délais:
 
 ```bash
 PUT /_ilm/policy/logs-policy
@@ -214,10 +257,21 @@ PUT /_ilm/policy/logs-policy
 }
 ```
 
-Attendez 1-2 minutes et vérifiez:
+Attendez 1-2 minutes et vérifiez: la première backing index (déjà rollée) passe en `warm`, la seconde reste en `hot`.
 
 ```bash
-GET /logs-*/_ilm/explain
+GET /app-logs/_ilm/explain
+```
+
+Remettez l'intervalle par défaut après le TP:
+
+```bash
+PUT /_cluster/settings
+{
+  "persistent": {
+    "indices.lifecycle.poll_interval": null
+  }
+}
 ```
 
 ## Tableau de comparaison Hot-Warm-Cold
@@ -241,8 +295,12 @@ GET /logs-*/_ilm/explain
    - Coût de stockage très réduit (~90% moins cher)
 
 3. **Comment forcer une transition immédiate ?**
+
+Avec l'API `move`, en remplaçant le nom par celui d'une backing index (`GET /_data_stream/app-logs`):
+
+<!-- ci: skip -->
 ```bash
-POST /logs-000001/_ilm/move_to_step
+POST /_ilm/move/.ds-app-logs-2026.10.08-000001
 {
   "current_step": {
     "phase": "hot",
@@ -250,9 +308,7 @@ POST /logs-000001/_ilm/move_to_step
     "name": "complete"
   },
   "next_step": {
-    "phase": "warm",
-    "action": "allocate",
-    "name": "allocate"
+    "phase": "warm"
   }
 }
 ```
@@ -262,3 +318,4 @@ POST /logs-000001/_ilm/move_to_step
 - Comprendre l'architecture hot-warm-cold
 - Savoir créer une ILM policy multi-phases
 - Maîtriser les actions: rollover, shrink, forcemerge, searchable_snapshot
+- Utiliser un data stream plutôt qu'un alias de rollover

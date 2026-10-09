@@ -251,7 +251,7 @@ Result: `name` → `text+keyword`, `count` → `long`
 
 Manually define types to control indexing:
 ```json
-PUT /my-index
+PUT /my-mapped-index
 {
   "mappings": {
     "properties": {

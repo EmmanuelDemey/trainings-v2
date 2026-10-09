@@ -2,723 +2,617 @@
 layout: cover
 ---
 
-# Monitoring 
+# Monitoring Strategy
+
+Surveillance and observability of Elasticsearch in production
 
 ---
 
-# Cluster Health APIs
+# Learning Objectives
 
-* API allowing to retrieve the health state of your Cluster
+By the end of this section, you will be able to:
 
-```
-GET /_cluster/health/
-```
-
----
-
-# Cluster Health APIs
-
-```text
-{
-  "cluster_name" : "xxx",
-  "status" : "red",
-  "timed_out" : false,
-  "number_of_nodes" : "x",
-  "number_of_data_nodes" : "x",
-  "active_primary_shards" : 116,
-  "active_shards" : 229,
-  "relocating_shards" : 0,
-  "initializing_shards" : 0,
-  "unassigned_shards" : 1,
-  "delayed_unassigned_shards" : 0,
-  "number_of_pending_tasks" : 0,
-  "number_of_inflight_fetch" : 0,
-  "task_max_waiting_in_queue_millis" : 0,
-  "active_shards_percent_as_number" : 98.70689655172413
-}
-```
+- Use native monitoring APIs to collect cluster metrics
+- Identify and monitor critical metrics for cluster health
+- Configure and leverage Kibana monitoring interfaces (Stack Monitoring)
+- Analyze Elasticsearch logs to diagnose operational problems
 
 ---
 
-# CAT APIs
+# Why Monitor Elasticsearch?
 
-* Set of APIs allowing to retrieve information about your cluster
-    * on nodes
-    * on indices
-    * on shards
-    * on templates
-    * ...
+Proactive monitoring is essential for maintaining a healthy Elasticsearch cluster.
 
----
+**Monitoring objectives**:
+- **Early detection**: Identify problems before user impact
+- **Capacity planning**: Anticipate resource needs
+- **Troubleshooting**: Quickly diagnose incidents
+- **Optimization**: Identify performance bottlenecks
+- **SLA compliance**: Verify availability objectives are met
 
-# CAT APIs
-
-```
-GET _cat
-GET _cat/indices
-GET _cat/shards
-GET _cat/snapshots
-GET _cat/templates
-GET _cat/nodes
-...
-```
+**Monitoring levels**:
+1. **Infrastructure**: CPU, RAM, disk, network (OS-level)
+2. **Cluster**: Health, nodes, shards, indices (Elasticsearch APIs)
+3. **Application**: Request latency, error rate, throughput
+4. **Business**: Business metrics (document volume, active users)
 
 ---
 
-# CAT API
+# Native Monitoring APIs
 
-* Enable `verbose` mode with the `v` parameter
-* Some APIs accept other parameters.
+Elasticsearch provides several [monitoring APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster.html) to observe cluster state.
 
-```
-GET /_cat/indices?v
-GET /_cat/indices?v&health=red
-```
+**Essential APIs**:
 
----
+| API | Usage | Recommended Frequency |
+|-----|-------|-----------------------|
+| `_cluster/health` | Overall cluster health | 30s - 1min |
+| `_cluster/stats` | Aggregated cluster statistics | 1 - 5min |
+| `_nodes/stats` | Detailed per-node metrics | 30s - 1min |
+| `_cat/indices` | Index state and size | 1 - 5min |
+| `_cat/shards` | Shard allocation and state | 1 - 5min |
+| `_nodes/hot_threads` | Active CPU threads (debug) | On demand |
+| `_cat/pending_tasks` | Pending master tasks | 30s - 1min |
 
-# CAT API
-
-* Here is the result of the call `GET /_cat/shards`
-
-```
-filebeat-7.10.0-2022.01.07-000014 0   P   UNASSIGNED
-filebeat-7.9.3-2022.01.07-000015  1   P   UNASSIGNED
-filebeat-7.9.3-2022.01.07-000015  2   r   UNASSIGNED
-```
-
----
-
-# Cluster Allocation Explain API
-
-* API allowing to understand why a shard has not been assigned
-
-```
-GET _cluster/allocation/explain
-{
-  "index": "filebeat-7.9.3-2022.01.07-000015",
-  "shard": 1,
-  "primary": true
-}
-```
-
----
-
-# Cluster Allocation Explain API
-
-* Here is the result of the previous request
-
-```text
-{
-  "index": "filebeat-7.9.3-2022.01.07-000015",
-  "shard": 1,
-  "primary": true,
-  "current_state": "unassigned",
-  "unassigned_info": {
-    "reason": "CLUSTER_RECOVERED",
-    "at": "2022-04-12T13:06:36.125Z",
-    "last_allocation_status": "no_valid_shard_copy"
-  },
-  "can_allocate": "no_valid_shard_copy",
-  "allocate_explanation": "cannot allocate because a previous copy of the primary shard existed but can no longer be found on the nodes in the cluster",
-  "node_allocation_decisions": [
-    {
-      "node_id": "xxxx",
-      "node_name": "instance-0000000005",
-      (... skip ...)
-      "node_decision": "no",
-      "store": {
-        "found": false
-      }
-    }
-  ]
-}
-```
-
----
-
-# Field Data Cache
-
-* The `Field Data Cache` is used to store information used notably for aggregations
-* An overused cache may indicate field data usage on analyzed fields (`type=text`)
-* We can monitor this via
-    * the `cat fielddata API`
-    * the `nodes stats API`
-
----
-
-# Field Data Cache
-
-* Via the `cat fielddata API`
-
-```
-GET /_cat/fielddata?v=true
-```
-
-```
-id                     host      ip        node    field   size
-Nqk-6inXQq-OxUfOUI8jNQ 127.0.0.1 127.0.0.1 Nqk-6in body    544b
-Nqk-6inXQq-OxUfOUI8jNQ 127.0.0.1 127.0.0.1 Nqk-6in mind    360b
-Nqk-6inXQq-OxUfOUI8jNQ 127.0.0.1 127.0.0.1 Nqk-6in soul    480b
-```
-
----
-
-# Field Data Cache
-
-* Via the `nodes stats API`
-
-```
-GET /_nodes/stats/indices/fielddata?fields=field1,field2
-
-GET /_nodes/stats/indices/fielddata?level=indices&fields=field1,field2
-
-GET /_nodes/stats/indices/fielddata?level=shards&fields=field1,field2
-
-GET /_nodes/stats/indices/fielddata?fields=field*```
-```
-
----
-
-# Other APIs
-
-```
-GET /_nodes/stats
-
-GET /_nodes/<node_id>/stats
-
-GET /_nodes/stats/<metric>
-
-GET /_nodes/<node_id>/stats/<metric>
-
-GET /_nodes/stats/<metric>/<index_metric>
-
-GET /_nodes/<node_id>/stats/<metric>/<index_metric>
-
-GET /_cluster/stats
-
-GET /_cluster/stats/nodes/<node_filter>
-```
-
----
-
-# Node Info API
-
-```text
-{
-  "_nodes": ...
-  "cluster_name": "elasticsearch",
-  "nodes": {
-    "USpTGYaBSIKbgSUJR2Z9lg": {
-      "name": "node-0",
-      "transport_address": "192.168.17:9300",
-      "host": "node-0.elastic.co",
-      "ip": "192.168.17",
-      "version": "{version}",
-      "build_flavor": "{build_flavor}",
-      "build_type": "{build_type}",
-      "build_hash": "587409e",
-      "roles": [
-        "master",
-        "data",
-        "ingest"
-      ],
-      "attributes": {},
-      "plugins": [
-        {
-          "name": "analysis-icu",
-          "version": "{version}",
-          "description": "The ICU Analysis plugin integrates Lucene ICU module into elasticsearch, adding ICU relates analysis components.",
-          "classname": "org.elasticsearch.plugin.analysis.icu.AnalysisICUPlugin",
-          "has_native_controller": false
-        }
-      ],
-      "modules": [
-        {
-          "name": "lang-painless",
-          "version": "{version}",
-          "description": "An easy, safe and fast scripting language for Elasticsearch",
-          "classname": "org.elasticsearch.painless.PainlessPlugin",
-          "has_native_controller": false
-        }
-      ]
-    }
-  }
-}
-```
+**General principle**: Lightweight and frequent queries for rapid detection, heavy queries less frequently.
 
 ---
 
 # Cluster Stats API
 
-```
-GET /_cluster/stats?human&pretty
+The [_cluster/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html) API provides aggregated statistics for the entire cluster.
+
+**Request**:
+```bash
+GET /_cluster/stats
 ```
 
-```
-
-
+**Key metrics returned**:
+```json
 {
-   "_nodes" : {
-      "total" : 1,
-      "successful" : 1,
-      "failed" : 0
-   },
-   "cluster_uuid": "YjAvIhsCQ9CbjWZb2qJw3Q",
-   "cluster_name": "elasticsearch",
-   "timestamp": 1459427693515,
-   "status": "green",
-   "indices": {
-      "count": 1,
-      "shards": {
-         "total": 5,
-         "primaries": 5,
-         "replication": 0,
-         "index": {
-            "shards": {
-               "min": 5,
-               "max": 5,
-               "avg": 5
-            },
-            "primaries": {
-               "min": 5,
-               "max": 5,
-               "avg": 5
-            },
-            "replication": {
-               "min": 0,
-               "max": 0,
-               "avg": 0
-            }
-         }
-      },
-      "docs": {
-         "count": 10,
-         "deleted": 0
-      },
-      "store": {
-         "size": "16.2kb",
-         "size_in_bytes": 16684
-      },
-      "fielddata": {
-         "memory_size": "0b",
-         "memory_size_in_bytes": 0,
-         "evictions": 0
-      },
-      "query_cache": {
-         "memory_size": "0b",
-         "memory_size_in_bytes": 0,
-         "total_count": 0,
-         "hit_count": 0,
-         "miss_count": 0,
-         "cache_size": 0,
-         "cache_count": 0,
-         "evictions": 0
-      },
-      "completion": {
-         "size": "0b",
-         "size_in_bytes": 0
-      },
-      "segments": {
-         "count": 4,
-         "memory": "8.6kb",
-         "memory_in_bytes": 8898,
-         "terms_memory": "6.3kb",
-         "terms_memory_in_bytes": 6522,
-         "stored_fields_memory": "1.2kb",
-         "stored_fields_memory_in_bytes": 1248,
-         "term_vectors_memory": "0b",
-         "term_vectors_memory_in_bytes": 0,
-         "norms_memory": "384b",
-         "norms_memory_in_bytes": 384,
-         "points_memory" : "0b",
-         "points_memory_in_bytes" : 0,
-         "doc_values_memory": "744b",
-         "doc_values_memory_in_bytes": 744,
-         "index_writer_memory": "0b",
-         "index_writer_memory_in_bytes": 0,
-         "version_map_memory": "0b",
-         "version_map_memory_in_bytes": 0,
-         "fixed_bit_set": "0b",
-         "fixed_bit_set_memory_in_bytes": 0,
-         "max_unsafe_auto_id_timestamp" : -9223372036854775808,
-         "file_sizes": {}
-      },
-      "mappings": {
-        "field_types": []
-      },
-      "analysis": {
-        "char_filter_types": [],
-        "tokenizer_types": [],
-        "filter_types": [],
-        "analyzer_types": [],
-        "built_in_char_filters": [],
-        "built_in_tokenizers": [],
-        "built_in_filters": [],
-        "built_in_analyzers": []
-      }
-   },
-   "nodes": {
-      "count": {
-         "total": 1,
-         "data": 1,
-         "coordinating_only": 0,
-         "master": 1,
-         "ingest": 1,
-         "voting_only": 0
-      },
-      "versions": [
-         "7.10.1"
-      ],
-      "os": {
-         "available_processors": 8,
-         "allocated_processors": 8,
-         "names": [
-            {
-               "name": "Mac OS X",
-               "count": 1
-            }
-         ],
-         "pretty_names": [
-            {
-               "pretty_name": "Mac OS X",
-               "count": 1
-            }
-         ],
-         "mem" : {
-            "total" : "16gb",
-            "total_in_bytes" : 17179869184,
-            "free" : "78.1mb",
-            "free_in_bytes" : 81960960,
-            "used" : "15.9gb",
-            "used_in_bytes" : 17097908224,
-            "free_percent" : 0,
-            "used_percent" : 100
-         }
-      },
-      "process": {
-         "cpu": {
-            "percent": 9
-         },
-         "open_file_descriptors": {
-            "min": 268,
-            "max": 268,
-            "avg": 268
-         }
-      },
-      "jvm": {
-         "max_uptime": "13.7s",
-         "max_uptime_in_millis": 13737,
-         "versions": [
-            {
-               "version": "12",
-               "vm_name": "OpenJDK 64-Bit Server VM",
-               "vm_version": "12+33",
-               "vm_vendor": "Oracle Corporation",
-               "bundled_jdk": true,
-               "using_bundled_jdk": true,
-               "count": 1
-            }
-         ],
-         "mem": {
-            "heap_used": "57.5mb",
-            "heap_used_in_bytes": 60312664,
-            "heap_max": "989.8mb",
-            "heap_max_in_bytes": 1037959168
-         },
-         "threads": 90
-      },
-      "fs": {
-         "total": "200.6gb",
-         "total_in_bytes": 215429193728,
-         "free": "32.6gb",
-         "free_in_bytes": 35064553472,
-         "available": "32.4gb",
-         "available_in_bytes": 34802409472
-      },
-      "plugins": [
-        {
-          "name": "analysis-icu",
-          "version": "7.8.0",
-          "description": "The ICU Analysis plugin integrates Lucene ICU module into elasticsearch, adding ICU relates analysis components.",
-          "classname": "org.elasticsearch.plugin.analysis.icu.AnalysisICUPlugin",
-          "has_native_controller": false
-        },
-        ...
-      ],
-      "ingest": {
-        "number_of_pipelines" : 1,
-        "processor_stats": {
-          ...
-        }
-      }
-   }
+  "cluster_name": "production",
+  "nodes": {
+    "count": { "total": 10, "data": 7, "master": 3 },
+    "os": { "mem": { "total_in_bytes": 687194767360 }},
+    "jvm": { "mem": { "heap_used_in_bytes": 123456789 }}
+  },
+  "indices": {
+    "count": 150,
+    "docs": { "count": 50000000 },
+    "store": { "size_in_bytes": 1099511627776 },
+    "shards": { "total": 450, "primaries": 225 }
+  }
 }
 ```
 
----
-
-# slowlog
-
-* Mechanism allowing to log requests exceeding a certain execution time
-* This information will be available in a specific log file
-* We can configure a threshold for queries of
-    * search (query)
-    * fetch
-    * index
+**Use case**: Cluster overview for dashboards, ratio calculations (heap usage rate, storage growth rate).
 
 ---
 
-# slowlog
+# Nodes Stats API
 
+The [_nodes/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html) API returns detailed metrics per node.
+
+**Request with filters**:
+```bash
+GET /_nodes/stats/jvm,os,process,indices,fs,thread_pool,breaker
 ```
-index.search.slowlog.threshold.query.warn: 10s
-index.search.slowlog.threshold.query.info: 5s
-index.search.slowlog.threshold.query.debug: 2s
-index.search.slowlog.threshold.query.trace: 500ms
 
-index.search.slowlog.threshold.fetch.warn: 1s
-...
+**Important sections**:
+- **jvm**: `mem.heap_used_percent`, `gc.collectors.*.collection_time_in_millis`
+- **os**: `cpu.percent`, `mem.used_percent`, `swap.used_in_bytes`
+- **process**: `cpu.percent`, `open_file_descriptors`
+- **indices**: `indexing.index_total`, `search.query_total`, `search.query_time_in_millis`
+- **fs**: `total.available_in_bytes`, `io_stats.total.operations`
+- **thread_pool**: `*.rejected` (critical rejections)
+- **breaker**: Triggered circuit breakers
 
-index.index
+**Monitoring key**: `indices.indexing.index_time_in_millis / indices.indexing.index_total` = average indexing latency
 
-ing.slowlog.threshold.index.warn: 10s
-...
+---
+
+# Cat Indices and Shards API
+
+The [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) offer concise views for daily operations.
+
+**Cat Indices** (index state):
+```bash
+GET /_cat/indices?v&h=index,health,status,pri,rep,docs.count,store.size&s=store.size:desc
+```
+
+Result:
+```
+index          health status pri rep docs.count store.size
+logs-2023.11   green  open     5   1   15000000      2.5gb
+products       yellow open     1   1     100000       50mb
+```
+
+**Cat Shards** (location and state):
+```bash
+GET /_cat/shards?v&h=index,shard,prirep,state,node,store&s=store:desc
+```
+
+Result:
+```
+index     shard prirep state   node    store
+logs-2023 0     p      STARTED node-1  512mb
+logs-2023 0     r      STARTED node-2  512mb
+```
+
+**Use case**: Rapid identification of unassigned shards, large indices, unbalanced distribution.
+
+---
+
+# Hot Threads API (Troubleshooting)
+
+The [_nodes/hot_threads](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html) API identifies threads consuming the most CPU.
+
+**Request**:
+```bash
+GET /_nodes/hot_threads
+GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
+```
+
+**Parameters**:
+- `threads`: Number of threads to display (default: 3)
+- `interval`: Sampling period (default: 500ms)
+- `type`: `cpu` (default), `wait`, `block`
+
+**Result** (excerpt):
+```
+::: {node-1}{abc123}
+   Hot threads at 2023-11-10T10:30:00.000Z, interval=500ms, busiestThreads=5:
+
+   99.8% (499ms out of 500ms) cpu usage by thread 'elasticsearch\[node-1\]\[search\]\[T#5\]'
+     org.elasticsearch.search.SearchService.executeQueryPhase()
+     org.elasticsearch.search.query.QueryPhase.execute()
+```
+
+**Usage**: Diagnosing CPU spikes, identifying expensive queries in real-time.
+
+---
+
+# Critical Metrics: Cluster Health
+
+[Cluster health](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html) is the most important metric to monitor.
+
+**Status colors**:
+- GREEN: All shards (primaries + replicas) allocated
+- YELLOW: All primaries allocated, some replicas missing
+- RED: At least one primary shard missing - DATA LOSS
+
+**Detailed request**:
+```bash
+GET /_cluster/health?level=indices
+```
+
+**Alerts to configure**:
+```yaml
+# Recommended alert thresholds
+cluster.status:
+  CRITICAL: status == "red"         # Immediate alert
+  WARNING: status == "yellow"       # Investigate within 15min
+
+unassigned_shards:
+  CRITICAL: > 10                    # Immediate action
+  WARNING: > 0                      # Investigate
+
+active_shards_percent:
+  CRITICAL: < 90%                   # Serious allocation problem
+  WARNING: < 98%                    # Increased surveillance
 ```
 
 ---
 
-# slowlog
+# Critical Metrics: CPU and Memory
 
-* We can also modify these parameters on the fly
+**CPU** and **memory** monitoring is critical for stability.
 
+**CPU monitoring**:
+```bash
+GET /_nodes/stats/os,process?filter_path=nodes.*.os.cpu,nodes.*.process.cpu
 ```
-PUT /my-index-000001/_settings
+
+**CPU thresholds**:
+- **<60%**: Healthy
+- **60-80%**: Monitor, plan scaling
+- **>80%**: Critical, risk of latency degradation
+- **>95%**: Overloaded cluster, immediate action
+
+**Heap memory monitoring**:
+```bash
+GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem
+```
+
+**Heap thresholds**:
+- **<75%**: Healthy
+- **75-85%**: Monitor GC frequency
+- **>85%**: Risk of OutOfMemoryError
+- **>95%**: GC thrashing likely, circuit breakers activated
+
+**Garbage Collection**:
+```
+gc_collection_time / gc_collection_count = average GC duration
+If average >100ms -> heap or GC tuning issue
+```
+
+---
+
+# Critical Metrics: Disk and I/O
+
+[Disk monitoring](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html#disk-based-shard-allocation) prevents failures due to disk filling.
+
+**Disk space monitoring**:
+```bash
+GET /_nodes/stats/fs?filter_path=nodes.*.fs.total
+```
+
+**Disk thresholds** (disk-based shard allocation):
+- **<85%**: Healthy
+- **85-90%**: LOW Watermark - no new shard allocation on this node
+- **90-95%**: HIGH Watermark - relocate shards from this node
+- **>95%**: FLOOD Watermark - indices go read-only!
+
+**Watermarks configuration**:
+```json
+PUT /_cluster/settings
+{
+  "persistent": {
+    "cluster.routing.allocation.disk.watermark.low": "85%",
+    "cluster.routing.allocation.disk.watermark.high": "90%",
+    "cluster.routing.allocation.disk.watermark.flood_stage": "95%"
+  }
+}
+```
+
+**I/O stats**: `fs.io_stats.total.operations`, `fs.io_stats.total.read_time` (I/O latency)
+
+---
+
+# Critical Metrics: Indexing and Search
+
+**Indexing** and **search** metrics measure application performance.
+
+**Indexing metrics**:
+```bash
+GET /_nodes/stats/indices?filter_path=nodes.*.indices.indexing
+```
+
+Key metrics:
+- `indexing.index_total`: Total number of indexed documents
+- `indexing.index_time_in_millis`: Total indexing time
+- `indexing.index_failed`: Failed documents (should be close to 0)
+
+**Average latency calculation**:
+```
+avg_indexing_latency = index_time_in_millis / index_total
+```
+
+**Search metrics**:
+```bash
+GET /_nodes/stats/indices?filter_path=nodes.*.indices.search
+```
+
+Key metrics:
+- `search.query_total`: Number of queries
+- `search.query_time_in_millis`: Total search time
+- `search.fetch_total`, `search.fetch_time_in_millis`: Fetch phase
+
+**Average latency calculation**:
+```
+avg_search_latency = query_time_in_millis / query_total
+```
+
+---
+
+# Critical Metrics: Thread Pool Rejections
+
+[Thread pool rejections](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html) indicate cluster overload.
+
+**Rejections monitoring**:
+```bash
+GET /_nodes/stats/thread_pool?filter_path=nodes.*.thread_pool.*.rejected
+```
+
+**Thread pools to monitor**:
+- **write**: Indexing rejections -> Cluster overloaded in writes
+- **search**: Search rejections -> Cluster overloaded in reads
+- **get**: GET by ID rejections (rare)
+
+**Alert thresholds**:
+```yaml
+thread_pool.*.rejected:
+  WARNING: delta > 10/min        # Temporary overload
+  CRITICAL: delta > 100/min      # Severe overload
+```
+
+**Corrective actions**:
+- Short term: Client-side throttle, increase queue_size (temporary)
+- Medium term: Optimize queries, add nodes
+- Long term: Review architecture, sharding strategy
+
+---
+
+# Kibana Stack Monitoring: Overview
+
+[Kibana Stack Monitoring](https://www.elastic.co/guide/en/kibana/current/xpack-monitoring.html) provides a graphical interface for monitoring Elasticsearch.
+
+**Activation**: metrics are collected **from outside** the cluster, by
+- **Elastic Agent** + the *Elasticsearch* integration (*Collect Stack Monitoring metrics* — recommended)
+- or **Metricbeat** and its `elasticsearch-xpack` module
+
+The legacy internal collection (`xpack.monitoring.collection.enabled`) is deprecated: in 9.x, setting it answers with a deprecation warning.
+
+**Main pages**:
+1. **Overview**: Global health, active nodes, resource usage
+2. **Nodes**: Detail per node (CPU, memory, disk, JVM)
+3. **Indices**: Index list with metrics (size, docs, search rate)
+4. **Advanced**: Logs, thread pools, CCR, Watcher
+
+**Advantages vs raw APIs**:
+- Graphical visualization with history (time-series)
+- Built-in Stack Monitoring rules (Kibana alerting: CPU, disk, JVM, missing nodes…)
+- Correlation between metrics (CPU spike + search latency)
+- Drill-down by node/index/shard
+
+**Limitation**: Monitoring overhead (~5-10% resources). For critical clusters, consider external monitoring (Prometheus, Datadog).
+
+---
+
+# Kibana Stack Monitoring: Cluster Overview
+
+The **Cluster Overview** page displays aggregated metrics in real-time.
+
+**Main widgets**:
+
+**1. Cluster Health**
+- Status color (green/yellow/red)
+- Number of active nodes
+- Shards (total, primaries, replicas, unassigned)
+
+**2. Search & Indexing Rate**
+- Time-series graph of requests/sec
+- Average latency (p50, p95, p99)
+- Error rate
+
+**3. Resource Usage**
+- CPU usage (cluster average)
+- JVM Heap (average across nodes)
+- Disk usage (total and per node)
+
+**4. Alerts**
+- List of active alerts (disk watermark, heap high, etc.)
+
+**Refresh configuration**: Default 10s, adjustable in Settings.
+
+---
+
+# Kibana Stack Monitoring: Nodes View
+
+The **Nodes** page allows monitoring each node individually.
+
+**Metrics per node**:
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| **CPU Usage** | % CPU used | >80% |
+| **JVM Memory** | % heap used | >85% |
+| **Disk Free Space** | Remaining disk space | <15% (85% full) |
+| **Load Average** | System load (1m, 5m, 15m) | >cores x 1.5 |
+| **Shards** | Number of shards on this node | >20/GB heap |
+
+**Available graphs**:
+- CPU usage over time
+- JVM heap usage over time
+- GC duration and frequency
+- Indexing and search latency
+- Disk I/O throughput
+
+**Drill-down**: Click on a node to see logs, hot threads, stack traces.
+
+---
+
+# Kibana Stack Monitoring: Indices View
+
+The **Indices** page monitors the health and performance of each index.
+
+**Metrics per index**:
+- **Health**: green/yellow/red
+- **Status**: open/close
+- **Document Count**: Number of documents
+- **Size**: Total size (primaries + replicas)
+- **Search Rate**: Searches/sec
+- **Indexing Rate**: Documents/sec
+
+**Time-series graphs**:
+- Document count evolution
+- Indexing rate (docs/s)
+- Search rate (queries/s)
+- Search latency (ms)
+
+**Use cases**:
+- Identify high-growth indices (capacity planning)
+- Detect unused indices (candidates for deletion/archiving)
+- Monitor yellow/red indices (allocation problems)
+
+---
+
+# Log Analysis: Locations
+
+Elasticsearch generates several types of [logs](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html) to diagnose problems.
+
+**Default log files**:
+```
+/var/log/elasticsearch/
+|- <cluster_name>.log              # Main log
+|- <cluster_name>_deprecation.log  # Deprecation warnings
+|- <cluster_name>_index_search_slowlog.log
+|- <cluster_name>_index_indexing_slowlog.log
+|- gc.log                          # Garbage Collection logs
+```
+
+**Log levels**:
+- **ERROR**: Errors requiring action
+- **WARN**: Warnings to monitor
+- **INFO**: Normal events (startup, config changes)
+- **DEBUG**: Details for troubleshooting (enable temporarily)
+- **TRACE**: Very verbose details (dev only)
+
+**Configuration in log4j2.properties**:
+```properties
+logger.action.name = org.elasticsearch.action
+logger.action.level = info
+```
+
+---
+
+# Log Analysis: Log4j2 Configuration
+
+The [Log4j2](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html#configuring-logging-levels) configuration controls log detail level.
+
+**log4j2.properties file**:
+```properties
+# Global level
+rootLogger.level = info
+
+# Logger for a specific package
+logger.discovery.name = org.elasticsearch.discovery
+logger.discovery.level = debug
+
+# Appender for log rotation
+appender.rolling.type = RollingFile
+appender.rolling.fileName = ${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}.log
+appender.rolling.filePattern = ${sys:es.logs.base_path}${sys:file.separator}${sys:es.logs.cluster_name}-%d{yyyy-MM-dd}-%i.log.gz
+appender.rolling.policies.type = Policies
+appender.rolling.policies.time.type = TimeBasedTriggeringPolicy
+appender.rolling.policies.time.interval = 1
+appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+appender.rolling.policies.size.size = 256MB
+```
+
+---
+
+# Log Analysis: Log4j2 Configuration
+
+**Dynamic modification** (without restart):
+```json
+PUT /_cluster/settings
+{
+  "persistent": {
+    "logger.org.elasticsearch.discovery": "DEBUG",
+    "logger.index.search.slowlog": "TRACE"
+  }
+}
+```
+
+* Back to normal: set them to `null`
+
+---
+
+# Log Analysis: Slow Logs
+
+[Slow logs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-slowlog.html) record queries exceeding latency thresholds.
+
+**Configuration per index**:
+```json
+PUT /my-index/_settings
 {
   "index.search.slowlog.threshold.query.warn": "10s",
   "index.search.slowlog.threshold.query.info": "5s",
   "index.search.slowlog.threshold.query.debug": "2s",
   "index.search.slowlog.threshold.query.trace": "500ms",
-  "index.search.slowlog.threshold.fetch.warn": "1s",
-  "index.search.slowlog.threshold.fetch.info": "800ms",
-  "index.search.slowlog.threshold.fetch.debug": "500ms",
-  "index.search.slowlog.threshold.fetch.trace": "200ms"
+
+  "index.indexing.slowlog.threshold.index.warn": "10s",
+  "index.indexing.slowlog.threshold.index.info": "5s",
+  "index.indexing.slowlog.threshold.index.debug": "2s",
+  "index.indexing.slowlog.threshold.index.trace": "500ms"
 }
 ```
 
 ---
 
-# slowlog
+# Log Analysis: Slow Logs
 
-```text
-[instance-0000000000] [movies/C2OBwoduS9SA_1EZ9ds4ow]
-  took[746.5micros], took_millis[0], type[_doc], id[2], routing[],
-  source[{"title":"Titanic"}]
-
-[instance-0000000001] [movies/C2OBwoduS9SA_1EZ9ds4ow]
-  took[2.7ms], took_millis[2], type[_doc], id[2], routing[],
-  source[{"title":"Fight Club"}]
+**Slow log format**:
 ```
+\[2023-11-10T10:30:15,123\]\[WARN \]\[i.s.s.query\] \[node-1\] \[my-index\]\[0\]
+took\[5.2s\], took_millis\[5234\], types\[\], stats\[\], search_type\[QUERY_THEN_FETCH\],
+total_shards\[5\], source\[{"query":{"match":{"field":"value"}}}\]
+```
+
+**Analysis**: Identify patterns (similar queries, same index), optimize or add resources.
 
 ---
 
-# Monitoring
+# Log Analysis: Common Error Messages
 
-* The recommended solution for monitoring an Elastic cluster is to use
-    * Metricbeat
-    * Filebeat
-    * Heartbeat
-    * ...
-* It is recommended to send these metrics to a second cluster
+Knowing how to interpret common errors accelerates troubleshooting.
+
+**Frequent errors**:
+
+**1. CircuitBreakerException**
+```
+\[parent\] Data too large, data for [<http_request>] would be [x], which is larger than the limit of [y]
+```
+-> Heap saturated, query too demanding. Actions: Reduce query size, increase heap, add nodes.
+
+**2. EsRejectedExecutionException**
+```
+rejected execution of org.elasticsearch.transport.TransportService$7@abc on EsThreadPoolExecutor\[search, queue capacity = 1000\]
+```
+-> Thread pool saturated. Actions: Client-side throttle, optimize queries, scale cluster.
+
+**3. SearchPhaseExecutionException**
+```
+Shard failures: \[failed shard on node \[xyz\]: query shard failed\]
+```
+-> Search failure on a shard. Actions: Check logs of concerned node, shard state.
+
+**4. ClusterBlockException**
+```
+index \[my-index\] blocked by: \[FORBIDDEN/12/index read-only / allow delete (api)\];
+```
+-> Index in read-only (often disk watermark flood). Actions: Free disk space, increase watermark.
 
 ---
 
-# Architecture
+# Summary
 
-* Agents written in Go
-* Data collectors
-* Respect the same configuration philosophy
-* Configuration via a YAML file
-* Extensible
+## Key Points
 
----
-
-# Architecture
-
-* Configuration via a YAML configuration file
-
-```
-./bin/*beat setup -e
-./bin/*beat -e
-```
-
-```
-output.elasticsearch:
-hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
-```
+- **Native APIs** (_cluster/health, _nodes/stats, _cat APIs) are essential for real-time monitoring
+- **Critical metrics** include: cluster health, CPU/memory/disk, indexing/search rates, thread pool rejections
+- **Kibana Stack Monitoring** offers a complete graphical interface with history and integrated alerts
+- **Log analysis** (main log, slow logs, GC logs) allows diagnosing operational problems
+- **Alert thresholds** must be configured for early detection: heap >85%, disk >85%, CPU >80%
 
 ---
 
-# Heartbeat
+# Summary
 
-* Agent used to ensure the availability of a service
+## Quick Reference APIs
 
-```
-heartbeat.monitors:
-- type: tcp
-schedule: '*/5 * * * * * *'
-hosts: ["myhost:12345"]
-id: my-tcp-service
-- type: http
-schedule: '@every 5s'
-urls: ["http://example.net"]
-service_name: apm-service-name
-id: my-http-service
-name: My HTTP Service
-```
-
-```
-./heartbeat setup -e
-./heartbeat -e
-```
+| API | Key Metric | Frequency |
+|-----|------------|-----------|
+| `_cluster/health` | status (green/yellow/red) | 30s |
+| `_nodes/stats/jvm` | heap_used_percent | 1min |
+| `_nodes/stats/os` | cpu.percent | 1min |
+| `_cat/indices` | health, store.size | 5min |
+| `_nodes/hot_threads` | Active CPU threads | On demand |
 
 ---
 
-# Filebeat
+# Practical Exercises
 
-* Agent used to index log lines
-* Possibility to activate modules to support logs from open-source products
+Now proceed to the **exercise workbook** to practice these concepts.
 
-```
-filebeat modules enable system nginx mysql
-```
+**Labs to complete**:
+- Lab 4.1: Using native monitoring APIs
+- Lab 4.2: Configuring critical alert thresholds
+- Lab 4.3: Exploring Kibana Stack Monitoring
 
-```
-./filebeat setup -e
-./filebeat -e
-```
-
----
-
-# Metricbeat
-
-* Agent used to index metrics from a server or system
-* Possibility to activate modules to support logs from open-source products
-
-```
-metricbeat modules enable apache mysql
-```
-
-```
-./metricbeat setup -e
-./metricbeat -e
-```
-
----
-
-# Packetbeat
-
-* Agent used to index network packets passing through an information system
-* Possibility to activate modules to support standardized frames.
-
-```
-./packetbeat setup -e
-./packetbeat -e
-```
-
-```
-packetbeat.protocols:
-
-- type: dhcpv4
-ports: [67, 68]
-
-- type: dns
-ports: [53]
-
-- type: http
-ports: [80, 8080, 8081, 5000, 8002]
-```
-
----
-
-# Metricbeat with Elasticsearch
-
-* First, we need to enable monitoring on the cluster
-
-```
-PUT _cluster/settings
-{
-  "persistent": {
-    "xpack.monitoring.elasticsearch.collection.enabled": true
-  }
-}
-```
-
----
-
-# Metricbeat with Elasticsearch
-
-```
-metricbeat modules enable elasticsearch-xpack
-```
-
----
-
-# Metricbeat with Elasticsearch
-
-* Configure the node we want to monitor
-
-```
-#modules.d/elasticsearch-xpack.yml
-
-- module: elasticsearch
-  xpack.enabled: true
-  period: 10s
-  hosts: ["http://localhost:9200"]
-```
-
----
-
-# Metricbeat with Elasticsearch
-
-* Configure the monitoring cluster
-
-```
-#metricbeat.yml
-output.elasticsearch:
-  hosts: ["http://es-mon-1:9200", "http://es-mon-2:9200"]
-
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-```
-
----
-
-# Permission Management
-
-* To collect, we must have the `remote_monitoring_collector` right
-* To send, we must have the `remote_monitoring_agent` right
-* We can use the predefined user `remote_monitoring_user`
-
----
-
-# Filebeat with Elasticsearch
-
-* The configuration for Filebeat is similar
-    * Install and configure Filebeat
-
-```
-#filebeat.yml
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["http://es-mon-1:9200", "http://es-mon-2:9200"]
-
-setup.kibana:
-  host: "localhost:5601"
-  #username: "my_kibana_user"
-  #password: "YOUR_PASSWORD"
-```
-
-* Enable the Elasticsearch module
-* Adjust the configuration in `modules.d/elasticsearch.yml`
+**These exercises cover**:
+- Queries on _cluster/health, _nodes/stats, _cat APIs
+- Slow logs and watermarks configuration
+- Navigation in Kibana Stack Monitoring
+- Log interpretation and simulated problem diagnosis

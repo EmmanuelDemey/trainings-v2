@@ -214,8 +214,9 @@ POST /heap-monitoring/_doc
 POST /heap-monitoring/_refresh
 ```
 
-Vérifiez les alertes indexées:
+Vérifiez les alertes indexées par l'action Index de la règle Kibana:
 
+<!-- ci: skip -->
 ```bash
 GET alert-history/_search
 {
@@ -228,15 +229,17 @@ GET alert-history/_search
 
 ### Étape 1: Vérifier l'Utilisateur Actuel et Créer les Indices
 
+Le nom `logs-2024.01` (avec un point) est voulu: Elasticsearch réserve `logs-*-*` aux data streams d'Elastic Agent (template intégré `logs`), et y refuserait un index classique comme `logs-2024-01`.
+
 ```bash
 GET /_security/_authenticate
 
-PUT /logs-2024-01
+PUT /logs-2024.01
 {
   "settings": { "number_of_shards": 1, "number_of_replicas": 0 }
 }
 
-POST /logs-2024-01/_bulk
+POST /logs-2024.01/_bulk
 {"index":{"_id":"1"}}
 {"timestamp":"2024-01-15T10:00:00Z","level":"INFO","message":"Application started","service":"api"}
 {"index":{"_id":"2"}}
@@ -307,11 +310,11 @@ POST /_security/user/charlie_dev
 
 ```bash
 # Lecture autorisée pour alice_reader
-curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/logs-2024-01/_search?pretty"
+curl -u alice_reader:ReadOnlyPass123! "https://localhost:9200/logs-2024.01/_search?pretty"
 # Résultat attendu: Succès (200 OK)
 
 # Écriture NON autorisée pour alice_reader
-curl -u alice_reader:ReadOnlyPass123! -X POST "https://localhost:9200/logs-2024-01/_doc" \
+curl -u alice_reader:ReadOnlyPass123! -X POST "https://localhost:9200/logs-2024.01/_doc" \
   -H 'Content-Type: application/json' \
   -d '{"timestamp":"2024-01-15T11:00:00Z","level":"INFO","message":"Test"}'
 # Résultat attendu: Erreur 403 Forbidden
@@ -425,7 +428,12 @@ GET /_security/role/logs_readonly,developer,sales_team,emea_manager
 
 # 2. Vérifier les utilisateurs
 GET /_security/user
+```
 
+Et si la règle Kibana de la partie B a tourné:
+
+<!-- ci: skip -->
+```bash
 # 3. Compter les alertes indexées
 GET alert-history/_count
 ```

@@ -28,7 +28,7 @@ docker run -d \
   -e "discovery.type=single-node" \
   -e "path.repo=/usr/share/elasticsearch/backups" \
   -v ~/elasticsearch-backups:/usr/share/elasticsearch/backups \
-  docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+  docker.elastic.co/elasticsearch/elasticsearch:9.5.5
 ```
 
 **Pour installation locale**:
@@ -121,8 +121,10 @@ GET /_cat/indices?v&h=index,docs.count,store.size
 
 ## Étape 4: Créer un Snapshot Complet
 
+Par défaut, l'API rend la main tout de suite et le snapshot se poursuit en arrière-plan. Avec `wait_for_completion=true`, elle attend la fin: pratique pour un TP ou un script.
+
 ```bash
-PUT /_snapshot/my_backup/snapshot_full_2024_01_15
+PUT /_snapshot/my_backup/snapshot_full_2024_01_15?wait_for_completion=true
 {
   "indices": "*",
   "ignore_unavailable": true,
@@ -135,13 +137,13 @@ PUT /_snapshot/my_backup/snapshot_full_2024_01_15
 }
 ```
 
-**Surveiller la progression**:
+**Surveiller la progression** (utile sans `wait_for_completion`, sur de gros volumes):
 
 ```bash
 GET /_snapshot/my_backup/snapshot_full_2024_01_15/_status
 ```
 
-**Attendre que l'état devienne SUCCESS**:
+**Vérifier que l'état est SUCCESS**:
 
 ```bash
 GET /_snapshot/my_backup/snapshot_full_2024_01_15
@@ -150,7 +152,7 @@ GET /_snapshot/my_backup/snapshot_full_2024_01_15
 ## Étape 5: Créer un Snapshot Partiel
 
 ```bash
-PUT /_snapshot/my_backup/snapshot_products_orders
+PUT /_snapshot/my_backup/snapshot_products_orders?wait_for_completion=true
 {
   "indices": "products,orders",
   "ignore_unavailable": false,
@@ -239,16 +241,17 @@ GET /restored_products/_count
 DELETE /products,orders,users,restored_products
 ```
 
-2. Restaurer tous les indices:
+2. Restaurer les indices applicatifs:
 
 ```bash
 POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 {
-  "indices": "*",
-  "include_global_state": true,
-  "ignore_unavailable": true
+  "indices": "products,orders,users",
+  "include_global_state": false
 }
 ```
+
+**Pourquoi pas `"indices": "*"` ?** Le snapshot complet contient aussi les index système (`.security`, `.kibana`…) et les data streams internes. Les restaurer par-dessus un cluster en marche échoue (« an open index with same name already exists ») ou, pire, écrase les utilisateurs et rôles. Les index système se restaurent par **feature state** (`"feature_states": ["security"]`), et `include_global_state: true` (templates, policies ILM, settings persistants) se réserve à la reconstruction d'un cluster vide.
 
 3. Vérifier la restauration complète:
 
@@ -277,7 +280,8 @@ GET /users/_count
 
 - Le chemin du repository doit être déclaré dans `path.repo` dans `elasticsearch.yml`
 - Les snapshots sont **incrémentaux**: seuls les nouveaux segments sont copiés
-- Utilisez `include_global_state: true` pour sauvegarder templates et policies
+- Utilisez `include_global_state: true` pour sauvegarder templates et policies — mais restaurez-le seulement sur un cluster vide
+- Les index système se sauvegardent et se restaurent par **feature states** (`GET /_features`)
 - La restauration nécessite que les indices n'existent pas (ou soient fermés)
 - `rename_pattern` et `rename_replacement` permettent de restaurer avec un nouveau nom
 - Utilisez `_verify` pour tester la connectivité du repository

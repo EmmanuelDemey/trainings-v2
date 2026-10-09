@@ -40,6 +40,7 @@ jobs:
           cat "$RUNNER_TEMP/plan.json"
           node -p "'workshops=' + JSON.stringify(require(process.env.RUNNER_TEMP + '/plan.json').workshops)" >> "$GITHUB_OUTPUT"
           node -p "'verify-script=' + require(process.env.RUNNER_TEMP + '/plan.json').verifyScript" >> "$GITHUB_OUTPUT"
+          node -p "'elasticsearch=' + require(process.env.RUNNER_TEMP + '/plan.json').elasticsearch" >> "$GITHUB_OUTPUT"
 
       # Workshops that are npm projects: every one of them, side by side.
       - uses: actions/setup-node@v7
@@ -90,6 +91,32 @@ jobs:
             exit 1
           fi
           echo "Starters fail as expected."
+
+      # Guided workshops, run in Kibana Dev Tools: every request of their READMEs,
+      # and of the examples of the slides, is replayed against the Elasticsearch
+      # of the training's Dockerfile.
+      - name: Start Elasticsearch
+        if: steps.plan.outputs.elasticsearch != ''
+        env:
+          CONTEXT: ${{ inputs.dir }}/${{ steps.plan.outputs.elasticsearch }}
+        run: |
+          docker build -t training-es "$CONTEXT"
+          docker run -d --name training-es -p 9200:9200 training-es
+
+      - name: Replay the workshops against Elasticsearch
+        if: steps.plan.outputs.elasticsearch != ''
+        env:
+          TRAINING: ${{ inputs.dir }}
+          ES_URL: http://localhost:9200
+          # Set by the Dockerfile: a throwaway cluster, local to the runner.
+          ES_PASSWORD: training
+          # Where the Dockerfile lives, next to the fixtures of the chapters.
+          ES_CI_DIR: ${{ steps.plan.outputs.elasticsearch }}
+        run: node scripts/check-console.mjs "$TRAINING"
+
+      - name: Elasticsearch logs
+        if: failure() && steps.plan.outputs.elasticsearch != ''
+        run: docker logs training-es 2>&1 | tail -200
 
   deploy:
     name: Deploy

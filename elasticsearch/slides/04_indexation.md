@@ -36,7 +36,6 @@ POST /movies/_doc
 ```text
 {
   "_index" : "movies",
-  "_type" : "_doc",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
   "_version" : 1,
   "result" : "created",
@@ -84,7 +83,6 @@ GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```text
 {
   "_index" : "movies",
-  "_type" : "_doc",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
   "_version" : 1,
   "_seq_no" : 0,
@@ -105,14 +103,14 @@ GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```
 PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 {
-    ...
+    "title": "Titanic",
+    "year": 1997
 }
 ```
 
 ```text
 {
   "_index" : "movies",
-  "_type" : "_doc",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
   "_version" : 2,
   "result" : "updated",
@@ -155,7 +153,6 @@ DELETE /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```text
 {
   "_index" : "movies",
-  "_type" : "_doc",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
   "_version" : 3,
   "result" : "deleted",
@@ -206,7 +203,6 @@ POST /movies/_search?q=titanic
     "hits" : [
       {
         "_index" : "movies",
-        "_type" : "_doc",
         "_id" : "mQ6jknEBOjsOKzV3MVdi",
         "_score" : 0.14874382,
         "_source" : {
@@ -229,7 +225,7 @@ POST /movies/_search?q=title:titanic&size=5
 
 POST /movies/_search?q=title:titanic&size=5&from=10
 
-POST /movies/_search?q=title:titanic&sort:title
+POST /movies/_search?q=title:titanic&sort=title.keyword:asc
 ```
 
 ---
@@ -238,6 +234,7 @@ POST /movies/_search?q=title:titanic&sort:title
 
 * We can create indexes manually
 
+<!-- ci: skip -->
 ```
 PUT /movies
 {
@@ -271,7 +268,7 @@ PUT /movies
 # Index Management
 
 ```
-PUT /movies
+PUT /books
 {
     "settings" : {
         "number_of_shards" : 3,
@@ -287,10 +284,10 @@ PUT /movies
 * We can modify certain *settings* of an index afterward.
 
 ```
-PUT /movies/_settings
+PUT /books/_settings
 {
     "index" : {
-        "number_of_replicas" : 2
+        "number_of_replicas" : 1
     }
 }
 ```
@@ -427,18 +424,18 @@ DELETE /movies,albums
 
 # Index Management
 
-* We can also delete all indexes :(
+* Deleting with a wildcard (`DELETE *`, `DELETE _all`) is refused by default since 8.0:
 
+<!-- ci: expect-error -->
 ```
 DELETE _all
 ```
 
-* It is recommended to disable this potential loophole in the `elasticsearch.yml` file.
-
-```
-action.disable_delete_all_indices: true
+```text
+Wildcard expressions or all indices are not allowed
 ```
 
+* Controlled by `action.destructive_requires_name` (default `true` — keep it)
 ---
 
 
