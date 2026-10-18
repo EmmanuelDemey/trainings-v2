@@ -202,6 +202,82 @@ useEffect(async () => {
 
 ---
 
+# Hook - useRef
+
+* Hook retournant un objet `{ current: valeur }` qui persiste entre les rendus
+* Deux cas d'usage principaux
+  * Accéder à un élément du DOM (focus, scroll, mesure, librairie tierce)
+  * Conserver une valeur mutable **sans déclencher de nouveau rendu**
+
+```tsx
+import { useRef } from 'react';
+
+const SearchInput = () => {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    return (
+        <>
+            <input ref={inputRef} />
+            <button onClick={() => inputRef.current?.focus()}>Rechercher</button>
+        </>
+    );
+}
+```
+
+---
+
+# Hook - useRef
+
+* Utile pour stocker une valeur technique : id d'un timer, valeur précédente, ...
+* Modifier `ref.current` ne provoque **pas** de nouveau rendu
+
+```tsx
+const Chrono = () => {
+    const [seconds, setSeconds] = useState(0);
+    const intervalRef = useRef<number | null>(null);
+
+    const start = () => {
+        intervalRef.current = window.setInterval(() => setSeconds(s => s + 1), 1000);
+    };
+    const stop = () => {
+        if (intervalRef.current) window.clearInterval(intervalRef.current);
+    };
+
+    useEffect(() => stop, []);
+
+    return (
+        <>
+            <p>{seconds}s</p>
+            <button onClick={start}>Démarrer</button>
+            <button onClick={stop}>Arrêter</button>
+        </>
+    );
+}
+```
+
+---
+
+# Hook - useRef
+
+* Une donnée affichée à l'écran doit rester dans un `useState`
+* Ne pas lire ni écrire `ref.current` pendant le rendu (seulement dans les handlers et les effets)
+* Depuis React 19, un composant reçoit `ref` comme une prop classique (plus besoin de `forwardRef`)
+
+```tsx
+// Mauvaise pratique : l'affichage ne se met pas à jour
+const Counter = () => {
+    const count = useRef(0);
+    return <button onClick={() => count.current++}>{count.current}</button>;
+}
+
+// React 19 : ref transmise comme une prop
+import { ComponentProps } from 'react';
+
+const Input = ({ ref, ...props }: ComponentProps<'input'>) => <input ref={ref} {...props} />;
+```
+
+---
+
 
 # Hook - custom
 
