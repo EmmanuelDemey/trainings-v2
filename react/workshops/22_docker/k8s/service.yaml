@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: star-wars-people
+spec:
+  # TODO 5.4: this selector matches no pod — compare it with the labels of the
+  #   pod template in deployment.yaml. And nginx no longer listens on 80.
+  selector:
+    app: react-trainings
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

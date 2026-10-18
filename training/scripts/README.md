@@ -4,8 +4,8 @@ Ce dossier contient les scripts pour générer les PDFs des formations.
 
 ## generateA11y.js
 
-Script de génération des PDFs pour toutes les formations (Accessibilité, Elasticsearch Ops,
-React et Vue.js Avancé).
+Script de génération des PDFs pour toutes les formations (Accessibilité, Elasticsearch Ops
+et Vue.js Avancé).
 
 ### Prérequis
 
@@ -27,13 +27,12 @@ pnpm install
 Depuis le dossier `training/` :
 
 ```bash
-# Tous les PDFs (A11y + Elasticsearch + React + Vue.js Avancé) — plusieurs minutes
+# Tous les PDFs (A11y + Elasticsearch + Vue.js Avancé) — plusieurs minutes
 pnpm run generate:all
 
 # Une seule formation (slides + cahier d'exercices)
 pnpm run generate:a11y
 pnpm run generate:elasticsearch
-pnpm run generate:react
 pnpm run generate:vuejs-advanced
 
 # Le cahier d'exercices Vue.js Avancé seul (~1 s, pas d'export Slidev)
@@ -46,7 +45,7 @@ Les alias ci-dessus reposent sur deux options, combinables :
 
 | Option | Effet |
 |---|---|
-| `--only=<formation>` | Restreint aux formations données (séparées par des virgules). Valeurs : `a11y`, `elasticsearch`, `react`, `vuejs-advanced` |
+| `--only=<formation>` | Restreint aux formations données (séparées par des virgules). Valeurs : `a11y`, `elasticsearch`, `vuejs-advanced` |
 | `--slides` | Seulement les slides (Slidev) |
 | `--exercices` | Seulement les cahiers d'exercices (Puppeteer) |
 
@@ -54,7 +53,7 @@ Sans option, tout est généré.
 
 ```bash
 node ./scripts/generateA11y.js --only=vuejs-advanced --exercices
-node ./scripts/generateA11y.js --only=react,vuejs-advanced --slides
+node ./scripts/generateA11y.js --only=a11y,vuejs-advanced --slides
 ```
 
 L'export Slidev est de loin l'étape la plus lente (~45 s par formation, séquentiel à
@@ -209,7 +208,6 @@ optionnelle `^1.10.0`, donc c'est bien la version du projet qui décide.
 Le script `generateA11y.js` est conçu pour être extensible et génère actuellement :
 - Formation Accessibilité (2 PDFs)
 - Formation Elasticsearch Ops (3 PDFs)
-- Formation React (2 PDFs)
 - Formation Vue.js Avancé (2 PDFs)
 
 Pour ajouter d'autres formations, créez de nouvelles fonctions `generate<Formation>SlidesPdf()` et `generate<Formation>ExercisesPdf()` et ajoutez-les au `Promise.all()` dans la fonction `main()`.

@@ -1,0 +1,7 @@
+{
+  // The program Vitest typechecks to run the `*.test-d.ts` type tests:
+  // the same options, with the type tests back in.
+  "extends": "./tsconfig.json",
+  "include": ["src"],
+  "exclude": []
+}

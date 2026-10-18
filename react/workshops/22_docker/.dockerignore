@@ -1,0 +1,9 @@
+# Everything listed here stays out of the build context: `docker build` does not
+# even send it to the daemon.
+
+# TODO 3.1: keep the dependencies, the build output and the git history of your
+#   machine out of the image — the image installs and builds its own.
+
+.env.local
+.env.*.local
+*.log

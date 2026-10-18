@@ -1,0 +1,40 @@
+// TODO 3.1: this is plain CSS in a .scss file. Make it Sass:
+//   - a $radius variable (12px) and a $droid-color one (#0969da)
+//   - an `elevated($depth)` mixin producing the box-shadow below, used by
+//     .card (depth 1) and by its :hover (depth 4)
+//   - nest the h2 / dl / dt / dd rules and the :hover inside .card with `&`
+// TODO 3.2: a .droid class — a 2px $droid-color border, and a ' 🤖' after the
+//           h2 (`h2::after { content: ... }`).
+
+.card {
+  border: 1px solid var(--border, #d0d7de);
+  border-radius: 12px;
+  padding: 1rem;
+  background: var(--surface, #fff);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15);
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+
+.card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.card dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0 0 0.75rem;
+}
+
+.card dt {
+  color: var(--muted, #57606a);
+}
+
+.card dd {
+  margin: 0;
+}

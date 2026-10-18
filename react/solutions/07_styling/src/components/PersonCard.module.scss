@@ -1,0 +1,50 @@
+// Sass: variables, a mixin and nesting — compiled to plain CSS by Vite, then
+// scoped like any CSS Module because of the `.module.scss` suffix.
+$radius: 12px;
+$droid-color: #0969da;
+
+@mixin elevated($depth) {
+  box-shadow: 0 #{$depth}px #{$depth * 3}px rgb(0 0 0 / 0.15);
+}
+
+.card {
+  border: 1px solid var(--border, #d0d7de);
+  border-radius: $radius;
+  padding: 1rem;
+  background: var(--surface, #fff);
+  @include elevated(1);
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    @include elevated(4);
+  }
+
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.75rem;
+    margin: 0 0 0.75rem;
+  }
+
+  dt {
+    color: var(--muted, #57606a);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.droid {
+  border-color: $droid-color;
+  border-width: 2px;
+
+  h2::after {
+    content: ' 🤖';
+  }
+}

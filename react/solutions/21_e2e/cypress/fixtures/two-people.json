@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "name": "Luke Skywalker",
+    "height": "172",
+    "mass": "77",
+    "hairColor": "blond",
+    "skinColor": "fair",
+    "eyeColor": "blue",
+    "birthYear": "19BBY",
+    "gender": "male"
+  },
+  {
+    "id": "99",
+    "name": "Grogu",
+    "height": "41",
+    "mass": "17",
+    "hairColor": "white",
+    "skinColor": "green",
+    "eyeColor": "black",
+    "birthYear": "41BBY",
+    "gender": "male"
+  }
+]

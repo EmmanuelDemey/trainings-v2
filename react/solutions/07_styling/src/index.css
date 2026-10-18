@@ -1,0 +1,12 @@
+/* Global styles: the reset and the page. Everything component-specific lives
+   in a CSS Module next to its component. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}

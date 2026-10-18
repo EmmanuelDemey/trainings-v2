@@ -1,0 +1,51 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #d9e2ec;
+}
+
+ul[aria-busy='true'] {
+  opacity: 0.5;
+}
+
+li button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #d97706;
+  cursor: pointer;
+}
+
+[role='alert'] {
+  border-left: 4px solid #d64545;
+  background: #ffe3e3;
+  padding: 0.5rem 1rem;
+}

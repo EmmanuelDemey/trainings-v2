@@ -1,0 +1,12 @@
+.track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--track, #d0d7de);
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background: var(--accent, #ffe81f);
+  transition: width 0.3s;
+}

@@ -1,0 +1,20 @@
+/* The theme is a set of custom properties. Components only read
+   `var(--surface)`, `var(--accent)`…: switching theme is changing the values
+   here, never touching a component. */
+.root {
+  --page: #f6f8fa;
+  --surface: #fff;
+  --text: #1f2328;
+  --muted: #57606a;
+  --border: #d0d7de;
+  --track: #d0d7de;
+
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: var(--page);
+  color: var(--text);
+}
+
+/* TODO 5.2: when the root has data-theme="dark", redefine the six custom
+   properties: --page #0d1117, --surface #161b22, --text #e6edf3,
+   --muted #8d96a0, --border #30363d, --track #30363d. */

@@ -1,0 +1,21 @@
+.field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.field input {
+  font: inherit;
+  padding: 0.5rem;
+  border: 1px solid #8888;
+  border-radius: 0.375rem;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: #cf222e;
+}
+
+.field__error {
+  margin: 0;
+  color: #cf222e;
+  font-size: 0.875rem;
+}

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    // Cypress' globals (`cy`, `describe`, its chai `expect`) clash with Vitest's
+    // and jest-dom's: that is why the e2e code has its own tsconfig.
+    "types": ["cypress", "node"],
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts", "../cypress.config.ts"]
+}

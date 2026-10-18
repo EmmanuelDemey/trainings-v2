@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+**/dist/
+**/dist-ssr/
+**/storybook-static/
+**/stats.html
+*.local
+*.log
+*.tsbuildinfo
+
+# Test output
+**/coverage/
+**/cypress/screenshots/
+**/cypress/videos/
+**/cypress/downloads/
+**/test-results/
+# Vitest browser mode writes a screenshot next to the spec when a test fails.
+**/__screenshots__/
+
+# Env — the `.env` files are part of the workshops and ARE committed.
+# Only the local overrides (which may hold real values) are ignored.
+.env.local
+.env.*.local
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/

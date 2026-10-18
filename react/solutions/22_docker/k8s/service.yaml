@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: star-wars-people
+spec:
+  # Must match the labels of the pod TEMPLATE of deployment.yaml: a selector
+  # matching nothing is accepted by kubectl, and routes to nobody.
+  selector:
+    app: star-wars-people
+  ports:
+    - protocol: TCP
+      port: 80 # what the Ingress (and other pods) call
+      targetPort: 8080 # what nginx listens on in the container
+  type: ClusterIP

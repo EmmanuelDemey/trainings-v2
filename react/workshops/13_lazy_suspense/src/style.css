@@ -1,0 +1,90 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+button {
+  font: inherit;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid #9aa5b1;
+  border-radius: 0.4rem;
+  background: white;
+  cursor: pointer;
+}
+
+button[aria-pressed='true'],
+button[aria-current='page'] {
+  background: #1f2933;
+  color: white;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  gap: 1.5rem;
+}
+
+.people {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.people button {
+  width: 100%;
+  text-align: left;
+}
+
+.panel {
+  background: white;
+  border-radius: 0.6rem;
+  padding: 1rem 1.5rem;
+  min-height: 12rem;
+  transition: opacity 0.2s;
+}
+
+.panel[aria-busy='true'] {
+  opacity: 0.5;
+}
+
+.loader {
+  color: #52606d;
+  font-style: italic;
+}
+
+.error {
+  color: #a61b1b;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.3rem 1rem;
+}
+
+dt {
+  font-weight: 600;
+}
+
+dd {
+  margin: 0;
+}

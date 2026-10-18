@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: star-wars-people
+  # No `rewrite-target: /` annotation: it would turn /people/leia-organa into /
+  # before nginx sees it, and every deep link would land on the home page.
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: star-wars-people.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: star-wars-people
+                port:
+                  number: 80

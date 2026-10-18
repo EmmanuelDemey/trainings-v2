@@ -1,0 +1,53 @@
+# kubectl apply -f k8s/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: star-wars-people
+  labels:
+    app: star-wars-people
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: star-wars-people
+  template:
+    metadata:
+      labels:
+        app: star-wars-people
+    spec:
+      # The kubelet refuses to start the pod if the image's user is root — a
+      # guarantee that does not depend on who wrote the Dockerfile.
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: web
+          # The image the workflow of .github/workflows/ publishes, at a tag:
+          # never `latest`, or a rollback cannot name what it rolls back to.
+          image: ghcr.io/your-account/star-wars-people:1.0.0
+          ports:
+            - containerPort: 8080
+          # Same image in every environment: only these values change.
+          env:
+            - name: API_BASE_URL
+              value: 'https://swapi.example.com/api'
+            - name: APP_ENVIRONMENT
+              value: 'production'
+          securityContext:
+            allowPrivilegeEscalation: false
+          # Ready: the Service may send it traffic. Live: no need to restart it.
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: '32Mi'
+              cpu: '25m'
+            limits:
+              memory: '64Mi'

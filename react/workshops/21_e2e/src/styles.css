@@ -1,0 +1,43 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color-scheme: light dark;
+}
+
+header,
+main {
+  max-width: 48rem;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+nav a.active {
+  font-weight: 700;
+}
+
+form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 20rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #8884;
+}
+
+[role='alert'] {
+  color: #cf222e;
+}

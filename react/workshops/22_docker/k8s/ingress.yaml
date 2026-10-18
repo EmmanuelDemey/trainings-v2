@@ -1,0 +1,8 @@
+# TODO 5.5: an Ingress (`networking.k8s.io/v1`) named `star-wars-people`, with
+#   `ingressClassName: nginx` and one rule for the host
+#   `star-wars-people.example.com`: path `/`, `pathType: Prefix`, backend the
+#   Service of service.yaml, on its `port`.
+#
+#   Do NOT copy the `nginx.ingress.kubernetes.io/rewrite-target: /` annotation
+#   most tutorials carry: it rewrites /people/leia-organa to / before nginx
+#   even sees it.

@@ -1,0 +1,95 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+main {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 18rem 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.people {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.people li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.people button {
+  flex: 1;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  background: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+.people button[aria-pressed='true'] {
+  border-color: #2563eb;
+  background: #e0ebff;
+}
+
+.likes {
+  font-size: 0.875rem;
+  color: #52606d;
+}
+
+.person {
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.person dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.person dt {
+  font-weight: 600;
+}
+
+.person dd {
+  margin: 0;
+}
+
+.person > button {
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: #2563eb;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+.person > button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+[role='alert'] {
+  color: #c81e1e;
+}

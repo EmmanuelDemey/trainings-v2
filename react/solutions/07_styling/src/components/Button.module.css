@@ -1,0 +1,42 @@
+/* A CSS Module: every class below is renamed at build time (`_button_x7f2a`),
+   so `.primary` here can never clash with a `.primary` anywhere else. */
+.button {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  /* Themed through a custom property set by ThemeRoot — with a fallback. */
+  background: var(--accent, #ffe81f);
+  color: #000;
+}
+
+.secondary {
+  background: transparent;
+  border-color: currentColor;
+  color: inherit;
+}
+
+.danger {
+  background: #d1242f;
+  color: #fff;
+}
+
+.small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}

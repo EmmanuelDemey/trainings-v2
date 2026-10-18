@@ -1,0 +1,86 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+main {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.forms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1.5rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.field input:not([type='radio']),
+.field select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #9aa5b1;
+  border-radius: 0.25rem;
+  font: inherit;
+}
+
+/* `aria-invalid` is the styling hook: no extra "has-error" class to keep in sync. */
+[aria-invalid='true'] input:not([type='radio']),
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: #c81e1e;
+  outline-color: #c81e1e;
+}
+
+.radio {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-right: 1rem;
+}
+
+.field-error,
+[role='alert'] {
+  margin: 0;
+  color: #c81e1e;
+  font-size: 0.875rem;
+}
+
+[role='status'] {
+  margin: 0;
+  color: #0e7a3a;
+}
+
+button {
+  align-self: flex-start;
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: #2563eb;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}

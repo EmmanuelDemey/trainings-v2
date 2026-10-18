@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // `typescript`, `unicorn` and `oxc` are on by default; `react` is not, and it is
+  // the one that carries the rules of hooks.
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "env": { "browser": true },
+  // node_modules is listed because a workshop unzipped on its own has no
+  // .gitignore for oxlint to read.
+  "ignorePatterns": ["dist", "node_modules"],
+  // `correctness`: code that is outright wrong. The default, made explicit.
+  "categories": { "correctness": "error" },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    // The one that finds real bugs: a stale value read by an effect.
+    "react/exhaustive-deps": "error",
+    "typescript/no-explicit-any": "error",
+    "prefer-const": "error"
+  }
+}
