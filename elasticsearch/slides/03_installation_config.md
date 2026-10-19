@@ -39,6 +39,18 @@ At the end of this section, you will be able to:
 
 ---
 
+# Running with Docker
+
+A single-node cluster for development:
+
+```shell
+docker run -p 9200:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+```
+
+**Other options**: Elastic Cloud, Elastic Cloud Enterprise, Helm chart / ECK for Kubernetes, GCP / AWS / Clever Cloud marketplaces
+
+---
+
 # Elasticsearch Directory Structure
 
 After installation, understanding the file structure is essential for administration.
@@ -126,6 +138,24 @@ kill -SIGTERM $(cat pid)
 ```
 
 **First ES 8.x startup**: Note the auto-generated credentials and enrollment token in the logs!
+
+---
+
+# Verifying the Node
+
+From Kibana Dev Tools: `GET /` — or from a terminal: `curl -u elastic https://localhost:9200/` (security is on by default since 8.0)
+
+```json
+{
+  "name": "node-1",
+  "cluster_name": "elasticsearch",
+  "version": {
+    "number": "9.5.5",
+    "lucene_version": "10.5.1"
+  },
+  "tagline": "You Know, for Search"
+}
+```
 
 ---
 
