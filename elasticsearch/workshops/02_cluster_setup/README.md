@@ -1,4 +1,4 @@
-# TP 4 — Installation et Configuration du Cluster
+# TP 2 — Installation et Configuration du Cluster
 
 > Démarrer un second nœud Elasticsearch, le joindre au cluster existant, puis configurer des rôles de nœuds spécifiques (master-only, data-only) pour optimiser l'architecture.
 

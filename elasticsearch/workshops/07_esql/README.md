@@ -1,4 +1,4 @@
-# TP 12 — ES|QL: Explorer des Logs en Pipes
+# TP 7 — ES|QL: Explorer des Logs en Pipes
 
 > Interroger des logs avec ES|QL: filtrer, calculer, agréger, joindre une table de référence, et rechercher en plein texte — le tout dans une seule requête lisible de haut en bas.
 

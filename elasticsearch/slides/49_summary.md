@@ -2,7 +2,7 @@
 layout: section
 ---
 
-# Part 15: Summary and Q&A
+# Summary and Q&A
 
 ---
 
@@ -10,23 +10,19 @@ layout: section
 
 <v-clicks>
 
-**Day 1 - Fundamentals**:
-- Concepts, Installation, Indexing
-- Mapping (critical!): text vs keyword
-- Templates and Search
-- Vector, semantic and hybrid search
+**Day 1 - Cluster and Indexing**:
+- Search engines, Lucene, the Elastic Stack, cluster configuration
+- Documents, Bulk API, aliases
+- Mapping, analyzers, templates
 
-**Day 2 - Performance**:
-- Sizing and memory:data ratios
-- ILM Hot/Warm/Delete
-- Data streams: LogsDB, lifecycle, failure store, TSDS
-- JVM Troubleshooting
+**Day 2 - Search and Aggregation**:
+- Lucene syntax, Query DSL, ES|QL, Cross Cluster Search
+- Metric, bucket and pipeline aggregations
 
-**Day 3 - Production**:
-- Monitoring and Alerting
-- Security
-- APM
-- ES|QL
+**Day 3 - Testing and Operating the Cluster**:
+- SDKs and Testcontainers
+- Sizing, JVM, topology, security
+- ILM, snapshots, monitoring
 
 </v-clicks>
 

@@ -1,4 +1,4 @@
-# TP 3 — Agrégations
+# TP 6 — Agrégations
 
 > Utiliser les agrégations Elasticsearch pour extraire des statistiques et analyser les données sans récupérer tous les documents.
 

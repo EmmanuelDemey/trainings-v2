@@ -356,7 +356,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log(`Elasticsearch ${info.version?.number}`);
   // Every workshop README, then every chapter of the deck: each one on its own,
   // the cluster wiped in between. An optional filter keeps the files whose path
-  // holds it: `node scripts/check-console.mjs elasticsearch 07_ilm`.
+  // holds it: `node scripts/check-console.mjs elasticsearch 11_ilm`.
   const numbered = async (folder, keep) =>
     (await readdir(join(dir, folder), { withFileTypes: true }))
       .filter((entry) => /^\d/.test(entry.name) && keep(entry))

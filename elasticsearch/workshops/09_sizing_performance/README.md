@@ -1,4 +1,4 @@
-# TP 6 — Dimensionnement et Performance
+# TP 9 — Dimensionnement et Performance
 
 > Apprendre à calculer le nombre optimal de shards, configurer correctement le heap JVM, et analyser les thread pools pour diagnostiquer les problèmes de performance.
 

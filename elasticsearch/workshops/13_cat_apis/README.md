@@ -1,4 +1,4 @@
-# TP 5 — Inspection du Cluster avec les _cat APIs
+# TP 13 — Inspection du Cluster avec les _cat APIs
 
 > Maîtriser les _cat APIs pour inspecter rapidement l'état du cluster, des indices, des shards, et de l'allocation de ressources.
 

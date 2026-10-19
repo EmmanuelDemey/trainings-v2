@@ -1,4 +1,4 @@
-# TP 8 — Monitoring
+# TP 14 — Monitoring
 
 > Maîtriser les APIs de monitoring pour diagnostiquer l'état du cluster, surveiller les métriques des nœuds, et configurer les slow query logs pour identifier les requêtes problématiques.
 

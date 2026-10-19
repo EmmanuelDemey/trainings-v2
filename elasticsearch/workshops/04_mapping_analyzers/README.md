@@ -1,4 +1,4 @@
-# TP 2 — Mapping et Analyzers
+# TP 4 — Mapping et Analyzers
 
 > Créer un index avec un mapping explicite pour contrôler précisément comment les données sont indexées et recherchables.
 

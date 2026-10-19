@@ -1,4 +1,4 @@
-# TP 11 — Architecture Avancée et Production
+# TP 15 — Architecture Avancée et Production
 
 > Maîtriser les configurations avancées: shard allocation awareness, Snapshot Lifecycle Management, Field-Level Security, et architecture complète de production.
 
@@ -164,7 +164,7 @@ Automatiser la création et le nettoyage de snapshots avec des politiques SLM, i
 
 ### Setup de cette partie
 
-Vérifiez qu'un repository existe (créé au TP 9):
+Vérifiez qu'un repository existe (créé au TP 12):
 
 <!-- ci: skip -->
 ```bash

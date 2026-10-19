@@ -1,4 +1,4 @@
-# TP 9 — Sécurité: Snapshots et Restauration
+# TP 12 — Sécurité: Snapshots et Restauration
 
 > Maîtriser la configuration de repositories de snapshots, la création de sauvegardes, et la restauration d'indices pour assurer la protection des données.
 

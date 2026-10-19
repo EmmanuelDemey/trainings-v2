@@ -64,7 +64,7 @@ the deploy.
 ```bash
 docker build -t training-es ci && docker run -d --rm --name training-es -p 9200:9200 training-es
 ES_PASSWORD=training node ../scripts/check-console.mjs .            # everything
-ES_PASSWORD=training node ../scripts/check-console.mjs . 07_ilm     # one file
+ES_PASSWORD=training node ../scripts/check-console.mjs . 11_ilm     # one file
 ```
 
 - A comment before a block tunes its check: `<!-- ci: skip -->` (several nodes, a

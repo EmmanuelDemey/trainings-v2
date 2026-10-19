@@ -2,12 +2,12 @@
 layout: cover
 ---
 
-# Quiz - Day 1
-## Fundamentals, Mapping and Search
+# Quiz
+## Indexing, Mapping and Search
 
 ---
 
-# Quiz Day 1 — Question 1
+# Quiz — Question 1
 
 **What is the main data structure used by Elasticsearch to perform fast searches?**
 
@@ -24,7 +24,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 2
+# Quiz — Question 2
 
 **What is the default port used by the Elasticsearch REST API?**
 
@@ -41,7 +41,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 3
+# Quiz — Question 3
 
 **What does a "yellow" cluster health status mean in Elasticsearch?**
 
@@ -58,7 +58,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 4
+# Quiz — Question 4
 
 **Which API should you use to index a large volume of documents?**
 
@@ -75,7 +75,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 5
+# Quiz — Question 5
 
 **What is the difference between `text` and `keyword` field types in a mapping?**
 
@@ -92,7 +92,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 6
+# Quiz — Question 6
 
 **What is the role of an analyzer in Elasticsearch?**
 
@@ -109,7 +109,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 7
+# Quiz — Question 7
 
 **In a `bool` query, which clause filters documents without affecting the relevance score?**
 
@@ -126,7 +126,7 @@ layout: cover
 
 ---
 
-# Quiz Day 1 — Question 8
+# Quiz — Question 8
 
 **Which scoring algorithm is used by default in Elasticsearch?**
 

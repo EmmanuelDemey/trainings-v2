@@ -1,4 +1,4 @@
-# TP 7 — ILM et Rétention des Données
+# TP 11 — ILM et Rétention des Données
 
 > Concevoir une architecture hot-warm-cold pour optimiser coût/performance, et configurer des policies Index Lifecycle Management (ILM) pour automatiser les transitions.
 
