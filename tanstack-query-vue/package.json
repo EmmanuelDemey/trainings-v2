@@ -15,7 +15,7 @@
   "devDependencies": {
     "@astrojs/starlight": "^0.42.0",
     "@emmanueldemey/training-kit": "^0.0.1",
-    "@slidev/cli": "52.8.0",
+    "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",
     "@stackblitz/sdk": "^1.11.1",

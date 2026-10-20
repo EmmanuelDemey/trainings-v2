@@ -13,7 +13,7 @@ Une application de e-commerce envoie ses logs et ses métriques dans Elasticsear
 
 Ce TP est autonome. Vérifiez que le cluster répond:
 
-```bash
+```json
 GET /_cluster/health
 ```
 
@@ -23,7 +23,7 @@ GET /_cluster/health
 
 Elasticsearch fournit déjà un template pour `logs-*-*`, utilisé par Elastic Agent:
 
-```bash
+```json
 GET /_index_template/logs
 ```
 
@@ -49,7 +49,7 @@ La convention de nommage est `<type>-<dataset>-<namespace>`: `logs-shop-producti
 
 Créez un template pour les logs de la boutique, plus prioritaire que le template intégré sur `logs-shop-*`:
 
-```bash
+```json
 PUT /_index_template/logs-shop-template
 {
   "index_patterns": ["logs-shop-*"],
@@ -86,7 +86,7 @@ PUT /_index_template/logs-shop-template
 
 Le data stream est créé au premier document:
 
-```bash
+```json
 POST /logs-shop-production/_bulk?refresh=true
 {"create":{}}
 {"@timestamp":"2026-10-08T10:00:00Z","host.name":"web-1","message":"GET /home 200","http.status":200}
@@ -98,7 +98,7 @@ POST /logs-shop-production/_bulk?refresh=true
 
 Un data stream n'accepte que des **créations** (`create`, pas `index` avec un `_id` existant).
 
-```bash
+```json
 GET /_data_stream/logs-shop-production
 ```
 
@@ -121,12 +121,12 @@ GET /_data_stream/logs-shop-production
 
 En LogsDB, le `_source` n'est pas stocké: il est **reconstruit** à partir des doc values. Indexez un document avec une valeur invalide:
 
-```bash
+```json
 POST /logs-shop-production/_doc?refresh=true
 { "@timestamp": "2026-10-08T10:03:00Z", "host.name": "web-3", "message": "GET /status", "http.status": "oops" }
 ```
 
-```bash
+```json
 POST /logs-shop-production/_search
 {
   "query": { "term": { "host.name": "web-3" } }
@@ -158,18 +158,18 @@ POST /logs-shop-production/_search
 
 ### Étape 5: Consulter et modifier la rétention
 
-```bash
+```json
 GET /_data_stream/logs-shop-production/_lifecycle
 ```
 
 L'équipe sécurité demande 30 jours. Modifiez la rétention du data stream existant, sans toucher au template:
 
-```bash
+```json
 PUT /_data_stream/logs-shop-production/_lifecycle
 { "data_retention": "30d" }
 ```
 
-```bash
+```json
 GET /logs-shop-production/_lifecycle/explain
 ```
 
@@ -183,7 +183,7 @@ GET /logs-shop-production/_lifecycle/explain
 
 Un document sans `@timestamp` ne peut pas entrer dans un data stream. Sans failure store, il serait perdu (et le client recevrait une erreur qu'il ignore souvent):
 
-```bash
+```json
 POST /logs-shop-production/_doc
 { "host.name": "web-2", "message": "log sans horodatage" }
 ```
@@ -200,11 +200,11 @@ POST /logs-shop-production/_doc
 
 Le sélecteur `::failures` donne accès au failure store, comme à un index:
 
-```bash
+```json
 POST /logs-shop-production::failures/_refresh
 ```
 
-```bash
+```json
 POST /logs-shop-production::failures/_search
 {
   "_source": ["error.type", "error.message", "document.source"]
@@ -230,7 +230,7 @@ POST /logs-shop-production::failures/_search
 
 Et en ES|QL, pour un tableau de bord des échecs:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
@@ -253,7 +253,7 @@ POST /_query?format=json
 
 Un TSDS n'accepte que les points proches de « maintenant » (par défaut, de 2 heures avant à 30 minutes après). Elastic Agent horodate ses métriques; ici, un pipeline d'ingestion pose `@timestamp` à l'heure de réception:
 
-```bash
+```json
 PUT /_ingest/pipeline/metrics-shop-timestamp
 {
   "processors": [
@@ -264,7 +264,7 @@ PUT /_ingest/pipeline/metrics-shop-timestamp
 
 ### Étape 9: Le template time series
 
-```bash
+```json
 PUT /_index_template/metrics-shop-template
 {
   "index_patterns": ["metrics-shop-*"],
@@ -302,7 +302,7 @@ PUT /_index_template/metrics-shop-template
 
 ### Étape 10: Envoyer des métriques
 
-```bash
+```json
 POST /metrics-shop-production/_bulk?refresh=true
 {"create":{}}
 {"host.name":"web-1","cpu.pct":0.42,"http.requests":1000}
@@ -310,7 +310,7 @@ POST /metrics-shop-production/_bulk?refresh=true
 {"host.name":"web-2","cpu.pct":0.87,"http.requests":2500}
 ```
 
-```bash
+```json
 GET /_data_stream/metrics-shop-production
 ```
 
@@ -329,7 +329,7 @@ Regardez `time_series.temporal_ranges`: la plage de temps acceptée par la backi
 
 La commande source `TS` d'ES|QL lit un time series data stream:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """

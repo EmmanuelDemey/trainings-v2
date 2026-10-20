@@ -63,7 +63,7 @@ Elasticsearch provides several [monitoring APIs](https://www.elastic.co/guide/en
 The [_cluster/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-stats.html) API provides aggregated statistics for the entire cluster.
 
 **Request**:
-```bash
+```json
 GET /_cluster/stats
 ```
 
@@ -94,7 +94,7 @@ GET /_cluster/stats
 The [_nodes/stats](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html) API returns detailed metrics per node.
 
 **Request with filters**:
-```bash
+```json
 GET /_nodes/stats/jvm,os,process,indices,fs,thread_pool,breaker
 ```
 
@@ -116,7 +116,7 @@ GET /_nodes/stats/jvm,os,process,indices,fs,thread_pool,breaker
 The [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) offer concise views for daily operations.
 
 **Cat Indices** (index state):
-```bash
+```json
 GET /_cat/indices?v&h=index,health,status,pri,rep,docs.count,store.size&s=store.size:desc
 ```
 
@@ -128,7 +128,7 @@ products       yellow open     1   1     100000       50mb
 ```
 
 **Cat Shards** (location and state):
-```bash
+```json
 GET /_cat/shards?v&h=index,shard,prirep,state,node,store&s=store:desc
 ```
 
@@ -148,7 +148,7 @@ logs-2023 0     r      STARTED node-2  512mb
 The [_nodes/hot_threads](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html) API identifies threads consuming the most CPU.
 
 **Request**:
-```bash
+```json
 GET /_nodes/hot_threads
 GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
 ```
@@ -182,7 +182,7 @@ GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
 - RED: At least one primary shard missing - DATA LOSS
 
 **Detailed request**:
-```bash
+```json
 GET /_cluster/health?level=indices
 ```
 
@@ -209,7 +209,7 @@ active_shards_percent:
 **CPU** and **memory** monitoring is critical for stability.
 
 **CPU monitoring**:
-```bash
+```json
 GET /_nodes/stats/os,process?filter_path=nodes.*.os.cpu,nodes.*.process.cpu
 ```
 
@@ -220,7 +220,7 @@ GET /_nodes/stats/os,process?filter_path=nodes.*.os.cpu,nodes.*.process.cpu
 - **>95%**: Overloaded cluster, immediate action
 
 **Heap memory monitoring**:
-```bash
+```json
 GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem
 ```
 
@@ -243,7 +243,7 @@ If average >100ms -> heap or GC tuning issue
 [Disk monitoring](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cluster.html#disk-based-shard-allocation) prevents failures due to disk filling.
 
 **Disk space monitoring**:
-```bash
+```json
 GET /_nodes/stats/fs?filter_path=nodes.*.fs.total
 ```
 
@@ -274,7 +274,7 @@ PUT /_cluster/settings
 **Indexing** and **search** metrics measure application performance.
 
 **Indexing metrics**:
-```bash
+```json
 GET /_nodes/stats/indices?filter_path=nodes.*.indices.indexing
 ```
 
@@ -289,7 +289,7 @@ avg_indexing_latency = index_time_in_millis / index_total
 ```
 
 **Search metrics**:
-```bash
+```json
 GET /_nodes/stats/indices?filter_path=nodes.*.indices.search
 ```
 
@@ -310,7 +310,7 @@ avg_search_latency = query_time_in_millis / query_total
 [Thread pool rejections](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html) indicate cluster overload.
 
 **Rejections monitoring**:
-```bash
+```json
 GET /_nodes/stats/thread_pool?filter_path=nodes.*.thread_pool.*.rejected
 ```
 

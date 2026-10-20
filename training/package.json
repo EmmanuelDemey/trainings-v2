@@ -13,7 +13,7 @@
     "merge:elasticsearch-ops": "bash merge_elasticsearch_ops_pw.sh"
   },
   "dependencies": {
-    "@slidev/cli": "52.8.0",
+    "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",
     "piscina": "^5.0.0-alpha.0"

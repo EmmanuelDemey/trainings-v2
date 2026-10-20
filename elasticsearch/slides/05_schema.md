@@ -138,7 +138,7 @@ PUT /advanced_custom_index
 
 * An analyzer is defined in the settings **of the index** that uses it
 
-```
+```json
 PUT movies_v2
 {
   "settings": {
@@ -175,25 +175,25 @@ PUT movies_v2
 
 # Mapping Modification
 
-![](/images/reindex1.png)
+<img src="/images/reindex1.png" class="h-96 mx-auto object-contain" />
 
 ---
 
 # Mapping Modification
 
-![](/images/reindex2.png)
+<img src="/images/reindex2.png" class="h-96 mx-auto object-contain" />
 
 ---
 
 # Mapping Modification
 
-![](/images/reindex3.png)
+<img src="/images/reindex3.png" class="h-96 mx-auto object-contain" />
 
 ---
 
 # Alias Configuration
 
-```
+```json
 POST /_aliases
 {
     "actions": [
@@ -219,7 +219,7 @@ POST /_aliases
 
 * We can reindex a complete index
 
-```
+```json
 POST _reindex
 {
   "source": {
@@ -237,7 +237,7 @@ POST _reindex
 
 * Or just a portion by defining a search query
 
-```
+```json
 POST _reindex
 {
   "source": {
@@ -262,7 +262,7 @@ POST _reindex
 * We can reindex data from a remote cluster (listed in `reindex.remote.whitelist`)
 
 <!-- ci: skip -->
-```
+```json
 POST _reindex
 {
   "source": {

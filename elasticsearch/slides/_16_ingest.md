@@ -13,7 +13,7 @@ layout: cover
 * Allows transformation, enrichment, and manipulation of data
 * Each pipeline consists of one or more processors executed in order
 
-```
+```json
 PUT _ingest/pipeline/my_pipeline
 {
   "description": "My first ingest pipeline",
@@ -98,7 +98,7 @@ node.roles: [ master, data ]   # no "ingest"
 * Specify processors and their order
 * Test the pipeline with sample data
 
-```
+```json
 PUT _ingest/pipeline/my_custom_pipeline
 {
   "processors": [
@@ -116,7 +116,7 @@ PUT _ingest/pipeline/my_custom_pipeline
 * Specify one or more sample documents to test
 * Analyze the output to understand how the pipeline transforms the data
 
-```
+```json
 POST _ingest/pipeline/_simulate
 {
   "pipeline": {
@@ -137,7 +137,7 @@ POST _ingest/pipeline/_simulate
 
 * Index Templates
 
-```
+```json
 PUT _index_template/my_template
 {
   "index_patterns": ["my-app-*"],
@@ -151,7 +151,7 @@ PUT _index_template/my_template
 
 * When Reindexing
 
-```
+```json
 POST _reindex
 {
   "source": {
@@ -166,7 +166,7 @@ POST _reindex
 
 * When indexing
 
-```
+```json
 PUT /my-index/_doc/1?pipeline=my_ingest_pipeline
 {
   "field1": "value1",

@@ -96,7 +96,7 @@ path.repo: ["/usr/share/elasticsearch/backups"]
 
 **Step 3**: Create the repository via API:
 
-```bash
+```json
 PUT /_snapshot/my_backup
 {
   "type": "fs",
@@ -112,7 +112,7 @@ PUT /_snapshot/my_backup
 
 **Step 4**: Verify the repository:
 
-```bash
+```json
 GET /_snapshot/my_backup
 ```
 
@@ -122,7 +122,7 @@ GET /_snapshot/my_backup
 
 **Complete cluster snapshot**:
 
-```bash
+```json
 PUT /_snapshot/my_backup/snapshot_1?wait_for_completion=true
 {
   "indices": "*",
@@ -137,7 +137,7 @@ PUT /_snapshot/my_backup/snapshot_1?wait_for_completion=true
 
 **Snapshot of specific indices**:
 
-```bash
+```json
 PUT /_snapshot/my_backup/snapshot_products_2024_01_15?wait_for_completion=true
 {
   "indices": "products-*,orders-2024-01-*",
@@ -159,13 +159,13 @@ PUT /_snapshot/my_backup/snapshot_products_2024_01_15?wait_for_completion=true
 
 **List all snapshots from a repository**:
 
-```bash
+```json
 GET /_snapshot/my_backup/_all
 ```
 
 **Get status of an in-progress snapshot**:
 
-```bash
+```json
 GET /_snapshot/my_backup/snapshot_1/_status
 ```
 
@@ -201,7 +201,7 @@ GET /_snapshot/my_backup/snapshot_1/_status
 **Restore everything** — on an **empty** cluster (disaster recovery):
 
 <!-- ci: skip -->
-```bash
+```json
 POST /_snapshot/my_backup/snapshot_1/_restore
 {
   "indices": "*",
@@ -214,7 +214,7 @@ POST /_snapshot/my_backup/snapshot_1/_restore
 
 **Restore with renaming** (for testing or comparison):
 
-```bash
+```json
 POST /_snapshot/my_backup/snapshot_1/_restore
 {
   "indices": "products",
@@ -230,7 +230,7 @@ POST /_snapshot/my_backup/snapshot_1/_restore
 
 **Partial restoration** (only certain indices) — over a **closed** index:
 
-```bash
+```json
 POST /orders-2024-01-15/_close
 
 POST /_snapshot/my_backup/snapshot_1/_restore
@@ -256,7 +256,7 @@ POST /_snapshot/my_backup/snapshot_1/_restore
 
 **Create an SLM policy**:
 
-```bash
+```json
 PUT /_slm/policy/daily-snapshots
 {
   "schedule": "0 30 1 * * ?",
@@ -292,19 +292,19 @@ PUT /_slm/policy/daily-snapshots
 
 **Manually execute an SLM policy**:
 
-```bash
+```json
 POST /_slm/policy/daily-snapshots/_execute
 ```
 
 **Check policy status**:
 
-```bash
+```json
 GET /_slm/policy/daily-snapshots
 ```
 
 **Display statistics of all policies** (snapshots taken, failed, deleted):
 
-```bash
+```json
 GET /_slm/stats
 ```
 
@@ -340,7 +340,7 @@ GET /_slm/stats
 
 **Delete a specific snapshot**:
 
-```bash
+```json
 DELETE /_snapshot/my_backup/snapshot_1
 ```
 
@@ -352,7 +352,7 @@ DELETE /_snapshot/my_backup/snapshot_1
 **Unregister a repository** — its snapshots stay in the storage, and come back if it is registered again:
 
 <!-- ci: skip -->
-```bash
+```json
 DELETE /_snapshot/my_backup
 ```
 
@@ -386,7 +386,7 @@ A **rolling restart** allows restarting nodes one by one without service interru
 
 **Step 1**: Disable shard allocation
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -403,7 +403,7 @@ PUT /_cluster/settings
 
 **Step 2**: Flush (optional but recommended)
 
-```bash
+```json
 POST /_flush
 ```
 
@@ -436,7 +436,7 @@ sudo systemctl start elasticsearch
 
 **Step 6**: Verify the node has joined the cluster
 
-```bash
+```json
 GET /_cat/nodes?v&h=name,node.role,uptime,heap.percent,cpu,load_1m
 ```
 
@@ -448,7 +448,7 @@ Wait for the node to be **UP** with low uptime (indicating a recent restart).
 
 **Step 7**: Verify cluster health before moving to the next node
 
-```bash
+```json
 GET /_cluster/health?wait_for_status=yellow&timeout=5m
 ```
 
@@ -456,7 +456,7 @@ GET /_cluster/health?wait_for_status=yellow&timeout=5m
 
 **Step 9**: Re-enable full shard allocation
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -467,7 +467,7 @@ PUT /_cluster/settings
 
 **Step 10**: Verify final cluster status
 
-```bash
+```json
 GET /_cluster/health?wait_for_status=green&timeout=10m
 ```
 
@@ -504,7 +504,7 @@ kill -9 $(cat /var/run/elasticsearch/elasticsearch.pid)
 
 **Monitor shard allocation**:
 
-```bash
+```json
 GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason&s=state
 ```
 
@@ -516,7 +516,7 @@ GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason&s=state
 
 **Identify unassigned shards**:
 
-```bash
+```json
 GET /_cluster/allocation/explain
 {
   "index": "my-index",
@@ -567,7 +567,7 @@ Elasticsearch follows strict version compatibility rules.
 
 **Step 2**: Check compatibility via API
 
-```bash
+```json
 GET /_migration/deprecations
 ```
 
@@ -600,7 +600,7 @@ Check levels: `warning`, `critical`
 
 **Step 3**: Create a complete snapshot
 
-```bash
+```json
 PUT /_snapshot/my_backup/pre_upgrade_snapshot
 {
   "indices": "*",
@@ -627,7 +627,7 @@ PUT /_snapshot/my_backup/pre_upgrade_snapshot
 
 **Step 1**: Disable shard allocation
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -638,7 +638,7 @@ PUT /_cluster/settings
 
 **Step 2**: Stop machine learning and monitoring tasks (if applicable)
 
-```bash
+```json
 POST _ml/set_upgrade_mode?enabled=true
 ```
 
@@ -688,7 +688,7 @@ sudo systemctl start elasticsearch
 
 **Step 7**: Verify the node has joined the cluster
 
-```bash
+```json
 GET /_cat/nodes?v&h=name,version,node.role,uptime
 ```
 
@@ -696,7 +696,7 @@ You should see the new version for the restarted node.
 
 **Step 8**: Re-enable shard allocation
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -707,7 +707,7 @@ PUT /_cluster/settings
 
 **Step 9**: Wait for cluster to be GREEN
 
-```bash
+```json
 GET /_cluster/health?wait_for_status=green&timeout=10m
 ```
 
@@ -715,7 +715,7 @@ GET /_cluster/health?wait_for_status=green&timeout=10m
 
 **Step 11**: Re-enable machine learning
 
-```bash
+```json
 POST _ml/set_upgrade_mode?enabled=false
 ```
 
@@ -725,13 +725,13 @@ POST _ml/set_upgrade_mode?enabled=false
 
 **Verify versions of all nodes**:
 
-```bash
+```json
 GET /_cat/nodes?v&h=name,version,build,jdk
 ```
 
 **Verify indices and their versions**:
 
-```bash
+```json
 GET /_cat/indices?v&h=index,health,status,pri,rep,docs.count,store.size
 ```
 
@@ -741,7 +741,7 @@ GET /_cat/indices?v&h=index,health,status,pri,rep,docs.count,store.size
 3. Run a simple aggregation
 4. Verify Kibana dashboards
 
-```bash
+```json
 # Indexing test
 POST /test-post-upgrade/_doc
 {"timestamp": "2024-01-15T10:00:00Z", "message": "Post-upgrade test"}
@@ -769,7 +769,7 @@ GET /test-post-upgrade/_search
 2. Force allocation if necessary (last resort):
 
 <!-- ci: skip -->
-```bash
+```json
 POST /_cluster/reroute
 {
   "commands": [{

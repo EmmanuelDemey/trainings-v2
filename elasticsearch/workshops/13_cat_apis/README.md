@@ -12,7 +12,7 @@ En tant qu'administrateur, vous devez diagnostiquer régulièrement l'état du c
 
 **Avant de commencer**, créez des index de test avec des données:
 
-```bash
+```json
 PUT /logs-2023.11
 {
   "settings": {
@@ -34,7 +34,7 @@ POST /logs-2023.11/_bulk
 
 ### Étape 1: Lister tous les indices avec _cat/indices
 
-```bash
+```json
 GET /_cat/indices?v
 ```
 
@@ -47,7 +47,7 @@ GET /_cat/indices?v
 
 ### Étape 2: Filtrer et trier les indices
 
-```bash
+```json
 GET /_cat/indices?v&s=store.size:desc&h=index,health,docs.count,store.size
 ```
 
@@ -58,7 +58,7 @@ GET /_cat/indices?v&s=store.size:desc&h=index,health,docs.count,store.size
 
 ### Étape 3: Inspecter l'allocation des shards avec _cat/shards
 
-```bash
+```json
 GET /_cat/shards?v
 ```
 
@@ -69,7 +69,7 @@ GET /_cat/shards?v
 
 ### Étape 4: Identifier les shards problématiques
 
-```bash
+```json
 GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason
 ```
 
@@ -81,7 +81,7 @@ GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason
 
 ### Étape 5: Vérifier l'utilisation disque avec _cat/allocation
 
-```bash
+```json
 GET /_cat/allocation?v
 ```
 
@@ -89,7 +89,7 @@ GET /_cat/allocation?v
 
 ### Étape 6: Surveiller les pending tasks
 
-```bash
+```json
 GET /_cat/pending_tasks?v
 ```
 
@@ -98,20 +98,20 @@ GET /_cat/pending_tasks?v
 ### Validation
 
 1. Comparer _cat/indices et _cat/shards pour un index:
-```bash
+```json
 GET /_cat/indices/logs-2023.11?v
 GET /_cat/shards/logs-2023.11?v
 ```
 **Vérification**: `pri × (1 + rep)` = nombre total de shards dans _cat/shards.
 
 2. Exporter les résultats en JSON:
-```bash
+```json
 GET /_cat/nodes?format=json
 GET /_cat/indices?format=json&pretty
 ```
 
 3. Utiliser help pour découvrir toutes les colonnes:
-```bash
+```json
 GET /_cat/indices?help
 GET /_cat/nodes?help
 ```

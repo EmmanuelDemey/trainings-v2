@@ -140,7 +140,7 @@ Each analyzed term is added to the inverted index with:
 # Document Indexing API
 
 **Index a single document**:
-```bash
+```json
 POST /my-index/_doc/1
 {
   "title": "Introduction to Elasticsearch",
@@ -168,7 +168,7 @@ More info: [Index API](https://www.elastic.co/guide/en/elasticsearch/reference/c
 
 The [Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) allows indexing multiple documents in a single request:
 
-```bash
+```json
 POST /_bulk
 { "index": { "_index": "my-index", "_id": "1" }}
 { "title": "Doc 1", "content": "..." }

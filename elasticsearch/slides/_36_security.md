@@ -307,7 +307,7 @@ Enabling security and creating users
 
 **Verify security status**:
 
-```bash
+```json
 GET /_xpack
 ```
 
@@ -379,7 +379,7 @@ PASSWORD elastic = aZ9kL2mN5vB7cX4r
 
 **Create a user with role**:
 
-```bash
+```json
 POST /_security/user/john_doe
 {
   "password": "StrongPassword123!",
@@ -402,13 +402,13 @@ POST /_security/user/john_doe
 
 **List all users**:
 
-```bash
+```json
 GET /_security/user
 ```
 
 **Get a specific user**:
 
-```bash
+```json
 GET /_security/user/john_doe
 ```
 
@@ -418,7 +418,7 @@ GET /_security/user/john_doe
 
 **Change a user's password**:
 
-```bash
+```json
 POST /_security/user/john_doe/_password
 {
   "password": "NewSecurePassword456!"
@@ -427,7 +427,7 @@ POST /_security/user/john_doe/_password
 
 **Modify a user's roles**:
 
-```bash
+```json
 PUT /_security/user/john_doe
 {
   "roles": ["kibana_admin", "monitoring_user", "reporting_user"],
@@ -438,19 +438,19 @@ PUT /_security/user/john_doe
 
 **Disable a user** (without deleting):
 
-```bash
+```json
 PUT /_security/user/john_doe/_disable
 ```
 
 **Re-enable a user**:
 
-```bash
+```json
 PUT /_security/user/john_doe/_enable
 ```
 
 **Delete a user**:
 
-```bash
+```json
 DELETE /_security/user/john_doe
 ```
 
@@ -466,7 +466,7 @@ curl -u elastic:password "https://localhost:9200/_cluster/health?pretty"
 
 **Method 2: Authenticate API**:
 
-```bash
+```json
 GET /_security/_authenticate
 ```
 
@@ -571,7 +571,7 @@ Elasticsearch defines privileges at **two levels**:
 
 **Example 1: "Read Only" role on log indices**:
 
-```bash
+```json
 POST /_security/role/logs_reader
 {
   "cluster": ["monitor"],
@@ -593,7 +593,7 @@ POST /_security/role/logs_reader
 
 **Example 2: "Developer" role**:
 
-```bash
+```json
 POST /_security/role/developer
 {
   "cluster": ["monitor", "manage_index_templates"],
@@ -615,7 +615,7 @@ POST /_security/role/developer
 
 You can specify **individual actions** for fine-grained control:
 
-```bash
+```json
 POST /_security/role/index_manager
 {
   "cluster": [],
@@ -648,7 +648,7 @@ POST /_security/role/index_manager
 
 **Method 1: During user creation**:
 
-```bash
+```json
 POST /_security/user/alice
 {
   "password": "SecurePass123!",
@@ -658,7 +658,7 @@ POST /_security/user/alice
 
 **Method 2: Modify an existing user**:
 
-```bash
+```json
 PUT /_security/user/alice
 {
   "roles": ["logs_reader", "kibana_user", "developer"]
@@ -667,7 +667,7 @@ PUT /_security/user/alice
 
 **Verify a user's roles**:
 
-```bash
+```json
 GET /_security/user/alice
 ```
 
@@ -707,7 +707,7 @@ readonly:
 
 **Via API**:
 
-```bash
+```json
 POST /_security/role_mapping/ldap_admins
 {
   "roles": ["kibana_admin", "superuser"],
@@ -722,7 +722,7 @@ POST /_security/role_mapping/ldap_admins
 
 **Advanced rules** (with conditions):
 
-```bash
+```json
 POST /_security/role_mapping/conditional_access
 {
   "roles": ["developer"],
@@ -764,7 +764,7 @@ Elasticsearch provides **predefined roles** for common use cases:
 
 **View all predefined roles**:
 
-```bash
+```json
 GET /_security/role
 ```
 
@@ -786,7 +786,7 @@ Document-Level Security, Field-Level Security, and Kibana management
 
 **Example: Access only to department orders**:
 
-```bash
+```json
 POST /_security/role/sales_team
 {
   "cluster": ["monitor"],
@@ -810,7 +810,7 @@ POST /_security/role/sales_team
 
 **Complex query with bool**:
 
-```bash
+```json
 "query": {
   "bool": {
     "must": [
@@ -835,7 +835,7 @@ POST /_security/role/sales_team
 
 **Example: Hide sensitive information**:
 
-```bash
+```json
 POST /_security/role/hr_analyst
 {
   "cluster": ["monitor"],
@@ -858,7 +858,7 @@ POST /_security/role/hr_analyst
 
 **Grant with wildcards**:
 
-```bash
+```json
 "field_security": {
   "grant": ["public_*", "metadata.*", "name", "email"],
   "except": ["metadata.internal", "public_notes"]
@@ -871,7 +871,7 @@ POST /_security/role/hr_analyst
 
 You can combine **DLS** (document filtering) and **FLS** (field filtering):
 
-```bash
+```json
 POST /_security/role/regional_manager
 {
   "cluster": ["monitor"],
@@ -905,7 +905,7 @@ POST /_security/role/regional_manager
 
 **Create an API key**:
 
-```bash
+```json
 POST /_security/api_key
 {
   "name": "my-app-key",
@@ -951,19 +951,19 @@ curl -H "Authorization: ApiKey YWJjMTIzeHl6OmJONmpIOW1QNHRZOHFXM3hhWjlrTDJtTjV2Q
 
 **List all API keys**:
 
-```bash
+```json
 GET /_security/api_key
 ```
 
 **Get a specific API key**:
 
-```bash
+```json
 GET /_security/api_key?name=my-app-key
 ```
 
 **Invalidate an API key**:
 
-```bash
+```json
 DELETE /_security/api_key
 {
   "ids": ["abc123xyz"]
@@ -972,7 +972,7 @@ DELETE /_security/api_key
 
 **Invalidate all API keys for a user**:
 
-```bash
+```json
 DELETE /_security/api_key
 {
   "username": "john_doe"
@@ -981,7 +981,7 @@ DELETE /_security/api_key
 
 **Invalidate expired API keys**:
 
-```bash
+```json
 DELETE /_security/api_key
 {
   "owner": true
@@ -1009,7 +1009,7 @@ DELETE /_security/api_key
 
 **Configure Feature Privileges per Space**:
 
-```bash
+```json
 POST /_security/role/sales_kibana_user
 {
   "applications": [

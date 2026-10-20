@@ -18,7 +18,7 @@ L'équipe marketing souhaite indexer des articles de blog avec des exigences sp�
 
 ### Étape 1: Créer l'index avec mapping explicite
 
-```bash
+```json
 PUT /blog_posts
 {
   "settings": {
@@ -77,7 +77,7 @@ PUT /blog_posts
 
 ### Étape 2: Indexer des articles de blog
 
-```bash
+```json
 POST /blog_posts/_doc/1
 {
   "title": "Introduction à Elasticsearch",
@@ -127,7 +127,7 @@ POST /blog_posts/_doc/3
 ### Étape 3: Tester les différents types de champs
 
 **Test 1 - Recherche full-text** (type `text`):
-```bash
+```json
 GET /blog_posts/_search
 {
   "query": {
@@ -140,7 +140,7 @@ GET /blog_posts/_search
 **Résultat attendu**: Document 2 retourné (analyseur French appliqué).
 
 **Test 2 - Filtrage exact** (type `keyword`):
-```bash
+```json
 GET /blog_posts/_search
 {
   "query": {
@@ -153,7 +153,7 @@ GET /blog_posts/_search
 **Résultat attendu**: Documents 1 et 3 retournés.
 
 **Test 3 - Recherche par date** (type `date`):
-```bash
+```json
 GET /blog_posts/_search
 {
   "query": {
@@ -168,7 +168,7 @@ GET /blog_posts/_search
 **Résultat attendu**: Documents 2 et 3 retournés.
 
 **Test 4 - Recherche géographique** (type `geo_point`):
-```bash
+```json
 GET /blog_posts/_search
 {
   "query": {
@@ -186,7 +186,7 @@ GET /blog_posts/_search
 
 ### Étape 4: Tenter d'ajouter un nouveau champ dynamique
 
-```bash
+```json
 POST /blog_posts/_doc/4
 {
   "title": "Nouveau champ non mappé",
@@ -202,7 +202,7 @@ POST /blog_posts/_doc/4
 ```
 
 Vérifiez le mapping après insertion:
-```bash
+```json
 GET /blog_posts/_mapping
 ```
 **Observation**: `new_field` a été ajouté automatiquement au mapping (mapping dynamique activé par défaut).

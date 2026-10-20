@@ -299,7 +299,7 @@ index.indexing.slowlog.threshold.index.info: 5s
 # Log Configuration: log4j2.properties
 
 **Dynamic adjustment** (without restart):
-```bash
+```json
 PUT /_cluster/settings
 {
   "transient": {
@@ -347,7 +347,7 @@ export ES_USER=elasticsearch
 The [_cat APIs](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html) provide readable information about cluster status.
 
 **Essential commands**:
-```bash
+```json
 # Cluster health (global status)
 GET /_cat/health?v
 
@@ -377,7 +377,7 @@ GET /_cat/master?v
 The [_cluster/health](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html) API returns detailed cluster status.
 
 **Request**:
-```bash
+```json
 GET /_cluster/health
 ```
 
@@ -413,7 +413,7 @@ GET /_cluster/health
 **_nodes API** returns node information and statistics.
 
 **Static information** (_nodes):
-```bash
+```json
 GET /_nodes
 GET /_nodes/node-1,node-2  # Specific nodes
 GET /_nodes/_master        # Current master node
@@ -422,7 +422,7 @@ GET /_nodes/_master        # Current master node
 Returns: version, roles, OS, JVM, installed plugins
 
 **Dynamic statistics** (_nodes/stats):
-```bash
+```json
 GET /_nodes/stats
 GET /_nodes/stats/jvm,os,process
 ```
@@ -441,7 +441,7 @@ Returns:
 The [_cat/indices](https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html) API lists all indices with their metrics.
 
 **Request**:
-```bash
+```json
 GET /_cat/indices?v&s=store.size:desc&h=index,health,status,pri,rep,docs.count,store.size
 ```
 

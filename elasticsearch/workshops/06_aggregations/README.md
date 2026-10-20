@@ -12,7 +12,7 @@ L'équipe analytics souhaite obtenir des statistiques sur les articles de blog: 
 
 Ce TP est autonome. Créez l'index `blog_posts` avec les données nécessaires avant de commencer les exercices:
 
-```bash
+```json
 DELETE /blog_posts
 
 PUT /blog_posts
@@ -101,7 +101,7 @@ POST /blog_posts/_doc/4
 
 Calculez les statistiques (min, max, avg, sum) sur le champ `views`:
 
-```bash
+```json
 GET /blog_posts/_search
 {
   "size": 0,
@@ -146,7 +146,7 @@ GET /blog_posts/_search
 
 Groupez les articles par auteur et comptez combien chaque auteur a écrit:
 
-```bash
+```json
 GET /blog_posts/_search
 {
   "size": 0,
@@ -180,7 +180,7 @@ GET /blog_posts/_search
 
 Groupez les articles par mois de publication:
 
-```bash
+```json
 GET /blog_posts/_search
 {
   "size": 0,
@@ -202,7 +202,7 @@ GET /blog_posts/_search
 
 Combinez une agrégation bucket (par auteur) avec des agrégations metrics:
 
-```bash
+```json
 GET /blog_posts/_search
 {
   "size": 0,
@@ -234,7 +234,7 @@ GET /blog_posts/_search
 
 Calculez la moyenne des vues moyennes par auteur:
 
-```bash
+```json
 GET /blog_posts/_search
 {
   "size": 0,

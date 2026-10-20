@@ -16,7 +16,7 @@ layout: cover
 
 # SQL
 
-```
+```json
 POST /_sql?format=txt
 {
   "query": "SELECT * FROM library WHERE release_date < '2000-01-01'"

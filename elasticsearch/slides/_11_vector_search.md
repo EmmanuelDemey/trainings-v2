@@ -19,7 +19,7 @@ layout: cover
 
 # dense_vector
 
-```
+```json
 PUT /movies-vectors
 {
   "mappings": {
@@ -41,7 +41,7 @@ PUT /movies-vectors
     * `bbq_hnsw` (Better Binary Quantization, ~32× smaller) from 384 dimensions
     * `int8_hnsw` (4× smaller) below
 
-```
+```json
 GET /movies-vectors/_mapping
 ```
 
@@ -49,7 +49,7 @@ GET /movies-vectors/_mapping
 
 # kNN search
 
-```
+```json
 POST /recipes/_search
 {
   "knn": {
@@ -72,7 +72,7 @@ POST /recipes/_search
 
 * The filter is applied **during** the graph traversal: still `k` results
 
-```
+```json
 POST /recipes/_search
 {
   "knn": {
@@ -95,7 +95,7 @@ POST /recipes/_search
 * A field type that calls an **inference endpoint** at index time **and** at query time
 * Long texts are split into **chunks**, each embedded
 
-```
+```json
 PUT /articles
 {
   "mappings": {
@@ -112,7 +112,7 @@ PUT /articles
 * Built-in endpoints (`GET _inference`): `.elser-2-elasticsearch` (sparse, English), `.multilingual-e5-small-elasticsearch` (dense, multilingual), `.rerank-v1-elasticsearch`
 * Or an external service: OpenAI, Cohere, Mistral, Amazon Bedrock, Google Vertex AI… (`PUT _inference/text_embedding/my-endpoint`)
 
-```
+```json
 GET /_inference
 ```
 
@@ -121,17 +121,17 @@ GET /_inference
 # Semantic query
 
 <!-- ci: retry -->
-```
+```json
 POST /articles/_doc/1?refresh=true
 { "content": "Le chat dort sur le canapé du salon." }
 ```
 
-```
+```json
 POST /articles/_doc/2?refresh=true
 { "content": "La bourse a fortement chuté ce matin." }
 ```
 
-```
+```json
 POST /articles/_search
 {
   "query": {
@@ -151,7 +151,7 @@ POST /articles/_search
 * But a BM25 score and a cosine similarity are not comparable: they cannot be added
 * **Retrievers** compose searches: `standard`, `knn`, `rrf`, `linear`, `text_similarity_reranker`, `rule`…
 
-```
+```json
 POST /recipes/_search
 {
   "retriever": {
@@ -175,7 +175,7 @@ POST /recipes/_search
 
 * A weighted sum of **normalized** scores — when one source should count more
 
-```
+```json
 POST /recipes/_search
 {
   "retriever": {
@@ -205,7 +205,7 @@ POST /recipes/_search
 * A **cross-encoder** model rereads the top results, with the query: more accurate, too slow for the whole index
 
 <!-- ci: retry -->
-```
+```json
 POST /recipes/_search
 {
   "retriever": {

@@ -46,7 +46,7 @@ layout: cover
 # Built-in Analyzers Examples
 
 ## Standard Analyzer
-```
+```json
 GET /_analyze
 {
   "analyzer": "standard",
@@ -56,7 +56,7 @@ GET /_analyze
 **Result**: `["the", "quick", "brown", "fox"]`
 
 ## Simple Analyzer
-```
+```json
 GET /_analyze
 {
   "analyzer": "simple",
@@ -66,7 +66,7 @@ GET /_analyze
 **Result**: `["the", "quick", "brown", "fox"]`
 
 ## Whitespace Analyzer
-```
+```json
 GET /_analyze
 {
   "analyzer": "whitespace",
@@ -76,7 +76,7 @@ GET /_analyze
 **Result**: `["The", "Quick", "Brown", "FOX!"]`
 
 ## Keyword Analyzer
-```
+```json
 GET /_analyze
 {
   "analyzer": "keyword",
@@ -86,7 +86,7 @@ GET /_analyze
 **Result**: `["The Quick Brown FOX!"]`
 
 ## French Analyzer
-```
+```json
 GET /_analyze
 {
   "analyzer": "french",
@@ -102,7 +102,7 @@ GET /_analyze
 * The `_analyze` API allows you to test how text is analyzed.
 * Very useful for debugging and understanding analyzers.
 
-```
+```json
 GET /_analyze
 {
   "analyzer": "standard",
@@ -118,7 +118,7 @@ GET /_analyze
 
 * You can test with a specific index's analyzer.
 
-```
+```json
 GET /movies/_analyze
 {
   "field": "title",
@@ -134,7 +134,7 @@ GET /movies/_analyze
 
 * You can also test individual components.
 
-```
+```json
 GET /_analyze
 {
   "tokenizer": "standard",
@@ -176,7 +176,7 @@ GET /_analyze
 * `mapping`: Replaces characters based on a mapping
 * `pattern_replace`: Uses regex to replace characters
 
-```
+```json
 GET /_analyze
 {
   "char_filter": ["html_strip"],
@@ -193,7 +193,7 @@ GET /_analyze
 
 * You can define custom analyzers in index settings.
 
-```
+```json
 PUT /articles
 {
   "settings": {
@@ -223,7 +223,7 @@ PUT /articles
 
 * Apply your custom analyzer to a field in the mapping of the **same index**.
 
-```
+```json
 PUT /articles/_mapping
 {
   "properties": {
@@ -242,7 +242,7 @@ PUT /articles/_mapping
 * You can use different analyzers for indexing and searching.
 * Useful for autocomplete with `edge_ngram`.
 
-```
+```json
 PUT /movies_autocomplete
 {
   "settings": {
@@ -272,14 +272,10 @@ PUT /movies_autocomplete
 
 # Performance Impact
 
-## Analyzer Performance Considerations
-
-* **Indexing Time**: Complex analyzers slow down indexing
-* **Query Performance**: Simpler analyzers = faster searches
-* **Disk Usage**: More tokens = larger index size
-* **Memory Usage**: Custom analyzers consume heap memory
-
-## Performance Comparison
+* **Indexing time**: complex analyzers slow down indexing
+* **Query performance**: simpler analyzers mean faster searches
+* **Disk usage**: more tokens mean a larger index
+* **Memory usage**: custom analyzers consume heap
 
 | Analyzer | Indexing Speed | Query Speed | Disk Usage |
 |----------|----------------|-------------|------------|
@@ -288,46 +284,33 @@ PUT /movies_autocomplete
 | `french` | Medium | Medium | High |
 | Custom with n-grams | Slow | Fast | Very High |
 
-## Optimization Tips
+---
 
-* Use `keyword` analyzer for exact matches (IDs, emails)
+# Performance Impact: Optimization Tips
+
+* Use the `keyword` analyzer for exact matches (IDs, emails)
 * Choose simpler analyzers for high-throughput scenarios
 * Test with real data before production deployment
 * Monitor indexing performance with `_nodes/stats`
 
 ---
-layout: cover
+
+# Best Practices: When to Use Which Analyzer
+
+| Analyzer | Use it for |
+|----------|------------|
+| `keyword` | Exact matches (product codes, IDs, emails), sorting, aggregations |
+| `standard` | General full-text search, multi-language content |
+| language (`french`, ...) | Content in one language: stemming and stopwords |
+| custom | Domain terminology, special characters, autocomplete |
+
 ---
 
-# Best Practices
+# Best Practices: Multi-field Strategy
 
-## When to Use Which Analyzer
+Index the same field several ways and pick the right one per query:
 
-### Use `keyword` analyzer for:
-* Exact matches (product codes, IDs, emails)
-* Faceting and sorting
-* Aggregations on categorical data
-
-### Use `standard` analyzer for:
-* General full-text search
-* Multi-language content
-* Balanced performance vs. relevance
-
-### Use `language` analyzers for:
-* Content in specific languages
-* Better stemming and stopwords handling
-* Improved relevance for natural language
-
-### Use custom analyzers for:
-* Domain-specific terminology
-* Special character handling
-* Autocomplete functionality
-* Multi-field strategies
-
-## Common Patterns
-
-### Multi-field Strategy
-```
+```json
 PUT /products
 {
   "mappings": {
@@ -335,16 +318,8 @@ PUT /products
       "name": {
         "type": "text",
         "fields": {
-          "keyword": {
-            "type": "keyword"
-          },
-          "search": {
-            "type": "text",
-            "analyzer": "standard"
-          },
-          "suggest": {
-            "type": "search_as_you_type"
-          }
+          "keyword": { "type": "keyword" },
+          "suggest": { "type": "search_as_you_type" }
         }
       }
     }
@@ -352,10 +327,15 @@ PUT /products
 }
 ```
 
-### Testing Strategy
-1. Always test with `_analyze` API first
+* `name` for full-text search, `name.keyword` for sorting and aggregations, `name.suggest` for autocomplete
+
+---
+
+# Best Practices: Testing Strategy
+
+1. Always test with the `_analyze` API first
 2. Use real data samples from your domain
-3. Compare different analyzers side-by-side
+3. Compare different analyzers side by side
 4. Measure relevance and performance
 
 ---

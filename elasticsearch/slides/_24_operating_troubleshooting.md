@@ -74,7 +74,7 @@ layout: cover
 
 # Slow Queries
 
-```
+```json
 PUT movies/_settings
 {
     "index.search.slowlog.threshold.query.warn": "500ms",
@@ -107,7 +107,7 @@ PUT movies/_settings
 
 # CAT API
 
-```
+```json
 GET /_cat/indices/twi*?v&s=index
 ```
 
@@ -121,7 +121,7 @@ green  open   twitter2 nYFWZEO7TUiOjLQXBaYJpA   1   0          0            0   
 
 # Node info API
 
-```
+```json
 GET /_nodes/process
 
 GET /_nodes/_all/process
@@ -137,7 +137,7 @@ GET /_nodes/nodeId1,nodeId2/_all
 
 # Node info API
 
-```text
+```json
 {
   "_nodes": ...
   "cluster_name": "elasticsearch",
@@ -184,11 +184,11 @@ GET /_nodes/nodeId1,nodeId2/_all
 
 # Cluster Stats API
 
-```
+```json
 GET /_cluster/stats?human&pretty
 ```
 
-```text
+```json
 {
    "_nodes" : {
       "total" : 1,
@@ -393,7 +393,7 @@ GET /_cluster/stats?human&pretty
 
 # Debug unassigned shards
 
-```
+```json
 POST /_cluster/allocation/explain
 {
   "index": "person-v6",
@@ -421,7 +421,7 @@ POST /_cluster/allocation/explain
 * The search thread pool is configured by default to ((# of allocated processors * 3) / 2) + 1 = 13 and a queue_size of 1000.
 * Possibility to overload these configurations
 
-```
+```json
 GET /_cat/thread_pool
 ```
 
@@ -429,7 +429,7 @@ GET /_cat/thread_pool
 
 # Thread Pools
 
-```
+```json
 GET /_cat/thread_pool?v&h=id,name,queue,rejected,completed
 ```
 
@@ -468,7 +468,7 @@ WR-MucALTGC98E2HPCCydQ write                                      0        0    
 
 * The source index must be read-only, with a copy of every shard on one node
 
-```
+```json
 PUT /my-index/_settings
 {
   "index.blocks.write": true

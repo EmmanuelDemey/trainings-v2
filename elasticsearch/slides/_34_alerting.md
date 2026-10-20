@@ -28,7 +28,7 @@ layout: cover
 
 # Watcher
 
-```
+```json
 PUT _watcher/watch/log_error_watch
 {
   "trigger": { "schedule": { "interval": "10m" } },
@@ -51,7 +51,7 @@ PUT _watcher/watch/log_error_watch
 
 # Trigger
 
-```text
+```json
 {
     "trigger" : {
         "schedule" : {
@@ -67,7 +67,7 @@ PUT _watcher/watch/log_error_watch
 
 * Can be of type `simple`, `search`, `http`, or `chain`
 
-```text
+```json
 {
   "input" : {
     "search" : {
@@ -89,7 +89,7 @@ PUT _watcher/watch/log_error_watch
 
 * Can be of type `always`, `never`, `compare`, `array_compare`, or `script`
 
-```text
+```json
 {
   "condition" : {
     "compare" : { "ctx.payload.hits.total" : { "gt" : 5 }}
@@ -103,7 +103,7 @@ PUT _watcher/watch/log_error_watch
 
 * Can be of type `email`, `webhook`, `index`, `logging`, `slack`, `pagerduty`, or `jira`
 
-```text
+```json
 {
   "actions" : {
     "my_webhook" : {
@@ -125,7 +125,7 @@ PUT _watcher/watch/log_error_watch
 
 * To list the watchers
 
-```
+```json
 POST /_watcher/_query/watches
 {
   "size" : 100
@@ -134,7 +134,7 @@ POST /_watcher/_query/watches
 
 * To delete a watcher, we can execute the following request
 
-```
+```json
 DELETE _watcher/watch/log_error_watch
 ```
 
@@ -144,7 +144,7 @@ DELETE _watcher/watch/log_error_watch
 
 * All of these executions will be recorded in an index `.watcher-history*`
 
-```
+```json
 POST .watcher-history*/_search?pretty
 {
   "sort" : [
@@ -157,7 +157,7 @@ POST .watcher-history*/_search?pretty
 
 # Concrete Example
 
-```
+```json
 PUT _watcher/watch/cluster_health_watch
 {
   "trigger" : {

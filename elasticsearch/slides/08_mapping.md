@@ -22,7 +22,7 @@ layout: cover
 
 * Mapping can be defined when creating the index.
 
-```
+```json
 PUT /movies
 {
   "mappings": {
@@ -42,7 +42,7 @@ PUT /movies
 * We can also modify a mapping.
 * Be careful, depending on the modifications made, this will require reindexing.
 
-```
+```json
 PUT /movies/_mapping
 {
   "properties": {
@@ -59,13 +59,13 @@ PUT /movies/_mapping
 
 * We can retrieve a mapping.
 
-```
+```json
 GET /movies/_mapping
 ```
 
 * Its deletion will occur when deleting the index.
 
-```
+```json
 DELETE /movies
 ```
 
@@ -92,7 +92,7 @@ DELETE /movies
 
 # The Index Property
 
-```
+```json
 PUT movies
 {
   "mappings": {
@@ -113,7 +113,7 @@ PUT movies
 * By default, the indexed document is retrievable via the `_source` property.
 * For performance and disk space usage reasons, you can disable this object.
 
-```
+```json
 DELETE movies
 
 PUT movies
@@ -144,7 +144,7 @@ PUT movies
 
 * To do this, we will define `fields` (a mapping change: the index is recreated).
 
-```
+```json
 DELETE movies
 
 PUT movies
@@ -170,11 +170,11 @@ PUT movies
 
 * We can thus search on the `directors` property and `directors.keyword` property.
 
-```
+```json
 POST movies/_search?q=directors:Charlie
 ```
 
-```
+```json
 POST movies/_search?q=directors.keyword:"Charlie Chaplin"
 ```
 
@@ -184,7 +184,7 @@ POST movies/_search?q=directors.keyword:"Charlie Chaplin"
 
 * It is possible to define properties of type `Object`.
 
-```
+```json
 DELETE movies
 
 PUT movies
@@ -209,7 +209,7 @@ PUT movies
 * A problem arises when we have an array of objects.
 * Let's imagine that our movie was directed by multiple directors.
 
-```
+```json
 POST /movies/_doc
 {
     "directors": [
@@ -225,7 +225,7 @@ POST /movies/_doc
 
 * Elasticsearch translates this structure into a new representation.
 
-```text
+```json
 {
     "directors.firstName": ["Charlie", "Buster"],
     "directors.lastName": ["Chaplin", "Keaton"]
@@ -240,7 +240,7 @@ POST /movies/_doc
 * This could impact the executed searches.
 * For example, the following search would return the previous movie.
 
-```
+```json
 POST movies/_search?q=directors.firstName:Charlie AND directors.lastName:Keaton
 ```
 
@@ -250,7 +250,7 @@ POST movies/_search?q=directors.firstName:Charlie AND directors.lastName:Keaton
 
 * To avoid losing these relationships, we can use the `nested` type.
 
-```
+```json
 DELETE movies
 
 PUT movies
@@ -278,7 +278,7 @@ PUT movies
 * Only you know the exact structure and requirements of your data.
 * Use dynamic templates cautiously and validate the generated mappings.
 
-```
+```json
 DELETE movies
 
 PUT movies
@@ -317,7 +317,7 @@ PUT movies
 
 # Index Templates
 
-```
+```json
 PUT _index_template/template_1
 {
   "index_patterns": ["te*", "bar*"],
@@ -356,7 +356,7 @@ PUT _index_template/template_1
 
 # Component Templates
 
-```http
+```json
 PUT _component_template/component_template1
 {
   "template": {
@@ -371,7 +371,7 @@ PUT _component_template/component_template1
 }
 ```
 
-```http
+```json
 PUT _index_template/template_1
 {
   "index_patterns": ["te*", "bar*"],

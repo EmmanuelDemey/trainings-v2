@@ -33,7 +33,7 @@ node.attr.zone: az3
 ```
 
 Vérification:
-```bash
+```json
 GET /_cat/nodeattrs?v&h=node,attr,value
 ```
 
@@ -51,7 +51,7 @@ Les étapes 2 à 6 demandent un cluster dont les nœuds portent l'attribut `zone
 
 ### Étape 2: Activer la shard allocation awareness
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -64,7 +64,7 @@ PUT /_cluster/settings
 
 ### Étape 3: Forcer l'allocation avec forced awareness
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -80,7 +80,7 @@ PUT /_cluster/settings
 
 ### Étape 4: Créer un index et vérifier la distribution
 
-```bash
+```json
 PUT /zone-aware-index
 {
   "settings": {
@@ -96,7 +96,7 @@ GET /_cat/shards/zone-aware-index?v&h=index,shard,prirep,state,node
 
 ### Étape 5: Forcer la relocation d'un shard
 
-```bash
+```json
 POST /_cluster/reroute
 {
   "commands": [
@@ -113,13 +113,13 @@ POST /_cluster/reroute
 ```
 
 **Suivi de la relocation**:
-```bash
+```json
 GET /_cat/recovery/zone-aware-index?v&h=index,shard,stage,source_node,target_node
 ```
 
 ### Étape 6: Exclure un nœud de l'allocation (maintenance)
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -131,7 +131,7 @@ PUT /_cluster/settings
 **Effet**: Tous les shards quittent `node-az1` et sont réalloués sur les autres nœuds.
 
 **Retour à la normale**:
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -146,7 +146,7 @@ PUT /_cluster/settings
 
 Les parties suivantes n'ont pas besoin de zones. Retirez les réglages de la partie A, sans quoi un cluster sans attribut `zone` ne pourrait plus allouer les nouveaux index:
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -167,13 +167,13 @@ Automatiser la création et le nettoyage de snapshots avec des politiques SLM, i
 Vérifiez qu'un repository existe (créé au TP 12):
 
 <!-- ci: skip -->
-```bash
+```json
 GET /_snapshot/my_backup
 ```
 
 Si le repository n'existe pas:
 
-```bash
+```json
 PUT /_snapshot/my_backup
 {
   "type": "fs",
@@ -186,7 +186,7 @@ PUT /_snapshot/my_backup
 
 Créez des indices de test:
 
-```bash
+```json
 PUT /orders-2024-01
 PUT /orders-2024-02
 PUT /payments-2024-01
@@ -211,7 +211,7 @@ POST /logs-2024.01.15/_bulk
 
 ### Étape 1: Politique SLM pour Indices Transactionnels (Critiques)
 
-```bash
+```json
 PUT /_slm/policy/daily-critical-backup
 {
   "schedule": "0 0 2 * * ?",
@@ -244,7 +244,7 @@ PUT /_slm/policy/daily-critical-backup
 
 ### Étape 2: Politique SLM pour Indices Analytiques (Hebdomadaire)
 
-```bash
+```json
 PUT /_slm/policy/weekly-analytics-backup
 {
   "schedule": "0 0 3 ? * SUN",
@@ -269,7 +269,7 @@ PUT /_slm/policy/weekly-analytics-backup
 
 ### Étape 3: Politique SLM pour Logs (Quotidien, Courte Rétention)
 
-```bash
+```json
 PUT /_slm/policy/daily-logs-backup
 {
   "schedule": "0 0 1 * * ?",
@@ -295,7 +295,7 @@ PUT /_slm/policy/daily-logs-backup
 
 ### Étape 4: Lister les Politiques et Exécuter Manuellement
 
-```bash
+```json
 # Lister toutes les politiques
 GET /_slm/policy
 
@@ -310,14 +310,14 @@ GET /_snapshot/my_backup/_all
 
 ### Étape 5: Consulter les Statistiques
 
-```bash
+```json
 GET /_slm/policy/daily-critical-backup
 GET /_slm/stats
 ```
 
 ### Étape 6: Tester la Rétention et Gérer SLM
 
-```bash
+```json
 # Forcer l'exécution de la rétention
 POST /_slm/_execute_retention
 
@@ -342,7 +342,7 @@ Implémenter la sécurité au niveau des champs pour cacher des données sensibl
 
 ### Étape 1: Créer un Index d'Employés Enrichi
 
-```bash
+```json
 PUT /employees_full
 {
   "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
@@ -390,7 +390,7 @@ POST /employees_full/_bulk
 
 ### Étape 2: Créer un Rôle "Public" avec FLS Restrictif
 
-```bash
+```json
 POST /_security/role/employee_public_view
 {
   "cluster": ["monitor"],
@@ -419,7 +419,7 @@ POST /_security/role/employee_public_view
 
 ### Étape 3: Créer un Rôle "HR Team" avec FLS Modéré
 
-```bash
+```json
 POST /_security/role/hr_team_view
 {
   "cluster": ["monitor"],
@@ -447,7 +447,7 @@ POST /_security/role/hr_team_view
 
 ### Étape 4: Créer un Rôle "HR Manager" avec Accès Complet
 
-```bash
+```json
 POST /_security/role/hr_manager_full
 {
   "cluster": ["monitor", "manage"],
@@ -465,7 +465,7 @@ POST /_security/role/hr_manager_full
 
 ### Étape 5: Créer des Utilisateurs et Tester
 
-```bash
+```json
 POST /_security/user/intern_view
 {
   "password": "InternPass123!",
@@ -518,7 +518,7 @@ curl -u jane_hr:HRPass456! -X GET "https://localhost:9200/employees_full/_search
 
 ### Étape 6: Combiner DLS + FLS
 
-```bash
+```json
 POST /_security/role/sales_dept_restricted
 {
   "cluster": ["monitor"],
@@ -600,7 +600,7 @@ COLD TIER (Searchable Snapshots, 53 jours)
 
 En production, `s3_backup` est un dépôt S3 (`"type": "s3"`, plugin intégré depuis la 8.0). Pour essayer les requêtes de cette partie sur votre cluster de TP, créez un dépôt `fs` du même nom:
 
-```bash
+```json
 PUT /_snapshot/s3_backup
 {
   "type": "fs",
@@ -610,7 +610,7 @@ PUT /_snapshot/s3_backup
 }
 ```
 
-```bash
+```json
 PUT _ilm/policy/logs-lifecycle
 {
   "policy": {
@@ -661,7 +661,7 @@ PUT _ilm/policy/logs-lifecycle
 
 ### Configuration Index Template de Production
 
-```bash
+```json
 PUT _index_template/logs-myapp-template
 {
   "index_patterns": ["logs-myapp-*"],
@@ -690,7 +690,7 @@ PUT _index_template/logs-myapp-template
 
 ### Configuration SLM de Production
 
-```bash
+```json
 PUT _slm/policy/daily-snapshots
 {
   "schedule": "0 30 2 * * ?",

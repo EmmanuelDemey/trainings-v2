@@ -271,7 +271,7 @@ Replication, rack awareness, and cross-cluster replication
 
 **Configure replica count**:
 
-```bash
+```json
 # At index level
 PUT /my-index
 {
@@ -362,7 +362,7 @@ node.attr.environment: production
 
 **Filter allocation by index**:
 
-```bash
+```json
 # Allocate only on "hot" nodes
 PUT /app-logs-2024.01/_settings
 {
@@ -384,7 +384,7 @@ PUT /app-logs-2024.01/_settings
 
 **Filter at cluster level**:
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -415,7 +415,7 @@ PUT /_cluster/settings
 
 1. **Configure the remote cluster** (on follower):
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -430,7 +430,7 @@ PUT /_cluster/settings
 2. **Create a follower index**:
 
 <!-- ci: skip -->
-```bash
+```json
 PUT /orders/_ccr/follow
 {
   "remote_cluster": "leader_cluster",
@@ -441,7 +441,7 @@ PUT /orders/_ccr/follow
 3. **Monitor replication**:
 
 <!-- ci: skip -->
-```bash
+```json
 GET /orders/_ccr/stats
 ```
 
@@ -502,7 +502,7 @@ RPO, RTO, and backup strategies
 - **RPO**: Depends on frequency (1h, 6h, 24h)
 - **RTO**: Restoration time (15 min - 2h depending on size)
 
-```bash
+```json
 # SLM policy for hourly snapshots
 PUT /_slm/policy/hourly-snapshots
 {
@@ -672,7 +672,7 @@ Pre-deployment, monitoring, and incident response
 # Incident Response Runbook
 
 **General workflow**:
-```text
+```json
 [Alert] -> [Triage] -> [Diagnosis] -> [Mitigation] -> [Resolution] -> [Post-Mortem]
 ```
 
@@ -681,7 +681,7 @@ Pre-deployment, monitoring, and incident response
 **Symptom**: `GET /_cluster/health` returns `"status": "red"`
 
 **Triage**:
-```bash
+```json
 GET /_cat/indices?v&health=red
 GET /_cat/shards?v&h=index,shard,state,unassigned.reason
 ```
@@ -691,7 +691,7 @@ GET /_cat/shards?v&h=index,shard,state,unassigned.reason
 # Incident 1: Cluster RED (diagnosis)
 
 **Diagnosis**:
-```bash
+```json
 GET /_cluster/allocation/explain
 {
   "index": "problematic-index",
@@ -710,7 +710,7 @@ GET /_cluster/allocation/explain
 # Incident 1: Cluster RED (mitigation)
 
 **Disk full mitigation** (temporary — free space, then reset them to `null`):
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -725,7 +725,7 @@ PUT /_cluster/settings
 
 **Corruption mitigation** (last resort: accepts losing the writes the stale copy missed):
 <!-- ci: skip -->
-```bash
+```json
 POST /_cluster/reroute
 {
   "commands": [{
@@ -744,7 +744,7 @@ POST /_cluster/reroute
 **Symptom**: Slow searches (p95 > 1s), slow indexing
 
 **Diagnosis**:
-```bash
+```json
 GET /slow-index/_settings
 GET /_nodes/hot_threads
 GET /_cat/tasks?v&detailed
@@ -768,7 +768,7 @@ thread_pool.write.queue_size: 10000
 ```
 
 **Temporarily disable replication**:
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -795,7 +795,7 @@ cluster.initial_master_nodes: ["master-1", "master-2", "master-3"]
 * Split brain today = two clusters bootstrapped separately (`initial_master_nodes` left in place, wiped data path)
 
 **Diagnosis**:
-```bash
+```json
 # Check elected masters
 GET /_cat/master?v
 

@@ -12,7 +12,7 @@ layout: cover
 * We will use the `_search` endpoint.
 * We can search on one or more indexes/aliases.
 
-```
+```json
 POST /movies/_search
 POST /movies,albums/_search
 POST /movies-*/_search
@@ -28,7 +28,7 @@ POST /movies-*/_search
 * These queries are hard to maintain and do not allow the full use of Elasticsearch DSL.
 * Spaces in the URL are written `+`.
 
-```
+```json
 GET /movies/_search?q=titanic
 GET /movies/_search?q=title:titanic
 GET /movies/_search?q=title:titanic+AND+year:[1990+TO+2000]
@@ -42,7 +42,7 @@ GET /movies/_search?q=title:titanic+AND+year:[1990+TO+2000]
     * sorting
     * pagination
 
-```
+```json
 GET /movies/_search?q=titanic&sort=year:desc&size=100&from=100
 ```
 
@@ -52,7 +52,7 @@ GET /movies/_search?q=titanic&sort=year:desc&size=100&from=100
 
 * For more complex searches, it's recommended to use the Elasticsearch DSL.
 
-```
+```json
 POST /movies/_search
 {
   "query": {
@@ -90,7 +90,7 @@ POST /movies/_search
 
 * For example, the `query_string` search type allows reusing the Lucene syntax.
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -108,7 +108,7 @@ POST /movies/_search
 
 * `match` search type
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -127,7 +127,7 @@ POST /movies/_search
 
 * `match_phrase` search type
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -144,7 +144,7 @@ POST /movies/_search
 
 * `multi_match` search type
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -163,7 +163,7 @@ POST /movies/_search
 * Exact matches allow manipulation of non-analyzed properties.
 * The search will not be analyzed at all. Beware of pitfalls.
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -182,7 +182,7 @@ POST /movies/_search
 
 * Range Query
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -202,7 +202,7 @@ POST /movies/_search
 
 * Range Query
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -221,7 +221,7 @@ POST /movies/_search
 
 * Range Query
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -241,7 +241,7 @@ POST /movies/_search
 
 * Fuzzy Query
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -260,7 +260,7 @@ POST /movies/_search
 
 * Wildcard Query
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -291,7 +291,7 @@ POST /movies/_search
 
 * Main use case, when the answer is yes or no.
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -312,7 +312,7 @@ POST /movies/_search
     * `geo_point`
     * `geo_shape`
 
-```
+```json
 PUT /movies/_mapping
 {
     "properties": {
@@ -329,7 +329,7 @@ PUT /movies/_mapping
 
 * Returns documents where the `geo_point` property is within a given distance.
 
-```
+```json
 POST /movies/_search
 {
     "query": {
@@ -355,7 +355,7 @@ POST /movies/_search
 
 # Boolean Searches
 
-```
+```json
 POST /movies/_search
 {
   "query": {
@@ -515,7 +515,7 @@ GET /restaurants/_search
 * Not very efficient, it's recommended to use the Scroll API for large volumes.
 * The Scroll API returns a cursor.
 
-```
+```json
 POST /movies/_search?scroll=1m
 {
     "size": 100,
@@ -531,7 +531,7 @@ POST /movies/_search?scroll=1m
 
 # Pagination
 
-```text
+```json
 {
     "_scroll_id" : "DXF1ZXJ5QW5kRmV0Y2gBAAAAAAAAAD4WYm9laVYtZndUQlNsdDcwakFMNjU1QQ==",
     "hits" {
@@ -545,7 +545,7 @@ POST /movies/_search?scroll=1m
 # Pagination
 
 <!-- ci: skip -->
-```
+```json
 POST /_search/scroll
 {
     "scroll" : "1m",
@@ -562,7 +562,7 @@ POST /_search/scroll
 * Approach now recommended by Elastic
 * Preserves the index state while traversing different pages.
 
-```
+```json
 POST /movies/_pit?keep_alive=1m
 ```
 
@@ -573,7 +573,7 @@ POST /movies/_pit?keep_alive=1m
 * Each page: the PIT id, and the sort values of the last hit of the previous page
 
 <!-- ci: skip -->
-```
+```json
 POST /_search
 {
   "size": 100,
@@ -698,7 +698,7 @@ GET /movies/_search
 - **Configuring Remote Clusters:**
   - Use the Cluster Settings API to specify remote clusters.
 
-```
+```json
 PUT /_cluster/settings 
 { 
     "persistent": { 

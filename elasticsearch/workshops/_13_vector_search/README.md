@@ -21,7 +21,7 @@ Ce TP est autonome. Il demande une **licence trial ou supérieure** pour la part
 
 Chaque recette a un vecteur de 3 dimensions. Imaginons que ces dimensions signifient « sucré », « salé/soupe » et « plat chaud » (un vrai modèle produit des centaines de dimensions, sans signification lisible):
 
-```bash
+```json
 DELETE /recipes
 
 PUT /recipes
@@ -51,7 +51,7 @@ POST /recipes/_bulk?refresh=true
 
 Regardez le mapping: Elasticsearch a choisi une **quantization** pour économiser la mémoire.
 
-```bash
+```json
 GET /recipes/_mapping
 ```
 
@@ -78,7 +78,7 @@ GET /recipes/_mapping
 
 Cherchez les 2 recettes les plus proches d'un vecteur « très sucré »:
 
-```bash
+```json
 POST /recipes/_search
 {
   "knn": {
@@ -112,7 +112,7 @@ POST /recipes/_search
 
 Le filtre s'applique **pendant** le parcours du graphe: on obtient toujours `k` résultats qui le respectent.
 
-```bash
+```json
 POST /recipes/_search
 {
   "knn": {
@@ -141,7 +141,7 @@ POST /recipes/_search
 
 Une recherche lexicale « pommes » trouve la tarte, la compote… et le gratin de pommes de terre:
 
-```bash
+```json
 POST /recipes/_search
 {
   "query": { "match": { "title": "pommes" } },
@@ -164,7 +164,7 @@ Le score BM25 et la similarité cosinus ne sont pas sur la même échelle: on ne
 
 Le retriever `rrf` combine les **rangs** de plusieurs recherches (`score = Σ 1 / (rank_constant + rang)`): un document bien classé dans les deux listes passe devant.
 
-```bash
+```json
 POST /recipes/_search
 {
   "retriever": {
@@ -197,7 +197,7 @@ POST /recipes/_search
 
 Le retriever `linear` normalise les scores (`minmax`), puis en fait une somme pondérée: ici, la similarité vectorielle compte double.
 
-```bash
+```json
 POST /recipes/_search
 {
   "retriever": {
@@ -226,7 +226,7 @@ POST /recipes/_search
 
 Elasticsearch fournit des endpoints prêts à l'emploi, qui déploient leur modèle à la première utilisation:
 
-```bash
+```json
 GET /_inference
 ```
 
@@ -236,7 +236,7 @@ Repérez `.multilingual-e5-small-elasticsearch` (embeddings denses, multilingue)
 
 Un champ `semantic_text` appelle l'inference endpoint à l'indexation **et** à la recherche, et découpe les textes longs en morceaux (chunks):
 
-```bash
+```json
 DELETE /articles
 
 PUT /articles
@@ -256,12 +256,12 @@ PUT /articles
 Indexez des documents. La **première** indexation télécharge et déploie le modèle: elle peut prendre une à deux minutes. Si elle échoue sur un timeout, renvoyez-la.
 
 <!-- ci: retry -->
-```bash
+```json
 POST /articles/_doc/1?refresh=true
 { "content": "Le chat dort sur le canapé du salon." }
 ```
 
-```bash
+```json
 POST /articles/_bulk?refresh=true
 {"index":{"_id":"2"}}
 {"content":"La bourse a fortement chuté ce matin après l'annonce des résultats."}
@@ -273,7 +273,7 @@ POST /articles/_bulk?refresh=true
 
 Aucun mot de la question n'apparaît dans le document attendu:
 
-```bash
+```json
 POST /articles/_search
 {
   "query": { "match": { "content": "félin endormi" } },
@@ -298,7 +298,7 @@ Essayez aussi en anglais (`"sleeping cat"`): le modèle est multilingue.
 Un modèle de **reranking** (cross-encoder) relit les meilleurs résultats d'une première recherche avec la question: plus précis, mais trop lent pour tout l'index. Le premier appel déploie le modèle: renvoyez-le s'il échoue sur un timeout.
 
 <!-- ci: retry -->
-```bash
+```json
 POST /recipes/_search
 {
   "retriever": {

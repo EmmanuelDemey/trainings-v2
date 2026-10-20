@@ -21,7 +21,7 @@ layout: cover
 * Aggregations are applied on the result of a query.
 * It's another object block in the DSL.
 
-```
+```json
 POST person/_search
 {
   "query": {
@@ -39,7 +39,7 @@ POST person/_search
 
 * The result of aggregations will be added to the response.
 
-```text
+```json
 {
   "took" : 1,
   "timed_out" : false,
@@ -64,7 +64,7 @@ POST person/_search
 
 * It's possible not to return the `hits` of the query by setting `size` to `0`.
 
-```
+```json
 POST person/_search
 {
   "size": 0,
@@ -87,7 +87,7 @@ POST person/_search
 
 # AVG Aggregations
 
-```
+```json
 POST /notes/_search?size=0
 {
     "aggs" : {
@@ -100,7 +100,7 @@ POST /notes/_search?size=0
 
 # AVG Aggregations
 
-```text
+```json
 {
     ...
     "aggregations": {
@@ -123,7 +123,7 @@ POST /notes/_search?size=0
 
 # Date Aggregations
 
-```
+```json
 POST /sales/_search?size=0
 {
     "aggs" : {
@@ -142,7 +142,7 @@ POST /sales/_search?size=0
 
 # Date Aggregations
 
-```text
+```json
 {
     ...
     "aggregations": {
@@ -172,7 +172,7 @@ POST /sales/_search?size=0
 
 # Filters Aggregations
 
-```
+```json
 POST logs/_search
 {
   "size": 0,
@@ -193,7 +193,7 @@ POST logs/_search
 
 # Filters Aggregations
 
-```text
+```json
 {
   "took": 9,
   "timed_out": false,
@@ -220,7 +220,7 @@ POST logs/_search
 
 * Groups data based on a property.
 
-```
+```json
 POST /movies/_search
 {
     "aggs" : {
@@ -237,7 +237,7 @@ POST /movies/_search
 
 * Here's the returned result.
 
-```text
+```json
 {
     ...
     "aggregations" : {
@@ -267,7 +267,7 @@ POST /movies/_search
 
 # Geo_distance Aggregations
 
-```
+```json
 POST /museums/_search?size=0
 {
     "aggs" : {
@@ -290,7 +290,7 @@ POST /museums/_search?size=0
 
 # Geo_distance Aggregations
 
-```text
+```json
 {
     ...
     "aggregations": {
@@ -334,7 +334,7 @@ POST /museums/_search?size=0
 
 * As soon as we use `bucket` type aggregations, we can nest them.
 
-```
+```json
 POST /movies/_search
 {
     "aggs" : {
@@ -354,7 +354,7 @@ POST /movies/_search
 
 # Pipeline Aggregations
 
-```
+```json
 POST /sales/_search
 {
     "size": 0,
@@ -385,7 +385,7 @@ POST /sales/_search
 
 # Pipeline Aggregations
 
-```text
+```json
 {
    "took": 11,
    "timed_out": false,

@@ -12,7 +12,7 @@ Un guide gastronomique en ligne veut proposer à ses lecteurs une recherche rich
 
 Ce TP est autonome. Créez l'index et chargez les données:
 
-```bash
+```json
 DELETE /restaurants
 PUT /restaurants
 {
@@ -56,7 +56,7 @@ La syntaxe Lucene tient dans le paramètre `q` de l'URL — pratique pour une re
 
 ### Étape 1: Un mot, dans tous les champs
 
-```bash
+```json
 GET /restaurants/_search?q=pizza
 ```
 
@@ -71,7 +71,7 @@ GET /restaurants/_search?q=pizza
 
 Les restaurants français de Paris:
 
-```bash
+```json
 GET /restaurants/_search?q=cuisine:française AND city:Paris
 ```
 
@@ -89,7 +89,7 @@ GET /restaurants/_search?q=cuisine:française AND city:Paris
 
 Les restaurants à 20 € ou moins:
 
-```bash
+```json
 GET /restaurants/_search?q=price:[* TO 20]
 ```
 
@@ -108,7 +108,7 @@ GET /restaurants/_search?q=price:[* TO 20]
 
 `description` est analysé avec l'analyzer `french`: « pizzas » et « pizza » donnent le même terme.
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -128,7 +128,7 @@ GET /restaurants/_search
 
 Par défaut, `match` est un **OU** entre les mots. Exigez-les tous:
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -153,7 +153,7 @@ GET /restaurants/_search
 
 Les mots dans cet ordre, côte à côte:
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -176,7 +176,7 @@ GET /restaurants/_search
 
 Cherchez « port » dans le nom et la description, le nom comptant trois fois plus:
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -199,7 +199,7 @@ GET /restaurants/_search
 
 ### Étape 5: Tolérer les fautes de frappe
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -223,7 +223,7 @@ GET /restaurants/_search
 
 ### Étape 1: `term` sur un `keyword`
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -243,7 +243,7 @@ GET /restaurants/_search
 
 ### Étape 2: `terms`
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -261,7 +261,7 @@ GET /restaurants/_search
 
 ### Étape 3: `range` sur une date
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -283,7 +283,7 @@ GET /restaurants/_search
 
 Les restaurants à moins de 2 km de l'Opéra Garnier (48.8719, 2.3316):
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -304,7 +304,7 @@ GET /restaurants/_search
 
 ### Étape 2: Trier par distance
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": { "term": { "city": "Paris" } },
@@ -338,7 +338,7 @@ GET /restaurants/_search
 
 Tous les restaurants dans un rectangle couvrant le sud-est de la France:
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -365,7 +365,7 @@ GET /restaurants/_search
 
 Le lecteur cherche « cuisine » à Paris ou Lyon, pas plus de 40 €, de préférence bien noté, mais pas d'italien:
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": {
@@ -397,7 +397,7 @@ GET /restaurants/_search
 
 ### Étape 2: Trier, paginer, choisir les champs
 
-```bash
+```json
 GET /restaurants/_search
 {
   "query": { "match_all": {} },
@@ -427,7 +427,7 @@ Cross Cluster Search interroge, en une requête, des index répartis sur plusieu
 
 ### Étape 1: Déclarer le cluster distant
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -437,7 +437,7 @@ PUT /_cluster/settings
 ```
 
 <!-- ci: retry -->
-```bash
+```json
 GET /_remote/info
 ```
 
@@ -455,7 +455,7 @@ GET /_remote/info
 
 Préfixez le nom de l'index par l'alias du cluster:
 
-```bash
+```json
 GET /guide:restaurants/_search
 {
   "query": { "term": { "city": "Lille" } }
@@ -474,7 +474,7 @@ GET /guide:restaurants/_search
 
 ### Étape 3: Chercher sur le cluster local et le distant à la fois
 
-```bash
+```json
 GET /restaurants,guide:restaurants/_search
 {
   "query": { "term": { "city": "Lille" } }
@@ -493,7 +493,7 @@ GET /restaurants,guide:restaurants/_search
 
 ### Étape 4: Nettoyer
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {

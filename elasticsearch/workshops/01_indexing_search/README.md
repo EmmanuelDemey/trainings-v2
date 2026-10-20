@@ -22,7 +22,7 @@ Vous travaillez pour une boutique en ligne qui souhaite indexer son catalogue pr
 
 Créez un index simple sans mapping explicite (mapping dynamique):
 
-```bash
+```json
 PUT /products
 {
   "settings": {
@@ -45,7 +45,7 @@ PUT /products
 
 Insérez 5 produits dans l'index:
 
-```bash
+```json
 POST /products/_doc/1
 {
   "name": "Smartphone Galaxy S23",
@@ -96,7 +96,7 @@ POST /products/_doc/5
 
 Recherchez tous les produits contenant le mot "bureau":
 
-```bash
+```json
 GET /products/_search
 {
   "query": {
@@ -113,7 +113,7 @@ GET /products/_search
 
 Recherchez les produits électroniques dont le prix est inférieur à 1000€:
 
-```bash
+```json
 GET /products/_search
 {
   "query": {

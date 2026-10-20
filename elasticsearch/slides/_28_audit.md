@@ -33,7 +33,7 @@ layout: section
 
 # Audit Commands
 
-```bash
+```json
 # 1. Global health
 GET /_cluster/health
 
@@ -54,7 +54,7 @@ GET /_cat/thread_pool?v&h=node_name,name,rejected&s=rejected:desc
 
 # Mapping Audit
 
-```bash
+```json
 # View mapping of an index
 GET /logs-parkki-*/_mapping
 

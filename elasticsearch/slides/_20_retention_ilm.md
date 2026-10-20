@@ -24,7 +24,7 @@ layout: section
 
 # Open/Close API
 
-```bash
+```json
 # Close an index (frees RAM/CPU)
 POST /logs-2025.01.01/_close
 
@@ -50,7 +50,7 @@ POST /logs-2025.01.01/_open
 
 Reduce the number of shards:
 
-```bash
+```json
 # Prepare the index (read-only)
 PUT /logs-old/_settings
 {
@@ -237,7 +237,7 @@ PUT /_index_template/logs-parkki-template
 
 # ILM Monitoring
 
-```bash
+```json
 # Global ILM status
 GET /_ilm/status
 
@@ -251,6 +251,6 @@ GET /*/_ilm/explain?only_errors=true
 Retry the failed step of a **backing index** in error (not the data stream name):
 
 <!-- ci: skip -->
-```bash
+```json
 POST /.ds-logs-parkki-default-2025.01.15-000003/_ilm/retry
 ```

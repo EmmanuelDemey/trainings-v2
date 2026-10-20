@@ -13,7 +13,7 @@ Une bibliothèque en ligne stocke son catalogue dans Elasticsearch. Chaque anné
 Ce TP est autonome. Si un essai précédent a laissé des index `books-*` ou le template `books`, supprimez-les:
 
 <!-- ci: skip -->
-```bash
+```json
 DELETE /books-*
 DELETE /_index_template/books
 ```
@@ -22,7 +22,7 @@ DELETE /_index_template/books
 
 ### Étape 1: Créer l'index
 
-```bash
+```json
 PUT /books-2025
 {
   "settings": { "number_of_shards": 1, "number_of_replicas": 0 }
@@ -31,7 +31,7 @@ PUT /books-2025
 
 ### Étape 2: Indexer un document avec un identifiant choisi
 
-```bash
+```json
 PUT /books-2025/_doc/1
 {
   "title": "Le Petit Prince",
@@ -55,7 +55,7 @@ PUT /books-2025/_doc/1
 
 Avec `POST`, Elasticsearch génère l'identifiant:
 
-```bash
+```json
 POST /books-2025/_doc
 {
   "title": "L'Étranger",
@@ -77,7 +77,7 @@ POST /books-2025/_doc
 
 ### Étape 4: Récupérer un document
 
-```bash
+```json
 GET /books-2025/_doc/1
 ```
 
@@ -94,7 +94,7 @@ GET /books-2025/_doc/1
 
 L'API `_update` ne modifie que les champs envoyés:
 
-```bash
+```json
 POST /books-2025/_update/1
 {
   "doc": { "stock": 2 }
@@ -111,7 +111,7 @@ POST /books-2025/_update/1
 
 Vérifiez que le titre est toujours là:
 
-```bash
+```json
 GET /books-2025/_doc/1
 ```
 
@@ -127,7 +127,7 @@ GET /books-2025/_doc/1
 
 Décrémentez le stock d'un exemplaire, sans le lire d'abord:
 
-```bash
+```json
 POST /books-2025/_update/1
 {
   "script": {
@@ -137,7 +137,7 @@ POST /books-2025/_update/1
 }
 ```
 
-```bash
+```json
 GET /books-2025/_doc/1?_source=stock
 ```
 
@@ -152,14 +152,14 @@ GET /books-2025/_doc/1?_source=stock
 
 Un `PUT` sur un identifiant existant **remplace** tout le document:
 
-```bash
+```json
 PUT /books-2025/_doc/1
 {
   "title": "Le Petit Prince"
 }
 ```
 
-```bash
+```json
 GET /books-2025/_doc/1
 ```
 
@@ -175,7 +175,7 @@ GET /books-2025/_doc/1
 
 ### Étape 8: Supprimer un document
 
-```bash
+```json
 DELETE /books-2025/_doc/1
 ```
 
@@ -187,7 +187,7 @@ DELETE /books-2025/_doc/1
 ```
 
 <!-- ci: expect-error -->
-```bash
+```json
 GET /books-2025/_doc/1
 ```
 
@@ -199,7 +199,7 @@ GET /books-2025/_doc/1
 
 Une requête `_bulk` enchaîne, sur des lignes NDJSON, une **action** puis (sauf pour `delete`) son **document**:
 
-```bash
+```json
 POST /books-2025/_bulk?refresh=true
 {"index":{"_id":"9782070612758"}}
 {"title":"Le Petit Prince","author":"Antoine de Saint-Exupéry","year":1943,"stock":3}
@@ -231,7 +231,7 @@ POST /books-2025/_bulk?refresh=true
 
 Rejouez une création sur un identifiant existant, avec un document valide derrière:
 
-```bash
+```json
 POST /books-2025/_bulk?refresh=true
 {"create":{"_id":"9782253006329"}}
 {"title":"Germinal","author":"Émile Zola","year":1885,"stock":4}
@@ -254,7 +254,7 @@ POST /books-2025/_bulk?refresh=true
 
 ### Étape 3: Récupérer tous les documents
 
-```bash
+```json
 GET /books-2025/_search
 {
   "query": { "match_all": {} }
@@ -276,7 +276,7 @@ Six documents: le livre indexé avec un identifiant généré en partie A, et le
 
 L'application interroge `books`, jamais `books-2025`:
 
-```bash
+```json
 POST /_aliases
 {
   "actions": [
@@ -285,7 +285,7 @@ POST /_aliases
 }
 ```
 
-```bash
+```json
 GET /books/_count
 ```
 
@@ -300,7 +300,7 @@ GET /books/_count
 
 Un alias peut porter un filtre — ici, les seuls livres de Camus:
 
-```bash
+```json
 POST /_aliases
 {
   "actions": [
@@ -315,7 +315,7 @@ POST /_aliases
 }
 ```
 
-```bash
+```json
 GET /books-camus/_count
 ```
 
@@ -332,7 +332,7 @@ GET /books-camus/_count
 
 Tous les futurs index `books-*` auront le même mapping et les mêmes settings — et rejoindront l'alias `books-next`:
 
-```bash
+```json
 PUT /_index_template/books
 {
   "index_patterns": ["books-*"],
@@ -353,7 +353,7 @@ PUT /_index_template/books
 
 ### Étape 2: Simuler l'index qui serait créé
 
-```bash
+```json
 POST /_index_template/_simulate_index/books-2026
 ```
 
@@ -375,7 +375,7 @@ POST /_index_template/_simulate_index/books-2026
 
 Il suffit d'y écrire: l'index est créé, avec le template.
 
-```bash
+```json
 POST /books-2026/_bulk?refresh=true
 {"index":{"_id":"9782070612758"}}
 {"title":"Le Petit Prince","author":"Antoine de Saint-Exupéry","year":1943,"stock":10}
@@ -383,7 +383,7 @@ POST /books-2026/_bulk?refresh=true
 {"title":"L'Étranger","author":"Albert Camus","year":1942,"stock":8}
 ```
 
-```bash
+```json
 GET /books-2026/_mapping
 ```
 
@@ -405,7 +405,7 @@ GET /books-2026/_mapping
 
 Les actions d'un même appel `_aliases` sont **atomiques**: aucune requête ne voit `books` vide, ni pointant sur deux index.
 
-```bash
+```json
 POST /_aliases
 {
   "actions": [
@@ -415,7 +415,7 @@ POST /_aliases
 }
 ```
 
-```bash
+```json
 GET /books/_count
 ```
 
@@ -426,7 +426,7 @@ GET /books/_count
 }
 ```
 
-```bash
+```json
 GET /_alias/books
 ```
 

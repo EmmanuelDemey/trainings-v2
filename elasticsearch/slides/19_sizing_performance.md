@@ -190,7 +190,7 @@ Final recommendation: 5 data nodes
 # System Configuration: Heap Size
 
 **Verifying configuration**:
-```bash
+```json
 GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_max_in_bytes
 ```
 
@@ -237,7 +237,7 @@ bootstrap.memory_lock: true
 ```
 
 **Verification**:
-```bash
+```json
 GET /_nodes?filter_path=nodes.*.process.mlockall
 ```
 
@@ -261,7 +261,9 @@ elasticsearch  -  nproc   4096
 # Before starting Elasticsearch
 ulimit -n
 # Should display: 65536
+```
 
+```json
 # After starting
 GET /_nodes/stats/process?filter_path=nodes.*.process.max_file_descriptors
 ```
@@ -304,7 +306,7 @@ thread_pool:
 ```
 
 **Thread pools monitoring**:
-```bash
+```json
 GET /_cat/thread_pool?v&h=node_name,name,active,queue,rejected
 ```
 
@@ -462,7 +464,7 @@ PUT /my-index/_settings
 # Indexing Optimization
 
 **3. Use Bulk API with optimal batches**:
-```bash
+```json
 # Optimal batch size: 5-15 MB or 1000-5000 docs
 POST /_bulk
 { "index": { "_index": "my-index" }}
@@ -544,7 +546,7 @@ Automatically managed by the OS (50% non-heap RAM). The most important!
 # Caching Strategies
 
 **Cache invalidation**:
-```bash
+```json
 POST /my-index/_cache/clear
 POST /_cache/clear?query=true&request=true&fielddata=true
 ```

@@ -624,7 +624,7 @@ Kibana offers [predefined alerts for Stack Monitoring](https://www.elastic.co/gu
 4. **Error**: Execution error (invalid query, unavailable connector)
 
 **Alert history**:
-```bash
+```json
 GET .watcher-history-*/_search
 {
   "query": {
@@ -638,7 +638,7 @@ GET .watcher-history-*/_search
 ```
 
 **Temporarily disable**:
-```bash
+```json
 PUT _watcher/watch/heap_usage_alert/_deactivate
 # Reactivate:
 PUT _watcher/watch/heap_usage_alert/_activate
@@ -649,12 +649,12 @@ PUT _watcher/watch/heap_usage_alert/_activate
 # Alert Lifecycle Management
 
 **Delete a watch**:
-```bash
+```json
 DELETE _watcher/watch/heap_usage_alert
 ```
 
 **Watch monitoring**:
-```bash
+```json
 GET _watcher/stats
 ```
 

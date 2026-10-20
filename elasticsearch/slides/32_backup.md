@@ -57,7 +57,7 @@ path:
 
 # Creating a repository
 
-```
+```json
 PUT /_snapshot/backups_1
 {
     "type": "fs",
@@ -79,7 +79,7 @@ PUT /_snapshot/backups_1
 
 # Automatic Snapshot Creation
 
-```
+```json
 PUT _slm/policy/nightly-snapshots
 {
   "schedule": "0 30 1 * * ?",       
@@ -97,7 +97,7 @@ PUT _slm/policy/nightly-snapshots
 }
 ```
 
-```
+```json
 POST _slm/policy/nightly-snapshots/_execute
 ```
 
@@ -105,7 +105,7 @@ POST _slm/policy/nightly-snapshots/_execute
 
 # Manual Snapshot Creation
 
-```
+```json
 PUT /_snapshot/backups_1/snapshot_1?wait_for_completion=true
 {
   "indices": "index_1,index_2",
@@ -121,7 +121,7 @@ PUT /_snapshot/backups_1/snapshot_1?wait_for_completion=true
 
 # Restoring the Snapshot
 
-```
+```json
 POST /_snapshot/backups_1/snapshot_1/_restore
 {
   "indices": "index_1,index_2",

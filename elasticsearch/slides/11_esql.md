@@ -16,7 +16,7 @@ layout: cover
     * **Kibana alerting** rules (ES|QL rule type)
 * GA since 8.14 — the language Elastic adds new features to first
 
-```
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -54,7 +54,7 @@ POST /_query?format=txt
 * `format=txt`, `csv`, `tsv`: for a human, or a spreadsheet
 * `format=json` (default): `columns` + `values`, row by row
 
-```
+```json
 POST /_query?format=json
 {
   "query": "FROM web-logs | KEEP url, status | LIMIT 2"
@@ -72,7 +72,7 @@ POST /_query?format=json
 
 # EVAL and functions
 
-```
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -92,7 +92,7 @@ POST /_query?format=txt
 
 # STATS … BY
 
-```
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -113,7 +113,7 @@ POST /_query?format=txt
 
 * `INLINE STATS` keeps every row, and adds the aggregate next to it
 
-```
+```json
 POST /_query?format=txt
 {
   "query": "FROM web-logs | INLINE STATS max_bytes = MAX(bytes) BY host | KEEP host, url, bytes, max_bytes"
@@ -126,7 +126,7 @@ POST /_query?format=txt
 
 * Never concatenate user input into a query: pass **parameters**
 
-```
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -145,7 +145,7 @@ POST /_query?format=txt
 * `MATCH`, `QSTR` (query string) and the `:` operator use the inverted index, like the Query DSL
 * `METADATA _score` exposes the relevance score
 
-```
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -163,7 +163,7 @@ POST /_query?format=txt
 
 * Joins every row with the matching document of a **lookup index** (`index.mode: lookup`: one shard, replicated on every node)
 
-```
+```json
 PUT /currencies
 {
   "settings": { "index.mode": "lookup" },
@@ -171,7 +171,7 @@ PUT /currencies
 }
 ```
 
-```
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -191,7 +191,7 @@ POST /_query?format=txt
 
 * A long query runs in the background: `wait_for_completion_timeout`, then poll with its `id`
 
-```
+```json
 POST /_query/async?format=json
 {
   "query": "FROM web-logs | STATS c = COUNT(*)",
@@ -200,7 +200,7 @@ POST /_query/async?format=json
 ```
 
 <!-- ci: skip -->
-```
+```json
 GET /_query/async/<id>
 ```
 

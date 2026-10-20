@@ -13,7 +13,7 @@ Votre cluster stocke des logs avec des patterns d'accès variables: les logs ré
 
 **Avant de commencer**, vérifiez que votre cluster est accessible:
 
-```bash
+```json
 GET /_cluster/health
 ```
 
@@ -37,7 +37,7 @@ node.roles: [ data_cold ]
 
 Redémarrez les nœuds et vérifiez:
 
-```bash
+```json
 GET /_cat/nodes?v&h=name,node.role
 ```
 
@@ -55,7 +55,7 @@ Sur un cluster à 1 nœud (Docker), ce nœud porte tous les rôles: tout le TP f
 
 La phase `cold` convertit les index en **searchable snapshots**: il faut un dépôt de snapshots. Le chemin doit être déclaré dans `path.repo` (`-e path.repo=/usr/share/elasticsearch/backups` avec Docker):
 
-```bash
+```json
 PUT /_snapshot/my-repository
 {
   "type": "fs",
@@ -67,7 +67,7 @@ PUT /_snapshot/my-repository
 
 Définissez une policy qui fait passer les données de hot à warm, puis cold, puis delete:
 
-```bash
+```json
 PUT /_ilm/policy/logs-policy
 {
   "policy": {
@@ -133,7 +133,7 @@ Pas besoin d'action `allocate` pour changer de nœud: ILM ajoute de lui-même un
 
 Un **data stream** est la façon moderne de stocker des données horodatées: un seul nom pour écrire et lire, des index cachés (`.ds-…`) derrière, et un rollover géré par ILM sans alias à configurer.
 
-```bash
+```json
 PUT /_index_template/app-logs-template
 {
   "index_patterns": ["app-logs*"],
@@ -161,7 +161,7 @@ PUT /_index_template/app-logs-template
 
 Il est créé automatiquement au premier document indexé, ou explicitement:
 
-```bash
+```json
 PUT /_data_stream/app-logs
 
 GET /_data_stream/app-logs
@@ -172,7 +172,7 @@ La réponse liste la backing index (`.ds-app-logs-<date>-000001`), le template e
 **Ancienne méthode — ne plus l'utiliser**: créer `logs-000001` à la main avec un alias `is_write_index` et le setting `index.lifecycle.rollover_alias`. Avec un template de data stream, Elasticsearch le refuse:
 
 <!-- ci: expect-error -->
-```bash
+```json
 PUT /app-logs-000001
 {
   "aliases": {
@@ -187,7 +187,7 @@ PUT /app-logs-000001
 
 Indexez des données. Un data stream n'accepte que des créations (pas de mise à jour par `_id`), et chaque document doit avoir un `@timestamp`:
 
-```bash
+```json
 POST /app-logs/_doc
 {
   "@timestamp": "2026-10-08T10:00:00Z",
@@ -197,7 +197,7 @@ POST /app-logs/_doc
 
 Forcez un rollover manuel (pour test):
 
-```bash
+```json
 POST /app-logs/_rollover
 ```
 
@@ -211,7 +211,7 @@ POST /app-logs/_rollover
 
 Vérifiez les backing indices: il y en a maintenant deux, et seule la plus récente reçoit les écritures.
 
-```bash
+```json
 GET /_data_stream/app-logs
 
 GET /_cat/indices/.ds-app-logs-*?v&h=index,health,status,docs.count,store.size
@@ -221,7 +221,7 @@ GET /_cat/indices/.ds-app-logs-*?v&h=index,health,status,docs.count,store.size
 
 ILM n'évalue les policies que toutes les 10 minutes (`indices.lifecycle.poll_interval`). Pour le TP, réduisez cet intervalle:
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -232,7 +232,7 @@ PUT /_cluster/settings
 
 Puis modifiez la policy pour raccourcir les délais:
 
-```bash
+```json
 PUT /_ilm/policy/logs-policy
 {
   "policy": {
@@ -259,13 +259,13 @@ PUT /_ilm/policy/logs-policy
 
 Attendez 1-2 minutes et vérifiez: la première backing index (déjà rollée) passe en `warm`, la seconde reste en `hot`.
 
-```bash
+```json
 GET /app-logs/_ilm/explain
 ```
 
 Remettez l'intervalle par défaut après le TP:
 
-```bash
+```json
 PUT /_cluster/settings
 {
   "persistent": {
@@ -299,7 +299,7 @@ PUT /_cluster/settings
 Avec l'API `move`, en remplaçant le nom par celui d'une backing index (`GET /_data_stream/app-logs`):
 
 <!-- ci: skip -->
-```bash
+```json
 POST /_ilm/move/.ds-app-logs-2026.10.08-000001
 {
   "current_step": {

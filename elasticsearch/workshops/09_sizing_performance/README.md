@@ -70,7 +70,7 @@ Shards par nœud:     134 / 5 nœuds = 26.8 ≈ 27 shards/nœud
 
 ### Étape 5: Stratégie d'indexation - Index par jour (Time-Based Indices)
 
-```bash
+```json
 PUT /_index_template/logs-template
 {
   "index_patterns": ["logs-*"],
@@ -155,7 +155,9 @@ sudo vi /etc/elasticsearch/jvm.options
 
 ```bash
 sudo systemctl start elasticsearch
+```
 
+```json
 # Vérifier la configuration heap via l'API
 GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.mem.heap_max_in_bytes
 
@@ -190,7 +192,7 @@ done
 
 ### Étape 1: Lister tous les thread pools
 
-```bash
+```json
 GET /_cat/thread_pool?v
 ```
 
@@ -201,13 +203,13 @@ GET /_cat/thread_pool?v
 
 ### Étape 2: Filtrer les thread pools importants
 
-```bash
+```json
 GET /_cat/thread_pool/write,search,get?v&h=node_name,name,active,queue,rejected,completed
 ```
 
 ### Étape 3: Analyser les rejections en détail
 
-```bash
+```json
 GET /_nodes/stats/thread_pool?filter_path=nodes.*.thread_pool.write,nodes.*.thread_pool.search
 ```
 
@@ -224,7 +226,7 @@ Taux de rejection = rejected / (completed + rejected) × 100%
 
 ### Étape 5: Identifier la cause des rejections
 
-```bash
+```json
 # Le thread pool est-il à sa capacité max ?
 GET /_cat/thread_pool/search?v&h=node_name,active,threads
 

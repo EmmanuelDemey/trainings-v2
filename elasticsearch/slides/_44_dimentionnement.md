@@ -10,7 +10,7 @@ layout: cover
 
 * We can create indexes manually
 
-```
+```json
 PUT /movies-v1
 {
     "settings" : {
@@ -41,7 +41,7 @@ PUT /movies-v1
 
 # Index Management
 
-```
+```json
 PUT /movies
 {
     "settings" : {
@@ -57,7 +57,7 @@ PUT /movies
 
 * We can modify certain *settings* of an index afterwards
 
-```
+```json
 PUT /movies/_settings
 {
     "index" : {
@@ -86,7 +86,7 @@ index.number_of_replicas: 1
 * If it is the case, the cluster status will be `yellow`
 * The cluster can have the status `green`, `yellow`, or `red`.
 
-```
+```json
 GET /_cluster/health
 ```
 
@@ -94,7 +94,7 @@ GET /_cluster/health
 
 # Cluster Status
 
-```text
+```json
 {
   "cluster_name" : "testcluster",
   "status" : "yellow",
@@ -182,7 +182,7 @@ cluster.info.update.interval: 30s
 * We can modify these values via the `_cluster/settings` API
 * All percentages or all free-space values (here, space left on the disk) — not a mix
 
-```
+```json
 PUT _cluster/settings
 {
     "persistent": {
@@ -224,7 +224,7 @@ cluster.routing.allocation.awareness.attributes: rack_id
 * Finally, we can add additional constraints via the `_cluster/settings` API
 * Using one of the properties `_name`, `_ip`, `_host`, ...
 
-```
+```json
 PUT _cluster/settings
 {
   "persistent" : {

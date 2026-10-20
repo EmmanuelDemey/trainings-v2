@@ -136,7 +136,7 @@ ES_PASSWORD=<votre mot de passe> node main.js
 Vérifiez depuis Kibana Dev Tools que l'index existe bien:
 
 <!-- ci: skip -->
-```bash
+```json
 GET /movies/_count
 ```
 

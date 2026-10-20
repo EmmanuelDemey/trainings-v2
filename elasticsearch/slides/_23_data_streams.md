@@ -14,7 +14,7 @@ layout: cover
 * Built-in templates: `logs-*-*`, `metrics-*-*`, `traces-*-*` (priority 100) — used by Elastic Agent
     * Never shadow them with a `logs-*` template of your own: use `logs-myapp-*`, or a higher-priority template that `composed_of` the built-in components
 
-```
+```json
 GET /_index_template/logs
 ```
 
@@ -25,7 +25,7 @@ GET /_index_template/logs
 * A simpler alternative to ILM: **a retention**, and Elasticsearch handles rollover and deletion
 * Declared in the template, or on an existing data stream
 
-```
+```json
 PUT /_index_template/logs-shop-template
 {
   "index_patterns": ["logs-shop-*"],
@@ -37,17 +37,17 @@ PUT /_index_template/logs-shop-template
 }
 ```
 
-```
+```json
 POST /logs-shop-default/_doc
 { "@timestamp": "2026-10-08T10:00:00Z", "message": "GET /home 200" }
 ```
 
-```
+```json
 PUT /_data_stream/logs-shop-default/_lifecycle
 { "data_retention": "30d" }
 ```
 
-```
+```json
 GET /_data_stream/logs-shop-default/_lifecycle
 ```
 
@@ -63,7 +63,7 @@ GET /_data_stream/logs-shop-default/_lifecycle
     * ZSTD compression, `ignore_malformed` and `ignore_above` on by default
 * **On by default** for `logs-*-*` data streams since 9.0 (`cluster.logsdb.enabled`)
 
-```
+```json
 PUT /_index_template/logs-shop-template
 {
   "index_patterns": ["logs-shop-*"],
@@ -80,12 +80,12 @@ PUT /_index_template/logs-shop-template
 
 # Synthetic _source: what changes
 
-```
+```json
 POST /logs-shop-default/_doc?refresh=true
 { "@timestamp": "2026-10-08T10:01:00Z", "host.name": "web-1", "message": "GET /cart", "http.status": "oops" }
 ```
 
-```
+```json
 POST /logs-shop-default/_search
 { "query": { "term": { "host.name": "web-1" } } }
 ```
@@ -110,7 +110,7 @@ POST /logs-shop-default/_search
 * A document that cannot be indexed (mapping error, failing ingest pipeline, missing `@timestamp`) is **not lost**: it goes to the data stream's **failure store**
 * On by default for `logs-*-*`; for your own templates:
 
-```
+```json
 PUT /_index_template/logs-shop-template
 {
   "index_patterns": ["logs-shop-*"],
@@ -126,12 +126,12 @@ PUT /_index_template/logs-shop-template
 
 * The template only applies to data streams created **after** it: switch an existing one on with its options
 
-```
+```json
 PUT /_data_stream/logs-shop-default/_options
 { "failure_store": { "enabled": true } }
 ```
 
-```
+```json
 POST /logs-shop-default/_doc
 { "host.name": "web-2", "message": "no timestamp" }
 ```
@@ -144,16 +144,16 @@ POST /logs-shop-default/_doc
 
 * The `::failures` selector reads the failure store: the original document, the error, the pipeline
 
-```
+```json
 POST /logs-shop-default::failures/_refresh
 ```
 
-```
+```json
 POST /logs-shop-default::failures/_search
 { "_source": ["error.type", "error.message", "document.source"] }
 ```
 
-```
+```json
 POST /_query?format=txt
 { "query": "FROM logs-shop-default::failures | STATS failures = COUNT(*) BY error.type" }
 ```
@@ -170,7 +170,7 @@ POST /_query?format=txt
 * Sorted by series then time, synthetic `_source`: **up to 70% less storage**
 * Only accepts points within its time bounds (`index.look_back_time`, 2 h by default)
 
-```
+```json
 PUT /_index_template/metrics-shop-template
 {
   "index_patterns": ["metrics-shop-*"],
@@ -205,11 +205,11 @@ PUT /_index_template/metrics-shop-template
 * Declared in the lifecycle (DSL) above, or as an ILM action
 * ES|QL reads time series with the `TS` source command
 
-```
+```json
 PUT /_data_stream/metrics-shop-default
 ```
 
-```
+```json
 POST /_query?format=txt
 { "query": "TS metrics-shop-default | STATS max_cpu = MAX(cpu.pct) BY host.name" }
 ```

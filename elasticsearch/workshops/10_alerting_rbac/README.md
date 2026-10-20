@@ -8,7 +8,7 @@
 
 Ce TP est autonome. Créez les indices de simulation avant de commencer:
 
-```bash
+```json
 PUT /cluster_health_logs
 {
   "mappings": {
@@ -92,7 +92,7 @@ Action requise: Vérifier l'état du cluster avec GET _cluster/health
 
 ### Étape 6: Tester le Déclenchement
 
-```bash
+```json
 POST /cluster_health_logs/_doc
 {
   "@timestamp": "2024-01-15T10:05:00Z",
@@ -140,7 +140,7 @@ while true; do echo -e "HTTP/1.1 200 OK\n\n" | nc -l 8888; done
 
 ### Étape 4: Créer un Index de Simulation
 
-```bash
+```json
 PUT /heap-monitoring
 {
   "mappings": {
@@ -202,7 +202,7 @@ POST /heap-monitoring/_bulk
 
 ### Étape 6: Déclencher et Vérifier
 
-```bash
+```json
 POST /heap-monitoring/_doc
 {
   "@timestamp": "2024-01-15T10:10:00Z",
@@ -217,7 +217,7 @@ POST /heap-monitoring/_refresh
 Vérifiez les alertes indexées par l'action Index de la règle Kibana:
 
 <!-- ci: skip -->
-```bash
+```json
 GET alert-history/_search
 {
   "query": { "range": { "@timestamp": { "gte": "now-1h" } } },
@@ -231,7 +231,7 @@ GET alert-history/_search
 
 Le nom `logs-2024.01` (avec un point) est voulu: Elasticsearch réserve `logs-*-*` aux data streams d'Elastic Agent (template intégré `logs`), et y refuserait un index classique comme `logs-2024-01`.
 
-```bash
+```json
 GET /_security/_authenticate
 
 PUT /logs-2024.01
@@ -250,7 +250,7 @@ POST /logs-2024.01/_bulk
 
 ### Étape 2: Créer les Rôles
 
-```bash
+```json
 # Rôle lecture seule sur logs
 POST /_security/role/logs_readonly
 {
@@ -288,7 +288,7 @@ POST /_security/role/developer
 
 ### Étape 3: Créer des Utilisateurs
 
-```bash
+```json
 POST /_security/user/alice_reader
 {
   "password": "ReadOnlyPass123!",
@@ -324,7 +324,7 @@ curl -u alice_reader:ReadOnlyPass123! -X POST "https://localhost:9200/logs-2024.
 
 Créez des données multi-tenant:
 
-```bash
+```json
 PUT /orders
 {
   "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
@@ -356,7 +356,7 @@ POST /orders/_bulk
 
 Créez un rôle avec DLS pour la sales team:
 
-```bash
+```json
 POST /_security/role/sales_team
 {
   "cluster": ["monitor"],
@@ -399,7 +399,7 @@ curl -u sarah_sales:SalesPass123! "https://localhost:9200/orders/_doc/3?pretty"
 
 Créez un rôle EMEA Manager (DLS par région):
 
-```bash
+```json
 POST /_security/role/emea_manager
 {
   "cluster": ["monitor"],
@@ -422,7 +422,7 @@ POST /_security/role/emea_manager
 
 ## Validation
 
-```bash
+```json
 # 1. Vérifier les rôles créés
 GET /_security/role/logs_readonly,developer,sales_team,emea_manager
 
@@ -433,7 +433,7 @@ GET /_security/user
 Et si la règle Kibana de la partie B a tourné:
 
 <!-- ci: skip -->
-```bash
+```json
 # 3. Compter les alertes indexées
 GET alert-history/_count
 ```

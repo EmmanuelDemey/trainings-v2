@@ -24,7 +24,7 @@ layout: cover
 
 - Complete deletion
 
-```
+```json
 DELETE /movies-2023
 ```
 
@@ -32,7 +32,7 @@ DELETE /movies-2023
 
 # Partial Deletion
 
-```
+```json
 POST /movies/_delete_by_query
 {
   "query": {
@@ -61,7 +61,7 @@ POST /movies/_delete_by_query
 - Useful for reducing resource consumption for indices that are not currently in use.
 - Syntax: `POST /<index>/_close`
 
-```http
+```json
 POST /my_index/_close
 ```
 
@@ -84,7 +84,7 @@ POST /my_index/_close
 - Opening a closed index makes it available again for search and indexing operations.
 - Syntax: `POST /<index>/_open`
 
-```http
+```json
 POST /my_index/_open
 ```
 
@@ -122,7 +122,7 @@ POST /my_index/_open
 - Before using the Shrink API, ensure the index is read-only by updating its settings.
 - Syntax: `PUT /<index>/_settings`
 
-```http
+```json
 PUT /my_index/_settings
 {
   "settings": {
@@ -146,7 +146,7 @@ PUT /my_index/_settings
 - To shrink an index, use the Shrink API and specify the target index name and settings.
 - Syntax: `POST /<source_index>/_shrink/<target_index>`
 
-```http
+```json
 POST /my_index/_shrink/my_index_shrinked
 {
   "settings": {
@@ -177,7 +177,7 @@ POST /my_index/_shrink/my_index_shrinked
 - Once the index is shrunk, you may want to make it writable again by updating its settings.
 - Syntax: `PUT /<shrinked_index>/_settings`
 
-```http
+```json
 PUT /my_index_shrinked/_settings
 {
   "settings": {
@@ -233,7 +233,7 @@ PUT /my_index_shrinked/_settings
 
 # ILM
 
-```
+```json
 PUT _ilm/policy/my_policy
 {
   "policy": {
@@ -266,7 +266,7 @@ PUT _ilm/policy/my_policy
 
 - We can associate an ILM with a template
 
-```
+```json
 PUT _index_template/timeseries_template
 {
   "index_patterns": ["timeseries-*"],

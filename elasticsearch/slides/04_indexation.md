@@ -20,7 +20,7 @@ layout: cover
 
 * A document is defined in JSON format.
 
-```
+```json
 POST /movies/_doc
 {
     "title": "Titanic"
@@ -33,7 +33,7 @@ POST /movies/_doc
 
 * Here is the response to the previous request.
 
-```text
+```json
 {
   "_index" : "movies",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
@@ -63,7 +63,7 @@ POST /movies/_doc
 
 * It is possible to use the `POST` verb and provide the document identifier.
 
-```
+```json
 POST /movies/_doc/myId
 {
     "title": "Titanic"
@@ -76,11 +76,11 @@ POST /movies/_doc/myId
 
 * We can retrieve a document using a `GET` request.
 
-```
+```json
 GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```
 
-```text
+```json
 {
   "_index" : "movies",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
@@ -100,7 +100,7 @@ GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 
 * We can update a document using a `PUT` request.
 
-```
+```json
 PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 {
     "title": "Titanic",
@@ -108,7 +108,7 @@ PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 }
 ```
 
-```text
+```json
 {
   "_index" : "movies",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
@@ -131,7 +131,7 @@ PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 * Caution, this update is total, and the previous document will be completely overwritten.
 * It is possible to perform partial updates using the `_update` API.
 
-```
+```json
 POST movies/_update/mQ6jknEBOjsOKzV3MVdi
 {
   "doc": {
@@ -146,11 +146,11 @@ POST movies/_update/mQ6jknEBOjsOKzV3MVdi
 
 * We can delete a document using a `DELETE` request.
 
-```
+```json
 DELETE /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 ```
 
-```text
+```json
 {
   "_index" : "movies",
   "_id" : "mQ6jknEBOjsOKzV3MVdi",
@@ -180,11 +180,11 @@ DELETE /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 
 # First Search
 
-```
+```json
 POST /movies/_search?q=titanic
 ```
 
-```text
+```json
 {
   "took" : 1536,
   "timed_out" : false,
@@ -218,7 +218,7 @@ POST /movies/_search?q=titanic
 
 # First Search
 
-```
+```json
 POST /movies/_search?q=title:titanic
 
 POST /movies/_search?q=title:titanic&size=5
@@ -235,7 +235,7 @@ POST /movies/_search?q=title:titanic&sort=title.keyword:asc
 * We can create indexes manually
 
 <!-- ci: skip -->
-```
+```json
 PUT /movies
 {
     "settings" : {
@@ -267,7 +267,7 @@ PUT /movies
 
 # Index Management
 
-```
+```json
 PUT /books
 {
     "settings" : {
@@ -283,7 +283,7 @@ PUT /books
 
 * We can modify certain *settings* of an index afterward.
 
-```
+```json
 PUT /books/_settings
 {
     "index" : {
@@ -364,7 +364,7 @@ PUT /logs-2025.01/_settings
 * If it is the case, the cluster status will be `yellow`.
 * The cluster can have the status `green`, `yellow`, or `red`.
 
-```
+```json
 GET /_cluster/health
 ```
 
@@ -372,7 +372,7 @@ GET /_cluster/health
 
 # Cluster Status
 
-```text
+```json
 {
   "cluster_name" : "testcluster",
   "status" : "yellow",
@@ -410,13 +410,13 @@ GET /_cluster/health
 
 * We can delete an index
 
-```
+```json
 DELETE /movies
 ```
 
 * We can delete multiple indexes
 
-```
+```json
 DELETE /movies,albums
 ```
 
@@ -427,7 +427,7 @@ DELETE /movies,albums
 * Deleting with a wildcard (`DELETE *`, `DELETE _all`) is refused by default since 8.0:
 
 <!-- ci: expect-error -->
-```
+```json
 DELETE _all
 ```
 
@@ -497,14 +497,14 @@ POST /_bulk
 
 # Best Practices
 
-```http
+```json
 PUT products/_settings
 {
     "refresh_interval": "-1"
 }
 ```
 
-```http
+```json
 PUT products/_settings
 {
     "refresh_interval": "30s"

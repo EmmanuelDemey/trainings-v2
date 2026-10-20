@@ -31,7 +31,7 @@ Document → Ingest Pipeline → Index Buffer → Segment → Merge
 
 # Segments and Merge
 
-```bash
+```json
 # View segments of an index
 GET /_cat/segments/parkki-logs-*?v
 
@@ -75,7 +75,7 @@ PUT /parkki-logs-*/_settings
 
 # Debugging Unassigned Shards
 
-```bash
+```json
 # View unassigned shards
 GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason
 
@@ -101,7 +101,7 @@ GET /_cluster/allocation/explain
 
 # Essential CAT APIs
 
-```bash
+```json
 # Cluster health
 GET /_cat/health?v
 
@@ -141,7 +141,7 @@ GET /_cat/allocation?v
 
 # JVM Monitoring
 
-```bash
+```json
 # Heap usage
 GET /_cat/nodes?v&h=name,heap.percent,heap.current,heap.max
 
@@ -167,7 +167,7 @@ GET /_nodes/stats/jvm?filter_path=nodes.*.jvm.gc
 
 **The classic trap**: aggregations on `text` fields
 
-```bash
+```json
 # View fielddata usage
 GET /_cat/fielddata?v
 

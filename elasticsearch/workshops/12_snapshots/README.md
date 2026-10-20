@@ -43,7 +43,7 @@ Redémarrez Elasticsearch pour appliquer la configuration.
 
 ## Étape 2: Créer un Repository de Snapshots
 
-```bash
+```json
 PUT /_snapshot/my_backup
 {
   "type": "fs",
@@ -59,13 +59,13 @@ PUT /_snapshot/my_backup
 
 **Tester la connectivité du repository**:
 
-```bash
+```json
 POST /_snapshot/my_backup/_verify
 ```
 
 ## Étape 3: Créer des Données de Test
 
-```bash
+```json
 # Index 1: Produits
 PUT /products
 {
@@ -115,7 +115,7 @@ POST /users/_bulk
 
 Vérifiez les indices créés:
 
-```bash
+```json
 GET /_cat/indices?v&h=index,docs.count,store.size
 ```
 
@@ -123,7 +123,7 @@ GET /_cat/indices?v&h=index,docs.count,store.size
 
 Par défaut, l'API rend la main tout de suite et le snapshot se poursuit en arrière-plan. Avec `wait_for_completion=true`, elle attend la fin: pratique pour un TP ou un script.
 
-```bash
+```json
 PUT /_snapshot/my_backup/snapshot_full_2024_01_15?wait_for_completion=true
 {
   "indices": "*",
@@ -139,19 +139,19 @@ PUT /_snapshot/my_backup/snapshot_full_2024_01_15?wait_for_completion=true
 
 **Surveiller la progression** (utile sans `wait_for_completion`, sur de gros volumes):
 
-```bash
+```json
 GET /_snapshot/my_backup/snapshot_full_2024_01_15/_status
 ```
 
 **Vérifier que l'état est SUCCESS**:
 
-```bash
+```json
 GET /_snapshot/my_backup/snapshot_full_2024_01_15
 ```
 
 ## Étape 5: Créer un Snapshot Partiel
 
-```bash
+```json
 PUT /_snapshot/my_backup/snapshot_products_orders?wait_for_completion=true
 {
   "indices": "products,orders",
@@ -167,7 +167,7 @@ PUT /_snapshot/my_backup/snapshot_products_orders?wait_for_completion=true
 
 ## Étape 6: Lister Tous les Snapshots
 
-```bash
+```json
 GET /_snapshot/my_backup/_all
 ```
 
@@ -175,19 +175,19 @@ GET /_snapshot/my_backup/_all
 
 1. Supprimer accidentellement l'index "orders":
 
-```bash
+```json
 DELETE /orders
 ```
 
 2. Vérifier que l'index n'existe plus:
 
-```bash
+```json
 GET /_cat/indices?v&h=index
 ```
 
 3. Restaurer uniquement l'index "orders":
 
-```bash
+```json
 POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 {
   "indices": "orders",
@@ -198,13 +198,13 @@ POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 
 4. Surveiller la restauration:
 
-```bash
+```json
 GET /_cat/recovery?v&h=index,stage,type,files_percent&s=index
 ```
 
 5. Vérifier que les données sont restaurées:
 
-```bash
+```json
 GET /orders/_search
 {
   "query": { "match_all": {} }
@@ -213,7 +213,7 @@ GET /orders/_search
 
 ## Étape 8: Scénario de Restauration 2 - Restauration avec Renommage
 
-```bash
+```json
 POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 {
   "indices": "products",
@@ -228,7 +228,7 @@ POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 
 Comparer les données:
 
-```bash
+```json
 GET /products/_count
 GET /restored_products/_count
 ```
@@ -237,13 +237,13 @@ GET /restored_products/_count
 
 1. Supprimer tous les indices (ATTENTION: uniquement en environnement de test):
 
-```bash
+```json
 DELETE /products,orders,users,restored_products
 ```
 
 2. Restaurer les indices applicatifs:
 
-```bash
+```json
 POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 {
   "indices": "products,orders,users",
@@ -255,13 +255,13 @@ POST /_snapshot/my_backup/snapshot_full_2024_01_15/_restore
 
 3. Vérifier la restauration complète:
 
-```bash
+```json
 GET /_cat/indices?v&h=index,docs.count,store.size
 ```
 
 ## Validation Finale
 
-```bash
+```json
 GET /_snapshot/_all
 GET /_snapshot/my_backup/_all
 GET /_cat/indices?v

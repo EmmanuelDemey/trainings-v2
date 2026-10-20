@@ -51,14 +51,14 @@ bin/elasticsearch --enrollment-token <VOTRE_TOKEN>
 ```
 
 **Résultat attendu**: Le nœud démarre et affiche:
-```
+```json
 [INFO ][o.e.n.Node] [node-2] started
 [INFO ][o.e.c.s.ClusterApplierService] [node-2] detected_master {node-1}{...}
 ```
 
 ### Étape 4: Vérifier la formation du cluster
 
-```bash
+```json
 GET /_cat/nodes?v
 ```
 
@@ -72,7 +72,7 @@ ip           heap.percent ram.percent cpu load_1m node.role master name
 ### Étape 5: Vérifier le statut du cluster
 
 <!-- ci: no-compare -->
-```bash
+```json
 GET /_cluster/health
 ```
 
@@ -92,17 +92,17 @@ GET /_cluster/health
 ### Validation
 
 1. Lister tous les nœuds avec leurs rôles:
-```bash
+```json
 GET /_cat/nodes?v&h=name,ip,node.role,master,heap.percent,ram.percent
 ```
 
 2. Vérifier l'allocation des shards entre les nœuds:
-```bash
+```json
 GET /_cat/shards?v
 ```
 
 3. Tester la résilience (optionnel):
-```bash
+```json
 PUT /test-resilience
 {
   "settings": {
@@ -150,7 +150,7 @@ bin/elasticsearch
 
 ### Étape 3: Vérifier les rôles des nœuds
 
-```bash
+```json
 GET /_cat/nodes?v&h=name,node.role,master
 ```
 
@@ -185,13 +185,13 @@ cluster.initial_master_nodes: ["node-1", "master-node-1"]
 
 ### Étape 5: Vérifier l'allocation des shards
 
-```bash
+```json
 GET /_cat/shards?v&h=index,shard,prirep,state,node
 ```
 
 ### Validation
 
-```bash
+```json
 GET /_nodes?filter_path=nodes.*.name,nodes.*.roles
 GET /_cat/allocation?v&h=node,shards,disk.used
 GET /_cat/master?v

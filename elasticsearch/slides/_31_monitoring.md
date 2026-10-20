@@ -10,7 +10,7 @@ layout: cover
 
 * API allowing to retrieve the health state of your Cluster
 
-```
+```json
 GET /_cluster/health/
 ```
 
@@ -18,7 +18,7 @@ GET /_cluster/health/
 
 # Cluster Health APIs
 
-```text
+```json
 {
   "cluster_name" : "xxx",
   "status" : "red",
@@ -53,7 +53,7 @@ GET /_cluster/health/
 
 # CAT APIs
 
-```
+```json
 GET _cat
 GET _cat/indices
 GET _cat/shards
@@ -69,7 +69,7 @@ GET _cat/nodes
 * Enable `verbose` mode with the `v` parameter
 * Some APIs accept other parameters.
 
-```
+```json
 GET /_cat/indices?v
 GET /_cat/indices?v&health=red
 ```
@@ -92,7 +92,7 @@ filebeat-7.9.3-2022.01.07-000015  2   r   UNASSIGNED
 
 * API allowing to understand why a shard has not been assigned
 
-```
+```json
 GET _cluster/allocation/explain
 {
   "index": "filebeat-7.9.3-2022.01.07-000015",
@@ -107,7 +107,7 @@ GET _cluster/allocation/explain
 
 * Here is the result of the previous request
 
-```text
+```json
 {
   "index": "filebeat-7.9.3-2022.01.07-000015",
   "shard": 1,
@@ -150,7 +150,7 @@ GET _cluster/allocation/explain
 
 * Via the `cat fielddata API`
 
-```
+```json
 GET /_cat/fielddata?v=true
 ```
 
@@ -167,7 +167,7 @@ Nqk-6inXQq-OxUfOUI8jNQ 127.0.0.1 127.0.0.1 Nqk-6in soul    480b
 
 * Via the `nodes stats API`
 
-```
+```json
 GET /_nodes/stats/indices/fielddata?fields=field1,field2
 
 GET /_nodes/stats/indices/fielddata?level=indices&fields=field1,field2
@@ -182,7 +182,7 @@ GET /_nodes/stats/indices/fielddata?fields=field*```
 # Other APIs
 
 <!-- ci: skip -->
-```text
+```json
 GET /_nodes/stats
 
 GET /_nodes/<node_id>/stats
@@ -202,7 +202,7 @@ GET /_cluster/stats/nodes/<node_filter>
 
 * For example, the JVM and search stats of the node you are connected to:
 
-```
+```json
 GET /_nodes/_local/stats/jvm,indices/search
 ```
 
@@ -210,7 +210,7 @@ GET /_nodes/_local/stats/jvm,indices/search
 
 # Node Info API
 
-```text
+```json
 {
   "_nodes": ...
   "cluster_name": "elasticsearch",
@@ -257,11 +257,11 @@ GET /_nodes/_local/stats/jvm,indices/search
 
 # Cluster Stats API
 
-```
+```json
 GET /_cluster/stats?human&pretty
 ```
 
-```
+```json
 
 
 {
@@ -498,7 +498,7 @@ ing.slowlog.threshold.index.warn: 10s
 
 * We can also modify these parameters on the fly
 
-```
+```json
 PUT /my-index-000001/_settings
 {
   "index.search.slowlog.threshold.query.warn": "10s",
@@ -516,7 +516,7 @@ PUT /my-index-000001/_settings
 
 # slowlog
 
-```text
+```json
 [instance-0000000000] [movies/C2OBwoduS9SA_1EZ9ds4ow]
   took[746.5micros], took_millis[0], type[_doc], id[2], routing[],
   source[{"title":"Titanic"}]
@@ -652,7 +652,7 @@ ports: [80, 8080, 8081, 5000, 8002]
 * Metricbeat collects the metrics itself, through the cluster's APIs
 * Nothing to enable in Elasticsearch: the legacy internal collection (`xpack.monitoring.*.collection.enabled`) is deprecated, keep it off
 
-```
+```json
 GET _cluster/settings?include_defaults&filter_path=*.xpack.monitoring.collection
 ```
 

@@ -59,7 +59,7 @@ xpack.security.authc.realms:
 
 # Creating Users
 
-```bash
+```json
 # Via API
 POST /_security/user/dev_user
 {
@@ -191,7 +191,7 @@ POST /_security/role/logs_anonymized
 
 # API Keys
 
-```bash
+```json
 # Create an API key
 POST /_security/api_key
 {

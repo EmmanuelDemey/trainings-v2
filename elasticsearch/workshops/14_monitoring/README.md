@@ -12,7 +12,7 @@ L'équipe reçoit une alerte indiquant que le cluster est passé en statut `yell
 
 Ce TP est autonome. Créez l'index de test avant de commencer:
 
-```bash
+```json
 PUT /health-test
 {
   "settings": {
@@ -26,7 +26,7 @@ PUT /health-test
 
 ### Étape 1: Consulter le cluster health basique
 
-```bash
+```json
 GET /_cluster/health
 ```
 
@@ -34,7 +34,7 @@ Le statut du cluster est le **pire** statut de ses index. Les compteurs (`active
 
 Concentrez-vous sur l'index du TP:
 
-```bash
+```json
 GET /_cluster/health/health-test
 ```
 
@@ -57,13 +57,13 @@ GET /_cluster/health/health-test
 
 ### Étape 2: Obtenir des détails par index
 
-```bash
+```json
 GET /_cluster/health?level=indices
 ```
 
 ### Étape 3: Identifier les shards non alloués
 
-```bash
+```json
 GET /_cat/shards/health-test?v&h=index,shard,prirep,state,unassigned.reason
 ```
 
@@ -86,7 +86,7 @@ health-test 1     r      UNASSIGNED INDEX_CREATED
 
 ### Étape 5: Diagnostiquer pourquoi un shard est unassigned
 
-```bash
+```json
 GET /_cluster/allocation/explain
 {
   "index": "health-test",
@@ -97,7 +97,7 @@ GET /_cluster/allocation/explain
 
 ### Étape 6: Utiliser les paramètres de l'API
 
-```bash
+```json
 # Attendre au moins le statut yellow (timeout 30s). Avec wait_for_status=green,
 # un cluster à 1 nœud répond 408 au bout de 30s: ses replicas ne seront jamais alloués.
 GET /_cluster/health?wait_for_status=yellow&timeout=30s
@@ -113,7 +113,7 @@ GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason
 
 ### Étape 1: Obtenir les statistiques JVM (heap usage)
 
-```bash
+```json
 GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.mem
 ```
 
@@ -124,7 +124,7 @@ GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.mem
 
 ### Étape 2: Vérifier les Garbage Collection stats
 
-```bash
+```json
 GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.gc
 ```
 
@@ -134,7 +134,7 @@ GET /_nodes/stats/jvm?filter_path=nodes.*.name,nodes.*.jvm.gc
 
 ### Étape 3: Monitorer l'utilisation CPU et RAM
 
-```bash
+```json
 GET /_nodes/stats/os?filter_path=nodes.*.name,nodes.*.os.cpu,nodes.*.os.mem
 ```
 
@@ -144,7 +144,7 @@ GET /_nodes/stats/os?filter_path=nodes.*.name,nodes.*.os.cpu,nodes.*.os.mem
 
 ### Étape 4: Vérifier l'utilisation disque
 
-```bash
+```json
 GET /_nodes/stats/fs?filter_path=nodes.*.name,nodes.*.fs.total,nodes.*.fs.io_stats
 ```
 
@@ -156,13 +156,13 @@ GET /_nodes/stats/fs?filter_path=nodes.*.name,nodes.*.fs.total,nodes.*.fs.io_sta
 
 ### Étape 5: Surveiller les métriques d'indexation et recherche
 
-```bash
+```json
 GET /_nodes/stats/indices?filter_path=nodes.*.name,nodes.*.indices.indexing,nodes.*.indices.search
 ```
 
 ### Étape 6: Tableau de bord synthétique
 
-```bash
+```json
 GET /_nodes/stats?filter_path=nodes.*.name,nodes.*.jvm.mem.heap_used_percent,nodes.*.os.cpu.percent,nodes.*.fs.total.available_in_bytes,nodes.*.indices.search.query_time_in_millis
 ```
 
@@ -172,7 +172,7 @@ GET /_nodes/stats?filter_path=nodes.*.name,nodes.*.jvm.mem.heap_used_percent,nod
 
 Créez un index de test avec des données:
 
-```bash
+```json
 PUT /slowlog-test
 {
   "settings": {
@@ -198,7 +198,7 @@ POST /slowlog-test/_bulk
 
 ### Étape 1: Configurer les seuils de slow query log
 
-```bash
+```json
 PUT /slowlog-test/_settings
 {
   "index.search.slowlog.threshold.query.warn": "500ms",
@@ -227,7 +227,7 @@ Avec l'image Docker, tous les logs partent sur la sortie standard: `docker logs 
 
 ### Étape 3: Exécuter une requête lente
 
-```bash
+```json
 GET /slowlog-test/_search
 {
   "query": {
@@ -241,7 +241,7 @@ GET /slowlog-test/_search
 
 Ou une agrégation complexe:
 
-```bash
+```json
 GET /slowlog-test/_search
 {
   "size": 0,
@@ -268,7 +268,7 @@ tail -f /var/log/elasticsearch/elasticsearch_index_search_slowlog.log
 ```
 
 **Format d'une entrée slow log**:
-```
+```json
 [2023-11-10T10:30:15,123][INFO ][i.s.s.query] [node-1] [slowlog-test][0]
 took[312ms], took_millis[312], total_hits[100 hits],
 source[{"query":{"wildcard":{"content":"*long*content*"}},"size":100}]
@@ -277,7 +277,7 @@ source[{"query":{"wildcard":{"content":"*long*content*"}},"size":100}]
 ### Étape 5: Optimiser la requête identifiée
 
 **Avant** (wildcard lent) - ~300ms:
-```bash
+```json
 GET /slowlog-test/_search
 {
   "query": {
@@ -289,7 +289,7 @@ GET /slowlog-test/_search
 ```
 
 **Après** (match query rapide) - ~10ms:
-```bash
+```json
 GET /slowlog-test/_search
 {
   "query": {
@@ -302,7 +302,7 @@ GET /slowlog-test/_search
 
 ### Étape 6: Vérifier la configuration et désactiver les slow logs
 
-```bash
+```json
 # Vérifier la configuration
 GET /slowlog-test/_settings?include_defaults&filter_path=*.index.search.slowlog*
 

@@ -45,7 +45,7 @@ bin/elasticsearch-setup-passwords interactive
 
 # Authorization
 
-```
+```json
 POST /_security/role/events_admin
 {
   "run_as": [ "admin" ],
@@ -77,7 +77,7 @@ POST /_security/role/events_admin
 
 # Creating a User
 
-```
+```json
 POST /_security/user/johndoe
 {
   "password" : "userpassword",
@@ -114,7 +114,7 @@ xpack.security.authc.realms:
 
 * Through the Role Mapping API, it's possible to associate a role with a group of users (`dn`, `dc`, `cn`...)
 
-```
+```json
 PUT /_security/role_mapping/admin_user
 {
   "roles" : [ "monitoring_user" ],
@@ -127,7 +127,7 @@ PUT /_security/role_mapping/admin_user
 
 # Document-level security
 
-```
+```json
 POST _security/role/click_role
 {
   "indices": [
@@ -148,7 +148,7 @@ POST _security/role/click_role
 
 # Field level security
 
-```
+```json
 POST /_security/role/ro-person-company
 {
   "indices": [
@@ -171,7 +171,7 @@ POST /_security/role/ro-person-company
 * We will define roles and privileges for it like for a user
 * An expiration date can be associated with it
 
-```
+```json
 POST /_security/api_key
 {
   "name": "my-api-key",

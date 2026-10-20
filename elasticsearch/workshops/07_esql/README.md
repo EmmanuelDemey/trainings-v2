@@ -12,7 +12,7 @@ L'équipe d'exploitation d'une boutique en ligne veut investiguer les erreurs de
 
 Ce TP est autonome. Créez l'index des logs et chargez les données:
 
-```bash
+```json
 DELETE /web-logs
 
 PUT /web-logs
@@ -56,7 +56,7 @@ POST /web-logs/_bulk?refresh=true
 
 Une requête ES|QL commence par une **commande source** (`FROM`), suivie de **commandes de traitement** séparées par `|`. Affichez les 3 requêtes les plus lentes:
 
-```bash
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -76,7 +76,7 @@ POST /_query?format=txt
 
 Comptez les erreurs serveur (`status >= 500`). Avec `format=json`, la réponse est un tableau de colonnes et de lignes:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
@@ -99,7 +99,7 @@ POST /_query?format=json
 
 Classez chaque requête en `ok`, `client error` ou `server error`, et convertissez la taille en kilo-octets:
 
-```bash
+```json
 POST /_query?format=txt
 {
   "query": """
@@ -117,7 +117,7 @@ POST /_query?format=txt
 
 Nombre d'erreurs et temps de réponse moyen, par page:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
@@ -145,7 +145,7 @@ L'ordre des colonnes suit la requête: d'abord les agrégats, puis les clés du 
 
 Nombre de requêtes par tranche de 30 minutes, avec `BUCKET`:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
@@ -172,7 +172,7 @@ POST /_query?format=json
 
 Les logs ne contiennent qu'un code pays. Créez une **lookup index** (`index.mode: lookup`: un seul shard, répliqué sur tous les nœuds) avec le nom de chaque pays:
 
-```bash
+```json
 DELETE /countries
 
 PUT /countries
@@ -197,7 +197,7 @@ POST /countries/_bulk?refresh=true
 
 Puis comptez les erreurs serveur par pays:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
@@ -227,7 +227,7 @@ POST /_query?format=json
 
 `MATCH` utilise l'index inversé, comme une requête `match` du Query DSL. `METADATA _score` donne accès au score de pertinence:
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
@@ -249,7 +249,7 @@ POST /_query?format=json
 
 Ne concaténez jamais une saisie utilisateur dans une requête: passez des **paramètres**.
 
-```bash
+```json
 POST /_query?format=json
 {
   "query": """
