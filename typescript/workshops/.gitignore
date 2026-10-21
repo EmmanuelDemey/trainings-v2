@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Test output
+**/coverage/
+*.log
+*.tsbuildinfo
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/

@@ -1,0 +1,7 @@
+{
+  // What Vitest checks the type-level specs (tests/*.test-d.ts) against. They
+  // stay out of tsconfig.json, so that `npm run typecheck` is green on the
+  // starter while the specs are still red.
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts"]
+}

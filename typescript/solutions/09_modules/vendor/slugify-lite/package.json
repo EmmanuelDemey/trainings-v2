@@ -1,0 +1,8 @@
+{
+  "name": "slugify-lite",
+  "version": "1.4.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  }
+}

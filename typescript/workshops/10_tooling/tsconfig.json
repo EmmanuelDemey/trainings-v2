@@ -1,0 +1,9 @@
+{
+  // TODO 3: one project for the whole workspace. Split it: a root that
+  // references packages/core and packages/cli, and compiles nothing itself.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["packages/*/src/**/*.ts"]
+}
