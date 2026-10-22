@@ -7,6 +7,7 @@ workshops, and the site that publishes them — built by
 ```
 slides/            one Markdown file per chapter (Slidev)
   public/images/   the images of the deck, referenced as /images/…
+ci/fixtures/       the data some chapters need, replayed before them in the CI
 workshops/         one folder per workshop, its README.md (in French)
 training.config.mjs
 ```
@@ -24,6 +25,14 @@ pnpm run site       # the workshops site, live — http://localhost:4321
 chapter 3, `workshops/03_…/` is workshop 3; `10_…` comes after `9_…`. A
 name that starts with `_` is turned off — kept on disk, left out of the deck, the
 site, the PDFs and the ZIPs. There is no list to maintain anywhere else.
+
+## What is shared with elastic-security
+
+The Elastic Stack overview, the Kibana tour, Elastic Agent and Fleet, and the
+images they show live once in [`../elasticsearch-common`](../elasticsearch-common):
+the chapters import them with Slidev's `src:`, and `pnpm run sync` (run by
+`postinstall`, `dev` and `build`) copies the images to `slides/public/images/common/`
+(gitignored).
 
 ## Build
 
@@ -55,16 +64,17 @@ deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 ## Tested against Elasticsearch
 
 Before each deploy, the CI replays **every request** of the workshops and of the
-slides against a real Elasticsearch — the one of [`ci/Dockerfile`](ci/Dockerfile),
-the only place its version is written
+slides against a real Elasticsearch — the one of [`../elasticsearch-common/ci/Dockerfile`](../elasticsearch-common/ci/Dockerfile),
+the only place its version is written, shared with `elastic-security`
 ([`check-console.mjs`](../scripts/check-console.mjs)). A request that fails, or a
 response that does not hold the workshop's « Résultat attendu » JSON, holds back
 the deploy.
 
 ```bash
-docker build -t training-es ci && docker run -d --rm --name training-es -p 9200:9200 training-es
-ES_PASSWORD=training node ../scripts/check-console.mjs .            # everything
-ES_PASSWORD=training node ../scripts/check-console.mjs . 11_ilm     # one file
+docker build -t training-es ../elasticsearch-common/ci && docker run -d --rm --name training-es -p 9200:9200 training-es
+export ES_PASSWORD=training
+node ../scripts/check-console.mjs .            # everything
+node ../scripts/check-console.mjs . 11_ilm     # one file
 ```
 
 - A comment before a block tunes its check: `<!-- ci: skip -->` (several nodes, a

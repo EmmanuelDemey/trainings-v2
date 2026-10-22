@@ -24,6 +24,9 @@
 //
 // A chapter whose examples need data (an index, documents…) has a fixture: the
 // requests of ci/fixtures/<chapter without its number>.md, replayed before it.
+// The Dockerfile itself may live elsewhere — the `elasticsearch` folder of the
+// training's workshops.ci.mjs, or ES_CI_DIR: the Elastic trainings
+// share the one of elasticsearch-common/ci, so they pin the same version.
 //
 // The workshops, then the chapters, run one after the other on the same cluster,
 // wiped in between: each one must work on its own, from a fresh cluster.
@@ -33,6 +36,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { request as httpRequest } from 'node:http';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { workshopChecks } from './workshops-ci.mjs';
 
 // A method, a path, and maybe a comment: `GET /_nodes/_master   # Current master`.
 const REQUEST = /^(GET|POST|PUT|DELETE|HEAD)\s+(\S+)\s*(?:(?:#|\/\/).*)?$/;
@@ -322,6 +326,16 @@ export function fixtureOf(file) {
 }
 
 /**
+ * Where the fixture of a chapter lives: in the training's own `ci/fixtures/`,
+ * even when the Dockerfile it is replayed against is shared with another
+ * training (elasticsearch-common/ci).
+ */
+export function fixturePath(dir, file) {
+  const fixture = fixtureOf(file);
+  return fixture ? join(dir, 'ci', 'fixtures', fixture) : null;
+}
+
+/**
  * The Elastic Stack images of `markdown` (`docker.elastic.co/…:9.2.0`) whose
  * version is not `version`, the one the CI tests: the slides and the workshops
  * must show the learners the very version their requests were checked against.
@@ -367,8 +381,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     ...(await numbered('slides', (entry) => entry.isFile() && entry.name.endsWith('.md'))).map((name) => join('slides', name)),
   ].filter((file) => !process.argv[3] || file.includes(process.argv[3]));
 
-  const ciDir = join(dir, process.env.ES_CI_DIR ?? 'ci');
-  const fixtures = join(ciDir, 'fixtures');
+  // The Dockerfile may be shared (`../elasticsearch-common/ci`); the fixtures are
+  // the training's own.
+  const ciDir = join(dir, process.env.ES_CI_DIR ?? ((await workshopChecks(dir)).elasticsearch || 'ci'));
   // The version the material must show: the pin, even when the cluster is another
   // one (.github/workflows/elasticsearch-latest.yml replays it on the latest).
   const dockerfile = join(ciDir, 'Dockerfile');
@@ -387,7 +402,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const steps = consoleSteps(markdown);
     if (steps.length === 0) continue;
     await wipe(es);
-    const fixture = fixtureOf(name) && join(fixtures, fixtureOf(name));
+    const fixture = fixturePath(dir, name);
     if (fixture && existsSync(fixture)) {
       const setup = await runSteps(consoleSteps(await readFile(fixture, 'utf8')), es);
       if (setup.length) {

@@ -1,0 +1,63 @@
+# Le lab de la formation Elastic Security : Elasticsearch, Kibana et un Fleet
+# Server, en local. Mot de passe de l'utilisateur `elastic` : changeme.
+#
+#   docker compose up -d --wait
+#
+# Le nom fixe le réseau, elastic-security-lab_default, que rejoint l'agent du TP.
+name: elastic-security-lab
+
+services:
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+    # Donne un mot de passe à kibana_system, l'utilisateur de Kibana.
+    command: >
+      bash -c 'curl -s -u elastic:changeme -X POST http://elasticsearch:9200/_security/user/kibana_system/_password
+      -H "Content-Type: application/json" -d "{\"password\":\"changeme\"}"'
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=changeme
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=trial
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    ports: ["9200:9200"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:changeme http://localhost:9200/_cluster/health | grep -q status"]
+      interval: 5s
+      retries: 60
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.5.5
+    depends_on:
+      setup: { condition: service_completed_successfully }
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    ports: ["5601:5601"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status | grep -q '\"level\":\"available\"'"]
+      interval: 10s
+      retries: 60
+
+  fleet-server:
+    image: docker.elastic.co/elastic-agent/elastic-agent:9.5.5
+    depends_on:
+      kibana: { condition: service_healthy }
+    user: root
+    environment:
+      - FLEET_SERVER_ENABLE=1
+      - FLEET_SERVER_ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - FLEET_SERVER_POLICY_ID=fleet-server-policy
+      - FLEET_SERVER_INSECURE_HTTP=1
+      - FLEET_SERVER_HOST=0.0.0.0
+      - FLEET_URL=http://fleet-server:8220
+      - FLEET_INSECURE=1
+      - KIBANA_FLEET_SETUP=1
+      - KIBANA_HOST=http://kibana:5601
+      - KIBANA_FLEET_USERNAME=elastic
+      - KIBANA_FLEET_PASSWORD=changeme
+    ports: ["8220:8220"]

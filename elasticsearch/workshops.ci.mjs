@@ -2,5 +2,7 @@
 //
 // The workshops are guided, run in Kibana Dev Tools: no solutions to test, but
 // every request of every README is replayed against the Elasticsearch of
-// ci/Dockerfile (scripts/check-console.mjs), and its « Résultat attendu » checked.
-export default { elasticsearch: 'ci' };
+// ../elasticsearch-common/ci/Dockerfile — shared with elastic-security, so both
+// trainings pin the same version — and its « Résultat attendu » checked
+// (scripts/check-console.mjs). The fixtures stay in ci/fixtures/.
+export default { elasticsearch: '../elasticsearch-common/ci' };

@@ -1,0 +1,32 @@
+server.host: "0.0.0.0"
+server.publicBaseUrl: "http://localhost:5601"
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "changeme"
+# Les règles de détection, les cases et Fleet chiffrent leurs secrets avec ces clés.
+xpack.encryptedSavedObjects.encryptionKey: "lab-elastic-security-encryption-key-0001"
+xpack.security.encryptionKey: "lab-elastic-security-security-key-00000001"
+xpack.reporting.encryptionKey: "lab-elastic-security-reporting-key-0000001"
+# Fleet : où les agents trouvent le Fleet Server, et où ils envoient les données.
+xpack.fleet.agents.fleet_server.hosts: ["http://fleet-server:8220"]
+xpack.fleet.outputs:
+  - id: lab-output
+    name: Elasticsearch du lab
+    type: elasticsearch
+    hosts: ["http://elasticsearch:9200"]
+    is_default: true
+    is_default_monitoring: true
+xpack.fleet.packages:
+  - name: fleet_server
+    version: latest
+  - name: system
+    version: latest
+xpack.fleet.agentPolicies:
+  - name: Fleet Server
+    id: fleet-server-policy
+    namespace: default
+    is_default_fleet_server: true
+    package_policies:
+      - name: fleet_server-1
+        package:
+          name: fleet_server

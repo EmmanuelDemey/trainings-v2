@@ -1,7 +1,7 @@
 // node --test scripts/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { consoleSteps, fixtureOf, mismatches, runSteps, staleImages } from './check-console.mjs';
+import { consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, staleImages } from './check-console.mjs';
 
 const fence = (lang, body) => `\`\`\`${lang}\n${body}\n\`\`\``;
 
@@ -220,6 +220,11 @@ test('the fixture of a chapter is named after it, without its number', () => {
   assert.equal(fixtureOf('slides/10_search.md'), 'search.md');
   assert.equal(fixtureOf('slides/4-indexation.md'), 'indexation.md');
   assert.equal(fixtureOf('workshops/01_indexing_search/README.md'), null);
+});
+
+test('the fixtures of a training are its own, wherever the Dockerfile it shares lives', () => {
+  assert.equal(fixturePath('/repo/elastic-security', 'slides/07_detection_rules.md'), '/repo/elastic-security/ci/fixtures/detection_rules.md');
+  assert.equal(fixturePath('/repo/elasticsearch', 'workshops/01_indexing_search/README.md'), null);
 });
 
 test('an Elastic Stack image of another version than the tested one is stale', () => {

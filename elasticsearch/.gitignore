@@ -5,3 +5,7 @@ node_modules/
 deck.generated.md
 .training-kit/
 build/
+
+# Copy of ../elasticsearch-common/images, written by `pnpm run sync` — which
+# `pnpm install`, `pnpm run dev` and `pnpm run build` run.
+slides/public/images/common/

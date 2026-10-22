@@ -1,7 +1,8 @@
 name: Elasticsearch latest
 
-# Every week, the workshops of the elasticsearch training are replayed against
-# the LATEST Elasticsearch release, whatever elasticsearch/ci/Dockerfile pins: a
+# Every week, the workshops of the Elastic trainings (elasticsearch,
+# elastic-security) are replayed against the LATEST Elasticsearch release,
+# whatever elasticsearch-common/ci/Dockerfile pins: a
 # release that breaks a workshop shows up here even before the Dependabot pull
 # request that bumps the pin (.github/dependabot.yml).
 
@@ -24,8 +25,8 @@ jobs:
           version=$(gh release view --repo elastic/elasticsearch --json tagName --jq '.tagName | ltrimstr("v")')
           echo "### Elasticsearch $version" >> "$GITHUB_STEP_SUMMARY"
           # A copy: the material must keep showing the pinned version, which the
-          # replay checks against elasticsearch/ci/Dockerfile.
-          cp -r elasticsearch/ci "$RUNNER_TEMP/es"
+          # replay checks against elasticsearch-common/ci/Dockerfile.
+          cp -r elasticsearch-common/ci "$RUNNER_TEMP/es"
           sed -i -E "s#^FROM (docker.elastic.co/elasticsearch/elasticsearch):.*#FROM \1:$version#" "$RUNNER_TEMP/es/Dockerfile"
           docker build -t training-es "$RUNNER_TEMP/es"
           docker run -d --name training-es -p 9200:9200 training-es
@@ -34,7 +35,9 @@ jobs:
         env:
           ES_URL: http://localhost:9200
           ES_PASSWORD: training
-        run: node scripts/check-console.mjs elasticsearch
+        run: |
+          node scripts/check-console.mjs elasticsearch
+          node scripts/check-console.mjs elastic-security
 
       - name: Elasticsearch logs
         if: failure()

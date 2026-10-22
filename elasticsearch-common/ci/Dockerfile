@@ -1,9 +1,10 @@
-# The Elasticsearch every workshop README is replayed against in the CI
+# The Elasticsearch every workshop README of the Elastic trainings (elasticsearch,
+# elastic-security) is replayed against in the CI
 # (scripts/check-console.mjs) — the one place its version is written. Dependabot
 # (.github/dependabot.yml) opens a pull request for each new release, whose CI
 # replays every workshop on it.
 #
-#   docker build -t training-es elasticsearch/ci
+#   docker build -t training-es elasticsearch-common/ci
 #   docker run --rm -p 9200:9200 training-es
 #   ES_PASSWORD=training node scripts/check-console.mjs elasticsearch
 FROM docker.elastic.co/elasticsearch/elasticsearch:9.5.5

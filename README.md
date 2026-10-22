@@ -10,6 +10,8 @@ react/               the React training, 3 days — a training-kit project, its 
 zod/                 the Zod training, half a day — a training-kit project, its own Netlify site
 typescript/          the TypeScript training, 2 days — a training-kit project, its own Netlify site
 elasticsearch/       the Elasticsearch training, 3 days — a training-kit project, its own Netlify site
+elastic-security/    Elastic Security for SIEM, 3 days — same
+elasticsearch-common/     what those two share: slide fragments, images, the CI's Elasticsearch
 tanstack-query-react/     React Query, 1 day — a training-kit project, its own Netlify site
 tanstack-query-angular/   TanStack Query for Angular, 1 day — same
 tanstack-query-vue/       TanStack Query for Vue, 1 day — same
@@ -21,12 +23,13 @@ site/                the workshops site of the other trainings (Astro + Starligh
 scripts/             the build that assembles it
 ```
 
-`javascript/`, `vuejs-advanced/`, `react/`, `zod/`, `typescript/`, `elasticsearch/` and the three `tanstack-query-*/` trainings are
+`javascript/`, `vuejs-advanced/`, `react/`, `zod/`, `typescript/`, `elasticsearch/`, `elastic-security/` and the three `tanstack-query-*/` trainings are
 built by [training-kit](https://www.npmjs.com/package/@emmanueldemey/training-kit):
 each folder is self-contained (its own `package.json`, lockfile and
 `netlify.toml`), and its README says how to write, build and deploy it. The three
 TanStack Query trainings also read `tanstack-query-common/`, written once for all
-three — its [README](tanstack-query-common/README.md) says how. Everything below
+three — its [README](tanstack-query-common/README.md) says how; the two Elastic
+trainings read `elasticsearch-common/` the same way ([README](elasticsearch-common/README.md)). Everything below
 is about the other trainings.
 
 ## Build everything
