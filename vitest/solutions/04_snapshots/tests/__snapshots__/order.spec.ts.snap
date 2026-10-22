@@ -1,0 +1,47 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`an order without coupon has no discount 1`] = `
+{
+  "coupon": null,
+  "createdAt": Any<Date>,
+  "customer": "bob@example.com",
+  "discountInCents": 0,
+  "id": Any<String>,
+  "lines": [
+    {
+      "isbn": "9782070360024",
+      "priceInCents": 790,
+      "quantity": 1,
+      "title": "L'Étranger",
+    },
+  ],
+  "subtotalInCents": 790,
+  "totalInCents": 790,
+}
+`;
+
+exports[`records the order, with its amounts 1`] = `
+{
+  "coupon": "SAVE10",
+  "createdAt": Any<Date>,
+  "customer": "alice@example.com",
+  "discountInCents": 877,
+  "id": StringMatching /\\^\\[0-9a-f-\\]\\{36\\}\\$/,
+  "lines": [
+    {
+      "isbn": "9780132350884",
+      "priceInCents": 3990,
+      "quantity": 2,
+      "title": "Clean Code",
+    },
+    {
+      "isbn": "9782070360024",
+      "priceInCents": 790,
+      "quantity": 1,
+      "title": "L'Étranger",
+    },
+  ],
+  "subtotalInCents": 8770,
+  "totalInCents": 7893,
+}
+`;
