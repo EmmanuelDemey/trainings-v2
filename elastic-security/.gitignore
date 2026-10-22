@@ -6,6 +6,8 @@ deck.generated.md
 .training-kit/
 build/
 
-# Copy of ../elasticsearch-common/images, written by `pnpm run sync` — which
-# `pnpm install`, `pnpm run dev` and `pnpm run build` run.
+# Copies of ../elasticsearch-common — its images, and the lab stack in every
+# workshop — written by `pnpm run sync`, which `pnpm install`, `pnpm run dev`
+# and `pnpm run build` run. The single source stays in elasticsearch-common/.
 slides/public/images/common/
+workshops/*/lab/

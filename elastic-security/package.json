@@ -4,13 +4,13 @@
   "type": "module",
   "packageManager": "pnpm@12.3.1",
   "scripts": {
-    "sync": "node ../elasticsearch-common/scripts/sync.mjs",
-    "postinstall": "node ../elasticsearch-common/scripts/sync.mjs",
+    "sync": "node ../elasticsearch-common/scripts/sync.mjs --lab",
+    "postinstall": "node ../elasticsearch-common/scripts/sync.mjs --lab",
     "list": "training-kit list",
-    "dev": "node ../elasticsearch-common/scripts/sync.mjs && training-kit slides",
+    "dev": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit slides",
     "site": "training-kit site",
-    "build": "node ../elasticsearch-common/scripts/sync.mjs && training-kit build",
-    "build:fast": "node ../elasticsearch-common/scripts/sync.mjs && training-kit build --no-pdf"
+    "build": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit build",
+    "build:fast": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit build --no-pdf"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.42.0",

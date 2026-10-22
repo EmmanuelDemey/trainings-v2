@@ -10,9 +10,10 @@ Le SOC démarre : avant de détecter quoi que ce soit, il faut **collecter**. Vo
 
 ## Setup
 
-Ce dossier contient la stack du lab : `docker-compose.yml` et `kibana.yml`. Il faut **Docker** (Compose v2) et **8 Go de RAM** libres.
+Le dossier `lab/` de ce TP contient la stack du lab : `docker-compose.yml` et `kibana.yml` — le même dans chaque TP. Il faut **Docker** (Compose v2) et **8 Go de RAM** libres.
 
 ```bash
+cd lab
 docker compose up -d --wait
 ```
 
@@ -52,7 +53,7 @@ Un seul nœud : statut `green` ou `yellow`.
 2. Dans l'onglet **Agents**, un agent est déjà là : le **Fleet Server**, dans la policy *Fleet Server*, statut **Healthy**.
 3. Onglet **Settings** : notez l'URL du Fleet Server (`http://fleet-server:8220`) et l'output (`http://elasticsearch:9200`).
 
-> Qui a créé cette policy ? `kibana.yml` (`xpack.fleet.agentPolicies`) : la configuration de Fleet peut être **du code**, versionné avec le reste.
+> Qui a créé cette policy ? `lab/kibana.yml` (`xpack.fleet.agentPolicies`) : la configuration de Fleet peut être **du code**, versionné avec le reste.
 
 ## Exercice 3 — Une agent policy
 

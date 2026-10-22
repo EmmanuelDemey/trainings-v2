@@ -159,10 +159,25 @@ jobs:
           PROD: ${{ github.event_name != 'pull_request' }}
           ALIAS: pr-${{ github.event.pull_request.number }}
         run: |
-          args=(--dir build --no-build --site-name "$SITE" --json --message "$GITHUB_SHA")
-          if [ -n "$TEAM" ]; then args+=(--team "$TEAM"); fi
+          netlify() { npx --yes netlify-cli@27.11.2 "$@"; }
+
+          # `--site-name` alone always tries to create the site: when the name is
+          # taken, the CLI silently creates `<name>-<random>` instead and deploys
+          # there. So the site is looked up first, and only created when Netlify
+          # answers Not Found — any other error fails the step rather than risk a
+          # duplicate.
+          args=(--dir build --no-build --json --message "$GITHUB_SHA")
+          if netlify api getSite --data "{\"site_id\":\"$SITE.netlify.app\"}" > /dev/null 2> "$RUNNER_TEMP/lookup.err"; then
+            args+=(--site "$SITE")
+          elif grep -q 'Not Found' "$RUNNER_TEMP/lookup.err"; then
+            args+=(--site-name "$SITE")
+            if [ -n "$TEAM" ]; then args+=(--team "$TEAM"); fi
+          else
+            cat "$RUNNER_TEMP/lookup.err" >&2
+            exit 1
+          fi
           if [ "$PROD" = true ]; then args+=(--prod); else args+=(--alias "$ALIAS"); fi
 
-          npx --yes netlify-cli@27.11.2 deploy "${args[@]}" > "$RUNNER_TEMP/deploy.json"
+          netlify deploy "${args[@]}" > "$RUNNER_TEMP/deploy.json"
           url=$(node -p "const d = require(process.env.RUNNER_TEMP + '/deploy.json'); process.env.PROD === 'true' ? d.url : d.deploy_url")
           echo "### ${{ inputs.slug }}: $url" >> "$GITHUB_STEP_SUMMARY"

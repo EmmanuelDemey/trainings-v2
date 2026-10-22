@@ -3,7 +3,8 @@ name: Deploy the trainings
 # One Netlify site per training-kit project — every top-level folder holding a
 # training.config.mjs. Nothing to configure per training, neither here nor in the
 # Netlify UI: scripts/trainings-to-deploy.mjs finds the trainings a push touched,
-# and `netlify deploy --site-name` creates the site the first time it deploys to it.
+# and the deploy step of training.yml creates the site the first time it deploys
+# to it.
 #
 #   site name  = vars.NETLIFY_SITE_PREFIX + the `slug` of training.config.mjs
 #   push main  → production deploy

@@ -1,7 +1,10 @@
-# Le lab de la formation Elastic Security : Elasticsearch, Kibana et un Fleet
-# Server, en local. Mot de passe de l'utilisateur `elastic` : changeme.
+# Le lab des formations Elastic : Elasticsearch, Kibana et un Fleet Server, en
+# local. Mot de passe de l'utilisateur `elastic` : changeme.
 #
 #   docker compose up -d --wait
+#
+# Source unique : elasticsearch-common/lab/. Le dossier lab/ de chaque TP en est
+# une copie, écrite par le `pnpm run sync` de la formation — ne pas l'éditer.
 #
 # Le nom fixe le réseau, elastic-security-lab_default, que rejoint l'agent du TP.
 name: elastic-security-lab

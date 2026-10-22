@@ -7,8 +7,8 @@ a slide deck, hands-on workshops, and the site that publishes them — built by
 
 ```
 slides/            one Markdown file per chapter (Slidev)
-workshops/         one folder per workshop, its README.md (in French)
-  01_lab_fleet/    the lab: docker-compose.yml + kibana.yml (Elasticsearch, Kibana, Fleet Server)
+workshops/         one folder per workshop, its README.md (in French), and lab/ —
+                   a gitignored copy of ../elasticsearch-common/lab
 ci/fixtures/       the lab dataset, replayed before the chapters that query it
 training.config.mjs
 ```
@@ -23,9 +23,11 @@ training.config.mjs
 
 The Elastic Stack overview, the Kibana presentation, Elastic Agent and Fleet, and
 the ES|QL anatomy are written once, in [`../elasticsearch-common`](../elasticsearch-common):
-the chapters import them with Slidev's `src:`. `pnpm run sync` (run by
-`postinstall`, `dev` and `build`) copies their images to
-`slides/public/images/common/` (gitignored).
+the chapters import them with Slidev's `src:`. So is the lab, the Docker Compose
+stack of the workshops. `pnpm run sync` (run by `postinstall`, `dev` and `build`)
+copies the images to `slides/public/images/common/` and the lab to
+`workshops/*/lab/` — both gitignored, so that each workshop's starter ZIP holds
+its own lab.
 
 ## Write
 

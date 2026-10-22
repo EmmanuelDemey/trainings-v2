@@ -7,8 +7,9 @@ section de dépannage.
 
 ## Ce qu'il faut
 
-- **Docker** (Compose v2) et **8 Go de RAM** libres, pour la stack du TP 1 —
-  Elasticsearch, Kibana et un Fleet Server 9.5.5 ; ou un essai **Elastic Cloud** ;
+- **Docker** (Compose v2) et **8 Go de RAM** libres, pour la stack du lab —
+  Elasticsearch, Kibana et un Fleet Server 9.5.5, dans le dossier `lab/` de
+  chaque TP (`docker compose up -d --wait`) ; ou un essai **Elastic Cloud** ;
 - un navigateur récent (Chrome ou Firefox), **sans bloqueur de publicité** ;
 - **Kibana Dev Tools** (Console) : les blocs `GET /…`, `POST /…`, `PUT /…` des
   énoncés s'y collent tels quels.
