@@ -2,7 +2,7 @@
 
 Hands-on exercises for the **React Query** training, based on **TanStack Query
 5.104**, **React 19.3**, **Vite 8**, **Vitest 5**, **React Testing Library 16** and
-**TypeScript 6.0**.
+**TypeScript 7**.
 
 **One workshop per chapter**, and each one is a **standalone project**: its own
 `package.json`, `tsconfig.json`, `.nvmrc` and `README.md`, its own `npm install`,
@@ -36,9 +36,9 @@ No machine? Every workshop page of the site opens the workshop in an online edit
 ## Toolchain versions
 
 Dependencies were last refreshed on **2026-10-08**, to the latest release of every
-package, with one deliberate pin: **TypeScript 6.0** (`~6.0.3`), not 7.x — the
-same version as the Angular and Vue editions of this training, whose tooling
-(Angular 22, `vue-tsc`) does not accept TypeScript 7 yet.
+package, **TypeScript 7** (`^7.0.2`) included. The Angular and Vue editions of
+this training stay on TypeScript 6.0: their tooling (Angular 22, `vue-tsc`) does
+not accept TypeScript 7 yet.
 
 ## How the workshops are checked: the spec and the Network panel
 

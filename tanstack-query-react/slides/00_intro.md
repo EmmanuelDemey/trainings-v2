@@ -28,7 +28,7 @@ src: ../../tanstack-query-common/slides/00_intro/agenda.md
   thin adapter per framework. For React: **`@tanstack/react-query`** — the
   library everybody still calls **React Query**
 - This training: **TanStack Query 5.104**, **React 19.3**, **Vite 8**,
-  **Vitest 5**, **TypeScript 6.0**
+  **Vitest 5**, **TypeScript 7**
 - React 18 is supported too; React 19 is what the workshops run
 
 ```bash
