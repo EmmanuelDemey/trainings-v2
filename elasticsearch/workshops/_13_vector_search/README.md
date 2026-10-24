@@ -1,25 +1,23 @@
-# TP 13 — Recherche Vectorielle, Hybride et Sémantique
+# Workshop 13 — Vector, hybrid and semantic search
 
-> Indexer des vecteurs, chercher les plus proches voisins, combiner recherche lexicale et vectorielle avec les retrievers, puis laisser Elasticsearch calculer lui-même les embeddings avec `semantic_text`.
+> Index vectors, find the nearest neighbours, combine lexical and vector search with retrievers, then let Elasticsearch compute the embeddings itself with `semantic_text`.
 
-**Niveau**: Avancé
-**Topic**: Recherche - Vector Search
+**Level**: Advanced
+**Topic**: Search — Vector search
 
-## Contexte
+## Context
 
-Un site de recettes veut qu'une recherche « dessert aux fruits » trouve la tarte aux pommes, même si aucun de ces mots n'est dans son titre. Vous allez d'abord manipuler des vecteurs « à la main » (3 dimensions, pour pouvoir les lire), puis utiliser un vrai modèle d'embeddings exécuté par Elasticsearch.
+A recipe site wants a search for « fruit dessert » to find the apple pie, even though none of these words is in its title. You first handle vectors « by hand » (3 dimensions, so you can read them), then use a real embedding model run by Elasticsearch.
+
+Each step states **what** to find, not **how**: look for the query in the documentation, try it, read the response. The expected result lets you check your answer. Hints are folded — open them only once you are stuck.
 
 ## Setup
 
-Ce TP est autonome. Il demande une **licence trial ou supérieure** pour la partie C (modèles de machine learning): Stack Management → License Management → Start trial, ou `-e xpack.license.self_generated.type=trial` avec Docker.
+This workshop stands on its own. Part C needs a **trial license or above** (machine learning models): Stack Management → License Management → Start trial, or `-e xpack.license.self_generated.type=trial` with Docker.
 
-**Prérequis**: Le nœud doit avoir le rôle `ml` (c'est le cas par défaut) et un accès à Internet pour télécharger les modèles (~100 Mo pour E5, la première fois).
+**Prerequisites**: the node must have the `ml` role (the default) and Internet access to download the models (~100 MB for E5, the first time).
 
-## Partie A: Vecteurs et kNN
-
-### Étape 1: Créer l'index
-
-Chaque recette a un vecteur de 3 dimensions. Imaginons que ces dimensions signifient « sucré », « salé/soupe » et « plat chaud » (un vrai modèle produit des centaines de dimensions, sans signification lisible):
+Each recipe has a 3-dimension vector. Pretend these dimensions mean « sweet », « savoury/soup » and « hot dish » (a real model produces hundreds of dimensions, with no readable meaning):
 
 ```json
 DELETE /recipes
@@ -29,7 +27,7 @@ PUT /recipes
   "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
   "mappings": {
     "properties": {
-      "title": { "type": "text", "analyzer": "french" },
+      "title": { "type": "text", "analyzer": "english" },
       "category": { "type": "keyword" },
       "embedding": { "type": "dense_vector", "dims": 3, "similarity": "cosine" }
     }
@@ -38,24 +36,27 @@ PUT /recipes
 
 POST /recipes/_bulk?refresh=true
 {"index":{"_id":"1"}}
-{"title":"Tarte aux pommes","category":"dessert","embedding":[0.9,0.1,0.0]}
+{"title":"Apple pie","category":"dessert","embedding":[0.9,0.1,0.0]}
 {"index":{"_id":"2"}}
-{"title":"Crumble aux poires","category":"dessert","embedding":[0.8,0.2,0.1]}
+{"title":"Pear crumble","category":"dessert","embedding":[0.8,0.2,0.1]}
 {"index":{"_id":"3"}}
-{"title":"Soupe de potiron","category":"entrée","embedding":[0.1,0.9,0.2]}
+{"title":"Pumpkin soup","category":"starter","embedding":[0.1,0.9,0.2]}
 {"index":{"_id":"4"}}
-{"title":"Gratin de pommes de terre","category":"plat","embedding":[0.2,0.3,0.9]}
+{"title":"Pork chops with apple sauce","category":"main","embedding":[0.2,0.3,0.9]}
 {"index":{"_id":"5"}}
-{"title":"Compote de pommes","category":"dessert","embedding":[0.95,0.05,0.0]}
+{"title":"Stewed apples","category":"dessert","embedding":[0.95,0.05,0.0]}
 ```
 
-Regardez le mapping: Elasticsearch a choisi une **quantization** pour économiser la mémoire.
+## Part A: Vectors and kNN
 
-```json
-GET /recipes/_mapping
-```
+Reference: [kNN search](https://www.elastic.co/docs/solutions/search/vector/knn).
 
-**Résultat attendu** (extrait):
+### Step 1: The mapping
+
+Look at the mapping of `recipes`: which `index_options` did Elasticsearch choose for `embedding`, though you set none?
+
+**Expected result** (excerpt):
+
 ```json
 {
   "recipes": {
@@ -72,61 +73,51 @@ GET /recipes/_mapping
 }
 ```
 
-`int8_hnsw` (4 fois moins de mémoire) sous 384 dimensions; `bbq_hnsw` (Better Binary Quantization, ~32 fois moins) à partir de 384.
+**Question**: what does this quantization save? Would it be the same with 1024 dimensions? Look at the [`dense_vector` field type](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/dense-vector).
 
-### Étape 2: Les plus proches voisins
+### Step 2: The nearest neighbours
 
-Cherchez les 2 recettes les plus proches d'un vecteur « très sucré »:
+Find the **2** recipes closest to the « very sweet » vector `[0.9, 0.1, 0.05]`, exploring 10 candidates, and return only their `title`.
 
-```json
-POST /recipes/_search
-{
-  "knn": {
-    "field": "embedding",
-    "query_vector": [0.9, 0.1, 0.05],
-    "k": 2,
-    "num_candidates": 10
-  },
-  "_source": ["title"]
-}
-```
+<details>
+<summary>Hint</summary>
 
-**Résultat attendu** (extrait):
+A `knn` section sits at the top level of the search body, next to (or instead of) `query`. It takes the field, the query vector, `k` and `num_candidates`.
+
+</details>
+
+**Expected result** (excerpt):
+
 ```json
 {
   "hits": {
     "total": { "value": 2 },
     "hits": [
-      { "_id": "1", "_source": { "title": "Tarte aux pommes" } },
-      { "_id": "5", "_source": { "title": "Compote de pommes" } }
+      { "_id": "1", "_source": { "title": "Apple pie" } },
+      { "_id": "5", "_source": { "title": "Stewed apples" } }
     ]
   }
 }
 ```
 
 **Questions**:
-- À quoi sert `num_candidates` ? (Le nombre de candidats explorés par shard dans le graphe HNSW: plus il est grand, plus le résultat est exact, et lent.)
-- Pourquoi dit-on que la recherche est **approximative** ?
 
-### Étape 3: kNN filtré
+- what is `num_candidates` for?
+- why is this search called **approximate**?
 
-Le filtre s'applique **pendant** le parcours du graphe: on obtient toujours `k` résultats qui le respectent.
+### Step 3: Filtered kNN
 
-```json
-POST /recipes/_search
-{
-  "knn": {
-    "field": "embedding",
-    "query_vector": [0.9, 0.1, 0.05],
-    "k": 1,
-    "num_candidates": 10,
-    "filter": { "term": { "category": "plat" } }
-  },
-  "_source": ["title"]
-}
-```
+Same vector, but find the single closest recipe among the `main` dishes.
 
-**Résultat attendu** (extrait):
+<details>
+<summary>Hint</summary>
+
+`knn` takes a `filter`. Is it applied before, during, or after walking the graph?
+
+</details>
+
+**Expected result** (excerpt):
+
 ```json
 {
   "hits": {
@@ -135,21 +126,16 @@ POST /recipes/_search
 }
 ```
 
-## Partie B: Recherche hybride avec les retrievers
+## Part B: Hybrid search with retrievers
 
-### Étape 4: Le problème
+Reference: [Retrievers](https://www.elastic.co/docs/solutions/search/retrievers-overview).
 
-Une recherche lexicale « pommes » trouve la tarte, la compote… et le gratin de pommes de terre:
+### Step 4: The problem
 
-```json
-POST /recipes/_search
-{
-  "query": { "match": { "title": "pommes" } },
-  "_source": ["title"]
-}
-```
+Search the titles for « apple », lexically.
 
-**Résultat attendu** (extrait):
+**Expected result** (excerpt):
+
 ```json
 {
   "hits": {
@@ -158,30 +144,21 @@ POST /recipes/_search
 }
 ```
 
-Le score BM25 et la similarité cosinus ne sont pas sur la même échelle: on ne peut pas simplement les additionner.
+**Question**: which one is no dessert? Why can't you simply add its BM25 score to the cosine similarity of step 2?
 
-### Étape 5: Reciprocal Rank Fusion
+### Step 5: Reciprocal Rank Fusion
 
-Le retriever `rrf` combine les **rangs** de plusieurs recherches (`score = Σ 1 / (rank_constant + rang)`): un document bien classé dans les deux listes passe devant.
+Combine the lexical search « apple » and the kNN search of step 2 (with `k` 3) by their **ranks**, over a window of 10, and keep the 2 first hits.
 
-```json
-POST /recipes/_search
-{
-  "retriever": {
-    "rrf": {
-      "retrievers": [
-        { "standard": { "query": { "match": { "title": "pommes" } } } },
-        { "knn": { "field": "embedding", "query_vector": [0.9, 0.1, 0.05], "k": 3, "num_candidates": 10 } }
-      ],
-      "rank_window_size": 10
-    }
-  },
-  "size": 2,
-  "_source": ["title"]
-}
-```
+<details>
+<summary>Hint</summary>
 
-**Résultat attendu** (extrait): la tarte et la compote, présentes dans les deux listes, sont devant le gratin.
+The `rrf` retriever takes a list of `retrievers`: a `standard` one wraps a `query`, a `knn` one takes the same keys as the `knn` section.
+
+</details>
+
+**Expected result** (excerpt): the pie and the stewed apples, found by both searches, come before the pork chops.
+
 ```json
 {
   "hits": {
@@ -193,96 +170,59 @@ POST /recipes/_search
 }
 ```
 
-### Étape 6: Combinaison linéaire
+**Question**: what is the formula of the RRF score? What is `rank_constant` for?
 
-Le retriever `linear` normalise les scores (`minmax`), puis en fait une somme pondérée: ici, la similarité vectorielle compte double.
+### Step 6: Linear combination
 
-```json
-POST /recipes/_search
-{
-  "retriever": {
-    "linear": {
-      "retrievers": [
-        {
-          "retriever": { "standard": { "query": { "match": { "title": "pommes" } } } },
-          "weight": 1,
-          "normalizer": "minmax"
-        },
-        {
-          "retriever": { "knn": { "field": "embedding", "query_vector": [0.9, 0.1, 0.05], "k": 3, "num_candidates": 10 } },
-          "weight": 2,
-          "normalizer": "minmax"
-        }
-      ]
-    }
-  },
-  "_source": ["title"]
-}
-```
+Same two searches, but now normalise their scores with `minmax` and make the vector similarity count **twice** as much as the lexical score.
 
-## Partie C: Laisser Elasticsearch calculer les embeddings
+<details>
+<summary>Hint</summary>
 
-### Étape 7: Les inference endpoints
+Look at the `linear` retriever: each of its retrievers has a `weight` and a `normalizer`.
 
-Elasticsearch fournit des endpoints prêts à l'emploi, qui déploient leur modèle à la première utilisation:
+</details>
 
-```json
-GET /_inference
-```
+## Part C: Let Elasticsearch compute the embeddings
 
-Repérez `.multilingual-e5-small-elasticsearch` (embeddings denses, multilingue) et `.rerank-v1-elasticsearch` (reranking).
+Reference: [Semantic search with `semantic_text`](https://www.elastic.co/docs/solutions/search/semantic-search/semantic-search-semantic-text).
 
-### Étape 8: Un champ semantic_text
+### Step 7: The inference endpoints
 
-Un champ `semantic_text` appelle l'inference endpoint à l'indexation **et** à la recherche, et découpe les textes longs en morceaux (chunks):
+List the inference endpoints of your cluster. Find the one that computes **dense embeddings, multilingual**, and the one that **reranks**.
 
-```json
-DELETE /articles
+<details>
+<summary>Hint</summary>
 
-PUT /articles
-{
-  "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
-  "mappings": {
-    "properties": {
-      "content": {
-        "type": "semantic_text",
-        "inference_id": ".multilingual-e5-small-elasticsearch"
-      }
-    }
-  }
-}
-```
+The inference API lists its endpoints with a `GET` on its root. The built-in ones start with a dot.
 
-Indexez des documents. La **première** indexation télécharge et déploie le modèle: elle peut prendre une à deux minutes. Si elle échoue sur un timeout, renvoyez-la.
+</details>
 
-<!-- ci: retry -->
-```json
-POST /articles/_doc/1?refresh=true
-{ "content": "Le chat dort sur le canapé du salon." }
-```
+### Step 8: A semantic_text field
 
-```json
-POST /articles/_bulk?refresh=true
-{"index":{"_id":"2"}}
-{"content":"La bourse a fortement chuté ce matin après l'annonce des résultats."}
-{"index":{"_id":"3"}}
-{"content":"Préchauffez le four, étalez la pâte et disposez les pommes en rosace."}
-```
+Create the index `articles` (1 shard, no replica) whose field `content` is a `semantic_text` computed by the multilingual endpoint of step 7. Then index these three documents, with ids `1`, `2` and `3`:
 
-### Étape 9: Une recherche sémantique
+- « The cat is sleeping on the living-room sofa. »
+- « The stock market fell sharply this morning after the results were announced. »
+- « Preheat the oven, roll out the pastry and lay the apples in a rosette. »
 
-Aucun mot de la question n'apparaît dans le document attendu:
+The **first** indexing downloads and deploys the model: it may take a minute or two. If it fails on a timeout, send it again.
 
-```json
-POST /articles/_search
-{
-  "query": { "match": { "content": "félin endormi" } },
-  "size": 1,
-  "_source": ["content"]
-}
-```
+**Question**: you index plain text. Where are the vectors? Look at the mapping, and at the hits with `"fields": ["_inference_fields"]`.
 
-**Résultat attendu** (extrait):
+### Step 9: A semantic search
+
+Search `articles` for « drowsy feline », and keep the best hit only.
+
+<details>
+<summary>Hint</summary>
+
+A `semantic_text` field is searched with the queries you already know.
+
+</details>
+
+**Expected result** (excerpt):
+
 ```json
 {
   "hits": {
@@ -291,46 +231,36 @@ POST /articles/_search
 }
 ```
 
-Essayez aussi en anglais (`"sleeping cat"`): le modèle est multilingue.
+**Try**: ask in French (`"félin endormi"`) — the model is multilingual.
 
-### Étape 10: Reranking
+### Step 10: Reranking
 
-Un modèle de **reranking** (cross-encoder) relit les meilleurs résultats d'une première recherche avec la question: plus précis, mais trop lent pour tout l'index. Le premier appel déploie le modèle: renvoyez-le s'il échoue sur un timeout.
+Take the lexical search « apple » of step 4, and have its 10 best hits read again by the reranking endpoint against the question « a fruit dessert ». The first call deploys the model: send it again if it fails on a timeout.
 
-<!-- ci: retry -->
-```json
-POST /recipes/_search
-{
-  "retriever": {
-    "text_similarity_reranker": {
-      "retriever": { "standard": { "query": { "match": { "title": "pommes" } } } },
-      "field": "title",
-      "inference_id": ".rerank-v1-elasticsearch",
-      "inference_text": "un dessert aux fruits",
-      "rank_window_size": 10
-    }
-  },
-  "_source": ["title"]
-}
-```
+<details>
+<summary>Hint</summary>
 
-**Question**: le gratin de pommes de terre est-il toujours dans le trio de tête ?
+Look at the `text_similarity_reranker` retriever: it wraps another retriever, and names the field to read, the inference endpoint and the text to compare with.
 
-## Critères de Succès
+</details>
 
-- Mapper un champ `dense_vector` et comprendre la quantization par défaut
-- Écrire une recherche `knn`, avec et sans filtre
-- Combiner recherche lexicale et vectorielle avec les retrievers `rrf` et `linear`
-- Indexer et rechercher un champ `semantic_text`
-- Reclasser des résultats avec `text_similarity_reranker`
+**Question**: where are the pork chops now?
 
-## Dépannage
+## Success criteria
 
-**Problème**: `model_deployment_timeout_exception` ou `Timed out after [30s] waiting for trained model deployment`
-→ Le modèle est en cours de téléchargement ou de déploiement: attendez une minute et renvoyez la requête. Suivez l'état avec `GET /_ml/trained_models/_stats`.
+- A `dense_vector` field mapped, its default quantization understood
+- A `knn` search, with and without a filter
+- Lexical and vector search combined with the `rrf` and `linear` retrievers
+- A `semantic_text` field indexed and searched
+- Results reranked with `text_similarity_reranker`
 
-**Problème**: `current license is non-compliant for [inference]`
-→ Les modèles intégrés demandent une licence trial ou supérieure (voir le Setup).
+## Troubleshooting
 
-**Problème**: `failed to download model` 
-→ Le nœud n'a pas accès à Internet: les modèles peuvent être installés hors ligne (voir la documentation « Deploy ELSER/E5 in air-gapped environments »).
+**Problem**: `model_deployment_timeout_exception` or `Timed out after [30s] waiting for trained model deployment`
+→ The model is being downloaded or deployed: wait a minute and send the request again. Follow it with `GET /_ml/trained_models/_stats`.
+
+**Problem**: `current license is non-compliant for [inference]`
+→ The built-in models need a trial license or above (see the setup).
+
+**Problem**: `failed to download model`
+→ The node has no Internet access: the models can be installed offline (see « Deploy ELSER/E5 in air-gapped environments » in the documentation).

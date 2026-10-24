@@ -5,16 +5,17 @@ export default defineConfig({
   title: 'Elasticsearch',
   slug: 'elasticsearch',
   author: 'Emmanuel Demey',
-  // The workshops are written in French.
-  lang: 'fr',
+  // The workshops are written in English.
+  lang: 'en',
 
   // One Markdown file per chapter, in the order of its number. Images live in
   // slides/public/images/ and are referenced as /images/….
   slides: 'slides',
   workshops: 'workshops',
-  // The workshops are guided: every request and its expected response is in
-  // the README, run in Kibana Dev Tools against the learner's own cluster.
-  // There is no code to hand out, hence no solutions — and no online editor.
+  // The learners write the requests, run in Kibana Dev Tools against their own
+  // cluster: the README gives the goal, a hint and the expected response. The
+  // requests live in solutions/<workshop>/SOLUTION.md, for the trainer and the
+  // CI only — never published, hence `false` — and there is no online editor.
   solutions: false,
 
   repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'elasticsearch' },

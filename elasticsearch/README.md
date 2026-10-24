@@ -8,7 +8,8 @@ workshops, and the site that publishes them — built by
 slides/            one Markdown file per chapter (Slidev)
   public/images/   the images of the deck, referenced as /images/…
 ci/fixtures/       the data some chapters need, replayed before them in the CI
-workshops/         one folder per workshop, its README.md (in French)
+workshops/         one folder per workshop, its README.md: setup, goals, hints
+solutions/         one SOLUTION.md per workshop — never published
 training.config.mjs
 ```
 
@@ -46,9 +47,10 @@ The downloads: `elasticsearch-slides.pdf`, `elasticsearch-workshops.pdf`,
 `elasticsearch-participants.zip`, plus a starter ZIP per workshop under
 `downloads/tp/`.
 
-The workshops are guided — each README holds the requests to send from Kibana
-Dev Tools and the responses to expect — so there are no solutions and no online
-editor.
+The learners write the requests themselves: each README holds the setup (index
+and data), then per step a goal, a folded hint and the response to expect. The
+requests are in `solutions/<workshop>/SOLUTION.md`, for the trainer — out of the
+site, the PDFs and the ZIPs (`solutions: false`). No online editor.
 
 The PDF exports print with Chromium. To use one already on the machine instead
 of downloading Playwright's, set `TRAINING_KIT_CHROME` to its path.
@@ -67,14 +69,15 @@ Before each deploy, the CI replays **every request** of the workshops and of the
 slides against a real Elasticsearch — the one of [`../elasticsearch-common/ci/Dockerfile`](../elasticsearch-common/ci/Dockerfile),
 the only place its version is written, shared with `elastic-security`
 ([`check-console.mjs`](../scripts/check-console.mjs)). A request that fails, or a
-response that does not hold the workshop's « Résultat attendu » JSON, holds back
-the deploy.
+response that does not hold the « Expected result » JSON that follows it, holds
+back the deploy. A workshop's `SOLUTION.md` is replayed right after its README, on
+the data the setup created: the solutions are proven to give the expected results.
 
 ```bash
 docker build -t training-es ../elasticsearch-common/ci && docker run -d --rm --name training-es -p 9200:9200 training-es
 export ES_PASSWORD=training
 node ../scripts/check-console.mjs .            # everything
-node ../scripts/check-console.mjs . 11_ilm     # one file
+node ../scripts/check-console.mjs . 10_ilm     # one file
 ```
 
 - A comment before a block tunes its check: `<!-- ci: skip -->` (several nodes, a

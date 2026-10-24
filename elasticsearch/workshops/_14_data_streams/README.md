@@ -1,33 +1,41 @@
-# TP 14 — Data Streams Modernes: LogsDB, Lifecycle, Failure Store et TSDS
+# Workshop 14 — Modern data streams: LogsDB, lifecycle, failure store and TSDS
 
-> Stocker des logs et des métriques comme le fait Elastic Agent: des data streams en mode LogsDB et time series, une rétention gérée par le data stream lifecycle, et un failure store pour ne plus perdre les documents rejetés.
+> Store logs and metrics the way Elastic Agent does: data streams in LogsDB and time series mode, a retention managed by the data stream lifecycle, and a failure store so that rejected documents are no longer lost.
 
-**Niveau**: Avancé
-**Topic**: Rétention et stockage - Data Streams
+**Level**: Advanced
+**Topic**: Retention and storage — Data streams
 
-## Contexte
+## Context
 
-Une application de e-commerce envoie ses logs et ses métriques dans Elasticsearch. L'équipe veut réduire la facture de stockage, garder les logs 7 jours sans maintenir de policy ILM, et ne plus perdre silencieusement les documents mal formés.
+An e-commerce application sends its logs and its metrics to Elasticsearch. The team wants a smaller storage bill, logs kept 7 days without maintaining an ILM policy, and no more malformed documents lost silently.
+
+Each step states **what** to build, not **how**: look for the setting or the API in the documentation, try it, read the response, adjust. The expected result lets you check your own answer. Hints are folded — open them only once you are stuck.
+
+Reference: [Data streams](https://www.elastic.co/docs/manage-data/data-store/data-streams).
 
 ## Setup
 
-Ce TP est autonome. Vérifiez que le cluster répond:
+This workshop stands on its own. Check that the cluster answers:
 
 ```json
 GET /_cluster/health
 ```
 
-## Partie A: Un data stream de logs en mode LogsDB
+## Part A: A logs data stream in LogsDB mode
 
-### Étape 1: Le template intégré
+### Step 1: The built-in template
 
-Elasticsearch fournit déjà un template pour `logs-*-*`, utilisé par Elastic Agent:
+Elasticsearch already ships a template for the logs of Elastic Agent. Find it, and its index patterns and priority.
 
-```json
-GET /_index_template/logs
-```
+<details>
+<summary>Hint</summary>
 
-**Résultat attendu** (extrait):
+It is an index template named after the type of data it holds.
+
+</details>
+
+**Expected result** (an excerpt):
+
 ```json
 {
   "index_templates": [
@@ -43,66 +51,48 @@ GET /_index_template/logs
 }
 ```
 
-La convention de nommage est `<type>-<dataset>-<namespace>`: `logs-shop-production`, `logs-shop-staging`… Ne créez jamais de template `logs-*`: il masquerait celui-ci pour toutes les sources de logs.
+**Question**: the naming convention is `<type>-<dataset>-<namespace>`. What would happen to every source of logs if you created a template on `logs-*` with a higher priority?
 
-### Étape 2: Votre template
+### Step 2: Your template
 
-Créez un template pour les logs de la boutique, plus prioritaire que le template intégré sur `logs-shop-*`:
+Create the template `logs-shop-template` for `logs-shop-*`, taking precedence over the built-in one: a data stream in **LogsDB** mode, 0 replicas, with `@timestamp` (date), `host.name` (keyword), `message` (a text **without positions nor scoring**) and `http.status` (integer); a **retention of 7 days** managed by the data stream lifecycle; and a **failure store** enabled.
+
+<details>
+<summary>Hint</summary>
+
+Look at the [`index.mode` setting](https://www.elastic.co/docs/manage-data/data-store/data-streams/logs-data-stream), at the [`match_only_text`](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/text#match-only-text-field-type) type, at [`lifecycle`](https://www.elastic.co/docs/manage-data/lifecycle/data-stream) in a template, and at the [failure store](https://www.elastic.co/docs/manage-data/data-store/data-streams/failure-store) under `data_stream_options`.
+
+</details>
+
+**Expected result**:
 
 ```json
-PUT /_index_template/logs-shop-template
-{
-  "index_patterns": ["logs-shop-*"],
-  "data_stream": {},
-  "priority": 200,
-  "template": {
-    "settings": {
-      "index.mode": "logsdb",
-      "number_of_replicas": 0
-    },
-    "mappings": {
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "host.name": { "type": "keyword" },
-        "message": { "type": "match_only_text" },
-        "http.status": { "type": "integer" }
-      }
-    },
-    "lifecycle": { "data_retention": "7d" },
-    "data_stream_options": {
-      "failure_store": { "enabled": true }
-    }
-  }
-}
+{ "acknowledged": true }
 ```
 
-**Points clés**:
-- `index.mode: logsdb`: documents triés par `host.name` puis `@timestamp`, `_source` synthétique, compression ZSTD — environ 65% de stockage en moins. C'est le défaut pour `logs-*-*` depuis la 9.0.
-- `match_only_text`: un `text` sans positions ni scoring, idéal pour les messages de logs
-- `lifecycle`: le **data stream lifecycle** gère rollover et suppression à partir d'une simple rétention
-- `failure_store`: les documents rejetés sont conservés à part (partie C)
+**Question**: what does LogsDB change to how the documents are stored?
 
-### Étape 3: Indexer des logs
+### Step 3: Index logs
 
-Le data stream est créé au premier document:
+Index these three logs into `logs-shop-production` — the data stream is created by the first one:
 
-```json
-POST /logs-shop-production/_bulk?refresh=true
-{"create":{}}
+```text
 {"@timestamp":"2026-10-08T10:00:00Z","host.name":"web-1","message":"GET /home 200","http.status":200}
-{"create":{}}
 {"@timestamp":"2026-10-08T10:01:00Z","host.name":"web-2","message":"POST /cart 500","http.status":500}
-{"create":{}}
 {"@timestamp":"2026-10-08T10:02:00Z","host.name":"web-1","message":"GET /product/42 200","http.status":200}
 ```
 
-Un data stream n'accepte que des **créations** (`create`, pas `index` avec un `_id` existant).
+Then look at the data stream.
 
-```json
-GET /_data_stream/logs-shop-production
-```
+<details>
+<summary>Hint</summary>
 
-**Résultat attendu** (extrait):
+A data stream only takes **creations**: in a `_bulk`, the action is `create`, not `index`.
+
+</details>
+
+**Expected result** (an excerpt of the data stream):
+
 ```json
 {
   "data_streams": [
@@ -117,15 +107,11 @@ GET /_data_stream/logs-shop-production
 }
 ```
 
-### Étape 4: Le _source synthétique
+### Step 4: The synthetic _source
 
-En LogsDB, le `_source` n'est pas stocké: il est **reconstruit** à partir des doc values. Indexez un document avec une valeur invalide:
+Index into `logs-shop-production` a log of `web-3` at `2026-10-08T10:03:00Z`, message `GET /status`, whose `http.status` is `"oops"`. Then find it by its `host.name`, with this search:
 
-```json
-POST /logs-shop-production/_doc?refresh=true
-{ "@timestamp": "2026-10-08T10:03:00Z", "host.name": "web-3", "message": "GET /status", "http.status": "oops" }
-```
-
+<!-- ci: skip -->
 ```json
 POST /logs-shop-production/_search
 {
@@ -133,7 +119,8 @@ POST /logs-shop-production/_search
 }
 ```
 
-**Résultat attendu** (extrait):
+**Expected result** (an excerpt):
+
 ```json
 {
   "hits": {
@@ -151,44 +138,40 @@ POST /logs-shop-production/_search
 ```
 
 **Questions**:
-- Pourquoi `host.name` est-il devenu un objet `host: { name }` ? (Le `_source` est reconstruit: équivalent, pas identique.)
-- Pourquoi le document a-t-il été accepté malgré `"oops"` ? (LogsDB active `ignore_malformed`: la valeur est gardée mais pas indexée, et listée dans `_ignored`.)
+- Why did `host.name` become an object `host: { name }`?
+- Why was the document accepted, with `"oops"` in an `integer` field?
 
-## Partie B: Le data stream lifecycle
+## Part B: The data stream lifecycle
 
-### Étape 5: Consulter et modifier la rétention
+### Step 5: Read and change the retention
+
+Read the lifecycle of `logs-shop-production`. The security team asks for **30 days**: change the retention of this data stream, **without** touching the template. Then ask the lifecycle to explain the state of its backing indices.
+
+<details>
+<summary>Hint</summary>
+
+The data stream has a `_lifecycle` endpoint; its backing indices have a `_lifecycle/explain` one.
+
+</details>
+
+**Expected result** (the change):
 
 ```json
-GET /_data_stream/logs-shop-production/_lifecycle
-```
-
-L'équipe sécurité demande 30 jours. Modifiez la rétention du data stream existant, sans toucher au template:
-
-```json
-PUT /_data_stream/logs-shop-production/_lifecycle
-{ "data_retention": "30d" }
-```
-
-```json
-GET /logs-shop-production/_lifecycle/explain
+{ "acknowledged": true }
 ```
 
 **Questions**:
-- Quelle différence avec ILM ? (Le lifecycle ne connaît qu'une rétention, et éventuellement un downsampling: pas de tiers hot/warm/cold, pas de searchable snapshots. ILM reste l'outil pour une architecture multi-tiers.)
-- Que se passera-t-il pour les prochains data streams `logs-shop-*` ? (Ils prendront la rétention du template: 7 jours.)
+- What can ILM do that the lifecycle cannot?
+- What retention will the next `logs-shop-*` data streams get?
 
-## Partie C: Le failure store
+## Part C: The failure store
 
-### Étape 6: Un document rejeté
+### Step 6: A rejected document
 
-Un document sans `@timestamp` ne peut pas entrer dans un data stream. Sans failure store, il serait perdu (et le client recevrait une erreur qu'il ignore souvent):
+Index into `logs-shop-production` a log of `web-2` with the message `log without a timestamp` — and **no** `@timestamp`.
 
-```json
-POST /logs-shop-production/_doc
-{ "host.name": "web-2", "message": "log sans horodatage" }
-```
+**Expected result** (an excerpt):
 
-**Résultat attendu** (extrait):
 ```json
 {
   "result": "created",
@@ -196,22 +179,21 @@ POST /logs-shop-production/_doc
 }
 ```
 
-### Étape 7: Lire les échecs
+**Question**: without a failure store, what would have happened to that document?
 
-Le sélecteur `::failures` donne accès au failure store, comme à un index:
+### Step 7: Read the failures
 
-```json
-POST /logs-shop-production::failures/_refresh
-```
+Search the failure store of `logs-shop-production`, keeping only `error.type`, `error.message` and `document.source`. Then count the failures per `error.type` in ES|QL.
 
-```json
-POST /logs-shop-production::failures/_search
-{
-  "_source": ["error.type", "error.message", "document.source"]
-}
-```
+<details>
+<summary>Hint</summary>
 
-**Résultat attendu** (extrait):
+A **selector** after the name of the data stream gives the failure store, as if it were an index. Refresh it first.
+
+</details>
+
+**Expected result** (an excerpt of the search):
+
 ```json
 {
   "hits": {
@@ -228,93 +210,65 @@ POST /logs-shop-production::failures/_search
 }
 ```
 
-Et en ES|QL, pour un tableau de bord des échecs:
+**Expected result** (ES|QL):
 
 ```json
-POST /_query?format=json
 {
-  "query": """
-    FROM logs-shop-production::failures
-    | STATS failures = COUNT(*) BY error.type
-  """
+  "values": [[1, "document_parsing_exception"]]
 }
 ```
 
-**Résultat attendu**:
+## Part D: A time series data stream (TSDS) for the metrics
+
+Reference: [Time series data streams](https://www.elastic.co/docs/manage-data/data-store/data-streams/time-series-data-stream-tsds).
+
+### Step 8: Timestamp at ingest
+
+A TSDS only takes points close to « now » (by default, from 2 hours before to 30 minutes after). Elastic Agent timestamps its metrics; here, create the ingest pipeline `metrics-shop-timestamp` that sets `@timestamp` to the time of reception — **unless** the document has one already.
+
+<details>
+<summary>Hint</summary>
+
+The [`set` processor](https://www.elastic.co/docs/reference/enrich-processor/set-processor), and the ingest metadata `_ingest.timestamp`.
+
+</details>
+
+**Expected result**:
+
 ```json
-{
-  "values": [ [ 1, "document_parsing_exception" ] ]
-}
+{ "acknowledged": true }
 ```
 
-## Partie D: Un time series data stream (TSDS) pour les métriques
+### Step 9: The time series template
 
-### Étape 8: Horodater à l'ingestion
+Create the template `metrics-shop-template`, priority 200, for `metrics-shop-*`: a data stream in **time series** mode that goes through `metrics-shop-timestamp` by default, 0 replicas. The series are identified by `host.name`; `cpu.pct` is a value that goes up and down, `http.requests` a counter that only grows. Keep the data 90 days, **downsampled** to one point per hour after 1 day, and one per day after 7 days.
 
-Un TSDS n'accepte que les points proches de « maintenant » (par défaut, de 2 heures avant à 30 minutes après). Elastic Agent horodate ses métriques; ici, un pipeline d'ingestion pose `@timestamp` à l'heure de réception:
+<details>
+<summary>Hint</summary>
+
+Look at `time_series_dimension` and `time_series_metric` in the mapping, at `index.default_pipeline`, and at `downsampling` in the `lifecycle`.
+
+</details>
+
+**Expected result**:
 
 ```json
-PUT /_ingest/pipeline/metrics-shop-timestamp
-{
-  "processors": [
-    { "set": { "field": "@timestamp", "value": "{{{_ingest.timestamp}}}", "override": false } }
-  ]
-}
+{ "acknowledged": true }
 ```
 
-### Étape 9: Le template time series
+### Step 10: Send metrics
 
-```json
-PUT /_index_template/metrics-shop-template
-{
-  "index_patterns": ["metrics-shop-*"],
-  "data_stream": {},
-  "priority": 200,
-  "template": {
-    "settings": {
-      "index.mode": "time_series",
-      "index.default_pipeline": "metrics-shop-timestamp",
-      "number_of_replicas": 0
-    },
-    "mappings": {
-      "properties": {
-        "@timestamp": { "type": "date" },
-        "host.name": { "type": "keyword", "time_series_dimension": true },
-        "cpu.pct": { "type": "double", "time_series_metric": "gauge" },
-        "http.requests": { "type": "long", "time_series_metric": "counter" }
-      }
-    },
-    "lifecycle": {
-      "data_retention": "90d",
-      "downsampling": [
-        { "after": "1d", "fixed_interval": "1h" },
-        { "after": "7d", "fixed_interval": "1d" }
-      ]
-    }
-  }
-}
-```
+Send these two points to `metrics-shop-production`, with no timestamp:
 
-**Points clés**:
-- `time_series_dimension`: ce qui identifie une série (ici, la machine)
-- `time_series_metric`: `gauge` (une valeur qui monte et descend) ou `counter` (un compteur qui ne fait que croître)
-- `downsampling`: après 1 jour, un point par heure et par série; après 7 jours, un point par jour
-
-### Étape 10: Envoyer des métriques
-
-```json
-POST /metrics-shop-production/_bulk?refresh=true
-{"create":{}}
+```text
 {"host.name":"web-1","cpu.pct":0.42,"http.requests":1000}
-{"create":{}}
 {"host.name":"web-2","cpu.pct":0.87,"http.requests":2500}
 ```
 
-```json
-GET /_data_stream/metrics-shop-production
-```
+Then look at the data stream.
 
-**Résultat attendu** (extrait):
+**Expected result** (an excerpt):
+
 ```json
 {
   "data_streams": [
@@ -323,50 +277,47 @@ GET /_data_stream/metrics-shop-production
 }
 ```
 
-Regardez `time_series.temporal_ranges`: la plage de temps acceptée par la backing index courante.
+**Question**: what does `time_series.temporal_ranges` tell you?
 
-### Étape 11: Interroger les séries
+### Step 11: Query the series
 
-La commande source `TS` d'ES|QL lit un time series data stream:
+In ES|QL, compute the **maximum CPU per host**, sorted by host, reading `metrics-shop-production` as a time series.
 
-```json
-POST /_query?format=json
-{
-  "query": """
-    TS metrics-shop-production
-    | STATS max_cpu = MAX(cpu.pct) BY host.name
-    | SORT host.name
-  """
-}
-```
+<details>
+<summary>Hint</summary>
 
-**Résultat attendu**:
+ES|QL has a source command of its own for time series data streams.
+
+</details>
+
+**Expected result**:
+
 ```json
 {
   "values": [
-    [ 0.42, "web-1" ],
-    [ 0.87, "web-2" ]
+    [0.42, "web-1"],
+    [0.87, "web-2"]
   ]
 }
 ```
 
-**Question**: indexez de nouveau un point pour `web-1` avec un `@timestamp` d'il y a 3 jours. Que se passe-t-il ? (Il est hors des bornes du TSDS: rejeté avec `timestamp_error`. La réponse indique `"failure_store": "not_enabled"`: activez le failure store dans ce template aussi pour le conserver.)
+**Try**: index a point for `web-1` with a `@timestamp` of 3 days ago. What happens? What does the response say about the failure store?
 
-## Critères de Succès
+## Success criteria
 
-- Nommer un data stream selon la convention `<type>-<dataset>-<namespace>` sans masquer les templates intégrés
-- Activer LogsDB et comprendre le `_source` synthétique
-- Gérer une rétention avec le data stream lifecycle
-- Activer le failure store et lire les échecs avec `::failures`
-- Créer un TSDS avec dimensions, metrics et downsampling, et l'interroger avec `TS`
+- A data stream named after `<type>-<dataset>-<namespace>`, without hiding the built-in templates
+- LogsDB enabled, and the synthetic `_source` understood
+- A retention managed with the data stream lifecycle
+- A failure store enabled, and its failures read
+- A TSDS with dimensions, metrics and downsampling, queried in ES|QL
 
-## Dépannage
+## Troubleshooting
 
-**Problème**: Le data stream n'a pas les réglages attendus (mode, rétention…)
-→ Un autre template l'a peut-être emporté. Vérifiez lequel s'applique, et le résultat de la fusion: `POST /_index_template/_simulate_index/logs-shop-production`. Le template de plus haute priorité gagne (200 > 100 pour le template intégré `logs`).
+**Problem**: the data stream does not have the expected settings (mode, retention…)
+→ Another template may have won. `POST /_index_template/_simulate_index/logs-shop-production` shows which one applies, and the merged result.
 
-**Problème**: `the document timestamp [...] is outside of ranges of currently writable indices`
-→ Le point est trop ancien (ou trop dans le futur) pour le TSDS: c'est voulu, un TSDS n'accepte que des données récentes.
+**Problem**: `the document timestamp [...] is outside of ranges of currently writable indices`
+→ The point is too old (or too far in the future) for the TSDS: on purpose, a TSDS only takes recent data.
 
-**Problème**: Le failure store reste vide
-→ Il ne s'applique qu'aux data streams créés après l'activation dans le template. Pour un data stream existant: `PUT /_data_stream/<nom>/_options { "failure_store": { "enabled": true } }`.
+**Problem**: the failure store stays empty
+→ It only applies to the data streams created after it was enabled in the template. For an existing one, look at the `_options` endpoint of the data stream.

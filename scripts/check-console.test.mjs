@@ -1,7 +1,7 @@
 // node --test scripts/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, staleImages } from './check-console.mjs';
+import { consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, solutionPath, staleImages } from './check-console.mjs';
 
 const fence = (lang, body) => `\`\`\`${lang}\n${body}\n\`\`\``;
 
@@ -248,4 +248,31 @@ test('a block declared as text is an output to read, not requests to send', () =
     consoleSteps(markdown).map((step) => step.requests[0].path),
     ['/a', '/b'],
   );
+});
+
+test('the JSON block after « Expected result » is the expected response of the step before it', () => {
+  const markdown = [fence('bash', 'GET /products/_count'), '**Expected result**:', fence('json', '{ "count": 5 }')].join('\n\n');
+
+  assert.deepEqual(consoleSteps(markdown)[0].expected, { count: 5 });
+});
+
+test('an expected result in a later section is not the one of the step before it', () => {
+  const markdown = [
+    '## Setup',
+    fence('json', 'PUT /blog_posts'),
+    '### Step 1',
+    'Count the posts.',
+    '**Expected result**:',
+    fence('json', '{ "count": 4 }'),
+  ].join('\n\n');
+
+  assert.equal(consoleSteps(markdown)[0].expected, undefined);
+});
+
+test('the solution of a workshop is solutions/<workshop>/SOLUTION.md, a chapter has none', () => {
+  assert.equal(
+    solutionPath('/repo/elasticsearch', 'workshops/06_aggregations/README.md'),
+    '/repo/elasticsearch/solutions/06_aggregations/SOLUTION.md',
+  );
+  assert.equal(solutionPath('/repo/elasticsearch', 'slides/10_search.md'), null);
 });

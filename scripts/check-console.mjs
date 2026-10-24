@@ -6,8 +6,10 @@
 //
 // Each code block of a workshop README or of a chapter whose first line is a request
 // (`GET /_cat/nodes`, `PUT /products` + its JSON body…) is a step: its requests are
-// sent in order, each must succeed, and when a « Résultat attendu » JSON block
-// follows it, the last response must hold everything that block shows. Shell and
+// sent in order, each must succeed, and when a « Résultat attendu » (or « Expected
+// result ») JSON block follows it in the same section, the last response must hold
+// everything that block shows. A workshop whose learners write the requests keeps
+// them in solutions/<workshop>/SOLUTION.md, replayed right after its README. Shell and
 // yaml blocks, and expected results that are not JSON, are left alone.
 //
 // A comment before a block, invisible on the site, changes how it is checked:
@@ -127,7 +129,9 @@ export function consoleSteps(markdown) {
     }
     const open = lines[i].match(/^```(\w*)\s*$/);
     if (!open) {
-      if (sinceStep !== null) sinceStep += `${lines[i]}\n`;
+      // A new section: what follows is no longer about the step before it.
+      if (/^#{1,6}\s/.test(lines[i])) sinceStep = null;
+      else if (sinceStep !== null) sinceStep += `${lines[i]}\n`;
       continue;
     }
     const start = i;
@@ -148,7 +152,7 @@ export function consoleSteps(markdown) {
       }
       steps.push(step);
       sinceStep = '';
-    } else if (sinceStep !== null && /Résultat attendu/.test(sinceStep)) {
+    } else if (sinceStep !== null && /Résultat attendu|Expected result/.test(sinceStep)) {
       try {
         steps.at(-1).expected = JSON.parse(code);
       } catch {
@@ -348,6 +352,16 @@ export function staleImages(markdown, version) {
   );
 }
 
+/**
+ * The solution of a workshop: the requests that answer its exercises, kept out of
+ * the README — the learners write them — in `solutions/<workshop>/SOLUTION.md`,
+ * replayed right after the README, on the data its setup created.
+ */
+export function solutionPath(dir, file) {
+  const match = file.match(/^workshops\/([^/]+)\/README\.md$/);
+  return match ? join(dir, 'solutions', match[1], 'SOLUTION.md') : null;
+}
+
 /** Resolves once the cluster answers, for up to `seconds`: a container takes a while to start. */
 async function ready(es, seconds = 180) {
   for (let elapsed = 0; elapsed < seconds; elapsed += 3) {
@@ -400,7 +414,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
     if (stale.length) failed++;
     const steps = consoleSteps(markdown);
-    if (steps.length === 0) continue;
+    // A workshop's solution runs right after its README, on what the setup created.
+    const solution = solutionPath(dir, name);
+    const solutionSteps = solution && existsSync(solution) ? consoleSteps(await readFile(solution, 'utf8')) : [];
+    if (steps.length + solutionSteps.length === 0) continue;
     await wipe(es);
     const fixture = fixturePath(dir, name);
     if (fixture && existsSync(fixture)) {
@@ -415,14 +432,18 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // A learner takes more than the refresh interval between two steps; the CI
     // does not, so what a step indexed is made searchable before the next one.
     const refresh = () => es.request({ method: 'POST', path: '/_refresh' });
-    const failures = await runSteps(steps, es, { beforeStep: refresh });
-    const run = steps.filter((step) => !step.directives.has('skip')).length;
-    console.log(`${failures.length ? '✗' : '✓'} ${name}: ${run - failures.length}/${run} steps (${steps.length - run} skipped)`);
-    for (const failure of failures) {
-      console.log(`    ${failure}`);
+    const failures = [
+      ...(await runSteps(steps, es, { beforeStep: refresh })).map((failure) => ({ file, failure })),
+      ...(await runSteps(solutionSteps, es, { beforeStep: refresh })).map((failure) => ({ file: solution, failure })),
+    ];
+    const all = [...steps, ...solutionSteps];
+    const run = all.filter((step) => !step.directives.has('skip')).length;
+    console.log(`${failures.length ? '✗' : '✓'} ${name}: ${run - failures.length}/${run} steps (${all.length - run} skipped)`);
+    for (const { file: where, failure } of failures) {
+      console.log(`    ${where === file ? '' : `${where.slice(dir.length + 1)}: `}${failure}`);
       if (github) {
         const line = failure.match(/^line (\d+)/)?.[1];
-        console.log(`::error file=${file.slice(process.cwd().length + 1)},line=${line}::${failure}`);
+        console.log(`::error file=${where.slice(process.cwd().length + 1)},line=${line}::${failure}`);
       }
     }
     if (failures.length) failed++;

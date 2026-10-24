@@ -1,43 +1,44 @@
-# Elasticsearch — Travaux pratiques
+# Elasticsearch — Workshops
 
-Les exercices pratiques de la formation **Elasticsearch**. Chaque TP est
-**guidé** : les requêtes à envoyer et les réponses attendues sont dans son
-énoncé, avec des critères de succès et une section de dépannage.
+The hands-on exercises of the **Elasticsearch** training. Each workshop gives you
+the data and a goal per step, **not the request**: you find it in the
+documentation, try it, read the response, and adjust. The expected result lets you
+check your own answer; a folded hint helps when you are stuck — try without it
+first.
 
-## Ce qu'il faut
+## What you need
 
-- un cluster **Elasticsearch** accessible (`GET /` doit répondre) ;
-- **Kibana**, pour envoyer les requêtes depuis **Dev Tools** (Console) — les
-  blocs `GET /…`, `PUT /…`, `POST /…` des énoncés s'y collent tels quels ;
-- un terminal, pour les TP qui touchent à la configuration des nœuds (TP 4, 6,
-  7, 9 et 11) et aux appels `curl`.
+- a reachable **Elasticsearch** cluster (`GET /` must answer);
+- **Kibana**, to send the requests from **Dev Tools** (Console) — the setup blocks
+  `GET /…`, `PUT /…`, `POST /…` paste there as is;
+- a terminal, for the workshops that touch the node configuration (workshops 8,
+  10, 11 and 14) and for the `curl` calls.
 
-Un seul nœud suffit pour la plupart des TP (statut `yellow` accepté) ; le TP 2
-en monte plusieurs. Le TP 8 se fait en code (Node.js, ou le langage de votre
-choix) et demande **Docker** pour Testcontainers.
+One node is enough (`yellow` status accepted). Workshop 7 is done in code
+(Node.js, or the language of your choice) and needs **Docker** for
+Testcontainers.
 
-Chaque TP est **autonome** : il crée lui-même les index et les données dont il a
-besoin, et peut être fait sans avoir fait les précédents.
+Each workshop **stands on its own**: it creates the indices and data it needs, and
+can be done without the previous ones.
 
-Tous les TP sont rejoués par la CI sur la dernière version d'Elasticsearch
-(9.5.5) : les requêtes passent, et les réponses ont la forme annoncée.
+The CI replays every workshop on the latest Elasticsearch (9.5.5), with the
+trainer's solutions: each expected result is the one a correct answer gets.
 
-## Les TP
+## The workshops
 
-| Jour | TP | Dossier | Sujet |
-|------|----|---------|-------|
-| 1 | 1 | `01_indexing_search/` | Créer un index, indexer des documents, `match` et `bool` |
-| 1 | 2 | `02_cluster_setup/` | Former un cluster multi-nœuds, rôles des nœuds |
-| 1 | 3 | `03_documents_alias_templates/` | CRUD de documents, `_bulk`, alias, index templates |
-| 1 | 4 | `04_mapping_analyzers/` | Mapping explicite, `text` vs `keyword`, analyzers |
-| 2 | 5 | `05_search/` | Lucene, Query DSL : plein texte, exact, géo, booléen, Cross Cluster Search |
-| 2 | 6 | `06_aggregations/` | Agrégations de métriques, de buckets et pipeline |
-| 2 | 7 | `07_esql/` | ES\|QL : filtrer, agréger, `LOOKUP JOIN`, plein texte |
-| 3 | 8 | `08_sdk/` | Client officiel, tests avec Testcontainers |
-| 3 | 9 | `09_sizing_performance/` | Nombre de shards, heap JVM, thread pools |
-| 3 | 10 | `10_alerting_rbac/` | Kibana Rules, webhooks, utilisateurs et rôles |
-| 3 | 11 | `11_ilm_retention/` | Architecture hot-warm-cold et policies ILM |
-| 3 | 12 | `12_snapshots/` | Repositories, snapshots et restaurations |
-| 3 | 13 | `13_cat_apis/` | Inspecter le cluster avec les `_cat` APIs |
-| 3 | 14 | `14_monitoring/` | Cluster health, statistiques des nœuds, slow logs |
-| 3 | 15 | `15_production_architecture/` | Allocation awareness, SLM, Field-Level Security |
+| Day | Workshop | Folder | Topic |
+|-----|----------|--------|-------|
+| 1 | 1 | `01_indexing_search/` | Create an index, index documents, `match` and `bool` |
+| 1 | 2 | `02_documents_alias_templates/` | Document CRUD, `_bulk`, aliases, index templates |
+| 1 | 3 | `03_mapping_analyzers/` | Explicit mapping, `text` vs `keyword`, analyzers |
+| 2 | 4 | `04_search/` | Lucene, Query DSL: full text, exact, geo, boolean, Cross Cluster Search |
+| 2 | 5 | `05_aggregations/` | Metrics, bucket and pipeline aggregations |
+| 2 | 6 | `06_esql/` | ES\|QL: filter, aggregate, `LOOKUP JOIN`, full text |
+| 3 | 7 | `07_sdk/` | Official client, tests with Testcontainers |
+| 3 | 8 | `08_sizing_performance/` | Shard count, JVM heap, thread pools |
+| 3 | 9 | `09_alerting_rbac/` | Kibana Rules, webhooks, users and roles |
+| 3 | 10 | `10_ilm_retention/` | Hot-warm-cold architecture and ILM policies |
+| 3 | 11 | `11_snapshots/` | Repositories, snapshots and restores |
+| 3 | 12 | `12_cat_apis/` | Inspect the cluster with the `_cat` APIs |
+| 3 | 13 | `13_monitoring/` | Cluster health, node statistics, slow logs |
+| 3 | 14 | `14_production_architecture/` | Allocation awareness, SLM, Field-Level Security |
