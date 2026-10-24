@@ -1,4 +1,4 @@
-# Workshop 9 — Alerting and access control: solution
+# Workshop 10 — Alerting and access control: solution
 
 For the trainer. Not published: the learners find these themselves.
 The CI replays the requests right after the setup of the workshop README.

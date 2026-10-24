@@ -1,4 +1,4 @@
-# Workshop 9 — Alerting and access control
+# Workshop 10 — Alerting and access control
 
 > Create monitoring alerts with Kibana Rules, wire them to advanced actions (webhook, index), and manage users with RBAC and Document-Level Security.
 

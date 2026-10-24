@@ -1,4 +1,4 @@
-# Workshop 6 — ES|QL: exploring logs with pipes
+# Workshop 5 — ES|QL: exploring logs with pipes
 
 > Query logs with ES|QL: filter, compute, aggregate, join a reference table and search full text — all in one request that reads from top to bottom.
 

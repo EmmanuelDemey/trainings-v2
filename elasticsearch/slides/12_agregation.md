@@ -430,8 +430,18 @@ POST /sales/_search
 }
 ```
 
+
 ---
 layout: cover
 ---
 
-# Practical Part
+# Hands-on
+
+## Workshop 6 - Aggregations
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/06_aggregations/</code> — steps in its <code>README.md</code></div>
+
+- Metrics: the statistics of the views
+- Buckets: per author, per month
+- Nested: statistics per author
+- Pipeline: the average of the averages

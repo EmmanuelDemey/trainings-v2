@@ -486,8 +486,17 @@ users          yellow open     1   1      50000       10mb
 - **Heap sizing**: Maximum 50% RAM, never exceed 32GB, -Xms = -Xmx
 - **Cluster health**: green (perfect), yellow (missing replicas), red (missing primaries)
 
+
 ---
-layout: section
+layout: cover
 ---
 
-# Practical Exercises
+# Hands-on
+
+## Workshop 8 - Inspecting the cluster with the _cat APIs
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/08_cat_apis/</code> — steps in its <code>README.md</code></div>
+
+- Every index, with chosen columns and sorted rows
+- The shards of an index, and why some are unassigned
+- Disk per node, pending tasks, the nodes in JSON

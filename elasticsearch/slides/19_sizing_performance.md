@@ -619,4 +619,17 @@ GET /products/_search
 - **Disk capacity**: `Volume x (1 + replicas) x 1.15 x 1.2`
 - **Master quorum**: `(number_masters / 2) + 1`
 
+---
+layout: cover
+---
 
+# Hands-on
+
+## Workshop 9 - Sizing and performance
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/09_sizing_performance/</code> — steps in its <code>README.md</code></div>
+
+- Size a logs cluster: volume, shards per day, per node
+- A template for the daily indices
+- Size, set and check the JVM heap
+- Read the thread pools, compute a rejection rate

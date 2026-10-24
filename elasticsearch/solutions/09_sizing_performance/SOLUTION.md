@@ -1,4 +1,4 @@
-# Workshop 8 — Sizing and performance: solution
+# Workshop 9 — Sizing and performance: solution
 
 For the trainer. Not published: the learners work these out themselves.
 The CI replays the requests right after the README, and checks each

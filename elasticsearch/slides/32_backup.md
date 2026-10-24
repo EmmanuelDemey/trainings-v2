@@ -139,7 +139,17 @@ layout: cover
 
 # Demo in Kibana
 
+
 ---
 layout: cover
 ---
-# Practical Part
+
+# Hands-on
+
+## Workshop 12 - Snapshots and restore
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/12_snapshots/</code> — steps in its <code>README.md</code></div>
+
+- Register and verify a repository
+- A full snapshot, then a partial one
+- Restore after a delete, under another name, then everything

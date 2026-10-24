@@ -1,4 +1,4 @@
-# Workshop 10 — ILM and data retention
+# Workshop 11 — ILM and data retention
 
 > Design a hot-warm-cold architecture that balances cost and performance, and set up Index Lifecycle Management (ILM) policies that automate the transitions.
 

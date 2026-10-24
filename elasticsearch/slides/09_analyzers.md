@@ -338,7 +338,18 @@ PUT /products
 3. Compare different analyzers side by side
 4. Measure relevance and performance
 
+
+---
+layout: cover
 ---
 
-# Practical Section
+# Hands-on
 
+## Workshop 3 - Mapping and analyzers
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/03_mapping_analyzers/</code> — steps in its <code>README.md</code></div>
+
+- An explicit mapping: `text` with its `keyword`, `date`, `geo_point`, an object left unindexed
+- An `english` analyzer, and what `_analyze` makes of a text
+- One search per type of field
+- A field nobody mapped — then forbid unknown fields

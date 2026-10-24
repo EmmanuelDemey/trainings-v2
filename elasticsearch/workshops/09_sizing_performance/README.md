@@ -1,4 +1,4 @@
-# Workshop 8 — Sizing and performance
+# Workshop 9 — Sizing and performance
 
 > Compute the right number of shards, set the JVM heap correctly, and read the thread pools to diagnose performance problems.
 

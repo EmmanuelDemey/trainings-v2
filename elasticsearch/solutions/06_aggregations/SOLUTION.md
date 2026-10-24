@@ -1,4 +1,4 @@
-# Workshop 5 — Aggregations: solution
+# Workshop 6 — Aggregations: solution
 
 For the trainer. Not published: the learners find these requests themselves.
 The CI replays them right after the setup of the workshop README, and checks

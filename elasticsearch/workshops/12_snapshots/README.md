@@ -1,4 +1,4 @@
-# Workshop 11 — Snapshots and restore
+# Workshop 12 — Snapshots and restore
 
 > Set up a snapshot repository, take backups, and restore indices to protect your data.
 

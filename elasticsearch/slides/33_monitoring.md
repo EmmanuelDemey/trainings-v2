@@ -600,19 +600,32 @@ index \[my-index\] blocked by: \[FORBIDDEN/12/index read-only / allow delete (ap
 | `_cat/indices` | health, store.size | 5min |
 | `_nodes/hot_threads` | Active CPU threads | On demand |
 
+
+---
+layout: cover
 ---
 
-# Practical Exercises
+# Hands-on
 
-Now proceed to the **exercise workbook** to practice these concepts.
+## Workshop 13 - Monitoring
 
-**Labs to complete**:
-- Lab 4.1: Using native monitoring APIs
-- Lab 4.2: Configuring critical alert thresholds
-- Lab 4.3: Exploring Kibana Stack Monitoring
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/13_monitoring/</code> — steps in its <code>README.md</code></div>
 
-**These exercises cover**:
-- Queries on _cluster/health, _nodes/stats, _cat APIs
-- Slow logs and watermarks configuration
-- Navigation in Kibana Stack Monitoring
-- Log interpretation and simulated problem diagnosis
+- Cluster health, unassigned shards and why
+- Heap, GC, CPU, disk, indexing and search per node
+- Slow logs: set the thresholds, catch a slow search, fix it
+
+---
+layout: cover
+---
+
+# Hands-on
+
+## Workshop 14 - Advanced architecture and production
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/14_production_architecture/</code> — steps in its <code>README.md</code></div>
+
+- Shard allocation awareness across two zones
+- Snapshot Lifecycle Management policies
+- Field-Level Security, combined with DLS
+- A production architecture for 500 GB/day

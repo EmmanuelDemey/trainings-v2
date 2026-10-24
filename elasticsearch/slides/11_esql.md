@@ -205,3 +205,18 @@ GET /_query/async/<id>
 * **Query DSL**: the application's search (relevance, pagination, highlighting)
 * **ES|QL**: exploration, investigation, reporting, alerting
 * **SQL**: the JDBC/ODBC tools that already speak it
+
+---
+layout: cover
+---
+
+# Hands-on
+
+## Workshop 5 - ES|QL: exploring logs with pipes
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/05_esql/</code> — steps in its <code>README.md</code></div>
+
+- Filter, compute, sort and cut
+- Aggregate per page, and over time
+- Join a lookup index with `LOOKUP JOIN`
+- Full-text search, and a query with parameters

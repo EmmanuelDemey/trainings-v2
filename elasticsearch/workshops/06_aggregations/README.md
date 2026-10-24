@@ -1,4 +1,4 @@
-# Workshop 5 — Aggregations
+# Workshop 6 — Aggregations
 
 > Use Elasticsearch aggregations to compute statistics and analyse data without fetching every document.
 

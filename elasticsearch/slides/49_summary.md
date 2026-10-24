@@ -10,8 +10,8 @@ layout: section
 
 <v-clicks>
 
-**Day 1 - Cluster and Indexing**:
-- Search engines, Lucene, the Elastic Stack, cluster configuration
+**Day 1 - Indexing**:
+- Search engines, Lucene, the Elastic Stack
 - Documents, Bulk API, aliases
 - Mapping, analyzers, templates
 
@@ -21,6 +21,7 @@ layout: section
 
 **Day 3 - Testing and Operating the Cluster**:
 - SDKs and Testcontainers
+- Installation and cluster configuration
 - Sizing, JVM, topology, security
 - ILM, snapshots, monitoring
 

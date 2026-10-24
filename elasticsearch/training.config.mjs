@@ -27,7 +27,7 @@ export default defineConfig({
       class: 'text-center',
       highlighter: 'shiki',
       lineNumbers: true,
-      info: '## Elasticsearch\nElasticsearch training — 3 days: cluster and indexing, search and aggregation, testing and operating your cluster.\n',
+      info: '## Elasticsearch\nElasticsearch training — 3 days: indexing, search and aggregation, then testing, installing and operating your cluster.\n',
       drawings: { persist: false },
       transition: 'slide-left',
       css: 'unocss',

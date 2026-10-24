@@ -728,7 +728,19 @@ PUT /_cluster/settings
   - Ensure balanced load across clusters.
 
 
+
 ---
 layout: cover
 ---
-# Practical Part
+
+# Hands-on
+
+## Workshop 4 - Search: Lucene, Query DSL, geo and Cross Cluster Search
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/04_search/</code> — steps in its <code>README.md</code></div>
+
+- The Lucene syntax in `q=`
+- Full-text queries: `match`, every word, phrase, several fields, typos
+- Exact values, ranges, distances and boxes
+- A `bool` query with its four clauses; sort, paginate, choose the fields
+- One search across two clusters

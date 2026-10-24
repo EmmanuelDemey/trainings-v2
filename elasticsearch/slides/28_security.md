@@ -237,7 +237,18 @@ layout: cover
 
 # Spaces in Kibana
 
+
 ---
 layout: cover
 ---
-# Practical Part
+
+# Hands-on
+
+## Workshop 10 - Alerting and access control
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/10_alerting_rbac/</code> — steps in its <code>README.md</code></div>
+
+- A Kibana rule that fires, with a server log action
+- A webhook connector, and an index connector for the history
+- Roles and users: a read allowed, a write refused
+- Document-Level Security: each team sees its own orders

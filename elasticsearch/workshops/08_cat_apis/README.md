@@ -1,4 +1,4 @@
-# Workshop 12 — Inspecting the cluster with the _cat APIs
+# Workshop 8 — Inspecting the cluster with the _cat APIs
 
 > Use the _cat APIs to inspect quickly the state of the cluster, its indices, its shards and how resources are allocated.
 

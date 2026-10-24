@@ -1,4 +1,4 @@
-# Workshop 10 — ILM and data retention: solution
+# Workshop 11 — ILM and data retention: solution
 
 For the trainer. Not published: the learners find these requests themselves.
 The CI replays them right after the setup of the workshop README, and checks

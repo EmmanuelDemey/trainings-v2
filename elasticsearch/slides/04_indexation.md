@@ -512,7 +512,17 @@ PUT products/_settings
 ```
 
 
+
 ---
 layout: cover
 ---
-# Practical Section
+
+# Hands-on
+
+## Workshop 1 - Getting started: indexing and basic search
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/01_indexing_search/</code> — steps in its <code>README.md</code></div>
+
+- Create the `products` index: one shard, no replica
+- Index five products, and count them
+- A first full-text search, then one with a filter

@@ -385,5 +385,14 @@ PUT _index_template/template_1
 ---
 layout: cover
 ---
-# Practical Section
 
+# Hands-on
+
+## Workshop 2 - Documents, bulk, aliases and templates
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/02_documents_alias_templates/</code> — steps in its <code>README.md</code></div>
+
+- Create, read, update and delete a document — partial update, script, replacement
+- Load a catalog with `_bulk`, and read what failed
+- Hide the index behind a read alias, then a filtered one
+- An index template for next year's index, and an alias switch without downtime

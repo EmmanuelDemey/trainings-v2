@@ -125,7 +125,7 @@ Reference: [Create a snapshot with SLM](https://www.elastic.co/docs/deploy-manag
 
 ### Setup of this part
 
-Check that a repository exists (created in workshop 11):
+Check that a repository exists (created in workshop 12):
 
 <!-- ci: skip -->
 ```json
