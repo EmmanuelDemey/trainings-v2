@@ -289,6 +289,31 @@ export class TypeDirective {
 
 ---
 
+# HOST_TAG_NAME
+
+- Le token **HOST_TAG_NAME** permet de récupérer le nom de la balise de l'élément hôte d'une directive ou d'un composant
+- Pratique pour adapter le comportement d'une directive selon l'élément sur lequel elle est posée
+
+```typescript
+import { Directive, HOST_TAG_NAME, inject } from "@angular/core";
+
+@Directive({
+  selector: "[appClickable]",
+  host: { "[attr.role]": "role", "[attr.tabindex]": "tabIndex" },
+})
+export class ClickableDirective {
+  private tagName = inject(HOST_TAG_NAME); // "button", "div", ...
+
+  role = this.tagName === "button" ? null : "button";
+  tabIndex = this.tagName === "button" ? null : 0;
+}
+```
+
+- L'injection doit se faire à la construction (constructeur ou initialisation d'un champ)
+- Sur un `<ng-container>` ou un `<ng-template>`, il n'y a pas d'élément DOM : une erreur est levée, sauf avec `inject(HOST_TAG_NAME, { optional: true })` qui renvoie `null`
+
+---
+
 # Directive Composition API
 
 - Cet API permet d'activer des **directives** existantes sur le **host** d'un composat
