@@ -607,9 +607,9 @@ layout: cover
 
 # Hands-on
 
-## Workshop 13 - Monitoring
+## Workshop 15 - Monitoring
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/13_monitoring/</code> — steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/15_monitoring/</code> — steps in its <code>README.md</code></div>
 
 - Cluster health, unassigned shards and why
 - Heap, GC, CPU, disk, indexing and search per node
@@ -621,9 +621,9 @@ layout: cover
 
 # Hands-on
 
-## Workshop 14 - Advanced architecture and production
+## Workshop 16 - Advanced architecture and production
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/14_production_architecture/</code> — steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/16_production_architecture/</code> — steps in its <code>README.md</code></div>
 
 - Shard allocation awareness across two zones
 - Snapshot Lifecycle Management policies

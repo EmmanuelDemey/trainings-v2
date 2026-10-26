@@ -1,8 +1,8 @@
-# Workshop 3 — Mapping and analyzers
+# Workshop 3 — Mapping, analyzers, aliases and templates
 
-> Create an index with an explicit mapping, to control exactly how the data is indexed and how it can be searched.
+> Create an index with an explicit mapping, to control exactly how the data is indexed and how it can be searched. Then decouple the application from its indices with aliases, and apply mappings and settings automatically with index templates.
 
-**Topic**: General concepts — Mappings
+**Topic**: General concepts — Mappings, aliases and templates
 
 ## Context
 
@@ -12,15 +12,21 @@ Each step states **what** to do, not **how**: find the API in the documentation,
 
 ## Setup
 
-This workshop stands on its own. If a `blog_posts` index is already there, delete it:
+This workshop stands on its own. If a previous attempt left the `blog_posts` index, `books-*` indices or the `books` template behind, delete them:
 
 ```json
 DELETE /blog_posts
 ```
 
+<!-- ci: skip -->
+```json
+DELETE /books-*
+DELETE /_index_template/books
+```
+
 Reference: [Field data types](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/field-data-types).
 
-## Exercises
+## Part A: Mapping and analyzers
 
 ### Step 1: Create the index with an explicit mapping
 
@@ -242,12 +248,187 @@ There is an API to [get the mapping of one field](https://www.elastic.co/docs/ap
 
 **Try**: forbid the index to accept unknown fields from now on, then index a fifth post with an `other_field`. What happens?
 
+## Part B: Aliases
+
+An online bookshop keeps its catalog in `books-2025`. Every year the catalog is reindexed into a new index (`books-2026`…), without the application that queries it noticing: you set up the alias and the template that make that switch seamless.
+
+References: [Aliases](https://www.elastic.co/docs/manage-data/data-store/aliases), [Index templates](https://www.elastic.co/docs/manage-data/data-store/templates).
+
+### Step 5: Load the catalog
+
+The request is given: run it.
+
+```json
+PUT /books-2025
+{
+  "settings": { "number_of_shards": 1, "number_of_replicas": 0 }
+}
+
+POST /books-2025/_bulk?refresh=true
+{"index":{"_id":"9782070612758"}}
+{"title":"The Little Prince","author":"Antoine de Saint-Exupéry","year":1943,"stock":3}
+{"index":{"_id":"9782070360024"}}
+{"title":"The Stranger","author":"Albert Camus","year":1942,"stock":6}
+{"index":{"_id":"9782070368228"}}
+{"title":"The Plague","author":"Albert Camus","year":1947,"stock":2}
+{"index":{"_id":"9782070360086"}}
+{"title":"The Fall","author":"Albert Camus","year":1956,"stock":1}
+{"index":{"_id":"9782253006329"}}
+{"title":"Germinal","author":"Émile Zola","year":1885,"stock":4}
+{"index":{"_id":"9782253004226"}}
+{"title":"Madame Bovary","author":"Gustave Flaubert","year":1857,"stock":1}
+```
+
+**Expected result**:
+
+```json
+{
+  "errors": false
+}
+```
+
+### Step 6: A read alias
+
+The application queries `books`, never `books-2025`. Make `books` an **alias** of `books-2025`, then count the documents through it.
+
+<details>
+<summary>Hint</summary>
+
+The [aliases API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-update-aliases) takes a list of `actions`.
+
+</details>
+
+**Expected result** (the count):
+
+```json
+{
+  "count": 6
+}
+```
+
+### Step 7: A filtered alias
+
+Create the alias `books-camus`: on `books-2025`, it only shows the books whose `author` matches `Camus`. Count through it.
+
+<details>
+<summary>Hint</summary>
+
+An alias can carry a `filter`: a query. The one you need is `{ "match": { "author": "Camus" } }`.
+
+</details>
+
+**Expected result**:
+
+```json
+{
+  "count": 3
+}
+```
+
+## Part C: Index templates
+
+### Step 8: The template
+
+Create the index template `books`, so that every future `books-*` index gets:
+
+- one shard, no replica;
+- this mapping: `title` a `text` with the `english` analyzer, `author` a `text` with a `keyword` sub-field, `year` and `stock` `integer`;
+- the alias `books-next`.
+
+<details>
+<summary>Hint</summary>
+
+The [index template API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-put-index-template): `index_patterns` says which indices, `template` holds `settings`, `mappings` and `aliases`.
+
+</details>
+
+### Step 9: Simulate before creating
+
+**Without creating it**, ask Elasticsearch what `books-2026` would look like if it were created now.
+
+<details>
+<summary>Hint</summary>
+
+The index template API has a `_simulate_index` endpoint.
+
+</details>
+
+**Expected result**:
+
+```json
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "title": { "type": "text", "analyzer": "english" }
+      }
+    },
+    "aliases": { "books-next": {} }
+  }
+}
+```
+
+### Step 10: Next year's index
+
+Load these two books into `books-2026` — **without creating the index first** — then look at its mapping:
+
+```text
+9782070612758  { "title": "The Little Prince", "author": "Antoine de Saint-Exupéry", "year": 1943, "stock": 10 }
+9782070360024  { "title": "The Stranger",      "author": "Albert Camus",             "year": 1942, "stock": 8 }
+```
+
+**Expected result** (the mapping):
+
+```json
+{
+  "books-2026": {
+    "mappings": {
+      "properties": {
+        "title": { "type": "text", "analyzer": "english" },
+        "year": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+**Try**: compare with the mapping of `books-2025`. Why did the template not change it?
+
+### Step 11: Switch the alias without downtime
+
+Move the alias `books` from `books-2025` to `books-2026` so that **no request ever sees it empty, nor pointing at both**. Then count through `books`, and ask which index `books` points at.
+
+<details>
+<summary>Hint</summary>
+
+The actions of one call to the aliases API are applied atomically.
+
+</details>
+
+**Expected result** (the count, then the alias):
+
+```json
+{
+  "count": 2
+}
+```
+
+```json
+{
+  "books-2026": { "aliases": { "books": {} } }
+}
+```
+
+**Question**: what could a request see if you did it in two calls?
+
 ## Success criteria
 
 - An index created with an explicit mapping and a custom analyzer
 - Full-text search goes through the `english` analysis
 - Exact filtering on `author`, a date range, and a 50 km radius return the right posts
 - You know what the dynamic mapping does with an unknown field, and how to forbid it
+- The alias `books` points at `books-2026`; the filtered alias `books-camus` counts 3 books
+- The template `books` applies to every new `books-*` index
 
 ## Troubleshooting
 
@@ -259,3 +440,6 @@ There is an API to [get the mapping of one field](https://www.elastic.co/docs/ap
 
 **Problem**: the geo search fails, or finds nothing
 → The field must be a `geo_point` **before** the documents are indexed: a `lat`/`lon` pair mapped dynamically becomes two `float`s. Delete the index and start again.
+
+**Problem**: the mapping of `books-2026` is not the template's
+→ The index existed before the template: a template only applies when an index is **created**. Delete it and do step 10 again.

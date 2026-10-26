@@ -1,4 +1,4 @@
-# Workshop 3 — Mapping and analyzers: solution
+# Workshop 3 — Mapping, analyzers, aliases and templates: solution
 
 For the trainer. Not published: the learners find these requests themselves.
 The CI replays them right after the setup of the workshop README, and checks
@@ -257,3 +257,172 @@ POST /blog_posts/_doc/5
 
 `dynamic: false` would accept the document and keep the field in `_source`,
 without indexing it.
+
+## Step 6
+
+```json
+POST /_aliases
+{
+  "actions": [
+    { "add": { "index": "books-2025", "alias": "books" } }
+  ]
+}
+```
+
+```json
+GET /books/_count
+```
+
+**Expected result**:
+
+```json
+{
+  "count": 6
+}
+```
+
+## Step 7
+
+```json
+POST /_aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "books-2025",
+        "alias": "books-camus",
+        "filter": { "match": { "author": "Camus" } }
+      }
+    }
+  ]
+}
+```
+
+```json
+GET /books-camus/_count
+```
+
+**Expected result**:
+
+```json
+{
+  "count": 3
+}
+```
+
+## Step 8
+
+```json
+PUT /_index_template/books
+{
+  "index_patterns": ["books-*"],
+  "template": {
+    "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+    "mappings": {
+      "properties": {
+        "title":  { "type": "text", "analyzer": "english" },
+        "author": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+        "year":   { "type": "integer" },
+        "stock":  { "type": "integer" }
+      }
+    },
+    "aliases": { "books-next": {} }
+  }
+}
+```
+
+## Step 9
+
+```json
+POST /_index_template/_simulate_index/books-2026
+```
+
+**Expected result**:
+
+```json
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "title": { "type": "text", "analyzer": "english" }
+      }
+    },
+    "aliases": { "books-next": {} }
+  }
+}
+```
+
+`books-camus` would not match: the template pattern is `books-*`, but templates
+apply to indices, not aliases — and `books-camus` is an alias.
+
+## Step 10
+
+```json
+POST /books-2026/_bulk?refresh=true
+{"index":{"_id":"9782070612758"}}
+{"title":"The Little Prince","author":"Antoine de Saint-Exupéry","year":1943,"stock":10}
+{"index":{"_id":"9782070360024"}}
+{"title":"The Stranger","author":"Albert Camus","year":1942,"stock":8}
+```
+
+```json
+GET /books-2026/_mapping
+```
+
+**Expected result**:
+
+```json
+{
+  "books-2026": {
+    "mappings": {
+      "properties": {
+        "title": { "type": "text", "analyzer": "english" },
+        "year": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+`books-2025` keeps its dynamic mapping (`year` is a `long`, `title` uses the
+standard analyzer): it existed before the template, which only applies when an
+index is created.
+
+## Step 11
+
+```json
+POST /_aliases
+{
+  "actions": [
+    { "remove": { "index": "books-2025", "alias": "books" } },
+    { "add":    { "index": "books-2026", "alias": "books" } }
+  ]
+}
+```
+
+```json
+GET /books/_count
+```
+
+**Expected result**:
+
+```json
+{
+  "count": 2
+}
+```
+
+```json
+GET /_alias/books
+```
+
+**Expected result**:
+
+```json
+{
+  "books-2026": { "aliases": { "books": {} } }
+}
+```
+
+Two separate calls would leave a moment where `books` points at nothing (remove
+first) or at both indices (add first, so every book counted twice).

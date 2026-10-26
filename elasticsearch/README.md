@@ -77,7 +77,7 @@ the data the setup created: the solutions are proven to give the expected result
 docker build -t training-es ../elasticsearch-common/ci && docker run -d --rm --name training-es -p 9200:9200 training-es
 export ES_PASSWORD=training
 node ../scripts/check-console.mjs .            # everything
-node ../scripts/check-console.mjs . 11_ilm     # one file
+node ../scripts/check-console.mjs . 13_ilm     # one file
 ```
 
 - A comment before a block tunes its check: `<!-- ci: skip -->` (several nodes, a

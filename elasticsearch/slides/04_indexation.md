@@ -526,3 +526,16 @@ layout: cover
 - Create the `products` index: one shard, no replica
 - Index five products, and count them
 - A first full-text search, then one with a filter
+
+---
+layout: cover
+---
+
+# Hands-on
+
+## Workshop 2 - Documents and bulk
+
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/02_documents_bulk/</code> — steps in its <code>README.md</code></div>
+
+- Create, read, update and delete a document — partial update, script, replacement
+- Load a catalog with `_bulk`, and read what failed
