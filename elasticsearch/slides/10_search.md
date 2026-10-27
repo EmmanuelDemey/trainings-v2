@@ -735,7 +735,7 @@ layout: cover
 
 # Hands-on
 
-## Workshop 4 - Search: Lucene, Query DSL, geo and Cross Cluster Search
+## Workshop 4 - Search: Lucene, Query DSL and geo
 
 <div style="opacity:.7; font-size:.85em">📁 <code>workshops/04_search/</code> — steps in its <code>README.md</code></div>
 

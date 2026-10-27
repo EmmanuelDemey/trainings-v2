@@ -66,7 +66,7 @@ GET /products/_count
 Given in the README; replayed here, once the index exists:
 
 ```json
-GET /products/_search
+POST /products/_search
 {
   "query": {
     "match": { "description": "adjustable" }
@@ -83,7 +83,7 @@ the query. `adjust` finds nothing: the standard analyzer does not stem — an
 Given in the README:
 
 ```json
-GET /products/_search
+POST /products/_search
 {
   "query": {
     "bool": {

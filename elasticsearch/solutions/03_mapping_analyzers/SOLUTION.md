@@ -73,7 +73,7 @@ POST /blog_posts/_bulk
 The four searches are given in the README; replayed here, once the posts exist:
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "query": {
     "match": { "content": "optimizing performance" }
@@ -88,7 +88,7 @@ GET /blog_posts/_search
 ```
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "query": {
     "term": { "author": "Jean Dupont" }
@@ -103,7 +103,7 @@ GET /blog_posts/_search
 ```
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "query": {
     "range": { "published_date": { "gte": "2023-11-01" } }
@@ -118,7 +118,7 @@ GET /blog_posts/_search
 ```
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "query": {
     "geo_distance": {
@@ -176,7 +176,7 @@ but indexes nothing of it.
 The search of the README returns no hit:
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "query": { "match": { "metadata.source": "import" } }
 }

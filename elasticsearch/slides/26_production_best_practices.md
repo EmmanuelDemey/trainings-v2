@@ -916,9 +916,9 @@ layout: cover
 
 # Hands-on
 
-## Workshop 12 - Alerting
+## Workshop 14 - Alerting
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/12_alerting/</code> — steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/14_alerting/</code> — steps in its <code>README.md</code></div>
 
 - A Kibana rule that fires, with a server log action
 - A webhook connector, and an index connector for the history

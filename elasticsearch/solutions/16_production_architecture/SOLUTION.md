@@ -369,7 +369,7 @@ POST /_security/user/susan_hrmanager
 curl -u jane_hr:HRPass456! "https://localhost:9200/employees_full/_doc/1?pretty"
 curl -u susan_hrmanager:ManagerPass789! "https://localhost:9200/employees_full/_doc/2?pretty"
 
-curl -u intern_view:InternPass123! -X GET "https://localhost:9200/employees_full/_search?pretty" \
+curl -u intern_view:InternPass123! -X POST "https://localhost:9200/employees_full/_search?pretty" \
   -H 'Content-Type: application/json' \
   -d '{"size":0,"aggs":{"avg_salary":{"avg":{"field":"salary"}}}}'
 ```
@@ -417,7 +417,7 @@ POST /_security/user/sales_viewer
 ```
 
 ```bash
-curl -u sales_viewer:SalesView123! "https://localhost:9200/employees_full/_search?pretty"
+curl -u sales_viewer:SalesView123! -X POST "https://localhost:9200/employees_full/_search?pretty"
 ```
 
 ## Part D: A complete production architecture

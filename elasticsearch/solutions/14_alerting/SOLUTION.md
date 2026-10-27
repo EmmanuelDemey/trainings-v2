@@ -1,4 +1,4 @@
-# Workshop 12 — Alerting: solution
+# Workshop 14 — Alerting: solution
 
 For the trainer. Not published: the learners find these themselves.
 The CI replays the requests right after the setup of the workshop README.
@@ -124,7 +124,7 @@ The document, with the current date, then:
 
 <!-- ci: skip -->
 ```json
-GET /alert-history/_search
+POST /alert-history/_search
 {
   "query": { "range": { "@timestamp": { "gte": "now-1h" } } },
   "sort": [{ "@timestamp": "desc" }]

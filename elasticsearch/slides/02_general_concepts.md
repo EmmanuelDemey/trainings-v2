@@ -90,9 +90,9 @@ An [inverted index](https://www.elastic.co/guide/en/elasticsearch/reference/curr
 elasticsearch → [1, 2, 3]
 fast          → [1]
 kibana        → [2]
-visualizes    → [2]
 logstash      → [3]
 sends         → [3]
+visualizes    → [2]
 ```
 
 Searching "elasticsearch" instantly returns docs 1, 2, 3!

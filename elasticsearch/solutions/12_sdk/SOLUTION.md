@@ -1,4 +1,4 @@
-# Workshop 9 — Develop with an SDK: solution
+# Workshop 12 — Develop with an SDK: solution
 
 For the trainer. Not published: the learners write this code themselves. No
 `package.json` here on purpose — the workshop is checked by hand, not by the CI.

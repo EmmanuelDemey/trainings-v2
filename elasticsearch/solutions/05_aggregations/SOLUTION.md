@@ -7,7 +7,7 @@ each « Expected result ».
 ## Step 1
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "size": 0,
   "aggs": {
@@ -37,7 +37,7 @@ GET /blog_posts/_search
 ## Step 2
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "size": 0,
   "aggs": {
@@ -68,7 +68,7 @@ by name.
 ## Step 3
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "size": 0,
   "aggs": {
@@ -105,7 +105,7 @@ histogram).
 ## Step 4
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "size": 0,
   "aggs": {
@@ -155,7 +155,7 @@ Sorted by total views: `"order": { "total_views": "desc" }` on the `terms`.
 ## Step 5
 
 ```json
-GET /blog_posts/_search
+POST /blog_posts/_search
 {
   "size": 0,
   "aggs": {

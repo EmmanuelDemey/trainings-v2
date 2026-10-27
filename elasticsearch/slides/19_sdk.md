@@ -166,9 +166,9 @@ layout: cover
 
 # Hands-on
 
-## Workshop 9 - Develop with an SDK, test with Testcontainers
+## Workshop 12 - Develop with an SDK, test with Testcontainers
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/09_sdk/</code> — steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/12_sdk/</code> — steps in its <code>README.md</code></div>
 
 - A catalog module with the official Node.js client: connect, create, bulk-index, search, aggregate
 - Integration tests against a real Elasticsearch started by Testcontainers

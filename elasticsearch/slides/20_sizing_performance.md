@@ -625,9 +625,9 @@ layout: cover
 
 # Hands-on
 
-## Workshop 11 - Sizing and performance
+## Workshop 13 - Sizing and performance
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/11_sizing_performance/</code> — steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/13_sizing_performance/</code> — steps in its <code>README.md</code></div>
 
 - Size a logs cluster: volume, shards per day, per node
 - A template for the daily indices

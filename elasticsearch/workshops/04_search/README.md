@@ -1,8 +1,8 @@
-# Workshop 4 — Search: Lucene, Query DSL, geo and Cross Cluster Search
+# Workshop 4 — Search: Lucene, Query DSL and geo
 
-> Query a dataset of restaurants with the Lucene syntax, then with the Query DSL: full-text, exact, geographic and boolean searches, sorting and pagination, and finally a search across several clusters.
+> Query a dataset of restaurants with the Lucene syntax, then with the Query DSL: full-text, exact, geographic and boolean searches, sorting and pagination.
 
-**Topic**: Search — Lucene, Query DSL, Cross Cluster Search
+**Topic**: Search — Lucene, Query DSL
 
 ## Context
 
@@ -451,101 +451,16 @@ Look at [paginate](https://www.elastic.co/docs/reference/elasticsearch/rest-apis
 
 **Try**: fetch the next page.
 
-## Part F: Cross Cluster Search
-
-Cross Cluster Search queries, in one request, indices spread over several clusters. To practise with one cluster, declare it as its **own** remote cluster, under the alias `guide`. Reference: [Cross-cluster search](https://www.elastic.co/docs/explore-analyze/cross-cluster-search).
-
-### Step 1: Declare the remote cluster
-
-Declare the remote cluster `guide`, whose seed is the transport address of your own node, `127.0.0.1:9300`. Then check that it is connected.
-
-<details>
-<summary>Hint</summary>
-
-A remote cluster is a persistent [cluster setting](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-put-settings) under `cluster.remote.<alias>`. Another API gives the state of the remote clusters.
-
-</details>
-
-**Expected result**:
-
-```json
-{
-  "guide": {
-    "connected": true,
-    "mode": "sniff"
-  }
-}
-```
-
-### Step 2: Search the remote cluster
-
-Find the restaurants of **Lille** in `restaurants` of the **remote** cluster `guide`.
-
-<details>
-<summary>Hint</summary>
-
-The index name takes a prefix.
-
-</details>
-
-**Expected result**:
-
-```json
-{
-  "_clusters": { "total": 1, "successful": 1 },
-  "hits": {
-    "hits": [{ "_index": "guide:restaurants", "_id": "7" }]
-  }
-}
-```
-
-### Step 3: Search the local and the remote at once
-
-Same search, on the local **and** the remote `restaurants` in one request.
-
-<details>
-<summary>Hint</summary>
-
-Several indices are separated by commas.
-
-</details>
-
-**Expected result**:
-
-```json
-{
-  "_clusters": { "total": 2, "successful": 2 },
-  "hits": { "total": { "value": 2 } }
-}
-```
-
-**Question**: what happens when the remote cluster stops answering? Look for the `skip_unavailable` setting.
-
-### Step 4: Clean up
-
-Remove the remote cluster `guide`.
-
-<details>
-<summary>Hint</summary>
-
-A cluster setting set to `null` is removed.
-
-</details>
-
 ## Success criteria
 
 - You can turn a Lucene search (`q=`) into Query DSL
 - You can tell full-text queries (`match`…) from exact ones (`term`, `range`…)
 - The boolean search of part E returns Chez Paul and Le Bouchon Lyonnais
-- One request searches two clusters
 
 ## Troubleshooting
 
 **Problem**: a `term` finds nothing on a `text` field
 → The indexed text was analysed (lowercase, stems…). Use `match`, or a `keyword` field.
-
-**Problem**: the remote cluster shows `"connected": false`
-→ The transport port is not `9300`, or does not listen on `127.0.0.1`: check `GET /_nodes/_local/transport?filter_path=**.publish_address`.
 
 **Problem**: a geo query returns nothing
 → The field must be mapped as `geo_point` **before** indexing: a dynamically mapped `lat`/`lon` pair becomes two `float`s.

@@ -11,10 +11,10 @@ first.
 - a reachable **Elasticsearch** cluster (`GET /` must answer);
 - **Kibana**, to send the requests from **Dev Tools** (Console) — the setup blocks
   `GET /…`, `PUT /…`, `POST /…` paste there as is;
-- a terminal, for the workshops that touch the node configuration (workshops 11,
-  13, 14 and 16) and for the `curl` calls.
+- a terminal, for the workshops that touch the node configuration (workshops 8,
+  9, 13 and 16) and for the `curl` calls.
 
-One node is enough (`yellow` status accepted). Workshop 9 is done in code
+One node is enough (`yellow` status accepted). Workshop 12 is done in code
 (Node.js, or the language of your choice) and needs **Docker** for
 Testcontainers.
 
@@ -31,16 +31,16 @@ trainer's solutions: each expected result is the one a correct answer gets.
 | 1 | 1 | `01_indexing_search/` | Create an index, index documents, `match` and `bool` |
 | 1 | 2 | `02_documents_bulk/` | Document CRUD, `_bulk` |
 | 1 | 3 | `03_mapping_analyzers/` | Explicit mapping, `text` vs `keyword`, analyzers, aliases, index templates |
-| 2 | 4 | `04_search/` | Lucene, Query DSL: full text, exact, geo, boolean, Cross Cluster Search |
+| 2 | 4 | `04_search/` | Lucene, Query DSL: full text, exact, geo, boolean |
 | 2 | 5 | `05_aggregations/` | Metrics, bucket and pipeline aggregations |
 | 2 | 6 | `06_ingest/` | Ingest pipelines: `grok`, `date`, conditions, `on_failure`, default pipeline |
 | 2 | 7 | `07_security/` | Users and roles (RBAC), Document-Level Security |
-| 2 | 8 | `08_esql/` | ES\|QL: filter, aggregate, `LOOKUP JOIN`, full text |
-| 3 | 9 | `09_sdk/` | Official client, tests with Testcontainers |
+| 2 | 8 | `08_ilm_retention/` | Hot-warm-cold architecture and ILM policies |
+| 2 | 9 | `09_snapshots/` | Repositories, snapshots and restores |
 | 3 | 10 | `10_cat_apis/` | Inspect the cluster with the `_cat` APIs |
-| 3 | 11 | `11_sizing_performance/` | Shard count, JVM heap, thread pools |
-| 3 | 12 | `12_alerting/` | Kibana Rules, webhooks, alert history |
-| 3 | 13 | `13_ilm_retention/` | Hot-warm-cold architecture and ILM policies |
-| 3 | 14 | `14_snapshots/` | Repositories, snapshots and restores |
+| 3 | 11 | `11_esql/` | ES\|QL: filter, aggregate, `LOOKUP JOIN`, full text |
+| 3 | 12 | `12_sdk/` | Official client, tests with Testcontainers |
+| 3 | 13 | `13_sizing_performance/` | Shard count, JVM heap, thread pools |
+| 3 | 14 | `14_alerting/` | Kibana Rules, webhooks, alert history |
 | 3 | 15 | `15_monitoring/` | Cluster health, node statistics, slow logs |
 | 3 | 16 | `16_production_architecture/` | Allocation awareness, SLM, Field-Level Security |

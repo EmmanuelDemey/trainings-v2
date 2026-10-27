@@ -1,4 +1,4 @@
-# Workshop 9 — Develop with an SDK, test with Testcontainers
+# Workshop 12 — Develop with an SDK, test with Testcontainers
 
 > Talk to Elasticsearch from code with the official client: create an index, bulk-index, search and aggregate — then test that code against a real Elasticsearch started by Testcontainers.
 

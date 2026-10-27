@@ -191,30 +191,6 @@ PUT movies_v2
 
 ---
 
-# Alias Configuration
-
-```json
-POST /_aliases
-{
-    "actions": [
-        {
-            "remove": {
-                "alias": "movies",
-                "index": "movies_v1"
-            }
-        },
-        {
-            "add": {
-                "alias": "movies",
-                "index": "movies_v2"
-            }
-        }
-    ]
-}
-```
-
----
-
 # Reindex API
 
 * We can reindex a complete index

@@ -173,7 +173,7 @@ PUT /slowlog-test/_settings
 ### Step 3
 
 ```json
-GET /slowlog-test/_search
+POST /slowlog-test/_search
 {
   "query": {
     "wildcard": {
@@ -199,7 +199,7 @@ and « content ».
 The aggregation:
 
 ```json
-GET /slowlog-test/_search
+POST /slowlog-test/_search
 {
   "size": 0,
   "aggs": {
@@ -229,7 +229,7 @@ The entry is an ECS JSON line: `elasticsearch.slowlog.took`, `took_millis`,
 ### Step 5
 
 ```json
-GET /slowlog-test/_search
+POST /slowlog-test/_search
 {
   "query": {
     "match": {

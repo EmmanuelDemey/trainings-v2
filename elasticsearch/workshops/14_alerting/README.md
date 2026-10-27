@@ -1,4 +1,4 @@
-# Workshop 12 — Alerting
+# Workshop 14 — Alerting
 
 > Create monitoring alerts with Kibana Rules, and wire them to advanced actions (webhook, index).
 

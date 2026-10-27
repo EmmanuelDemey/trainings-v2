@@ -16,14 +16,16 @@ layout: section
 - Mapping, analyzers, templates
 
 **Day 2 - Search and Aggregation**:
-- Lucene syntax, Query DSL, ES|QL, Cross Cluster Search
+- Lucene syntax, Query DSL
 - Metric, bucket and pipeline aggregations
+- ILM, data retention, snapshots
 
 **Day 3 - Testing and Operating the Cluster**:
+- Installation, cluster configuration and inspection
+- ES|QL
 - SDKs and Testcontainers
-- Installation and cluster configuration
 - Sizing, JVM, topology, security
-- ILM, snapshots, monitoring
+- Monitoring
 
 </v-clicks>
 

@@ -215,12 +215,59 @@ Une règle sur le **beacon** (Command and Control), dès 10:05 — au lieu de 10
 
 </details>
 
+## Exercice 7 (optionnel) — Pousser le case vers TheHive
+
+Le SOC suit ses incidents dans un outil dédié — Jira, ServiceNow, TheHive. Un **connector** pousse le case Kibana vers cet outil. Ici, [TheHive](https://docs.strangebee.com/thehive/), en local, à côté du lab. Il demande environ **1,5 Go de RAM** en plus.
+
+1. Démarrez TheHive, une fois la stack du lab lancée — le dossier `thehive/` du TP :
+
+   ```bash
+   cd thehive
+   docker compose up -d --wait
+   ```
+
+   Si le port `9000` est déjà pris sur votre machine : `THEHIVE_PORT=9010 docker compose up -d --wait`, et remplacez `9000` par `9010` dans les URL du **navigateur** et des `curl` ci-dessous (Kibana, lui, appelle toujours `http://thehive:9000`).
+
+2. Préparez TheHive : une organisation `soc`, un analyste pour vous, et un compte de service pour Kibana, avec sa clé d'API. Le compte `admin@thehive.local` / `secret` ne gère que les organisations et les comptes :
+
+   ```bash
+   H=http://localhost:9000; A=admin@thehive.local:secret
+   curl -s -u $A -H 'Content-Type: application/json' $H/api/v1/organisation \
+     -d '{"name":"soc","description":"Le SOC du lab"}'
+   curl -s -u $A -H 'Content-Type: application/json' $H/api/v1/user \
+     -d '{"login":"analyst@soc.local","name":"Analyste","profile":"analyst","organisation":"soc","password":"changeme"}'
+   curl -s -u $A -H 'Content-Type: application/json' $H/api/v1/user \
+     -d '{"login":"kibana@soc.local","name":"Kibana","profile":"analyst","organisation":"soc","type":"Service"}'
+   curl -s -u $A -X POST $H/api/v1/user/kibana@soc.local/key/renew   # affiche la clé d'API
+   ```
+
+3. Dans Kibana, **Stack Management → Connectors → Create connector → TheHive** :
+   - nom `TheHive du lab` ;
+   - URL `http://thehive:9000` — le nom du conteneur sur le réseau du lab, pas `localhost` ;
+   - Organisation `soc` ; API key : la clé de l'étape 2.
+
+4. Dans le case de l'exercice 5, panneau de droite, **External incident management system** : choisissez `TheHive du lab`, TLP **AMBER**. Puis **Push as TheHive incident**.
+5. Connectez-vous à TheHive, `http://localhost:9000`, en `analyst@soc.local` / `changeme` : le case y est.
+6. Dans Kibana, ajoutez un commentaire au case, puis **Update TheHive incident**. Le commentaire apparaît dans TheHive.
+
+**Question** : la severity *High* de Kibana, que devient-elle dans TheHive ? Et dans quel sens va la synchronisation ?
+
+<details>
+<summary>Réponse</summary>
+
+*High* devient la severity **3** de TheHive (1 *Low* → 4 *Critical*) ; titre, description, tags et commentaires suivent. La synchronisation va **dans un seul sens**, de Kibana vers TheHive, et seulement au **push** : ce qui change dans TheHive ne revient pas dans Kibana, et un commentaire Kibana n'arrive qu'au push suivant.
+
+</details>
+
+Pour arrêter TheHive : `docker compose down -v`, dans `thehive/`.
+
 ## Critères de succès
 
 - [ ] Les alertes sont triées : *Acknowledged*, puis *Closed* avec un motif
 - [ ] La timeline `Intrusion ws-02` contient les événements épinglés et leurs notes
 - [ ] Le case rassemble alertes, timeline, visualisation et observable
 - [ ] Vous savez nommer chaque étape de l'intrusion et sa tactique
+- [ ] *(optionnel)* Le case est dans TheHive, avec son dernier commentaire
 
 ## Dépannage
 
@@ -229,8 +276,11 @@ Une règle sur le **beacon** (Command and Control), dès 10:05 — au lieu de 10
 | Pas d'alertes | Règles du TP 5 absentes ou look-back trop court | Voir le setup |
 | La timeline est vide | Index de la timeline | Data view **Security** ; `logs-lab-*` dans `securitySolution:defaultIndex` |
 | *Add to case* grisé | Droits | Le rôle doit avoir *Cases: All* |
+| `network elastic-security-lab_default not found` | TheHive lancé avant le lab | `docker compose up -d --wait` dans `lab/`, puis dans `thehive/` |
+| Le push échoue : `ECONNREFUSED` ou `ENOTFOUND` | URL du connector | `http://thehive:9000`, pas `localhost` : c'est Kibana qui appelle |
+| Le push échoue : `401` | Clé d'API | Régénérez-la (`key/renew`) et collez-la dans le connector |
 
 ## Pour aller plus loin
 
 - **Timeline templates** : un template `host.name: {host.name}`, attaché à la règle PowerShell.
-- **Connectors** : un webhook (ou Jira) sur le case — **Push as …**.
+- **Connectors** : le même push vers Jira ou ServiceNow — un compte Jira Cloud gratuit, ou une *Personal Developer Instance* ServiceNow.

@@ -1,4 +1,4 @@
-# Workshop 8 — ES|QL: solution
+# Workshop 11 — ES|QL: solution
 
 For the trainer. Not published: the learners find these queries themselves.
 The CI replays them right after the setup of the workshop README, and checks

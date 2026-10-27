@@ -212,9 +212,9 @@ layout: cover
 
 # Hands-on
 
-## Workshop 8 - ES|QL: exploring logs with pipes
+## Workshop 11 - ES|QL: exploring logs with pipes
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/08_esql/</code> — steps in its <code>README.md</code></div>
+<div style="opacity:.7; font-size:.85em">📁 <code>workshops/11_esql/</code> — steps in its <code>README.md</code></div>
 
 - Filter, compute, sort and cut
 - Aggregate per page, and over time

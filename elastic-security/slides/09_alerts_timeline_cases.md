@@ -145,3 +145,4 @@ FROM .alerts-security.alerts-default
 
 * **Workshop 6** — Triage the alerts of workshop 5: build a timeline of the
   intrusion on `ws-02`, open a case, attach the evidence
+* *Optional* — push the case to **TheHive**, run locally next to the lab

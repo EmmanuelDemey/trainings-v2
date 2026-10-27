@@ -249,7 +249,7 @@ decide for each: retry it (`429`, too many requests), or report it (`409`,
 Given in the README; replayed here, once the index exists:
 
 ```json
-GET /books-2025/_search
+POST /books-2025/_search
 {
   "query": { "match_all": {} }
 }

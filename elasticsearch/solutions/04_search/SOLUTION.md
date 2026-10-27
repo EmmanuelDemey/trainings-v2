@@ -7,7 +7,7 @@ each « Expected result ».
 ## Part A — Step 1
 
 ```json
-GET /restaurants/_search?q=pizza
+POST /restaurants/_search?q=pizza
 ```
 
 **Expected result**:
@@ -26,7 +26,7 @@ Without a field, `q` searches every field.
 ## Part A — Step 2
 
 ```json
-GET /restaurants/_search?q=cuisine:french AND city:Paris
+POST /restaurants/_search?q=cuisine:french AND city:Paris
 ```
 
 **Expected result**:
@@ -45,7 +45,7 @@ GET /restaurants/_search?q=cuisine:french AND city:Paris
 ## Part A — Step 3
 
 ```json
-GET /restaurants/_search?q=price:[* TO 20]
+POST /restaurants/_search?q=price:[* TO 20]
 ```
 
 **Expected result**:
@@ -64,7 +64,7 @@ Behind a user-facing search box, a syntax error is an error 400 (`q=price:[* TO`
 ## Part B — Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "match": { "description": "pizza" }
@@ -88,7 +88,7 @@ The `english` analyzer stems « pizzas » to `pizza`: `GET /restaurants/_analyze
 ## Part B — Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "match": {
@@ -114,7 +114,7 @@ Without `operator`, Sakura (ramen, no broth) comes back too.
 ## Part B — Step 3
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "match_phrase": { "description": "fresh produce" }
@@ -138,7 +138,7 @@ A `match` would also find Le Vieux Port (« fresh fish »).
 ## Part B — Step 4
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "multi_match": {
@@ -162,7 +162,7 @@ GET /restaurants/_search
 ## Part B — Step 5
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "match": {
@@ -187,7 +187,7 @@ GET /restaurants/_search
 ## Part C — Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "term": { "cuisine": "japanese" }
@@ -211,7 +211,7 @@ GET /restaurants/_search
 ## Part C — Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "terms": { "city": ["Lyon", "Marseille"] }
@@ -233,7 +233,7 @@ GET /restaurants/_search
 ## Part C — Step 3
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "range": { "opened": { "gte": "2018-01-01" } }
@@ -255,7 +255,7 @@ GET /restaurants/_search
 ## Part D — Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "geo_distance": {
@@ -280,7 +280,7 @@ GET /restaurants/_search
 ## Part D — Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "term": { "city": "Paris" } },
   "sort": [
@@ -315,7 +315,7 @@ Each hit's `sort` value is its distance, in km.
 ## Part D — Step 3
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "geo_bounding_box": {
@@ -342,7 +342,7 @@ GET /restaurants/_search
 ## Part E — Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "bool": {
@@ -374,7 +374,7 @@ Chez Paul and Le Bouchon Lyonnais. With a `must`, the `should` only adds to the 
 ## Part E — Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "match_all": {} },
   "sort": [ { "rating": "desc" } ],
@@ -399,83 +399,3 @@ GET /restaurants/_search
 ```
 
 The next page: `"from": 3`.
-
-## Part F — Step 1
-
-```json
-PUT /_cluster/settings
-{
-  "persistent": {
-    "cluster.remote.guide.seeds": ["127.0.0.1:9300"]
-  }
-}
-```
-
-<!-- ci: retry -->
-```json
-GET /_remote/info
-```
-
-**Expected result**:
-
-```json
-{
-  "guide": {
-    "connected": true,
-    "mode": "sniff"
-  }
-}
-```
-
-## Part F — Step 2
-
-```json
-GET /guide:restaurants/_search
-{
-  "query": { "term": { "city": "Lille" } }
-}
-```
-
-**Expected result**:
-
-```json
-{
-  "_clusters": { "total": 1, "successful": 1 },
-  "hits": {
-    "hits": [{ "_index": "guide:restaurants", "_id": "7" }]
-  }
-}
-```
-
-## Part F — Step 3
-
-```json
-GET /restaurants,guide:restaurants/_search
-{
-  "query": { "term": { "city": "Lille" } }
-}
-```
-
-**Expected result**:
-
-```json
-{
-  "_clusters": { "total": 2, "successful": 2 },
-  "hits": { "total": { "value": 2 } }
-}
-```
-
-When the remote cluster does not answer: with `cluster.remote.guide.skip_unavailable: true`
-(the default since 8.15) the search succeeds with the local hits, and `_clusters` reports
-it `skipped`; with `false` the whole search fails.
-
-## Part F — Step 4
-
-```json
-PUT /_cluster/settings
-{
-  "persistent": {
-    "cluster.remote.guide.seeds": null
-  }
-}
-```
