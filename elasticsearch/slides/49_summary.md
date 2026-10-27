@@ -18,7 +18,7 @@ layout: section
 **Day 2 - Search and Aggregation**:
 - Lucene syntax, Query DSL
 - Metric, bucket and pipeline aggregations
-- ILM, data retention, snapshots
+- Snapshots, ILM and data retention
 
 **Day 3 - Testing and Operating the Cluster**:
 - Installation, cluster configuration and inspection

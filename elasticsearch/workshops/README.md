@@ -35,8 +35,8 @@ trainer's solutions: each expected result is the one a correct answer gets.
 | 2 | 5 | `05_aggregations/` | Metrics, bucket and pipeline aggregations |
 | 2 | 6 | `06_ingest/` | Ingest pipelines: `grok`, `date`, conditions, `on_failure`, default pipeline |
 | 2 | 7 | `07_security/` | Users and roles (RBAC), Document-Level Security |
-| 2 | 8 | `08_ilm_retention/` | Hot-warm-cold architecture and ILM policies |
-| 2 | 9 | `09_snapshots/` | Repositories, snapshots and restores |
+| 2 | 8 | `08_snapshots/` | Repositories, snapshots and restores |
+| 2 | 9 | `09_ilm_retention/` | Hot-warm-cold architecture and ILM policies |
 | 3 | 10 | `10_cat_apis/` | Inspect the cluster with the `_cat` APIs |
 | 3 | 11 | `11_esql/` | ES\|QL: filter, aggregate, `LOOKUP JOIN`, full text |
 | 3 | 12 | `12_sdk/` | Official client, tests with Testcontainers |
