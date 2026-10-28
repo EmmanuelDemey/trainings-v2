@@ -466,12 +466,3 @@ Number('hello')            // NaN
 # Hands-on
 
 ## Workshop 3 - Functions and arrays
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/03_syntax/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- Write a function `isEven(n)` and use it in a `filter`
-- Write a `celsiusToFahrenheit(c)` function and convert an array of temperatures with `map`
-- Compute the total price of a shopping cart with `reduce`
-- FizzBuzz: loop from 1 to 100, print `Fizz` / `Buzz` / `FizzBuzz`
-- Destructure a `{ name, role }` parameter and build the line with a template literal
-- `withLike(messages, id)` and `removeById(messages, id)` — the two moves of Day 3

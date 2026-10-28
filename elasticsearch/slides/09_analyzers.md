@@ -346,12 +346,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 3 - Mapping, analyzers, aliases and templates
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/03_mapping_analyzers/</code> — steps in its <code>README.md</code></div>
-
-- An explicit mapping: `text` with its `keyword`, `date`, `geo_point`, an object left unindexed
-- An `english` analyzer, and what `_analyze` makes of a text
-- One search per type of field
-- A field nobody mapped — then forbid unknown fields
-- Hide the index behind a read alias, then a filtered one
-- An index template for next year's index, and an alias switch without downtime

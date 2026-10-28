@@ -195,10 +195,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 6 - Ingest pipelines
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/06_ingest/</code> — steps in its <code>README.md</code></div>
-
-- Parse a raw access log with `grok`, tested with `_simulate`
-- A real `@timestamp` with `date`, a conditional `set`
-- Keep the lines that do not parse with `on_failure`
-- Index through the pipeline, then make it the default of the index

@@ -607,13 +607,7 @@ layout: cover
 
 # Hands-on
 
-## Workshop 15 - Monitoring
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/15_monitoring/</code> — steps in its <code>README.md</code></div>
-
-- Cluster health, unassigned shards and why
-- Heap, GC, CPU, disk, indexing and search per node
-- Slow logs: set the thresholds, catch a slow search, fix it
+## Workshop 17 - Monitoring
 
 ---
 layout: cover
@@ -621,11 +615,4 @@ layout: cover
 
 # Hands-on
 
-## Workshop 16 - Advanced architecture and production
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/16_production_architecture/</code> — steps in its <code>README.md</code></div>
-
-- Shard allocation awareness across two zones
-- Snapshot Lifecycle Management policies
-- Field-Level Security, combined with DLS
-- A production architecture for 500 GB/day
+## Workshop 18 - Advanced architecture and production

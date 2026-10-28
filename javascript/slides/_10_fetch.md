@@ -253,11 +253,3 @@ npx serve workshops/13_fetch     # then open the printed http://…
 # Hands-on
 
 ## Workshop 13 - Talking to a server
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/13_fetch/</code> — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
-
-- Load a JSON file with `fetch` and render it as a list
-- Handle the three states: loading, error, data
-- Rewrite the whole thing with `async` / `await` and `try` / `catch`
-- Check `response.ok` and make a 404 show a readable message
-- Bonus: a *Retry* button, and a search box that aborts its previous request

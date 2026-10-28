@@ -284,9 +284,12 @@ export function client(url, password, { timeout = 120_000 } = {}) {
   };
 }
 
-/** Removes what a workshop left behind: its data, templates, policies, snapshots and settings. */
-async function wipe(es) {
+/** Removes what a workshop left behind: its transforms, data, templates, policies, snapshots and settings. */
+export async function wipe(es) {
   const quiet = (method, path, body) => es.request({ method, path, body: body && JSON.stringify(body) });
+  // Transforms first: a continuous one would write its destination index again.
+  const { body: transforms } = await quiet('GET', '/_transform?size=1000');
+  for (const { id } of transforms.transforms ?? []) await quiet('DELETE', `/_transform/${id}?force=true`);
   await quiet('DELETE', '/_data_stream/*?expand_wildcards=all');
   // By name: action.destructive_requires_name forbids a wildcard.
   const { body: indices } = await quiet('GET', '/_cat/indices?format=json&h=index&expand_wildcards=open,closed');
@@ -384,7 +387,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log(`Elasticsearch ${info.version?.number}`);
   // Every workshop README, then every chapter of the deck: each one on its own,
   // the cluster wiped in between. An optional filter keeps the files whose path
-  // holds it: `node scripts/check-console.mjs elasticsearch 08_ilm`.
+  // holds it: `node scripts/check-console.mjs elasticsearch 09_ilm`.
   const numbered = async (folder, keep) =>
     (await readdir(join(dir, folder), { withFileTypes: true }))
       .filter((entry) => /^\d/.test(entry.name) && keep(entry))

@@ -206,5 +206,4 @@ GET /logs-custom-default/_mapping/field/source.ip
 
 # Practical part
 
-* **Workshop 2** — Load the lab dataset, read its events in ECS, and write a
-  pipeline that normalizes a raw `sshd` line
+## Workshop 2 — Elastic Common Schema

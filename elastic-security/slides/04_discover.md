@@ -163,5 +163,4 @@ POST /_query?format=txt
 
 # Practical part
 
-* **Workshop 3** — Investigate the lab dataset in Discover with KQL, Lucene and
-  ES|QL: the brute force, the PowerShell, the beacon
+## Workshop 3 — Discover: KQL, Lucene, ES|QL

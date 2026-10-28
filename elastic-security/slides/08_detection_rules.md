@@ -214,5 +214,4 @@ POST kbn:/api/detection_engine/rules
 
 # Practical part
 
-* **Workshop 5, part 2** — Write four rules on the lab dataset: a custom query,
-  a threshold, an EQL sequence, an ES|QL rule — and see them fire
+## Workshop 5, part 2 — Detection rules

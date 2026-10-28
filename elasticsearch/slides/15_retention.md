@@ -295,10 +295,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 9 - ILM and data retention
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/09_ilm_retention/</code> — steps in its <code>README.md</code></div>
-
-- Hot, warm and cold tiers
-- An ILM policy: rollover, shrink, force merge, searchable snapshot, delete
-- A data stream managed by that policy, and a rollover
-- Watch an index change phase

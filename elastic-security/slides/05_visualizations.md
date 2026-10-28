@@ -125,5 +125,4 @@ POST /_query?format=txt
 
 # Practical part
 
-* **Workshop 4, part 1** — Build Lens visualizations on the lab dataset: failed
-  logons over time, top talkers, rare processes, a failure-rate formula
+## Workshop 4, part 1 — Visualizations

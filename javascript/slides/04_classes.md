@@ -258,14 +258,6 @@ ada instanceof Account;                            // true
 
 ## Workshop 4 - Modelling a bank account
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/04_classes/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- A `Counter`: a public field, two methods, `new`
-- A `BankAccount` whose balance is **private**, read through a getter
-- A setter that validates the owner, a private method that guards every amount
-- An `InsufficientFundsError` you can catch by its type, and a private history
-- A `static` check built on `#balance in value`, and a `SavingsAccount` that `extends` it
-
 ---
 layout: cover
 ---

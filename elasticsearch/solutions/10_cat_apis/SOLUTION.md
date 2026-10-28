@@ -51,9 +51,24 @@ rebuilt elsewhere), `REPLICA_ADDED`, `ALLOCATION_FAILED` (the one to worry about
 GET /_cat/allocation?v
 ```
 
-The `UNASSIGNED` row counts the shards on no node. The low disk watermark, 85%
-by default, stops new shards on a node; the high one, 90%, moves shards away; the
-flood stage, 95%, makes its indices read-only.
+The `UNASSIGNED` row counts the shards on no node: on a single node, the replicas
+— here the two of `logs-2023.11`, which cannot sit next to their primary.
+
+The disk watermarks, by default:
+
+- **low**, 85%: no more shards allocated to the node — except the primaries of a
+  newly created index;
+- **high**, 90%: not even those, and shards are moved away;
+- **flood stage**, 95%: the indices with a shard on the node become read-only
+  (`index.blocks.read_only_allow_delete`), released once usage drops below high.
+
+On a large disk the percentage is not the whole story: each watermark has a
+`max_headroom` (200 GB, 150 GB, 100 GB) and stops applying while that much space
+is still free. On a 2 TB disk, low is reached at 1.8 TB used (90%), not at 85%.
+
+```json
+GET /_cluster/settings?include_defaults=true&filter_path=defaults.cluster.routing.allocation.disk
+```
 
 ## Step 5
 

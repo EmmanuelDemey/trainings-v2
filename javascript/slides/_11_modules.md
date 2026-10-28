@@ -160,11 +160,3 @@ button.addEventListener('click', async () => {
 # Hands-on
 
 ## Workshop 14 - Splitting an application
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/14_es_modules/</code> — <b>run it with <code>npx serve</code></b>, steps in its <code>README.md</code></div>
-
-- Split a working single-file app into `format.js`, `store.js` and `app.js`
-- Export named functions, import them, make the page work again
-- Prove that a module is only evaluated once
-- Add a default export, and load a module on demand with `import(...)`
-- Read the errors: a missing `./`, a missing `.js`, a name that is not exported

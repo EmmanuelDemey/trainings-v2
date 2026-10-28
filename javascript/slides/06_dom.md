@@ -142,11 +142,3 @@ fruits.forEach((fruit) => {
 # Hands-on
 
 ## Workshop 6 - Manipulating the page
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/06_dom/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- Select the title of a page and change its text
-- Hide / show a block by toggling a `hidden` class
-- Render an array of products as an HTML list with `createElement`
-- Add a "Remove" behavior that deletes an item from the list
-- Going further: the same selection with `getElementById` — and the live-collection trap

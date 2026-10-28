@@ -86,5 +86,4 @@ At the end of this chapter, you will be able to:
 
 # Practical part
 
-* **Workshop 4, part 2** — Assemble the visualizations into a *SOC — Lab overview*
-  dashboard, with controls and a drilldown to Discover
+## Workshop 4, part 2 — A SOC dashboard

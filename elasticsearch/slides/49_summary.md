@@ -22,7 +22,7 @@ layout: section
 
 **Day 3 - Testing and Operating the Cluster**:
 - Installation, cluster configuration and inspection
-- ES|QL
+- ES|QL, transforms
 - SDKs and Testcontainers
 - Sizing, JVM, topology, security
 - Monitoring

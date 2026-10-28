@@ -9,3 +9,11 @@ updates:
       interval: weekly
     commit-message:
       prefix: ci
+  # The OpenSearch the workshops of the OpenSearch training are replayed against
+  # (opensearch/ci/Dockerfile).
+  - package-ecosystem: docker
+    directory: /opensearch/ci
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci

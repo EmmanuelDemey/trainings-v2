@@ -170,10 +170,3 @@ errorZone.textContent = 'Email is required';    // the error IN the page, not in
 # Hands-on
 
 ## Workshop 7 - Interactive interfaces
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/07_events/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- A counter with `+` / `-` buttons that updates a displayed number
-- A character counter under a text field (`input` event)
-- A form with `submit` validation and error messages in the page
-- A mini todo-list: add a task, click on it to delete it

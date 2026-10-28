@@ -245,9 +245,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 7 - Security: users, roles and Document-Level Security
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/07_security/</code> — steps in its <code>README.md</code></div>
-
-- Who am I? The authenticate API
-- Roles and users: a read allowed, a write refused
-- Document-Level Security: each team sees its own orders

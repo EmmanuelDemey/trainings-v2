@@ -12,9 +12,9 @@ first.
 - **Kibana**, to send the requests from **Dev Tools** (Console) — the setup blocks
   `GET /…`, `PUT /…`, `POST /…` paste there as is;
 - a terminal, for the workshops that touch the node configuration (workshops 8,
-  9, 13 and 16) and for the `curl` calls.
+  9, 15 and 18) and for the `curl` calls.
 
-One node is enough (`yellow` status accepted). Workshop 12 is done in code
+One node is enough (`yellow` status accepted). Workshop 14 is done in code
 (Node.js, or the language of your choice) and needs **Docker** for
 Testcontainers.
 
@@ -39,8 +39,10 @@ trainer's solutions: each expected result is the one a correct answer gets.
 | 2 | 9 | `09_ilm_retention/` | Hot-warm-cold architecture and ILM policies |
 | 3 | 10 | `10_cat_apis/` | Inspect the cluster with the `_cat` APIs |
 | 3 | 11 | `11_esql/` | ES\|QL: filter, aggregate, `LOOKUP JOIN`, full text |
-| 3 | 12 | `12_sdk/` | Official client, tests with Testcontainers |
-| 3 | 13 | `13_sizing_performance/` | Shard count, JVM heap, thread pools |
-| 3 | 14 | `14_alerting/` | Kibana Rules, webhooks, alert history |
-| 3 | 15 | `15_monitoring/` | Cluster health, node statistics, slow logs |
-| 3 | 16 | `16_production_architecture/` | Allocation awareness, SLM, Field-Level Security |
+| 3 | 12 | `12_transforms_pivot/` | Transforms: pivot an index into an entity-centric one |
+| 3 | 13 | `13_transforms_continuous/` | Continuous transforms, `latest`, checkpoints |
+| 3 | 14 | `14_sdk/` | Official client, tests with Testcontainers |
+| 3 | 15 | `15_sizing_performance/` | Shard count, JVM heap, thread pools |
+| 3 | 16 | `16_alerting/` | Kibana Rules, webhooks, alert history |
+| 3 | 17 | `17_monitoring/` | Cluster health, node statistics, slow logs |
+| 3 | 18 | `18_production_architecture/` | Allocation awareness, SLM, Field-Level Security |

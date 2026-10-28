@@ -122,10 +122,3 @@ console.log(languages.lenght.toFixed(2));
 # Hands-on
 
 ## Workshop 1 - First steps
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/01_introduction/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- Open the developer tools on any website
-- Inspect and modify an element in the **Elements** panel
-- Run your first instructions in the **Console**
-- Create an HTML page that loads a `.js` file and logs a message

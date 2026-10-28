@@ -214,5 +214,4 @@ POST /_query?format=txt
 
 # Practical part
 
-* **Workshop 7** — The capstone: four hunt missions on the lab dataset, alone,
-  then as a team — and the rules they leave behind
+## Workshop 7 — Capstone: the hunt

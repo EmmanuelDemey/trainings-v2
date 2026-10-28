@@ -148,11 +148,17 @@ POST /_query?format=txt
 
 * Joins every row with the matching document of a **lookup index** (`index.mode: lookup`: one shard, replicated on every node)
 
+<!-- ci: skip -->
 ```json
-PUT /currencies
+PUT /countries
 {
   "settings": { "index.mode": "lookup" },
-  "mappings": { "properties": { "code": { "type": "keyword" } } }
+  "mappings": {
+    "properties": {
+      "country_code": { "type": "keyword" },
+      "country_name": { "type": "keyword" }
+    }
+  }
 }
 ```
 
@@ -213,10 +219,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 11 - ES|QL: exploring logs with pipes
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/11_esql/</code> — steps in its <code>README.md</code></div>
-
-- Filter, compute, sort and cut
-- Aggregate per page, and over time
-- Join a lookup index with `LOOKUP JOIN`
-- Full-text search, and a query with parameters

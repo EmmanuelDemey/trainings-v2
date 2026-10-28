@@ -1,7 +1,7 @@
 // node --test scripts/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, solutionPath, staleImages } from './check-console.mjs';
+import { consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, solutionPath, staleImages, wipe } from './check-console.mjs';
 
 const fence = (lang, body) => `\`\`\`${lang}\n${body}\n\`\`\``;
 
@@ -275,4 +275,21 @@ test('the solution of a workshop is solutions/<workshop>/SOLUTION.md, a chapter 
     '/repo/elasticsearch/solutions/06_aggregations/SOLUTION.md',
   );
   assert.equal(solutionPath('/repo/elasticsearch', 'slides/10_search.md'), null);
+});
+
+test('a wipe deletes the transforms first: a continuous one would recreate its destination index', async () => {
+  const sent = [];
+  const es = {
+    request: async ({ method, path }) => {
+      sent.push(`${method} ${path}`);
+      if (path.startsWith('/_transform')) return { status: 200, body: { transforms: [{ id: 'customers-live' }] } };
+      if (path.startsWith('/_cat/indices')) return { status: 200, body: [{ index: 'customers-live' }] };
+      return { status: 200, body: {} };
+    },
+  };
+
+  await wipe(es);
+  const transform = sent.indexOf('DELETE /_transform/customers-live?force=true');
+  assert.ok(transform >= 0, `no transform deleted: ${sent.join(', ')}`);
+  assert.ok(transform < sent.indexOf('DELETE /customers-live'));
 });

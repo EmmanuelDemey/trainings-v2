@@ -494,9 +494,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 10 - Inspecting the cluster with the _cat APIs
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/10_cat_apis/</code> — steps in its <code>README.md</code></div>
-
-- Every index, with chosen columns and sorted rows
-- The shards of an index, and why some are unassigned
-- Disk per node, pending tasks, the nodes in JSON

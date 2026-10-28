@@ -241,11 +241,3 @@ setInterval(() => {
 # Hands-on
 
 ## Workshop 5 - The window
-
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/05_window/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- Log the viewport size and the current URL in the console
-- Display a message 2 seconds after page load with `setTimeout`
-- Build a timer that logs every second and stops after 10 seconds
-- Bonus: a "Back to top" smooth scroll with `scrollTo`
-- Going further: display the date and a price with `Intl`, in two locales

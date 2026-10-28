@@ -108,5 +108,4 @@ src: ../../elasticsearch-common/slides/fleet/deploy-manage.md
 
 # Practical part
 
-* **Workshop 1** — Start the stack, set up Fleet Server, create an agent policy
-  with the System integration, and enroll an Elastic Agent
+## Workshop 1 — The lab, Fleet and a first Elastic Agent

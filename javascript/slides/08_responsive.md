@@ -86,13 +86,6 @@ mobileQuery.addEventListener('change', apply); // fires ONLY when crossing the b
 
 ## Workshop 8 - Responsive behavior
 
-<div style="opacity:.7; font-size:.85em">📁 <code>workshops/08_responsive/</code> — open <code>index.html</code>, steps in its <code>README.md</code></div>
-
-- Display the viewport width live in the page while resizing
-- Toggle a `mobile` class on `<body>` under 768px (via `resize`)
-- Rebuild the same feature with `matchMedia` and compare
-- Burger menu: hidden list on mobile, toggled by a button
-
 ---
 layout: cover
 ---

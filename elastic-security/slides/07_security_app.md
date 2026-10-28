@@ -148,5 +148,4 @@ At the end of this chapter, you will be able to:
 
 # Practical part
 
-* **Workshop 5, part 1** — Explore the lab dataset in the Security app: hosts,
-  users, network, the data quality dashboard
+## Workshop 5, part 1 — The Security app
