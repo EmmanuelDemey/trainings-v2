@@ -80,7 +80,7 @@ POST person/_search
 
 * Aggregation type that returns a metric.
     * e.g., calculating an average price.
-* Impossible to create nested metrics.
+* A metric aggregation cannot hold sub-aggregations: it is always a leaf of the tree.
 * Several types available: `max`, `min`, `sum`, `avg`, `stats`, ...
 
 ---
@@ -235,6 +235,13 @@ POST /movies/_search
 
 # Terms Aggregations
 
+* Only the **10** most frequent terms by default: set `"size"` in `terms` for more.
+* Each shard sends its own top terms, so the counts can be approximate on several shards: `doc_count_error_upper_bound` is the maximum error, `sum_other_doc_count` the documents of the terms not returned.
+
+---
+
+# Terms Aggregations
+
 * Here's the returned result.
 
 ```json
@@ -321,15 +328,6 @@ POST /museums/_search?size=0
 
 ---
 
-# Pipeline Aggregations
-
-* Aggregation that works with the output of a previous aggregation.
-* Two types of aggregations
-    * Parent
-    * Sibling
-
----
-
 # Nested Aggregations
 
 * As soon as we use `bucket` type aggregations, we can nest them.
@@ -353,6 +351,16 @@ POST /movies/_search
 ---
 
 # Pipeline Aggregations
+
+* Aggregation that works with the output of other aggregations, not with the documents.
+* Two types of aggregations
+    * **Parent**: placed inside a multi-bucket aggregation, it adds a value to each bucket (`derivative`, `cumulative_sum`, `moving_fn`)
+    * **Sibling**: placed next to it, it computes one value from all its buckets (`avg_bucket`, `max_bucket`, `sum_bucket`, `stats_bucket`)
+* `buckets_path` names the aggregation to read: `sales`, or `sales_per_month>sales` from a sibling
+
+---
+
+# Pipeline Aggregations: Parent
 
 ```json
 POST /sales/_search
@@ -430,6 +438,46 @@ POST /sales/_search
 }
 ```
 
+
+---
+
+# Pipeline Aggregations: Sibling
+
+* The average of the monthly sales: `avg_bucket` sits next to `sales_per_month`
+
+```json
+POST /sales/_search
+{
+    "size": 0,
+    "aggs" : {
+        "sales_per_month" : {
+            "date_histogram" : { "field" : "date", "calendar_interval" : "month" },
+            "aggs": {
+                "sales": { "sum": { "field": "price" } }
+            }
+        },
+        "avg_monthly_sales": {
+            "avg_bucket": { "buckets_path": "sales_per_month>sales" }
+        }
+    }
+}
+```
+
+---
+
+# Pipeline Aggregations: Sibling
+
+* One value, next to the buckets
+
+<!-- ci: no-compare -->
+```json
+{
+   "aggregations": {
+      "sales_per_month": { "buckets": [ ... ] },
+      "avg_monthly_sales": { "value": 328.33 }
+   }
+}
+```
 
 ---
 layout: cover

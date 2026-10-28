@@ -14,9 +14,9 @@ export default defineConfig({
   workshops: 'workshops',
   // The learners write the requests, run in Kibana Dev Tools against their own
   // cluster: the README gives the goal, a hint and the expected response. The
-  // requests live in solutions/<workshop>/SOLUTION.md, for the trainer and the
-  // CI only — never published, hence `false` — and there is no online editor.
-  solutions: false,
+  // requests live in solutions/<workshop>/SOLUTION.md, replayed by the CI and
+  // published as a ZIP per workshop on the Resources page. No online editor.
+  solutions: 'solutions',
 
   repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'elasticsearch' },
 

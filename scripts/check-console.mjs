@@ -284,7 +284,7 @@ export function client(url, password, { timeout = 120_000 } = {}) {
   };
 }
 
-/** Removes what a workshop left behind: its transforms, data, templates, policies, snapshots and settings. */
+/** Removes what a workshop left behind: its transforms, data, templates, policies, snapshots, users, roles and settings. */
 export async function wipe(es) {
   const quiet = (method, path, body) => es.request({ method, path, body: body && JSON.stringify(body) });
   // Transforms first: a continuous one would write its destination index again.
@@ -318,6 +318,15 @@ export async function wipe(es) {
   for (const repository of Object.keys(repositories)) {
     await quiet('DELETE', `/_snapshot/${repository}/*`);
     await quiet('DELETE', `/_snapshot/${repository}`);
+  }
+  // The users and roles a workshop created; the reserved ones (elastic, superuser…) stay.
+  const { body: roles } = await quiet('GET', '/_security/role');
+  for (const [name, role] of Object.entries(roles ?? {})) {
+    if (!role?.metadata?._reserved) await quiet('DELETE', `/_security/role/${name}`);
+  }
+  const { body: users } = await quiet('GET', '/_security/user');
+  for (const [name, user] of Object.entries(users ?? {})) {
+    if (!user?.metadata?._reserved) await quiet('DELETE', `/_security/user/${name}`);
   }
   await quiet('PUT', '/_cluster/settings', { persistent: { '*': null }, transient: { '*': null } });
 }

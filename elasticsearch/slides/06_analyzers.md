@@ -16,18 +16,20 @@ layout: cover
     * **Tokenizer**: Splits the text into tokens
     * **Token Filters**: Transform, add, or remove tokens
 
+![](/images/analyzer.png)
+
 ---
 
 # Analysis Pipeline
 
 ```
-"The Quick Brown FOX!"
+"<p>The Quick Brown FOX!</p>"
         ↓
-  [Character Filters]  →  "the quick brown fox"
+  [Character Filters]  →  "The Quick Brown FOX!"              (html_strip)
         ↓
-     [Tokenizer]       →  ["the", "quick", "brown", "fox"]
+     [Tokenizer]       →  ["The", "Quick", "Brown", "FOX"]    (standard)
         ↓
-   [Token Filters]     →  ["quick", "brown", "fox"]  (stopwords removed)
+   [Token Filters]     →  ["quick", "brown", "fox"]           (lowercase, then stop)
 ```
 
 ---
@@ -65,6 +67,10 @@ GET /_analyze
 ```
 **Result**: `["the", "quick", "brown", "fox"]`
 
+---
+
+# Built-in Analyzers Examples
+
 ## Whitespace Analyzer
 ```json
 GET /_analyze
@@ -84,6 +90,10 @@ GET /_analyze
 }
 ```
 **Result**: `["The Quick Brown FOX!"]`
+
+---
+
+# Built-in Analyzers Examples
 
 ## French Analyzer
 ```json
@@ -139,7 +149,7 @@ GET /_analyze
 {
   "tokenizer": "standard",
   "filter": ["lowercase", "asciifolding"],
-  "text": "Cafe resume"
+  "text": "Café Résumé"
 }
 ```
 
@@ -165,7 +175,7 @@ GET /_analyze
 * `stop`: Removes stop words
 * `stemmer`: Reduces words to their root form
 * `synonym`: Adds synonyms
-* `asciifolding`: Converts special characters (e → e)
+* `asciifolding`: Removes accents (é → e)
 * `ngram` / `edge_ngram`: Creates n-grams from tokens
 
 ---
@@ -237,6 +247,69 @@ PUT /articles/_mapping
 
 ---
 
+# Advanced Custom Analyzer Example
+
+- Demonstrating a complex analyzer setup for nuanced text processing.
+- Configured char filters and token filters are **named** in `char_filter` / `filter`, then referenced by the analyzer (inline definitions only work with `_analyze`).
+ 
+```json
+PUT /advanced_custom_index
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "advanced_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip", "ampersand_to_and"],
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding", "stop", "quick_synonyms"]
+        }
+      },
+      "char_filter": {
+        "ampersand_to_and": { "type": "mapping", "mappings": ["&=>and"] }
+      },
+      "filter": {
+        "quick_synonyms": { "type": "synonym", "synonyms": ["quick,fast"] }
+      }
+    }
+  }
+}
+```
+
+---
+
+# Configure Analyzer for a field
+
+* An analyzer is defined in the settings **of the index** that uses it
+
+```json
+PUT movies_v2
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_custom_analyzer": {
+          "type": "custom",
+          "char_filter": ["html_strip"],
+          "tokenizer": "whitespace",
+          "filter": ["lowercase", "asciifolding", "stop"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "my_custom_analyzer"
+      }
+    }
+  }
+}
+```
+
+---
+
 # Search Analyzer
 
 * You can use different analyzers for indexing and searching.
@@ -272,17 +345,10 @@ PUT /movies_autocomplete
 
 # Performance Impact
 
-* **Indexing time**: complex analyzers slow down indexing
-* **Query performance**: simpler analyzers mean faster searches
-* **Disk usage**: more tokens mean a larger index
-* **Memory usage**: custom analyzers consume heap
-
-| Analyzer | Indexing Speed | Query Speed | Disk Usage |
-|----------|----------------|-------------|------------|
-| `keyword` | Fastest | Fastest | Minimal |
-| `standard` | Fast | Fast | Moderate |
-| `french` | Medium | Medium | High |
-| Custom with n-grams | Slow | Fast | Very High |
+* **Indexing time**: every filter runs on every value indexed: a long chain slows indexing down
+* **Disk usage**: more tokens per value mean a larger index; `ngram` / `edge_ngram` multiply them
+* **Query time**: the query text is analyzed too, but it is short: what costs is the number of terms the query expands to
+* Measure on your data rather than trusting a rule of thumb: index a sample, compare `GET /_cat/indices?v` and the indexing rate
 
 ---
 
@@ -339,10 +405,3 @@ PUT /products
 4. Measure relevance and performance
 
 
----
-layout: cover
----
-
-# Hands-on
-
-## Workshop 3 - Mapping, analyzers, aliases and templates

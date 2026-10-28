@@ -11,9 +11,9 @@ layout: cover
 - Several possible stages for your data
   - Available "normally"
   - `closed`
-  - `shrinked`
-  - `rollover-ed`
-  - `snapshot-ed`
+  - shrunk (`_shrink`)
+  - rolled over (`_rollover`)
+  - snapshotted
   - Deleted
   - On a less heavy configuration
   - On less performing hardware
@@ -102,10 +102,9 @@ POST /my_index/_open
 - **Performance:** Closing indices can free up resources, improving the cluster's overall performance.
 - **Limitations:** Not all operations are allowed on closed indices, e.g., you cannot index documents into a closed index.
 
-- Best Practices & Use Cases
-  - **Maintenance:** Close indices during maintenance to improve performance.
-  - **Archiving:** Close indices that contain historical data not frequently accessed.
-  - **Resource Management:** Close indices to free up resources like memory and reduce the load on the cluster.
+- A closed index cannot be searched at all, and is not snapshotted by default: closing is no longer the way to archive.
+- For historical data rarely searched, prefer the **cold** and **frozen** tiers (searchable snapshots, below): the data stays searchable at a fraction of the cost.
+- Keep `_close` for a few operations that require it (changing some static settings, such as analyzers).
 
 ---
 
@@ -147,7 +146,7 @@ PUT /my_index/_settings
 - Syntax: `POST /<source_index>/_shrink/<target_index>`
 
 ```json
-POST /my_index/_shrink/my_index_shrinked
+POST /my_index/_shrink/my_index_shrunk
 {
   "settings": {
     "index.number_of_replicas": 1,
@@ -166,7 +165,7 @@ POST /my_index/_shrink/my_index_shrinked
 {
   "acknowledged": true,
   "shards_acknowledged": true,
-  "index": "my_index_shrinked"
+  "index": "my_index_shrunk"
 }
 ```
 
@@ -175,10 +174,10 @@ POST /my_index/_shrink/my_index_shrinked
 # Post-Shrink Operations
 
 - Once the index is shrunk, you may want to make it writable again by updating its settings.
-- Syntax: `PUT /<shrinked_index>/_settings`
+- Syntax: `PUT /<shrunk_index>/_settings`
 
 ```json
-PUT /my_index_shrinked/_settings
+PUT /my_index_shrunk/_settings
 {
   "settings": {
     "index.blocks.write": false
@@ -194,28 +193,28 @@ PUT /my_index_shrinked/_settings
 
 ---
 
-# DataStream
+# Data Streams
 
-- Mechanism allowing dynamically generating multiple indexes
+- Mechanism allowing dynamically generating multiple indices
 - Useful for `time series` data
 - Only the latest index will be available for writing
-- All indexes will be accessible for reading
+- All indices will be accessible for reading
 
 ---
 
-# DataStream
+# Data Streams
 
 ![](/images/data-streams-diagram.svg)
 
 ---
 
-# DataStream
+# Data Streams
 
 ![](/images/data-streams-search-request.svg)
 
 ---
 
-# DataStream
+# Data Streams
 
 ![](/images/data-streams-index-request.svg)
 
@@ -241,6 +240,14 @@ PUT _ilm/policy/my_policy
       "description": "used for nginx log"
     },
     "phases": {
+      "hot": {
+        "actions": {
+          "rollover": {
+            "max_primary_shard_size": "50gb",
+            "max_age": "1d"
+          }
+        }
+      },
       "warm": {
         "min_age": "10d",
         "actions": {
@@ -257,6 +264,58 @@ PUT _ilm/policy/my_policy
       }
     }
   }
+}
+```
+
+---
+
+# ILM
+
+- `rollover`, in the hot phase: a new backing index as soon as one condition is met (size of the largest primary shard, age, number of documents)
+- `min_age` of the next phases is counted from the rollover
+- Without rollover, the indices of a data stream would grow forever
+
+---
+
+# Data Tiers and Searchable Snapshots
+
+| Tier | Hardware | Data |
+|------|----------|------|
+| **hot** | Fast SSD | Written and searched often |
+| **warm** | Bigger, slower disks | Read-only, still searched |
+| **cold** | Searchable snapshot, fully mounted | Rarely searched, no replica (the snapshot is the copy) |
+| **frozen** | Searchable snapshot, partially mounted (local cache only) | Kept for months / years, slow searches |
+
+<!-- ci: skip -->
+```json
+"frozen": {
+  "min_age": "90d",
+  "actions": {
+    "searchable_snapshot": { "snapshot_repository": "my_repository" }
+  }
+}
+```
+
+* Searchable snapshots need an Enterprise license (or the trial) and a snapshot repository.
+
+---
+
+# ILM or Data Stream Lifecycle?
+
+| | ILM | Data stream lifecycle |
+|---|---|---|
+| Scope | Any index, data stream | Data streams only |
+| Configuration | Policy with phases | `"lifecycle": { "data_retention": "30d" }` in the template or on the data stream |
+| Rollover | Conditions you choose | Automatic, managed by Elasticsearch |
+| Tiers (warm, cold, frozen) | Yes | No |
+| Shrink, force merge, searchable snapshot | Yes | Force merge and downsampling only |
+
+* Data stream lifecycle: logs or metrics that only need a retention. ILM: as soon as the data moves between tiers.
+
+```json
+PUT /_data_stream/logs-app-default/_lifecycle
+{
+  "data_retention": "30d"
 }
 ```
 

@@ -163,7 +163,7 @@ GET /_nodes/node-1/hot_threads?threads=5&interval=500ms&type=cpu
 ::: {node-1}{abc123}
    Hot threads at 2023-11-10T10:30:00.000Z, interval=500ms, busiestThreads=5:
 
-   99.8% (499ms out of 500ms) cpu usage by thread 'elasticsearch\[node-1\]\[search\]\[T#5\]'
+   99.8% (499ms out of 500ms) cpu usage by thread 'elasticsearch[node-1][search][T#5]'
      org.elasticsearch.search.SearchService.executeQueryPhase()
      org.elasticsearch.search.query.QueryPhase.execute()
 ```
@@ -264,6 +264,8 @@ PUT /_cluster/settings
   }
 }
 ```
+
+* Set the three together, `low` ≤ `high` ≤ `flood_stage`: a percentage you set turns off that watermark's `max_headroom`, and a mix is refused. Reset them to `null` once the disk is freed
 
 **I/O stats**: `fs.io_stats.total.operations`, `fs.io_stats.total.read_time` (I/O latency)
 
@@ -399,7 +401,7 @@ The **Nodes** page allows monitoring each node individually.
 | **JVM Memory** | % heap used | >85% |
 | **Disk Free Space** | Remaining disk space | <15% (85% full) |
 | **Load Average** | System load (1m, 5m, 15m) | >cores x 1.5 |
-| **Shards** | Number of shards on this node | >20/GB heap |
+| **Shards** | Number of shards on this node | Close to `cluster.max_shards_per_node` (1 000) |
 
 **Available graphs**:
 - CPU usage over time
@@ -444,11 +446,12 @@ Elasticsearch generates several types of [logs](https://www.elastic.co/guide/en/
 **Default log files**:
 ```
 /var/log/elasticsearch/
-|- <cluster_name>.log              # Main log
-|- <cluster_name>_deprecation.log  # Deprecation warnings
-|- <cluster_name>_index_search_slowlog.log
-|- <cluster_name>_index_indexing_slowlog.log
-|- gc.log                          # Garbage Collection logs
+|- <cluster_name>_server.json               # Main log (JSON, ECS)
+|- <cluster_name>.log                       # Main log, plain text
+|- <cluster_name>_deprecation.json          # Deprecation warnings
+|- <cluster_name>_index_search_slowlog.json
+|- <cluster_name>_index_indexing_slowlog.json
+|- gc.log                                   # Garbage Collection logs
 ```
 
 **Log levels**:
@@ -533,11 +536,20 @@ PUT /my-index/_settings
 
 # Log Analysis: Slow Logs
 
-**Slow log format**:
-```
-\[2023-11-10T10:30:15,123\]\[WARN \]\[i.s.s.query\] \[node-1\] \[my-index\]\[0\]
-took\[5.2s\], took_millis\[5234\], types\[\], stats\[\], search_type\[QUERY_THEN_FETCH\],
-total_shards\[5\], source\[{"query":{"match":{"field":"value"}}}\]
+**Slow log format** (one JSON line, ECS, in `<cluster>_index_search_slowlog.json`):
+```json
+{
+  "@timestamp": "2026-10-28T10:30:15.123Z",
+  "log.level": "WARN",
+  "log.logger": "index.search.slowlog.query",
+  "elasticsearch.node.name": "node-1",
+  "elasticsearch.slowlog.message": "[my-index][0]",
+  "elasticsearch.slowlog.took": "5.2s",
+  "elasticsearch.slowlog.took_millis": 5234,
+  "elasticsearch.slowlog.search_type": "QUERY_THEN_FETCH",
+  "elasticsearch.slowlog.total_shards": 5,
+  "elasticsearch.slowlog.source": "{\"query\":{\"match\":{\"field\":\"value\"}}}"
+}
 ```
 
 **Analysis**: Identify patterns (similar queries, same index), optimize or add resources.
@@ -552,25 +564,25 @@ Knowing how to interpret common errors accelerates troubleshooting.
 
 **1. CircuitBreakerException**
 ```
-\[parent\] Data too large, data for [<http_request>] would be [x], which is larger than the limit of [y]
+[parent] Data too large, data for [<http_request>] would be [x], which is larger than the limit of [y]
 ```
 -> Heap saturated, query too demanding. Actions: Reduce query size, increase heap, add nodes.
 
 **2. EsRejectedExecutionException**
 ```
-rejected execution of org.elasticsearch.transport.TransportService$7@abc on EsThreadPoolExecutor\[search, queue capacity = 1000\]
+rejected execution of org.elasticsearch.transport.TransportService$7@abc on EsThreadPoolExecutor[search, queue capacity = 1000]
 ```
 -> Thread pool saturated. Actions: Client-side throttle, optimize queries, scale cluster.
 
 **3. SearchPhaseExecutionException**
 ```
-Shard failures: \[failed shard on node \[xyz\]: query shard failed\]
+Shard failures: [failed shard on node [xyz]: query shard failed]
 ```
 -> Search failure on a shard. Actions: Check logs of concerned node, shard state.
 
 **4. ClusterBlockException**
 ```
-index \[my-index\] blocked by: \[FORBIDDEN/12/index read-only / allow delete (api)\];
+index [my-index] blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];
 ```
 -> Index in read-only (often disk watermark flood). Actions: Free disk space, increase watermark.
 
@@ -608,11 +620,3 @@ layout: cover
 # Hands-on
 
 ## Workshop 17 - Monitoring
-
----
-layout: cover
----
-
-# Hands-on
-
-## Workshop 18 - Advanced architecture and production

@@ -35,7 +35,7 @@ At the end of this section, you will be able to:
 - Docker: Isolation, reproducibility, orchestration (Kubernetes)
 - Cloud: Zero infrastructure maintenance, automatic scaling
 
-**Common prerequisites**: Java 17+ (included in official packages since ES 7.x)
+**Prerequisites**: none for Java: every package bundles its own JDK (since 7.0), the one to use. `ES_JAVA_HOME` only to force another JVM.
 
 ---
 
@@ -61,7 +61,8 @@ After installation, understanding the file structure is essential for administra
 |-----------|---------|-------------|
 | `/usr/share/elasticsearch/` | Binaries & libs | Elasticsearch installation |
 | `/etc/elasticsearch/` | Configuration | elasticsearch.yml, jvm.options, log4j2.properties |
-| `/var/lib/elasticsearch/` | Data | Indices, snapshots |
+| `/var/lib/elasticsearch/` | Data | Indices (`path.data`) |
+| `path.repo` (e.g. `/mnt/backups`) | Snapshots | Shared file system repository, to declare: no default |
 | `/var/log/elasticsearch/` | Logs | Application logs |
 
 ---
@@ -99,10 +100,16 @@ transport.port: 9300
 path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
 
-# Security (ES 8.x+ enabled by default)
+# Security (ES 8.x+ enabled by default): written by the auto-configuration on first start
 xpack.security.enabled: true
-xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl:
+  enabled: true
+  verification_mode: certificate
+  keystore.path: certs/transport.p12
+  truststore.path: certs/transport.p12
 ```
+
+* `transport.ssl.enabled: true` alone, without keystore and truststore, prevents the node from starting.
 
 **Important**: Restart required after modifying elasticsearch.yml
 
@@ -238,19 +245,19 @@ node.roles: [ master, data, ingest, ml, transform ]
 
 ---
 
-# JVM Configuration: jvm.options
+# JVM Configuration: jvm.options.d/
 
-The [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/current/advanced-configuration.html#set-jvm-options) file controls JVM parameters.
+Never edit `jvm.options` itself: add your [JVM options](https://www.elastic.co/guide/en/elasticsearch/reference/current/advanced-configuration.html#set-jvm-options) in a file of `jvm.options.d/`, which upgrades leave alone.
 
-**Critical parameters**:
+**`/etc/elasticsearch/jvm.options.d/heap.options`**:
 ```
 # Heap size (ALWAYS identical for Xms and Xmx)
 -Xms4g
 -Xmx4g
-
-# Garbage collector type (G1GC recommended)
--XX:+UseG1GC
 ```
+
+* Without it, Elasticsearch sizes the heap itself from the node's roles and RAM (since 7.11): set it only when you need to.
+* G1GC is already the default garbage collector: no need to set it.
 
 ---
 
@@ -269,7 +276,7 @@ The [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/curren
 
 **Heap sizing rules**:
 - ✅ Maximum 50% of physical RAM (the rest for OS cache)
-- ✅ Never exceed 32GB (loss of compressed oops)
+- ✅ Stay below ~31GB (beyond, the JVM loses compressed oops)
 - ✅ -Xms = -Xmx (avoids dynamic resizing)
 
 ---
@@ -278,20 +285,22 @@ The [jvm.options](https://www.elastic.co/guide/en/elasticsearch/reference/curren
 
 Elasticsearch uses [Log4j2](https://www.elastic.co/guide/en/elasticsearch/reference/current/logging.html) for logging.
 
-**Default configuration**:
+**Log levels, in `log4j2.properties`**:
 ```properties
-# Global log level
 logger.action.name = org.elasticsearch.action
 logger.action.level = info
+```
 
-# Slow search logs
-index.search.slowlog.threshold.query.warn: 10s
-index.search.slowlog.threshold.query.info: 5s
-index.search.slowlog.threshold.query.debug: 2s
-
-# Slow indexing logs
-index.indexing.slowlog.threshold.index.warn: 10s
-index.indexing.slowlog.threshold.index.info: 5s
+**Slow log thresholds are index settings**, not log4j ones:
+```json
+PUT /my-index
+{
+  "settings": {
+    "index.search.slowlog.threshold.query.warn": "10s",
+    "index.search.slowlog.threshold.query.info": "5s",
+    "index.indexing.slowlog.threshold.index.warn": "10s"
+  }
+}
 ```
 
 ---
@@ -302,13 +311,13 @@ index.indexing.slowlog.threshold.index.info: 5s
 ```json
 PUT /_cluster/settings
 {
-  "transient": {
+  "persistent": {
     "logger.org.elasticsearch.discovery": "DEBUG"
   }
 }
 ```
 
-**Log types**: elasticsearch.log (general), elasticsearch_deprecation.log, gc.log, elasticsearch_index_indexing_slowlog.log
+**Log types** (JSON, ECS format since 8.0): `<cluster>_server.json` (general), `<cluster>_deprecation.json`, `<cluster>_index_search_slowlog.json`, `<cluster>_index_indexing_slowlog.json`, `gc.log`
 
 ---
 
@@ -331,12 +340,11 @@ export ES_JAVA_OPTS="-Xms4g -Xmx4g"
 # Configuration path
 export ES_PATH_CONF=/etc/elasticsearch
 
-# Cluster name
+# Read by ${ES_CLUSTER_NAME} in elasticsearch.yml
 export ES_CLUSTER_NAME=production
-
-# Elasticsearch user (startup)
-export ES_USER=elasticsearch
 ```
+
+* The packages run Elasticsearch as the `elasticsearch` user (systemd): no variable for it, and it refuses to run as `root`.
 
 **Use cases**: Containerized deployments (Docker, Kubernetes), CI/CD, multi-environments
 
@@ -483,7 +491,7 @@ users          yellow open     1   1      50000       10mb
 
 - **cluster.initial_master_nodes**: Required at first startup, remove afterwards
 - **Enrollment tokens** (ES 8.x+): Automatic security for adding nodes
-- **Heap sizing**: Maximum 50% RAM, never exceed 32GB, -Xms = -Xmx
+- **Heap sizing**: Maximum 50% RAM, stay below ~31GB, -Xms = -Xmx
 - **Cluster health**: green (perfect), yellow (missing replicas), red (missing primaries)
 
 

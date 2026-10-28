@@ -9,7 +9,7 @@ slides/            one Markdown file per chapter (Slidev)
   public/images/   the images of the deck, referenced as /images/…
 ci/fixtures/       the data some chapters need, replayed before them in the CI
 workshops/         one folder per workshop, its README.md: setup, goals, hints
-solutions/         one SOLUTION.md per workshop — never published
+solutions/         one SOLUTION.md per workshop, published as ZIPs
 training.config.mjs
 ```
 
@@ -44,13 +44,13 @@ pnpm dlx serve build    # serve it as Netlify will
 ```
 
 The downloads: `elasticsearch-slides.pdf`, `elasticsearch-workshops.pdf`,
-`elasticsearch-participants.zip`, plus a starter ZIP per workshop under
-`downloads/tp/`.
+`elasticsearch-participants.zip`, `elasticsearch-solutions.zip`, plus a starter
+and a solution ZIP per workshop under `downloads/tp/`.
 
 The learners write the requests themselves: each README holds the setup (index
 and data), then per step a goal, a folded hint and the response to expect. The
-requests are in `solutions/<workshop>/SOLUTION.md`, for the trainer — out of the
-site, the PDFs and the ZIPs (`solutions: false`). No online editor.
+requests are in `solutions/<workshop>/SOLUTION.md`, published on the Resources
+page and each workshop page, kept out of the participants ZIP. No online editor.
 
 The PDF exports print with Chromium. To use one already on the machine instead
 of downloading Playwright's, set `TRAINING_KIT_CHROME` to its path.

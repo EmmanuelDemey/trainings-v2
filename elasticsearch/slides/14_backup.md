@@ -143,7 +143,7 @@ layout: cover
 layout: cover
 ---
 
-# Rolling upgrade: from 7 to 8
+# Rolling upgrade: from 8 to 9
 
 <!-- ci: skip-start -->
 
@@ -151,27 +151,27 @@ layout: cover
 
 # Upgrade paths
 
-* A major version is never skipped: **7.x → 7.17 → 8.x**
-  * the rolling upgrade to 8 starts from the **last 7.17 patch**
-  * the same rule applies after: **8.x → 8.19 → 9.x**
+* A major version is never skipped: **8.x → 8.19 → 9.x**
+  * the rolling upgrade to 9 starts from the **last 8.19 patch**
+  * the same rule applied before: **7.x → 7.17 → 8.x**
 * An index can only be read by the **next** major version
-  * Elasticsearch 8 refuses an index **created in 6.x**: reindex it, or delete it, in 7.17
-  * Elasticsearch 9 refuses an index created in 7.x, unless it is reindexed or marked read-only
+  * Elasticsearch 9 refuses an index **created in 7.x**: reindex it, delete it, or mark it read-only, in 8.19
+  * the data streams too: their 7.x backing indices are reindexed by the Upgrade Assistant
 * **No downgrade**: an upgraded node cannot go back — only a snapshot taken before brings the old version back
 
 ```text
-6.8 ──► 7.17 ──► 8.19 ──► 9.x
-         │        │
+7.17 ──► 8.19 ──► 9.x
+         │
          └ Upgrade Assistant: what blocks the next major
 ```
 
 ---
 
-# The Upgrade Assistant (Kibana 7.17)
+# The Upgrade Assistant (Kibana 8.19)
 
-* **Stack Management → Upgrade Assistant**: what must be fixed before upgrading to 8
+* **Stack Management → Upgrade Assistant**: what must be fixed before upgrading to 9
   * **critical** issues block the upgrade, **warnings** do not
-  * reindexes the 6.x indices in one click
+  * reindexes the 7.x indices, or marks them read-only, in one click
   * turns on the **deprecation logs**, to find the clients still calling deprecated APIs
 * The same information, through the API:
 
@@ -182,11 +182,11 @@ GET /_migration/deprecations
 ```json
 {
   "cluster_settings": [
-    { "level": "critical", "message": "Setting [node.data] is deprecated…" }
+    { "level": "warning", "message": "Setting [xpack.monitoring.collection.enabled] is deprecated…" }
   ],
   "index_settings": {
-    "logs-2019": [
-      { "level": "critical", "message": "Index created before 7.0" }
+    "logs-2021": [
+      { "level": "critical", "message": "Old index with a compatibility version < 8.0" }
     ]
   }
 }
@@ -194,29 +194,27 @@ GET /_migration/deprecations
 
 ---
 
-# What changes in 8
+# What changes in 9
 
-* **Security on by default** for a new cluster: TLS, the `elastic` password, enrollment tokens
-  * for an upgraded cluster: set `xpack.security.enabled` explicitly in 7.17 — the Upgrade Assistant flags it
-* **Mapping types are gone**: no more `/my-index/my-type/1`, only `/my-index/_doc/1`
-* **Removed settings**: `node.master`, `node.data`… → `node.roles`; `discovery.zen.*` → `discovery.seed_hosts`
-* **Clients**: the Java High Level REST Client gives way to the **Java API Client**
-* **REST compatibility**: a 7.x client keeps working, by asking for the 7 behaviour
+* **Indices created in 7.x** are no longer readable: reindexed or read-only beforehand (see above)
+* **Removed settings and APIs**: everything flagged *critical* by the deprecation API — read it, rather than a list by heart
+* **Clients**: use the 9.x client; an 8.x client keeps working through the REST compatibility, by asking for the 8 behaviour
+* **Kibana**: same version as Elasticsearch, upgraded right after
 
 ```text
-Accept: application/vnd.elasticsearch+json;compatible-with=7
-Content-Type: application/vnd.elasticsearch+json;compatible-with=7
+Accept: application/vnd.elasticsearch+json;compatible-with=8
+Content-Type: application/vnd.elasticsearch+json;compatible-with=8
 ```
 
 ---
 
 # Before the upgrade
 
-1. Upgrade to the last **7.17**, and clear every **critical** issue of the Upgrade Assistant
+1. Upgrade to the last **8.19**, and clear every **critical** issue of the Upgrade Assistant
 2. Take a **snapshot** of everything — the only way back
 
 ```json
-PUT /_snapshot/my_backup/before-8
+PUT /_snapshot/my_backup/before-9
 {
   "indices": "*",
   "include_global_state": true
@@ -240,7 +238,7 @@ PUT /_cluster/settings
 }
 ```
 
-**2.** Flush, so that the shards recover faster — the synced flush no longer exists in 8
+**2.** Flush, so that the shards recover faster
 
 ```json
 POST /_flush
@@ -252,7 +250,7 @@ POST /_flush
 POST /_ml/set_upgrade_mode?enabled=true
 ```
 
-**4.** Stop the node, install the 8.x package (or change the Docker image), upgrade its plugins, migrate its `elasticsearch.yml`
+**4.** Stop the node, install the 9.x package (or change the Docker image), upgrade its plugins, migrate its `elasticsearch.yml`
 
 ---
 
@@ -275,7 +273,7 @@ PUT /_cluster/settings
 GET /_cluster/health?wait_for_status=green&timeout=10m
 ```
 
-**7.** Next node: back to step 1. Once every node is in 8:
+**7.** Next node: back to step 1. Once every node is in 9:
 
 ```json
 POST /_ml/set_upgrade_mode?enabled=false
@@ -285,12 +283,12 @@ POST /_ml/set_upgrade_mode?enabled=false
 
 # During the upgrade: a mixed cluster
 
-* 7.17 and 8.x nodes work together for as long as the upgrade takes — keep it **short**
+* 8.19 and 9.x nodes work together for as long as the upgrade takes — keep it **short**
 * A shard is only copied to a node of the **same or a newer** version
-  * a primary on an 8.x node gets no replica on a 7.17 node
+  * a primary on a 9.x node gets no replica on an 8.19 node
   * with few upgraded nodes, the cluster may stay `yellow` — expected
-* The new features of 8 are only available once **every** node is upgraded
-* A node in 8 cannot rejoin a 7.17 cluster: there is **no rollback** node by node
+* The new features of 9 are only available once **every** node is upgraded
+* A node in 9 cannot rejoin an 8.19 cluster: there is **no rollback** node by node
 
 ---
 
@@ -305,13 +303,13 @@ GET /_cluster/health
 
 * Upgrade Kibana, then the agents and Beats
 * Smoke tests: index, search, a dashboard
-* Read the **deprecation logs** again: what 8 still accepts, 9 will refuse
+* Read the **deprecation logs** again: what 9 still accepts, 10 will refuse
 
 | Problem | Where to look |
 |---|---|
-| A node does not start | its log: a setting removed in 8 (`node.master`, `discovery.zen.*`…) |
-| Shards stay `UNASSIGNED` | `GET /_cluster/allocation/explain` — often a replica waiting for a node in 8 |
-| A client fails | the REST compatibility headers, or the new Java API Client |
+| A node does not start | its log: a setting removed in 9, an index created in 7.x |
+| Shards stay `UNASSIGNED` | `GET /_cluster/allocation/explain` — often a replica waiting for a node in 9 |
+| A client fails | the REST compatibility headers (`compatible-with=8`), or upgrade the client |
 
 <!-- ci: skip-end -->
 

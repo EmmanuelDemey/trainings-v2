@@ -89,7 +89,7 @@ Look at the [client helpers](https://www.elastic.co/docs/reference/elasticsearch
 <details>
 <summary>Hint</summary>
 
-`client.search` takes the same `query` and `aggs` as the search API of Dev Tools. The response holds `hits.hits` and `aggregations`. Workshops 4 and 6 hold the queries you need.
+`client.search` takes the same `query` and `aggs` as the search API of Dev Tools. The response holds `hits.hits` and `aggregations`. Workshops 4 (search) and 5 (aggregations) hold the queries you need.
 
 </details>
 

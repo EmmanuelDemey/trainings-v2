@@ -18,7 +18,22 @@ layout: cover
 
 ---
 
-# Mapping
+# Dynamic Mapping
+
+Elasticsearch automatically detects field types:
+```json
+POST /auto-index/_doc/1
+{ "name": "Test", "count": 42 }
+```
+Result: `name` → `text+keyword`, `count` → `long`
+
+**Advantages**: Quick for prototyping
+
+**Disadvantages**: May guess type incorrectly (dates as strings, etc.)
+
+---
+
+# Explicit Mapping
 
 * Mapping can be defined when creating the index.
 
@@ -34,6 +49,8 @@ PUT /movies
   }
 }
 ```
+
+**Best practice**: Always define mapping explicitly in production!
 
 ---
 
@@ -71,13 +88,23 @@ DELETE /movies
 
 ---
 
-# Supported Types
+# Main Field Types
 
-* text, keyword, boolean, and date
-* object, nested, arrays, range
-* geo-point, geo-shape
-* ip
-* ...
+| Type | Usage | Example |
+|------|-------|---------|
+| **text** | Full-text search (analyzed) | Articles, descriptions |
+| **keyword** | Exact filtering, aggregations | Statuses, tags, IDs |
+| **date** | Dates and timestamps | `"2025-11-10"`, `1699632000000` |
+| **long/integer** | Integer numbers | Ages, counters |
+| **float/double** | Decimal numbers | Prices, coordinates |
+| **boolean** | True/false | Flags, states |
+| **geo_point**, **geo_shape** | Geographic coordinates and shapes | `{"lat": 48.8566, "lon": 2.3522}` |
+| **object**, **nested** | JSON objects | Addresses, metadata |
+| **ip**, **range**, ... | | |
+
+* No `array` type: any field can hold several values.
+
+Complete documentation: [Field types](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
 
 ---
 
@@ -127,6 +154,25 @@ PUT movies
 ```
 
 * Be careful, disabling the source makes certain operations impossible (simple get, update, update_by_query, reindex).
+
+---
+
+# Synthetic `_source`
+
+* Rather than dropping `_source`, let Elasticsearch **rebuild** it from the doc values: less disk, and get, update and reindex keep working.
+* The rebuilt document may differ: fields sorted, arrays sorted and deduplicated for some types.
+* Default of the `logsdb` index mode (`logs-*` data streams in 9.x); otherwise an Enterprise license feature.
+
+```json
+DELETE movies
+
+PUT movies
+{
+  "settings": {
+    "index.mapping.source.mode": "synthetic"
+  }
+}
+```
 
 ---
 
@@ -180,9 +226,37 @@ POST movies/_search?q=directors.keyword:"Charlie Chaplin"
 
 ---
 
+# Important Mapping Parameters
+
+```json
+{
+  "properties": {
+    "description": {
+      "type": "text",
+      "analyzer": "french",
+      "fields": { "keyword": { "type": "keyword" } }
+    },
+    "status": {
+      "type": "keyword", "ignore_above": 256
+    },
+    "metadata": {
+      "type": "object", "enabled": false
+    }
+  }
+}
+```
+
+**Key parameters**:
+- `analyzer`: Defines how text is analyzed (see the next chapter)
+- `fields`: Multi-fields (same data, multiple types)
+- `ignore_above`: Ignores strings that are too long
+- `enabled`: Enables/disables field indexing
+
+---
+
 # Object versus Nested
 
-* It is possible to define properties of type `Object`.
+* It is possible to define properties of type `object`.
 
 ```json
 DELETE movies
@@ -273,7 +347,7 @@ PUT movies
 
 # Dynamic Templates
 
-* Dynamic templates allow automatic mapping of new fields based on patterns.
+* Dynamic templates map the **new** fields by their name or detected type.
 * While useful for prototyping, it's recommended to define explicit mappings in production.
 * Only you know the exact structure and requirements of your data.
 * Use dynamic templates cautiously and validate the generated mappings.
@@ -286,17 +360,17 @@ PUT movies
   "mappings": {
     "dynamic_templates": [
       {
-        "strings": {
+        "ids_as_keywords": {
           "match_mapping_type": "string",
-          "mapping": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type":  "keyword",
-                "ignore_above": 256
-              }
-            }
-          }
+          "match": "*_id",
+          "mapping": { "type": "keyword" }
+        }
+      },
+      {
+        "counts_as_integers": {
+          "match_mapping_type": "long",
+          "match": "nb_*",
+          "mapping": { "type": "integer" }
         }
       }
     ]

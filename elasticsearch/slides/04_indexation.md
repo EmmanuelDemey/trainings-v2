@@ -9,7 +9,7 @@ layout: cover
 # Creating an Index
 
 * A document is indexed within an `index`.
-* For backward compatibility, a `_doc` type is associated with it.
+* Mapping types are gone since 8.0: `_doc` in `/my-index/_doc/1` is only the endpoint, not a type.
 * When indexing the first document, Elasticsearch will deduce the document's structure.
 * It's important not to leave this default structure.
 * Retrieve this generated configuration to modify it later.
@@ -96,9 +96,9 @@ GET /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 
 ---
 
-# Updating a Document
+# Replacing a Document
 
-* We can update a document using a `PUT` request.
+* A `PUT` on an existing `_id` **replaces** the whole document (`result: updated`, `_version` incremented).
 
 ```json
 PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
@@ -128,8 +128,8 @@ PUT /movies/_doc/mQ6jknEBOjsOKzV3MVdi
 
 # Updating a Document
 
-* Caution, this update is total, and the previous document will be completely overwritten.
-* It is possible to perform partial updates using the `_update` API.
+* The `PUT` above is total: the previous document is completely overwritten.
+* A partial update goes through the `_update` API.
 
 ```json
 POST movies/_update/mQ6jknEBOjsOKzV3MVdi
@@ -232,7 +232,7 @@ POST /movies/_search?q=title:titanic&sort=title.keyword:asc
 
 # Index Management
 
-* We can create indexes manually
+* We can create indices manually
 
 <!-- ci: skip -->
 ```json
@@ -296,11 +296,20 @@ PUT /books/_settings
 
 # Index Management
 
-* A global configuration can be defined in the `elasticsearch.yml` file.
+* Index settings cannot be set in `elasticsearch.yml`: a node refuses to start with `index.*` settings there.
+* Defaults shared by several indices go into an **index template**, applied to every new index whose name matches.
 
-```
-index.number_of_shards: 1
-index.number_of_replicas: 1
+```json
+PUT /_index_template/logs-defaults
+{
+  "index_patterns": ["app-logs-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1
+    }
+  }
+}
 ```
 
 ---
@@ -312,7 +321,7 @@ index.number_of_replicas: 1
 | `number_of_shards` | 1 | Primary shards (immutable) | 1 shard per 10-50GB |
 | `number_of_replicas` | 1 | Replica count | 1-2 for production |
 | `refresh_interval` | 1s | Search visibility delay | 30s for logs |
-| `max_result_window` | 10000 | Max from + size | Increase if needed |
+| `max_result_window` | 10000 | Max from + size | Keep it: page deeper with `search_after` + PIT |
 | `codec` | default | Compression type | `best_compression` for cold |
 
 ---
@@ -324,8 +333,7 @@ PUT /logs-2025.01/_settings
 {
   "index": {
     "refresh_interval": "30s",
-    "number_of_replicas": 1,
-    "max_result_window": 50000
+    "number_of_replicas": 1
   }
 }
 ```
@@ -360,8 +368,8 @@ PUT /logs-2025.01/_settings
 # Cluster Status
 
 * Elasticsearch will create shards and place them correctly.
-* A shard replica cannot be on the same node as a primary shard.
-* If it is the case, the cluster status will be `yellow`.
+* A replica is never allocated on the same node as its primary.
+* With no other node to hold it, the replica stays *unassigned*: the cluster status is `yellow`.
 * The cluster can have the status `green`, `yellow`, or `red`.
 
 ```json
@@ -414,7 +422,7 @@ GET /_cluster/health
 DELETE /movies
 ```
 
-* We can delete multiple indexes
+* We can delete multiple indices
 
 ```json
 DELETE /movies,albums
@@ -491,7 +499,7 @@ POST /_bulk
   - Set to `-1` to disable during bulk indexing
   - Reset to a reasonable value (e.g., `30s`) after indexing completes
 
-- **Monitoring**: Monitor the `thread_pool.bulk.queue` and `thread_pool.bulk.rejected` metrics to tune bulk request sizes and intervals
+- **Monitoring**: Monitor the `queue` and `rejected` of the `write` thread pool (`GET /_cat/thread_pool/write?v`) metrics to tune bulk request sizes and intervals
 
 ---
 

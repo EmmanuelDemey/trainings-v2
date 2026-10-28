@@ -24,8 +24,10 @@ layout: section
 - Installation, cluster configuration and inspection
 - ES|QL, transforms
 - SDKs and Testcontainers
-- Sizing, JVM, topology, security
+- Sizing, cluster architecture, high availability, performance tuning
 - Monitoring
+
+**Appendix**: disaster recovery, checklists and incident runbooks, for after the training
 
 </v-clicks>
 

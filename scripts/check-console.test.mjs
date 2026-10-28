@@ -293,3 +293,26 @@ test('a wipe deletes the transforms first: a continuous one would recreate its d
   assert.ok(transform >= 0, `no transform deleted: ${sent.join(', ')}`);
   assert.ok(transform < sent.indexOf('DELETE /customers-live'));
 });
+
+test('a wipe deletes the users and roles a workshop created, not the built-in ones', async () => {
+  const sent = [];
+  const es = {
+    request: async ({ method, path }) => {
+      sent.push(`${method} ${path}`);
+      if (path === '/_security/role') {
+        return { status: 200, body: { hr_viewer: { metadata: {} }, superuser: { metadata: { _reserved: true } } } };
+      }
+      if (path === '/_security/user') {
+        return { status: 200, body: { susan: { metadata: {} }, elastic: { metadata: { _reserved: true } } } };
+      }
+      return { status: 200, body: {} };
+    },
+  };
+
+  await wipe(es);
+
+  assert.ok(sent.includes('DELETE /_security/role/hr_viewer'), sent.join(', '));
+  assert.ok(sent.includes('DELETE /_security/user/susan'), sent.join(', '));
+  assert.ok(!sent.includes('DELETE /_security/role/superuser'));
+  assert.ok(!sent.includes('DELETE /_security/user/elastic'));
+});

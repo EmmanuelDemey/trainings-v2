@@ -10,7 +10,7 @@ layout: cover
 
 * Once the data is indexed, we can execute searches.
 * We will use the `_search` endpoint.
-* We can search on one or more indexes/aliases.
+* We can search on one or more indices/aliases.
 
 ```json
 POST /movies/_search
@@ -325,9 +325,9 @@ PUT /movies/_mapping
 
 ---
 
-# geo_distance box Query
+# geo_distance Query
 
-* Returns documents where the `geo_point` property is within a given distance.
+* Returns documents where the `geo_point` property is within a given distance of a point.
 
 ```json
 POST /movies/_search
@@ -338,6 +338,26 @@ POST /movies/_search
             "location" : {
                 "lat" : 40,
                 "lon" : -70
+            }
+        }
+    }
+}
+```
+
+---
+
+# geo_bounding_box Query
+
+* Returns documents where the `geo_point` property is inside a rectangle, given by its top-left and bottom-right corners.
+
+```json
+POST /movies/_search
+{
+    "query": {
+        "geo_bounding_box": {
+            "location": {
+                "top_left":     { "lat": 42, "lon": -75 },
+                "bottom_right": { "lat": 40, "lon": -73 }
             }
         }
     }
@@ -505,15 +525,15 @@ GET /restaurants/_search
 
 - **Testing and Validation:**
   - Validate sorting logic with a variety of queries to ensure it meets user expectations.
-  - Use the explain API to understand how sort values are calculated.
+  - Check the `sort` values returned with each hit to understand the order.
 
 ---
 
 # Pagination
 
 * We can manage pagination manually using the `from` and `size` parameters.
-* Not very efficient, it's recommended to use the Scroll API for large volumes.
-* The Scroll API returns a cursor.
+* Limited to `from + size` ≤ 10 000 (`index.max_result_window`), and costly for deep pages.
+* The Scroll API returns a cursor: kept for legacy exports, no longer recommended for deep pagination (see PIT + `search_after` below).
 
 ```json
 POST /movies/_search?scroll=1m
@@ -640,25 +660,47 @@ GET /movies/_search
 # Function Score Query Example
 
 
-- **Response:**
+- **Response:** the BM25 score of "Titanic" multiplied by `1.2 × popularity`
+<!-- ci: no-compare -->
 ```json
 {
-    "took": 30,
     "hits": {
-        "total": 10,
-        "max_score": 5.2,
+        "total": { "value": 1, "relation": "eq" },
+        "max_score": 10.47,
         "hits": [
         {
-            "_score": 5.2,
+            "_score": 10.47,
             "_source": {
-            "title": "Elasticsearch Basics",
-            "popularity": 10
+            "title": "Titanic",
+            "popularity": 9.5
             }
         }
         ]
     }
 }
 ```
+
+---
+
+# Script Score Query Example
+
+- Compute the score with a Painless script: here, the text score weighted by the number of views (`log` to soften the large values).
+
+```json
+GET /movies/_search
+{
+    "query": {
+        "script_score": {
+            "query": { "match": { "title": "titanic" } },
+            "script": {
+                "source": "_score * Math.log(2 + doc['views'].value)"
+            }
+        }
+    }
+}
+```
+
+- More flexible than `function_score`, but the script runs on every matching document: keep it simple.
 
 
 ---
@@ -687,7 +729,7 @@ GET /movies/_search
 
 - **Why use Cross Cluster Search?**
   - Scalability: Search over large datasets distributed across clusters.
-  - Resilience: Mitigate risks of data loss and ensure high availability.
+  - Isolation: Keep separate clusters (per team, per region) and still search them together.
   - Flexibility: Combine data from different domains without data migration.
 
 
@@ -706,6 +748,8 @@ PUT /_cluster/settings
     } 
 }
 ```
+
+- Since 8.10, prefer the **API key** security model: the remote cluster listens on its own port (9443, `remote_cluster_server.enabled: true`), and the local one connects with a cross-cluster API key (`POST /_security/cross_cluster/api_key`). Copying the data to another cluster for disaster recovery is the job of **CCR**, not CCS.
 
 - **Searching Across Clusters:**
   - Use the standard search API with cluster aliases.

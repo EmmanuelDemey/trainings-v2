@@ -96,7 +96,57 @@ POST /_query?format=txt
 2              |750.0          |2026-10-01T11:00:00.000Z
 ```
 
-* `INLINE STATS` keeps every row, and adds the aggregate next to it
+---
+
+# From Aggregations to STATS
+
+* The same question, *average size of the responses per host*, both ways:
+
+```json
+POST /web-logs/_search
+{
+  "size": 0,
+  "aggs": {
+    "by_host": {
+      "terms": { "field": "host" },
+      "aggs": { "avg_bytes": { "avg": { "field": "bytes" } } }
+    }
+  }
+}
+```
+
+```json
+POST /_query?format=txt
+{
+  "query": "FROM web-logs | STATS avg_bytes = AVG(bytes) BY host | SORT host"
+}
+```
+
+* Aggregations answer a tree of buckets; ES|QL a flat table, one row per group
+
+---
+
+# From Aggregations to STATS
+
+| Aggregation | ES\|QL |
+|---|---|
+| `terms` | `BY field` |
+| `date_histogram` | `BY BUCKET(@timestamp, 1 hour)` |
+| `avg`, `sum`, `min`, `max`, `value_count` | `AVG()`, `SUM()`, `MIN()`, `MAX()`, `COUNT()` |
+| `cardinality` | `COUNT_DISTINCT()` (approximate too) |
+| `percentiles` | `PERCENTILE(field, 95)` |
+| sub-aggregation | several `BY` columns |
+| `bucket_selector` (keep some buckets) | `WHERE` after `STATS` |
+| `bucket_sort`, `size` | `SORT`, `LIMIT` |
+| sibling pipeline (`avg_bucket`...) | a second `STATS` on the result |
+
+* The application that renders facets keeps the aggregations; the analyst exploring the data writes `STATS`
+
+---
+
+# INLINE STATS
+
+* `INLINE STATS` keeps every row, and adds the aggregate next to it (tech preview in 9.x: check its status for your version)
 
 ```json
 POST /_query?format=txt
@@ -174,6 +224,7 @@ POST /_query?format=txt
 }
 ```
 
+* A **left join**: a row with no match is kept, its lookup columns are `null`
 * Simpler than `ENRICH` (no enrich policy to create and execute): the lookup index is updated like any index
 
 ---

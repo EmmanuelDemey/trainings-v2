@@ -12,25 +12,61 @@ layout: cover
     * Authentication and Authorization
     * Data integrity (SSL/TLS)
     * Audit
+* Authentication, role-based access and TLS are in the free Basic license; document/field-level security and audit logging need a Platinum or Enterprise license (or the 30-day trial).
 
 ---
 
 # Security
 
-* First, we need to enable this option in the elasticsearch.yml file
-
-```
-xpack.security.enabled: true
-```
+* Since 8.0, security is **on by default**: on first start, Elasticsearch generates the TLS certificates, the `elastic` password and a Kibana enrollment token.
+* `xpack.security.enabled: true` is written in `elasticsearch.yml` by this auto-configuration: there is nothing to enable.
 
 ---
 
 # Security
 
-* We can first define the passwords for technical users (`kibana_system`, `beats_system`, ...)
+* Reset the password of a built-in user (`elastic`, `kibana_system`, ...) with `elasticsearch-reset-password`
+* `elasticsearch-setup-passwords` is deprecated since 8.0
 
 ```
-bin/elasticsearch-setup-passwords interactive
+bin/elasticsearch-reset-password -u kibana_system -i
+```
+
+---
+
+# TLS
+
+* Since 8.0, the first start generates a CA and the certificates, and writes in `elasticsearch.yml`:
+
+```yaml
+xpack.security.http.ssl:          # HTTPS for the clients (REST API, Kibana)
+  enabled: true
+  keystore.path: certs/http.p12
+xpack.security.transport.ssl:     # mutual TLS between the nodes
+  enabled: true
+  verification_mode: certificate
+  keystore.path: certs/transport.p12
+  truststore.path: certs/transport.p12
+```
+
+* Other nodes join with an enrollment token: `bin/elasticsearch-create-enrollment-token -s node`
+
+---
+
+# TLS: Your Own Certificates
+
+* `elasticsearch-certutil` generates a CA and the node certificates (or use your company's PKI)
+
+```
+bin/elasticsearch-certutil ca                         # elastic-stack-ca.p12
+bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12   # elastic-certificates.p12
+bin/elasticsearch-certutil http                       # certificates for the HTTP layer
+```
+
+* Keystore passwords go into the secure settings, never in `elasticsearch.yml`:
+
+```
+bin/elasticsearch-keystore add xpack.security.transport.ssl.keystore.secure_password
 ```
 
 ---
@@ -48,20 +84,24 @@ bin/elasticsearch-setup-passwords interactive
 ```json
 POST /_security/role/events_admin
 {
-  "run_as": [ "admin" ],
-  "cluster": [ "monitor"],
+  "cluster": [ "monitor" ],
   "indices" : [
     {
       "names" : [ "events*" ],
       "privileges" : [ "all" ]
-    },
+    }
+  ],
+  "applications": [
     {
-      "names" : [ ".kibana*" ],
-      "privileges" : [ "manage", "read", "index" ]
+      "application": "kibana-.kibana",
+      "privileges": [ "feature_discover.read", "feature_dashboard.read" ],
+      "resources": [ "space:default" ]
     }
   ]
 }
 ```
+
+* Never grant privileges on the system indices (`.kibana*`): access to Kibana goes through **Kibana privileges** (`applications`), easier to set in *Stack Management > Roles*.
 
 ---
 
@@ -168,7 +208,7 @@ POST /_security/role/ro-person-company
 # Generating an API Key
 
 * It's also possible to define an API Key
-* We will define roles and privileges for it like for a user
+* We will define roles and privileges for it like for a user: give it only what it needs
 * An expiration date can be associated with it
 
 ```json
@@ -178,8 +218,8 @@ POST /_security/api_key
   "expiration": "1d",
   "role_descriptors": {
     "role-a": {
-      "cluster": ["all"],
-      "index": [
+      "cluster": [],
+      "indices": [
         {
           "names": ["index-a*"],
           "privileges": ["read"]
@@ -215,15 +255,19 @@ xpack.security.audit.logfile.events.ignore_filters.<policy_name>.users:
 
 ---
 
-# Policy Name
+# Event Types and Ignore Filters
 
-* Where `policy_name` represents the event that will be recorded
-    * `access_denied`
-    * `access_granted`
-    * `authentication_failed`
-    * `delete_user`
-    * `put_role`
+* `events.include` / `events.exclude` take the **event types** to record:
+    * `access_denied`, `access_granted`
+    * `authentication_failed`, `authentication_success`
+    * `security_config_change` (users, roles, API keys...)
     * ...
+* `ignore_filters.<policy_name>`: `policy_name` is a free name; each policy drops the events matching all its criteria (`users`, `realms`, `roles`, `indices`, `actions`)
+
+```
+xpack.security.audit.logfile.events.include: [ "access_denied", "authentication_failed", "security_config_change" ]
+xpack.security.audit.logfile.events.ignore_filters.monitoring.users: [ "metricbeat_internal" ]
+```
 
 ---
 layout: cover

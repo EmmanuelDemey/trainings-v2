@@ -6,7 +6,7 @@ layout: cover
 
 ---
 
-# Using a SDK
+# Using an SDK
 
 * Elasticsearch is usable via simple HTTP requests
 * Many SDKs exist for integration with Java, JavaScript, .NET, PHP, etc.
@@ -20,7 +20,7 @@ npm install @elastic/elasticsearch
 
 ---
 
-# Using a SDK
+# Using an SDK
 
 
 ```typescript
@@ -45,11 +45,10 @@ import { Client } from '@elastic/elasticsearch';
 
 const client = new Client({ node: 'http://localhost:9200' });
 
-const { body } = await client./* action */({
+// Since v8: the request's body is spread into the argument, and the response is the body itself
+const response = await client./* action */({
     index: 'INDEX NAME',
-    body: {
-
-    }
+    /* the fields of the request body: query, aggs, document… */
 })
 ```
 
@@ -70,7 +69,7 @@ async function indexDocument() {
 
   const response = await client.index({
     index: 'documents',
-    body: document
+    document
   });
 
   console.log(response);
@@ -87,10 +86,8 @@ indexDocument().catch(console.error);
 async function searchDocuments() {
   const response = await client.search({
     index: 'documents',
-    body: {
-      query: {
-        match: { title: 'sample' }
-      }
+    query: {
+      match: { title: 'sample' }
     }
   });
 
@@ -113,12 +110,12 @@ const client = new Client({ node: 'http://localhost:9200' });
 
 async function getClusterInfo() {
   try {
-    const { body } = await client.cluster.stats();
+    const stats = await client.cluster.stats();
 
-    console.log('Cluster Name:', body.cluster_name);
-    console.log('Cluster Status:', body.status);
-    console.log('Nodes Count:', body.nodes.count);
-    console.log('Indices Count:', body.indices.count);
+    console.log('Cluster Name:', stats.cluster_name);
+    console.log('Cluster Status:', stats.status);
+    console.log('Nodes Count:', stats.nodes.count.total);
+    console.log('Indices Count:', stats.indices.count);
   } catch (error) {
     console.error('Error retrieving cluster information:', error);
   }
@@ -129,26 +126,30 @@ getClusterInfo();
 
 ---
 
-## Integration with TestContainer
+## Integration with Testcontainers
 
-* **TestContainer** is an open-source solution that allows you to programmatically launch a Docker image.
+* **Testcontainers** is an open-source solution that allows you to programmatically launch a Docker image.
 * This solution is often used to implement integration tests that depend on a service we do not control (such as a database, etc.).
-* **TestContainer** can be used in multiple languages and on different platforms (like Node.js).
+* **Testcontainers** can be used in multiple languages and on different platforms (like Node.js).
 
 ```shell
 npm install @testcontainers/elasticsearch --save-dev
 ```
 
 ```typescript
+import { Client } from '@elastic/elasticsearch';
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch';
 
 it("should create an index", async () => {
-  const container = await new ElasticsearchContainer().start();
-  const client = new Client({ node: container.getHttpUrl() });
+  const container = await new ElasticsearchContainer('docker.elastic.co/elasticsearch/elasticsearch:9.5.5').start();
+  const client = new Client({
+    node: container.getHttpUrl(),
+    auth: { username: container.getUsername(), password: container.getPassword() },
+  });
 
   await client.indices.create({ index: "people" });
 
-  expect((await client.indices.exists({ index: "people" })).statusCode).toBe(200);
+  expect(await client.indices.exists({ index: "people" })).toBe(true);
   await container.stop();
 });
 ```
