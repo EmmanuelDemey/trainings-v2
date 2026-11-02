@@ -13,9 +13,13 @@ L'application mobile du guide a besoin de quatre écrans : une liste triée et p
 Ce TP est autonome. Créez l'index `restaurants` et ses douze documents :
 
 ```json
-DELETE /restaurants
 DELETE /restaurant_names
 DELETE /alerts
+```
+
+<!-- include: ../../data/restaurants.md -->
+```json
+DELETE /restaurants
 
 PUT /restaurants
 {
@@ -60,6 +64,7 @@ POST /restaurants/_bulk?refresh=true
 { "index": { "_id": "12" } }
 { "name": "L'Étoile du Nord", "description": "Menu dégustation, cuisine gastronomique de saison.", "cuisine": "gastronomique", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
 ```
+<!-- /include -->
 
 Référence : [Search features](https://docs.opensearch.org/latest/search-plugins/searching-data/).
 

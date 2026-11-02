@@ -12,6 +12,7 @@ Le guide prépare son édition annuelle. Le rédacteur en chef veut des chiffres
 
 Ce TP est autonome. Créez l'index `restaurants` et ses douze documents :
 
+<!-- include: ../../data/restaurants.md -->
 ```json
 DELETE /restaurants
 
@@ -58,6 +59,7 @@ POST /restaurants/_bulk?refresh=true
 { "index": { "_id": "12" } }
 { "name": "L'Étoile du Nord", "description": "Menu dégustation, cuisine gastronomique de saison.", "cuisine": "gastronomique", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
 ```
+<!-- /include -->
 
 Référence : [Aggregations](https://docs.opensearch.org/latest/aggregations/).
 

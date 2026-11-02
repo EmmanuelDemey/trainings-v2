@@ -16,6 +16,7 @@ L'équipe d'exploitation d'un site web veut un tableau de bord : le trafic dans 
 
 L'index `opensearch_dashboards_sample_data_logs` contient environ **14 000** requêtes HTTP, réparties sur quelques semaines **autour d'aujourd'hui**. Champs utiles :
 
+<!-- ci: sample-data logs -->
 | Champ | Type | Contenu |
 |---|---|---|
 | `timestamp` | `date` | Date de la requête |

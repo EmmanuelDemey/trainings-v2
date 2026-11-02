@@ -22,6 +22,9 @@
 //   elasticsearch       guided workshops, run in Kibana Dev Tools: the folder of the
 //                       Dockerfile of the Elasticsearch their README requests are
 //                       replayed against (scripts/check-console.mjs)
+//   dashboards          workshops done in the OpenSearch Dashboards UI: the folder
+//                       of the docker-compose.yml of the lab their sample data is
+//                       loaded in (scripts/check-dashboards.mjs)
 
 import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
@@ -36,13 +39,14 @@ const DEFAULTS = {
   skip: [],
   verifyScript: false,
   elasticsearch: '',
+  dashboards: '',
 };
 
 /** The checks of the training in `dir`. */
 export async function workshopChecks(dir) {
   const configFile = join(dir, 'workshops.ci.mjs');
   const config = existsSync(configFile) ? (await import(pathToFileURL(configFile))).default : {};
-  const { setup, build, quietTest, learnerWritesTests, skip, verifyScript, elasticsearch } = { ...DEFAULTS, ...config };
+  const { setup, build, quietTest, learnerWritesTests, skip, verifyScript, elasticsearch, dashboards } = { ...DEFAULTS, ...config };
 
   // A training without solutions (guided workshops, nothing to run) has nothing to check.
   const solutions = join(dir, 'solutions');
@@ -53,7 +57,7 @@ export async function workshopChecks(dir) {
     .sort()
     .map((name) => ({ name, starter: learnerWritesTests.includes(name) ? 'green' : 'red' }));
 
-  return { workshops, setup, build, quietTest, verifyScript, elasticsearch };
+  return { workshops, setup, build, quietTest, verifyScript, elasticsearch, dashboards };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

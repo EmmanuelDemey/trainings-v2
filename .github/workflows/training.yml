@@ -41,6 +41,14 @@ jobs:
           node -p "'workshops=' + JSON.stringify(require(process.env.RUNNER_TEMP + '/plan.json').workshops)" >> "$GITHUB_OUTPUT"
           node -p "'verify-script=' + require(process.env.RUNNER_TEMP + '/plan.json').verifyScript" >> "$GITHUB_OUTPUT"
           node -p "'elasticsearch=' + require(process.env.RUNNER_TEMP + '/plan.json').elasticsearch" >> "$GITHUB_OUTPUT"
+          node -p "'dashboards=' + require(process.env.RUNNER_TEMP + '/plan.json').dashboards" >> "$GITHUB_OUTPUT"
+
+      # A block several files share (a dataset's setup…) is written once and
+      # copied where an include marks it: every copy must match its source.
+      - name: The includes are in sync
+        env:
+          TRAINING: ${{ inputs.dir }}
+        run: node scripts/sync-includes.mjs "$TRAINING" --check
 
       # Workshops that are npm projects: every one of them, side by side.
       - uses: actions/setup-node@v7
@@ -117,6 +125,25 @@ jobs:
       - name: Elasticsearch logs
         if: failure() && steps.plan.outputs.elasticsearch != ''
         run: docker logs training-es 2>&1 | tail -200
+
+      # Workshops done in the OpenSearch Dashboards UI: their sample data must
+      # still load in the learners' lab, with the fields their README lists.
+      - name: Check the Dashboards workshops
+        if: steps.plan.outputs.dashboards != ''
+        env:
+          TRAINING: ${{ inputs.dir }}
+          LAB: ${{ inputs.dir }}/${{ steps.plan.outputs.dashboards }}
+        run: |
+          # The lab takes port 9200 too.
+          docker stop training-es 2> /dev/null || true
+          docker compose --project-directory "$LAB" up -d --wait
+          node scripts/check-dashboards.mjs "$TRAINING"
+
+      - name: Dashboards logs
+        if: failure() && steps.plan.outputs.dashboards != ''
+        env:
+          LAB: ${{ inputs.dir }}/${{ steps.plan.outputs.dashboards }}
+        run: docker compose --project-directory "$LAB" logs --tail 200
 
   deploy:
     name: Deploy

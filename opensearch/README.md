@@ -9,6 +9,7 @@ slides/            one Markdown file per chapter (Slidev)
   shared/          the end-of-day retro, imported by the last chapter
 ci/Dockerfile      the OpenSearch the CI replays every request against
 ci/fixtures/       the data some chapters need, replayed before them in the CI
+data/              the setups several files share, copied where an include marks them
 workshops/         one folder per workshop, its README.md: setup, goals, hints
   01_installation/docker-compose.yml   the learners' lab: OpenSearch + Dashboards
 solutions/         one SOLUTION.md per workshop — never published
@@ -77,7 +78,19 @@ the only place its version is written, security plugin off as in the lab
 ([`check-console.mjs`](../scripts/check-console.mjs): OpenSearch speaks the REST
 API of Elasticsearch 7.10, the script needs no change). A request that fails, or
 a response that does not hold the « Résultat attendu » JSON that follows it, holds
-back the deploy. Workshop 8 is done in the Dashboards UI: nothing to replay.
+back the deploy. Workshop 8 is done in the Dashboards UI: nothing to replay, but
+the CI starts the lab of workshop 1, loads the sample web logs, and checks that
+the fields of the table under `<!-- ci: sample-data logs -->` are still there,
+with their types ([`check-dashboards.mjs`](../scripts/check-dashboards.mjs)).
+
+The `restaurants` index of workshops 3, 5, 6 and of the fixtures is written once,
+in [`data/restaurants.md`](data/restaurants.md): each file holds a copy between
+`<!-- include: … -->` and `<!-- /include -->`. Change the source, then rewrite
+the copies — the CI fails on a stale one:
+
+```bash
+node ../scripts/sync-includes.mjs .
+```
 
 ```bash
 docker build -t training-os ci && docker run -d --rm --name training-os -p 9200:9200 training-os

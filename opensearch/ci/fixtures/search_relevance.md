@@ -1,5 +1,6 @@
 # Fixture: the `restaurants` index of the slides, replayed before each chapter that queries it.
 
+<!-- include: ../../data/restaurants.md -->
 ```json
 DELETE /restaurants
 
@@ -46,3 +47,4 @@ POST /restaurants/_bulk?refresh=true
 { "index": { "_id": "12" } }
 { "name": "L'Étoile du Nord", "description": "Menu dégustation, cuisine gastronomique de saison.", "cuisine": "gastronomique", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
 ```
+<!-- /include -->

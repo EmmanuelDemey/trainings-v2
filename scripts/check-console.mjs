@@ -244,8 +244,8 @@ export async function runSteps(steps, es, { retries = 30, delay = 2000, beforeSt
 }
 
 /** A client for the cluster at `url`, as the `elastic` user when `password` is given. */
-export function client(url, password, { timeout = 120_000 } = {}) {
-  const headers = { 'Content-Type': 'application/json' };
+export function client(url, password, { timeout = 120_000, headers: extra = {} } = {}) {
+  const headers = { 'Content-Type': 'application/json', ...extra };
   if (password) headers.Authorization = `Basic ${Buffer.from(`elastic:${password}`).toString('base64')}`;
   return {
     // node:http rather than fetch: Dev Tools sends a body with a GET (_search…).

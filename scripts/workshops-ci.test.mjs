@@ -35,6 +35,7 @@ test('every solution that is an npm project is a workshop whose starter must fai
     quietTest: '--reporter=default',
     verifyScript: false,
     elasticsearch: '',
+    dashboards: '',
   });
 });
 
