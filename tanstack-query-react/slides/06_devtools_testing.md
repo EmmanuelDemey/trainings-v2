@@ -86,7 +86,39 @@ function App() {
 - `lazy` + `Suspense`: users who never call it never download it
 
 ---
-src: ../../tanstack-query-common/slides/06_devtools_testing/testing-principles.md
+src: ../../tanstack-query-common/slides/06_devtools_testing/testing-principles.md#1-2
+---
+
+---
+
+# The render helper of the workshops — `renderApp()`
+
+```tsx
+// src/tests/render.tsx
+import { cleanup, render } from '@testing-library/react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { App } from '../App';
+import { createQueryClient } from '../queryClient';
+
+export async function renderApp(): Promise<void> {
+  cleanup();   // a second render in the same test replaces the first
+  render(
+    <QueryClientProvider client={createQueryClient()}>
+      <App />
+    </QueryClientProvider>,
+  );
+}
+```
+
+- A **fresh** client per call: no cache leaks from one test to the next, and
+  the request counts stay true
+- Built with **your** `createQueryClient()`: your `defaultOptions` apply in the
+  specs too
+- The **only** React-aware file of the specs: the shared specs call it, then
+  read the page with `@testing-library/dom`
+
+---
+src: ../../tanstack-query-common/slides/06_devtools_testing/testing-principles.md#3-8
 ---
 
 ---
@@ -233,5 +265,9 @@ using invalidate = jest.spyOn(queryClient, 'invalidateQueries');   // Jest ≥ 3
   `jsc.parser.explicitResourceManagement`, or TypeScript ≥ 5.2 through `ts-jest`
 
 ---
+layout: cover
+---
 
-## Workshop 06 — Testing
+# Workshop 06
+
+## Testing

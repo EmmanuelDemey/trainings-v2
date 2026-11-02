@@ -45,6 +45,9 @@ npm install -D @tanstack/eslint-plugin-query   # optional, recommended
 
 # The client and the provider
 
+<div style="display: flex; gap: 1.5em;">
+<div style="flex: 1.25; min-width: 0;">
+
 ```tsx {all|5-6|10-15}
 // main.tsx
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -62,17 +65,32 @@ createRoot(document.getElementById('root')!).render(
 );
 ```
 
+</div>
+<div style="flex: 1; min-width: 0;">
+
 ```ts
-// queryClient.ts — a factory: the app calls it once, every test calls it again
-export function createQueryClient(): QueryClient {
-  return new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } });
+// queryClient.ts — a factory: the app
+// calls it once, every test calls it again
+export function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: 30_000 },
+    },
+  });
 }
 ```
 
 - `QueryClientProvider` puts the client in a **React context**; every hook below
   reads it with `useQueryClient()`
 - A client created in a component body is a **new, empty cache at every
-  render**. If it must live in a component (SSR), `useState(() => new QueryClient())`
+  render**. 
+
+</div>
+</div>
+
+<style>
+.slidev-code { --slidev-code-font-size: 11px; --slidev-code-line-height: 16px; }
+</style>
 
 ---
 
@@ -144,5 +162,3 @@ export async function renderApp(): Promise<void> {
 
 - A **fresh** client per test, built with **your** `createQueryClient()`: your
   defaults apply in the specs too
-- `src/api/` and `src/tests/shared/` are copies shared with the Angular and Vue
-  editions — read them, don't edit them

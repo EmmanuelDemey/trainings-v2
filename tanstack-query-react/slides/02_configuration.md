@@ -123,5 +123,9 @@ const { data: titles } = useQuery({ ...issuesQuery('open'), select: selectTitles
   be able to run
 
 ---
+layout: cover
+---
 
-## Workshop 02 — Query configuration
+# Workshop 02
+
+## Query configuration

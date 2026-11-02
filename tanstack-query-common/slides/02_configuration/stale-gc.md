@@ -99,22 +99,31 @@ table { font-size: 0.85em; }
 | A detail being edited by others, a dashboard | 0 + `refetchOnWindowFocus` / `refetchInterval` | Must reflect others' changes |
 | Data **you** change | anything — **invalidate** after your own writes | Your writes do not need the clock |
 
+<style>
+table { font-size: 0.8em; }
+</style>
+
+---
+
+# Setting them: a default, then per query
+
 ```ts
 new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000 } },   // the app's default
 });
 
-queryOptions({ queryKey: ['countries'], queryFn: fetchCountries, staleTime: Infinity, gcTime: Infinity });
+queryOptions({
+  queryKey: ['countries'],
+  queryFn: fetchCountries,
+  staleTime: Infinity,
+  gcTime: Infinity,
+});
 ```
 
 - Raising `gcTime` keeps more in **memory** — rarely a problem, but think of
   many large entries (chapter 08)
 - Keep `gcTime` **≥** `staleTime` in practice: fresh data that has already been
   collected is no use
-
-<style>
-table { font-size: 0.8em; }
-</style>
 
 ---
 

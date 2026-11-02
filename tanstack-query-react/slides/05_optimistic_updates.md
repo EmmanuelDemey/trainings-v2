@@ -105,5 +105,9 @@ const statusChange = useSetIssueStatus();
   the client — chapter 07
 
 ---
+layout: cover
+---
 
-## Workshop 05 — Optimistic updates
+# Workshop 05
+
+## Optimistic updates

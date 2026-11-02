@@ -83,7 +83,9 @@ export const issueQuery = (id: number | null) =>
 </div>
 </div>
 
-<br />
+---
+
+# `skipToken` or `enabled`?
 
 - Both give the same status: `pending` + `idle` while skipped
 - Prefer `skipToken` when the condition is "a parameter is missing"; `enabled`
@@ -135,6 +137,10 @@ export function createQueryClient(): QueryClient {
   return queryClient;
 }
 ```
+
+---
+
+# Which option wins?
 
 Precedence, lowest to highest:
 

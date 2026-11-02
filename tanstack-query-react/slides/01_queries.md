@@ -220,5 +220,9 @@ return (
   `isPending && isFetching`, and is `false` for a disabled query
 
 ---
+layout: cover
+---
 
-## Workshop 01 — First queries
+# Workshop 01
+
+## First queries

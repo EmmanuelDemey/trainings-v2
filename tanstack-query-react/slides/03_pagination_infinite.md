@@ -120,5 +120,9 @@ function LoadMoreSentinel({ onVisible }: { onVisible: () => void }) {
   end" of an infinite list
 
 ---
+layout: cover
+---
 
-## Workshop 03 — Pagination & infinite
+# Workshop 03
+
+## Pagination & infinite

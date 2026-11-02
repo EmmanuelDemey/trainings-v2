@@ -74,18 +74,29 @@ Close #1 ✅, close #2 ❌ (server refuses), close #4 ✅ — in flight together
   **before** #4's: #4 goes back to *open* on screen, #1 stays closed ❌
 - A snapshot restore is only exact when **no other** optimistic write happened
   since
-- Two ways out:
+
+---
+
+# Partial failures — two ways out
 
 <div style="display: flex; gap: 2em;">
-<div>
+<div style="flex: 3; min-width: 0;">
 
 ### Inverse operation
 
 ```ts
 onError: (_e, { id, status }) => {
   const previous = status === 'closed' ? 'open' : 'closed';
-  for (const [key, issues] of queryClient.getQueriesData<IssueSummary[]>({ queryKey: issueKeys.lists() })) {
-    if (issues) queryClient.setQueryData(key, applyStatus(issues, id, previous, key[2] as IssueFilter));
+  const lists = queryClient.getQueriesData<IssueSummary[]>({
+    queryKey: issueKeys.lists(),
+  });
+  for (const [key, issues] of lists) {
+    if (!issues) continue;
+    const filter = key[2] as IssueFilter;
+    queryClient.setQueryData(
+      key,
+      applyStatus(issues, id, previous, filter),
+    );
   }
 },
 ```
@@ -93,7 +104,7 @@ onError: (_e, { id, status }) => {
 Undo **only** this change, keep the others.
 
 </div>
-<div>
+<div style="flex: 2; min-width: 0;">
 
 ### Converge with the server
 

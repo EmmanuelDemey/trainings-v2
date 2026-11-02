@@ -9,7 +9,9 @@
 | You **invalidate** it | `queryClient.invalidateQueries(…)` | — |
 | You **ask** | `refetch()`, `queryClient.refetchQueries(…)` | — |
 
-<br />
+---
+
+# The automatic triggers — only when stale
 
 - The first three only refetch **stale** queries: with a `staleTime` of 30 s,
   focusing the tab 10 s after a fetch sends **nothing**

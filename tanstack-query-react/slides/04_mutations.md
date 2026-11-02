@@ -115,5 +115,9 @@ const pendingTitles = useMutationState({
   `['issues', 'delete']`
 
 ---
+layout: cover
+---
 
-## Workshop 04 — Mutations
+# Workshop 04
+
+## Mutations

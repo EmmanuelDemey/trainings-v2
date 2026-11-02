@@ -122,6 +122,12 @@ vi.mock('../api/fakeApi', async (importOriginal) => ({
 # Testing a mutation
 
 ```ts
+import { expect, it } from 'vitest';
+import { screen } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
+import { sent } from '../../api/fakeApi';
+import { renderApp } from '../render';
+
 it('creates an issue and clears the input', async () => {
   const user = userEvent.setup();
   await renderApp();
@@ -135,6 +141,10 @@ it('creates an issue and clears the input', async () => {
   expect(sent('POST /issues')).toBe(1);
 });
 ```
+
+---
+
+# Testing a mutation — what else to cover
 
 - Same rules: act like a user (`userEvent`), assert on the page and on the
   requests
