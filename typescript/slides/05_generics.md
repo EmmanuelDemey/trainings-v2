@@ -265,6 +265,30 @@ function log(value: unknown): void { console.log(value); }  // ✔
 
 ---
 
+# Variance — `in` and `out`
+
+```ts
+interface Producer<out T> { get(): T }               // T only comes out: covariant
+interface Consumer<in T> { accept(value: T): void }  // T only goes in: contravariant
+
+declare let produceString: Producer<string>;
+declare let produceAny: Producer<string | number>;
+produceAny = produceString;     // ✔ whoever wants string | number is happy with a string
+produceString = produceAny;     // ✘ Type 'string | number' is not assignable to type 'string'.
+
+declare let acceptString: Consumer<string>;
+declare let acceptAny: Consumer<string | number>;
+acceptString = acceptAny;       // ✔ handles strings — and more
+acceptAny = acceptString;       // ✘ it would be handed numbers it cannot handle
+```
+
+- TypeScript **measures** variance on its own: the annotation is **optional**
+- Write it to **document** the intent, get an error where the type breaks it,
+  and speed up the check of big recursive types
+- Both at once: `<in out T>` — invariant (a mutable box)
+
+---
+
 # Quiz — Question 1 / 3
 
 **`function wrap<T>(value: T) { return [value]; }` — what is the type of

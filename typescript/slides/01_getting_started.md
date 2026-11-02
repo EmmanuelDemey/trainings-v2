@@ -71,7 +71,8 @@ npx tsc --init
 <br />
 
 > **TypeScript 7** is the **native** port of the compiler (written in Go):
-> same `tsc` command, same options, about **10× faster**.
+> same `tsc` command, same options, **8 to 12× faster**. Since 7.0 it ships as
+> the `typescript` package itself.
 
 ---
 
@@ -98,6 +99,29 @@ npx tsc --init
 
 ---
 
+# The defaults changed — TypeScript 6 and 7
+
+What you get **without writing it**:
+
+| Option | Before (5.x) | Now (6.0, 7.0) |
+|---|---|---|
+| `strict` | `false` | **`true`** |
+| `module` | depends on `target` | `esnext` |
+| `target` | `es5` | the latest: `es2025` |
+| `types` | every `node_modules/@types` | **`[]`** — list them: `["node"]` |
+| `rootDir` | inferred from the sources | the folder of `tsconfig.json` |
+| `noUncheckedSideEffectImports` | `false` | `true` |
+
+```txt
+error TS2304: Cannot find name 'process'.     ← the classic one after upgrading: add "types": ["node"]
+```
+
+- Gone in 7.0: `target: "es5"`, `moduleResolution: "node10"`, `baseUrl`, `outFile`,
+  `module: "amd" | "umd" | "system"` — see chapter 9
+- `tsc file.ts` next to a `tsconfig.json` is now an **error**: `--ignoreConfig` to bypass it
+
+---
+
 # `strict`: the setting that matters
 
 `strict: true` turns on a **family** of checks — among them:
@@ -117,8 +141,9 @@ const last = ['a', 'b'].at(-1);         // string | undefined
 last.toUpperCase();                     // ✘ 'last' is possibly 'undefined'.
 ```
 
-> Without `strict`, TypeScript is a linter with good completion. **Start every
-> project strict**; migrate an old one flag by flag.
+> Without `strict`, TypeScript is a linter with good completion. It is **on by
+> default** since TypeScript 6: an old project that turns it off says so with
+> `"strict": false` — migrate it flag by flag.
 
 ---
 

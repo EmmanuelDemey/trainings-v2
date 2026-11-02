@@ -31,8 +31,12 @@ At the end of this chapter, you will be able to:
 <br />
 
 - **TypeScript 7** is a **native port** of that compiler, written in Go:
-  same command, same options, same errors — about **10× faster**, in parallel
+  same command, same options, same errors — **8 to 12× faster** on a full build, in parallel
 - The editor's language service runs on the same native code
+- Parallelism: `--checkers <n>`, `--builders <n>` (project references),
+  `--singleThreaded` to turn it off
+- **No compiler API in 7.0** (a new one is planned for 7.1): tools that need it,
+  like typescript-eslint, still install TypeScript 6 side by side
 
 ---
 
@@ -41,11 +45,11 @@ At the end of this chapter, you will be able to:
 ```jsonc
 {
   "compilerOptions": {
-    "target": "es2023",              // the syntax emitted
-    "lib": ["es2023", "dom"],        // the APIs that exist at run time
-    "module": "nodenext",            // or "preserve" for a bundler
-    "types": ["node"],               // the global @types loaded
-    "strict": true,
+    "target": "es2025",              // the syntax emitted — the default
+    "lib": ["es2025", "dom"],        // the APIs that exist at run time
+    "module": "nodenext",            // or "preserve" for a bundler — default: esnext
+    "types": ["node"],               // the global @types loaded — default: none
+    "strict": true,                  // the default, written for the reader
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
@@ -172,6 +176,9 @@ const total = items.reduce(…) as any;   // no-unsafe-assignment
 ```
 
 - Biome and oxlint lint faster, with fewer type-aware rules
+- typescript-eslint uses the compiler API, absent from TypeScript 7.0: alias
+  6.0 next to it — `"typescript": "npm:@typescript/typescript6@^6.0.2"`,
+  `"@typescript/native": "npm:typescript@^7.0.2"`
 
 ---
 

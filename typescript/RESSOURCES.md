@@ -82,12 +82,23 @@
 - Lire — https://typedoc.org
 - Lire — https://tsx.is
 
-## Typage à l'exécution
+## 11. Validation à l'exécution
 
 - Regarder — https://www.youtube.com/watch?v=Lkgpy_ctzIo (Zod/ArkType, comment typer vos applications JS au runtime)
 - Lire — https://zod.dev
-- Lire — https://arktype.io
+- Lire — https://zod.dev/api
+- Lire — https://standardschema.dev (Standard Schema, l'interface commune)
+- Lire — https://github.com/standard-schema/standard-schema
 - Lire — https://valibot.dev
+- Lire — https://arktype.io
+
+## 12. Migrer un projet JavaScript
+
+- Lire — https://www.typescriptlang.org/docs/handbook/migrating-from-javascript.html
+- Lire — https://www.typescriptlang.org/docs/handbook/intro-to-js-ts.html
+- Lire — https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
+- Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#the-jsdoc-import-tag (le tag `@import`)
+- Lire — https://www.typescriptlang.org/docs/handbook/declaration-files/dts-from-js.html (générer des `.d.ts` depuis du JavaScript)
 
 ## Veille
 

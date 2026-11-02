@@ -72,6 +72,72 @@ import { emit, type EventMap } from './events.ts';
   `package.json` and the extension (`.mts`, `.cts`)
 - `bundler` is more lenient — and lets through imports Node.js would refuse
 - Pick the one that matches **what runs the code**, not the most lenient one
+- `node20` pins Node.js 20+ behaviour; `nodenext` follows the latest Node.js
+
+---
+
+# `require(esm)`, side effects, `#/` imports
+
+```ts
+// report.cts — CommonJS, under module: nodenext (5.8)
+const { publish } = require('./articles.js');   // ✔ an ES module, loaded synchronously
+                                                // (no top-level await in it)
+
+import './polyfills.ts';     // checked since 5.6: the file must exist
+import './theme.css';       // ✘ Cannot find module or type declarations for side-effect import of './theme.css'.
+```
+
+```json
+// package.json — subpath imports: private aliases, resolved by Node.js itself
+{ "imports": { "#/*": "./src/*" } }
+```
+
+```ts
+import { publish } from '#/articles.ts';
+```
+
+- **`noUncheckedSideEffectImports`** is **on by default** since TypeScript 6:
+  declare `declare module '*.css';` for files a bundler handles
+- `#/…` replaces most `paths` aliases — and needs no bundler
+
+---
+
+# `import defer` — load now, run later (5.9)
+
+```ts
+import defer * as charts from './charts.ts';   // fetched and parsed — not evaluated
+
+export function renderDashboard() {
+  return charts.render();   // ← charts.ts (and its imports) run here, on first access
+}
+```
+
+- Cuts start-up time when a heavy module is needed only on some paths
+- Only `import defer * as ns`: no named or default import
+- Only under **`module: esnext` or `preserve`** — and the runtime or bundler must
+  support it (TC39 stage 3)
+
+---
+
+# Gone in TypeScript 7
+
+Deprecated in 6.0, **removed** in 7.0 — `tsc` refuses the config:
+
+| Option | Instead |
+|---|---|
+| `moduleResolution: "node"` / `"node10"` / `"classic"` | `nodenext`, or `bundler` |
+| `baseUrl` | `paths` with full paths: `"@app/*": ["./src/app/*"]` — or `#/` imports |
+| `module: "amd"` / `"umd"` / `"system"` / `"none"`, `outFile` | a bundler |
+| `target: "es5"`, `downlevelIteration` | `es2015`+, or a bundler that downlevels |
+| `esModuleInterop: false`, `allowSyntheticDefaultImports: false` | always on: `import express from 'express'` |
+| `import data from './x.json' assert { … }` | `with { type: 'json' }` |
+
+```txt
+error TS5102: Option 'baseUrl' has been removed. Please remove it from your configuration.
+```
+
+- Upgrade through **6.0** first: fix every deprecation, turn on `--stableTypeOrdering`
+- The experimental **`ts5to6`** tool rewrites `baseUrl` and `rootDir` for you
 
 ---
 

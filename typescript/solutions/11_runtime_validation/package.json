@@ -1,0 +1,22 @@
+{
+  "name": "tp-11-runtime-validation",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --typecheck",
+    "test:watch": "vitest --typecheck"
+  },
+  "dependencies": {
+    "@standard-schema/spec": "^1.1.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}

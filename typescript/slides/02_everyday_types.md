@@ -271,6 +271,53 @@ await using file = await open('data.json');   // Symbol.asyncDispose, awaited
 
 ---
 
+# `await using` and `DisposableStack`
+
+```ts
+async function importOrders(path: string) {
+  await using file = await open(path);         // FileHandle: Symbol.asyncDispose
+  await using db = await connect();            // disposed first: reverse order
+  for await (const line of file.readLines()) await db.insert(JSON.parse(line));
+}                                              // db closed, then file — even on a throw
+
+function openAll(paths: string[]) {
+  using stack = new DisposableStack();
+  const connections = paths.map((p) => stack.use(openConnection(p)));
+  const owned = stack.move();                  // success: hand them over, nothing closed
+  return { connections, [Symbol.dispose]: () => owned.dispose() };
+}                                              // a throw halfway: the opened ones are closed
+```
+
+- `await using` **awaits** `Symbol.asyncDispose` at the end of the scope
+- **`DisposableStack`** / `AsyncDisposableStack`: a dynamic number of resources,
+  `defer(() => …)` for a plain callback
+- Disposal runs in **reverse** order of declaration
+
+---
+
+# New built-ins, typed — `lib: ["es2025"]` and `esnext`
+
+```ts
+const firstBigOrders = Iterator.from(orders)    // iterator helpers: lazy
+  .filter((o) => o.total > 100)
+  .map((o) => o.id)
+  .take(3)
+  .toArray();                                   // string[]
+
+const both = admins.intersection(editors);      // Set methods: union, difference…
+const byStatus = Object.groupBy(orders, (o) => o.status);   // Partial<Record<Status, Order[]>>
+const { promise, resolve } = Promise.withResolvers<number>();
+
+const cache = new Map<string, Order[]>();
+cache.getOrInsertComputed(customerId, () => []).push(order);   // esnext: upsert
+```
+
+- The types follow `lib`, not `target`: `lib` says **what exists at run time**
+- `Iterator` and `Set` methods moved into **`es2025`** with TypeScript 6;
+  `Temporal` and `Map.getOrInsert` are still `esnext`
+
+---
+
 # Quiz — Question 1 / 3
 
 **`const SHIPPING = { EUR: 490 } satisfies Record<string, number>`. What is

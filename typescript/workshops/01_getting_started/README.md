@@ -59,6 +59,11 @@ Set `"strict": true`, then run `npm run typecheck`. Read every error before
 fixing any: which ones are about a parameter, which one is about a value that
 may be missing?
 
+> Since TypeScript 6, `strict` is **on by default**: this starter had to switch
+> it off on purpose, as many projects migrated from older versions still do.
+> Deleting the line would work too — the spec asks for it written out, so that
+> the next reader does not have to know the default.
+
 → **Done when** the `tsconfig` spec is green and you can say what `noImplicitAny`
 and `strictNullChecks` — both switched on by `strict` — each complain about.
 

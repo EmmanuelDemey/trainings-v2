@@ -88,6 +88,32 @@ function greet(name?: string) {
 
 ---
 
+# Narrowing keeps getting smarter
+
+```ts
+const ids = ['a1', undefined, 'b2'].filter((id) => id !== undefined);
+// string[] — the predicate `id is string` is inferred (5.5)
+
+function label(value: string | number) {
+  if (typeof value === 'string') {
+    return tags.map((tag) => `${tag}:${value.toUpperCase()}`);   // still string in the closure (5.4)
+  }
+  return [];
+}
+
+function read(config: Record<string, unknown>, key: string) {
+  if (typeof config[key] === 'string') return config[key].trim();   // obj[key], key constant (5.5)
+}
+
+if (/^\d+$/) { … }                    // ✘ This kind of expression is always truthy. (5.6)
+if ((n: number) => n > 0) { … }       // ✘ the same: a function is never falsy
+```
+
+- Before 5.5, `.filter(x => x !== undefined)` kept `(string | undefined)[]`
+- In a closure, the narrowing holds **if** the variable is not reassigned afterwards
+
+---
+
 # A bag of optional fields
 
 ```ts
@@ -230,7 +256,7 @@ name.toUpperCase();           // name: string
 
 - A guard that **throws** instead of returning `false`
 - Must be declared with an **explicit** type annotation (`function`, or a typed `const`)
-- Parsing `unknown` by hand gets long fast: that is what **Zod** is for
+- Parsing `unknown` by hand gets long fast: that is what **Zod** is for — chapter 11
 
 ---
 
