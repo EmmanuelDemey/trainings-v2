@@ -5,14 +5,17 @@
   "packageManager": "pnpm@12.3.1",
   "scripts": {
     "list": "training-kit list",
-    "dev": "training-kit slides",
+    "dev": "training-kit dev",
+    "slides": "training-kit slides",
     "site": "training-kit site",
     "build": "training-kit build",
-    "build:fast": "training-kit build --no-pdf"
+    "build:fast": "training-kit build --no-pdf",
+    "check": "training-kit check",
+    "verify": "training-kit verify"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.42.0",
-    "@emmanueldemey/training-kit": "^0.0.1",
+    "@emmanueldemey/training-kit": "^0.1.0",
     "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",

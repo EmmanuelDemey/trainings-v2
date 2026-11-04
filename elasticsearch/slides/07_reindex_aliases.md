@@ -12,18 +12,22 @@ layout: cover
 * Good practice: the application queries an **alias**, switched to the new index once reindexed (see below).
 * Reindexing can be done via a batch system or using the _reindex_ API.
 ---
+
 # Mapping Modification
 
 <img src="/images/reindex1.png" class="h-96 mx-auto object-contain" />
 ---
+
 # Mapping Modification
 
 <img src="/images/reindex2.png" class="h-96 mx-auto object-contain" />
 ---
+
 # Mapping Modification
 
 <img src="/images/reindex3.png" class="h-96 mx-auto object-contain" />
 ---
+
 # Reindex API
 
 * We can reindex a complete index
@@ -40,6 +44,7 @@ POST _reindex
 }
 ```
 ---
+
 # Reindex API
 
 * Or just a portion by defining a search query
@@ -61,6 +66,7 @@ POST _reindex
 }
 ```
 ---
+
 # Reindex API
 
 * We're not limited to indices within the same cluster

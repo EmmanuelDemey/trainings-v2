@@ -7,14 +7,16 @@
     "sync": "node ../elasticsearch-common/scripts/sync.mjs --lab",
     "postinstall": "node ../elasticsearch-common/scripts/sync.mjs --lab",
     "list": "training-kit list",
-    "dev": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit slides",
+    "dev": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit dev",
+    "slides": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit slides",
     "site": "training-kit site",
     "build": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit build",
-    "build:fast": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit build --no-pdf"
+    "build:fast": "node ../elasticsearch-common/scripts/sync.mjs --lab && training-kit build --no-pdf",
+    "check": "training-kit check"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.42.0",
-    "@emmanueldemey/training-kit": "^0.0.1",
+    "@emmanueldemey/training-kit": "^0.1.0",
     "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",

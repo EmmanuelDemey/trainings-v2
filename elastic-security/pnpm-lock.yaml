@@ -113,8 +113,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.6(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(typescript@5.9.3)
       '@emmanueldemey/training-kit':
-        specifier: ^0.0.1
-        version: 0.0.1(@astrojs/starlight@0.42.6(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(typescript@5.9.3))(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@slidev/cli@52.14.2(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@types/markdown-it@14.2.0)(@types/node@24.19.2)(@vue/compiler-sfc@3.5.44)(cac@7.1.0)(esbuild@0.28.2)(lightningcss@1.33.0)(magicast@0.5.5)(markdown-it-async@2.2.0)(markdown-it@14.3.3)(playwright-chromium@1.64.1)(postcss@8.5.31)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6))(@vue/compiler-sfc@3.5.44)(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(cac@7.1.0)(markdown-it-async@2.2.0)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6)(typescript@5.9.3)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))
+        specifier: ^0.1.0
+        version: 0.1.0(@astrojs/starlight@0.42.6(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(typescript@5.9.3))(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@slidev/cli@52.14.2(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@types/markdown-it@14.2.0)(@types/node@24.19.2)(@vue/compiler-sfc@3.5.44)(cac@7.1.0)(esbuild@0.28.2)(lightningcss@1.33.0)(magicast@0.5.5)(markdown-it-async@2.2.0)(markdown-it@14.3.3)(playwright-chromium@1.64.1)(postcss@8.5.31)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6))(@vue/compiler-sfc@3.5.44)(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(cac@7.1.0)(markdown-it-async@2.2.0)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6)(typescript@5.9.3)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))
       '@slidev/cli':
         specifier: 52.14.2
         version: 52.14.2(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@types/markdown-it@14.2.0)(@types/node@24.19.2)(@vue/compiler-sfc@3.5.44)(cac@7.1.0)(esbuild@0.28.2)(lightningcss@1.33.0)(magicast@0.5.5)(markdown-it-async@2.2.0)(markdown-it@14.3.3)(playwright-chromium@1.64.1)(postcss@8.5.31)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6)
@@ -472,8 +472,8 @@ packages:
   '@drauu/core@1.0.0':
     resolution: {integrity: sha512-r1fPyuKaGuNHc8vxRFUT8LxqWjJ3nx+U+zsHcEOurmJoB7uN+zpFw5kTLInfdfvQZ+qF/ebQjw1AwbGcc1XKsQ==}
 
-  '@emmanueldemey/training-kit@0.0.1':
-    resolution: {integrity: sha512-seJXwZjtn2Xgn0neLprOjEBM+gPncYh9pFoOflesCs3GbG/LtYsOJ4QaFJKqYmhh+ptCDNcTqPy5z7napbmdFg==}
+  '@emmanueldemey/training-kit@0.1.0':
+    resolution: {integrity: sha512-VRvsjzIpvVcj4DZBfpmnptjbiRQoLvgDrO9gj4S0bcSZIEuzFora29/mScrEvJnUZ1USx96r09Z0ACDyFffV4g==}
     engines: {node: '>=22.12'}
     hasBin: true
     peerDependencies:
@@ -4951,7 +4951,7 @@ snapshots:
 
   '@drauu/core@1.0.0': {}
 
-  '@emmanueldemey/training-kit@0.0.1(@astrojs/starlight@0.42.6(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(typescript@5.9.3))(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@slidev/cli@52.14.2(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@types/markdown-it@14.2.0)(@types/node@24.19.2)(@vue/compiler-sfc@3.5.44)(cac@7.1.0)(esbuild@0.28.2)(lightningcss@1.33.0)(magicast@0.5.5)(markdown-it-async@2.2.0)(markdown-it@14.3.3)(playwright-chromium@1.64.1)(postcss@8.5.31)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6))(@vue/compiler-sfc@3.5.44)(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(cac@7.1.0)(markdown-it-async@2.2.0)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6)(typescript@5.9.3)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))':
+  '@emmanueldemey/training-kit@0.1.0(@astrojs/starlight@0.42.6(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(typescript@5.9.3))(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@slidev/cli@52.14.2(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@types/markdown-it@14.2.0)(@types/node@24.19.2)(@vue/compiler-sfc@3.5.44)(cac@7.1.0)(esbuild@0.28.2)(lightningcss@1.33.0)(magicast@0.5.5)(markdown-it-async@2.2.0)(markdown-it@14.3.3)(playwright-chromium@1.64.1)(postcss@8.5.31)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6))(@vue/compiler-sfc@3.5.44)(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(cac@7.1.0)(markdown-it-async@2.2.0)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6)(typescript@5.9.3)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1))':
     dependencies:
       '@astrojs/starlight': 0.42.6(astro@7.4.1(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(typescript@5.9.3)
       '@slidev/cli': 52.14.2(@nuxt/kit@3.21.11(magicast@0.5.5))(@oxc-project/types@0.154.0)(@types/markdown-it@14.2.0)(@types/node@24.19.2)(@vue/compiler-sfc@3.5.44)(cac@7.1.0)(esbuild@0.28.2)(lightningcss@1.33.0)(magicast@0.5.5)(markdown-it-async@2.2.0)(markdown-it@14.3.3)(playwright-chromium@1.64.1)(postcss@8.5.31)(rolldown@1.2.14)(rollup@4.64.12)(srvx@1.0.6)

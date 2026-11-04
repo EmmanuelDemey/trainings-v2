@@ -175,6 +175,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Duplicate numbers, workshops without a solution, links, slide assets and
+      # `src:` imports that lead nowhere: caught in seconds, before the build.
+      - name: Check
+        run: pnpm run check
+
       - name: Build
         run: pnpm run build
 

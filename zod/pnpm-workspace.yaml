@@ -14,4 +14,4 @@ allowBuilds:
   sharp: false
 
 minimumReleaseAgeExclude:
-  - '@emmanueldemey/training-kit@0.0.1'
+  - '@emmanueldemey/training-kit@0.0.1 || 0.1.0'
