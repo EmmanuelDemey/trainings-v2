@@ -1,0 +1,31 @@
+{
+  "name": "sentry-nestjs",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.3.1",
+  "scripts": {
+    "sync": "node ../sentry-common/scripts/sync.mjs",
+    "postinstall": "node ../sentry-common/scripts/sync.mjs",
+    "list": "training-kit list",
+    "dev": "training-kit dev",
+    "slides": "training-kit slides",
+    "site": "training-kit site",
+    "build": "node ../sentry-common/scripts/sync.mjs && training-kit build",
+    "build:fast": "node ../sentry-common/scripts/sync.mjs && training-kit build --no-pdf",
+    "check": "training-kit check",
+    "verify": "training-kit verify"
+  },
+  "devDependencies": {
+    "@astrojs/starlight": "^0.42.0",
+    "@emmanueldemey/training-kit": "^0.1.0",
+    "@slidev/cli": "52.14.2",
+    "@slidev/theme-default": "^0.25.0",
+    "@slidev/theme-seriph": "^0.25.0",
+    "@stackblitz/sdk": "^1.11.1",
+    "astro": "^7.2.10",
+    "sharp": "^0.35.3"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}
