@@ -32,7 +32,7 @@ queryClient.invalidateQueries({ queryKey: issueKeys.detail(7), exact: true });
 
 // Predicate — anything you can compute from the Query
 queryClient.invalidateQueries({
-  predicate: (query) => query.queryKey[0] === 'issues' && query.state.dataUpdatedAt < cutoff,
+  predicate: (query) => query.queryKey[0] === issueKeys.all[0] && query.state.dataUpdatedAt < cutoff,
 });
 
 // refetchType — which matches to refetch now

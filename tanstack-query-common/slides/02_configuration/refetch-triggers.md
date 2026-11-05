@@ -121,7 +121,7 @@ table { font-size: 0.85em; }
 
 ```ts
 queryOptions({
-  queryKey: ['activity', 'latest'],
+  queryKey: activityKeys.latest(),
   queryFn: () => fetchActivity(0),
   refetchInterval: 10_000,                 // every 10 s while used
   refetchIntervalInBackground: false,      // default: pause when the tab is hidden
@@ -129,7 +129,7 @@ queryOptions({
 
 // Adaptive: poll fast while a job runs, stop when it is done
 queryOptions({
-  queryKey: ['export', exportId],
+  queryKey: exportKeys.detail(exportId),
   queryFn: () => fetchExport(exportId),
   refetchInterval: (query) => (query.state.data?.status === 'done' ? false : 2_000),
 });

@@ -3,7 +3,7 @@
 ```ts
 // The detail panel, nothing selected yet: selectedId is null
 queryOptions({
-  queryKey: [...issueKeys.details(), selectedId],   // null is a valid key part
+  queryKey: issueKeys.detail(selectedId),   // null is a valid key part
   queryFn: () => fetchIssue(selectedId!),
   enabled: selectedId !== null,           // or (query) => boolean
 });
@@ -26,12 +26,12 @@ Query B needs a value from query A:
 
 ```ts
 // A: the current user
-const meQuery = queryOptions({ queryKey: ['me'], queryFn: fetchMe });
+const meQuery = queryOptions({ queryKey: meKeys.all, queryFn: fetchMe });
 
 // B: their assigned issues — waits for A's data
 const assignedQuery = (me: User | undefined) =>
   queryOptions({
-    queryKey: ['issues', 'assigned', me?.name],
+    queryKey: issueKeys.assigned(me?.name),
     queryFn: () => fetchAssigned(me!.name),
     enabled: !!me,
   });
@@ -57,7 +57,7 @@ import { skipToken } from '@tanstack/query-core';   // re-exported by every adap
 
 export const issueQuery = (id: number | null) =>
   queryOptions({
-    queryKey: [...issueKeys.details(), id],
+    queryKey: issueKeys.detail(id),
     queryFn: id === null ? skipToken : () => fetchIssue(id),   // id: number here
   });
 ```

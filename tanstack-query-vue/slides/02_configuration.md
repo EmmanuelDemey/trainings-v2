@@ -142,7 +142,7 @@ useQuery({
 // skipToken: decided where the id is known — no `!`
 export function issueQuery(id: number | undefined) {
   return queryOptions({
-    queryKey: issueKeys.detail(id),
+    queryKey: issueKeys.detail(id ?? null),
     queryFn: id === undefined ? skipToken : () => fetchIssue(id),
   });
 }

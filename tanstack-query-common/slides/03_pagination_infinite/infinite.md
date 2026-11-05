@@ -9,6 +9,7 @@ import { infiniteQueryOptions } from '@tanstack/query-core';   // re-exported by
 export const activityKeys = {
   all: ['activity'] as const,
   feed: () => [...activityKeys.all, 'feed'] as const,
+  latest: () => [...activityKeys.all, 'latest'] as const,
 };
 
 export const activityFeedQuery = infiniteQueryOptions({

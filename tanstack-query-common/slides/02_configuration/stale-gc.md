@@ -113,7 +113,7 @@ new QueryClient({
 });
 
 queryOptions({
-  queryKey: ['countries'],
+  queryKey: countryKeys.all,
   queryFn: fetchCountries,
   staleTime: Infinity,
   gcTime: Infinity,

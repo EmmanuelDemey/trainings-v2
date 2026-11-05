@@ -64,7 +64,7 @@ import { useQuery } from '@tanstack/react-query';
 
 function IssueCounter() {
   const { data: issues, isPending, error } = useQuery({
-    queryKey: ['issues', 'list', 'open'],
+    queryKey: issueKeys.list('open'),
     queryFn: () => fetchIssues('open'),
   });
 
@@ -128,10 +128,10 @@ function IssueList() {
   not hold
 
 ```tsx
-// ❌ `userId` is read but not in the key: user 2 gets user 1's issues from the cache
-useQuery({ queryKey: ['issues'], queryFn: () => fetchIssuesOf(userId) });
+// ❌ `name` is read but not in the key: Bob gets Ada's issues from the cache
+useQuery({ queryKey: issueKeys.all, queryFn: () => fetchAssigned(name) });
 // ✅
-useQuery({ queryKey: ['issues', { userId }], queryFn: () => fetchIssuesOf(userId) });
+useQuery({ queryKey: issueKeys.assigned(name), queryFn: () => fetchAssigned(name) });
 ```
 
 ---
@@ -150,7 +150,7 @@ function IssueDetail({ id }: Readonly<{ id: number }>) {
 ```tsx
 function IssueDetail({ id }: Readonly<{ id: number }>) {
   const { data: comments } = useQuery({
-    queryKey: ['issues', 'detail', id, 'comments'],
+    queryKey: issueKeys.comments(id),
     queryFn: () => fetchComments(id),
   });
 }

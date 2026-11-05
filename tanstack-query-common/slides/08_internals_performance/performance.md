@@ -54,7 +54,7 @@ const selectOpenCount = (issues: IssueSummary[]) => issues.length;
 
 ```ts
 queryOptions({
-  queryKey: ['report', id],
+  queryKey: reportKeys.detail(id),
   queryFn: () => fetchReport(id),     // 50 000 rows
   structuralSharing: false,
 });
@@ -79,7 +79,7 @@ queryOptions({
 
 ### The network: invalidation scope
 
-- `invalidateQueries({ queryKey: ['issues'] })` refetches every **active**
+- `invalidateQueries({ queryKey: issueKeys.all })` refetches every **active**
   issue query — usually few
 - `refetchType: 'all'` or `refetchQueries()` without filters: **everything**
   — avoid

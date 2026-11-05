@@ -117,7 +117,9 @@ export const issueKeys = {
   pages: () => [...issueKeys.all, 'page'] as const,
   page: (page: number) => [...issueKeys.pages(), page] as const,
   details: () => [...issueKeys.all, 'detail'] as const,
-  detail: (id: number) => [...issueKeys.details(), id] as const,
+  detail: (id: number | null) => [...issueKeys.details(), id] as const,
+  comments: (id: number) => [...issueKeys.detail(id), 'comments'] as const,
+  assigned: (name: string | undefined) => [...issueKeys.all, 'assigned', name] as const,
 };
 ```
 
