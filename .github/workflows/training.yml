@@ -193,6 +193,16 @@ jobs:
         run: |
           netlify() { npx --yes netlify-cli@27.11.2 "$@"; }
 
+          # Install the CLI into the npx cache first, with retries: a transitive
+          # dependency published seconds ago can be listed by the registry before
+          # its tarball is served (npm ETARGET). Later calls reuse the cache.
+          for attempt in 1 2 3; do
+            netlify --version > /dev/null && break
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            echo "netlify-cli install failed (attempt $attempt), retrying in 30s" >&2
+            sleep 30
+          done
+
           # `--site-name` alone always tries to create the site: when the name is
           # taken, the CLI silently creates `<name>-<random>` instead and deploys
           # there. So the site is looked up first, and only created when Netlify
