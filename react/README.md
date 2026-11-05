@@ -25,7 +25,7 @@ chapter 3, `workshops/03_…/` is workshop 3; `10_…` comes after `9_…`. A
 name that starts with `_` is turned off — kept on disk, left out of the deck, the
 site, the PDFs and the ZIPs. There is no list to maintain anywhere else.
 
-Chapters 0 and 24 (introduction, what's new in React) have no workshop: every
+Chapters 0 and 25 (introduction, what's new in React) have no workshop: every
 other chapter has the workshop of the same number.
 
 ## Build
@@ -56,7 +56,7 @@ a preview. Nothing to set up in the Netlify UI — the site is created on its fi
 deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 
 The end-of-day retro is not a chapter: it lives in `slides/shared/retro.md` and
-is imported at the end of chapters 8, 15 and 24. Course resources and further
+is imported at the end of chapters 8, 15 and 25. Course resources and further
 reading are in [`RESSOURCES.md`](RESSOURCES.md).
 
 ## Checking the workshops

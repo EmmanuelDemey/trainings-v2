@@ -548,7 +548,7 @@ export function PeopleTable({ people }: { people: Person[] }) {
 
 <br />
 
-> The **React Compiler** (chapter 24) inserts this memoisation automatically at build
+> The **React Compiler** (chapter 25) inserts this memoisation automatically at build
 > time. In a compiled project, hand-written `useMemo` / `useCallback` become rare —
 > but you still need to understand what they do.
 

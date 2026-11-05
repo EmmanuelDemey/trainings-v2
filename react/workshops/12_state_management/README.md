@@ -1,8 +1,11 @@
-# TP 12 — Sharing state with Context
+# TP 12 — Sharing state: Context, then Redux Toolkit
 
-> This TP is **autonomous**: it does not depend on any other TP. A characters page
-> with a filter and favorites is provided and working — through prop drilling. Your
-> job is to move its shared state into two contexts, without changing what the user sees.
+> This TP is **autonomous**: it does not depend on any other TP. It has two parts.
+> **Part 1** — a characters page with a filter and favorites is provided and working,
+> through prop drilling: move its shared state into two contexts, without changing
+> what the user sees. **Part 2** — the same favorites in a **Redux Toolkit** store,
+> with a middleware of your own that persists them and a **saga** that runs a
+> debounced, cancellable search.
 
 ## Goal
 
@@ -15,6 +18,10 @@ Chapter 12 — Share state between distant components:
 - **Split contexts**: the filter and the favorites change at different rates, and a
   consumer of one must not re-render for the other
 - **Refactor safely**: behaviour specs green before, during and after
+- **Redux Toolkit**: `createSlice` with Immer, `configureStore`, typed hooks, selectors
+- **A middleware** written by hand (`store => next => action`), to persist the favorites
+- **Redux-Saga**: `takeLatest`, `delay`, `call`, `put`, cancellation
+- **Redux DevTools**: actions, state diff and time travel
 
 ## Prerequisites
 
@@ -30,7 +37,7 @@ npm test             # vitest run
 npm run test:watch   # vitest, in watch mode
 ```
 
-Four spec files grade this TP:
+Part 1 is graded by four spec files:
 
 - **`src/App.spec.tsx`** — what the user sees: filtering, starring, counting, clearing.
   It is **green on the starter**, and must stay green at every step: it is the safety
@@ -39,6 +46,19 @@ Four spec files grade this TP:
   and **`src/context/FavoritesContext.spec.tsx`** — the new building blocks, red on the
   starter. The last one renders a `<Profiler>` around a favorites consumer and types in
   the filter: it checks that the counter rendered **once**.
+
+Part 2 by four more, in `src/redux/`, all red on the starter:
+
+- **`favoritesSlice.spec.ts`** — the slice's reducers and selectors, without React
+- **`ReduxFavoriteButton.spec.tsx`** and **`ReduxSearchPage.spec.tsx`** — the components
+  through a `<Provider store>`; a `<Profiler>` checks that starring Luke does not
+  re-render Leia's button
+- **`persistMiddleware.spec.ts`** — the middleware, against an in-memory storage
+- **`searchSaga.spec.ts`** — the saga, with fake timers and a fake API injected into
+  the store: debounce, cancellation of a stale request, errors
+
+`npm run dev` shows part 1 at `http://localhost:5173/`, part 2 at
+`http://localhost:5173/#redux` (reload after changing the hash).
 
 **Already done for you:**
 
@@ -59,6 +79,10 @@ Four spec files grade this TP:
   ```
 
 - The types of the contexts' values and of the reducer's actions, in `src/context/`.
+- For part 2: the search slice (`src/redux/searchSlice.ts`), the page
+  (`ReduxSearchPage.tsx`), an in-memory API (`api.ts`), and the skeleton of the store.
+  `makeStore` is a **function** taking its dependencies (`api`, `storage`): every spec
+  builds a fresh store with its own fakes.
 
 ## The workshop at a glance
 
@@ -69,6 +93,11 @@ Four spec files grade this TP:
 | 3 | The favorites reducer | `src/context/favoritesReducer.ts` | `favoritesReducer.spec.ts` is green |
 | 4 | `FavoritesProvider` with `useReducer`, and `useFavorites` | `src/context/FavoritesContext.tsx` | `FavoritesContext.spec.tsx` is green |
 | 5 | Remove the favorites' prop drilling | `App.tsx`, `Header.tsx`, `src/people/` | `App` holds no state at all |
+| 6 | The favorites slice and its selectors | `src/redux/favoritesSlice.ts` | `favoritesSlice.spec.ts` is green |
+| 7 | Read and dispatch from a component | `src/redux/ReduxFavoriteButton.tsx` | `ReduxFavoriteButton.spec.tsx` is green |
+| 8 | A persistence middleware | `src/redux/persistMiddleware.ts`, `store.ts` | `persistMiddleware.spec.ts` is green |
+| 9 | A debounced, cancellable search saga | `src/redux/searchSaga.ts`, `store.ts` | `searchSaga.spec.ts` and `ReduxSearchPage.spec.tsx` are green |
+| 10 | Debug with the Redux DevTools | the browser | You replayed a session with time travel |
 
 ## Steps
 
@@ -129,6 +158,88 @@ the point of a reducer.
 → **Done when** every spec is green, `App` has no `useState`, and the only props left in
 `src/people/` are `person`.
 
+## Part 2 — Redux Toolkit
+
+### 6. The slice — `src/redux/favoritesSlice.ts`
+
+1. `toggled`: add the id when it is missing, remove it otherwise. Write it with
+   `push` and `splice`: `createSlice` runs the reducer on an **Immer draft**, and the
+   "mutations" produce a new, frozen state. The spec freezes the state it passes in to
+   prove nothing is mutated.
+2. `cleared`: `state.ids = []`.
+3. The three selectors take the **root** state (`{ favorites }`), not the slice. Note
+   that `toggled('1')` produces `{ type: 'favorites/toggled', payload: '1' }`: the
+   slice's name prefixes every action type.
+
+→ **Done when** `favoritesSlice.spec.ts` is green.
+
+### 7. A component on the store — `src/redux/ReduxFavoriteButton.tsx`
+
+1. `useAppSelector` and `useAppDispatch` are already typed with `.withTypes<…>()` in
+   `store.ts`: read them, no component ever writes `RootState` by hand.
+2. The starter selects the **whole** slice. `useSelector` re-renders when the selected
+   value changes (`===`): a new `favorites` object on every toggle, so every button
+   re-renders. Select `selectIsFavorite(state, person.id)` instead — a boolean.
+3. Dispatch `toggled(person.id)` on click.
+
+→ **Done when** `ReduxFavoriteButton.spec.tsx` is green — including the `<Profiler>`
+spec: starring Luke renders Leia's button **once** (its mount).
+
+### 8. A middleware — `src/redux/persistMiddleware.ts`
+
+A middleware is three nested functions: `store => next => action => …`. Every
+`dispatch` goes through it **before** the reducers.
+
+1. Call `next(action)` **first**: when it returns, the reducers have run, and
+   `store.getState()` holds the new favorites. Write them under `FAVORITES_KEY`.
+2. Only for `toggled` and `cleared`: `isAnyOf(toggled, cleared)` is a type guard built
+   from the action creators. A search must not write anything.
+3. Always return what `next` returned — another middleware may rely on it.
+4. `loadFavorites` reads the key back, and returns `[]` for anything that is not an
+   array of strings (missing key, invalid JSON, hand-edited value).
+5. In `makeStore`: `preloadedState` from `loadFavorites(storage)`, and
+   `getDefaultMiddleware().concat(createPersistMiddleware(storage))`. Keep the defaults:
+   they bring the thunk middleware and the dev-mode checks that catch a mutation or a
+   non-serialisable value in the state.
+
+→ **Done when** `persistMiddleware.spec.ts` is green. In the browser, star someone at
+`/#redux`, reload: the star is still there.
+
+### 9. A saga — `src/redux/searchSaga.ts`
+
+The search slice only holds plain actions. Something has to react to
+`searchRequested`, wait, call the API and dispatch the result: a **saga**, a generator
+the saga middleware runs. Each `yield` hands an **effect** (a plain object) to the
+middleware, which executes it.
+
+1. `search(api, action)`: `yield delay(SEARCH_DEBOUNCE_MS)`, then
+   `yield call(api.searchPeople, action.payload, controller.signal)`, then
+   `yield put(searchSucceeded(results))`. On error, `put(searchFailed(message))`.
+2. `rootSaga`: `yield takeLatest(searchRequested.type, search, api)`. `takeLatest`
+   **cancels** the running task when a new query comes in. Cancelled during `delay`,
+   that is a debounce. Cancelled during `call`, its result is never `put` — the race
+   condition of chapter 9, solved by the library.
+3. In the `finally`, `if (yield cancelled()) controller.abort()`: the HTTP request is
+   aborted too, not just ignored.
+4. In `makeStore`: `createSagaMiddleware()`, added to the `concat`, and
+   `sagaMiddleware.run(rootSaga, api)` **after** `configureStore`.
+
+→ **Done when** `searchSaga.spec.ts` and `ReduxSearchPage.spec.tsx` are green. The
+saga spec injects a fake `api` into the store and drives the clock with
+`vi.advanceTimersByTimeAsync`: read it, it is the way to test a saga end to end.
+
+### 10. The Redux DevTools
+
+Install the **Redux DevTools** browser extension. `configureStore` connects to it in
+development, no code needed.
+
+1. Open `/#redux`, type a search, star two people.
+2. In the **Redux** panel: the action list (`search/searchRequested`,
+   `search/searchSucceeded`, `favorites/toggled`…), the **Diff** tab for each one, the
+   **State** tab.
+3. Drag the slider (time travel): the UI goes back to the state of each action.
+4. Note the cancelled searches: several `searchRequested`, a single `searchSucceeded`.
+
 ## Definition of Done
 
 Tick every box before moving on. The "Going further" section is **not** part of
@@ -147,6 +258,7 @@ this list.
 - [ ] `App` holds no state; no component receives a prop only to pass it on
 - [ ] `useFilter()` / `useFavorites()` outside their provider throw an explicit error
 - [ ] Typing in the filter does not re-render the favorites counter
+- [ ] At `/#redux`, the favorites survive a reload, and a fast typist triggers a single search
 
 **You can explain**
 
@@ -154,6 +266,9 @@ this list.
 - [ ] Why the provider's `value` is memoised, and what happens to the consumers if it is not
 - [ ] Why the filter and the favorites live in two contexts and not one
 - [ ] What a reducer buys you over a few `useState` setters
+- [ ] Why `next(action)` comes before `store.getState()` in the middleware
+- [ ] What `takeLatest` does to a task that is waiting in `delay`, or in `call`
+- [ ] When you would pick a thunk, the listener middleware, a saga — or TanStack Query
 
 ## Going further
 
@@ -162,9 +277,17 @@ this list.
   re-renders when the list changes. Prove it with a `<Profiler>` spec.
 - **Persist** the favorites: initialise the reducer from `localStorage` (the third
   argument of `useReducer`), and write them back in an effect.
-- **Redux Toolkit**: `npm i @reduxjs/toolkit react-redux`, write a `favoritesSlice` with
-  `createSlice` (its reducers may "mutate" — Immer turns that into a copy), a store with
-  `configureStore`, a `<Provider store>`, and `useSelector` / `useDispatch` hooks typed
-  with `.withTypes<…>()`. Compare: which re-renders does a selector avoid that the
-  context version cannot?
+- **The listener middleware**: rewrite the persistence with Redux Toolkit's
+  `createListenerMiddleware` (`startListening({ matcher: isAnyOf(toggled, cleared), effect })`).
+  Then rewrite the search with it too: `listenerApi.cancelActiveListeners()` and
+  `listenerApi.delay()` give `takeLatest` + `delay`, without generators.
+- **`redux-persist`**: replace your middleware with the library (`persistReducer`,
+  `persistStore`, `<PersistGate>`). What does it do that yours does not (versions,
+  migrations, rehydration actions)? Mind the serializability check: it needs
+  `ignoredActions`.
+- **A unit test of the saga**: step through `search(api, action)` with `.next()` and
+  compare each yielded effect with `call(...)` / `put(...)`. Compare with the
+  end-to-end spec: which one breaks on a harmless refactor?
+- **RTK Query**: replace the search slice and the saga with `createApi` and
+  `useSearchPeopleQuery(query)`.
 - Chapter 19 does the same with **Zustand**, in a dozen lines and without a provider.

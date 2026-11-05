@@ -120,7 +120,7 @@ layout: cover
                 <ul>
                     <li>Lifting state up</li>
                     <li>Context, Provider and <code>useReducer</code></li>
-                    <li>Redux Toolkit overview</li>
+                    <li>Redux Toolkit, middleware, Redux-Saga</li>
                 </ul>
             </li>
             <li>13 - Lazy loading &amp; Suspense
@@ -210,7 +210,14 @@ layout: cover
                     <li>The anti-patterns it finds</li>
                 </ul>
             </li>
-            <li>24 - What's new in React
+            <li>24 - Security &amp; authentication
+                <ul>
+                    <li>JWT, OAuth 2 / OIDC, token storage</li>
+                    <li>Protected routes and roles</li>
+                    <li>XSS, DOMPurify, CSP</li>
+                </ul>
+            </li>
+            <li>25 - What's new in React
                 <ul>
                     <li>React 19, the React Compiler</li>
                     <li>Server Components &amp; Server Actions</li>
@@ -230,7 +237,8 @@ layout: cover
 - **Create and tool** a React project with Vite, TypeScript, oxlint and oxfmt
 - **Build** an interface out of small, typed, **function components**
 - **Manage state** — local with hooks, shared with Context, global with Zustand or
-  Redux Toolkit, server-side with **TanStack Query**
+  Redux Toolkit (middleware, sagas), server-side with **TanStack Query**
+- **Secure** it: authentication with JWT / OIDC, protected routes and roles, XSS
 - **Fetch data** robustly: loading and error states, cancellation, error boundaries,
   `Suspense`
 - Structure a multi-page application with **React Router**, translate it, and
@@ -297,7 +305,7 @@ Duration: **3 days**
 |---|---|---|
 | **Day 1** | 0 → 8 — setup &amp; tooling, TypeScript, unit testing, modern JS, JSX, components, styling, hooks | TP 1 → TP 8 |
 | **Day 2** | 9 → 15 — data fetching, error boundaries, custom hooks, state management, Suspense, router, i18n | TP 9 → TP 15 |
-| **Day 3** | 16 → 24 — forms, TanStack Query, UI library, Zustand, Storybook, e2e, Docker, React Doctor, what's new | TP 16 → TP 23 |
+| **Day 3** | 16 → 25 — forms, TanStack Query, UI library, Zustand, Storybook, e2e, Docker, React Doctor, security, what's new | TP 16 → TP 24 |
 
 <br />
 
@@ -330,7 +338,7 @@ Duration: **3 days**
 
 # The workshop projects
 
-- **Twenty-three standalone workshops**, one per chapter, under `workshops/`, each
+- **Twenty-four standalone workshops**, one per chapter, under `workshops/`, each
   its own Vite project — no import between them, take them in any order:
 
 ```bash

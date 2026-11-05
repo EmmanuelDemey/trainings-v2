@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 24 - What's new in React
+# 25 - What's new in React
 
 ---
 

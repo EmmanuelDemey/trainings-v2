@@ -184,6 +184,6 @@ of this list.
   prefer, and why?
 - Wrap `PeopleTable` in `memo` and pass `onSelect` with and without
   `useCallback`. Use the Profiler to see when the table re-renders. Then read
-  about the React Compiler (chapter 24): what would it change here?
+  about the React Compiler (chapter 25): what would it change here?
 - Install `eslint-plugin-react-hooks` and break the rules on purpose — a hook
   in an `if`, a missing dependency — to see what it reports.

@@ -134,6 +134,11 @@
 - Read — https://redux-toolkit.js.org/api/createSlice
 - Read — https://redux.js.org/usage/deriving-data-selectors
 - Read — https://redux.js.org/style-guide/
+- Read — https://redux.js.org/understanding/history-and-design/middleware
+- Read — https://redux-toolkit.js.org/api/createListenerMiddleware
+- Read — https://redux-saga.js.org/docs/introduction/GettingStarted
+- Read — https://redux-saga.js.org/docs/advanced/Testing
+- Read — https://github.com/reduxjs/redux-devtools
 
 ## 13. Lazy loading, Suspense & transitions
 
@@ -279,7 +284,21 @@
 - Read — https://react.dev/learn/separating-events-from-effects
 - Read — https://react.dev/reference/react/Profiler
 
-## 24. What's new in React
+## 24. Security & authentication
+
+- Read — https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+- Read — https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
+- Read — https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
+- Read — https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps
+- Read — https://oauth.net/2/pkce/
+- Read — https://openid.net/developers/how-connect-works/
+- Read — https://jwt.io/introduction
+- Read — https://github.com/authts/react-oidc-context
+- Read — https://github.com/cure53/DOMPurify
+- Read — https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+- Read — https://react.dev/reference/react-dom/components/common#dangerously-setting-the-inner-html
+
+## 25. What's new in React
 
 - Read — https://react.dev/blog/2024/12/05/react-19
 - Read — https://react.dev/blog/2024/04/25/react-19-upgrade-guide

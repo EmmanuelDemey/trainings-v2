@@ -57,7 +57,7 @@ React only renders components. A complete application adds other libraries:
 <br />
 
 > Meta-frameworks (**Next.js**, React Router in framework mode) bundle these choices
-> together with server rendering — chapter 24.
+> together with server rendering — chapter 25.
 
 ---
 

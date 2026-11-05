@@ -83,7 +83,7 @@ function PeopleTable({ people, search }: Props) {
 
 - The effect version renders **twice** per change, and the first render shows a
   **stale** list
-- Expensive? `useMemo` — or let the React Compiler memoize it (chapter 24)
+- Expensive? `useMemo` — or let the React Compiler memoize it (chapter 25)
 
 ---
 

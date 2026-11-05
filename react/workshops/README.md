@@ -85,7 +85,7 @@ runnable folder per workshop. Do not hand it out before the exercise.
 | 9 | `09_data_fetching/` | Loading / error states, `AbortController` against races, `VITE_API_BASE_URL` | — |
 | 10 | `10_error_boundaries/` | A class `ErrorBoundary` with `fallback` and `resetKeys`, what it does not catch | — |
 | 11 | `11_custom_hooks/` | `useFetch`, `useDebouncedValue`, `useLocalStorage`, tested with `renderHook` | — |
-| 12 | `12_state_management/` | `FavoritesContext` with `useReducer`, split contexts, no more prop drilling | — |
+| 12 | `12_state_management/` | `FavoritesContext` with `useReducer`, split contexts; then Redux Toolkit, a persistence middleware, a search saga | — |
 | 13 | `13_lazy_suspense/` | `React.lazy`, `Suspense`, `use()` on a cached promise, `useTransition` | — |
 | 14 | `14_router/` | React Router data mode: layout + `Outlet`, `NavLink`, loaders, search params, error route | — |
 | 15 | `15_i18n/` | i18next + react-i18next, plurals, `Intl` number / date / relative time, typed keys | — |
@@ -97,6 +97,7 @@ runnable folder per workshop. Do not hand it out before the exercise.
 | 21 | `21_e2e/` | Cypress against the dev server: specs, `cy.intercept`, a custom command | Cypress downloads a browser |
 | 22 | `22_docker/` | Runtime `env.js`, multi-stage non-root image, nginx SPA fallback, Kubernetes, GitHub Actions | Docker; `kubectl` + a local cluster are optional |
 | 23 | `23_react_doctor/` | Scan with React Doctor, fix derived state, effect chains, `key` resets, index keys | Network for `npx react-doctor@latest` |
+| 24 | `24_security/` | JWT, an auth context, protected routes and roles, a refreshing `fetch`, DOMPurify, open redirects | — |
 
 > Each folder is a starter: implement the `// TODO` markers following the steps in
 > its own `README.md`.

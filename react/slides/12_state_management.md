@@ -16,8 +16,11 @@ At the end of this chapter, you will be able to:
 - **Build** a context the robust way: a typed `createContext`, a Provider component
   with `useReducer`, and a `useX()` hook that throws outside its provider
 - **Avoid** needless re-renders by splitting contexts and memoising the value
-- **Read** a Redux Toolkit slice: `createSlice`, `configureStore`, typed hooks,
+- **Build** a Redux Toolkit store: `createSlice`, `configureStore`, typed hooks,
   selectors and `createAsyncThunk`
+- **Write** a middleware, and **run** async flows with the listener middleware or
+  **Redux-Saga** (`takeLatest`, `call`, `put`, cancellation)
+- **Debug** with the Redux DevTools and **persist** a slice across reloads
 
 ---
 
@@ -377,25 +380,208 @@ useEffect(() => { const promise = dispatch(fetchPeople()); return () => promise.
 
 ---
 
-# And Redux Saga?
-
-- A middleware describing async flows as **generator functions** (`call`, `put`, `takeLatest`)
-- Popular before 2020, still found in **legacy** codebases
-- For new code: thunks for simple flows, RTK Query / TanStack Query for server data,
-  the **listener middleware** of Redux Toolkit for reacting to actions
+# Middleware — the model
 
 <br />
 
+```
+dispatch(action) ──▶ middleware 1 ──▶ middleware 2 ──▶ … ──▶ reducers ──▶ new state
+                         ▲  can log, delay, transform, swallow, dispatch other actions
+```
+
 ```ts
-// Redux Toolkit's listener middleware: "when X is dispatched, do Y"
-listenerMiddleware.startListening({
-  actionCreator: toggle,
-  effect: (_action, api) => {
-    const state = api.getState() as RootState;
-    localStorage.setItem('favorites', JSON.stringify(state.favorites.ids));
+import type { Middleware } from '@reduxjs/toolkit';
+
+// store => next => action: three functions, set up once, called on every dispatch
+export const logger: Middleware = (store) => (next) => (action) => {
+  console.log('before', store.getState());
+  const result = next(action);           // hand over to the next middleware… and the reducers
+  console.log('after', store.getState()); // the reducers have run
+  return result;
+};
+```
+
+- The **only** place where side effects plug into Redux: thunks, sagas, RTK Query,
+  the DevTools are all middleware
+- Always `return next(action)`'s result: the middleware before you may need it
+
+---
+
+# A middleware of your own: persistence
+
+```ts {*}{maxHeight:'300px'}
+import { isAnyOf, type Middleware } from '@reduxjs/toolkit';
+
+const isFavoritesAction = isAnyOf(toggle, clear);   // a type guard from action creators
+
+export const persistFavorites: Middleware<object, RootState> = (store) => (next) => (action) => {
+  const result = next(action);
+  if (isFavoritesAction(action)) {
+    localStorage.setItem('favorites', JSON.stringify(store.getState().favorites.ids));
+  }
+  return result;
+};
+
+export const store = configureStore({
+  reducer: { favorites: favoritesSlice.reducer },
+  preloadedState: { favorites: { ids: loadFavorites() } },      // read back at start-up
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(persistFavorites),
+});
+```
+
+- `getDefaultMiddleware()` = thunk + the **dev-mode checks** (mutation,
+  non-serialisable values): keep it, `concat` yours
+- The library version: **`redux-persist`** — `persistReducer`, `persistStore`,
+  `<PersistGate>`, versions and migrations
+
+---
+
+# The listener middleware
+
+Redux Toolkit's answer to "when **X** is dispatched, do **Y**" — no extra package.
+
+```ts
+import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
+
+export const listener = createListenerMiddleware();
+
+listener.startListening({
+  actionCreator: searchRequested,
+  effect: async (action, api) => {
+    api.cancelActiveListeners();               // a newer search cancels the older one
+    await api.delay(300);                      // debounce — throws if cancelled meanwhile
+    const results = await searchPeople(action.payload, api.signal);
+    api.dispatch(searchSucceeded(results));
+  },
+});
+
+// configureStore({ …, middleware: (gDM) => gDM().prepend(listener.middleware) })
+```
+
+- Plain `async` / `await`, typed, cancellable through `api.signal`
+- Covers most of what sagas were used for
+
+---
+
+# Redux-Saga — the idea
+
+```shell
+npm install redux-saga
+```
+
+- A **saga** is a generator function. It `yield`s **effects** — plain objects that
+  *describe* work — and the saga middleware executes them
+
+| Effect | Means |
+|---|---|
+| `take(type)` | wait for an action |
+| `takeEvery` / `takeLatest(type, saga)` | run `saga` for every action / only for the **last** one |
+| `call(fn, ...args)` | call a function, wait for its promise |
+| `put(action)` | dispatch an action |
+| `delay(ms)` | wait |
+| `select(selector)` | read the state |
+| `fork` / `cancel` / `race` / `all` | concurrency |
+
+- Async flows read like **synchronous** code; long-running processes (polling,
+  websockets, wizards) are its sweet spot
+
+---
+
+# A saga: debounced, cancellable search
+
+```ts {*}{maxHeight:'330px'}
+import { call, cancelled, delay, put, takeLatest } from 'redux-saga/effects';
+
+function* search(action: PayloadAction<string>): SagaIterator {
+  yield delay(300);                                   // cancelled here = debounced
+  const controller = new AbortController();
+  try {
+    const results: Person[] = yield call(searchPeople, action.payload, controller.signal);
+    yield put(searchSucceeded(results));
+  } catch (error) {
+    yield put(searchFailed(String(error)));
+  } finally {
+    if (yield cancelled()) controller.abort();        // a newer search took over
+  }
+}
+
+export function* rootSaga(): SagaIterator {
+  yield takeLatest(searchRequested.type, search);     // cancels the running task
+}
+```
+
+```ts
+const sagaMiddleware = createSagaMiddleware();
+const store = configureStore({ reducer, middleware: (gDM) => gDM().concat(sagaMiddleware) });
+sagaMiddleware.run(rootSaga);                         // AFTER the store exists
+```
+
+---
+
+# Testing a saga
+
+**End to end**: a real store, a fake API injected, a fake clock.
+
+```ts
+const api = { searchPeople: vi.fn(async () => [luke]) };
+const store = makeStore({ api });            // makeStore runs the saga with this api
+
+store.dispatch(searchRequested('luke'));
+await vi.advanceTimersByTimeAsync(300);
+
+expect(api.searchPeople).toHaveBeenCalledWith('luke', expect.any(AbortSignal));
+expect(store.getState().search.results).toEqual([luke]);
+```
+
+**Step by step**: effects are data, compare them.
+
+```ts
+const gen = search(searchRequested('luke'));
+expect(gen.next().value).toEqual(delay(300));
+expect(gen.next().value).toEqual(call(searchPeople, 'luke', expect.any(AbortSignal)));
+```
+
+- Prefer the first: it survives a refactor of the saga's internals
+
+---
+
+# Thunk, listener, saga — or no Redux at all?
+
+| Need | Tool |
+|---|---|
+| fetch-and-store, once | `createAsyncThunk` |
+| react to actions, debounce, cancel | **listener middleware** |
+| complex, long-lived flows; existing saga codebase | **Redux-Saga** |
+| cache of server data | **RTK Query** / TanStack Query (ch. 17) |
+
+<br />
+
+- Sagas are powerful but cost a concept (generators, effects) and a dependency
+- Most "async in Redux" is in fact **server cache**: RTK Query removes the slice, the
+  thunk and the loading flags at once
+
+---
+
+# Redux DevTools
+
+- Browser extension; `configureStore` connects to it **in development**, no code
+- **Action list** with type and payload, **Diff** of the state for each action
+- **Time travel**: a slider replays the app state by state
+- **Trace**: the stack that dispatched an action
+- **Export / import** a session: attach it to a bug report
+
+```ts
+configureStore({
+  reducer,
+  devTools: {
+    name: 'People app',                 // tells several stores apart
+    trace: true,                        // record who dispatched
+    actionsDenylist: ['search/tick'],   // hide noisy actions
   },
 });
 ```
+
+- Same extension for **Zustand** (`devtools` middleware, ch. 19)
 
 ---
 
@@ -410,6 +596,9 @@ listenerMiddleware.startListening({
   split by concern
 - Redux Toolkit: `createSlice` (Immer), `configureStore`, `withTypes()` hooks,
   memoised selectors with `createSelector`, `createAsyncThunk` for async
+- A **middleware** is `store => next => action`: the hook for side effects (persistence,
+  logging); the **listener middleware** or **Redux-Saga** for async flows; the
+  **DevTools** to replay it all
 
 ---
 
@@ -473,4 +662,4 @@ layout: cover
 
 # Hands-on
 
-## Workshop 12 - Sharing state with Context
+## Workshop 12 - Sharing state: Context, then Redux Toolkit
