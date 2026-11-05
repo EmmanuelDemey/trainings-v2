@@ -54,6 +54,6 @@ export class IssueTable {
   protected readonly issues = injectQuery(() => issuePageQuery(this.page()));
 
   // TODO (step 2): whenever a real page is on screen, prefetch the next one
-  // with `queryClient.prefetchQuery(...)` — in an `effect()` of the constructor,
+  // with `queryClient.query(...).catch(noop)` — in an `effect()` of the constructor,
   // with `inject(QueryClient)` as a field.
 }

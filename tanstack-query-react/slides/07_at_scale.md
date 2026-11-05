@@ -14,7 +14,7 @@ At the end of this chapter, you will be able to:
 - **Send** errors to the right place: inline, an error boundary, a global toast
 - **Use** Suspense with `useSuspenseQuery`, error boundaries and
   `QueryErrorResetBoundary`
-- **Prefetch at scale** in React Router loaders with `ensureQueryData`
+- **Prefetch at scale** in React Router loaders with `queryClient.query`
 - **Know** what React 19 changes — and what it does not — for TanStack Query
 
 ---
@@ -38,7 +38,7 @@ src/features/issues/
   `issueQuery(id)` without rendering anything
 - Only what needs a hook becomes a hook. A `useIssues()` that only wraps
   `useQuery(issuesQuery())` adds a name, and hides the options from
-  `prefetchQuery` and `getQueryData`
+  `queryClient.query` and `getQueryData`
 - Another feature needs the issues? It imports `issuesQuery` from
   `features/issues` — the key factory guarantees it shares the cache entry
 
@@ -93,7 +93,7 @@ import { createBrowserRouter, useParams, type LoaderFunctionArgs } from 'react-r
 
 // The loader starts the fetch BEFORE the route renders — no waterfall
 const issueLoader = (queryClient: QueryClient) => async ({ params }: LoaderFunctionArgs) => {
-  await queryClient.ensureQueryData(issueQuery(Number(params.id)));   // cached? instant
+  await queryClient.query({ ...issueQuery(Number(params.id)), staleTime: 'static' }); // cached? instant
   return null;
 };
 
@@ -113,8 +113,8 @@ function IssuePage() {
   options: refetch on focus, invalidation, optimistic updates keep working
 - Never `useLoaderData()` for server state: it is a snapshot that nothing
   invalidates
-- 5.104 deprecates `ensureQueryData` in favour of
-  `queryClient.query({ ...issueQuery(id), staleTime: 'static' })` — same behaviour
+- `staleTime: 'static'`: cached data, even stale, is returned as is — what the
+  deprecated `ensureQueryData` did
 
 ---
 
@@ -154,7 +154,7 @@ src: ../../tanstack-query-common/slides/07_at_scale/beyond.md
 // Next.js App Router — a server component prefetches, the client hydrates the cache
 export default async function IssuesPage() {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery(issuesQuery('open'));
+  await queryClient.query(issuesQuery('open'));
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <IssueList />   {/* a client component: useQuery finds the data, no loading state */}
@@ -182,4 +182,4 @@ export default async function IssuesPage() {
   answer, server-sent events
 - **React Native**: `focusManager` and `onlineManager` wired to `AppState` and
   NetInfo — the cache code is the same
-- **TanStack Router**: loaders built around `ensureQueryData`, typed end to end
+- **TanStack Router**: loaders built around `queryClient.query`, typed end to end

@@ -14,6 +14,30 @@ workshop you could not finish never blocks the next one.
 All code is **TypeScript**, in standalone components with signals, the `@if` /
 `@for` control flow and zoneless change detection (Angular 22's default).
 
+## Get the workshops
+
+Two parts of every workshop are **not in the repository**: the fake API
+(`src/api/`) and the shared spec (`src/tests/shared/`). Their single source is
+`tanstack-query-common/`, next to this training, and a script copies them into
+every workshop. So **do not download a workshop folder on its own** (from
+GitHub's file browser, for instance): clone the whole repository, then run the
+copy once, from the training's folder:
+
+```bash
+git clone --depth 1 https://github.com/EmmanuelDemey/trainings-v2.git
+cd trainings-v2/tanstack-query-angular
+npm run sync         # copies src/api/ and src/tests/shared/ into every workshop and solution
+```
+
+`npm run sync` installs nothing: it is a plain Node.js script. Run it again
+after a `git pull`. Without it, `npm run dev` fails on the missing `src/api/`
+and `npm test` finds no spec.
+
+The starter and solution **ZIPs** of the workshops site, and its online editor
+(StackBlitz), already contain both folders: nothing to run there.
+
+Then, in each workshop:
+
 ```bash
 cd 01_first_queries
 nvm use              # Node.js 24, from .nvmrc
@@ -80,7 +104,7 @@ reset or trigger an error. No browser extension.
 |---|---|---|
 | 1 | `01_first_queries/` | `provideTanStackQuery`, `injectQuery`, a key factory, `isPending` vs `isFetching` |
 | 2 | `02_query_configuration/` | `staleTime`, `skipToken`, `placeholderData` from the list cache, `refetchOnWindowFocus` |
-| 3 | `03_pagination_infinite/` | `keepPreviousData`, `prefetchQuery` in an `effect()`, `injectInfiniteQuery` |
+| 3 | `03_pagination_infinite/` | `keepPreviousData`, a prefetch (`queryClient.query`) in an `effect()`, `injectInfiniteQuery` |
 | 4 | `04_mutations/` | `injectMutation` in your own inject functions, invalidation, callbacks, `injectIsMutating` |
 | 5 | `05_optimistic_updates/` | Optimistic updates through the cache and through the UI, rollbacks |
 | 6 | `06_testing/` | `renderWithClient`, the error state two ways, mutations, `TestBed.runInInjectionContext` |

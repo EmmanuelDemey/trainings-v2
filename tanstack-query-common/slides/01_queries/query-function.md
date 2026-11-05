@@ -123,8 +123,8 @@ t=400  response            → one cache write → both components render the sa
 - It is per **key**, not per URL: two different keys calling the same URL are
   two requests — another reason to centralise keys
 - `queryClient.query(options)` is the **imperative** read: cached data if fresh,
-  otherwise a fetch. It replaces `fetchQuery`, deprecated in recent 5.x
-  releases — you will still meet `fetchQuery` in most codebases
+  otherwise a fetch. It replaces `fetchQuery`, deprecated since 5.104 — you
+  will still meet `fetchQuery` in existing codebases
 
 ---
 

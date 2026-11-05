@@ -11,7 +11,7 @@ const page = ref(1);
 // TODO (step 1) — `placeholderData: keepPreviousData`, and dim the table /
 // disable "Next" while `isPlaceholderData`.
 // TODO (step 2) — once a page is on screen, prefetch the next one with
-// `queryClient.prefetchQuery(issuePageQuery(n + 1))` (a `watch` on `data`).
+// `queryClient.query(issuePageQuery(n + 1)).catch(noop)` (a `watch` on `data`).
 const { data, isPending, isFetching, error } = useQuery(() => issuePageQuery(page.value));
 </script>
 

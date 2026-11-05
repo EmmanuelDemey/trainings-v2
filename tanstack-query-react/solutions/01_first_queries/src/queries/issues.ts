@@ -21,7 +21,7 @@ export const issueKeys = {
 /**
  * Key and fetcher travel together: no component can pair a key with the wrong
  * fetcher, and the type of `data` is inferred from `queryFn`. The same object
- * works for `useQuery`, `prefetchQuery`, `getQueryData`… — `queryOptions` only
+ * works for `useQuery`, `queryClient.query`, `getQueryData`… — `queryOptions` only
  * adds types.
  */
 export function issuesQuery(filter: IssueFilter) {

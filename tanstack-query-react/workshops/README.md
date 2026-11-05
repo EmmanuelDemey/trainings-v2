@@ -10,6 +10,30 @@ and not a single import from another workshop. Each starter is the solution of t
 previous workshop plus what is new — so you can start any workshop with a clean
 slate, even if you did not finish the previous one.
 
+## Get the workshops
+
+Two parts of every workshop are **not in the repository**: the fake API
+(`src/api/`) and the shared spec (`src/tests/shared/`). Their single source is
+`tanstack-query-common/`, next to this training, and a script copies them into
+every workshop. So **do not download a workshop folder on its own** (from
+GitHub's file browser, for instance): clone the whole repository, then run the
+copy once, from the training's folder:
+
+```bash
+git clone --depth 1 https://github.com/EmmanuelDemey/trainings-v2.git
+cd trainings-v2/tanstack-query-react
+npm run sync         # copies src/api/ and src/tests/shared/ into every workshop and solution
+```
+
+`npm run sync` installs nothing: it is a plain Node.js script. Run it again
+after a `git pull`. Without it, `npm run dev` fails on the missing `src/api/`
+and `npm test` finds no spec.
+
+The starter and solution **ZIPs** of the workshops site, and its online editor
+(StackBlitz), already contain both folders: nothing to run there.
+
+Then, in each workshop:
+
 ```bash
 cd 01_first_queries
 npm install
@@ -84,7 +108,7 @@ workshop, same names. Do not hand it out before the exercise.
 |---|---|---|
 | 1 | `01_first_queries/` | `QueryClientProvider`, devtools, `useQuery`, key factory, `queryOptions`, `isPending` vs `isFetching` |
 | 2 | `02_query_configuration/` | `staleTime`, `skipToken` / `enabled`, `placeholderData` from the list cache, `refetchOnWindowFocus` |
-| 3 | `03_pagination_infinite/` | `keepPreviousData`, `prefetchQuery`, `useInfiniteQuery` on a cursor |
+| 3 | `03_pagination_infinite/` | `keepPreviousData`, `queryClient.query` (prefetch), `useInfiniteQuery` on a cursor |
 | 4 | `04_mutations/` | `useMutation`, invalidation, the callbacks of `mutate()`, `useIsMutating` |
 | 5 | `05_optimistic_updates/` | Optimistic through the cache with rollback, optimistic through the UI |
 | 6 | `06_testing/` | `renderWithClient`, `findBy*`, `vi.mock`, `renderHook`, `using` spies |

@@ -76,17 +76,19 @@ replaces it. The page indicator moves at once: it reads the `page` state, not
 1. `const queryClient = useQueryClient();`
 2. In a `useEffect`, as soon as a page is **really** on screen
    (`!isPlaceholderData`) and there is a next one, call
-   `queryClient.prefetchQuery(issuePageQuery(page + 1))`. Dependencies:
+   `queryClient.query(issuePageQuery(page + 1)).catch(noop)` (`noop` is
+   exported by `@tanstack/react-query`). Dependencies:
    `[queryClient, page, hasNext, isPlaceholderData]`.
 
-`prefetchQuery` fetches only if the query is missing or stale, never throws, and
-returns nothing to render: it just fills the cache. Because the prefetched page is
+`queryClient.query` fetches only if the query is missing or stale, and nobody
+awaits it: `.catch(noop)` swallows a failed prefetch (the `useQuery` of the next
+page will retry and show the error). It just fills the cache. Because the prefetched page is
 fresh for 30 s, the `useQuery` of the next render finds it and sends nothing.
 
-> TanStack Query 5.104 marks `prefetchQuery` as **deprecated**, in favour of
-> `queryClient.query(options).catch(noop)` — same behaviour, explicit about the
-> swallowed error. It still works, and you will meet it in every codebase for
-> years: the workshop keeps it.
+> `queryClient.query(options).catch(noop)` replaces `prefetchQuery`,
+> **deprecated** since TanStack Query 5.104 (removed in the next major): same
+> behaviour, explicit about the swallowed error. You will still meet
+> `prefetchQuery` in existing codebases.
 
 **Check it**: reload — the Network panel shows `GET /issues?page=2` without any
 click. Click **Next**: page 2 shows at once, and `GET /issues?page=3` goes out.

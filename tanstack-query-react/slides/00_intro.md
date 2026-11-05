@@ -129,7 +129,7 @@ src/
 - **Components never import the API**: they call `useQuery(issuesQuery(filter))`
   or a mutation hook from `queries/`
 - `queries/` holds **plain functions** returning options (usable outside React:
-  loaders, tests, `prefetchQuery`) and the **hooks** that need React
+  loaders, tests, `queryClient.query`) and the **hooks** that need React
   (`useMutation` with `useQueryClient`)
 
 ---

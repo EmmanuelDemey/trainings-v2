@@ -3,21 +3,20 @@
 ```ts
 // On intent: the pointer enters a row, the detail will probably be opened
 function onRowPointerEnter(id: number) {
-  void queryClient.prefetchQuery(issueQuery(id));
+  queryClient.query(issueQuery(id)).catch(noop);
 }
 ```
 
-- `prefetchQuery` fetches **if missing or stale**, caches the result, **never
-  throws**, resolves to nothing
+- `queryClient.query` fetches **if missing or stale** and caches the result;
+  `.catch(noop)` makes it **never throw**: nobody awaits it
 - 100–300 ms between hover and click: often enough to make the detail
   **instant**
 - The entry has no observer yet: it is **inactive**, `gcTime` runs — prefetch
   what is likely to be used **soon**
 - Give the query a `staleTime`, or the prefetched data is stale at once and
   refetched on mount (wasted request)
-- Recent 5.x: `prefetchQuery` is deprecated in favour of
-  `queryClient.query(options).catch(noop)` — same behaviour, explicit about the
-  swallowed error
+- Replaces `prefetchQuery`, deprecated since 5.104 — same behaviour, explicit
+  about the swallowed error
 
 ---
 
@@ -28,19 +27,20 @@ function onRowPointerEnter(id: number) {
 async function issueRouteLoader(id: number) {
   // Ensure the detail is in the cache: returns cached data at once if present,
   // fetches (and THROWS on error) otherwise
-  await queryClient.ensureQueryData(issueQuery(id));
+  await queryClient.query({ ...issueQuery(id), staleTime: 'static' });
 
   // Nice to have — don't block the navigation on it
-  void queryClient.prefetchQuery(activityFeedQuery);
+  queryClient.query(activityFeedQuery).catch(noop);
 }
 ```
 
-| | Returns | Throws | Fetches when |
-|---|---|---|---|
-| `prefetchQuery` | `void` | never | missing or stale |
-| `ensureQueryData` | the data | yes | **missing** only (`revalidateIfStale` to refresh) |
-| `fetchQuery` | the data | yes | missing or stale |
-| `query` (recent 5.x) | the data | yes | missing or stale — replaces `fetchQuery`; with `staleTime: 'static'`, replaces `ensureQueryData` |
+| `queryClient.…` | Returns | Throws | Fetches when | Replaces (deprecated) |
+|---|---|---|---|---|
+| `query(options)` | the data | yes | missing or stale | `fetchQuery` |
+| `query({ ...options, staleTime: 'static' })` | the data | yes | **missing** only | `ensureQueryData` |
+| `query(options).catch(noop)` | — | never | missing or stale | `prefetchQuery` |
+
+- `infiniteQuery(options)` does the same for infinite queries
 
 - The component then reads the **same** options through the adapter: the data
   is already there, no loading state

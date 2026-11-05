@@ -185,5 +185,5 @@ Tick every box before moving on. The "Going further" section is **not** part of 
   the rollback.
 - **Create a person**: a `useCreatePerson()` mutation (add a `POST /api/people` handler),
   then `setQueryData` on the new person's detail key so that opening it needs no request.
-- **Prefetch on hover**: `queryClient.prefetchQuery(personQuery(id))` in the list's
+- **Prefetch on hover**: `queryClient.query(personQuery(id)).catch(noop)` in the list's
   `onMouseEnter` — the detail is often in the cache before the click.

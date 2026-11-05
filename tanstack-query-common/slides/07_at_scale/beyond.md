@@ -56,7 +56,7 @@ await queryClient.resumePausedMutations();
 ```ts
 // On the server, PER REQUEST — never a module-level client: users would share a cache
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 60_000 } } });
-await queryClient.prefetchQuery(issuesQuery('open'));
+await queryClient.query(issuesQuery('open'));
 const state = dehydrate(queryClient);                 // a serialisable snapshot
 // … render the HTML, embed `state` in the page
 

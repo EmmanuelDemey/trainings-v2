@@ -15,8 +15,8 @@ export function IssueTable() {
 
   // TODO (step 2): as soon as a page is REALLY on screen (not a placeholder),
   // prefetch the next one in an effect:
-  // `queryClient.prefetchQuery(issuePageQuery(page + 1))`, with
-  // `const queryClient = useQueryClient()`.
+  // `queryClient.query(issuePageQuery(page + 1)).catch(noop)`, with
+  // `const queryClient = useQueryClient()` and `noop` from `@tanstack/react-query`.
 
   return (
     <section>

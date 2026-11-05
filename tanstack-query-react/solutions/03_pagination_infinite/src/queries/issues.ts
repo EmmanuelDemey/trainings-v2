@@ -15,7 +15,7 @@ export const issueKeys = {
   page: (page: number) => [...issueKeys.pages(), page] as const,
 };
 
-/** One page of 10 issues. Also what `prefetchQuery` is given: same key, same fetcher. */
+/** One page of 10 issues. Also what `queryClient.query` is given: same key, same fetcher. */
 export function issuePageQuery(page: number) {
   return queryOptions({
     queryKey: issueKeys.page(page),

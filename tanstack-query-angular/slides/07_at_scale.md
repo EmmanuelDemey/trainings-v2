@@ -12,7 +12,7 @@ At the end of this chapter, you will be able to:
 
 - **Organise** queries as Angular services that expose `queryOptions` factories
 - **Build** the `QueryClient` inside DI, so its global handlers can use your services
-- **Prefetch** in the router: resolvers, guards and `ensureQueryData`
+- **Prefetch** in the router: resolvers, guards and `queryClient.query`
 - **Replace** Suspense with what Angular has: `@defer`, `@if`, and the router
 - **Know** what exists beyond the day: persistence, SSR, offline
 
@@ -99,11 +99,14 @@ src: ../../tanstack-query-common/slides/07_at_scale/prefetching.md
 ```ts
 // A resolver: navigation waits for the data — which is then in the cache
 export const issueResolver: ResolveFn<Issue> = (route) =>
-  inject(QueryClient).ensureQueryData(inject(IssueQueries).detail(Number(route.paramMap.get('id'))));
+  inject(QueryClient).query({
+    ...inject(IssueQueries).detail(Number(route.paramMap.get('id'))),
+    staleTime: 'static',                       // cached data, even stale, is enough
+  });
 
 // A guard that does not wait: start the request, let the page show its own loading
 export const prefetchIssues: CanActivateFn = () => {
-  void inject(QueryClient).prefetchQuery(inject(IssueQueries).list('open'));
+  inject(QueryClient).query(inject(IssueQueries).list('open')).catch(noop);
   return true;
 };
 
@@ -113,13 +116,12 @@ export const routes: Routes = [
 ];
 ```
 
-- `ensureQueryData` returns the cached data if there is some, fetches otherwise —
+- `staleTime: 'static'`: returns the cached data if there is some, fetches otherwise —
   and the component still uses `injectQuery` on the same options (it stays in
   sync, refetches, invalidates)
 - Route functions run in an **injection context**: `inject()` just works there
-- In `query-core` 5.104, `ensureQueryData` and `prefetchQuery` are deprecated:
-  `queryClient.query({ ...options, staleTime: 'static' })` and
-  `queryClient.query(options).catch(noop)` replace them — same behaviour
+- These two forms replace `ensureQueryData` and `prefetchQuery`, deprecated in
+  `query-core` 5.104 — same behaviour
 
 ---
 
@@ -139,7 +141,7 @@ export const routes: Routes = [
 }
 ```
 
-- The router waits when you **want** it to (a resolver + `ensureQueryData`),
+- The router waits when you **want** it to (a resolver + `queryClient.query`),
   and only then — the data-first navigation Suspense gives React
 
 ---

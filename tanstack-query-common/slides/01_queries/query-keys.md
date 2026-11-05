@@ -157,7 +157,7 @@ export function issueQuery(id: number) {
 
 - At runtime it **returns its argument** — its value is entirely in the **types**
 - No call site can pair a key with the **wrong** function
-- The **same object** feeds the adapter's query function, `prefetchQuery`,
+- The **same object** feeds the adapter's query function, `queryClient.query`,
   `getQueryData`, `setQueryData`, `invalidateQueries`, the tests…
 
 ---

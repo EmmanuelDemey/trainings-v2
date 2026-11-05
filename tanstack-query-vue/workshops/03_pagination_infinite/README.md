@@ -10,7 +10,7 @@ Chapter 03 — Paginated and infinite queries:
 
 - **`placeholderData: keepPreviousData`** and **`isPlaceholderData`**: no empty
   table between two pages
-- **`prefetchQuery`**: the next page is in the cache before the click
+- **`queryClient.query(…).catch(noop)`**: the next page is in the cache before the click
 - **`useInfiniteQuery`**: one query for the whole feed, `fetchNextPage`,
   `hasNextPage`, `isFetchingNextPage`
 
@@ -102,22 +102,22 @@ watch(
   data,
   (current) => {
     if (current && current.page < current.totalPages) {
-      void queryClient.prefetchQuery(issuePageQuery(current.page + 1));
+      queryClient.query(issuePageQuery(current.page + 1)).catch(noop);
     }
   },
   { immediate: true },
 );
 ```
 
-`prefetchQuery` respects `staleTime`: a page already fresh is not fetched
-again. It never throws and returns nothing useful — hence the `void`.
+`queryClient.query` respects `staleTime`: a page already fresh is not fetched
+again. Nobody awaits a prefetch, so `.catch(noop)` (`noop` is exported by
+`@tanstack/vue-query`) swallows a failure — the `useQuery` of that page will
+retry and show the error.
 
-> **Deprecated, still fine today.** In TanStack Query 5.10x, `prefetchQuery`,
-> `fetchQuery` and `ensureQueryData` are marked `@deprecated` (your editor
-> strikes them through) in favour of `queryClient.query(options)` — removed in
-> the next major. The equivalent of the prefetch above is
-> `void queryClient.query(issuePageQuery(n)).catch(() => {})`. The workshop keeps
-> `prefetchQuery`, the name every article and the other two trainings use.
+> `queryClient.query(options).catch(noop)` replaces `prefetchQuery`, marked
+> `@deprecated` since TanStack Query 5.104 (removed in the next major), like
+> `fetchQuery` and `ensureQueryData`. You will still meet them in existing
+> codebases.
 
 **Check it**: reload. `GET /issues?page=2` leaves right after page 1 lands,
 before any click. Click **Next**: page 2 shows at once, and the Network panel

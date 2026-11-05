@@ -104,7 +104,7 @@ const { data: count } = useQuery({ ...issuesQuery('open'), select: (issues) => i
 ```
 
 - Prefer `queryOptions` over a `useIssues()` custom hook: the same object also
-  feeds `prefetchQuery`, `getQueryData`, `setQueryData`, a router loader, a test
+  feeds `queryClient.query`, `getQueryData`, `setQueryData`, a router loader, a test
 - A custom hook is still the right place for what **needs React**:
   `useQueryClient()`, another hook, a context value
 

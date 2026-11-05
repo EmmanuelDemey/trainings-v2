@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { keepPreviousData, noop, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { issuePageQuery } from '@/queries/issues';
 
 const page = ref(1);
@@ -23,11 +23,10 @@ watch(
   data,
   (current) => {
     if (current && current.page < current.totalPages) {
-      // `prefetchQuery` respects `staleTime`: a page already fresh in the
-      // cache is not fetched again. It never throws, and returns nothing.
-      // (Marked deprecated in 5.10x in favour of `queryClient.query(…)`,
-      // removed in the next major — see the README.)
-      void queryClient.prefetchQuery(issuePageQuery(current.page + 1));
+      // `queryClient.query` respects `staleTime`: a page already fresh in the
+      // cache is not fetched again. Nobody awaits it: `.catch(noop)` swallows
+      // a failure (replaces `prefetchQuery`, deprecated since 5.104).
+      queryClient.query(issuePageQuery(current.page + 1)).catch(noop);
     }
   },
   { immediate: true },

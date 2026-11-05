@@ -80,20 +80,19 @@ table { font-size: 0.8em; }
 // As soon as page N is shown, warm the cache for page N + 1
 function prefetchNext(queryClient: QueryClient, data: Page<IssueSummary>) {
   if (data.page < data.totalPages) {
-    void queryClient.prefetchQuery(issuePageQuery(data.page + 1));
+    queryClient.query(issuePageQuery(data.page + 1)).catch(noop);
   }
 }
 ```
 
-- `prefetchQuery` fetches **only if** the entry is missing or stale, never
-  throws, returns nothing — *fire and forget*
+- `queryClient.query` fetches **only if** the entry is missing or stale;
+  `.catch(noop)` swallows the error — *fire and forget*
 - *Next* then hits a **fresh** entry: no placeholder, no request, instant
 - Prefetched data obeys `staleTime`: with `staleTime: 0` it is stale at once
   and refetched when the page mounts — give the query a `staleTime`
 - Without observer, a prefetched entry is **inactive**: `gcTime` starts at once
-- Recent 5.x releases deprecate `prefetchQuery` in favour of
-  `queryClient.query(options).catch(noop)` — same effect; the workshops use
-  `prefetchQuery`, still fully supported in v5
+- Replaces `prefetchQuery`, deprecated since 5.104 (removed in the next major):
+  same behaviour, explicit about the swallowed error
 
 > Where to call it: an effect / `effect()` / `watch` on the shown page, a
 > router loader, `onMouseEnter` on the *Next* button. The training shows its own.

@@ -180,4 +180,4 @@ section are **not** part of this list.
   panel for the starter's code, and for yours?
 - Write a `useIssues(filter)` custom hook around `useQuery(issuesQuery(filter))`.
   What does it add over `queryOptions`, and what does it take away
-  (`prefetchQuery`, `getQueryData` cannot call a hook)?
+  (`queryClient.query`, `getQueryData` cannot call a hook)?

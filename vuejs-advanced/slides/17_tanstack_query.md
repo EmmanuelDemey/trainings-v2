@@ -161,7 +161,7 @@ export function issuesQuery(filter: IssueFilter) {
 ```ts
 useQuery(issuesQuery('open'));                                   // a component
 useQuery({ ...issuesQuery('open'), select: (all) => all.length }); // + local options
-queryClient.prefetchQuery(issuesQuery('closed'));                  // on hover
+queryClient.query(issuesQuery('closed')).catch(noop);              // on hover
 queryClient.getQueryData(issuesQuery('open').queryKey);            // typed: Issue[] | undefined
 ```
 

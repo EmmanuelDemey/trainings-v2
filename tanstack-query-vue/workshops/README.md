@@ -11,6 +11,30 @@ long it is the same app — an issue tracker — growing a feature per chapter:
 workshop N starts where workshop N−1 ended (03 is a page of its own, and 06
 tests the finished app of 04).
 
+## Get the workshops
+
+Two parts of every workshop are **not in the repository**: the fake API
+(`src/api/`) and the shared spec (`src/tests/shared/`). Their single source is
+`tanstack-query-common/`, next to this training, and a script copies them into
+every workshop. So **do not download a workshop folder on its own** (from
+GitHub's file browser, for instance): clone the whole repository, then run the
+copy once, from the training's folder:
+
+```bash
+git clone --depth 1 https://github.com/EmmanuelDemey/trainings-v2.git
+cd trainings-v2/tanstack-query-vue
+npm run sync         # copies src/api/ and src/tests/shared/ into every workshop and solution
+```
+
+`npm run sync` installs nothing: it is a plain Node.js script. Run it again
+after a `git pull`. Without it, `npm run dev` fails on the missing `src/api/`
+and `npm test` finds no spec.
+
+The starter and solution **ZIPs** of the workshops site, and its online editor
+(StackBlitz), already contain both folders: nothing to run there.
+
+Then, in each workshop:
+
 ```bash
 cd 01_first_queries
 npm install
@@ -86,7 +110,7 @@ app sends — or no longer sends.
 |---|---|---|
 | 1 | `01_first_queries/` | `VueQueryPlugin`, `useQuery` with a getter, key factory, `queryOptions`, `isPending` vs `isFetching` |
 | 2 | `02_query_configuration/` | `staleTime`, `skipToken` / `enabled`, `placeholderData` from the list, `refetchOnWindowFocus: 'always'`, `retry`, `select` |
-| 3 | `03_pagination_infinite/` | `keepPreviousData`, `isPlaceholderData`, `prefetchQuery`, `useInfiniteQuery` on a cursor |
+| 3 | `03_pagination_infinite/` | `keepPreviousData`, `isPlaceholderData`, `queryClient.query` (prefetch), `useInfiniteQuery` on a cursor |
 | 4 | `04_mutations/` | `useMutation`, invalidation, the callbacks of `mutate()`, `isPending`, `mutationKey`, `useIsMutating` |
 | 5 | `05_optimistic_updates/` | Optimistic through the cache (snapshot, rollback), optimistic through the UI (`variables`) |
 | 6 | `06_testing/` | `renderWithClient`, `findBy*`, the fake server vs `vi.mock`, a mutation, a composable in a host component, `using` spies |

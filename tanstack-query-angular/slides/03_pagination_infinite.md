@@ -41,7 +41,7 @@ export class IssueTable {
     effect(() => {
       const current = this.issues.data();
       if (!current || this.issues.isPlaceholderData() || current.page >= current.totalPages) return;
-      void this.queryClient.prefetchQuery(issuePageQuery(current.page + 1));
+      this.queryClient.query(issuePageQuery(current.page + 1)).catch(noop);
     });
   }
 }
@@ -55,8 +55,8 @@ export class IssueTable {
 
 - `effect()` and not the click handler: the **data** decides — first load, back
   button, a page reached any other way all prefetch the same
-- `prefetchQuery` is deprecated in `query-core` 5.104 (struck through in the
-  editor): `queryClient.query(options).catch(noop)` is its new name
+- `queryClient.query(options).catch(noop)` replaces `prefetchQuery`, deprecated
+  in `query-core` 5.104 (struck through in the editor) — same behaviour
 
 ---
 src: ../../tanstack-query-common/slides/03_pagination_infinite/infinite.md

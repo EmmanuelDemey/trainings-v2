@@ -12,7 +12,7 @@ At the end of this chapter, you will be able to:
 
 - **Organise** queries as composables, one resource module per feature
 - **Route** errors: global handlers, `throwOnError`, Vue's `onErrorCaptured`
-- **Prefetch** in vue-router guards with `ensureQueryData`, and suspend with
+- **Prefetch** in vue-router guards with `queryClient.query`, and suspend with
   `suspense()` and `<Suspense>`
 - **Split** the state between Pinia and TanStack Query, and know what changes
   with Nuxt
@@ -101,19 +101,20 @@ src: ../../tanstack-query-common/slides/07_at_scale/prefetching.md
   component: () => import('./IssueDetailPage.vue'),
   beforeEnter: async (to) => {
     const queryClient = useQueryClient();          // guards run in the app's injection context
-    await queryClient.ensureQueryData(issueQuery(Number(to.params.id)));
+    await queryClient.query({ ...issueQuery(Number(to.params.id)), staleTime: 'static' });
   },
 }
 ```
 
-- `ensureQueryData`: the cached data if any (fresh or not), otherwise **fetch
+- `staleTime: 'static'`: the cached data if any (fresh or not), otherwise **fetch
   and wait** — the page renders with its data, no "Loading…"
-- `prefetchQuery` instead, without `await`: start the request, don't block the
-  navigation — the page shows its pending state for less time
+- `queryClient.query(options).catch(noop)` instead, without `await`: start the
+  request, don't block the navigation — the page shows its pending state for
+  less time
 - The component then calls `useQuery(() => issueQuery(Number(route.params.id)))`
   — same options, same key: it reads what the guard put in the cache
-- 5.10x marks `ensureQueryData` / `prefetchQuery` **deprecated**, in favour of
-  `queryClient.query({ ...options, staleTime: 'static' })` / `queryClient.query(options)`
+- These forms replace `ensureQueryData` / `prefetchQuery`, **deprecated** since
+  5.104 — same behaviour
 - `useQueryClient()` works in a guard because Vue Router runs guards inside
   `app.runWithContext()`; otherwise, export the client from a module
 

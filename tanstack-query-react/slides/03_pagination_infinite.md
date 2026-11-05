@@ -36,7 +36,7 @@ function IssueTable() {
 
   useEffect(() => {
     // Once a page is REALLY on screen, warm the cache for the next one
-    if (!isPlaceholderData && hasNext) void queryClient.prefetchQuery(issuePageQuery(page + 1));
+    if (!isPlaceholderData && hasNext) queryClient.query(issuePageQuery(page + 1)).catch(noop);
   }, [queryClient, page, hasNext, isPlaceholderData]);
 
   return (/* … */ <button disabled={isPlaceholderData || !hasNext} onClick={() => setPage((p) => p + 1)}>Next</button>);
@@ -46,7 +46,7 @@ function IssueTable() {
 - The page number lives in React state — or better, in the **URL**
   (`useSearchParams`): shareable, and the back button works
 - An **effect** is fine here: it synchronises the cache with what is on screen,
-  and `prefetchQuery` is idempotent (`<StrictMode>`'s double run costs nothing)
+  and `queryClient.query` is idempotent (`<StrictMode>`'s double run costs nothing)
 - `usePrefetchQuery(options)` does the same during render — no effect, but no
   condition on `isPlaceholderData` either
 

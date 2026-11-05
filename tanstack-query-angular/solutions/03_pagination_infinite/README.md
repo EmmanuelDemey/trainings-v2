@@ -75,16 +75,17 @@ provided (`app.config.ts`), with `staleTime: 30_000` (`queryClient.ts`).
 1. Add `private readonly queryClient = inject(QueryClient);`.
 2. In the constructor, an `effect()`: read `this.issues.data()`; if there is a
    real page (not a placeholder) and a page after it, call
-   `void this.queryClient.prefetchQuery(issuePageQuery(current.page + 1))`.
+   `this.queryClient.query(issuePageQuery(current.page + 1)).catch(noop)`
+   (`noop` is exported by `@tanstack/angular-query-experimental`).
 
 Why an `effect()` and not the click handler? The **data** decides: the first
 load, the back button, any way of reaching a page — all prefetch the same. And
-thanks to `staleTime`, `prefetchQuery` sends nothing for a page already fresh.
+thanks to `staleTime`, `queryClient.query` sends nothing for a page already fresh.
+Nobody awaits it: `.catch(noop)` swallows a failed prefetch.
 
-> In the installed `query-core` (5.104), `prefetchQuery` is marked **deprecated**
-> in favour of `queryClient.query(options).catch(noop)` — same behaviour, a new
-> name, removed in the next major only. The workshop keeps `prefetchQuery`, the
-> name every article and the devtools still use; your editor will strike it through.
+> `queryClient.query(options).catch(noop)` replaces `prefetchQuery`, marked
+> **deprecated** in `query-core` 5.104 (removed in the next major) — same
+> behaviour. You will still meet `prefetchQuery` in existing codebases.
 
 **Check it**: reload. `GET /issues?page=2` appears **before** you click; clicking
 **Next** then sends nothing for page 2 — and prefetches page 3.

@@ -187,7 +187,7 @@ empties at every click); the feed loads its first page with a plain query and
 `load-more` does nothing.
 
 **Steps.** 1. `placeholderData: keepPreviousData` (+ `isPlaceholderData` to disable
-`page-next` / dim the table). 2. Prefetch the next page (`prefetchQuery`) as soon as
+`page-next` / dim the table). 2. Prefetch the next page (`queryClient.query(…).catch(noop)`) as soon as
 a page is shown. 3. The feed with the adapter's infinite query: `initialPageParam: 0`,
 `getNextPageParam: (last) => last.nextCursor ?? undefined`, `fetchNextPage`,
 `hasNextPage`, `isFetchingNextPage`. Bonus: `maxPages`.

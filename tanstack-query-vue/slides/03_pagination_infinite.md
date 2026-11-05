@@ -13,7 +13,7 @@ At the end of this chapter, you will be able to:
 - **Page** through a list with a `ref` in the key, without the table emptying
   at every click — `keepPreviousData`, `isPlaceholderData`
 - **Prefetch** the next page from a component, with `watch` and
-  `prefetchQuery`
+  `queryClient.query`
 - **Build** an infinite feed with `useInfiniteQuery` and
   `infiniteQueryOptions`, and render its pages in a template
 
@@ -38,7 +38,7 @@ const { data, isPending, isPlaceholderData } = useQuery(() => ({
 // Once a page is ON SCREEN, fetch the next one into the cache
 watch(data, (current) => {
   if (current && current.page < current.totalPages) {
-    void queryClient.prefetchQuery(issuePageQuery(current.page + 1));
+    queryClient.query(issuePageQuery(current.page + 1)).catch(noop);
   }
 }, { immediate: true });
 </script>
@@ -53,8 +53,8 @@ watch(data, (current) => {
 
 - `page` is client state — a `ref`, or the URL (`route.query.page`): the key
   follows it through the getter
-- `prefetchQuery` is marked **deprecated** in 5.10x (→ `queryClient.query(…)`,
-  next major) — still the name used today
+- `.catch(noop)`: nobody awaits a prefetch — replaces `prefetchQuery`,
+  **deprecated** since 5.104 (removed in the next major)
 - `watch(data)`, not `watch(page)`: while page 3 is a placeholder, `data` is
   still page 2 — and page 3 is already on its way
 

@@ -184,7 +184,7 @@ export function personQuery(id: string) {
 ```tsx
 useQuery(personQuery(id));                                        // a component
 useQuery({ ...personQuery(id), select: (person) => person.name });  // + local options
-queryClient.prefetchQuery(personQuery(id));                       // on hover, in a loader
+queryClient.query(personQuery(id)).catch(noop);                   // on hover, in a loader
 queryClient.getQueryData(personQuery(id).queryKey);               // typed: Person | undefined
 ```
 

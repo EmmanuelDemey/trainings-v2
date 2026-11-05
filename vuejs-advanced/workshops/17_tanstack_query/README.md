@@ -190,7 +190,7 @@ section are **not** part of this list.
 
 ## Going further
 
-- *(Bonus)* Prefetch on hover: `queryClient.prefetchQuery(issuesQuery('closed'))`
+- *(Bonus)* Prefetch on hover: `queryClient.query(issuesQuery('closed')).catch(noop)`
   on the `mouseenter` of the "closed" tab. Check that clicking it afterwards
   sends nothing.
 - Install `@tanstack/vue-query-devtools` and mount `<VueQueryDevtools />`: the

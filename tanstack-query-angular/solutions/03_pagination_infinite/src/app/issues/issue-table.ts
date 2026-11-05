@@ -1,5 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { injectQuery, keepPreviousData, QueryClient } from '@tanstack/angular-query-experimental';
+import { injectQuery, keepPreviousData, noop, QueryClient } from '@tanstack/angular-query-experimental';
 import { issuePageQuery } from './issue-queries';
 
 @Component({
@@ -69,7 +69,7 @@ export class IssueTable {
     effect(() => {
       const current = this.issues.data();
       if (!current || this.issues.isPlaceholderData() || current.page >= current.totalPages) return;
-      void this.queryClient.prefetchQuery(issuePageQuery(current.page + 1));
+      this.queryClient.query(issuePageQuery(current.page + 1)).catch(noop);
     });
   }
 }

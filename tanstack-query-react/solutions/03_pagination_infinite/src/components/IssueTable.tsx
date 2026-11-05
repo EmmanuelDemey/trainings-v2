@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, noop, useQuery, useQueryClient } from '@tanstack/react-query';
 import { issuePageQuery } from '../queries/issues';
 
 export function IssueTable() {
@@ -22,7 +22,7 @@ export function IssueTable() {
   // (`staleTime`), so the click itself sends nothing.
   useEffect(() => {
     if (!isPlaceholderData && hasNext) {
-      void queryClient.prefetchQuery(issuePageQuery(page + 1));
+      queryClient.query(issuePageQuery(page + 1)).catch(noop);
     }
   }, [queryClient, page, hasNext, isPlaceholderData]);
 

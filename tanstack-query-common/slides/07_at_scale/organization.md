@@ -76,7 +76,7 @@ each calling the adapter's query function with options nobody else can see —
 // ✅ one factory, every use
 issuesQuery('open');                                           // a component
 { ...issuesQuery('open'), select: (issues) => issues.length }  // the counter
-queryClient.prefetchQuery(issuesQuery('closed'));               // a loader
+queryClient.query(issuesQuery('closed'));                       // a loader
 ```
 
 - Wrap when you add **real logic** (combining two queries, mapping params from
