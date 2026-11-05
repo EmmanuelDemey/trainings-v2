@@ -83,6 +83,7 @@ onSuccess: (issue: Issue) => {
     assignee: issue.assignee, commentCount: issue.commentCount,
   };
   // issuesQuery(…).queryKey is tagged: `old` is IssueSummary[] | undefined
+  // not cached: return undefined → nothing written, fetched in full when shown
   queryClient.setQueryData(issuesQuery('open').queryKey, (old) => (old ? [...old, summary] : old));
   queryClient.setQueryData(issuesQuery('all').queryKey, (old) => (old ? [...old, summary] : old));
 },
