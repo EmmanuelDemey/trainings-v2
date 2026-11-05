@@ -30,7 +30,7 @@ export class NewIssueForm {
   protected readonly title = signal('');
 
   protected readonly createIssue = injectMutation(() => ({
-    mutationKey: ['issues', 'create'],
+    mutationKey: issueMutationKeys.create(),
     mutationFn: (title: string) => createIssue({ title }),
     onSuccess: () => this.queryClient.invalidateQueries({ queryKey: issueKeys.all }),
   }));

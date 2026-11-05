@@ -27,7 +27,7 @@ Two ways to do it with TanStack Query:
 
 ```ts
 export const createIssueMutation = (queryClient: QueryClient) => ({
-  mutationKey: ['issues', 'create'] as const,
+  mutationKey: issueMutationKeys.create(),
   mutationFn: createIssue,
   // RETURN it: the mutation stays pending until the real row is in the list
   onSettled: () => queryClient.invalidateQueries({ queryKey: issueKeys.all }),

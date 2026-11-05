@@ -45,15 +45,21 @@ export const issueQuery = (id: number) =>
   queryOptions({ queryKey: issueKeys.detail(id), queryFn: () => fetchIssue(id), staleTime: 60_000 });
 
 // features/issues/issues.mutations.ts
+export const issueMutationKeys = {
+  all: ['issues'] as const,
+  create: () => [...issueMutationKeys.all, 'create'] as const,
+};
+
 export const createIssueMutation = (queryClient: QueryClient) => ({
-  mutationKey: ['issues', 'create'] as const,
+  mutationKey: issueMutationKeys.create(),
   mutationFn: createIssue,
   onSuccess: () => queryClient.invalidateQueries({ queryKey: issueKeys.all }),
 });
 ```
 
-- Naming: `xxxKeys`, `xxxQuery(params)`, `xxxMutation(queryClient)` — greppable
-- Other features **import** `issueKeys` to invalidate: no copy of a key anywhere
+- Naming: `xxxKeys`, `xxxMutationKeys`, `xxxQuery(params)`, `xxxMutation(queryClient)` — greppable
+- Other features **import** `issueKeys` to invalidate, `issueMutationKeys` to
+  filter mutations: no copy of a key anywhere
 
 ---
 

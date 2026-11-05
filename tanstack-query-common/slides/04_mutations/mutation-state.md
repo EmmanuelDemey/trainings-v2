@@ -5,7 +5,7 @@ component. But the header wants to say *"Saving…"* while **any** write runs:
 
 ```ts
 queryClient.isMutating();                                        // number of pending mutations
-queryClient.isMutating({ mutationKey: ['issues'] });             // prefix match, like query keys
+queryClient.isMutating({ mutationKey: issueMutationKeys.all });  // prefix match: ['issues'] matches create, delete…
 queryClient.isMutating({ predicate: (m) => m.state.variables?.id === 7 });
 ```
 
@@ -21,14 +21,14 @@ queryClient.isMutating({ predicate: (m) => m.state.variables?.id === 7 });
 # `setMutationDefaults` — options by key
 
 ```ts
-queryClient.setMutationDefaults(['issues', 'create'], {
+queryClient.setMutationDefaults(issueMutationKeys.create(), {
   mutationFn: createIssue,
   onSuccess: () => queryClient.invalidateQueries({ queryKey: issueKeys.all }),
   retry: 0,
 });
 
 // Anywhere: only the key is needed — the defaults supply the rest
-// options: { mutationKey: ['issues', 'create'] }
+// options: { mutationKey: issueMutationKeys.create() }
 ```
 
 - Mutation defaults matched by **`mutationKey` prefix**, merged under the

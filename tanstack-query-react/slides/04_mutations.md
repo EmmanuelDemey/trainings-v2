@@ -30,7 +30,7 @@ export function useCreateIssue() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['issues', 'create'],
+    mutationKey: issueMutationKeys.create(),
     mutationFn: createIssue,                    // (input: { title: string }) => Promise<Issue>
     onSuccess: () => queryClient.invalidateQueries({ queryKey: issueKeys.all }),
   });
@@ -95,7 +95,7 @@ src: ../../tanstack-query-common/slides/04_mutations/mutation-state.md
 ```tsx
 // In the header, far from the form and the rows
 function SavingIndicator() {
-  const saving = useIsMutating({ mutationKey: ['issues'] });   // a number
+  const saving = useIsMutating({ mutationKey: issueMutationKeys.all });   // a number
   return saving > 0 ? <span>Saving…</span> : null;
 }
 ```
@@ -103,7 +103,7 @@ function SavingIndicator() {
 ```tsx
 // The titles being created right now, from any component
 const pendingTitles = useMutationState({
-  filters: { mutationKey: ['issues', 'create'], status: 'pending' },
+  filters: { mutationKey: issueMutationKeys.create(), status: 'pending' },
   select: (mutation) => (mutation.state.variables as { title: string }).title,
 });
 ```

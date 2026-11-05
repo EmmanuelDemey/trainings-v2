@@ -31,12 +31,12 @@ persistQueryClient({
 
 ```ts
 // 1. Defaults BY KEY — a function cannot be persisted, the key can
-queryClient.setMutationDefaults(['issues', 'toggle'], {
+queryClient.setMutationDefaults(issueMutationKeys.toggle(), {
   mutationFn: ({ id, status }: Toggle) => updateIssue(id, { status }),
   onSettled: () => queryClient.invalidateQueries({ queryKey: issueKeys.all }),
 });
 
-// 2. The app only names the mutation: { mutationKey: ['issues', 'toggle'] }
+// 2. The app only names the mutation: { mutationKey: issueMutationKeys.toggle() }
 
 // 3. Once the persisted cache is restored, replay what was waiting
 await queryClient.resumePausedMutations();

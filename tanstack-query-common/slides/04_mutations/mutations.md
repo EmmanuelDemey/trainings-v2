@@ -28,9 +28,16 @@ table { font-size: 0.85em; }
 ```ts
 import type { QueryClient } from '@tanstack/query-core';
 
+// A key factory, like issueKeys — mutation keys are written once too
+export const issueMutationKeys = {
+  all: ['issues'] as const,
+  create: () => [...issueMutationKeys.all, 'create'] as const,
+  delete: () => [...issueMutationKeys.all, 'delete'] as const,
+};
+
 // Plain options — identical for useMutation / injectMutation
 export const createIssueMutation = (queryClient: QueryClient) => ({
-  mutationKey: ['issues', 'create'] as const,
+  mutationKey: issueMutationKeys.create(),
   mutationFn: (input: { title: string }) => createIssue(input),  // (variables, context) => Promise<TData>
   onSuccess: () => queryClient.invalidateQueries({ queryKey: issueKeys.all }),
 });
@@ -124,7 +131,7 @@ table { font-size: 0.85em; }
 
 ```ts
 export const deleteIssueMutation = (queryClient: QueryClient) => ({
-  mutationKey: ['issues', 'delete'] as const,          // name it: devtools, filters, defaults
+  mutationKey: issueMutationKeys.delete(),             // name it: devtools, filters, defaults
   mutationFn: (id: number) => deleteIssue(id),
   scope: { id: 'issues' },                             // mutations of a scope run one after the other
   retry: 2,                                            // only if the operation is idempotent

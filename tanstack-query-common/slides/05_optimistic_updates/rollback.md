@@ -43,13 +43,13 @@ t=550…  #2, #4 settle → more refetches → they disappear again
 
 ```ts
 export const toggleIssueMutation = (queryClient: QueryClient) => ({
-  mutationKey: ['issues', 'toggle'] as const,           // needed to count them
+  mutationKey: issueMutationKeys.toggle(),              // needed to count them
   mutationFn: ({ id, status }: Toggle) => updateIssue(id, { status }),
   // onMutate: cancel, snapshot, write — as before
   // onError: restore the snapshot — as before
   onSettled: () => {
     // During onSettled, THIS mutation still counts as pending
-    if (queryClient.isMutating({ mutationKey: ['issues', 'toggle'] }) === 1) {
+    if (queryClient.isMutating({ mutationKey: issueMutationKeys.toggle() }) === 1) {
       void queryClient.invalidateQueries({ queryKey: issueKeys.all });
     }
   },
