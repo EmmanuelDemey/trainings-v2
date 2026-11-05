@@ -143,6 +143,6 @@ section are **not** part of this list.
 - *(Bonus)* Show the pending row **in the list** instead of the form, with
   `injectMutationState(() => ({ filters: { mutationKey: issueMutationKeys.create(), status: 'pending' }, select: (m) => m.state.variables as string }))`.
 - Toggle three issues fast with a 3000 ms latency: each `onSettled` invalidates.
-  Use `queryClient.isMutating({ mutationKey: issueMutationKeys.status() }) === 1`
+  Use `queryClient.isMutating({ mutationKey: issueMutationKeys.toggle() }) === 1`
   to invalidate only when the last one settles.
 - Add a **Dismiss** button calling `setStatus.reset()`.

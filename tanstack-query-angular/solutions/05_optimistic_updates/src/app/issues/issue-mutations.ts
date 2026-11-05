@@ -20,7 +20,7 @@ export const issueMutationKeys = {
   all: ['issues'] as const,
   create: () => [...issueMutationKeys.all, 'create'] as const,
   delete: () => [...issueMutationKeys.all, 'delete'] as const,
-  status: () => [...issueMutationKeys.all, 'status'] as const,
+  toggle: () => [...issueMutationKeys.all, 'toggle'] as const,
 };
 
 export function injectCreateIssue() {
@@ -56,7 +56,7 @@ export function injectSetIssueStatus() {
   const queryClient = inject(QueryClient);
 
   return injectMutation(() => ({
-    mutationKey: issueMutationKeys.status(),
+    mutationKey: issueMutationKeys.toggle(),
     mutationFn: ({ id, status }: { id: number; status: IssueStatus }) => updateIssue(id, { status }),
 
     onMutate: async ({ id, status }) => {

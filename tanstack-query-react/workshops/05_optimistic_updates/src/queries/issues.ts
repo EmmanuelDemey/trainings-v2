@@ -15,7 +15,7 @@ export const issueKeys = {
 export const issueMutationKeys = {
   all: ['issues'] as const,
   create: () => [...issueMutationKeys.all, 'create'] as const,
-  setStatus: () => [...issueMutationKeys.all, 'set-status'] as const,
+  toggle: () => [...issueMutationKeys.all, 'toggle'] as const,
 };
 
 export function issuesQuery(filter: IssueFilter) {
@@ -50,7 +50,7 @@ export function useSetIssueStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: issueMutationKeys.setStatus(),
+    mutationKey: issueMutationKeys.toggle(),
     mutationFn: ({ id, status }: StatusChange) => updateIssue(id, { status }),
 
     // TODO (step 1): `onMutate: async ({ id, status }) => { … }`

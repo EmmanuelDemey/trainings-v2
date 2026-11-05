@@ -18,7 +18,7 @@ export const issueMutationKeys = {
   all: ['issues'] as const,
   create: () => [...issueMutationKeys.all, 'create'] as const,
   delete: () => [...issueMutationKeys.all, 'delete'] as const,
-  status: () => [...issueMutationKeys.all, 'status'] as const,
+  toggle: () => [...issueMutationKeys.all, 'toggle'] as const,
 };
 
 export function injectCreateIssue() {
@@ -51,7 +51,7 @@ export function injectSetIssueStatus() {
   // Pessimistic: nothing moves until the PATCH is back AND the lists have
   // refetched — two round trips after the click.
   return injectMutation(() => ({
-    mutationKey: issueMutationKeys.status(),
+    mutationKey: issueMutationKeys.toggle(),
     mutationFn: ({ id, status }: { id: number; status: IssueStatus }) => updateIssue(id, { status }),
     // TODO (step 1): `onMutate` — cancel `issueKeys.all`, snapshot every list
     // with `getQueriesData`, write the new status into every cached list, and

@@ -64,7 +64,7 @@ export function injectSetIssueStatus() {
   const queryClient = inject(QueryClient);
 
   return injectMutation(() => ({
-    mutationKey: issueMutationKeys.status(),
+    mutationKey: issueMutationKeys.toggle(),
     mutationFn: ({ id, status }: { id: number; status: IssueStatus }) => updateIssue(id, { status }),
     onMutate: async ({ id, status }) => {
       await queryClient.cancelQueries({ queryKey: issueKeys.all });
