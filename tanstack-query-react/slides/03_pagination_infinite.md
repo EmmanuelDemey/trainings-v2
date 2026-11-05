@@ -94,7 +94,7 @@ function ActivityFeed() {
 # Infinite scroll in React
 
 ```tsx
-function LoadMoreSentinel({ onVisible }: { onVisible: () => void }) {
+function LoadMoreSentinel({ onVisible }: Readonly<{ onVisible: () => void }>) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

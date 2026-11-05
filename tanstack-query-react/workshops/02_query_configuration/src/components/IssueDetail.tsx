@@ -4,7 +4,7 @@ interface IssueDetailProps {
   id: number | undefined;
 }
 
-export function IssueDetail({ id }: IssueDetailProps) {
+export function IssueDetail({ id }: Readonly<IssueDetailProps>) {
   // Called before any early return: hooks run in the same order on every render.
   const { data: issue, error } = useIssue(id);
 

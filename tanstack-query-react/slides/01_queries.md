@@ -139,7 +139,7 @@ useQuery({ queryKey: ['issues', { userId }], queryFn: () => fetchIssuesOf(userId
 # Stale props, stale closures — not here
 
 ```tsx
-function IssueDetail({ id }: { id: number }) {
+function IssueDetail({ id }: Readonly<{ id: number }>) {
   const [comments, setComments] = useState<Comment[]>([]);
   useEffect(() => {
     fetchComments(id).then(setComments);   // id = 1 answers after id = 2…
@@ -148,7 +148,7 @@ function IssueDetail({ id }: { id: number }) {
 ```
 
 ```tsx
-function IssueDetail({ id }: { id: number }) {
+function IssueDetail({ id }: Readonly<{ id: number }>) {
   const { data: comments } = useQuery({
     queryKey: ['issues', 'detail', id, 'comments'],
     queryFn: () => fetchComments(id),

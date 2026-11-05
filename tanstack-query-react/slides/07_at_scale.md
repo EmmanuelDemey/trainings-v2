@@ -121,7 +121,7 @@ function IssuePage() {
 # Suspense — `useSuspenseQuery`
 
 ```tsx
-function IssuePage({ id }: { id: number }) {
+function IssuePage({ id }: Readonly<{ id: number }>) {
   const { data: issue } = useSuspenseQuery(issueQuery(id));   // Issue — never undefined
   const { data: activity } = useSuspenseQuery(activityQuery(id));
   return <IssueView issue={issue} activity={activity} />;

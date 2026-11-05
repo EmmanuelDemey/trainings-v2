@@ -10,7 +10,7 @@ interface IssueListProps {
   onSelect: (id: number) => void;
 }
 
-export function IssueList({ selectedId, onSelect }: IssueListProps) {
+export function IssueList({ selectedId, onSelect }: Readonly<IssueListProps>) {
   const [filter, setFilter] = useState<IssueFilter>('open');
 
   // The key is rebuilt from `filter` on every render: when it changes,

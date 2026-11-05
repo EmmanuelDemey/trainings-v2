@@ -23,7 +23,7 @@ export function createTestQueryClient(): QueryClient {
 
 /** For `renderHook`: a component that provides `queryClient` to the hook under test. */
 export function createWrapper(queryClient: QueryClient) {
-  return function Wrapper({ children }: { children: ReactNode }) {
+  return function Wrapper({ children }: Readonly<{ children: ReactNode }>) {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   };
 }
