@@ -66,7 +66,7 @@ onMutate → mutationFn → options.onSuccess → options.onSettled → mutate.o
 ```
 
 (and `MutationCache` callbacks, if any, before each options-level one — see
-mutation state)
+chapter 07)
 
 ---
 
