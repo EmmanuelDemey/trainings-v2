@@ -19,6 +19,8 @@ GET /
 
 ## Étape 2
 
+<!-- ci: retry -->
+
 ```json
 GET /_cluster/health
 ```
