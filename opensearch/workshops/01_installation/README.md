@@ -1,47 +1,47 @@
-# TP 1 — Installation et premiers pas
+# Workshop 1 — Installation and first steps
 
-> Démarrer OpenSearch et OpenSearch Dashboards avec Docker, interroger le cluster, et comprendre pourquoi il devient jaune.
+> Start OpenSearch and OpenSearch Dashboards with Docker, query the cluster, and understand why it turns yellow.
 
-**Durée** : 20 min · **Chapitre** : 3 — Installation et API REST
+**Duration**: 20 min · **Chapter**: 3 — Installation and REST API
 
-## Contexte
+## Context
 
-Le lab tient dans un fichier, `docker-compose.yml`, dans ce dossier : un nœud OpenSearch et OpenSearch Dashboards, plugin de sécurité désactivé. Vous le démarrez, puis vous parlez au cluster par son API REST, depuis Dev Tools et depuis un terminal.
+The lab fits in one file, `docker-compose.yml`, in this folder: one OpenSearch node and OpenSearch Dashboards, with the security plugin disabled. You start it, then you talk to the cluster through its REST API, from Dev Tools and from a terminal.
 
-Chaque étape dit **quoi** faire, pas **comment** : cherchez l'API dans la documentation, essayez, lisez la réponse, ajustez. Le résultat attendu vous permet de vérifier. Les indices sont repliés — ouvrez-les seulement si vous bloquez.
+Each step states **what** to do, not **how**: look for the API in the documentation, try it, read the response, adjust. The expected result lets you check your answer. Hints are folded — open them only once you are stuck.
 
-## Mise en place
+## Setup
 
-Sous Linux, une fois par machine :
+On Linux, once per machine:
 
 ```bash
 sudo sysctl -w vm.max_map_count=262144
 ```
 
-Dans ce dossier :
+In this folder:
 
 ```bash
 docker compose up -d --wait
 ```
 
-Ouvrez **http://localhost:5601**, puis menu ☰ → **Management** → **Dev Tools**.
+Open **http://localhost:5601**, then ☰ menu → **Management** → **Dev Tools**.
 
-Référence : [Installing OpenSearch with Docker](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/docker/).
+Reference: [Installing OpenSearch with Docker](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/docker/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : Qui répond ?
+### Step 1: Who is answering?
 
-Demandez au cluster sa version et sa distribution.
+Ask the cluster for its version and its distribution.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-La racine `/` de l'API.
+The root `/` of the API.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -49,90 +49,90 @@ La racine `/` de l'API.
 }
 ```
 
-### Étape 2 : En quelle santé ?
+### Step 2: How healthy is it?
 
-Affichez la santé du cluster, puis la liste de ses nœuds avec leurs rôles, sous forme de tableau.
+Display the health of the cluster, then the list of its nodes with their roles, as a table.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`_cluster/health`, puis une API `_cat` — `?v` ajoute les en-têtes.
+`_cluster/health`, then a `_cat` API — `?v` adds the headers.
 
 </details>
 
-**Résultat attendu** (la santé) :
+**Expected result** (the health):
 
 ```json
 { "status": "green", "number_of_nodes": 1 }
 ```
 
-**Question** : quel nœud est le `cluster_manager` ? Quels rôles a-t-il ?
+**Question**: which node is the `cluster_manager`? Which roles does it have?
 
-### Étape 3 : Un index jaune
+### Step 3: A yellow index
 
-Créez un index `hello` avec **1 shard** et **1 réplica**, puis affichez la santé de cet index.
+Create a `hello` index with **1 shard** and **1 replica**, then display the health of this index.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`PUT /hello` avec un bloc `settings`. La santé d'un index : `_cluster/health/<index>`, ou `_cat/indices`.
+`PUT /hello` with a `settings` block. The health of an index: `_cluster/health/<index>`, or `_cat/indices`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "status": "yellow", "active_primary_shards": 1, "unassigned_shards": 1 }
 ```
 
-**Question** : où le réplica pourrait-il aller ? Affichez les shards de l'index avec `_cat/shards` pour le voir.
+**Question**: where could the replica go? Display the shards of the index with `_cat/shards` to see it.
 
-### Étape 4 : Le remettre au vert
+### Step 4: Back to green
 
-Sans recréer l'index, rendez-le `green`.
+Without recreating the index, make it `green`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`number_of_replicas` est un setting **dynamique** : `PUT /hello/_settings`.
+`number_of_replicas` is a **dynamic** setting: `PUT /hello/_settings`.
 
 </details>
 
-**Résultat attendu** (la santé de l'index) :
+**Expected result** (the health of the index):
 
 ```json
 { "status": "green", "unassigned_shards": 0 }
 ```
 
-### Étape 5 : Sans Dev Tools
+### Step 5: Without Dev Tools
 
-Depuis un terminal, listez les index avec `curl`, en n'affichant que les colonnes `index`, `health` et `docs.count`.
+From a terminal, list the indices with `curl`, showing only the `index`, `health` and `docs.count` columns.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`_cat/indices?v&h=…`. Dans Dev Tools, la clé à molette → **Copy as cURL** donne la commande.
+`_cat/indices?v&h=…`. In Dev Tools, the wrench icon → **Copy as cURL** gives you the command.
 
 </details>
 
-## Critères de réussite
+## Success criteria
 
-- Le lab tourne : OpenSearch sur 9200, Dashboards sur 5601
-- Vous savez lire `status`, et expliquer un `yellow` sur un seul nœud
-- Vous avez modifié un setting dynamique à chaud
+- The lab is running: OpenSearch on 9200, Dashboards on 5601
+- You can read `status`, and explain a `yellow` on a single node
+- You have changed a dynamic setting live
 
-## Pour aller plus loin
+## Going further
 
-- Ajoutez un **deuxième nœud** au `docker-compose.yml` (même `cluster.name`, `discovery.seed_hosts`, `cluster.initial_cluster_manager_nodes`, sans `discovery.type`). Remettez un réplica à `hello` : il devient vert. Arrêtez un nœud : que devient l'index ?
-- Démarrez OpenSearch **avec** le plugin de sécurité (`OPENSEARCH_INITIAL_ADMIN_PASSWORD`) : que faut-il changer dans vos appels `curl` ?
+- Add a **second node** to `docker-compose.yml` (same `cluster.name`, `discovery.seed_hosts`, `cluster.initial_cluster_manager_nodes`, no `discovery.type`). Give `hello` a replica again: it turns green. Stop a node: what happens to the index?
+- Start OpenSearch **with** the security plugin (`OPENSEARCH_INITIAL_ADMIN_PASSWORD`): what must change in your `curl` calls?
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : le conteneur `opensearch` redémarre en boucle, `max virtual memory areas vm.max_map_count [65530] is too low`
-→ `sudo sysctl -w vm.max_map_count=262144` (et dans `/etc/sysctl.conf` pour le garder).
+**Problem**: the `opensearch` container keeps restarting, `max virtual memory areas vm.max_map_count [65530] is too low`
+→ `sudo sysctl -w vm.max_map_count=262144` (and in `/etc/sysctl.conf` to keep it).
 
-**Problème** : `port is already allocated`
-→ Un autre service écoute sur 9200 ou 5601. Changez le port **à gauche** dans `ports:` (`"9201:9200"`).
+**Problem**: `port is already allocated`
+→ Another service listens on 9200 or 5601. Change the port **on the left** in `ports:` (`"9201:9200"`).
 
-**Problème** : Dashboards affiche « OpenSearch Dashboards server is not ready yet »
-→ Patientez une minute : il attend qu'OpenSearch soit prêt.
+**Problem**: Dashboards shows "OpenSearch Dashboards server is not ready yet"
+→ Wait a minute: it waits for OpenSearch to be ready.

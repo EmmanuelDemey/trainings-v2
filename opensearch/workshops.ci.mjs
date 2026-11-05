@@ -2,7 +2,7 @@
 //
 // The workshops run in OpenSearch Dashboards Dev Tools: every request of every
 // README (the setup), then of its solutions/<workshop>/SOLUTION.md, is replayed
-// against the OpenSearch of ci/Dockerfile, and its « Résultat attendu » checked
+// against the OpenSearch of ci/Dockerfile, and its « Expected result » checked
 // (scripts/check-console.mjs) — the script speaks the REST API OpenSearch shares
 // with Elasticsearch 7.10, hence the key's name. The fixtures of the chapters stay
 // in ci/fixtures/.

@@ -1,18 +1,19 @@
-# TP 2 — Indexation et mapping : solution
+# Workshop 2 — Indexing and mapping: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the setup of the workshop README, and checks
+each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 PUT /books_guess/_doc/1
-{ "title": "Le Petit Prince", "author": "Antoine de Saint-Exupéry", "isbn": "9782070612758", "price": 7.5, "published": "1943-04-06", "pages": 96, "tags": ["conte", "jeunesse"] }
+{ "title": "The Little Prince", "author": "Antoine de Saint-Exupéry", "isbn": "9782070612758", "price": 7.5, "published": "1943-04-06", "pages": 96, "tags": ["tale", "children"] }
 
 GET /books_guess/_mapping
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -29,19 +30,19 @@ GET /books_guess/_mapping
 }
 ```
 
-`isbn` est indexé deux fois — analysé en `text`, et tel quel en `keyword` — alors
-qu'on ne le cherche qu'exactement. `pages` en `long` : 8 octets pour un nombre de
-pages. `tags`, `title`, `author` : `text` + `keyword` aussi, à trancher.
+`isbn` is indexed twice — analyzed as `text`, and as is as `keyword` — although
+it is only ever searched exactly. `pages` as `long`: 8 bytes for a page count.
+`tags`, `title`, `author`: `text` + `keyword` too, to be decided.
 
-## Étape 2
+## Step 2
 
 <!-- ci: expect-error -->
 ```json
 PUT /books_guess/_doc/2
-{ "title": "Les Misérables", "price": "épuisé" }
+{ "title": "Les Misérables", "price": "out of print" }
 ```
 
-## Étape 3
+## Step 3
 
 ```json
 PUT /books_v1
@@ -62,33 +63,33 @@ PUT /books_v1
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "acknowledged": true, "index": "books_v1" }
 ```
 
-## Étape 4
+## Step 4
 
 ```json
 POST /books_v1/_bulk?refresh=true
 { "index": { "_id": "1" } }
-{ "title": "Le Petit Prince", "author": "Antoine de Saint-Exupéry", "isbn": "9782070612758", "price": 7.5, "published": "1943-04-06", "pages": 96, "tags": ["conte", "jeunesse"] }
+{ "title": "The Little Prince", "author": "Antoine de Saint-Exupéry", "isbn": "9782070612758", "price": 7.5, "published": "1943-04-06", "pages": 96, "tags": ["tale", "children"] }
 { "index": { "_id": "2" } }
-{ "title": "L'Étranger", "author": "Albert Camus", "isbn": "9782070360024", "price": 6.9, "published": "1942-05-19", "pages": 184, "tags": ["roman", "absurde"] }
+{ "title": "The Stranger", "author": "Albert Camus", "isbn": "9782070360024", "price": 6.9, "published": "1942-05-19", "pages": 184, "tags": ["novel", "absurdism"] }
 { "index": { "_id": "3" } }
-{ "title": "Germinal", "author": "Émile Zola", "isbn": "9782253004226", "price": 8.2, "published": "1885-03-01", "pages": 592, "tags": ["roman", "naturalisme"] }
+{ "title": "Germinal", "author": "Émile Zola", "isbn": "9782253004226", "price": 8.2, "published": "1885-03-01", "pages": 592, "tags": ["novel", "naturalism"] }
 
 GET /books_v1/_count
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "count": 3 }
 ```
 
-Avec un champ inconnu, `strict_dynamic_mapping_exception` :
+With an unknown field, `strict_dynamic_mapping_exception`:
 
 <!-- ci: expect-error -->
 ```json
@@ -96,7 +97,7 @@ PUT /books_v1/_doc/4
 { "title": "Nana", "editor": "Charpentier" }
 ```
 
-## Étape 5
+## Step 5
 
 ```json
 PUT /books_v2
@@ -126,7 +127,7 @@ GET /books/_search
 { "query": { "match": { "author": "camus" } } }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -137,5 +138,5 @@ GET /books/_search
 }
 ```
 
-Bascule sans trou : `remove` de l'ancien et `add` du nouveau **dans le même**
-appel `_aliases` — les actions sont appliquées atomiquement.
+Switching with no gap: `remove` the old one and `add` the new one **in the same**
+`_aliases` call — the actions are applied atomically.

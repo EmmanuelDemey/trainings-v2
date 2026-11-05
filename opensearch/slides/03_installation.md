@@ -2,47 +2,47 @@
 layout: cover
 ---
 
-# 3 - Installation et API REST
+# 3 - Installation and REST API
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~30 min**, TP compris), vous saurez :
+By the end of this section (**~30 min**, workshop included), you will be able to:
 
-- **Démarrer** OpenSearch et OpenSearch Dashboards avec Docker
-- **Lire** les fichiers et paramètres de configuration essentiels
-- **Vérifier** la santé du cluster avec l'API REST et les API `_cat`
-- **Envoyer** des requêtes depuis Dev Tools et depuis `curl`
+- **Start** OpenSearch and OpenSearch Dashboards with Docker
+- **Read** the essential configuration files and settings
+- **Check** the health of the cluster with the REST API and the `_cat` APIs
+- **Send** requests from Dev Tools and from `curl`
 
 ---
 
-# Les modes d'installation
+# Installation options
 
-| Mode | Pour qui |
+| Option | For whom |
 |---|---|
-| **Docker / Docker Compose** | Lab, CI, la plupart des déploiements conteneurisés |
-| **Archive `tar.gz`**, paquets **RPM / DEB** | Serveurs classiques, gérés par systemd |
+| **Docker / Docker Compose** | Lab, CI, most containerized deployments |
+| **`tar.gz` archive**, **RPM / DEB** packages | Classic servers, managed by systemd |
 | **Helm chart / Operator** | Kubernetes |
-| **Service managé** | Amazon OpenSearch Service, Aiven… |
+| **Managed service** | Amazon OpenSearch Service, Aiven… |
 
 <br />
 
-- OpenSearch embarque son **JDK** : rien à installer à côté
-- **Linux** : `vm.max_map_count` ≥ **262144** (Lucene mappe ses fichiers en mémoire)
+- OpenSearch ships its own **JDK**: nothing else to install
+- **Linux**: `vm.max_map_count` ≥ **262144** (Lucene memory-maps its files)
 
 ---
 
-# Le lab : Docker Compose
+# The lab: Docker Compose
 
 ```yaml
 services:
   opensearch:
     image: opensearchproject/opensearch:3.9.0
     environment:
-      - discovery.type=single-node          # un seul nœud, pas d'élection
-      - DISABLE_SECURITY_PLUGIN=true        # lab uniquement !
-      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g  # heap JVM
+      - discovery.type=single-node          # a single node, no election
+      - DISABLE_SECURITY_PLUGIN=true        # lab only!
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g  # JVM heap
     ports: ["9200:9200"]
 
   dashboards:
@@ -53,16 +53,16 @@ services:
     ports: ["5601:5601"]
 ```
 
-Le fichier complet : `workshops/01_installation/docker-compose.yml`.
+The full file: `workshops/01_installation/docker-compose.yml`.
 
 ---
 
-# La configuration
+# Configuration
 
-`config/opensearch.yml` — ou des variables d'environnement, avec Docker :
+`config/opensearch.yml` — or environment variables, with Docker:
 
 ```yaml
-cluster.name: formation
+cluster.name: training
 node.name: node-1
 node.roles: [cluster_manager, data, ingest]
 path.data: /var/lib/opensearch
@@ -72,58 +72,58 @@ discovery.seed_hosts: ["node-1", "node-2", "node-3"]
 cluster.initial_cluster_manager_nodes: ["node-1", "node-2", "node-3"]
 ```
 
-- `config/jvm.options` : la **heap**. Règle : **≤ 50 %** de la RAM, **≤ ~31 Go**, `Xms` = `Xmx`
-- `cluster.initial_cluster_manager_nodes` : **une seule fois**, au premier démarrage
+- `config/jvm.options`: the **heap**. Rule: **≤ 50 %** of the RAM, **≤ ~31 GB**, `Xms` = `Xmx`
+- `cluster.initial_cluster_manager_nodes`: **only once**, on the very first startup
 
 ---
 
-# La sécurité, en vrai
+# Security, for real
 
-En production, le **plugin de sécurité** est **activé** :
+In production, the **security plugin** is **enabled**:
 
-- **TLS** sur le transport (entre nœuds) et sur HTTP
-- **Authentification** : utilisateurs internes, LDAP, SAML, OpenID Connect
-- **Autorisations** : rôles, au niveau du cluster, de l'index, du document et du champ
-- **Journal d'audit**
+- **TLS** on the transport layer (between nodes) and on HTTP
+- **Authentication**: internal users, LDAP, SAML, OpenID Connect
+- **Authorization**: roles, at the cluster, index, document and field level
+- **Audit log**
 
 <br />
 
-Sans le désactiver, l'image Docker exige un mot de passe admin :
+Without disabling it, the Docker image requires an admin password:
 
 ```bash
-docker run -e OPENSEARCH_INITIAL_ADMIN_PASSWORD='M0t-de-passe!Fort' \
+docker run -e OPENSEARCH_INITIAL_ADMIN_PASSWORD='Str0ng-Passw0rd!' \
   -e discovery.type=single-node -p 9200:9200 opensearchproject/opensearch:3.9.0
-curl -k -u admin:'M0t-de-passe!Fort' https://localhost:9200
+curl -k -u admin:'Str0ng-Passw0rd!' https://localhost:9200
 ```
 
 ---
 
-# L'API REST
+# The REST API
 
-Tout passe par **HTTP + JSON** : `MÉTHODE /chemin`, et un corps JSON éventuel.
+Everything goes through **HTTP + JSON**: `METHOD /path`, and an optional JSON body.
 
-| Méthode | Usage |
+| Method | Usage |
 |---|---|
-| `GET` | Lire : un document, une recherche, un état |
-| `PUT` | Créer ou remplacer à un chemin connu : un index, un document d'`_id` donné |
-| `POST` | Créer sans `_id`, ou une action : `_search`, `_bulk`, `_update` |
-| `DELETE` | Supprimer |
-| `HEAD` | Tester l'existence |
+| `GET` | Read: a document, a search, a state |
+| `PUT` | Create or replace at a known path: an index, a document with a given `_id` |
+| `POST` | Create without an `_id`, or an action: `_search`, `_bulk`, `_update` |
+| `DELETE` | Delete |
+| `HEAD` | Test existence |
 
 <br />
 
-- Les chemins qui commencent par `_` sont des **API** : `_search`, `_cat`, `_cluster`…
-- `?pretty`, `?format=json`, `?v` : options de sortie
+- Paths starting with `_` are **APIs**: `_search`, `_cat`, `_cluster`…
+- `?pretty`, `?format=json`, `?v`: output options
 
 ---
 
-# Le cluster répond-il ?
+# Is the cluster up?
 
 ```json
 GET /
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -136,14 +136,14 @@ GET /
 GET /_cluster/health
 ```
 
-- `status` : `green`, `yellow`, `red`
+- `status`: `green`, `yellow`, `red`
 - `number_of_nodes`, `active_shards`, `unassigned_shards`
 
 ---
 
-# Les API `_cat`
+# The `_cat` APIs
 
-Des tableaux lisibles par un humain — `?v` ajoute les en-têtes :
+Human-readable tables — `?v` adds the headers:
 
 ```json
 GET /_cat/nodes?v
@@ -157,21 +157,21 @@ ip         heap.percent ram.percent cpu load_1m node.role node.roles            
 172.18.0.2           24          71   3    0.52 dimr      cluster_manager,data,ingest,remote_cluster_client *  opensearch-node1
 ```
 
-- `?format=json` : le même tableau, en JSON, pour un script
-- `?h=index,health,docs.count` : choisir ses colonnes ; `?s=docs.count:desc` : trier
+- `?format=json`: the same table, as JSON, for a script
+- `?h=index,health,docs.count`: pick your columns; `?s=docs.count:desc`: sort
 
 ---
 
 # Dev Tools
 
-OpenSearch Dashboards → menu ☰ → **Management** → **Dev Tools**
+OpenSearch Dashboards → ☰ menu → **Management** → **Dev Tools**
 
-- La console envoie la requête **au cluster** : pas besoin de `curl`
-- Auto-complétion des API, des index et des champs
-- `Ctrl + Entrée` : envoyer la requête sous le curseur
-- Clé à molette → **Copy as cURL**
+- The console sends the request **to the cluster**: no need for `curl`
+- Auto-completion of APIs, indices and fields
+- `Ctrl + Enter`: send the request under the cursor
+- Wrench icon → **Copy as cURL**
 
-Le même appel, en ligne de commande :
+The same call, from the command line:
 
 ```bash
 curl -s 'http://localhost:9200/_cat/indices?v'
@@ -181,6 +181,6 @@ curl -s -X PUT 'http://localhost:9200/test' -H 'Content-Type: application/json' 
 
 ---
 
-# En pratique
+# Hands-on
 
-## TP 1 - Installation et premiers pas
+## Workshop 1 - Installation and first steps

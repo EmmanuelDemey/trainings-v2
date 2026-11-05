@@ -5,8 +5,8 @@ export default defineConfig({
   title: 'OpenSearch',
   slug: 'opensearch',
   author: 'Emmanuel Demey',
-  // The training is given in French.
-  lang: 'fr',
+  // The training is given in English.
+  lang: 'en',
 
   // One Markdown file per chapter, in the order of its number. The end-of-day
   // retro lives in slides/shared/ — a sub-folder, so not a chapter — and is
@@ -29,7 +29,7 @@ export default defineConfig({
       class: 'text-center',
       highlighter: 'shiki',
       lineNumbers: true,
-      info: '## OpenSearch\nFormation OpenSearch — 1 jour : architecture, indexation, recherche, analyse, agrégations, ingest pipelines et OpenSearch Dashboards.\n',
+      info: '## OpenSearch\nOne-day OpenSearch training: architecture, indexing, search, analysis, aggregations, ingest pipelines and OpenSearch Dashboards.\n',
       drawings: { persist: false },
       transition: 'slide-left',
       css: 'unocss',

@@ -2,30 +2,30 @@
 layout: cover
 ---
 
-# 5 - Recherche et pertinence
+# 5 - Search and relevance
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~45 min**, TP compris), vous saurez :
+By the end of this sequence (**~45 min**, workshop included), you will be able to:
 
-- **Écrire** une recherche avec le Query DSL : plein texte et valeurs exactes
-- **Combiner** des critères avec `bool` : `must`, `should`, `filter`, `must_not`
-- **Distinguer** contexte de requête (score) et contexte de filtre (oui / non)
-- **Lire** un score, et l'**influencer** avec `boost` et `function_score`
+- **Write** a search with the Query DSL: full text and exact values
+- **Combine** criteria with `bool`: `must`, `should`, `filter`, `must_not`
+- **Tell** query context (score) from filter context (yes / no)
+- **Read** a score, and **influence** it with `boost` and `function_score`
 
 ---
 
-# Le jeu de données
+# The dataset
 
-Les exemples des chapitres 5 à 8 interrogent l'index `restaurants` :
+The examples of chapters 5 to 8 query the `restaurants` index:
 
 ```json
 {
   "name": "Pizzeria Napoli",
-  "description": "Pizzas cuites au feu de bois et pâtes fraîches maison.",
-  "cuisine": "italienne",
+  "description": "Wood-fired pizzas and homemade fresh pasta.",
+  "cuisine": "italian",
   "city": "Paris",
   "location": { "lat": 48.8566, "lon": 2.3522 },
   "rating": 4.2,
@@ -34,64 +34,64 @@ Les exemples des chapitres 5 à 8 interrogent l'index `restaurants` :
 }
 ```
 
-`name` : `text` + `keyword` · `description` : `text`, analyseur `french` ·
-`cuisine`, `city` : `keyword` · `location` : `geo_point`
+`name`: `text` + `keyword` · `description`: `text`, `english` analyzer ·
+`cuisine`, `city`: `keyword` · `location`: `geo_point`
 
 ---
 
-# La forme d'une recherche
+# The shape of a search
 
 ```json
 GET /restaurants/_search
 {
-  "query": { "match": { "description": "pâtes" } },
+  "query": { "match": { "description": "pasta" } },
   "size": 5,
   "_source": ["name", "city"]
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "hits": {
     "total": { "value": 2, "relation": "eq" },
     "hits": [
-      { "_id": "2", "_source": { "name": "Pizzeria Napoli", "city": "Paris" } },
-      { "_id": "4", "_source": { "name": "La Trattoria", "city": "Lyon" } }
+      { "_id": "4", "_source": { "name": "La Trattoria", "city": "Lyon" } },
+      { "_id": "2", "_source": { "name": "Pizzeria Napoli", "city": "Paris" } }
     ]
   }
 }
 ```
 
-- `hits.total` : le nombre de documents qui correspondent
-- `hits.hits` : les `size` premiers, triés par `_score` décroissant
+- `hits.total`: the number of matching documents
+- `hits.hits`: the first `size` ones, sorted by descending `_score`
 
 ---
 
-# Plein texte : `match`
+# Full text: `match`
 
-Le texte de la requête est **analysé** comme le champ, puis cherché terme à terme :
+The query text is **analyzed** like the field, then searched term by term:
 
 ```json
 GET /restaurants/_search
 {
   "query": {
-    "match": { "description": { "query": "pâtes fraîches", "operator": "and" } }
+    "match": { "description": { "query": "fresh pasta", "operator": "and" } }
   }
 }
 ```
 
-| Variante | Effet |
+| Variant | Effect |
 |---|---|
-| `match` | Un terme suffit (`or`) ; `operator: and` les exige tous |
-| `match_phrase` | Les termes, **dans l'ordre**, côte à côte |
-| `multi_match` | Plusieurs champs : `"fields": ["name^3", "description"]` |
-| `fuzziness: "AUTO"` | Tolère les fautes de frappe |
+| `match` | One term is enough (`or`); `operator: and` requires them all |
+| `match_phrase` | The terms, **in order**, side by side |
+| `multi_match` | Several fields: `"fields": ["name^3", "description"]` |
+| `fuzziness: "AUTO"` | Tolerates typos |
 
 ---
 
-# Valeurs exactes : `term`, `terms`, `range`
+# Exact values: `term`, `terms`, `range`
 
 ```json
 GET /restaurants/_search
@@ -105,73 +105,73 @@ GET /restaurants/_search
 }
 ```
 
-- `term` sur un `keyword` : **pas d'analyse**, la casse compte : `"lyon"` ne trouve rien
-- `term` sur un `text` : piège classique — le champ est indexé en minuscules
-- `terms` : une valeur parmi une liste ; `exists`, `prefix`, `wildcard`, `ids`
+- `term` on a `keyword`: **no analysis**, case matters: `"lyon"` finds nothing
+- `term` on a `text`: the classic trap — the field is indexed lowercased
+- `terms`: one value among a list; `exists`, `prefix`, `wildcard`, `ids`
 
 ---
 
-# Combiner : `bool`
+# Combining: `bool`
 
 ```json
 GET /restaurants/_search
 {
   "query": {
     "bool": {
-      "must":     [ { "match": { "description": "poisson" } } ],
+      "must":     [ { "match": { "description": "fish" } } ],
       "filter":   [ { "term": { "city": "Paris" } },
                     { "range": { "price": { "lte": 50 } } } ],
       "should":   [ { "range": { "rating": { "gte": 4.5 } } } ],
-      "must_not": [ { "term": { "cuisine": "américaine" } } ]
+      "must_not": [ { "term": { "cuisine": "american" } } ]
     }
   }
 }
 ```
 
-| Clause | Doit correspondre | Compte dans le score |
+| Clause | Must match | Counts in the score |
 |---|---|---|
 | `must` | ✅ | ✅ |
-| `filter` | ✅ | ❌ — et mis en **cache** |
-| `should` | ❌ (bonus) si `must` ou `filter` présent | ✅ |
-| `must_not` | ❌ ne doit pas | ❌ |
+| `filter` | ✅ | ❌ — and **cached** |
+| `should` | ❌ (bonus) when `must` or `filter` is present | ✅ |
+| `must_not` | ❌ must not | ❌ |
 
 ---
 
-# Requête ou filtre ?
+# Query or filter?
 
-- **Contexte de requête** — *« à quel point ce document correspond-il ? »* → un `_score`
-- **Contexte de filtre** — *« correspond-il, oui ou non ? »* → pas de score, **cache**
+- **Query context** — *"how well does this document match?"* → a `_score`
+- **Filter context** — *"does it match, yes or no?"* → no score, **cache**
 
 <br />
 
-Règle pratique :
+Rule of thumb:
 
-- Ce que l'utilisateur **tape** → `must` / `should` (plein texte)
-- Ce qu'il **coche** (ville, prix, dates, statut) → `filter`
+- What the user **types** → `must` / `should` (full text)
+- What they **tick** (city, price, dates, status) → `filter`
 
 ---
 
-# Le score : BM25
+# The score: BM25
 
-Le `_score` d'un document pour un terme dépend de :
+The `_score` of a document for a term depends on:
 
-- **TF** — la fréquence du terme dans le champ : plus il revient, mieux c'est (avec saturation)
-- **IDF** — la rareté du terme dans l'index : un terme rare pèse plus
-- **Longueur du champ** — un terme dans un titre court pèse plus que dans un long texte
+- **TF** — the term frequency in the field: the more often, the better (with saturation)
+- **IDF** — how rare the term is in the index: a rare term weighs more
+- **Field length** — a term in a short title weighs more than in a long text
 
 ```json
 GET /restaurants/_explain/2
-{ "query": { "match": { "description": "pâtes" } } }
+{ "query": { "match": { "description": "pasta" } } }
 ```
 
-> Les statistiques sont calculées **par shard** : sur peu de documents et plusieurs
-> shards, les scores peuvent surprendre.
+> Statistics are computed **per shard**: with few documents and several
+> shards, scores can be surprising.
 
 ---
 
-# Influencer le score : `boost`
+# Influencing the score: `boost`
 
-Donner plus de poids à un champ, ou à une clause :
+Give more weight to a field, or to a clause:
 
 ```json
 GET /restaurants/_search
@@ -189,8 +189,8 @@ GET /restaurants/_search
   "query": {
     "bool": {
       "should": [
-        { "match": { "description": { "query": "poisson", "boost": 2 } } },
-        { "match": { "description": "fruits de mer" } }
+        { "match": { "description": { "query": "fish", "boost": 2 } } },
+        { "match": { "description": "seafood" } }
       ]
     }
   }
@@ -199,9 +199,9 @@ GET /restaurants/_search
 
 ---
 
-# Influencer le score : `function_score`
+# Influencing the score: `function_score`
 
-Mêler la pertinence textuelle à une **valeur métier** — ici, la note :
+Blend text relevance with a **business value** — here, the rating:
 
 ```json
 GET /restaurants/_search
@@ -216,29 +216,29 @@ GET /restaurants/_search
 }
 ```
 
-- `field_value_factor` : un champ numérique (note, popularité, stock)
-- `gauss`, `exp`, `linear` : **décroissance** avec la distance ou l'âge
-- `boost_mode` : `multiply`, `sum`, `replace`…
+- `field_value_factor`: a numeric field (rating, popularity, stock)
+- `gauss`, `exp`, `linear`: **decay** with distance or age
+- `boost_mode`: `multiply`, `sum`, `replace`…
 
 ---
 
 # Quiz
 
-**Pourquoi mettre le critère « ville = Paris » dans `filter` plutôt que dans `must` ?**
+**Why put the "city = Paris" criterion in `filter` rather than in `must`?**
 
 <v-clicks>
 
-- A) `must` ne fonctionne pas avec `term`
-- B) Pas de calcul de score, et le résultat est mis en cache ✅
-- C) `filter` trie les résultats
-- D) `must` ignore les `keyword`
+- A) `must` does not work with `term`
+- B) No score computation, and the result is cached ✅
+- C) `filter` sorts the results
+- D) `must` ignores `keyword` fields
 
-**Réponse : B** — le critère est binaire : il n'a pas à peser dans le score.
+**Answer: B** — the criterion is binary: it has no reason to weigh in the score.
 
 </v-clicks>
 
 ---
 
-# En pratique
+# Hands-on
 
-## TP 3 - Recherche et pertinence
+## Workshop 3 - Search and relevance

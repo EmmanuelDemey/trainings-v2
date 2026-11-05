@@ -1,16 +1,16 @@
-# TP 6 — Recherche avancée
+# Workshop 6 — Advanced search
 
-> Les fonctions qui font une vraie page de résultats : tri et pagination, surlignage, autocomplétion, « autour de moi », et des alertes qui préviennent quand un nouveau restaurant correspond.
+> The features that make a real results page: sorting and pagination, highlighting, autocomplete, "near me", and alerts that fire when a new restaurant matches.
 
-**Durée** : 35 min · **Chapitre** : 8 — Fonctions de recherche avancées
+**Duration**: 35 min · **Chapter**: 8 — Advanced search features
 
-## Contexte
+## Context
 
-L'application mobile du guide a besoin de quatre écrans : une liste triée et paginée, des résultats où le mot cherché est mis en valeur, un champ de recherche qui complète la saisie, et une carte « autour de moi ». Et les utilisateurs veulent être **alertés** quand un restaurant qui leur correspond ouvre.
+The guide's mobile app needs four screens: a sorted and paginated list, results where the searched word stands out, a search box that completes what you type, and a "near me" map. And the users want to be **alerted** when a restaurant that suits them opens.
 
-## Mise en place
+## Setup
 
-Ce TP est autonome. Créez l'index `restaurants` et ses douze documents :
+This workshop stands on its own. Create the `restaurants` index and its twelve documents:
 
 ```json
 DELETE /restaurant_names
@@ -27,7 +27,7 @@ PUT /restaurants
   "mappings": {
     "properties": {
       "name": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
-      "description": { "type": "text", "analyzer": "french" },
+      "description": { "type": "text", "analyzer": "english" },
       "cuisine": { "type": "keyword" },
       "city": { "type": "keyword" },
       "location": { "type": "geo_point" },
@@ -40,48 +40,48 @@ PUT /restaurants
 
 POST /restaurants/_bulk?refresh=true
 { "index": { "_id": "1" } }
-{ "name": "Le Bouchon Lyonnais", "description": "Cuisine lyonnaise traditionnelle : quenelles, saucisson brioché et tarte aux pralines.", "cuisine": "française", "city": "Lyon", "location": { "lat": 45.7640, "lon": 4.8357 }, "rating": 4.5, "price": 35, "opened": "2012-03-15" }
+{ "name": "Le Bouchon Lyonnais", "description": "Traditional Lyon cuisine: quenelles, sausage in brioche and praline tart.", "cuisine": "french", "city": "Lyon", "location": { "lat": 45.7640, "lon": 4.8357 }, "rating": 4.5, "price": 35, "opened": "2012-03-15" }
 { "index": { "_id": "2" } }
-{ "name": "Pizzeria Napoli", "description": "Pizzas cuites au feu de bois et pâtes fraîches maison.", "cuisine": "italienne", "city": "Paris", "location": { "lat": 48.8566, "lon": 2.3522 }, "rating": 4.2, "price": 18, "opened": "2018-06-01" }
+{ "name": "Pizzeria Napoli", "description": "Wood-fired pizzas and homemade fresh pasta.", "cuisine": "italian", "city": "Paris", "location": { "lat": 48.8566, "lon": 2.3522 }, "rating": 4.2, "price": 18, "opened": "2018-06-01" }
 { "index": { "_id": "3" } }
-{ "name": "Sushi Zen", "description": "Sushis et sashimis préparés devant vous, poisson frais du jour.", "cuisine": "japonaise", "city": "Paris", "location": { "lat": 48.8606, "lon": 2.3376 }, "rating": 4.7, "price": 40, "opened": "2020-09-10" }
+{ "name": "Sushi Zen", "description": "Sushi and sashimi prepared in front of you, fresh fish of the day.", "cuisine": "japanese", "city": "Paris", "location": { "lat": 48.8606, "lon": 2.3376 }, "rating": 4.7, "price": 40, "opened": "2020-09-10" }
 { "index": { "_id": "4" } }
-{ "name": "La Trattoria", "description": "Pâtes fraîches, risotto aux champignons et tiramisu.", "cuisine": "italienne", "city": "Lyon", "location": { "lat": 45.7578, "lon": 4.8320 }, "rating": 3.9, "price": 22, "opened": "2016-11-20" }
+{ "name": "La Trattoria", "description": "Fresh pasta, mushroom risotto and tiramisu.", "cuisine": "italian", "city": "Lyon", "location": { "lat": 45.7578, "lon": 4.8320 }, "rating": 3.9, "price": 22, "opened": "2016-11-20" }
 { "index": { "_id": "5" } }
-{ "name": "Le Vieux Port", "description": "Bouillabaisse, poissons grillés et plateau de fruits de mer face au port.", "cuisine": "fruits de mer", "city": "Marseille", "location": { "lat": 43.2951, "lon": 5.3740 }, "rating": 4.4, "price": 50, "opened": "2010-05-05" }
+{ "name": "Le Vieux Port", "description": "Bouillabaisse, grilled fishes and seafood platter facing the harbour.", "cuisine": "seafood", "city": "Marseille", "location": { "lat": 43.2951, "lon": 5.3740 }, "rating": 4.4, "price": 50, "opened": "2010-05-05" }
 { "index": { "_id": "6" } }
-{ "name": "Burger Factory", "description": "Burgers gourmands, frites maison et milkshakes.", "cuisine": "américaine", "city": "Paris", "location": { "lat": 48.8530, "lon": 2.3499 }, "rating": 3.6, "price": 15, "opened": "2021-02-14" }
+{ "name": "Burger Factory", "description": "Gourmet burgers, homemade fries and milkshakes.", "cuisine": "american", "city": "Paris", "location": { "lat": 48.8530, "lon": 2.3499 }, "rating": 3.6, "price": 15, "opened": "2021-02-14" }
 { "index": { "_id": "7" } }
-{ "name": "Chez Mamie", "description": "Cuisine familiale : blanquette de veau, bœuf bourguignon et tarte tatin.", "cuisine": "française", "city": "Paris", "location": { "lat": 48.8867, "lon": 2.3431 }, "rating": 4.6, "price": 28, "opened": "2014-01-08" }
+{ "name": "Chez Mamie", "description": "Home-style cuisine: veal blanquette, bœuf bourguignon and tarte tatin.", "cuisine": "french", "city": "Paris", "location": { "lat": 48.8867, "lon": 2.3431 }, "rating": 4.6, "price": 28, "opened": "2014-01-08" }
 { "index": { "_id": "8" } }
-{ "name": "Ramen Ya", "description": "Ramen au bouillon tonkotsu et gyozas grillés.", "cuisine": "japonaise", "city": "Lyon", "location": { "lat": 45.7676, "lon": 4.8344 }, "rating": 4.1, "price": 16, "opened": "2022-04-22" }
+{ "name": "Ramen Ya", "description": "Tonkotsu broth ramen and grilled gyoza.", "cuisine": "japanese", "city": "Lyon", "location": { "lat": 45.7676, "lon": 4.8344 }, "rating": 4.1, "price": 16, "opened": "2022-04-22" }
 { "index": { "_id": "9" } }
-{ "name": "La Cantine Provençale", "description": "Spécialités provençales : ratatouille, tapenade et aïoli.", "cuisine": "française", "city": "Marseille", "location": { "lat": 43.2965, "lon": 5.3698 }, "rating": 4.0, "price": 25, "opened": "2019-07-01" }
+{ "name": "La Cantine Provençale", "description": "Provençal specialities: ratatouille, tapenade and aioli.", "cuisine": "french", "city": "Marseille", "location": { "lat": 43.2965, "lon": 5.3698 }, "rating": 4.0, "price": 25, "opened": "2019-07-01" }
 { "index": { "_id": "10" } }
-{ "name": "Taj Mahal", "description": "Curry, poulet tandoori et naans au fromage.", "cuisine": "indienne", "city": "Marseille", "location": { "lat": 43.2990, "lon": 5.3810 }, "rating": 3.8, "price": 20, "opened": "2017-10-12" }
+{ "name": "Taj Mahal", "description": "Curry, tandoori chicken and cheese naans.", "cuisine": "indian", "city": "Marseille", "location": { "lat": 43.2990, "lon": 5.3810 }, "rating": 3.8, "price": 20, "opened": "2017-10-12" }
 { "index": { "_id": "11" } }
-{ "name": "Green Bowl", "description": "Bowls végétariens, salades de saison et jus pressés.", "cuisine": "végétarienne", "city": "Lyon", "location": { "lat": 45.7600, "lon": 4.8400 }, "rating": 4.3, "price": 14, "opened": "2023-03-30" }
+{ "name": "Green Bowl", "description": "Vegetarian bowls, seasonal salads and pressed juices.", "cuisine": "vegetarian", "city": "Lyon", "location": { "lat": 45.7600, "lon": 4.8400 }, "rating": 4.3, "price": 14, "opened": "2023-03-30" }
 { "index": { "_id": "12" } }
-{ "name": "L'Étoile du Nord", "description": "Menu dégustation, cuisine gastronomique de saison.", "cuisine": "gastronomique", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
+{ "name": "L'Étoile du Nord", "description": "Tasting menu, seasonal fine-dining cuisine.", "cuisine": "fine dining", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
 ```
 <!-- /include -->
 
-Référence : [Search features](https://docs.opensearch.org/latest/search-plugins/searching-data/).
+Reference: [Search features](https://docs.opensearch.org/latest/search-plugins/searching-data/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : Trier et paginer
+### Step 1: Sort and paginate
 
-Les restaurants du **moins cher au plus cher**, à prix égal par nom, **4 par page**. N'affichez que le nom et le prix. Puis demandez la **page suivante** sans utiliser `from`.
+The restaurants from the **cheapest to the most expensive**, by name at equal price, **4 per page**. Show only the name and the price. Then ask for the **next page** without using `from`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`sort` sur `price` puis `name.keyword`. Chaque hit porte un tableau `sort` : passez celui du **dernier** hit à `search_after`.
+`sort` on `price` then `name.keyword`. Each hit carries a `sort` array: pass the one of the **last** hit to `search_after`.
 
 </details>
 
-**Résultat attendu** (la page 2) :
+**Expected result** (page 2):
 
 ```json
 {
@@ -96,69 +96,69 @@ Les restaurants du **moins cher au plus cher**, à prix égal par nom, **4 par p
 }
 ```
 
-**Question** : pourquoi un second critère de tri (`name.keyword`) est-il indispensable avec `search_after` ?
+**Question**: why is a second sort criterion (`name.keyword`) essential with `search_after`?
 
-### Étape 2 : Surligner
+### Step 2: Highlight
 
-Cherchez « grillés » dans la description, et entourez les termes trouvés de `<em>` … `</em>`. Pas de `_source`.
+Search for "grilled" in the description, and wrap the matched terms in `<em>` … `</em>`. No `_source`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Un bloc `highlight` avec `pre_tags`, `post_tags` et `fields`.
+A `highlight` block with `pre_tags`, `post_tags` and `fields`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "hits": {
     "hits": [
-      { "_id": "8", "highlight": { "description": ["Ramen au bouillon tonkotsu et gyozas <em>grillés</em>."] } },
-      { "_id": "5", "highlight": { "description": ["Bouillabaisse, poissons <em>grillés</em> et plateau de fruits de mer face au port."] } }
+      { "_id": "8", "highlight": { "description": ["Tonkotsu broth ramen and <em>grilled</em> gyoza."] } },
+      { "_id": "5", "highlight": { "description": ["Bouillabaisse, <em>grilled</em> fishes and seafood platter facing the harbour."] } }
     ]
   }
 }
 ```
 
-### Étape 3 : Autocomplétion
+### Step 3: Autocomplete
 
-Créez un index `restaurant_names` (1 shard, 0 réplica) avec un champ `suggest` de type `completion`. Indexez trois noms : « Le Bouchon Lyonnais », « Le Vieux Port », « La Trattoria », avec les `_id` `1`, `5` et `4`. Puis demandez les complétions de « le ».
+Create a `restaurant_names` index (1 shard, 0 replicas) with a `suggest` field of type `completion`. Index three names: "Le Bouchon Lyonnais", "Le Vieux Port", "La Trattoria", with the `_id`s `1`, `5` and `4`. Then ask for the completions of "le".
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Le mapping `{ "suggest": { "type": "completion" } }`, des documents `{ "suggest": "Le Vieux Port" }`, puis un bloc `suggest` avec `prefix` et `completion.field`.
+The mapping `{ "suggest": { "type": "completion" } }`, documents `{ "suggest": "Le Vieux Port" }`, then a `suggest` block with `prefix` and `completion.field`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "suggest": {
-    "noms": [
+    "names": [
       { "text": "le", "options": [ { "text": "Le Bouchon Lyonnais" }, { "text": "Le Vieux Port" } ] }
     ]
   }
 }
 ```
 
-**Essayez** : ajoutez `"fuzzy": { "fuzziness": 1 }` et tapez « la v ».
+**Try it**: add `"fuzzy": { "fuzziness": 1 }` and type "la v".
 
-### Étape 4 : Autour de moi
+### Step 4: Near me
 
-Vous êtes à la tour Eiffel (lat `48.8584`, lon `2.2945`). Trouvez les restaurants à moins de **5 km**, du plus proche au plus loin, avec la distance en km. N'affichez que le nom.
+You are at the Eiffel Tower (lat `48.8584`, lon `2.2945`). Find the restaurants less than **5 km** away, from the closest to the farthest, with the distance in km. Show only the name.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Un `geo_distance` dans un `filter`, et un tri `_geo_distance` avec `unit`.
+A `geo_distance` inside a `filter`, and a `_geo_distance` sort with `unit`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -174,57 +174,57 @@ Un `geo_distance` dans un `filter`, et un tri `_geo_distance` avec `unit`.
 }
 ```
 
-**Question** : où lire la distance de chaque restaurant dans la réponse ?
+**Question**: where do you read the distance of each restaurant in the response?
 
-### Étape 5 : Les alertes, par percolation
+### Step 5: Alerts, through percolation
 
-Un utilisateur veut être prévenu de l'ouverture d'un restaurant **japonais** à **Lyon**, un autre d'un restaurant à **moins de 20 €**. Créez un index `alerts` (1 shard, 0 réplica) qui stocke ces deux requêtes, avec les `_id` `japonais-lyon` et `petit-budget`. Puis soumettez-lui le nouveau restaurant :
+One user wants to be told when a **Japanese** restaurant opens in **Lyon**, another one when a restaurant **under €20** does. Create an `alerts` index (1 shard, 0 replicas) that stores these two queries, with the `_id`s `japanese-lyon` and `budget`. Then submit the new restaurant to it:
 
 ```text
-{ "name": "Udon Lyon", "cuisine": "japonaise", "city": "Lyon", "price": 15 }
+{ "name": "Udon Lyon", "cuisine": "japanese", "city": "Lyon", "price": 15 }
 ```
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Le mapping déclare un champ `query` de type `percolator`, **et** les champs que les requêtes interrogent (`cuisine`, `city`, `price`). Puis une recherche `percolate` avec `document`.
+The mapping declares a `query` field of type `percolator`, **and** the fields the queries look at (`cuisine`, `city`, `price`). Then a `percolate` search with `document`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "hits": {
     "total": { "value": 2 },
-    "hits": [ { "_id": "japonais-lyon" }, { "_id": "petit-budget" } ]
+    "hits": [ { "_id": "japanese-lyon" }, { "_id": "budget" } ]
   }
 }
 ```
 
-**Essayez** : soumettez un restaurant japonais à Paris, à 30 €.
+**Try it**: submit a Japanese restaurant in Paris, at €30.
 
-## Critères de réussite
+## Success criteria
 
-- Une pagination stable avec `sort` et `search_after`
-- Les termes trouvés sont surlignés
-- L'autocomplétion repose sur un champ `completion`
-- Une recherche géographique filtre et trie par distance
-- Des requêtes stockées sont rejouées sur un document entrant
+- A stable pagination with `sort` and `search_after`
+- The matched terms are highlighted
+- The autocomplete relies on a `completion` field
+- A geographic search filters and sorts by distance
+- Stored queries are replayed against an incoming document
 
-## Pour aller plus loin
+## Going further
 
-- Ouvrez un **Point in Time** (`POST /restaurants/_search/point_in_time?keep_alive=1m`) et paginez avec : indexez un nouveau restaurant entre deux pages — apparaît-il ?
-- Un `term` suggester sur `name` : quelle correction propose-t-il pour « trattorai » ?
-- Une agrégation `geo_distance` : combien de restaurants à 0–5, 5–100, 100+ km de la tour Eiffel ?
+- Open a **Point in Time** (`POST /restaurants/_search/point_in_time?keep_alive=1m`) and paginate with it: index a new restaurant between two pages — does it show up?
+- A `term` suggester on `name`: which correction does it offer for "trattorai"?
+- A `geo_distance` aggregation: how many restaurants at 0–5, 5–100, 100+ km from the Eiffel Tower?
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : `search_after` renvoie la même page
-→ Le tableau passé doit être celui du **dernier** hit de la page précédente, avec le **même** `sort`.
+**Problem**: `search_after` returns the same page
+→ The array you pass must be the one of the **last** hit of the previous page, with the **same** `sort`.
 
-**Problème** : `field [suggest] is not a completion suggest field`
-→ L'index a été créé sans le mapping : supprimez-le et recréez-le.
+**Problem**: `field [suggest] is not a completion suggest field`
+→ The index was created without the mapping: delete it and create it again.
 
-**Problème** : `percolate` ne trouve rien
-→ Les champs interrogés par les requêtes stockées doivent être **dans le mapping** de l'index `alerts`, avec les mêmes types.
+**Problem**: `percolate` finds nothing
+→ The fields the stored queries look at must be **in the mapping** of the `alerts` index, with the same types.

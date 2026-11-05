@@ -2,23 +2,23 @@
 layout: cover
 ---
 
-# 8 - Fonctions de recherche avancées
+# 8 - Advanced search features
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~40 min**, TP compris), vous saurez :
+By the end of this sequence (**~40 min**, workshop included), you will be able to:
 
-- **Trier** et **paginer** des résultats, y compris en profondeur
-- **Surligner** les termes trouvés
-- **Suggérer** des complétions et des corrections
-- **Chercher** autour d'un point géographique
-- **Inverser** la recherche avec la **percolation**
+- **Sort** and **paginate** results, deep pagination included
+- **Highlight** the matched terms
+- **Suggest** completions and corrections
+- **Search** around a geographic point
+- **Reverse** the search with **percolation**
 
 ---
 
-# Trier
+# Sorting
 
 ```json
 GET /restaurants/_search
@@ -32,25 +32,25 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "hits": { "hits": [ { "_id": "12", "sort": [4.9, "L'Étoile du Nord"] } ] } }
 ```
 
-- Trier sur un `keyword`, un nombre, une date — **pas** sur un `text`
-- Un `sort` explicite **désactive** le calcul du `_score` (sauf `"track_scores": true`)
+- Sort on a `keyword`, a number, a date — **not** on a `text`
+- An explicit `sort` **disables** the `_score` computation (unless `"track_scores": true`)
 
 ---
 
-# Paginer
+# Paginating
 
-| Méthode | Usage | Limite |
+| Method | Use | Limit |
 |---|---|---|
-| `from` + `size` | Pages d'une interface : `from: 20, size: 10` | `from + size` ≤ **10 000** (`index.max_result_window`) |
-| `search_after` | Pagination profonde, « page suivante » | Pas de saut à la page N |
-| **Point in Time** + `search_after` | Parcours **cohérent** pendant que l'index change | Ressource à fermer |
-| `scroll` | Export complet, historique | Préférer PIT |
+| `from` + `size` | Pages of a UI: `from: 20, size: 10` | `from + size` ≤ **10,000** (`index.max_result_window`) |
+| `search_after` | Deep pagination, "next page" | No jump to page N |
+| **Point in Time** + `search_after` | **Consistent** traversal while the index changes | A resource to close |
+| `scroll` | Full export, legacy | Prefer PIT |
 
 ```json
 GET /restaurants/_search
@@ -64,14 +64,14 @@ GET /restaurants/_search
 
 ---
 
-# Surlignage
+# Highlighting
 
-Montrer **pourquoi** un document correspond :
+Show **why** a document matches:
 
 ```json
 GET /restaurants/_search
 {
-  "query": { "match": { "description": "pâtes" } },
+  "query": { "match": { "description": "pasta" } },
   "highlight": {
     "pre_tags": ["<mark>"], "post_tags": ["</mark>"],
     "fields": { "description": {} }
@@ -80,26 +80,26 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "hits": {
     "hits": [
-      { "_id": "4", "highlight": { "description": ["<mark>Pâtes</mark> fraîches, risotto aux champignons et tiramisu."] } }
+      { "_id": "4", "highlight": { "description": ["Fresh <mark>pasta</mark>, mushroom risotto and tiramisu."] } }
     ]
   }
 }
 ```
 
-- Fragmente les longs textes : `fragment_size`, `number_of_fragments`
-- Surligne selon l'**analyse** : `pâtes` trouve aussi `Pâtes`
+- Splits long texts into fragments: `fragment_size`, `number_of_fragments`
+- Highlights according to the **analysis**: `pastas` also finds `pasta`
 
 ---
 
-# Suggestions : corriger
+# Suggestions: correcting
 
-Le **term suggester** propose des termes proches de ceux de l'index :
+The **term suggester** offers terms close to those of the index:
 
 ```json
 GET /restaurants/_search
@@ -114,20 +114,20 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "suggest": { "correction": [ { "text": "trattorai", "options": [ { "text": "trattoria" } ] } ] } }
 ```
 
-- `phrase` : corrige une phrase entière
-- Alternative simple : `match` avec `"fuzziness": "AUTO"`
+- `phrase`: corrects a whole sentence
+- A simple alternative: `match` with `"fuzziness": "AUTO"`
 
 ---
 
-# Suggestions : compléter
+# Suggestions: completing
 
-Le **completion suggester** : un type de champ dédié, en mémoire, très rapide :
+The **completion suggester**: a dedicated field type, in memory, very fast:
 
 ```json
 PUT /cities
@@ -142,20 +142,20 @@ POST /cities/_bulk?refresh=true
 { "suggest": { "input": ["Lyon"], "weight": 8 } }
 
 GET /cities/_search
-{ "suggest": { "villes": { "prefix": "pa", "completion": { "field": "suggest" } } } }
+{ "suggest": { "cities": { "prefix": "pa", "completion": { "field": "suggest" } } } }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
-{ "suggest": { "villes": [ { "options": [ { "text": "Paris" }, { "text": "Pau" } ] } ] } }
+{ "suggest": { "cities": [ { "options": [ { "text": "Paris" }, { "text": "Pau" } ] } ] } }
 ```
 
 ---
 
-# Requêtes géographiques
+# Geographic queries
 
-Un champ `geo_point` : `{ "lat": 48.85, "lon": 2.35 }`, `"48.85,2.35"`, ou `[2.35, 48.85]` (lon, lat !)
+A `geo_point` field: `{ "lat": 48.85, "lon": 2.35 }`, `"48.85,2.35"`, or `[2.35, 48.85]` (lon, lat!)
 
 ```json
 GET /restaurants/_search
@@ -174,14 +174,14 @@ GET /restaurants/_search
 }
 ```
 
-- `geo_bounding_box`, `geo_polygon`, `geo_shape` : rectangle, polygone, formes
-- Agrégations : `geo_distance`, `geohash_grid`, `geotile_grid` → **cartes** dans Dashboards
+- `geo_bounding_box`, `geo_polygon`, `geo_shape`: rectangle, polygon, shapes
+- Aggregations: `geo_distance`, `geohash_grid`, `geotile_grid` → **maps** in Dashboards
 
 ---
 
-# La percolation
+# Percolation
 
-La recherche **à l'envers** : on indexe des **requêtes**, et on leur soumet un **document**.
+Search **in reverse**: we index **queries**, and submit a **document** to them.
 
 ```json
 PUT /alerts
@@ -189,50 +189,50 @@ PUT /alerts
   "mappings": {
     "properties": {
       "query":       { "type": "percolator" },
-      "description": { "type": "text", "analyzer": "french" },
+      "description": { "type": "text", "analyzer": "english" },
       "price":       { "type": "integer" }
     }
   }
 }
 
-PUT /alerts/_doc/japonais-pas-cher?refresh=true
+PUT /alerts/_doc/cheap-japanese?refresh=true
 { "query": { "bool": { "must": { "match": { "description": "sushi" } }, "filter": { "range": { "price": { "lte": 30 } } } } } }
 
 GET /alerts/_search
 {
   "query": {
-    "percolate": { "field": "query", "document": { "description": "Sushis à volonté", "price": 25 } }
+    "percolate": { "field": "query", "document": { "description": "All-you-can-eat sushi", "price": 25 } }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
-{ "hits": { "hits": [ { "_id": "japonais-pas-cher" } ] } }
+{ "hits": { "hits": [ { "_id": "cheap-japanese" } ] } }
 ```
 
-→ Alertes « nouvelle annonce qui me correspond », classification, routage.
+→ "A new listing matches me" alerts, classification, routing.
 
 ---
 
 # Quiz
 
-**Un utilisateur veut la page 2 000 d'une recherche, 10 résultats par page. Que se passe-t-il avec `from` / `size` ?**
+**A user wants page 2,000 of a search, 10 results per page. What happens with `from` / `size`?**
 
 <v-clicks>
 
-- A) Ça marche, c'est juste lent
-- B) Erreur : `from + size` dépasse `max_result_window` (10 000) ✅
-- C) OpenSearch renvoie la dernière page
-- D) OpenSearch bascule en `scroll`
+- A) It works, it's just slow
+- B) Error: `from + size` exceeds `max_result_window` (10,000) ✅
+- C) OpenSearch returns the last page
+- D) OpenSearch switches to `scroll`
 
-**Réponse : B** — au-delà, `search_after` (+ PIT). Et une interface ne propose pas la page 2 000.
+**Answer: B** — beyond that, `search_after` (+ PIT). And a UI does not offer page 2,000 anyway.
 
 </v-clicks>
 
 ---
 
-# En pratique
+# In practice
 
-## TP 6 - Recherche avancée
+## Workshop 6 - Advanced search

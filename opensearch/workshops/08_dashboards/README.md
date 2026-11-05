@@ -1,157 +1,157 @@
-# TP 8 — OpenSearch Dashboards
+# Workshop 8 — OpenSearch Dashboards
 
-> Explorer les logs d'un site web dans Discover, construire quatre visualisations et une carte, puis les assembler en un tableau de bord interactif à partager.
+> Explore the logs of a website in Discover, build four visualizations and a map, then assemble them into an interactive dashboard to share.
 
-**Durée** : 45 min · **Chapitre** : 10 — OpenSearch Dashboards
+**Duration**: 45 min · **Chapter**: 10 — OpenSearch Dashboards
 
-## Contexte
+## Context
 
-L'équipe d'exploitation d'un site web veut un tableau de bord : le trafic dans le temps, les erreurs, les systèmes des visiteurs, et d'où ils viennent. OpenSearch Dashboards fournit un jeu de **logs web d'exemple** : vous partez de lui, et construisez **votre** tableau de bord — sans regarder celui qu'il fournit.
+The operations team of a website wants a dashboard: traffic over time, errors, the visitors' operating systems, and where they come from. OpenSearch Dashboards ships a **sample web logs** data set: you start from it, and build **your own** dashboard — without looking at the one it ships.
 
-## Mise en place
+## Setup
 
-1. Ouvrez **http://localhost:5601**.
-2. Page d'accueil → **Add sample data** (ou menu ☰ → **Home** → **Sample data**).
-3. Sur **Sample web logs**, cliquez **Add data**.
+1. Open **http://localhost:5601**.
+2. Home page → **Add sample data** (or menu ☰ → **Home** → **Sample data**).
+3. On **Sample web logs**, click **Add data**.
 
-L'index `opensearch_dashboards_sample_data_logs` contient environ **14 000** requêtes HTTP, réparties sur quelques semaines **autour d'aujourd'hui**. Champs utiles :
+The `opensearch_dashboards_sample_data_logs` index holds about **14,000** HTTP requests, spread over a few weeks **around today**. Useful fields:
 
 <!-- ci: sample-data logs -->
-| Champ | Type | Contenu |
+| Field | Type | Content |
 |---|---|---|
-| `timestamp` | `date` | Date de la requête |
-| `response` / `response.keyword` | `text` / `keyword` | Code HTTP : `200`, `404`, `503` |
-| `bytes` | `long` | Taille de la réponse |
-| `machine.os.keyword` | `keyword` | Système du visiteur |
-| `extension.keyword` | `keyword` | Extension du fichier demandé |
-| `geo.src` | `keyword` | Pays d'origine (code ISO) |
-| `geo.coordinates` | `geo_point` | Position du visiteur |
-| `clientip` | `ip` | IP du visiteur |
+| `timestamp` | `date` | Date of the request |
+| `response` / `response.keyword` | `text` / `keyword` | HTTP status: `200`, `404`, `503` |
+| `bytes` | `long` | Size of the response |
+| `machine.os.keyword` | `keyword` | Visitor's operating system |
+| `extension.keyword` | `keyword` | Extension of the requested file |
+| `geo.src` | `keyword` | Country of origin (ISO code) |
+| `geo.coordinates` | `geo_point` | Visitor's location |
+| `clientip` | `ip` | Visitor's IP address |
 
-Référence : [OpenSearch Dashboards](https://docs.opensearch.org/latest/dashboards/).
+Reference: [OpenSearch Dashboards](https://docs.opensearch.org/latest/dashboards/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : L'index pattern
+### Step 1: The index pattern
 
-L'ajout des données d'exemple a créé un index pattern. Créez-en **un autre**, à vous : motif `opensearch_dashboards_sample_data_logs*`, champ de temps `timestamp`.
+Adding the sample data created an index pattern. Create **another one**, your own: pattern `opensearch_dashboards_sample_data_logs*`, time field `timestamp`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
 Menu ☰ → **Dashboards Management** → **Index patterns** → **Create index pattern**.
 
 </details>
 
-**Résultat attendu** : l'index pattern liste une trentaine de champs ; `geo.coordinates` est de type `geo_point`, `bytes` de type `number`, agrégeable.
+**Expected result**: the index pattern lists about thirty fields; `geo.coordinates` is of type `geo_point`, `bytes` of type `number`, aggregatable.
 
-**Question** : `response` apparaît deux fois, `response` et `response.keyword`. Lequel est **agrégeable** ? Pourquoi ?
+**Question**: `response` shows up twice, `response` and `response.keyword`. Which one is **aggregatable**? Why?
 
-### Étape 2 : Discover
+### Step 2: Discover
 
-Dans **Discover**, avec votre index pattern :
+In **Discover**, with your index pattern:
 
-1. Réglez la période sur les **7 derniers jours**.
-2. Affichez les colonnes `clientip`, `request`, `response`, `bytes`.
-3. Avec **DQL**, trouvez les erreurs serveur : les réponses **503**.
-4. Ajoutez un **filtre** qui exclut le système `win xp`.
-5. Enregistrez la recherche sous le nom `Erreurs 503`.
+1. Set the time range to the **last 7 days**.
+2. Show the `clientip`, `request`, `response`, `bytes` columns.
+3. With **DQL**, find the server errors: the **503** responses.
+4. Add a **filter** that excludes the `win xp` operating system.
+5. Save the search as `503 errors`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-DQL : `response:503`. Pour le filtre : **+ Add filter**, `machine.os.keyword` **is not** `win xp` — ou survolez une valeur dans un document, et cliquez la loupe barrée.
+DQL: `response:503`. For the filter: **+ Add filter**, `machine.os.keyword` **is not** `win xp` — or hover a value in a document, and click the crossed-out magnifier.
 
 </details>
 
-**Résultat attendu** : quelques dizaines de documents, tous en `503`, aucun `win xp`.
+**Expected result**: a few dozen documents, all `503`, no `win xp`.
 
-**Essayez** : dans la barre DQL, `bytes > 10000 and extension:css`. Puis **Inspect** → **Request** : à quoi ressemble la requête envoyée à OpenSearch ?
+**Try it**: in the DQL bar, `bytes > 10000 and extension:css`. Then **Inspect** → **Request**: what does the request sent to OpenSearch look like?
 
-### Étape 3 : Une métrique
+### Step 3: A metric
 
-Menu ☰ → **Visualize** → **Create visualization** → **Metric**. Affichez le **nombre total de requêtes** et le **volume moyen** (`bytes`). Enregistrez-la sous `Trafic — chiffres clés`.
+Menu ☰ → **Visualize** → **Create visualization** → **Metric**. Show the **total number of requests** and the **average size** (`bytes`). Save it as `Traffic — key figures`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-**Metrics** → **Add** → *Average* sur `bytes`. La première métrique, *Count*, est déjà là.
+**Metrics** → **Add** → *Average* on `bytes`. The first metric, *Count*, is already there.
 
 </details>
 
-### Étape 4 : Le trafic dans le temps, par code HTTP
+### Step 4: Traffic over time, per HTTP status
 
-Une **Vertical bar** : en X, un **Date Histogram** sur `timestamp` ; les barres **empilées** par code HTTP (`response.keyword`). Enregistrez-la sous `Trafic par code HTTP`.
+A **Vertical bar**: on the X axis, a **Date Histogram** on `timestamp`; the bars **stacked** by HTTP status (`response.keyword`). Save it as `Traffic per HTTP status`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-**Buckets** → **Add** → **X-axis** → *Date Histogram*. Puis **Add** → **Split series** → *Terms* sur `response.keyword`. Le panneau de droite → **Metrics & axes** → **Mode** : *stacked*.
+**Buckets** → **Add** → **X-axis** → *Date Histogram*. Then **Add** → **Split series** → *Terms* on `response.keyword`. Right-hand panel → **Metrics & axes** → **Mode**: *stacked*.
 
 </details>
 
-**Question** : quelles agrégations du chapitre 7 cette visualisation envoie-t-elle ? Vérifiez avec **Inspect** → **Requests**.
+**Question**: which aggregations of chapter 7 does this visualization send? Check with **Inspect** → **Requests**.
 
-### Étape 5 : Les systèmes des visiteurs
+### Step 5: The visitors' operating systems
 
-Un **Pie** (en anneau, *donut*) : la part de chaque système (`machine.os.keyword`), puis, à l'intérieur de chaque système, la part de chaque extension (`extension.keyword`, top 3). Enregistrez-le sous `Systèmes et fichiers`.
+A **Pie** (as a ring, *donut*): the share of each operating system (`machine.os.keyword`), then, inside each operating system, the share of each extension (`extension.keyword`, top 3). Save it as `Systems and files`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Deux **Split slices** : un *Terms* sur `machine.os.keyword`, puis un *Terms* sur `extension.keyword`. L'ordre des buckets compte.
+Two **Split slices**: a *Terms* on `machine.os.keyword`, then a *Terms* on `extension.keyword`. The order of the buckets matters.
 
 </details>
 
-### Étape 6 : La carte
+### Step 6: The map
 
-Menu ☰ → **Maps** → **Create map**. Ajoutez une couche **Documents** sur votre index pattern, champ géo `geo.coordinates`. Colorez les points selon `response.keyword`. Enregistrez la carte sous `Visiteurs`.
+Menu ☰ → **Maps** → **Create map**. Add a **Documents** layer on your index pattern, geo field `geo.coordinates`. Color the points by `response.keyword`. Save the map as `Visitors`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-**Add layer** → **Documents**. Onglet **Style** → couleur par champ. Si **Maps** n'apparaît pas, utilisez **Visualize** → **Coordinate Map**, avec une agrégation *Geohash* sur `geo.coordinates`.
+**Add layer** → **Documents**. **Style** tab → color by field. If **Maps** does not show up, use **Visualize** → **Coordinate Map**, with a *Geohash* aggregation on `geo.coordinates`.
 
 </details>
 
-**Question** : sans le type `geo_point` dans le mapping, cette carte serait-elle possible ?
+**Question**: without the `geo_point` type in the mapping, would this map be possible?
 
-### Étape 7 : Le tableau de bord
+### Step 7: The dashboard
 
-Menu ☰ → **Dashboards** → **Create** → **Dashboard**. Ajoutez vos quatre visualisations et la recherche `Erreurs 503`. Disposez-les, puis enregistrez sous `Exploitation du site`.
+Menu ☰ → **Dashboards** → **Create** → **Dashboard**. Add your four visualizations and the `503 errors` search. Lay them out, then save as `Website operations`.
 
-Puis, **sur le tableau de bord** :
+Then, **on the dashboard**:
 
-1. Cliquez sur le secteur `osx` du camembert : que deviennent **tous** les panneaux ?
-2. Sélectionnez à la souris une plage de l'histogramme : que devient la période ?
-3. Retirez les filtres.
+1. Click the `osx` slice of the pie: what happens to **every** panel?
+2. Drag over a range of the histogram with the mouse: what happens to the time range?
+3. Remove the filters.
 
-### Étape 8 : Partager
+### Step 8: Share
 
-1. **Share** → **Copy link** : ouvrez le lien dans une fenêtre privée.
-2. Menu ☰ → **Dashboards Management** → **Saved objects** : exportez le tableau de bord **avec ses objets liés**. Ouvrez le fichier `.ndjson` obtenu : que contient-il ?
+1. **Share** → **Copy link**: open the link in a private window.
+2. Menu ☰ → **Dashboards Management** → **Saved objects**: export the dashboard **with its related objects**. Open the `.ndjson` file you get: what does it hold?
 
-## Critères de réussite
+## Success criteria
 
-- Un index pattern avec un champ de temps
-- Une recherche DQL et un filtre, enregistrés
-- Quatre visualisations : métrique, histogramme empilé, anneau, carte
-- Un tableau de bord interactif, exporté en `.ndjson`
+- An index pattern with a time field
+- A DQL search and a filter, saved
+- Four visualizations: metric, stacked histogram, donut, map
+- An interactive dashboard, exported as `.ndjson`
 
-## Pour aller plus loin
+## Going further
 
-- Créez votre propre index pattern sur `restaurants` (TP 3) — sans champ de temps — et une carte de ses restaurants.
-- Une visualisation **TSVB** : le trafic, et en surimpression la moyenne mobile sur 1 h.
-- Menu ☰ → **Query Workbench** : la même question que l'étape 4, en **PPL** :
+- Create your own index pattern on `restaurants` (workshop 3) — with no time field — and a map of its restaurants.
+- A **TSVB** visualization: the traffic, overlaid with its moving average over 1 h.
+- Menu ☰ → **Query Workbench**: the same question as step 4, in **PPL**:
   `source = opensearch_dashboards_sample_data_logs | stats count() by span(timestamp, 1d), response`.
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : Discover affiche « No results match your search criteria »
-→ La **période** ne couvre pas les données : élargissez-la (*Last 30 days*).
+**Problem**: Discover shows “No results match your search criteria”
+→ The **time range** does not cover the data: widen it (*Last 30 days*).
 
-**Problème** : `response` n'est pas proposé dans *Terms*
-→ C'est un `text` : prenez `response.keyword`.
+**Problem**: `response` is not offered in *Terms*
+→ It is a `text` field: pick `response.keyword`.
 
-**Problème** : un nouveau champ du mapping n'apparaît pas
-→ **Index patterns** → votre pattern → bouton **Refresh field list**.
+**Problem**: a new field of the mapping does not show up
+→ **Index patterns** → your pattern → **Refresh field list** button.

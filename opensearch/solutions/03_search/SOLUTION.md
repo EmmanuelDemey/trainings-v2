@@ -1,19 +1,19 @@
-# TP 3 — Recherche et pertinence : solution
+# Workshop 3 — Search and relevance: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the workshop README, and checks each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 GET /restaurants/_search
 {
-  "query": { "match": { "description": "poisson frais" } },
+  "query": { "match": { "description": "fish" } },
   "_source": false
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -24,20 +24,20 @@ GET /restaurants/_search
 }
 ```
 
-`description` utilise l'analyseur `french` : « poissons » et « poisson » ont la même
-racine.
+`description` uses the `english` analyzer: "fishes" and "fish" share the same
+stem.
 
-## Étape 2
+## Step 2
 
 ```json
 GET /restaurants/_search
 {
-  "query": { "match_phrase": { "description": "pâtes fraîches" } },
+  "query": { "match_phrase": { "description": "fresh pasta" } },
   "_source": false
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -48,16 +48,16 @@ GET /restaurants/_search
 }
 ```
 
-## Étape 3
+## Step 3
 
-Ne trouve rien : l'index contient `sushi` et `zen`, pas `Sushi Zen`.
+Finds nothing: the index holds `sushi` and `zen`, not `Sushi Zen`.
 
 ```json
 GET /restaurants/_search
 { "query": { "term": { "name": "Sushi Zen" } } }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "hits": { "total": { "value": 0 } } }
@@ -71,7 +71,7 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -82,7 +82,7 @@ GET /restaurants/_search
 }
 ```
 
-## Étape 4
+## Step 4
 
 ```json
 GET /restaurants/_search
@@ -100,7 +100,7 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -114,28 +114,28 @@ GET /restaurants/_search
 }
 ```
 
-Même score : « cuisine » apparaît une fois dans chaque description, de longueurs
-voisines ; les filtres ne comptent pas.
+Run it without the `filter`: restaurants 1 and 7 keep the very same scores —
+the filters only remove documents, they never score.
 
-## Étape 5
+## Step 5
 
 ```json
 GET /restaurants/_search
 {
   "query": {
-    "multi_match": { "query": "tarte", "fields": ["name^3", "description"] }
+    "multi_match": { "query": "tart", "fields": ["name^3", "description"] }
   },
   "_source": ["name"]
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "hits": { "total": { "value": 2 } } }
 ```
 
-## Étape 6
+## Step 6
 
 ```json
 GET /restaurants/_search
@@ -151,7 +151,7 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -164,5 +164,5 @@ GET /restaurants/_search
 }
 ```
 
-Sans `function_score`, L'Étoile du Nord arrive aussi premier (description la plus
-courte) ; l'écart se creuse avec la note 4.9.
+Without `function_score`, L'Étoile du Nord comes first too (shortest description);
+its 4.9 rating widens the gap.

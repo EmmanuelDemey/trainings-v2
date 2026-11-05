@@ -6,145 +6,145 @@ layout: cover
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~50 min**, TP compris), vous saurez :
+By the end of this sequence (**~50 min**, workshop included), you will be able to:
 
-- **Naviguer** dans OpenSearch Dashboards
-- **Déclarer** un index pattern et son champ de temps
-- **Explorer** les données dans Discover : filtres, DQL, période
-- **Construire** des visualisations : métriques, barres, courbes, camemberts, cartes
-- **Assembler** et **partager** un tableau de bord interactif
+- **Find your way** around OpenSearch Dashboards
+- **Declare** an index pattern and its time field
+- **Explore** the data in Discover: filters, DQL, time range
+- **Build** visualizations: metrics, bars, lines, pies, maps
+- **Assemble** and **share** an interactive dashboard
 
 ---
 
-# L'interface
+# The interface
 
-| Menu | Pour |
+| Menu | For |
 |---|---|
-| **Discover** | Explorer les documents bruts, filtrer, chercher |
-| **Visualize** | Créer une visualisation : métrique, graphique, carte, tableau |
-| **Dashboards** | Assembler des visualisations, filtrer le tout d'un clic |
-| **Maps** | Cartes multi-couches à partir de données géographiques |
-| **Dev Tools** | La console de l'API REST |
-| **Dashboards Management** | Index patterns, objets sauvegardés, paramètres avancés |
+| **Discover** | Exploring the raw documents, filtering, searching |
+| **Visualize** | Creating a visualization: metric, chart, map, table |
+| **Dashboards** | Assembling visualizations, filtering them all in one click |
+| **Maps** | Multi-layer maps built from geographic data |
+| **Dev Tools** | The REST API console |
+| **Dashboards Management** | Index patterns, saved objects, advanced settings |
 
-Et, selon les plugins : Alerting, Anomaly Detection, Index Management, Query Workbench (SQL / PPL), Observability…
+And, depending on the plugins: Alerting, Anomaly Detection, Index Management, Query Workbench (SQL / PPL), Observability…
 
 ---
 
-# L'index pattern
+# The index pattern
 
-Dashboards ne lit pas un index : il lit un **index pattern**.
+Dashboards does not read an index: it reads an **index pattern**.
 
-- Un **motif** : `restaurants`, `logs-*`, `opensearch_dashboards_sample_data_logs`
-- Un **champ de temps** (optionnel) : active le **sélecteur de période** et les histogrammes
-- La liste des champs, leurs types, s'ils sont **agrégeables** et **cherchables**
+- A **pattern**: `restaurants`, `logs-*`, `opensearch_dashboards_sample_data_logs`
+- A **time field** (optional): enables the **time picker** and the histograms
+- The list of fields, their types, whether they are **aggregatable** and **searchable**
 
 **Dashboards Management** → **Index patterns** → **Create index pattern**
 
 <br />
 
-> Un nouveau champ dans le mapping ? **Rafraîchir** la liste des champs de l'index pattern.
+> A new field in the mapping? **Refresh** the field list of the index pattern.
 
 ---
 
 # Discover
 
-- **Sélecteur de période** — en haut à droite : *Last 15 minutes*, absolu, relatif
-- **Barre de recherche** — **DQL** (par défaut) ou Lucene
-- **Filtres** — `+ Add filter`, ou un clic sur la loupe à côté d'une valeur
-- **Histogramme** — le nombre de documents dans le temps
-- **Colonnes** — choisir les champs affichés ; **Save** : une recherche réutilisable
+- **Time picker** — top right: *Last 15 minutes*, absolute, relative
+- **Search bar** — **DQL** (the default) or Lucene
+- **Filters** — `+ Add filter`, or a click on the magnifier next to a value
+- **Histogram** — the number of documents over time
+- **Columns** — pick the fields shown; **Save**: a reusable search
 
 <br />
 
-> Aucun document ? Neuf fois sur dix, la **période** ne couvre pas les données.
+> No documents? Nine times out of ten, the **time range** does not cover the data.
 
 ---
 
 # DQL — Dashboards Query Language
 
-| Requête | Trouve |
+| Query | Finds |
 |---|---|
-| `response:404` | Un champ égal à une valeur |
-| `response:(404 or 503)` | Une valeur parmi plusieurs |
-| `bytes > 10000` | Une plage |
-| `machine.os:win*` | Un préfixe |
-| `not response:200` | La négation |
-| `extension:css and geo.src:FR` | Une combinaison |
-| `tags:*` | Le champ existe |
-| `message:"page not found"` | Une phrase |
+| `response:404` | A field equal to a value |
+| `response:(404 or 503)` | One value among several |
+| `bytes > 10000` | A range |
+| `machine.os:win*` | A prefix |
+| `not response:200` | The negation |
+| `extension:css and geo.src:FR` | A combination |
+| `tags:*` | The field exists |
+| `message:"page not found"` | A phrase |
 
-- DQL se traduit en Query DSL : **Inspect** → **Request** le montre
-- Les **filtres** (pastilles) et la requête se **cumulent**
+- DQL is translated into Query DSL: **Inspect** → **Request** shows it
+- The **filters** (pills) and the query **add up**
 
 ---
 
-# Les visualisations
+# Visualizations
 
-| Type | Pour |
+| Type | For |
 |---|---|
-| **Metric**, **Gauge** | Un chiffre clé : nombre de requêtes, temps moyen |
-| **Vertical / Horizontal bar** | Comparer des catégories, ou le temps |
-| **Line**, **Area** | Une tendance dans le temps |
-| **Pie** | Une répartition — peu de catégories |
-| **Data table** | Le détail chiffré |
-| **Heat map** | Deux dimensions croisées |
-| **Coordinate / Region map**, **Maps** | Des données géographiques |
-| **TSVB**, **Vega** | Séries temporelles avancées, graphiques sur mesure |
-| **VisBuilder** | Glisser-déposer, le plus simple pour commencer |
+| **Metric**, **Gauge** | A key figure: number of requests, average time |
+| **Vertical / Horizontal bar** | Comparing categories, or periods of time |
+| **Line**, **Area** | A trend over time |
+| **Pie** | A breakdown — few categories |
+| **Data table** | The detailed figures |
+| **Heat map** | Two crossed dimensions |
+| **Coordinate / Region map**, **Maps** | Geographic data |
+| **TSVB**, **Vega** | Advanced time series, custom charts |
+| **VisBuilder** | Drag and drop, the easiest way to start |
 
 ---
 
-# Une visualisation = des agrégations
+# A visualization = aggregations
 
-Une **barre verticale** « requêtes par jour, par code HTTP » :
+A **vertical bar** chart “requests per day, per HTTP status”:
 
-| Dans l'éditeur | En Query DSL |
+| In the editor | In Query DSL |
 |---|---|
-| **Metrics** → Y-axis : *Count* | `value_count` (le `doc_count`) |
-| **Buckets** → X-axis : *Date Histogram* sur `timestamp` | `date_histogram` |
-| **Buckets** → Split series : *Terms* sur `response.keyword` | `terms`, en sous-agrégation |
+| **Metrics** → Y-axis: *Count* | `value_count` (the `doc_count`) |
+| **Buckets** → X-axis: *Date Histogram* on `timestamp` | `date_histogram` |
+| **Buckets** → Split series: *Terms* on `response.keyword` | `terms`, as a sub-aggregation |
 
 <br />
 
-- Exactement les agrégations du **chapitre 7**
-- **Inspect** → **Requests** : la requête envoyée, la réponse, les données
+- Exactly the aggregations of **chapter 7**
+- **Inspect** → **Requests**: the request sent, the response, the data
 
 ---
 
-# Les cartes
+# Maps
 
-- Un champ **`geo_point`** (ou `geo_shape`) dans le mapping — un `float` lat / lon ne suffit pas
-- **Maps** : fond de carte, couches de **documents**, de **grilles** (`geotile_grid`), de **régions**
-- **Coordinate map** : une agrégation géographique sur un fond de carte
-- **Region map** : colorer des pays ou régions selon une métrique (code ISO)
+- A **`geo_point`** (or `geo_shape`) field in the mapping — a `float` lat / lon is not enough
+- **Maps**: a base map, layers of **documents**, **grids** (`geotile_grid`), **regions**
+- **Coordinate map**: a geographic aggregation on a base map
+- **Region map**: color countries or regions by a metric (ISO code)
 
 <br />
 
-> Le mapping fait tout : un champ de position indexé en `text` ne sera **jamais** une carte.
-> C'est le chapitre 4 qui se rappelle à nous.
+> The mapping decides everything: a location field indexed as `text` will **never** be a map.
+> Chapter 4 coming back to haunt us.
 
 ---
 
-# Le tableau de bord
+# The dashboard
 
-- **Dashboards** → **Create** → **Add** : des visualisations et des recherches sauvegardées
-- Glisser, redimensionner ; **Save**, avec ou sans la période (*Store time with dashboard*)
-- **Interactif** : un clic sur une barre ou un secteur crée un **filtre** appliqué à **tout** le tableau
-- La barre de recherche et la période filtrent aussi tous les panneaux
+- **Dashboards** → **Create** → **Add**: visualizations and saved searches
+- Drag, resize; **Save**, with or without the time range (*Store time with dashboard*)
+- **Interactive**: a click on a bar or a slice creates a **filter** applied to the **whole** dashboard
+- The search bar and the time range filter every panel too
 
 <br />
 
-**Partager** :
+**Share**:
 
-- **Share** → lien (court ou complet), **iframe** à intégrer
-- **Reporting** : PDF / PNG, à la demande ou planifié
-- **Saved objects** → **Export** : un fichier `.ndjson`, à importer sur un autre cluster
+- **Share** → link (short or full), **iframe** to embed
+- **Reporting**: PDF / PNG, on demand or scheduled
+- **Saved objects** → **Export**: an `.ndjson` file, to import into another cluster
 
 ---
 
-# En pratique
+# In practice
 
-## TP 8 - OpenSearch Dashboards
+## Workshop 8 - OpenSearch Dashboards

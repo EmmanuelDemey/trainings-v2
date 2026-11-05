@@ -1,14 +1,14 @@
-# Le lab de la formation OpenSearch : un nœud OpenSearch et OpenSearch Dashboards,
-# en local. Sécurité désactivée (HTTP simple, pas d'utilisateur) : un lab jetable.
+# The lab of the OpenSearch training: one OpenSearch node and OpenSearch Dashboards,
+# locally. Security disabled (plain HTTP, no user): a throwaway lab.
 #
 #   docker compose up -d --wait
 #
-# Puis http://localhost:5601 → menu ☰ → Dev Tools.
+# Then http://localhost:5601 → ☰ menu → Dev Tools.
 #
-# La version est celle de opensearch/ci/Dockerfile, contre laquelle la CI rejoue chaque requête
-# des TP : les deux se mettent à jour ensemble.
+# The version is the one of opensearch/ci/Dockerfile, against which the CI replays every
+# request of the workshops: both are updated together.
 #
-# Linux : OpenSearch exige vm.max_map_count ≥ 262144 —
+# Linux: OpenSearch requires vm.max_map_count ≥ 262144 —
 #   sudo sysctl -w vm.max_map_count=262144
 name: opensearch-lab
 

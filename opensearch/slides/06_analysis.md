@@ -2,100 +2,100 @@
 layout: cover
 ---
 
-# 6 - Analyse de texte
+# 6 - Text analysis
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~30 min**, TP compris), vous saurez :
+At the end of this sequence (**~30 min**, workshop included), you will be able to:
 
-- **Décomposer** un analyseur : char filters, tokenizer, token filters
-- **Tester** un analyseur avec l'API `_analyze`
-- **Choisir** un analyseur de langue
-- **Construire** un analyseur personnalisé : accents, synonymes, stop words
+- **Break down** an analyzer: char filters, tokenizer, token filters
+- **Test** an analyzer with the `_analyze` API
+- **Choose** a language analyzer
+- **Build** a custom analyzer: accents, synonyms, stop words
 
 ---
 
-# Pourquoi analyser ?
+# Why analyze?
 
-L'utilisateur tape **« Pâtes fraiches »**, le document contient **« pâtes fraîches maison »**.
+The user types **"fresh pasta"**, the document holds **"Homemade Fresh Pastas"**.
 
-Pour qu'ils se rencontrent, les deux passent par la **même** chaîne :
+For them to meet, both go through the **same** chain:
 
 ```text
-"Pâtes fraîches maison"
-   │ char filters     → nettoie le texte brut (HTML, caractères)
-   │ tokenizer        → découpe : [Pâtes] [fraîches] [maison]
-   │ token filters    → transforme : minuscules, accents, racines, synonymes
+"Homemade Fresh Pastas"
+   │ char filters     → cleans the raw text (HTML, characters)
+   │ tokenizer        → splits: [Homemade] [Fresh] [Pastas]
+   │ token filters    → transforms: lowercase, accents, stems, synonyms
    ▼
-[pate] [frai] [maison]   ← les termes de l'index inversé
+[homemad] [fresh] [pasta]   ← the terms of the inverted index
 ```
 
-- À l'**indexation** : sur le champ `text`
-- À la **recherche** : sur le texte de la requête `match`
-- Un `keyword` n'est **pas** analysé (au plus un `normalizer`)
+- At **index time**: on the `text` field
+- At **search time**: on the text of the `match` query
+- A `keyword` is **not** analyzed (a `normalizer` at most)
 
 ---
 
-# L'API `_analyze`
+# The `_analyze` API
 
 ```json
 POST /_analyze
 {
   "analyzer": "standard",
-  "text": "Les Pâtes fraîches, c'est MAISON !"
+  "text": "The Fresh Pastas, it's HOMEMADE!"
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "tokens": [
-    { "token": "les" }, { "token": "pâtes" }, { "token": "fraîches" },
-    { "token": "c'est" }, { "token": "maison" }
+    { "token": "the" }, { "token": "fresh" }, { "token": "pastas" },
+    { "token": "it's" }, { "token": "homemade" }
   ]
 }
 ```
 
-- `standard` : découpe sur les mots (Unicode), met en minuscules — c'est tout
-- Garde les **accents**, les **pluriels** et les mots vides (`les`)
+- `standard`: splits on words (Unicode), lowercases — that's all
+- Keeps the **accents**, the **plurals** and the stop words (`the`)
 
 ---
 
-# Les analyseurs intégrés
+# The built-in analyzers
 
-| Analyseur | Effet |
+| Analyzer | Effect |
 |---|---|
-| `standard` | Mots + minuscules — le défaut |
-| `simple` | Coupe sur tout ce qui n'est pas une lettre, minuscules |
-| `whitespace` | Coupe sur les espaces, rien d'autre |
-| `keyword` | Un seul terme : le texte entier |
-| `french`, `english`… | Langue : élisions, mots vides, **racinisation** |
+| `standard` | Words + lowercase — the default |
+| `simple` | Splits on anything that is not a letter, lowercase |
+| `whitespace` | Splits on whitespace, nothing else |
+| `keyword` | One single term: the whole text |
+| `english`, `french`… | Language: possessives / elisions, stop words, **stemming** |
 
 ```json
 POST /_analyze
-{ "analyzer": "french", "text": "Les Pâtes fraîches, c'est MAISON !" }
+{ "analyzer": "english", "text": "The Fresh Pastas, it's HOMEMADE!" }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
-{ "tokens": [ { "token": "pâte" }, { "token": "fraich" }, { "token": "maison" } ] }
+{ "tokens": [ { "token": "fresh" }, { "token": "pasta" }, { "token": "homemad" } ] }
 ```
 
 ---
 
-# Les briques
+# The building blocks
 
-| Brique | Exemples |
+| Block | Examples |
 |---|---|
-| **Char filters** | `html_strip`, `mapping` (`& → et`), `pattern_replace` |
+| **Char filters** | `html_strip`, `mapping` (`& → and`), `pattern_replace` |
 | **Tokenizer** | `standard`, `whitespace`, `keyword`, `pattern`, `ngram`, `edge_ngram`, `path_hierarchy` |
 | **Token filters** | `lowercase`, `asciifolding` (accents), `stop`, `elision`, `stemmer`, `synonym`, `edge_ngram`, `unique` |
 
-On les compose à la volée pour tester :
+Combine them on the fly to test:
 
 ```json
 POST /_analyze
@@ -107,7 +107,7 @@ POST /_analyze
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "tokens": [ { "token": "creme" }, { "token": "brulee" } ] }
@@ -115,7 +115,7 @@ POST /_analyze
 
 ---
 
-# Un analyseur personnalisé
+# A custom analyzer
 
 ```json
 PUT /menu
@@ -123,34 +123,34 @@ PUT /menu
   "settings": {
     "analysis": {
       "filter": {
-        "fr_elision":  { "type": "elision", "articles_case": true, "articles": ["l", "d", "c", "j", "qu"] },
-        "fr_stop":     { "type": "stop", "stopwords": "_french_" },
-        "fr_synonyms": { "type": "synonym", "synonyms": ["frites, pommes frites", "burger, hamburger"] }
+        "en_possessive": { "type": "stemmer", "language": "possessive_english" },
+        "en_stop":       { "type": "stop", "stopwords": "_english_" },
+        "en_synonyms":   { "type": "synonym", "synonyms": ["fries, french fries", "burger, hamburger"] }
       },
       "analyzer": {
-        "menu_fr": {
+        "menu_en": {
           "type": "custom",
           "tokenizer": "standard",
-          "filter": ["fr_elision", "lowercase", "fr_stop", "fr_synonyms", "asciifolding"]
+          "filter": ["lowercase", "en_possessive", "en_stop", "en_synonyms", "asciifolding"]
         }
       }
     }
   },
-  "mappings": { "properties": { "dish": { "type": "text", "analyzer": "menu_fr" } } }
+  "mappings": { "properties": { "dish": { "type": "text", "analyzer": "menu_en" } } }
 }
 
 POST /menu/_analyze
-{ "analyzer": "menu_fr", "text": "L'Hamburger et ses frites" }
+{ "analyzer": "menu_en", "text": "The Chef's Hamburger with fries" }
 ```
 
 ---
 
-# Analyse à l'indexation, à la recherche
+# Analysis at index time, at search time
 
-- `analyzer` : utilisé aux **deux** moments, par défaut
-- `search_analyzer` : un autre analyseur pour la **requête** seulement
+- `analyzer`: used at **both** moments, by default
+- `search_analyzer`: another analyzer for the **query** only
 
-Cas typique — l'**autocomplétion par préfixe** :
+Typical case — **prefix autocompletion**:
 
 ```json
 "title": {
@@ -160,32 +160,32 @@ Cas typique — l'**autocomplétion par préfixe** :
 }
 ```
 
-- `autocomplete` = tokenizer `standard` + filtre `edge_ngram` (2 → 10) : `pizza` → `pi`, `piz`, `pizz`, `pizza`
-- À la recherche, `piz` reste `piz` : il trouve le préfixe indexé
+- `autocomplete` = `standard` tokenizer + `edge_ngram` filter (2 → 10): `pizza` → `pi`, `piz`, `pizz`, `pizza`
+- At search time, `piz` stays `piz`: it finds the indexed prefix
 
 <br />
 
-> Changer l'analyseur d'un champ existant ? **Impossible** : nouvel index + `_reindex`.
+> Change the analyzer of an existing field? **Impossible**: new index + `_reindex`.
 
 ---
 
 # Quiz
 
-**Un champ `text` avec l'analyseur `standard` contient « Crème brûlée ». La requête `match` « creme brulee » le trouve-t-elle ?**
+**A `text` field with the `standard` analyzer holds "Crème brûlée". Does the `match` query "creme brulee" find it?**
 
 <v-clicks>
 
-- A) Oui, `standard` retire les accents
-- B) Non, il faut le filtre `asciifolding` ✅
-- C) Oui, `match` ignore les accents
-- D) Non, il faut un `keyword`
+- A) Yes, `standard` removes the accents
+- B) No, it needs the `asciifolding` filter ✅
+- C) Yes, `match` ignores the accents
+- D) No, it needs a `keyword`
 
-**Réponse : B** — `standard` ne fait que minuscules : `crème` ≠ `creme`.
+**Answer: B** — `standard` only lowercases: `crème` ≠ `creme`.
 
 </v-clicks>
 
 ---
 
-# En pratique
+# In practice
 
-## TP 4 - Analyse de texte
+## Workshop 4 - Text analysis

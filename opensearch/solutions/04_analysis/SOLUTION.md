@@ -1,48 +1,51 @@
-# TP 4 — Analyse de texte : solution
+# Workshop 4 — Text analysis: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the workshop README, and checks each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 POST /_analyze
-{ "analyzer": "standard", "text": "L'Hamburger végétarien et ses frites maison" }
+{ "analyzer": "standard", "text": "The chef's vegetarian Hamburger and its homemade fries" }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "tokens": [
-    { "token": "l'hamburger" }, { "token": "végétarien" }, { "token": "et" },
-    { "token": "ses" }, { "token": "frites" }, { "token": "maison" }
+    { "token": "the" }, { "token": "chef's" }, { "token": "vegetarian" }, { "token": "hamburger" },
+    { "token": "and" }, { "token": "its" }, { "token": "homemade" }, { "token": "fries" }
   ]
 }
 ```
 
-Non : le terme indexé est `l'hamburger`, élision comprise.
+No: the indexed term is `chef's`, possessive included.
 
-## Étape 2
+## Step 2
 
 ```json
 POST /_analyze
-{ "analyzer": "french", "text": "L'Hamburger végétarien et ses frites maison" }
+{ "analyzer": "english", "text": "The chef's vegetarian Hamburger and its homemade fries" }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
-  "tokens": [ { "token": "hamburg" }, { "token": "vegetarien" }, { "token": "frit" }, { "token": "maison" } ]
+  "tokens": [
+    { "token": "chef" }, { "token": "vegetarian" }, { "token": "hamburg" },
+    { "token": "it" }, { "token": "homemad" }, { "token": "fri" }
+  ]
 }
 ```
 
-L'élision et les mots vides (`et`, `ses`) ont disparu, les mots sont réduits à leur
-racine. « burger » ne trouve toujours rien : `burger` ≠ `hamburg`. Il faut des
-synonymes.
+The possessive and the stop words (`the`, `and`) are gone, the words are reduced
+to their stem (`its` → `it`: the stemmer does not know it is a stop word). "burger"
+still finds nothing: `burger` ≠ `hamburg`. It takes synonyms.
 
-## Étape 3
+## Step 3
 
 ```json
 POST /_analyze
@@ -54,13 +57,13 @@ POST /_analyze
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "tokens": [ { "token": "creme" }, { "token": "brulee" } ] }
 ```
 
-## Étape 4
+## Step 4
 
 ```json
 PUT /dishes
@@ -70,54 +73,57 @@ PUT /dishes
     "number_of_replicas": 0,
     "analysis": {
       "filter": {
-        "fr_elision":  { "type": "elision", "articles_case": true, "articles": ["l", "d", "c", "j", "qu", "s"] },
-        "fr_stop":     { "type": "stop", "stopwords": "_french_" },
-        "fr_synonyms": { "type": "synonym", "synonyms": ["burger, hamburger", "frites, pommes frites"] }
+        "en_possessive": { "type": "stemmer", "language": "possessive_english" },
+        "en_stop":       { "type": "stop", "stopwords": "_english_" },
+        "en_synonyms":   { "type": "synonym", "synonyms": ["burger, hamburger", "fries, french fries"] }
       },
       "analyzer": {
-        "dish_fr": {
+        "dish_en": {
           "type": "custom",
           "char_filter": ["html_strip"],
           "tokenizer": "standard",
-          "filter": ["fr_elision", "lowercase", "fr_stop", "fr_synonyms", "asciifolding"]
+          "filter": ["lowercase", "en_possessive", "en_stop", "en_synonyms", "asciifolding"]
         }
       }
     }
   },
-  "mappings": { "properties": { "dish": { "type": "text", "analyzer": "dish_fr" } } }
+  "mappings": { "properties": { "dish": { "type": "text", "analyzer": "dish_en" } } }
 }
 
 POST /dishes/_analyze
-{ "analyzer": "dish_fr", "text": "<b>L'Hamburger</b> végétarien et ses frites" }
+{ "analyzer": "dish_en", "text": "<b>The Chef's</b> vegetarian Hamburger and its fries" }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "tokens": [
+    { "token": "chef" }, { "token": "vegetarian" },
     { "token": "hamburger" }, { "token": "burger", "type": "SYNONYM" },
-    { "token": "vegetarien" }, { "token": "frites" }, { "token": "pommes", "type": "SYNONYM" }
+    { "token": "its" }, { "token": "fries" }, { "token": "french", "type": "SYNONYM" }
   ]
 }
 ```
 
-## Étape 5
+`its` stays: it is not in the `_english_` stop word list.
+
+## Step 5
 
 ```json
 POST /dishes/_bulk?refresh=true
 { "index": { "_id": "1" } }
-{ "dish": "<p>L'Hamburger végétarien et ses frites</p>" }
+{ "dish": "<p>The chef's vegetarian Hamburger and its fries</p>" }
 { "index": { "_id": "2" } }
-{ "dish": "<p>Crème brûlée à la vanille</p>" }
+{ "dish": "<p>Crème brûlée with vanilla</p>" }
 { "index": { "_id": "3" } }
-{ "dish": "<p>Burger de bœuf, pommes frites</p>" }
+{ "dish": "<p>Beef burger, French fries</p>" }
 
 GET /dishes/_search
 { "query": { "match": { "dish": "burger" } }, "_source": false }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -133,13 +139,13 @@ GET /dishes/_search
 { "query": { "match": { "dish": "creme brulee" } }, "_source": false }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "hits": { "total": { "value": 1 }, "hits": [ { "_id": "2" } ] } }
 ```
 
-Un synonyme accentué `crème, flan` fonctionne : quand `synonym` s'exécute, le
-texte a encore ses accents (`asciifolding` vient après). Le piège est l'inverse :
-un synonyme écrit **sans** accent (`creme, flan`) ne correspond jamais. Règle :
-écrire les synonymes tels que le texte est **à cet endroit** de la chaîne.
+An accented synonym `crème, custard` works: when `synonym` runs, the text still
+has its accents (`asciifolding` comes after). The trap is the other way round: a
+synonym written **without** accents (`creme, custard`) never matches. Rule: write
+the synonyms as the text is **at that point** of the chain.

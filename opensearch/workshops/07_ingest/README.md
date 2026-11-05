@@ -1,16 +1,16 @@
-# TP 7 — Ingest pipelines
+# Workshop 7 — Ingest pipelines
 
-> Transformer des avis clients reçus en CSV brut en documents structurés : découper, typer, dater, classer — et garder les lignes illisibles au lieu de les perdre.
+> Turn customer reviews received as raw CSV into structured documents: split, cast, date, classify — and keep the unreadable lines instead of losing them.
 
-**Durée** : 30 min · **Chapitre** : 9 — Ingest pipelines
+**Duration**: 30 min · **Chapter**: 9 — Ingest pipelines
 
-## Contexte
+## Context
 
-Le guide reçoit les avis de ses lecteurs par un export CSV : une ligne par avis, `restaurant_id,auteur,étoiles,date,commentaire`. Indexées telles quelles, ces lignes sont inutilisables : impossible de filtrer sur les étoiles ou de tracer les avis dans le temps. Vous écrivez le pipeline qui les structure **avant** l'indexation.
+The guide receives its readers' reviews through a CSV export: one line per review, `restaurant_id,author,stars,date,comment`. Indexed as is, these lines are useless: no way to filter on the stars, or to follow the reviews over time. You write the pipeline that structures them **before** indexing.
 
-## Mise en place
+## Setup
 
-Ce TP est autonome. Créez l'index `reviews`, et supprimez le pipeline qu'une tentative précédente a pu laisser :
+This workshop stands on its own. Create the `reviews` index, and delete the pipeline a previous attempt may have left behind:
 
 ```json
 DELETE /reviews
@@ -25,7 +25,7 @@ PUT /reviews
       "restaurant_id": { "type": "keyword" },
       "author": { "type": "keyword" },
       "stars": { "type": "integer" },
-      "comment": { "type": "text", "analyzer": "french" },
+      "comment": { "type": "text", "analyzer": "english" },
       "sentiment": { "type": "keyword" },
       "message": { "type": "text" },
       "error": { "type": "keyword" }
@@ -34,31 +34,31 @@ PUT /reviews
 }
 ```
 
-Les quatre lignes du TP, chacune dans un champ `message` :
+The four lines of the workshop, each one in a `message` field:
 
 ```text
-1  3,Camille,5,12/10/2026,"Poisson parfait, service rapide"
-2  6,Hugo,2,13/10/2026,Frites froides
-3  12,Inès,4,14/10/2026,Menu dégustation mémorable
-4  ligne cassée
+1  3,Camille,5,12/10/2026,"Perfect fish, quick service"
+2  6,Hugo,2,13/10/2026,Cold fries
+3  12,Inès,4,14/10/2026,Memorable tasting menu
+4  broken line
 ```
 
-Référence : [Ingest pipelines](https://docs.opensearch.org/latest/ingest-pipelines/).
+Reference: [Ingest pipelines](https://docs.opensearch.org/latest/ingest-pipelines/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : Découper la ligne, sans rien indexer
+### Step 1: Split the line, without indexing anything
 
-Testez, **sans créer de pipeline**, un processeur qui découpe la ligne 1 en `restaurant_id`, `author`, `stars`, `date` et `comment`.
+Test, **without creating a pipeline**, a processor that splits line 1 into `restaurant_id`, `author`, `stars`, `date` and `comment`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`POST /_ingest/pipeline/_simulate`, avec un `pipeline` et des `docs`. Le processeur [`csv`](https://docs.opensearch.org/latest/ingest-pipelines/processors/csv/) gère les guillemets. Dans le JSON de `docs`, un guillemet s'écrit `\"`.
+`POST /_ingest/pipeline/_simulate`, with a `pipeline` and some `docs`. The [`csv`](https://docs.opensearch.org/latest/ingest-pipelines/processors/csv/) processor handles quotes. In the JSON of `docs`, a quote is written `\"`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -70,7 +70,7 @@ Testez, **sans créer de pipeline**, un processeur qui découpe la ligne 1 en `r
           "author": "Camille",
           "stars": "5",
           "date": "12/10/2026",
-          "comment": "Poisson parfait, service rapide"
+          "comment": "Perfect fish, quick service"
         }
       }
     }
@@ -78,20 +78,20 @@ Testez, **sans créer de pipeline**, un processeur qui découpe la ligne 1 en `r
 }
 ```
 
-**Question** : `"5"` ou `5` — le mapping de `stars` dit `integer`. Pourquoi convertir quand même dans le pipeline ? (Pensez à l'étape 3.)
+**Question**: `"5"` or `5` — the mapping of `stars` says `integer`. Why convert it in the pipeline anyway? (Think of step 3.)
 
-### Étape 2 : Typer, dater, nettoyer
+### Step 2: Cast, date, clean up
 
-Ajoutez au pipeline simulé : la conversion de `stars` en entier, la lecture de `date` (format `dd/MM/yyyy`, heure de Paris) vers `@timestamp`, puis la suppression de `message` et `date`. Simulez sur la ligne 1.
+Add to the simulated pipeline: the conversion of `stars` to an integer, the parsing of `date` (format `dd/MM/yyyy`, Paris time) into `@timestamp`, then the removal of `message` and `date`. Simulate on line 1.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Les processeurs `convert`, `date` (`formats`, `target_field`, `timezone`) et `remove` — qui accepte une liste de champs.
+The `convert`, `date` (`formats`, `target_field`, `timezone`) and `remove` processors — the latter accepts a list of fields.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -101,18 +101,18 @@ Les processeurs `convert`, `date` (`formats`, `target_field`, `timezone`) et `re
 }
 ```
 
-### Étape 3 : Positif ou négatif
+### Step 3: Positive or negative
 
-Ajoutez un champ `sentiment` : `positive` pour **4 étoiles ou plus**, `negative` pour **2 ou moins**, rien sinon. Simulez sur les lignes 1 et 2.
+Add a `sentiment` field: `positive` for **4 stars or more**, `negative` for **2 or fewer**, nothing otherwise. Simulate on lines 1 and 2.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Deux processeurs `set`, chacun avec un `if` en Painless : `ctx.stars >= 4`. C'est là que la conversion de l'étape 2 sert.
+Two `set` processors, each with an `if` in Painless: `ctx.stars >= 4`. This is where the conversion of step 2 pays off.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -123,35 +123,35 @@ Deux processeurs `set`, chacun avec un `if` en Painless : `ctx.stars >= 4`. C'es
 }
 ```
 
-### Étape 4 : Ne rien perdre, et enregistrer
+### Step 4: Lose nothing, and save
 
-Simulez sur la ligne 4 : le pipeline échoue. Ajoutez-lui une gestion d'erreur qui garde le document en écrivant le message d'erreur dans `error`. Enregistrez enfin le pipeline sous le nom `reviews`.
+Simulate on line 4: the pipeline fails. Add error handling that keeps the document, writing the error message into `error`. Finally, save the pipeline under the name `reviews`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Un bloc `on_failure` au niveau du pipeline, avec un `set` et `{{ _ingest.on_failure_message }}`. Puis `PUT /_ingest/pipeline/reviews`.
+An `on_failure` block at the pipeline level, with a `set` and `{{ _ingest.on_failure_message }}`. Then `PUT /_ingest/pipeline/reviews`.
 
 </details>
 
-**Résultat attendu** (l'enregistrement) :
+**Expected result** (the save):
 
 ```json
 { "acknowledged": true }
 ```
 
-### Étape 5 : Le pipeline par défaut
+### Step 5: The default pipeline
 
-Les applications qui écrivent dans `reviews` ne doivent pas avoir à nommer le pipeline. Faites-en le pipeline **par défaut** de l'index, puis indexez les quatre lignes — `_id` `1` à `4` — en une requête, cherchables tout de suite. Lisez l'avis `1`, puis comptez les avis **positifs**, et ceux **en erreur**.
+The applications that write to `reviews` should not have to name the pipeline. Make it the **default** pipeline of the index, then index the four lines — `_id` `1` to `4` — in a single request, searchable right away. Read review `1`, then count the **positive** reviews, and the ones **in error**.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`index.default_pipeline` est un setting dynamique. Un `_bulk` avec `{ "message": "…" }` par document. Pour les erreurs : la requête `exists` sur `error`.
+`index.default_pipeline` is a dynamic setting. A `_bulk` with `{ "message": "…" }` per document. For the errors: the `exists` query on `error`.
 
 </details>
 
-**Résultat attendu** (l'avis 1) :
+**Expected result** (review 1):
 
 ```json
 {
@@ -166,7 +166,7 @@ Les applications qui écrivent dans `reviews` ne doivent pas avoir à nommer le 
 }
 ```
 
-**Résultat attendu** (les deux comptages) :
+**Expected result** (the two counts):
 
 ```json
 { "count": 2 }
@@ -176,28 +176,28 @@ Les applications qui écrivent dans `reviews` ne doivent pas avoir à nommer le 
 { "count": 1 }
 ```
 
-**Essayez** : `GET /_nodes/stats/ingest?filter_path=nodes.*.ingest.pipelines.reviews` — que vous dit-il ?
+**Try it**: `GET /_nodes/stats/ingest?filter_path=nodes.*.ingest.pipelines.reviews` — what does it tell you?
 
-## Critères de réussite
+## Success criteria
 
-- Un pipeline testé avec `_simulate` avant d'être enregistré
-- `csv`, `convert`, `date`, `remove` et un `set` conditionnel structurent une ligne brute
-- Une ligne illisible est gardée, marquée `error`
-- L'index applique le pipeline par défaut
+- A pipeline tested with `_simulate` before being saved
+- `csv`, `convert`, `date`, `remove` and a conditional `set` structure a raw line
+- An unreadable line is kept, flagged with `error`
+- The index applies the pipeline by default
 
-## Pour aller plus loin
+## Going further
 
-- Ajoutez un processeur `script` qui calcule la longueur du commentaire dans `comment_length`.
-- Remplacez `csv` par `dissect` : qu'est-ce qui casse sur la ligne 1, et pourquoi ?
-- Mettez le nettoyage (`remove`) dans un second pipeline appelé avec le processeur `pipeline`, et branchez-le en `index.final_pipeline`.
+- Add a `script` processor that computes the length of the comment into `comment_length`.
+- Replace `csv` with `dissect`: what breaks on line 1, and why?
+- Move the clean-up (`remove`) into a second pipeline called with the `pipeline` processor, and attach it as `index.final_pipeline`.
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : `field [stars] not present as part of path [stars]`
-→ Attendu sur la ligne 4. Ailleurs : le `csv` n'a pas produit `stars` — vérifiez `target_fields`.
+**Problem**: `field [stars] not present as part of path [stars]`
+→ Expected on line 4. Anywhere else: the `csv` did not produce `stars` — check `target_fields`.
 
-**Problème** : `unable to parse date [12/10/2026]`
-→ Le format doit correspondre exactement : `dd/MM/yyyy`, `MM` pour le mois, `mm` pour les minutes.
+**Problem**: `unable to parse date [12/10/2026]`
+→ The format must match exactly: `dd/MM/yyyy`, `MM` for the month, `mm` for the minutes.
 
-**Problème** : `@timestamp` absent après l'indexation
-→ Le document n'est pas passé par le pipeline : nommez-le avec `?pipeline=reviews`, ou réglez `index.default_pipeline`.
+**Problem**: `@timestamp` missing after indexing
+→ The document did not go through the pipeline: name it with `?pipeline=reviews`, or set `index.default_pipeline`.

@@ -6,104 +6,104 @@ layout: cover
 
 ---
 
-# Ce que nous avons vu
+# What we covered
 
-| Chapitre | À retenir |
+| Chapter | Key takeaway |
 |---|---|
-| **1 - OpenSearch** | Fork Apache 2.0 d'Elasticsearch 7.10, gouverné par la Linux Foundation |
-| **2 - Architecture** | Index inversé, shards primaires et réplicas, `green` / `yellow` / `red` |
-| **3 - Installation** | Docker, `opensearch.yml`, heap ≤ 50 % de la RAM, API REST et `_cat` |
-| **4 - Mapping** | Mapping explicite, `text` vs `keyword`, `_bulk`, `_reindex` + alias |
-| **5 - Recherche** | `match` vs `term`, `bool` : `filter` sans score, BM25, `boost` |
-| **6 - Analyse** | Char filters → tokenizer → token filters, `_analyze` |
-| **7 - Agrégations** | Metrics, buckets, sous-agrégations, pipeline |
-| **8 - Recherche avancée** | `search_after`, highlight, suggesters, géo, percolation |
-| **9 - Ingest** | Processeurs, `_simulate`, `on_failure`, `default_pipeline` |
-| **10 - Dashboards** | Index pattern, Discover, visualisations, tableaux de bord |
+| **1 - OpenSearch** | Apache 2.0 fork of Elasticsearch 7.10, governed by the Linux Foundation |
+| **2 - Architecture** | Inverted index, primary shards and replicas, `green` / `yellow` / `red` |
+| **3 - Installation** | Docker, `opensearch.yml`, heap ≤ 50% of the RAM, REST API and `_cat` |
+| **4 - Mapping** | Explicit mapping, `text` vs `keyword`, `_bulk`, `_reindex` + alias |
+| **5 - Search** | `match` vs `term`, `bool`: `filter` without scoring, BM25, `boost` |
+| **6 - Analysis** | Char filters → tokenizer → token filters, `_analyze` |
+| **7 - Aggregations** | Metrics, buckets, sub-aggregations, pipeline |
+| **8 - Advanced search** | `search_after`, highlight, suggesters, geo, percolation |
+| **9 - Ingest** | Processors, `_simulate`, `on_failure`, `default_pipeline` |
+| **10 - Dashboards** | Index pattern, Discover, visualizations, dashboards |
 
 ---
 
-# Pour aller plus loin
+# Going further
 
-Ce que la journée n'a pas couvert, et que le programme sur deux jours approfondit :
+What the day did not cover, and the two-day program goes into:
 
-- **Sécurité** — TLS, utilisateurs, rôles, sécurité au niveau document et champ
-- **Index State Management** (ISM) — rollover, passage hot / warm, suppression des vieux index
-- **Snapshots** — sauvegarde et restauration
-- **Alerting** et **Anomaly Detection**
-- **SQL et PPL** — Query Workbench
-- **Recherche vectorielle** — k-NN, recherche hybride, neural search
-- **Exploitation** — dimensionnement des shards, monitoring, slow logs
+- **Security** — TLS, users, roles, document- and field-level security
+- **Index State Management** (ISM) — rollover, hot / warm transitions, deletion of old indices
+- **Snapshots** — backup and restore
+- **Alerting** and **Anomaly Detection**
+- **SQL and PPL** — Query Workbench
+- **Vector search** — k-NN, hybrid search, neural search
+- **Operations** — shard sizing, monitoring, slow logs
 
 <br />
 
-📚 Documentation : **https://docs.opensearch.org** · Forum : **https://forum.opensearch.org**
+📚 Documentation: **https://docs.opensearch.org** · Forum: **https://forum.opensearch.org**
 
 ---
 
-# Quiz final — Question 1
+# Final quiz — Question 1
 
-**Un champ `email` doit servir à un filtre exact et à une agrégation. Quel type ?**
+**An `email` field is used for an exact filter and for an aggregation. Which type?**
 
 <v-clicks>
 
 - A) `text`
 - B) `keyword` ✅
-- C) `text` avec l'analyseur `email`
+- C) `text` with the `email` analyzer
 - D) `object`
 
-**Réponse : B** — valeur exacte, non analysée, avec doc values.
+**Answer: B** — an exact value, not analyzed, with doc values.
 
 </v-clicks>
 
 ---
 
-# Quiz final — Question 2
+# Final quiz — Question 2
 
-**Le cluster d'un seul nœud est `yellow`. Pourquoi ?**
+**The single-node cluster is `yellow`. Why?**
 
 <v-clicks>
 
-- A) Un shard primaire est perdu
-- B) Un index a des réplicas qui ne peuvent pas être alloués ✅
-- C) La heap JVM est pleine
-- D) Le plugin de sécurité est désactivé
+- A) A primary shard is lost
+- B) An index has replicas that cannot be allocated ✅
+- C) The JVM heap is full
+- D) The security plugin is disabled
 
-**Réponse : B** — un réplica n'est jamais placé sur le nœud de son primaire.
+**Answer: B** — a replica is never placed on the node of its primary.
 
 </v-clicks>
 
 ---
 
-# Quiz final — Question 3
+# Final quiz — Question 3
 
-**On veut extraire l'IP et le code HTTP d'une ligne de log brute avant de l'indexer. Avec quoi ?**
+**You want to extract the IP address and the HTTP status from a raw log line before indexing it. With what?**
 
 <v-clicks>
 
-- A) Un analyseur personnalisé
-- B) Un ingest pipeline avec un processeur `grok` ✅
-- C) Une agrégation `terms`
-- D) Un index template
+- A) A custom analyzer
+- B) An ingest pipeline with a `grok` processor ✅
+- C) A `terms` aggregation
+- D) An index template
 
-**Réponse : B** — l'analyseur découpe du texte pour la recherche ; il ne crée pas de champs.
+**Answer: B** — an analyzer splits text for search; it does not create fields.
 
 </v-clicks>
 
 ---
 
-# Quiz final — Question 4
+# Final quiz — Question 4
 
-**Une visualisation n'affiche aucune donnée, alors que l'index en contient. Première chose à vérifier ?**
+**A visualization shows no data, although the index holds some. First thing to check?**
 
 <v-clicks>
 
-- A) Le mapping
-- B) La période sélectionnée ✅
-- C) Le nombre de shards
-- D) Le plugin de sécurité
+- A) The mapping
+- B) The selected time range ✅
+- C) The number of shards
+- D) The security plugin
 
-**Réponse : B** — l'index pattern a un champ de temps : la période filtre tout.
+**Answer: B** — the index pattern has a time field: the time range filters everything.
 
 </v-clicks>
 

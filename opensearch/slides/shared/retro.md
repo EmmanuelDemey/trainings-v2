@@ -1,39 +1,39 @@
-# Rétrospective de fin de journée
+# End-of-day retrospective
 
-**15 minutes.** Un tour de table, tout le monde parle.
+**15 minutes.** A round table, everyone speaks.
 
 <div style="display: flex; gap: 2em; font-size: 0.95em;">
 <div>
 
-### 1. Ce que je retiens
+### 1. What I take away
 
-- La notion qui a **fait tilt** aujourd'hui
-- Ce que je vais **utiliser sur mon projet** la semaine prochaine
-
-</div>
-<div>
-
-### 2. Ce qui reste flou
-
-- Une notion à **revoir**
-- Une étape de TP que je n'ai pas finie
+- The concept that **clicked** today
+- What I will **use on my project** next week
 
 </div>
 <div>
 
-### 3. Ce qu'on ajuste
+### 2. What is still unclear
 
-- Rythme, profondeur, démos vs slides
-- Un sujet à approfondir ?
+- A concept to **go over again**
+- A workshop step I did not finish
+
+</div>
+<div>
+
+### 3. What we adjust
+
+- Pace, depth, demos vs slides
+- A topic to dig deeper into?
 
 </div>
 </div>
 
 <br />
 
-> **ROTI** (Return On Time Invested) — chacun lève 1 à 5 doigts :
-> 1 = journée perdue, 5 = bien au-delà de mes attentes. En dessous de 3 :
-> « qu'est-ce qui en aurait fait un 4 ? »
+> **ROTI** (Return On Time Invested) — everyone raises 1 to 5 fingers:
+> 1 = a wasted day, 5 = well beyond my expectations. Below 3:
+> “what would have made it a 4?”
 
 <style>
 h3 {

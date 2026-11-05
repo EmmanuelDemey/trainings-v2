@@ -2,49 +2,49 @@
 layout: cover
 ---
 
-# 2 - Architecture et concepts
+# 2 - Architecture and concepts
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~30 min**), vous saurez :
+By the end of this section (**~30 min**), you will be able to:
 
-- **Expliquer** pourquoi un index inversé répond en millisecondes
-- **Décrire** un cluster : nœuds, rôles, index, shards primaires et réplicas
-- **Suivre** une requête de recherche d'un nœud à l'autre
-- **Raisonner** sur la scalabilité et la tolérance aux pannes
+- **Explain** why an inverted index answers in milliseconds
+- **Describe** a cluster: nodes, roles, indices, primary shards and replicas
+- **Follow** a search request from one node to another
+- **Reason** about scalability and fault tolerance
 
 ---
 
-# L'index inversé
+# The inverted index
 
-Une base relationnelle lit les lignes pour trouver un mot. Un moteur de recherche
-**inverse** la relation : pour chaque **terme**, la liste des documents qui le contiennent.
+A relational database reads the rows to find a word. A search engine
+**inverts** the relationship: for each **term**, the list of documents that contain it.
 
-| Document | Texte |
+| Document | Text |
 |---|---|
-| 1 | Pâtes fraîches maison |
-| 2 | Pizza et pâtes |
-| 3 | Pizza au feu de bois |
+| 1 | Homemade fresh pasta |
+| 2 | Pizza and pasta |
+| 3 | Wood-fired pizza |
 
-| Terme | Documents |
+| Term | Documents |
 |---|---|
-| `pâtes` | 1, 2 |
+| `pasta` | 1, 2 |
 | `pizza` | 2, 3 |
-| `fraîches` | 1 |
-| `bois` | 3 |
+| `fresh` | 1 |
+| `wood` | 3 |
 
-- Chercher « pizza pâtes » : deux lectures dans le dictionnaire, une **union** de listes
-- Construit par **Apache Lucene** à l'indexation — d'où l'importance de l'**analyse** (chapitre 6)
+- Searching "pizza pasta": two lookups in the dictionary, a **union** of lists
+- Built by **Apache Lucene** at indexing time — hence the importance of **analysis** (chapter 6)
 
 ---
 
 # Document, index
 
-- **Document** — un objet **JSON**, l'unité stockée et retournée. Identifié par un `_id`
-- **Index** — une collection de documents de même nature (`restaurants`, `logs-2026.10.27`)
-- **Mapping** — le schéma de l'index : le **type** de chaque champ (chapitre 4)
+- **Document** — a **JSON** object, the unit stored and returned. Identified by an `_id`
+- **Index** — a collection of documents of the same kind (`restaurants`, `logs-2026.10.27`)
+- **Mapping** — the schema of the index: the **type** of each field (chapter 4)
 
 ```json
 {
@@ -52,7 +52,7 @@ Une base relationnelle lit les lignes pour trouver un mot. Un moteur de recherch
   "_id": "2",
   "_source": {
     "name": "Pizzeria Napoli",
-    "cuisine": "italienne",
+    "cuisine": "italian",
     "rating": 4.2
   }
 }
@@ -60,97 +60,97 @@ Une base relationnelle lit les lignes pour trouver un mot. Un moteur de recherch
 
 <br />
 
-> Un index n'est **pas** une table : pas de jointure, pas de transaction multi-documents.
-> On **dénormalise**.
+> An index is **not** a table: no joins, no multi-document transactions.
+> You **denormalize**.
 
 ---
 
-# Shards et réplicas
+# Shards and replicas
 
-- Un index est découpé en **shards primaires** : chacun est un index Lucene complet
-- Chaque primaire a **0 à n réplicas** : copies sur d'**autres** nœuds
-- Un document va dans **un** shard : `shard = hash(_id) % nombre_de_primaires`
+- An index is split into **primary shards**: each one is a complete Lucene index
+- Each primary has **0 to n replicas**: copies on **other** nodes
+- A document goes into **one** shard: `shard = hash(_id) % number_of_primaries`
 
 ```text
-             Nœud 1           Nœud 2           Nœud 3
+             Node 1           Node 2           Node 3
 restaurants  [P0] [R1]        [P1] [R2]        [P2] [R0]
 ```
 
-| | Fixé | Rôle |
+| | Fixed | Role |
 |---|---|---|
-| **Primaires** | À la création de l'index | Répartir les **données** et l'écriture |
-| **Réplicas** | Modifiable à chaud | **Résilience**, et débit de **lecture** |
+| **Primaries** | When the index is created | Spread the **data** and the writes |
+| **Replicas** | Can be changed live | **Resilience**, and **read** throughput |
 
-> Un réplica n'est **jamais** sur le même nœud que son primaire.
+> A replica is **never** on the same node as its primary.
 
 ---
 
-# Nœuds et rôles
+# Nodes and roles
 
-| Rôle | Fait quoi |
+| Role | Does what |
 |---|---|
-| `cluster_manager` | Tient l'**état du cluster** : index, mappings, placement des shards. Un seul élu, 3 éligibles en production |
-| `data` | Stocke les shards, exécute recherches et agrégations |
-| `ingest` | Exécute les **ingest pipelines** (chapitre 9) |
-| `coordinating` | (aucun rôle) Reçoit les requêtes, les distribue, fusionne les résultats |
-| `search` | Nœud dédié aux réplicas de recherche (searchable snapshots, remote store) |
+| `cluster_manager` | Holds the **cluster state**: indices, mappings, shard placement. Only one elected, 3 eligible in production |
+| `data` | Stores the shards, runs searches and aggregations |
+| `ingest` | Runs the **ingest pipelines** (chapter 9) |
+| `coordinating` | (no role) Receives the requests, dispatches them, merges the results |
+| `search` | Node dedicated to search replicas (searchable snapshots, remote store) |
 
 <br />
 
-- Par défaut, un nœud a **tous** les rôles — parfait pour un lab
-- OpenSearch dit **cluster manager** là où Elasticsearch dit **master**
+- By default, a node has **all** the roles — perfect for a lab
+- OpenSearch says **cluster manager** where Elasticsearch says **master**
 
 ---
 
-# Une recherche, pas à pas
+# A search, step by step
 
-1. Le client envoie `GET /restaurants/_search` à **n'importe quel** nœud : il devient **coordinateur**
-2. **Query** — le coordinateur interroge **une copie** (primaire ou réplica) de **chaque** shard ; chacun renvoie ses meilleurs `_id` et scores
-3. Le coordinateur **fusionne** et trie
-4. **Fetch** — il récupère le `_source` des documents retenus, sur les shards qui les ont
-5. Il répond au client
+1. The client sends `GET /restaurants/_search` to **any** node: it becomes the **coordinator**
+2. **Query** — the coordinator queries **one copy** (primary or replica) of **each** shard; each one returns its best `_id`s and scores
+3. The coordinator **merges** and sorts
+4. **Fetch** — it retrieves the `_source` of the selected documents, from the shards that hold them
+5. It answers the client
 
 <br />
 
-> Plus de shards = plus de **parallélisme**, mais aussi plus de **coût de fusion**.
-> Ordre de grandeur : un shard de **10 à 50 Go**.
+> More shards = more **parallelism**, but also a higher **merge cost**.
+> Rule of thumb: a shard of **10 to 50 GB**.
 
 ---
 
-# Scalabilité et résilience
+# Scalability and resilience
 
-- **Ajouter un nœud** : le cluster manager **déplace** des shards vers lui, sans interruption
-- **Perdre un nœud** : ses réplicas ailleurs sont **promus** primaires, de nouveaux réplicas sont recréés
+- **Add a node**: the cluster manager **moves** shards to it, without downtime
+- **Lose a node**: its replicas elsewhere are **promoted** to primaries, new replicas are rebuilt
 
-| Statut | Signification |
+| Status | Meaning |
 |---|---|
-| 🟢 `green` | Tous les primaires et réplicas sont alloués |
-| 🟡 `yellow` | Tous les primaires sont là, au moins un réplica ne l'est pas |
-| 🔴 `red` | Au moins un primaire manque : des données sont inaccessibles |
+| 🟢 `green` | All primaries and replicas are allocated |
+| 🟡 `yellow` | All primaries are there, at least one replica is not |
+| 🔴 `red` | At least one primary is missing: some data is unavailable |
 
 <br />
 
-> Sur un nœud unique, un index avec `number_of_replicas: 1` est **jaune** : le réplica
-> n'a nulle part où aller. C'est normal dans le lab.
+> On a single node, an index with `number_of_replicas: 1` is **yellow**: the replica
+> has nowhere to go. That is expected in the lab.
 
 ---
 
 # Near real time
 
-- Un document indexé est d'abord dans un **buffer** mémoire et le **translog** (durabilité)
-- Toutes les **secondes** (`refresh_interval`), un **refresh** crée un nouveau segment Lucene : le document devient **cherchable**
-- `GET /index/_doc/1` le voit **tout de suite**, `_search` après le refresh
+- An indexed document first lands in a memory **buffer** and in the **translog** (durability)
+- Every **second** (`refresh_interval`), a **refresh** creates a new Lucene segment: the document becomes **searchable**
+- `GET /index/_doc/1` sees it **right away**, `_search` after the refresh
 
 <br />
 
-- Indexation massive : `refresh_interval: -1` le temps du chargement, puis remettre `1s`
-- Dans les TP : `?refresh=true` sur l'écriture, pour chercher juste après
+- Bulk indexing: `refresh_interval: -1` during the load, then set it back to `1s`
+- In the workshops: `?refresh=true` on the write, to search right after
 
 ---
 
 # Quiz
 
-**Un index a 3 shards primaires et 1 réplica. Combien de shards en tout ?**
+**An index has 3 primary shards and 1 replica. How many shards in total?**
 
 <v-clicks>
 
@@ -159,6 +159,6 @@ restaurants  [P0] [R1]        [P1] [R2]        [P2] [R0]
 - C) 6 ✅
 - D) 9
 
-**Réponse : C** — 1 réplica **par primaire** : 3 primaires + 3 réplicas.
+**Answer: C** — 1 replica **per primary**: 3 primaries + 3 replicas.
 
 </v-clicks>

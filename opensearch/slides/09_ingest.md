@@ -6,42 +6,42 @@ layout: cover
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~30 min**, TP compris), vous saurez :
+By the end of this sequence (**~30 min**, workshop included), you will be able to:
 
-- **Expliquer** où s'exécute un ingest pipeline, et quand l'utiliser
-- **Enchaîner** des processeurs : `grok`, `date`, `set`, `rename`, `remove`, `convert`
-- **Tester** un pipeline avec `_simulate`, sans rien indexer
-- **Gérer** les erreurs, et **brancher** le pipeline sur un index
+- **Explain** where an ingest pipeline runs, and when to use one
+- **Chain** processors: `grok`, `date`, `set`, `rename`, `remove`, `convert`
+- **Test** a pipeline with `_simulate`, without indexing anything
+- **Handle** errors, and **attach** the pipeline to an index
 
 ---
 
-# Transformer avant d'indexer
+# Transform before indexing
 
 ```text
- application ──► nœud ingest ──► [ grok → date → set → remove ] ──► shard primaire
+ application ──► ingest node ──► [ grok → date → set → remove ] ──► primary shard
                                        ingest pipeline
 ```
 
-- Une suite de **processeurs** qui modifient le document **avant** l'indexation
-- Exécuté par les nœuds de rôle `ingest` — tous, par défaut
-- Pour : extraire des champs d'un log, normaliser, enrichir, nettoyer
+- A sequence of **processors** that modify the document **before** indexing
+- Run by the nodes with the `ingest` role — all of them, by default
+- To: extract fields from a log line, normalize, enrich, clean up
 
-| Où transformer ? | Quand |
+| Where to transform? | When |
 |---|---|
-| **Ingest pipeline** | Transformations simples, au plus près du cluster |
-| **Data Prepper**, Logstash, Fluent Bit | Volumes importants, sources multiples, buffers, routage |
-| **L'application** | Logique métier |
+| **Ingest pipeline** | Simple transformations, as close to the cluster as possible |
+| **Data Prepper**, Logstash, Fluent Bit | Large volumes, multiple sources, buffering, routing |
+| **The application** | Business logic |
 
 ---
 
-# Créer un pipeline
+# Create a pipeline
 
 ```json
 PUT /_ingest/pipeline/restaurants-clean
 {
-  "description": "Normalise les restaurants avant indexation",
+  "description": "Normalizes the restaurants before indexing",
   "processors": [
     { "trim":      { "field": "name" } },
     { "uppercase": { "field": "city_code" } },
@@ -52,23 +52,23 @@ PUT /_ingest/pipeline/restaurants-clean
 }
 ```
 
-- Les processeurs s'exécutent **dans l'ordre**
-- `{{…}}` : un modèle Mustache — un autre champ, ou une méta-donnée `_ingest`
+- The processors run **in order**
+- `{{…}}`: a Mustache template — another field, or `_ingest` metadata
 
 ---
 
-# Tester : `_simulate`
+# Test: `_simulate`
 
 ```json
 POST /_ingest/pipeline/restaurants-clean/_simulate
 {
   "docs": [
-    { "_source": { "name": "  Chez Paul ", "city_code": "lyo", "price": "27", "internal_note": "à revoir" } }
+    { "_source": { "name": "  Chez Paul ", "city_code": "lyo", "price": "27", "internal_note": "to review" } }
   ]
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -78,28 +78,28 @@ POST /_ingest/pipeline/restaurants-clean/_simulate
 }
 ```
 
-- `?verbose=true` : l'état du document **après chaque** processeur
-- Sans pipeline enregistré : `POST /_ingest/pipeline/_simulate` avec `"pipeline": { … }`
+- `?verbose=true`: the state of the document **after each** processor
+- Without a stored pipeline: `POST /_ingest/pipeline/_simulate` with `"pipeline": { … }`
 
 ---
 
-# Les processeurs utiles
+# Useful processors
 
-| Processeur | Effet |
+| Processor | Effect |
 |---|---|
-| `set`, `remove`, `rename`, `copy` | Écrire, supprimer, renommer un champ |
-| `convert`, `lowercase`, `uppercase`, `trim` | Typer, normaliser |
-| `grok`, `dissect` | Extraire des champs d'un texte (regex nommées / séparateurs) |
-| `date` | Lire une date dans un format donné → `@timestamp` |
-| `split`, `join`, `csv`, `json`, `kv` | Découper ou parser un texte structuré |
-| `geoip`, `user_agent` | Enrichir une IP, un navigateur |
-| `script` | Painless, quand rien d'autre ne suffit |
-| `pipeline` | Appeler un autre pipeline |
-| `drop`, `fail` | Ignorer le document, ou le rejeter |
+| `set`, `remove`, `rename`, `copy` | Write, remove, rename a field |
+| `convert`, `lowercase`, `uppercase`, `trim` | Cast, normalize |
+| `grok`, `dissect` | Extract fields from a text (named regexes / delimiters) |
+| `date` | Parse a date in a given format → `@timestamp` |
+| `split`, `join`, `csv`, `json`, `kv` | Split or parse structured text |
+| `geoip`, `user_agent` | Enrich an IP address, a browser |
+| `script` | Painless, when nothing else will do |
+| `pipeline` | Call another pipeline |
+| `drop`, `fail` | Drop the document, or reject it |
 
 ---
 
-# Parser un log : `grok` et `date`
+# Parse a log line: `grok` and `date`
 
 ```json
 POST /_ingest/pipeline/_simulate
@@ -115,7 +115,7 @@ POST /_ingest/pipeline/_simulate
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -127,9 +127,9 @@ POST /_ingest/pipeline/_simulate
 
 ---
 
-# Conditions et erreurs
+# Conditions and errors
 
-Tout processeur accepte un `if` (Painless) et un `on_failure` :
+Every processor accepts an `if` (Painless) and an `on_failure`:
 
 ```json
 PUT /_ingest/pipeline/price-range
@@ -145,21 +145,21 @@ PUT /_ingest/pipeline/price-range
 }
 ```
 
-- Sans `on_failure`, une erreur **rejette** le document
-- Avec, il est indexé **marqué** : on le retrouve, on le corrige
+- Without `on_failure`, an error **rejects** the document
+- With it, the document is indexed **flagged**: you can find it and fix it
 
 ---
 
-# Brancher le pipeline
+# Attach the pipeline
 
-Sur une requête :
+On a single request:
 
 ```json
 PUT /prices/_doc/1?pipeline=price-range
 { "name": "Chez Paul", "price": 15 }
 ```
 
-Ou par défaut, pour **toutes** les écritures d'un index :
+Or by default, for **every** write to an index:
 
 ```json
 PUT /prices/_settings
@@ -171,16 +171,16 @@ PUT /prices/_doc/2
 GET /prices/_doc/2
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "_source": { "range": "premium", "rating": 4.9 } }
 ```
 
-- `index.final_pipeline` : s'exécute **après**, toujours — même si la requête en nomme un autre
+- `index.final_pipeline`: runs **afterwards**, always — even when the request names another pipeline
 
 ---
 
-# En pratique
+# In practice
 
-## TP 7 - Ingest pipelines
+## Workshop 7 - Ingest pipelines

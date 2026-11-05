@@ -1,28 +1,28 @@
-# TP 5 — Agrégations : solution
+# Workshop 5 — Aggregations: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the workshop README, and checks each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 GET /restaurants/_search
 {
   "size": 0,
-  "aggs": { "notes": { "stats": { "field": "rating" } } }
+  "aggs": { "ratings": { "stats": { "field": "rating" } } }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
-{ "aggregations": { "notes": { "count": 12 } } }
+{ "aggregations": { "ratings": { "count": 12 } } }
 ```
 
-`rating` est un `float` (simple précision) : 4.2 n'y est pas représentable
-exactement, l'agrégation calcule en `double` sur ces valeurs approchées.
+`rating` is a `float` (single precision): 4.2 cannot be represented exactly,
+and the aggregation computes in `double` over these approximated values.
 
-## Étape 2
+## Step 2
 
 ```json
 GET /restaurants/_search
@@ -32,99 +32,99 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "aggregations": { "cuisines": { "value": 8 } } }
 ```
 
-## Étape 3
+## Step 3
 
 ```json
 GET /restaurants/_search
 {
   "size": 0,
   "aggs": {
-    "par_ville": {
+    "by_city": {
       "terms": { "field": "city" },
-      "aggs": { "prix_moyen": { "avg": { "field": "price" } } }
+      "aggs": { "avg_price": { "avg": { "field": "price" } } }
     }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "aggregations": {
-    "par_ville": {
+    "by_city": {
       "buckets": [
-        { "key": "Paris", "doc_count": 5, "prix_moyen": { "value": 45.2 } },
-        { "key": "Lyon", "doc_count": 4, "prix_moyen": { "value": 21.75 } },
-        { "key": "Marseille", "doc_count": 3, "prix_moyen": { "value": 31.666666666666668 } }
+        { "key": "Paris", "doc_count": 5, "avg_price": { "value": 45.2 } },
+        { "key": "Lyon", "doc_count": 4, "avg_price": { "value": 21.75 } },
+        { "key": "Marseille", "doc_count": 3, "avg_price": { "value": 31.666666666666668 } }
       ]
     }
   }
 }
 ```
 
-La moyenne de Paris est tirée par L'Étoile du Nord (125 €) : la médiane
-(`percentiles`, 50) est bien plus basse.
+The average of Paris is pulled up by L'Étoile du Nord (€125): the median
+(`percentiles`, 50) is much lower.
 
 ```json
 GET /restaurants/_search
 {
   "size": 0,
   "query": { "term": { "city": "Paris" } },
-  "aggs": { "prix": { "percentiles": { "field": "price", "percents": [50] } } }
+  "aggs": { "price": { "percentiles": { "field": "price", "percents": [50] } } }
 }
 ```
 
-## Étape 4
+## Step 4
 
 ```json
 GET /restaurants/_search
 {
   "size": 0,
   "aggs": {
-    "par_cuisine": {
-      "terms": { "field": "cuisine", "order": { "note_moyenne": "desc" } },
-      "aggs": { "note_moyenne": { "avg": { "field": "rating" } } }
+    "by_cuisine": {
+      "terms": { "field": "cuisine", "order": { "avg_rating": "desc" } },
+      "aggs": { "avg_rating": { "avg": { "field": "rating" } } }
     }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "aggregations": {
-    "par_cuisine": {
+    "by_cuisine": {
       "buckets": [
-        { "key": "gastronomique" },
-        { "key": "fruits de mer" }
+        { "key": "fine dining" },
+        { "key": "seafood" }
       ]
     }
   }
 }
 ```
 
-## Étape 5
+## Step 5
 
 ```json
 GET /restaurants/_search
 {
   "size": 0,
   "aggs": {
-    "gammes": {
+    "price_ranges": {
       "range": {
         "field": "price",
         "ranges": [
-          { "key": "petit budget", "to": 20 },
-          { "key": "moyen", "from": 20, "to": 50 },
-          { "key": "haut de gamme", "from": 50 }
+          { "key": "budget", "to": 20 },
+          { "key": "mid-range", "from": 20, "to": 50 },
+          { "key": "high-end", "from": 50 }
         ]
       }
     }
@@ -132,23 +132,23 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "aggregations": {
-    "gammes": {
+    "price_ranges": {
       "buckets": [
-        { "key": "petit budget", "doc_count": 4 },
-        { "key": "moyen", "doc_count": 6 },
-        { "key": "haut de gamme", "doc_count": 2 }
+        { "key": "budget", "doc_count": 4 },
+        { "key": "mid-range", "doc_count": 6 },
+        { "key": "high-end", "doc_count": 2 }
       ]
     }
   }
 }
 ```
 
-## Étape 6
+## Step 6
 
 ```json
 GET /restaurants/_search
@@ -156,19 +156,19 @@ GET /restaurants/_search
   "size": 0,
   "query": { "term": { "city": "Paris" } },
   "aggs": {
-    "ouvertures": {
+    "openings": {
       "date_histogram": { "field": "opened", "calendar_interval": "year", "format": "yyyy", "min_doc_count": 1 }
     }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "aggregations": {
-    "ouvertures": {
+    "openings": {
       "buckets": [
         { "key_as_string": "2011", "doc_count": 1 },
         { "key_as_string": "2014", "doc_count": 1 },
@@ -181,26 +181,26 @@ GET /restaurants/_search
 }
 ```
 
-## Étape 7
+## Step 7
 
 ```json
 GET /restaurants/_search
 {
   "size": 0,
   "aggs": {
-    "par_ville": {
+    "by_city": {
       "terms": { "field": "city" },
-      "aggs": { "prix_moyen": { "avg": { "field": "price" } } }
+      "aggs": { "avg_price": { "avg": { "field": "price" } } }
     },
-    "ville_la_plus_chere": {
-      "max_bucket": { "buckets_path": "par_ville>prix_moyen" }
+    "most_expensive_city": {
+      "max_bucket": { "buckets_path": "by_city>avg_price" }
     }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
-{ "aggregations": { "ville_la_plus_chere": { "keys": ["Paris"], "value": 45.2 } } }
+{ "aggregations": { "most_expensive_city": { "keys": ["Paris"], "value": 45.2 } } }
 ```

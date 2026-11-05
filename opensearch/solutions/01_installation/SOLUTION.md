@@ -1,15 +1,15 @@
-# TP 1 — Installation et premiers pas : solution
+# Workshop 1 — Installation and first steps: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the workshop README, and checks each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 GET /
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -17,7 +17,7 @@ GET /
 }
 ```
 
-## Étape 2
+## Step 2
 
 <!-- ci: retry -->
 
@@ -25,7 +25,7 @@ GET /
 GET /_cluster/health
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "status": "green", "number_of_nodes": 1 }
@@ -35,10 +35,10 @@ GET /_cluster/health
 GET /_cat/nodes?v&h=name,node.roles,cluster_manager
 ```
 
-L'unique nœud est `cluster_manager` (`*`), avec tous les rôles : `cluster_manager`,
+The only node is the `cluster_manager` (`*`), with all the roles: `cluster_manager`,
 `data`, `ingest`, `remote_cluster_client`.
 
-## Étape 3
+## Step 3
 
 ```json
 DELETE /hello
@@ -51,7 +51,7 @@ PUT /hello
 GET /_cluster/health/hello
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "status": "yellow", "active_primary_shards": 1, "unassigned_shards": 1 }
@@ -61,10 +61,10 @@ GET /_cluster/health/hello
 GET /_cat/shards/hello?v
 ```
 
-Le réplica est `UNASSIGNED` : il ne peut pas être sur le nœud de son primaire, et
-il n'y en a pas d'autre.
+The replica is `UNASSIGNED`: it cannot sit on the node of its primary, and there
+is no other one.
 
-## Étape 4
+## Step 4
 
 ```json
 PUT /hello/_settings
@@ -73,13 +73,13 @@ PUT /hello/_settings
 GET /_cluster/health/hello
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "status": "green", "unassigned_shards": 0 }
 ```
 
-## Étape 5
+## Step 5
 
 ```bash
 curl -s 'http://localhost:9200/_cat/indices?v&h=index,health,docs.count'

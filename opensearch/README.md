@@ -1,7 +1,7 @@
 # OpenSearch
 
 The material of the **OpenSearch** training — a 2-day program delivered in 1 day,
-in French: a slide deck, hands-on workshops, and the site that publishes them —
+in English: a slide deck, hands-on workshops, and the site that publishes them —
 built by [training-kit](https://www.npmjs.com/package/@emmanueldemey/training-kit).
 
 ```
@@ -34,7 +34,7 @@ site, the PDFs and the ZIPs. There is no list to maintain anywhere else.
 
 The [official program](https://www.sparks-formation.com/formation/opensearch-maitriser-le-moteur-de-recherche-open-source/)
 runs over two days; this deck covers all of it in one, with short workshops
-(20–45 min) and a « Pour aller plus loin » section in each README for what the
+(20–45 min) and a « Going further » section in each README for what the
 day leaves out.
 
 | | Chapters | Workshops |
@@ -42,8 +42,8 @@ day leaves out.
 | Morning | 0 → 5 — OpenSearch, architecture, installation, mapping, search | 1 · 2 · 3 |
 | Afternoon | 6 → 11 — analysis, aggregations, advanced search, ingest, Dashboards | 4 · 5 · 6 · 7 · 8 |
 
-To give it over two days, keep the same chapters and do the « Pour aller plus
-loin » sections in the session.
+To give it over two days, keep the same chapters and do the « Going
+further » sections in the session.
 
 ## Build
 
@@ -77,7 +77,7 @@ slides against a real OpenSearch — the one of [`ci/Dockerfile`](ci/Dockerfile)
 the only place its version is written, security plugin off as in the lab
 ([`check-console.mjs`](../scripts/check-console.mjs): OpenSearch speaks the REST
 API of Elasticsearch 7.10, the script needs no change). A request that fails, or
-a response that does not hold the « Résultat attendu » JSON that follows it, holds
+a response that does not hold the « Expected result » JSON that follows it, holds
 back the deploy. Workshop 8 is done in the Dashboards UI: nothing to replay, but
 the CI starts the lab of workshop 1, loads the sample web logs, and checks that
 the fields of the table under `<!-- ci: sample-data logs -->` are still there,

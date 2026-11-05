@@ -1,16 +1,16 @@
-# TP 2 — Indexation et mapping
+# Workshop 2 — Indexing and mapping
 
-> Laisser OpenSearch deviner un mapping et voir où il se trompe, écrire le bon, charger les données en `_bulk`, puis corriger un champ sans interrompre les lectures.
+> Let OpenSearch guess a mapping and see where it goes wrong, write the right one, load the data with `_bulk`, then fix a field without interrupting reads.
 
-**Durée** : 30 min · **Chapitre** : 4 — Indexation et mapping
+**Duration**: 30 min · **Chapter**: 4 — Indexing and mapping
 
-## Contexte
+## Context
 
-Une librairie en ligne veut un moteur de recherche sur son catalogue. Chaque livre a un titre, un auteur, un ISBN, un prix, une date de parution, un nombre de pages et des tags. Avant d'indexer des milliers de livres, vous fixez le schéma.
+An online bookshop wants a search engine on its catalogue. Each book has a title, an author, an ISBN, a price, a publication date, a page count and tags. Before indexing thousands of books, you settle the schema.
 
-## Mise en place
+## Setup
 
-Ce TP est autonome. Supprimez ce qu'une tentative précédente a pu laisser :
+This workshop is self-contained. Delete whatever a previous attempt may have left:
 
 ```json
 DELETE /books_guess
@@ -18,30 +18,30 @@ DELETE /books_v1
 DELETE /books_v2
 ```
 
-Les trois livres du TP :
+The three books of the workshop:
 
 ```text
-1  { "title": "Le Petit Prince", "author": "Antoine de Saint-Exupéry", "isbn": "9782070612758", "price": 7.5,  "published": "1943-04-06", "pages": 96,  "tags": ["conte", "jeunesse"] }
-2  { "title": "L'Étranger",      "author": "Albert Camus",             "isbn": "9782070360024", "price": 6.9,  "published": "1942-05-19", "pages": 184, "tags": ["roman", "absurde"] }
-3  { "title": "Germinal",        "author": "Émile Zola",               "isbn": "9782253004226", "price": 8.2,  "published": "1885-03-01", "pages": 592, "tags": ["roman", "naturalisme"] }
+1  { "title": "The Little Prince", "author": "Antoine de Saint-Exupéry", "isbn": "9782070612758", "price": 7.5,  "published": "1943-04-06", "pages": 96,  "tags": ["tale", "children"] }
+2  { "title": "The Stranger",      "author": "Albert Camus",             "isbn": "9782070360024", "price": 6.9,  "published": "1942-05-19", "pages": 184, "tags": ["novel", "absurdism"] }
+3  { "title": "Germinal",          "author": "Émile Zola",               "isbn": "9782253004226", "price": 8.2,  "published": "1885-03-01", "pages": 592, "tags": ["novel", "naturalism"] }
 ```
 
-Référence : [Mappings and field types](https://docs.opensearch.org/latest/field-types/).
+Reference: [Mappings and field types](https://docs.opensearch.org/latest/field-types/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : Le mapping deviné
+### Step 1: The guessed mapping
 
-Indexez le livre 1, avec l'`_id` `1`, dans un index `books_guess` qui n'existe pas encore. Affichez le mapping qu'OpenSearch a créé.
+Index book 1, with the `_id` `1`, into a `books_guess` index that does not exist yet. Display the mapping OpenSearch created.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`PUT /books_guess/_doc/1` crée l'index au passage. Puis `GET /books_guess/_mapping`.
+`PUT /books_guess/_doc/1` creates the index along the way. Then `GET /books_guess/_mapping`.
 
 </details>
 
-**Résultat attendu** (un extrait du mapping) :
+**Expected result** (an excerpt of the mapping):
 
 ```json
 {
@@ -58,74 +58,74 @@ Indexez le livre 1, avec l'`_id` `1`, dans un index `books_guess` qui n'existe p
 }
 ```
 
-**Question** : pour chaque champ, le type deviné vous convient-il ? Que coûte un `isbn` en `text` + `keyword` ?
+**Question**: for each field, does the guessed type suit you? What does an `isbn` as `text` + `keyword` cost?
 
-### Étape 2 : Le premier document décide
+### Step 2: The first document decides
 
-Indexez dans `books_guess`, avec l'`_id` `2`, un livre dont le `price` vaut `"épuisé"`.
+Index into `books_guess`, with the `_id` `2`, a book whose `price` is `"out of print"`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Le type du champ est fixé par le premier document.
+The type of a field is set by the first document.
 
 </details>
 
-**Résultat attendu** : une erreur `mapper_parsing_exception`.
+**Expected result**: a `mapper_parsing_exception` error.
 
-### Étape 3 : Le mapping explicite
+### Step 3: The explicit mapping
 
-Créez `books_v1`, 1 shard et 0 réplica, avec un mapping qui **refuse** tout champ inconnu et où :
+Create `books_v1`, 1 shard and 0 replicas, with a mapping that **rejects** any unknown field and where:
 
-- `title` se cherche en plein texte **et** se trie ;
-- `author` se cherche en plein texte ;
-- `isbn` et `tags` sont des valeurs exactes ;
-- `price` est un nombre décimal, `pages` un entier, `published` une date.
+- `title` can be searched as full text **and** sorted;
+- `author` can be searched as full text;
+- `isbn` and `tags` are exact values;
+- `price` is a decimal number, `pages` an integer, `published` a date.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`"dynamic": "strict"` au niveau de `mappings`. Un multi-field `fields` pour `title`.
+`"dynamic": "strict"` at the `mappings` level. A `fields` multi-field for `title`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "acknowledged": true, "index": "books_v1" }
 ```
 
-### Étape 4 : Charger en masse
+### Step 4: Bulk loading
 
-Indexez les trois livres dans `books_v1` en **une seule** requête, avec les `_id` `1`, `2` et `3`, et rendez-les cherchables immédiatement. Puis comptez les documents.
+Index the three books into `books_v1` in **a single** request, with the `_id`s `1`, `2` and `3`, and make them searchable immediately. Then count the documents.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`POST /books_v1/_bulk?refresh=true` : une ligne `{ "index": { "_id": "…" } }`, puis une ligne de document. Compter : `_count`.
+`POST /books_v1/_bulk?refresh=true`: a `{ "index": { "_id": "…" } }` line, then a document line. Counting: `_count`.
 
 </details>
 
-**Résultat attendu** (le comptage) :
+**Expected result** (the count):
 
 ```json
 { "count": 3 }
 ```
 
-**Essayez** : indexez un document avec un champ `editor` en plus. Que répond OpenSearch ?
+**Try it**: index a document with an extra `editor` field. What does OpenSearch answer?
 
-### Étape 5 : Corriger un type
+### Step 5: Fixing a type
 
-L'équipe veut agréger sur l'**auteur**. Impossible sur un `text` seul — et on ne change pas le type d'un champ existant. Créez `books_v2`, même mapping, mais `author` a un sous-champ `keyword`. Copiez-y les documents de `books_v1`, puis faites pointer l'alias `books` vers `books_v2`. Cherchez enfin via l'alias les livres de Camus.
+The team wants to aggregate on the **author**. Impossible on a plain `text` — and you cannot change the type of an existing field. Create `books_v2`, same mapping, but `author` gets a `keyword` sub-field. Copy the documents of `books_v1` into it, then point the `books` alias to `books_v2`. Finally, search Camus's books through the alias.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`POST /_reindex`, puis `POST /_aliases` avec une action `add`. Un `match` sur `author`, en interrogeant `/books/_search`.
+`POST /_reindex`, then `POST /_aliases` with an `add` action. A `match` on `author`, querying `/books/_search`.
 
 </details>
 
-**Résultat attendu** (la recherche) :
+**Expected result** (the search):
 
 ```json
 {
@@ -136,28 +136,28 @@ L'équipe veut agréger sur l'**auteur**. Impossible sur un `text` seul — et o
 }
 ```
 
-**Question** : demain, un `books_v3`. Comment basculer l'alias **sans** instant où il ne pointe sur rien ?
+**Question**: tomorrow, a `books_v3`. How do you switch the alias **without** any moment where it points to nothing?
 
-## Critères de réussite
+## Success criteria
 
-- Vous savez lire un mapping, et repérer un type mal deviné
-- Un index en `dynamic: strict` refuse les champs imprévus
-- Les documents sont chargés en `_bulk`
-- Un changement de type passe par un nouvel index, `_reindex` et un alias
+- You can read a mapping, and spot a wrongly guessed type
+- An index in `dynamic: strict` rejects unexpected fields
+- The documents are loaded with `_bulk`
+- A type change goes through a new index, `_reindex` and an alias
 
-## Pour aller plus loin
+## Going further
 
-- Créez un **index template** `books-*` qui porte ce mapping, puis un index `books-2026` : vérifiez qu'il en hérite.
-- Changez un prix avec `_update`, puis relisez le document : que vaut `_version` ?
-- Rejouez le `_bulk` avec l'action `create` au lieu de `index` : que contient `items` ?
+- Create a `books-*` **index template** carrying this mapping, then a `books-2026` index: check that it inherits it.
+- Change a price with `_update`, then read the document again: what is `_version`?
+- Replay the `_bulk` with the `create` action instead of `index`: what does `items` contain?
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : `strict_dynamic_mapping_exception`
-→ Attendu à l'étape 4 avec `editor`. Ailleurs : un champ du document n'est pas dans le mapping — une faute de frappe ?
+**Problem**: `strict_dynamic_mapping_exception`
+→ Expected in step 4 with `editor`. Elsewhere: a field of the document is not in the mapping — a typo?
 
-**Problème** : `The bulk request must be terminated by a newline`
-→ Le corps `_bulk` se termine par un retour à la ligne. Dans Dev Tools, laissez une ligne vide à la fin.
+**Problem**: `The bulk request must be terminated by a newline`
+→ A `_bulk` body ends with a newline. In Dev Tools, leave an empty line at the end.
 
-**Problème** : `resource_already_exists_exception`
-→ L'index existe déjà : relancez la mise en place.
+**Problem**: `resource_already_exists_exception`
+→ The index already exists: run the setup again.

@@ -1,9 +1,9 @@
-# TP 7 — Ingest pipelines : solution
+# Workshop 7 — Ingest pipelines: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the workshop README, and checks each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 POST /_ingest/pipeline/_simulate
@@ -14,12 +14,12 @@ POST /_ingest/pipeline/_simulate
     ]
   },
   "docs": [
-    { "_source": { "message": "3,Camille,5,12/10/2026,\"Poisson parfait, service rapide\"" } }
+    { "_source": { "message": "3,Camille,5,12/10/2026,\"Perfect fish, quick service\"" } }
   ]
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -31,7 +31,7 @@ POST /_ingest/pipeline/_simulate
           "author": "Camille",
           "stars": "5",
           "date": "12/10/2026",
-          "comment": "Poisson parfait, service rapide"
+          "comment": "Perfect fish, quick service"
         }
       }
     }
@@ -39,10 +39,10 @@ POST /_ingest/pipeline/_simulate
 }
 ```
 
-Le mapping convertit `"5"` à l'indexation, mais **après** le pipeline : dans le
-pipeline, `ctx.stars >= 4` comparerait une chaîne à un nombre et échouerait.
+The mapping converts `"5"` at indexing time, but **after** the pipeline: inside the
+pipeline, `ctx.stars >= 4` would compare a string to a number and fail.
 
-## Étape 2
+## Step 2
 
 ```json
 POST /_ingest/pipeline/_simulate
@@ -56,12 +56,12 @@ POST /_ingest/pipeline/_simulate
     ]
   },
   "docs": [
-    { "_source": { "message": "3,Camille,5,12/10/2026,\"Poisson parfait, service rapide\"" } }
+    { "_source": { "message": "3,Camille,5,12/10/2026,\"Perfect fish, quick service\"" } }
   ]
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -71,7 +71,7 @@ POST /_ingest/pipeline/_simulate
 }
 ```
 
-## Étape 3
+## Step 3
 
 ```json
 POST /_ingest/pipeline/_simulate
@@ -87,13 +87,13 @@ POST /_ingest/pipeline/_simulate
     ]
   },
   "docs": [
-    { "_source": { "message": "3,Camille,5,12/10/2026,\"Poisson parfait, service rapide\"" } },
-    { "_source": { "message": "6,Hugo,2,13/10/2026,Frites froides" } }
+    { "_source": { "message": "3,Camille,5,12/10/2026,\"Perfect fish, quick service\"" } },
+    { "_source": { "message": "6,Hugo,2,13/10/2026,Cold fries" } }
   ]
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -104,12 +104,12 @@ POST /_ingest/pipeline/_simulate
 }
 ```
 
-## Étape 4
+## Step 4
 
 ```json
 PUT /_ingest/pipeline/reviews
 {
-  "description": "Structure les avis CSV",
+  "description": "Structures the CSV reviews",
   "processors": [
     { "csv": { "field": "message", "target_fields": ["restaurant_id", "author", "stars", "date", "comment"] } },
     { "convert": { "field": "stars", "type": "integer" } },
@@ -124,13 +124,13 @@ PUT /_ingest/pipeline/reviews
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "acknowledged": true }
 ```
 
-## Étape 5
+## Step 5
 
 ```json
 PUT /reviews/_settings
@@ -138,18 +138,18 @@ PUT /reviews/_settings
 
 POST /reviews/_bulk?refresh=true
 { "index": { "_id": "1" } }
-{ "message": "3,Camille,5,12/10/2026,\"Poisson parfait, service rapide\"" }
+{ "message": "3,Camille,5,12/10/2026,\"Perfect fish, quick service\"" }
 { "index": { "_id": "2" } }
-{ "message": "6,Hugo,2,13/10/2026,Frites froides" }
+{ "message": "6,Hugo,2,13/10/2026,Cold fries" }
 { "index": { "_id": "3" } }
-{ "message": "12,Inès,4,14/10/2026,Menu dégustation mémorable" }
+{ "message": "12,Inès,4,14/10/2026,Memorable tasting menu" }
 { "index": { "_id": "4" } }
-{ "message": "ligne cassée" }
+{ "message": "broken line" }
 
 GET /reviews/_doc/1
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -169,7 +169,7 @@ GET /reviews/_count
 { "query": { "term": { "sentiment": "positive" } } }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "count": 2 }
@@ -180,7 +180,7 @@ GET /reviews/_count
 { "query": { "exists": { "field": "error" } } }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "count": 1 }

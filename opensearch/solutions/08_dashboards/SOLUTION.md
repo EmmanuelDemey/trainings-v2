@@ -1,40 +1,39 @@
-# TP 8 — OpenSearch Dashboards : solution
+# Workshop 8 — OpenSearch Dashboards: solution
 
-Pour le formateur. Non publié. Ce TP se fait dans l'interface : rien à rejouer en CI.
+For the trainer. Not published. This workshop is done in the UI: nothing to replay in the CI.
 
-## Étape 1
+## Step 1
 
-`response.keyword` est agrégeable : un `keyword` a des doc values. `response`,
-analysé, ne l'est pas — sauf à activer `fielddata`, à proscrire.
+`response.keyword` is aggregatable: a `keyword` has doc values. `response`,
+analyzed, is not — unless you enable `fielddata`, which you should never do.
 
-## Étape 2
+## Step 2
 
-- DQL : `response:503`
-- Filtre : `NOT machine.os.keyword: win xp`
-- **Inspect** → **Request** sur `bytes > 10000 and extension:css` : une `bool` avec
-  un `range` sur `bytes` et un `match` sur `extension`, dans un `filter` avec le
-  `range` sur `timestamp` (la période).
+- DQL: `response:503`
+- Filter: `NOT machine.os.keyword: win xp`
+- **Inspect** → **Request** on `bytes > 10000 and extension:css`: a `bool` with
+  a `range` on `bytes` and a `match` on `extension`, in a `filter` alongside the
+  `range` on `timestamp` (the time range).
 
-## Étape 4
+## Step 4
 
-Un `date_histogram` sur `timestamp` (intervalle *auto*), et en sous-agrégation un
-`terms` sur `response.keyword`. Le *Count* est le `doc_count` de chaque bucket.
+A `date_histogram` on `timestamp` (*auto* interval), and as a sub-aggregation a
+`terms` on `response.keyword`. The *Count* is the `doc_count` of each bucket.
 
-## Étape 6
+## Step 6
 
-Non : une carte exige un `geo_point` (ou `geo_shape`). Deux champs `lat`/`lon` en
-`float`, ou une chaîne, ne permettent ni agrégation géographique ni couche de
-documents.
+No: a map requires a `geo_point` (or `geo_shape`). Two `lat`/`lon` fields as
+`float`, or a string, allow neither a geographic aggregation nor a documents
+layer.
 
-## Étape 7
+## Step 7
 
-1. Le clic crée un filtre `machine.os.keyword: osx`, appliqué à **tous** les
-   panneaux, y compris la recherche enregistrée et la carte.
-2. La sélection sur l'histogramme change la **période** globale du tableau de bord.
+1. The click creates a `machine.os.keyword: osx` filter, applied to **every**
+   panel, the saved search and the map included.
+2. The selection on the histogram changes the global **time range** of the dashboard.
 
-## Étape 8
+## Step 8
 
-Le `.ndjson` contient un objet par ligne : le tableau de bord, chaque
-visualisation, la recherche, la carte et l'index pattern, avec leurs références.
-Il s'importe sur un autre cluster (**Saved objects** → **Import**), à condition
-que l'index existe.
+The `.ndjson` holds one object per line: the dashboard, each visualization, the
+search, the map and the index pattern, with their references. It can be imported
+into another cluster (**Saved objects** → **Import**), provided the index exists.

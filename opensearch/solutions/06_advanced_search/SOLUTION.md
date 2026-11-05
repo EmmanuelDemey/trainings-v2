@@ -1,9 +1,9 @@
-# TP 6 — Recherche avancée : solution
+# Workshop 6 — Advanced search: solution
 
-Pour le formateur. Non publié : les participants trouvent ces requêtes eux-mêmes.
-La CI les rejoue juste après le README du TP, et vérifie chaque « Résultat attendu ».
+For the trainer. Not published: the learners find these requests themselves.
+The CI replays them right after the workshop README, and checks each « Expected result ».
 
-## Étape 1
+## Step 1
 
 ```json
 GET /restaurants/_search
@@ -14,7 +14,7 @@ GET /restaurants/_search
 }
 ```
 
-Le dernier hit porte `"sort": [18, "Pizzeria Napoli"]`.
+The last hit carries `"sort": [18, "Pizzeria Napoli"]`.
 
 ```json
 GET /restaurants/_search
@@ -26,7 +26,7 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -41,15 +41,15 @@ GET /restaurants/_search
 }
 ```
 
-Sans second critère, deux restaurants au même prix n'ont pas d'ordre garanti :
-`search_after` en sauterait ou en répéterait un. Le second critère doit être unique.
+Without a second criterion, two restaurants at the same price have no guaranteed order:
+`search_after` would skip or repeat one of them. The second criterion must be unique.
 
-## Étape 2
+## Step 2
 
 ```json
 GET /restaurants/_search
 {
-  "query": { "match": { "description": "grillés" } },
+  "query": { "match": { "description": "grilled" } },
   "highlight": {
     "pre_tags": ["<em>"],
     "post_tags": ["</em>"],
@@ -59,20 +59,20 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "hits": {
     "hits": [
-      { "_id": "8", "highlight": { "description": ["Ramen au bouillon tonkotsu et gyozas <em>grillés</em>."] } },
-      { "_id": "5", "highlight": { "description": ["Bouillabaisse, poissons <em>grillés</em> et plateau de fruits de mer face au port."] } }
+      { "_id": "8", "highlight": { "description": ["Tonkotsu broth ramen and <em>grilled</em> gyoza."] } },
+      { "_id": "5", "highlight": { "description": ["Bouillabaisse, <em>grilled</em> fishes and seafood platter facing the harbour."] } }
     ]
   }
 }
 ```
 
-## Étape 3
+## Step 3
 
 ```json
 PUT /restaurant_names
@@ -92,24 +92,24 @@ POST /restaurant_names/_bulk?refresh=true
 GET /restaurant_names/_search
 {
   "suggest": {
-    "noms": { "prefix": "le", "completion": { "field": "suggest" } }
+    "names": { "prefix": "le", "completion": { "field": "suggest" } }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "suggest": {
-    "noms": [
+    "names": [
       { "text": "le", "options": [ { "text": "Le Bouchon Lyonnais" }, { "text": "Le Vieux Port" } ] }
     ]
   }
 }
 ```
 
-## Étape 4
+## Step 4
 
 ```json
 GET /restaurants/_search
@@ -128,7 +128,7 @@ GET /restaurants/_search
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -144,9 +144,9 @@ GET /restaurants/_search
 }
 ```
 
-La distance est la valeur `sort` de chaque hit, en km.
+The distance is the `sort` value of each hit, in km.
 
-## Étape 5
+## Step 5
 
 ```json
 PUT /alerts
@@ -162,10 +162,10 @@ PUT /alerts
   }
 }
 
-PUT /alerts/_doc/japonais-lyon
-{ "query": { "bool": { "filter": [ { "term": { "cuisine": "japonaise" } }, { "term": { "city": "Lyon" } } ] } } }
+PUT /alerts/_doc/japanese-lyon
+{ "query": { "bool": { "filter": [ { "term": { "cuisine": "japanese" } }, { "term": { "city": "Lyon" } } ] } } }
 
-PUT /alerts/_doc/petit-budget?refresh=true
+PUT /alerts/_doc/budget?refresh=true
 { "query": { "range": { "price": { "lt": 20 } } } }
 
 GET /alerts/_search
@@ -173,19 +173,19 @@ GET /alerts/_search
   "query": {
     "percolate": {
       "field": "query",
-      "document": { "name": "Udon Lyon", "cuisine": "japonaise", "city": "Lyon", "price": 15 }
+      "document": { "name": "Udon Lyon", "cuisine": "japanese", "city": "Lyon", "price": 15 }
     }
   }
 }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "hits": {
     "total": { "value": 2 },
-    "hits": [ { "_id": "japonais-lyon" }, { "_id": "petit-budget" } ]
+    "hits": [ { "_id": "japanese-lyon" }, { "_id": "budget" } ]
   }
 }
 ```

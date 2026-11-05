@@ -1,38 +1,38 @@
-# OpenSearch — Travaux pratiques
+# OpenSearch — Workshops
 
-Les exercices de la formation **OpenSearch**. Chaque TP vous donne les données et un
-objectif par étape, **pas la requête** : vous la trouvez dans la documentation, vous
-l'essayez, vous lisez la réponse, vous ajustez. Le résultat attendu vous permet de
-vérifier ; un indice replié aide si vous bloquez — essayez d'abord sans.
+The exercises of the **OpenSearch** training. Each workshop gives you the data and a
+goal per step, **not the request**: you find it in the documentation, you try it,
+you read the response, you adjust. The expected result lets you check your answer;
+a folded hint helps if you are stuck — try without it first.
 
-## Ce qu'il vous faut
+## What you need
 
-- **Docker** (Docker Desktop ou Docker Engine + Compose), 4 Go de RAM libres ;
-- un navigateur ;
-- un terminal, pour démarrer le lab et pour quelques appels `curl`.
+- **Docker** (Docker Desktop or Docker Engine + Compose), 4 GB of free RAM;
+- a browser;
+- a terminal, to start the lab and for a few `curl` calls.
 
-Le lab est dans `01_installation/docker-compose.yml` : un nœud **OpenSearch** et
-**OpenSearch Dashboards**, plugin de sécurité désactivé. Les requêtes se collent
-telles quelles dans **Dev Tools** (menu ☰ → Management → Dev Tools).
+The lab is in `01_installation/docker-compose.yml`: one **OpenSearch** node and
+**OpenSearch Dashboards**, with the security plugin disabled. The requests are pasted
+as is into **Dev Tools** (☰ menu → Management → Dev Tools).
 
-Chaque TP est **autonome** : il crée les index et les données dont il a besoin, et
-peut se faire sans les précédents.
+Each workshop is **self-contained**: it creates the indices and the data it needs, and
+can be done without the previous ones.
 
-La CI rejoue chaque TP sur OpenSearch 3.9.0, avec les solutions du formateur :
-chaque résultat attendu est celui qu'obtient une bonne réponse.
+The CI replays each workshop on OpenSearch 3.9.0, with the trainer's solutions:
+every expected result is the one a correct answer gets.
 
-## Les TP
+## The workshops
 
-| Moment | TP | Dossier | Sujet |
+| When | Workshop | Folder | Topic |
 |-----|----|---------|-------|
-| Matin | 1 | `01_installation/` | Démarrer le lab, santé du cluster, `_cat`, réplicas |
-| Matin | 2 | `02_indexing_mapping/` | Mapping dynamique vs explicite, `_bulk`, `_reindex`, alias |
-| Matin | 3 | `03_search/` | `match`, `term`, `bool`, `boost`, `function_score` |
-| Après-midi | 4 | `04_analysis/` | `_analyze`, analyseur personnalisé, synonymes |
-| Après-midi | 5 | `05_aggregations/` | Metrics, buckets, sous-agrégations, pipeline |
-| Après-midi | 6 | `06_advanced_search/` | Tri, `search_after`, surlignage, complétion, géo, percolation |
-| Après-midi | 7 | `07_ingest/` | `_simulate`, `csv`, `date`, conditions, `on_failure`, pipeline par défaut |
-| Après-midi | 8 | `08_dashboards/` | Index pattern, Discover, visualisations, carte, tableau de bord |
+| Morning | 1 | `01_installation/` | Start the lab, cluster health, `_cat`, replicas |
+| Morning | 2 | `02_indexing_mapping/` | Dynamic vs explicit mapping, `_bulk`, `_reindex`, aliases |
+| Morning | 3 | `03_search/` | `match`, `term`, `bool`, `boost`, `function_score` |
+| Afternoon | 4 | `04_analysis/` | `_analyze`, custom analyzer, synonyms |
+| Afternoon | 5 | `05_aggregations/` | Metrics, buckets, sub-aggregations, pipeline |
+| Afternoon | 6 | `06_advanced_search/` | Sorting, `search_after`, highlighting, completion, geo, percolation |
+| Afternoon | 7 | `07_ingest/` | `_simulate`, `csv`, `date`, conditions, `on_failure`, default pipeline |
+| Afternoon | 8 | `08_dashboards/` | Index pattern, Discover, visualizations, map, dashboard |
 
-Chaque TP se termine par **« Pour aller plus loin »** : de quoi prolonger après la
-session, ce que la journée ne laisse pas le temps de faire.
+Each workshop ends with **"Going further"**: something to keep going after the
+session, what the day leaves no time for.

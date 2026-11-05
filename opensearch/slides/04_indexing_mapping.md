@@ -2,23 +2,23 @@
 layout: cover
 ---
 
-# 4 - Indexation et mapping
+# 4 - Indexing and mapping
 
 ---
 
-# Objectifs pédagogiques
+# Learning objectives
 
-À la fin de cette séquence (**~45 min**, TP compris), vous saurez :
+By the end of this sequence (**~45 min**, workshop included), you will be able to:
 
-- **Créer**, configurer et supprimer un index
-- **Indexer**, lire, modifier et supprimer des documents, un par un ou en `_bulk`
-- **Choisir** le type de chaque champ : `text` ou `keyword`, nombres, dates, `geo_point`
-- **Repérer** les pièges du mapping dynamique
-- **Découpler** les applications des index avec un **alias**
+- **Create**, configure and delete an index
+- **Index**, read, update and delete documents, one by one or with `_bulk`
+- **Choose** the type of each field: `text` or `keyword`, numbers, dates, `geo_point`
+- **Spot** the pitfalls of dynamic mapping
+- **Decouple** applications from indices with an **alias**
 
 ---
 
-# Créer un index
+# Creating an index
 
 ```json
 PUT /books
@@ -30,8 +30,8 @@ PUT /books
 }
 ```
 
-- `number_of_shards` : **figé** à la création (sauf `_split` / `_shrink`)
-- `number_of_replicas`, `refresh_interval` : **dynamiques**
+- `number_of_shards`: **fixed** at creation (except with `_split` / `_shrink`)
+- `number_of_replicas`, `refresh_interval`: **dynamic**
 
 ```json
 PUT /books/_settings
@@ -45,21 +45,21 @@ DELETE /books
 
 ---
 
-# Indexer un document
+# Indexing a document
 
 ```json
 PUT /books/_doc/1
-{ "title": "Le Petit Prince", "author": "Saint-Exupéry", "year": 1943 }
+{ "title": "The Little Prince", "author": "Saint-Exupéry", "year": 1943 }
 
 POST /books/_doc
-{ "title": "L'Étranger", "author": "Camus", "year": 1942 }
+{ "title": "The Stranger", "author": "Camus", "year": 1942 }
 ```
 
-- `PUT /index/_doc/<id>` : **crée ou remplace** le document de cet `_id`
-- `POST /index/_doc` : OpenSearch **génère** l'`_id`
-- `PUT /index/_create/<id>` : échoue (**409**) si l'`_id` existe déjà
+- `PUT /index/_doc/<id>`: **creates or replaces** the document with this `_id`
+- `POST /index/_doc`: OpenSearch **generates** the `_id`
+- `PUT /index/_create/<id>`: fails (**409**) if the `_id` already exists
 
-**Résultat attendu** (le `POST`) :
+**Expected result** (the `POST`):
 
 ```json
 { "_index": "books", "result": "created" }
@@ -67,7 +67,7 @@ POST /books/_doc
 
 ---
 
-# Lire, modifier, supprimer
+# Read, update, delete
 
 ```json
 GET /books/_doc/1
@@ -78,24 +78,24 @@ POST /books/_update/1
 GET /books/_doc/1
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
-{ "_id": "1", "_version": 2, "found": true, "_source": { "title": "Le Petit Prince", "year": 1946 } }
+{ "_id": "1", "_version": 2, "found": true, "_source": { "title": "The Little Prince", "year": 1946 } }
 ```
 
 ```json
 DELETE /books/_doc/1
 ```
 
-- Un document est **immuable** dans Lucene : une mise à jour **réécrit** le document entier, et `_version` s'incrémente
-- `_update` évite seulement de renvoyer tout le document
+- A document is **immutable** in Lucene: an update **rewrites** the whole document, and `_version` is incremented
+- `_update` only saves you from sending the whole document again
 
 ---
 
-# `_bulk` : indexer en masse
+# `_bulk`: indexing in batches
 
-Une ligne d'**action**, puis une ligne de **document** — format **NDJSON** :
+One **action** line, then one **document** line — the **NDJSON** format:
 
 ```json
 POST /books/_bulk?refresh=true
@@ -106,21 +106,21 @@ POST /books/_bulk?refresh=true
 { "delete": { "_id": "2" } }
 ```
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "errors": false }
 ```
 
-- Actions : `index`, `create`, `update`, `delete`
-- Un échec **n'annule pas** les autres : lire `errors`, puis `items[]`
-- Taille de lot : **5 à 15 Mo**, à mesurer
+- Actions: `index`, `create`, `update`, `delete`
+- One failure **does not cancel** the others: read `errors`, then `items[]`
+- Batch size: **5 to 15 MB**, to be measured
 
 ---
 
-# Le mapping dynamique
+# Dynamic mapping
 
-Sans mapping, OpenSearch **devine** le type au premier document :
+Without a mapping, OpenSearch **guesses** the type from the first document:
 
 ```json
 PUT /guess/_doc/1
@@ -129,27 +129,27 @@ PUT /guess/_doc/1
 GET /guess/_mapping
 ```
 
-| Champ | Deviné | Le problème |
+| Field | Guessed | The problem |
 |---|---|---|
-| `title` | `text` + sous-champ `keyword` | Deux index pour un champ : souvent inutile |
-| `year` | `long` | 8 octets pour une année |
+| `title` | `text` + `keyword` sub-field | Two indexes for one field: often useless |
+| `year` | `long` | 8 bytes for a year |
 | `price` | `float` | OK |
-| `published` | `date` | OK — parce que le format est ISO |
-| `zip` | `text` + `keyword` | Un code postal ne se cherche pas en plein texte |
+| `published` | `date` | OK — because the format is ISO |
+| `zip` | `text` + `keyword` | A zip code is never searched as full text |
 
-> En production : un **mapping explicite**, et `"dynamic": "strict"` pour refuser l'inconnu.
+> In production: an **explicit mapping**, and `"dynamic": "strict"` to reject unknown fields.
 
 ---
 
-# `text` ou `keyword` ?
+# `text` or `keyword`?
 
 | | `text` | `keyword` |
 |---|---|---|
-| Indexé | **Analysé** : découpé en termes, minuscules… | **Tel quel**, une seule valeur exacte |
-| Pour | Recherche **plein texte** : `match` | **Filtre** exact, **tri**, **agrégation** : `term` |
-| Exemple | Description, titre, message de log | Statut, ville, tag, e-mail, ID |
+| Indexed | **Analyzed**: split into terms, lowercased… | **As is**, a single exact value |
+| For | **Full-text** search: `match` | Exact **filter**, **sort**, **aggregation**: `term` |
+| Example | Description, title, log message | Status, city, tag, email, ID |
 
-Les deux à la fois, avec un **multi-field** :
+Both at once, with a **multi-field**:
 
 ```json
 "name": {
@@ -158,29 +158,29 @@ Les deux à la fois, avec un **multi-field** :
 }
 ```
 
-→ `match` sur `name`, tri et agrégation sur `name.keyword`.
+→ `match` on `name`, sort and aggregate on `name.keyword`.
 
 ---
 
-# Les types de données
+# Data types
 
-| Famille | Types |
+| Family | Types |
 |---|---|
-| Texte | `text`, `keyword`, `match_only_text`, `wildcard` |
-| Nombres | `integer`, `long`, `float`, `double`, `scaled_float`, `unsigned_long` |
-| Dates | `date` (avec `format`), `date_nanos` |
-| Autres | `boolean`, `ip`, `binary`, `range` |
-| Objets | `object` (par défaut), `nested`, `flat_object` |
-| Géo | `geo_point`, `geo_shape` |
-| Spécialisés | `completion`, `percolator`, `knn_vector`, `join` |
+| Text | `text`, `keyword`, `match_only_text`, `wildcard` |
+| Numbers | `integer`, `long`, `float`, `double`, `scaled_float`, `unsigned_long` |
+| Dates | `date` (with `format`), `date_nanos` |
+| Others | `boolean`, `ip`, `binary`, `range` |
+| Objects | `object` (default), `nested`, `flat_object` |
+| Geo | `geo_point`, `geo_shape` |
+| Specialized | `completion`, `percolator`, `knn_vector`, `join` |
 
 <br />
 
-> Un **tableau** n'est pas un type : tout champ accepte une ou plusieurs valeurs.
+> An **array** is not a type: every field accepts one or more values.
 
 ---
 
-# Un mapping explicite
+# An explicit mapping
 
 ```json
 PUT /products
@@ -200,12 +200,12 @@ PUT /products
 }
 ```
 
-- On peut **ajouter** un champ à chaud (`PUT /products/_mapping`)
-- On ne peut **pas changer** le type d'un champ existant : nouvel index + **`_reindex`**
+- You can **add** a field on the fly (`PUT /products/_mapping`)
+- You **cannot change** the type of an existing field: new index + **`_reindex`**
 
 ---
 
-# Changer un mapping : `_reindex` et alias
+# Changing a mapping: `_reindex` and aliases
 
 ```json
 PUT /products_v2
@@ -222,14 +222,14 @@ POST /_aliases
 }
 ```
 
-- Les applications lisent et écrivent sur l'**alias**, jamais sur l'index
-- La bascule `remove` + `add`, dans **un seul** appel `_aliases`, est **atomique**
+- Applications read and write through the **alias**, never the index
+- Switching with `remove` + `add`, in **a single** `_aliases` call, is **atomic**
 
 ---
 
 # Index templates
 
-Le mapping et les settings **appliqués automatiquement** aux nouveaux index d'un motif :
+Mapping and settings **applied automatically** to the new indices matching a pattern:
 
 ```json
 PUT /_index_template/logs
@@ -248,7 +248,7 @@ PUT /_index_template/logs
 }
 
 PUT /logs-2026.10.27/_doc/1
-{ "@timestamp": "2026-10-27T10:00:00Z", "level": "INFO", "message": "démarrage" }
+{ "@timestamp": "2026-10-27T10:00:00Z", "level": "INFO", "message": "starting" }
 
 GET /logs-2026.10.27/_mapping
 ```
@@ -257,7 +257,7 @@ GET /logs-2026.10.27/_mapping
 
 # Quiz
 
-**On veut trier des restaurants par ville. Quel type pour `city` ?**
+**We want to sort restaurants by city. Which type for `city`?**
 
 <v-clicks>
 
@@ -266,12 +266,12 @@ GET /logs-2026.10.27/_mapping
 - C) `object`
 - D) `geo_point`
 
-**Réponse : B** — on trie et on agrège sur une valeur **exacte**, non analysée.
+**Answer: B** — you sort and aggregate on an **exact**, non-analyzed value.
 
 </v-clicks>
 
 ---
 
-# En pratique
+# Hands-on
 
-## TP 2 - Indexation et mapping
+## Workshop 2 - Indexing and mapping

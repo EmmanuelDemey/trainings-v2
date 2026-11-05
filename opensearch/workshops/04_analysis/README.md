@@ -1,125 +1,129 @@
-# TP 4 — Analyse de texte
+# Workshop 4 — Text analysis
 
-> Voir ce que deviennent les mots à l'indexation, puis construire un analyseur qui ignore le HTML, les accents et les élisions, et connaît les synonymes de la carte.
+> See what the words become at index time, then build an analyzer that ignores HTML, accents and possessives, and knows the synonyms of the menu.
 
-**Durée** : 25 min · **Chapitre** : 6 — Analyse de texte
+**Duration**: 25 min · **Chapter**: 6 — Text analysis
 
-## Contexte
+## Context
 
-La carte d'un restaurant arrive en HTML. Les clients tapent « burger » quand la carte dit « hamburger », « creme brulee » sans accents. Avec l'analyseur `standard`, rien de tout ça ne se trouve. Vous écrivez l'analyseur qui fait se rencontrer les deux.
+A restaurant's menu arrives as HTML. The customers type "burger" when the menu says "hamburger", "creme brulee" without accents. With the `standard` analyzer, none of this is found. You write the analyzer that makes both meet.
 
-## Mise en place
+## Setup
 
-Ce TP est autonome. Supprimez l'index qu'une tentative précédente a pu laisser :
+This workshop is self-contained. Delete the index a previous attempt may have left:
 
 ```json
 DELETE /dishes
 ```
 
-Les trois plats du TP, tels que la carte les envoie :
+The three dishes of the workshop, as the menu sends them:
 
 ```text
-1  <p>L'Hamburger végétarien et ses frites</p>
-2  <p>Crème brûlée à la vanille</p>
-3  <p>Burger de bœuf, pommes frites</p>
+1  <p>The chef's vegetarian Hamburger and its fries</p>
+2  <p>Crème brûlée with vanilla</p>
+3  <p>Beef burger, French fries</p>
 ```
 
-Référence : [Text analysis](https://docs.opensearch.org/latest/analyzers/).
+Reference: [Text analysis](https://docs.opensearch.org/latest/analyzers/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : L'analyseur `standard`
+### Step 1: The `standard` analyzer
 
-Analysez « L'Hamburger végétarien et ses frites maison » avec l'analyseur `standard`.
+Analyze "The chef's vegetarian Hamburger and its homemade fries" with the `standard` analyzer.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`POST /_analyze`, avec `analyzer` et `text`.
+`POST /_analyze`, with `analyzer` and `text`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
   "tokens": [
-    { "token": "l'hamburger" }, { "token": "végétarien" }, { "token": "et" },
-    { "token": "ses" }, { "token": "frites" }, { "token": "maison" }
+    { "token": "the" }, { "token": "chef's" }, { "token": "vegetarian" }, { "token": "hamburger" },
+    { "token": "and" }, { "token": "its" }, { "token": "homemade" }, { "token": "fries" }
   ]
 }
 ```
 
-**Question** : un client qui cherche « hamburger » trouvera-t-il ce plat ?
+**Question**: will a customer searching for "chef" find this dish?
 
-### Étape 2 : L'analyseur `french`
+### Step 2: The `english` analyzer
 
-Analysez le même texte avec l'analyseur `french`.
+Analyze the same text with the `english` analyzer.
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
-  "tokens": [ { "token": "hamburg" }, { "token": "vegetarien" }, { "token": "frit" }, { "token": "maison" } ]
+  "tokens": [
+    { "token": "chef" }, { "token": "vegetarian" }, { "token": "hamburg" },
+    { "token": "it" }, { "token": "homemad" }, { "token": "fri" }
+  ]
 }
 ```
 
-**Question** : qu'est-ce qui a disparu, et qu'est-ce qui a changé ? « burger » trouvera-t-il ce plat ?
+**Question**: what disappeared, and what changed? Will "burger" find this dish?
 
-### Étape 3 : Composer à la volée
+### Step 3: Compose on the fly
 
-Sans créer d'index, testez la chaîne : char filter `html_strip`, tokenizer `standard`, filtres `lowercase` et `asciifolding`, sur le texte `<p>Crème brûlée</p>`.
+Without creating an index, test the chain: `html_strip` char filter, `standard` tokenizer, `lowercase` and `asciifolding` filters, on the text `<p>Crème brûlée</p>`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`_analyze` accepte `char_filter`, `tokenizer` et `filter` au lieu d'`analyzer`.
+`_analyze` accepts `char_filter`, `tokenizer` and `filter` instead of `analyzer`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "tokens": [ { "token": "creme" }, { "token": "brulee" } ] }
 ```
 
-### Étape 4 : L'analyseur personnalisé
+### Step 4: The custom analyzer
 
-Créez l'index `dishes` (1 shard, 0 réplica) avec un analyseur `dish_fr` qui :
+Create the `dishes` index (1 shard, 0 replicas) with a `dish_en` analyzer that:
 
-- retire le HTML ;
-- découpe avec le tokenizer `standard` ;
-- retire les élisions (`l'`, `d'`, `c'`, `j'`, `qu'`, `s'`), même en majuscules ;
-- met en minuscules ;
-- retire les mots vides français ;
-- connaît les synonymes `burger, hamburger` et `frites, pommes frites` ;
-- retire les accents.
+- removes the HTML;
+- splits with the `standard` tokenizer;
+- lowercases;
+- removes the possessives (`chef's` → `chef`);
+- removes the English stop words;
+- knows the synonyms `burger, hamburger` and `fries, french fries`;
+- removes the accents.
 
-Le champ `dish` de l'index utilise cet analyseur. Vérifiez-le avec `_analyze` sur `<b>L'Hamburger</b> végétarien et ses frites`.
+The `dish` field of the index uses this analyzer. Check it with `_analyze` on `<b>The Chef's</b> vegetarian Hamburger and its fries`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`settings.analysis` : des `filter` (`elision` avec `articles_case`, `stop` avec `_french_`, `synonym`), puis un `analyzer` de type `custom`. L'ordre des filtres compte : `lowercase` avant `stop` et `synonym`.
+`settings.analysis`: some `filter` (`stemmer` with `possessive_english`, `stop` with `_english_`, `synonym`), then an `analyzer` of type `custom`. The order of the filters matters: `lowercase` before `stop` and `synonym`.
 
 </details>
 
-**Résultat attendu** (l'analyse) :
+**Expected result** (the analysis):
 
 ```json
 {
   "tokens": [
+    { "token": "chef" }, { "token": "vegetarian" },
     { "token": "hamburger" }, { "token": "burger", "type": "SYNONYM" },
-    { "token": "vegetarien" }, { "token": "frites" }, { "token": "pommes", "type": "SYNONYM" }
+    { "token": "fries" }, { "token": "french", "type": "SYNONYM" }
   ]
 }
 ```
 
-### Étape 5 : Le vérifier par la recherche
+### Step 5: Check it with a search
 
-Indexez les trois plats (`_id` `1`, `2`, `3`) en une requête, cherchables tout de suite. Cherchez ensuite « burger », puis « creme brulee ».
+Index the three dishes (`_id` `1`, `2`, `3`) in one request, searchable right away. Then search "burger", then "creme brulee".
 
-**Résultat attendu** (« burger ») :
+**Expected result** ("burger"):
 
 ```json
 {
@@ -130,30 +134,30 @@ Indexez les trois plats (`_id` `1`, `2`, `3`) en une requête, cherchables tout 
 }
 ```
 
-**Résultat attendu** (« creme brulee ») :
+**Expected result** ("creme brulee"):
 
 ```json
 { "hits": { "total": { "value": 1 }, "hits": [ { "_id": "2" } ] } }
 ```
 
-**Question** : `asciifolding` est placé **après** `synonym`. Que se passerait-il avec un synonyme accentué (`crème, flan`) ?
+**Question**: `asciifolding` is placed **after** `synonym`. What would happen with an accented synonym (`crème, custard`)?
 
-## Critères de réussite
+## Success criteria
 
-- Vous savez lire la sortie de `_analyze`, et prévoir ce qu'une recherche trouvera
-- Un analyseur `custom` enchaîne char filter, tokenizer et filtres
-- La recherche bénéficie de la même analyse que l'indexation
+- You can read the output of `_analyze`, and predict what a search will find
+- A `custom` analyzer chains char filter, tokenizer and filters
+- The search benefits from the same analysis as the indexing
 
-## Pour aller plus loin
+## Going further
 
-- Ajoutez un filtre `stemmer` (`"language": "light_french"`) : « frite » trouve-t-il maintenant « frites » ?
-- Créez un analyseur `autocomplete` (`edge_ngram` 2 → 10) et branchez-le sur un sous-champ `dish.prefix`, avec `"search_analyzer": "standard"`. Cherchez « hamb ».
-- Ajoutez un `normalizer` (`lowercase`, `asciifolding`) sur un champ `keyword` : un `term` sur « CREME » le trouve-t-il ?
+- Add a `stemmer` filter (`"language": "light_english"`): does "fry" now find "fries"?
+- Create an `autocomplete` analyzer (`edge_ngram` 2 → 10) and plug it into a `dish.prefix` sub-field, with `"search_analyzer": "standard"`. Search "hamb".
+- Add a `normalizer` (`lowercase`, `asciifolding`) to a `keyword` field: does a `term` on "CREME" find it?
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : `failed to build synonyms`
-→ Un synonyme contient un mot retiré par un filtre placé avant (mot vide). Vérifiez l'ordre des filtres.
+**Problem**: `failed to build synonyms`
+→ A synonym holds a word removed by a filter placed before it (a stop word). Check the order of the filters.
 
-**Problème** : l'analyseur ne s'applique pas à la recherche
-→ Vous interrogez un autre champ, ou l'index a été créé sans le mapping : `GET /dishes/_mapping`.
+**Problem**: the analyzer does not apply to the search
+→ You query another field, or the index was created without the mapping: `GET /dishes/_mapping`.

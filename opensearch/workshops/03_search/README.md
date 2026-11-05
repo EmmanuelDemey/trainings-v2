@@ -1,16 +1,16 @@
-# TP 3 — Recherche et pertinence
+# Workshop 3 — Search and relevance
 
-> Chercher en plein texte et sur des valeurs exactes, combiner les critères d'une recherche à facettes, puis faire remonter les meilleurs restaurants.
+> Search full text and exact values, combine the criteria of a faceted search, then bring the best restaurants to the top.
 
-**Durée** : 30 min · **Chapitre** : 5 — Recherche et pertinence
+**Duration**: 30 min · **Chapter**: 5 — Search and relevance
 
-## Contexte
+## Context
 
-Un guide de restaurants en ligne. L'utilisateur tape des mots (« poisson frais »), coche des filtres (ville, budget), et s'attend à voir les **bons** restaurants en premier. Vous écrivez les requêtes derrière chaque interaction.
+An online restaurant guide. The user types words ("fish"), ticks filters (city, budget), and expects to see the **right** restaurants first. You write the queries behind each interaction.
 
-## Mise en place
+## Setup
 
-Ce TP est autonome. Créez l'index `restaurants` et ses douze documents :
+This workshop is self-contained. Create the `restaurants` index and its twelve documents:
 
 <!-- include: ../../data/restaurants.md -->
 ```json
@@ -22,7 +22,7 @@ PUT /restaurants
   "mappings": {
     "properties": {
       "name": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
-      "description": { "type": "text", "analyzer": "french" },
+      "description": { "type": "text", "analyzer": "english" },
       "cuisine": { "type": "keyword" },
       "city": { "type": "keyword" },
       "location": { "type": "geo_point" },
@@ -35,48 +35,48 @@ PUT /restaurants
 
 POST /restaurants/_bulk?refresh=true
 { "index": { "_id": "1" } }
-{ "name": "Le Bouchon Lyonnais", "description": "Cuisine lyonnaise traditionnelle : quenelles, saucisson brioché et tarte aux pralines.", "cuisine": "française", "city": "Lyon", "location": { "lat": 45.7640, "lon": 4.8357 }, "rating": 4.5, "price": 35, "opened": "2012-03-15" }
+{ "name": "Le Bouchon Lyonnais", "description": "Traditional Lyon cuisine: quenelles, sausage in brioche and praline tart.", "cuisine": "french", "city": "Lyon", "location": { "lat": 45.7640, "lon": 4.8357 }, "rating": 4.5, "price": 35, "opened": "2012-03-15" }
 { "index": { "_id": "2" } }
-{ "name": "Pizzeria Napoli", "description": "Pizzas cuites au feu de bois et pâtes fraîches maison.", "cuisine": "italienne", "city": "Paris", "location": { "lat": 48.8566, "lon": 2.3522 }, "rating": 4.2, "price": 18, "opened": "2018-06-01" }
+{ "name": "Pizzeria Napoli", "description": "Wood-fired pizzas and homemade fresh pasta.", "cuisine": "italian", "city": "Paris", "location": { "lat": 48.8566, "lon": 2.3522 }, "rating": 4.2, "price": 18, "opened": "2018-06-01" }
 { "index": { "_id": "3" } }
-{ "name": "Sushi Zen", "description": "Sushis et sashimis préparés devant vous, poisson frais du jour.", "cuisine": "japonaise", "city": "Paris", "location": { "lat": 48.8606, "lon": 2.3376 }, "rating": 4.7, "price": 40, "opened": "2020-09-10" }
+{ "name": "Sushi Zen", "description": "Sushi and sashimi prepared in front of you, fresh fish of the day.", "cuisine": "japanese", "city": "Paris", "location": { "lat": 48.8606, "lon": 2.3376 }, "rating": 4.7, "price": 40, "opened": "2020-09-10" }
 { "index": { "_id": "4" } }
-{ "name": "La Trattoria", "description": "Pâtes fraîches, risotto aux champignons et tiramisu.", "cuisine": "italienne", "city": "Lyon", "location": { "lat": 45.7578, "lon": 4.8320 }, "rating": 3.9, "price": 22, "opened": "2016-11-20" }
+{ "name": "La Trattoria", "description": "Fresh pasta, mushroom risotto and tiramisu.", "cuisine": "italian", "city": "Lyon", "location": { "lat": 45.7578, "lon": 4.8320 }, "rating": 3.9, "price": 22, "opened": "2016-11-20" }
 { "index": { "_id": "5" } }
-{ "name": "Le Vieux Port", "description": "Bouillabaisse, poissons grillés et plateau de fruits de mer face au port.", "cuisine": "fruits de mer", "city": "Marseille", "location": { "lat": 43.2951, "lon": 5.3740 }, "rating": 4.4, "price": 50, "opened": "2010-05-05" }
+{ "name": "Le Vieux Port", "description": "Bouillabaisse, grilled fishes and seafood platter facing the harbour.", "cuisine": "seafood", "city": "Marseille", "location": { "lat": 43.2951, "lon": 5.3740 }, "rating": 4.4, "price": 50, "opened": "2010-05-05" }
 { "index": { "_id": "6" } }
-{ "name": "Burger Factory", "description": "Burgers gourmands, frites maison et milkshakes.", "cuisine": "américaine", "city": "Paris", "location": { "lat": 48.8530, "lon": 2.3499 }, "rating": 3.6, "price": 15, "opened": "2021-02-14" }
+{ "name": "Burger Factory", "description": "Gourmet burgers, homemade fries and milkshakes.", "cuisine": "american", "city": "Paris", "location": { "lat": 48.8530, "lon": 2.3499 }, "rating": 3.6, "price": 15, "opened": "2021-02-14" }
 { "index": { "_id": "7" } }
-{ "name": "Chez Mamie", "description": "Cuisine familiale : blanquette de veau, bœuf bourguignon et tarte tatin.", "cuisine": "française", "city": "Paris", "location": { "lat": 48.8867, "lon": 2.3431 }, "rating": 4.6, "price": 28, "opened": "2014-01-08" }
+{ "name": "Chez Mamie", "description": "Home-style cuisine: veal blanquette, bœuf bourguignon and tarte tatin.", "cuisine": "french", "city": "Paris", "location": { "lat": 48.8867, "lon": 2.3431 }, "rating": 4.6, "price": 28, "opened": "2014-01-08" }
 { "index": { "_id": "8" } }
-{ "name": "Ramen Ya", "description": "Ramen au bouillon tonkotsu et gyozas grillés.", "cuisine": "japonaise", "city": "Lyon", "location": { "lat": 45.7676, "lon": 4.8344 }, "rating": 4.1, "price": 16, "opened": "2022-04-22" }
+{ "name": "Ramen Ya", "description": "Tonkotsu broth ramen and grilled gyoza.", "cuisine": "japanese", "city": "Lyon", "location": { "lat": 45.7676, "lon": 4.8344 }, "rating": 4.1, "price": 16, "opened": "2022-04-22" }
 { "index": { "_id": "9" } }
-{ "name": "La Cantine Provençale", "description": "Spécialités provençales : ratatouille, tapenade et aïoli.", "cuisine": "française", "city": "Marseille", "location": { "lat": 43.2965, "lon": 5.3698 }, "rating": 4.0, "price": 25, "opened": "2019-07-01" }
+{ "name": "La Cantine Provençale", "description": "Provençal specialities: ratatouille, tapenade and aioli.", "cuisine": "french", "city": "Marseille", "location": { "lat": 43.2965, "lon": 5.3698 }, "rating": 4.0, "price": 25, "opened": "2019-07-01" }
 { "index": { "_id": "10" } }
-{ "name": "Taj Mahal", "description": "Curry, poulet tandoori et naans au fromage.", "cuisine": "indienne", "city": "Marseille", "location": { "lat": 43.2990, "lon": 5.3810 }, "rating": 3.8, "price": 20, "opened": "2017-10-12" }
+{ "name": "Taj Mahal", "description": "Curry, tandoori chicken and cheese naans.", "cuisine": "indian", "city": "Marseille", "location": { "lat": 43.2990, "lon": 5.3810 }, "rating": 3.8, "price": 20, "opened": "2017-10-12" }
 { "index": { "_id": "11" } }
-{ "name": "Green Bowl", "description": "Bowls végétariens, salades de saison et jus pressés.", "cuisine": "végétarienne", "city": "Lyon", "location": { "lat": 45.7600, "lon": 4.8400 }, "rating": 4.3, "price": 14, "opened": "2023-03-30" }
+{ "name": "Green Bowl", "description": "Vegetarian bowls, seasonal salads and pressed juices.", "cuisine": "vegetarian", "city": "Lyon", "location": { "lat": 45.7600, "lon": 4.8400 }, "rating": 4.3, "price": 14, "opened": "2023-03-30" }
 { "index": { "_id": "12" } }
-{ "name": "L'Étoile du Nord", "description": "Menu dégustation, cuisine gastronomique de saison.", "cuisine": "gastronomique", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
+{ "name": "L'Étoile du Nord", "description": "Tasting menu, seasonal fine-dining cuisine.", "cuisine": "fine dining", "city": "Paris", "location": { "lat": 48.8800, "lon": 2.3550 }, "rating": 4.9, "price": 125, "opened": "2011-09-01" }
 ```
 <!-- /include -->
 
-Référence : [Query DSL](https://docs.opensearch.org/latest/query-dsl/).
+Reference: [Query DSL](https://docs.opensearch.org/latest/query-dsl/).
 
-## Exercices
+## Exercises
 
-### Étape 1 : Plein texte
+### Step 1: Full text
 
-Trouvez les restaurants dont la **description** parle de « poisson frais ». N'affichez pas le `_source`.
+Find the restaurants whose **description** mentions "fish". Don't return the `_source`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Une requête `match`. `"_source": false` allège la réponse.
+A `match` query. `"_source": false` keeps the response short.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -87,20 +87,20 @@ Une requête `match`. `"_source": false` allège la réponse.
 }
 ```
 
-**Question** : le restaurant 5 parle de « poisson**s** grillés ». Pourquoi est-il trouvé ? (Relisez le mapping de `description`.)
+**Question**: restaurant 5 mentions "grilled fish**es**". Why is it found? (Read the mapping of `description` again.)
 
-### Étape 2 : Une expression exacte
+### Step 2: An exact phrase
 
-Trouvez les restaurants qui proposent des « pâtes fraîches » — les deux mots, **côte à côte et dans cet ordre**.
+Find the restaurants that serve "fresh pasta" — both words, **side by side and in this order**.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
 `match_phrase`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -111,18 +111,18 @@ Trouvez les restaurants qui proposent des « pâtes fraîches » — les deux mo
 }
 ```
 
-### Étape 3 : Le piège du `term`
+### Step 3: The `term` trap
 
-Cherchez le restaurant nommé exactement « Sushi Zen » avec une requête `term` sur le champ `name`. Puis corrigez la requête pour qu'elle le trouve.
+Look for the restaurant named exactly "Sushi Zen" with a `term` query on the `name` field. Then fix the query so that it finds it.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`name` est un `text` : il est indexé en minuscules, mot à mot. Son sous-champ, lui, garde la valeur telle quelle.
+`name` is a `text`: it is indexed lowercased, word by word. Its sub-field keeps the value as is.
 
 </details>
 
-**Résultat attendu** (la requête corrigée) :
+**Expected result** (the fixed query):
 
 ```json
 {
@@ -133,18 +133,18 @@ Cherchez le restaurant nommé exactement « Sushi Zen » avec une requête `term
 }
 ```
 
-### Étape 4 : Une recherche à facettes
+### Step 4: A faceted search
 
-L'utilisateur tape « cuisine », coche les villes **Paris** et **Lyon**, et un budget de **40 € maximum**. Écrivez la requête : seul le texte tapé doit compter dans le score. N'affichez que le nom.
+The user types "cuisine", ticks the cities **Paris** and **Lyon**, and a budget of **€40 at most**. Write the query: only the typed text may count in the score. Return the name only.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-Une `bool` : le texte dans `must`, les cases cochées dans `filter` (`terms`, `range`).
+A `bool`: the text in `must`, the ticked boxes in `filter` (`terms`, `range`).
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -158,37 +158,37 @@ Une `bool` : le texte dans `must`, les cases cochées dans `filter` (`terms`, `r
 }
 ```
 
-**Question** : les deux ont le même score. Pourquoi ?
+**Question**: the filters don't change the scores. How can you tell?
 
-### Étape 5 : Le nom compte plus
+### Step 5: The name matters more
 
-Cherchez « tarte » à la fois dans le nom et la description, un mot trouvé dans le **nom** valant **trois fois** plus.
+Search "tart" in both the name and the description, a word found in the **name** being worth **three times** more.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`multi_match`, et la notation `champ^3`.
+`multi_match`, and the `field^3` notation.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 { "hits": { "total": { "value": 2 } } }
 ```
 
-### Étape 6 : Les mieux notés d'abord
+### Step 6: Best rated first
 
-Cherchez « cuisine » dans la description, en **multipliant** le score par la note (`rating`) du restaurant.
+Search "cuisine" in the description, **multiplying** the score by the restaurant's `rating`.
 
 <details>
-<summary>Indice</summary>
+<summary>Hint</summary>
 
-`function_score` avec `field_value_factor` et `"boost_mode": "multiply"`.
+`function_score` with `field_value_factor` and `"boost_mode": "multiply"`.
 
 </details>
 
-**Résultat attendu** :
+**Expected result**:
 
 ```json
 {
@@ -201,24 +201,24 @@ Cherchez « cuisine » dans la description, en **multipliant** le score par la n
 }
 ```
 
-**Question** : sans `function_score`, lequel arrive en tête ? Comparez avec `_explain`.
+**Question**: without `function_score`, which one comes first? Compare with `_explain`.
 
-## Critères de réussite
+## Success criteria
 
-- `match` pour le texte tapé, `term` / `range` pour les valeurs exactes
-- Les critères binaires sont dans `filter`, hors du score
-- Vous savez renforcer un champ (`^3`) et injecter une valeur métier dans le score
+- `match` for the typed text, `term` / `range` for exact values
+- The yes/no criteria are in `filter`, out of the score
+- You know how to boost a field (`^3`) and inject a business value into the score
 
-## Pour aller plus loin
+## Going further
 
-- Cherchez « sushy » avec `"fuzziness": "AUTO"`.
-- Remplacez `field_value_factor` par une décroissance `gauss` sur `location` : les restaurants proches de la tour Eiffel (48.8584, 2.2945) remontent.
-- Ajoutez `"explain": true` à une recherche et repérez `idf`, `tf` et la longueur du champ.
+- Search "sushy" with `"fuzziness": "AUTO"`.
+- Replace `field_value_factor` with a `gauss` decay on `location`: the restaurants close to the Eiffel Tower (48.8584, 2.2945) come up.
+- Add `"explain": true` to a search and spot `idf`, `tf` and the field length.
 
-## Dépannage
+## Troubleshooting
 
-**Problème** : `term` ne trouve rien
-→ Un `term` sur un champ `text` compare à des termes analysés (en minuscules, découpés). Utilisez le sous-champ `.keyword`, ou `match`.
+**Problem**: `term` finds nothing
+→ A `term` on a `text` field compares to analyzed terms (lowercased, split). Use the `.keyword` sub-field, or `match`.
 
-**Problème** : `failed to create query` sur un `range`
-→ Vérifiez le champ : `price` est un `integer`, `rating` un `float`, `opened` une `date`.
+**Problem**: `failed to create query` on a `range`
+→ Check the field: `price` is an `integer`, `rating` a `float`, `opened` a `date`.
