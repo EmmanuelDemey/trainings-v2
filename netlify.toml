@@ -12,9 +12,9 @@
   publish = "build"
   # A change that only touches the trainings deployed elsewhere — any folder
   # with a training.config.mjs, found at build time so a new training needs no
-  # edit here —, the folder the TanStack Query ones share, or the CI, does not
+  # edit here —, the folders the TanStack Query and Sentry ones share, or the CI, does not
   # rebuild this site.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . $(for f in */training.config.mjs; do printf \":!%s \" \"${f%%/*}\"; done) ':!tanstack-query-common' ':!.github'"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . $(for f in */training.config.mjs; do printf \":!%s \" \"${f%%/*}\"; done) ':!tanstack-query-common' ':!sentry-common' ':!.github'"
 
 [build.environment]
   NODE_VERSION = "24"
