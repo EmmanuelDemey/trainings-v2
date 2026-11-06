@@ -180,7 +180,9 @@ curl -s -X PUT 'http://localhost:9200/test' -H 'Content-Type: application/json' 
 ```
 
 ---
+layout: cover
+---
 
-# Hands-on
+# Workshop 1
 
-## Workshop 1 - Installation and first steps
+## Installation and first steps

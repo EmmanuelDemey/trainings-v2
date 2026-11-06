@@ -144,7 +144,9 @@ A **vertical bar** chart “requests per day, per HTTP status”:
 - **Saved objects** → **Export**: an `.ndjson` file, to import into another cluster
 
 ---
+layout: cover
+---
 
-# In practice
+# Workshop 8
 
-## Workshop 8 - OpenSearch Dashboards
+## OpenSearch Dashboards

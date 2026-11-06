@@ -205,7 +205,9 @@ GET /restaurants/_search
 </v-clicks>
 
 ---
+layout: cover
+---
 
-# In practice
+# Workshop 5
 
-## Workshop 5 - Aggregations
+## Aggregations

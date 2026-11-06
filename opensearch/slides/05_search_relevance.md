@@ -238,7 +238,9 @@ GET /restaurants/_search
 </v-clicks>
 
 ---
+layout: cover
+---
 
-# Hands-on
+# Workshop 3
 
-## Workshop 3 - Search and relevance
+## Search and relevance

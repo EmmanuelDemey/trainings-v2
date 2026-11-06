@@ -271,7 +271,9 @@ GET /logs-2026.10.27/_mapping
 </v-clicks>
 
 ---
+layout: cover
+---
 
-# Hands-on
+# Workshop 2
 
-## Workshop 2 - Indexing and mapping
+## Indexing and mapping

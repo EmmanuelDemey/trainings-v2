@@ -232,7 +232,9 @@ GET /alerts/_search
 </v-clicks>
 
 ---
+layout: cover
+---
 
-# In practice
+# Workshop 6
 
-## Workshop 6 - Advanced search
+## Advanced search

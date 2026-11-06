@@ -180,7 +180,9 @@ GET /prices/_doc/2
 - `index.final_pipeline`: runs **afterwards**, always — even when the request names another pipeline
 
 ---
+layout: cover
+---
 
-# In practice
+# Workshop 7
 
-## Workshop 7 - Ingest pipelines
+## Ingest pipelines

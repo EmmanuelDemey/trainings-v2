@@ -185,7 +185,9 @@ Typical case — **prefix autocompletion**:
 </v-clicks>
 
 ---
+layout: cover
+---
 
-# In practice
+# Workshop 4
 
-## Workshop 4 - Text analysis
+## Text analysis
