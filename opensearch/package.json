@@ -13,12 +13,12 @@
     "check": "training-kit check"
   },
   "devDependencies": {
-    "@astrojs/starlight": "^0.42.0",
+    "@astrojs/starlight": "^0.42.8",
     "@emmanueldemey/training-kit": "^0.1.0",
     "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",
-    "astro": "^7.2.10",
+    "astro": "^7.4.4",
     "sharp": "^0.35.3"
   },
   "engines": {
