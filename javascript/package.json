@@ -14,14 +14,14 @@
     "verify": "node scripts/verify.mjs"
   },
   "devDependencies": {
-    "@astrojs/starlight": "^0.42.0",
+    "@astrojs/starlight": "^0.42.8",
     "@emmanueldemey/training-kit": "^0.1.0",
     "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
     "@slidev/theme-seriph": "^0.25.0",
     "@stackblitz/sdk": "^1.11.1",
-    "astro": "^7.2.10",
-    "playwright-chromium": "^1.63.0",
+    "astro": "^7.4.4",
+    "playwright-chromium": "^1.64.1",
     "sharp": "^0.35.3"
   },
   "engines": {
