@@ -8,7 +8,7 @@ section de dépannage.
 ## Ce qu'il faut
 
 - **Docker** (Compose v2) et **8 Go de RAM** libres, pour la stack du lab —
-  Elasticsearch, Kibana et un Fleet Server 9.5.5, dans le dossier `lab/` de
+  Elasticsearch, Kibana et un Fleet Server 9.5.6, dans le dossier `lab/` de
   chaque TP (`docker compose up -d --wait`) ; ou un essai **Elastic Cloud** ;
 - un navigateur récent (Chrome ou Firefox), **sans bloqueur de publicité** ;
 - **Kibana Dev Tools** (Console) : les blocs `GET /…`, `POST /…`, `PUT /…` des
@@ -20,7 +20,7 @@ intrusion : brute force SSH, phishing, beacon C2, reconnaissance, mouvement
 latéral, dump d'identifiants et exfiltration. Ses dates sont recalculées au
 chargement : réglez Kibana sur **Last 4 hours**.
 
-Toutes les requêtes Dev Tools sont rejouées par la CI sur Elasticsearch 9.5.5 :
+Toutes les requêtes Dev Tools sont rejouées par la CI sur Elasticsearch 9.5.6 :
 elles passent, et les réponses ont la forme annoncée.
 
 ## Les TP

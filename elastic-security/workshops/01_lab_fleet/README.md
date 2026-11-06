@@ -92,7 +92,7 @@ docker run -d --name lab-agent --user root \
   -e FLEET_URL=http://fleet-server:8220 \
   -e FLEET_INSECURE=1 \
   -e FLEET_ENROLLMENT_TOKEN=<votre token> \
-  docker.elastic.co/elastic-agent/elastic-agent:9.5.5
+  docker.elastic.co/elastic-agent/elastic-agent:9.5.6
 ```
 
 4. Dans **Agents**, un deuxième agent apparaît, statut **Healthy** en moins d'une minute.

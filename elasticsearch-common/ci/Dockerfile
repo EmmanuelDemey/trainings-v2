@@ -7,7 +7,7 @@
 #   docker build -t training-es elasticsearch-common/ci
 #   docker run --rm -p 9200:9200 training-es
 #   ES_PASSWORD=training node scripts/check-console.mjs elasticsearch
-FROM docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+FROM docker.elastic.co/elasticsearch/elasticsearch:9.5.6
 
 # One node, as in a learner's Docker setup; security on, as by default, but over
 # plain HTTP. The trial license unlocks what the workshops use beyond the basic one

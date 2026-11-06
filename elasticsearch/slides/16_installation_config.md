@@ -44,7 +44,7 @@ At the end of this section, you will be able to:
 A single-node cluster for development:
 
 ```shell
-docker run -p 9200:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+docker run -p 9200:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:9.5.6
 ```
 
 **Other options**: Elastic Cloud, Elastic Cloud Enterprise, Helm chart / ECK for Kubernetes, GCP / AWS / Clever Cloud marketplaces
@@ -157,7 +157,7 @@ From Kibana Dev Tools: `GET /` — or from a terminal: `curl -u elastic https://
   "name": "node-1",
   "cluster_name": "elasticsearch",
   "version": {
-    "number": "9.5.5",
+    "number": "9.5.6",
     "lucene_version": "10.5.1"
   },
   "tagline": "You Know, for Search"

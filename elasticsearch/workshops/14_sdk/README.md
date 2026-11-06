@@ -119,7 +119,7 @@ ES_PASSWORD=<your password> node main.js
 **Expected result**:
 
 ```text
-9.5.5
+9.5.6
 2
 [ 'The Matrix' ] { comedy: 1, 'sci-fi': 1 }
 ```
@@ -141,7 +141,7 @@ Reference: [Testcontainers for Node.js — Elasticsearch](https://node.testconta
 
 Create `catalog.test.js`, with Vitest. Before all the tests, it:
 
-- starts an `ElasticsearchContainer` from `docker.elastic.co/elasticsearch/elasticsearch:9.5.5` — give it up to 3 minutes;
+- starts an `ElasticsearchContainer` from `docker.elastic.co/elasticsearch/elasticsearch:9.5.6` — give it up to 3 minutes;
 - builds a `Client` for it — **not** with `connect()`: the container gives its own URL, user and password;
 - creates the index, and loads `The Matrix` (sci-fi, 1999), `The Matrix Reloaded` (sci-fi, 2003) and `Amélie` (comedy, 2001).
 
@@ -205,4 +205,4 @@ Put `keyword` back.
 → Docker is not running, or your user cannot reach its socket.
 
 **Problem**: `beforeAll` times out
-→ The first download of the image is long: run again, or `docker pull docker.elastic.co/elasticsearch/elasticsearch:9.5.5` first.
+→ The first download of the image is long: run again, or `docker pull docker.elastic.co/elasticsearch/elasticsearch:9.5.6` first.

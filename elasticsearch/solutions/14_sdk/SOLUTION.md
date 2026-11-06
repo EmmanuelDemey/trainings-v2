@@ -89,7 +89,7 @@ let container;
 let client;
 
 beforeAll(async () => {
-  container = await new ElasticsearchContainer('docker.elastic.co/elasticsearch/elasticsearch:9.5.5').start();
+  container = await new ElasticsearchContainer('docker.elastic.co/elasticsearch/elasticsearch:9.5.6').start();
   client = new Client({
     node: container.getHttpUrl(),
     auth: { username: container.getUsername(), password: container.getPassword() },

@@ -34,7 +34,7 @@ docker run -d \
   -e "discovery.type=single-node" \
   -e "path.repo=/usr/share/elasticsearch/backups" \
   -v ~/elasticsearch-backups:/usr/share/elasticsearch/backups \
-  docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+  docker.elastic.co/elasticsearch/elasticsearch:9.5.6
 ```
 
 **For a local install**:

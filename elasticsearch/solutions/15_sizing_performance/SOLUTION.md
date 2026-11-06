@@ -137,7 +137,7 @@ GET /_nodes?filter_path=nodes.*.thread_pool.search,nodes.*.thread_pool.write
 ```
 
 `write`: as many threads as cores; `search`: `cores × 3 / 2 + 1` threads. On the
-CI's Elasticsearch 9.5.5, with 16 cores: `write` has 16 threads and a queue of
+CI's Elasticsearch 9.5.6, with 16 cores: `write` has 16 threads and a queue of
 12,000, `search` 25 threads and a queue of 25,000. The queue sizes change from
 one version to the next: read them from the node, not from memory.
 

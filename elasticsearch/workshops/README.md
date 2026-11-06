@@ -21,7 +21,7 @@ Testcontainers.
 Each workshop **stands on its own**: it creates the indices and data it needs, and
 can be done without the previous ones.
 
-The CI replays every workshop on the latest Elasticsearch (9.5.5), with the
+The CI replays every workshop on the latest Elasticsearch (9.5.6), with the
 trainer's solutions: each expected result is the one a correct answer gets.
 
 ## The workshops

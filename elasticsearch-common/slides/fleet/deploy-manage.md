@@ -42,9 +42,9 @@ In Kibana → Fleet → Settings:
 3. **Deploy Fleet Server**:
 
 ```bash
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-9.5.5-linux-x86_64.tar.gz
-tar xzvf elastic-agent-9.5.5-linux-x86_64.tar.gz
-cd elastic-agent-9.5.5-linux-x86_64
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-9.5.6-linux-x86_64.tar.gz
+tar xzvf elastic-agent-9.5.6-linux-x86_64.tar.gz
+cd elastic-agent-9.5.6-linux-x86_64
 
 sudo ./elastic-agent install \
   --fleet-server-es=https://elasticsearch:9200 \
@@ -62,9 +62,9 @@ Once Fleet Server is active, install agents:
 
 ```bash
 # Command generated from Kibana Fleet UI
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-9.5.5-linux-x86_64.tar.gz
-tar xzvf elastic-agent-9.5.5-linux-x86_64.tar.gz
-cd elastic-agent-9.5.5-linux-x86_64
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-9.5.6-linux-x86_64.tar.gz
+tar xzvf elastic-agent-9.5.6-linux-x86_64.tar.gz
+cd elastic-agent-9.5.6-linux-x86_64
 
 sudo ./elastic-agent install \
   --url=https://fleet-server:8220 \

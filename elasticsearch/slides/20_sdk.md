@@ -141,7 +141,7 @@ import { Client } from '@elastic/elasticsearch';
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch';
 
 it("should create an index", async () => {
-  const container = await new ElasticsearchContainer('docker.elastic.co/elasticsearch/elasticsearch:9.5.5').start();
+  const container = await new ElasticsearchContainer('docker.elastic.co/elasticsearch/elasticsearch:9.5.6').start();
   const client = new Client({
     node: container.getHttpUrl(),
     auth: { username: container.getUsername(), password: container.getPassword() },

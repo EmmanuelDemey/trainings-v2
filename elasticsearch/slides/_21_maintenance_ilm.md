@@ -606,7 +606,7 @@ PUT /_snapshot/my_backup/pre_upgrade_snapshot
   "indices": "*",
   "include_global_state": true,
   "metadata": {
-    "taken_before": "upgrade-to-9.5.5"
+    "taken_before": "upgrade-to-9.5.6"
   }
 }
 ```
@@ -659,13 +659,13 @@ sudo systemctl stop elasticsearch
 ```bash
 # Debian/Ubuntu
 sudo apt-get update
-sudo apt-get install elasticsearch=9.5.5
+sudo apt-get install elasticsearch=9.5.6
 
 # RHEL/CentOS
-sudo yum update elasticsearch-9.5.5
+sudo yum update elasticsearch-9.5.6
 
 # Docker: change the image tag, then recreate the container
-# docker.elastic.co/elasticsearch/elasticsearch:9.5.5
+# docker.elastic.co/elasticsearch/elasticsearch:9.5.6
 ```
 
 **Step 5**: Update plugins (if installed)
