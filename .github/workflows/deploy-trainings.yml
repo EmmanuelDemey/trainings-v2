@@ -9,7 +9,9 @@ name: Deploy the trainings
 #   site name  = vars.NETLIFY_SITE_PREFIX + the `slug` of training.config.mjs
 #   push main  → production deploy
 #   PR         → preview deploy at pr-<number>--<site>.netlify.app (job summary)
-#   dispatch   → production deploy of every training
+#   dispatch   → production deploy of every training, or of those changed
+#                between the `base` and `head` inputs (dependabot-auto-merge.yml,
+#                whose merges trigger no push run)
 #
 # One-time setup, in the repository settings:
 #   secret   NETLIFY_AUTH_TOKEN   a Netlify personal access token
@@ -30,9 +32,19 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      base:
+        description: Deploy only the trainings changed since this commit (empty → every training)
+        required: false
+        type: string
+      head:
+        description: Up to this commit (empty → the dispatched ref)
+        required: false
+        type: string
 
 concurrency:
-  group: deploy-trainings-${{ github.ref }}
+  # A dispatch for one merge must not cancel the deploy of another.
+  group: deploy-trainings-${{ github.ref }}${{ inputs.head && format('-{0}', inputs.head) || '' }}
   cancel-in-progress: true
 
 jobs:
@@ -52,14 +64,16 @@ jobs:
 
       - id: detect
         env:
-          # The push diff, or the PR diff. A new branch has no `before` (all
-          # zeros), and a dispatch none at all: everything is deployed.
-          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          # The push diff, the PR diff, or the range of a dispatch. A new branch
+          # has no `before` (all zeros), and a plain dispatch no range at all:
+          # everything is deployed.
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event_name == 'workflow_dispatch' && inputs.base || github.event.before }}
+          HEAD: ${{ github.event_name == 'workflow_dispatch' && inputs.head || github.sha }}
         run: |
-          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || [ -z "$BASE" ] || [ "$BASE" = 0000000000000000000000000000000000000000 ]; then
+          if [ -z "$BASE" ] || [ "$BASE" = 0000000000000000000000000000000000000000 ]; then
             trainings=$(node scripts/trainings-to-deploy.mjs)
           else
-            trainings=$(node scripts/trainings-to-deploy.mjs "$BASE" "$GITHUB_SHA")
+            trainings=$(node scripts/trainings-to-deploy.mjs "$BASE" "$HEAD")
           fi
           echo "trainings=$trainings" >> "$GITHUB_OUTPUT"
           echo "Trainings to deploy: $trainings"

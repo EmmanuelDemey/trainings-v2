@@ -1,0 +1,62 @@
+name: Dependabot auto-merge
+
+# Merges a Dependabot pull request once the CI of the training it touches is
+# green. Dependabot opens its pull requests training by training
+# (.github/dependabot.yml), and "Deploy the trainings" checks only the trainings
+# a pull request touches: its run succeeding means the workshops, the check and
+# the build of every training the pull request changed passed.
+#
+# A merge made with the GITHUB_TOKEN pushes to main without triggering any
+# workflow — GitHub's guard against loops. So the production deploy is started
+# here, by a dispatch limited to the trainings the merge changed.
+#
+# No repository setting needed: neither "Allow auto-merge" nor a required check.
+
+on:
+  workflow_run:
+    workflows: [Deploy the trainings]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  merge:
+    name: Merge
+    # A green run of a pull request whose last push is Dependabot's: a commit
+    # someone adds to its branch makes them the actor, and that pull request is
+    # merged by hand. A re-run of a flaky run keeps Dependabot as the actor.
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: dependabot-auto-merge-${{ github.event.workflow_run.head_branch }}
+    steps:
+      - name: Merge the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr=$(gh pr list --head "$BRANCH" --base main --state open --author 'app/dependabot' --json number,headRefOid \
+            --jq ".[] | select(.headRefOid == \"$HEAD_SHA\") | .number")
+          if [ -z "$pr" ]; then
+            echo "No open Dependabot pull request on $BRANCH at $HEAD_SHA: closed, or pushed again since the run."
+            exit 0
+          fi
+
+          # --match-head-commit: refused if a commit landed on the branch after
+          # the green run.
+          gh pr merge "$pr" --squash --match-head-commit "$HEAD_SHA"
+
+          merge=$(gh pr view "$pr" --json mergeCommit --jq .mergeCommit.oid)
+          base=$(gh api "repos/$GH_REPO/commits/$merge" --jq '.parents[0].sha')
+          echo "### Merged #$pr ($merge)" >> "$GITHUB_STEP_SUMMARY"
+
+          # The production deploy of the trainings the merge changed.
+          gh workflow run deploy-trainings.yml --ref main -f base="$base" -f head="$merge"

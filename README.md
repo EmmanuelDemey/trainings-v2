@@ -120,6 +120,15 @@ are global on Netlify) and, with several Netlify teams, `NETLIFY_TEAM`. These
 sites must **not** be linked to the repository in the Netlify UI, or each push
 would deploy twice.
 
+**Dependency updates.** [`dependabot.yml`](.github/dependabot.yml) gives each
+training its own npm block (its `package.json`, its workshops and solutions): a
+pull request touches a single training, so the CI above checks that training
+only. [`dependabot-auto-merge.yml`](.github/workflows/dependabot-auto-merge.yml)
+squash-merges it once that run is green, then dispatches the production deploy
+of what it changed (a merge made with the `GITHUB_TOKEN` triggers no push run).
+A pull request someone pushed to is left to be merged by hand. A new training
+needs its block: `pnpm test` fails until it has one.
+
 **The other trainings** share one Netlify site, built by Netlify itself from
 [`netlify.toml`](netlify.toml) at the repository root. It skips its deploy when a
 commit only touches the training-kit projects. The rest of this section is

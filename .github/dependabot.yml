@@ -1,5 +1,245 @@
 version: 2
 updates:
+  # The npm dependencies: one block per training (every top-level folder holding
+  # a training.config.mjs), its own package.json and those of its workshops and
+  # solutions. Each pull request therefore touches ONE training, whose CI alone
+  # decides its merge: .github/workflows/dependabot-auto-merge.yml merges it once
+  # the CI of that training is green (deploy-trainings.yml only checks the
+  # trainings a pull request touches). scripts/dependabot.test.mjs fails when a
+  # training has no block.
+  #
+  # Two groups per training: a major update that breaks a workshop must not hold
+  # back the minor and patch ones.
+  - package-ecosystem: npm
+    directories:
+      - /elasticsearch
+    schedule:
+      interval: weekly
+    groups:
+      elasticsearch:
+        update-types: [minor, patch]
+      elasticsearch-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /elastic-security
+    schedule:
+      interval: weekly
+    groups:
+      elastic-security:
+        update-types: [minor, patch]
+      elastic-security-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /javascript
+    schedule:
+      interval: weekly
+    groups:
+      javascript:
+        update-types: [minor, patch]
+      javascript-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /opensearch
+    schedule:
+      interval: weekly
+    groups:
+      opensearch:
+        update-types: [minor, patch]
+      opensearch-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /react
+      - /react/workshops/*
+      - /react/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      react:
+        update-types: [minor, patch]
+      react-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /sentry-nestjs
+      - /sentry-nestjs/workshops/*
+      - /sentry-nestjs/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      sentry-nestjs:
+        update-types: [minor, patch]
+      sentry-nestjs-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /sentry-react
+      - /sentry-react/workshops/*
+      - /sentry-react/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      sentry-react:
+        update-types: [minor, patch]
+      sentry-react-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /tanstack-query-angular
+      - /tanstack-query-angular/workshops/*
+      - /tanstack-query-angular/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      tanstack-query-angular:
+        update-types: [minor, patch]
+      tanstack-query-angular-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /tanstack-query-react
+      - /tanstack-query-react/workshops/*
+      - /tanstack-query-react/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      tanstack-query-react:
+        update-types: [minor, patch]
+      tanstack-query-react-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /tanstack-query-vue
+      - /tanstack-query-vue/workshops/*
+      - /tanstack-query-vue/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      tanstack-query-vue:
+        update-types: [minor, patch]
+      tanstack-query-vue-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /typescript
+      - /typescript/workshops/*
+      - /typescript/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      typescript:
+        update-types: [minor, patch]
+      typescript-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /vitest
+      - /vitest/workshops/*
+      - /vitest/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      vitest:
+        update-types: [minor, patch]
+      vitest-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /vuejs-advanced
+      - /vuejs-advanced/workshops/*
+      - /vuejs-advanced/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      vuejs-advanced:
+        update-types: [minor, patch]
+      vuejs-advanced-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
+      - /zod
+      - /zod/workshops/*
+      - /zod/solutions/*
+    schedule:
+      interval: weekly
+    groups:
+      zod:
+        update-types: [minor, patch]
+      zod-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
   # The Elasticsearch the workshops of the Elastic trainings (elasticsearch,
   # elastic-security) are replayed against (elasticsearch-common/ci/Dockerfile): a pull request for each new release,
   # whose CI replays every workshop on it — see scripts/check-console.mjs.
