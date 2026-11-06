@@ -12,11 +12,17 @@ switch (command) {
     todos.forEach((todo) => console.log(formatTodo(todo)));
     console.log(summary(todos));
     break;
-  case 'add':
+  case 'add': {
+    // `todos.at(-1)` is typed `Todo | undefined`: on an empty array there is no
+    // last element, and the checker does not track that we just pushed one. With
+    // `strictNullChecks`, `undefined` is not a `Todo`, so `formatTodo` refuses it.
+    // A `!` or an `as` would only silence the checker; keeping the todo we created
+    // in a variable gives it a `Todo` it can prove — no `undefined` to deal with.
     const todo = createTodo(todos.length + 1, args.join(' '));
     todos.push(todo);
     console.log(formatTodo(todo));
     break;
+  }
   default:
     console.error(`Unknown command: ${command}`);
     process.exitCode = 1;

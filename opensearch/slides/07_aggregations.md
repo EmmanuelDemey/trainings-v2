@@ -193,16 +193,16 @@ GET /restaurants/_search
 
 **Why does a `terms` aggregation on `name` (type `text`) fail?**
 
-<v-clicks>
-
 - A) `terms` only works on numbers
-- B) A `text` field has no doc values: aggregate on `name.keyword` instead ✅
+- B) A `text` field has no doc values: aggregate on `name.keyword` instead
 - C) It needs `size: 0`
 - D) It needs a `query`
 
+<v-click>
+
 **Answer: B** — we aggregate on the exact value, stored in columns (doc values).
 
-</v-clicks>
+</v-click>
 
 ---
 layout: cover

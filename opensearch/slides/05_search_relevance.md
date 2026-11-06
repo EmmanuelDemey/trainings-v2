@@ -226,16 +226,16 @@ GET /restaurants/_search
 
 **Why put the "city = Paris" criterion in `filter` rather than in `must`?**
 
-<v-clicks>
-
 - A) `must` does not work with `term`
-- B) No score computation, and the result is cached ✅
+- B) No score computation, and the result is cached
 - C) `filter` sorts the results
 - D) `must` ignores `keyword` fields
 
+<v-click>
+
 **Answer: B** — the criterion is binary: it has no reason to weigh in the score.
 
-</v-clicks>
+</v-click>
 
 ---
 layout: cover

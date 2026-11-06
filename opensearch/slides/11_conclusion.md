@@ -45,16 +45,16 @@ What the day did not cover, and the two-day program goes into:
 
 **An `email` field is used for an exact filter and for an aggregation. Which type?**
 
-<v-clicks>
-
 - A) `text`
-- B) `keyword` ✅
+- B) `keyword`
 - C) `text` with the `email` analyzer
 - D) `object`
 
+<v-click>
+
 **Answer: B** — an exact value, not analyzed, with doc values.
 
-</v-clicks>
+</v-click>
 
 ---
 
@@ -62,16 +62,16 @@ What the day did not cover, and the two-day program goes into:
 
 **The single-node cluster is `yellow`. Why?**
 
-<v-clicks>
-
 - A) A primary shard is lost
-- B) An index has replicas that cannot be allocated ✅
+- B) An index has replicas that cannot be allocated
 - C) The JVM heap is full
 - D) The security plugin is disabled
 
+<v-click>
+
 **Answer: B** — a replica is never placed on the node of its primary.
 
-</v-clicks>
+</v-click>
 
 ---
 
@@ -79,16 +79,16 @@ What the day did not cover, and the two-day program goes into:
 
 **You want to extract the IP address and the HTTP status from a raw log line before indexing it. With what?**
 
-<v-clicks>
-
 - A) A custom analyzer
-- B) An ingest pipeline with a `grok` processor ✅
+- B) An ingest pipeline with a `grok` processor
 - C) A `terms` aggregation
 - D) An index template
 
+<v-click>
+
 **Answer: B** — an analyzer splits text for search; it does not create fields.
 
-</v-clicks>
+</v-click>
 
 ---
 
@@ -96,16 +96,16 @@ What the day did not cover, and the two-day program goes into:
 
 **A visualization shows no data, although the index holds some. First thing to check?**
 
-<v-clicks>
-
 - A) The mapping
-- B) The selected time range ✅
+- B) The selected time range
 - C) The number of shards
 - D) The security plugin
 
+<v-click>
+
 **Answer: B** — the index pattern has a time field: the time range filters everything.
 
-</v-clicks>
+</v-click>
 
 ---
 src: ./shared/retro.md

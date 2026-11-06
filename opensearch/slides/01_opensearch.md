@@ -89,13 +89,13 @@ By the end of this section (**~20 min**), you will be able to:
 
 **OpenSearch is a fork of which version of Elasticsearch?**
 
-<v-clicks>
-
 - A) 6.8
-- B) 7.10 ✅
+- B) 7.10
 - C) 8.0
 - D) 8.16
 
+<v-click>
+
 **Answer: B** — 7.10.2 is the last version of Elasticsearch released under Apache 2.0.
 
-</v-clicks>
+</v-click>

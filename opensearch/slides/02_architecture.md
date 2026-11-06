@@ -152,13 +152,13 @@ restaurants  [P0] [R1]        [P1] [R2]        [P2] [R0]
 
 **An index has 3 primary shards and 1 replica. How many shards in total?**
 
-<v-clicks>
-
 - A) 3
 - B) 4
-- C) 6 ✅
+- C) 6
 - D) 9
+
+<v-click>
 
 **Answer: C** — 1 replica **per primary**: 3 primaries + 3 replicas.
 
-</v-clicks>
+</v-click>
