@@ -2,171 +2,271 @@
 layout: cover
 ---
 
-# Mapping
+# 5 - Mapping
 
 ---
 
-# Mapping
+# Learning objectives
 
-* Mapping is Elasticsearch's representation of your data.
-* When indexing the first document, Elasticsearch generates a mapping.
-* Often, this mapping is not optimal and requires optimization.
-* In this mapping, we can:
-    * Define the types of document properties.
-    * Specify if these properties should be ignored and/or indexed.
-    * If indexed, in what way should they be indexed?
+By the end of this sequence (**~45 min**), you will be able to:
+
+- **Spot** the pitfalls of dynamic mapping, and **lock** an index with `"dynamic": "strict"`
+- **Choose** the type of each field: `text` or `keyword`, numbers, dates, `geo_point`
+- **Tune** a field: `index`, `doc_values`, `ignore_above`, `enabled`, multi-fields
+- **Choose** between `object` and `nested` for an array of objects
+- **Map** the new fields by their name with dynamic templates
 
 ---
 
-# Dynamic Mapping
+# What the mapping decides
 
-Elasticsearch automatically detects field types:
+The mapping is the **schema** of an index. For each field, it says:
+
+- its **type** — and therefore which queries work on it
+- whether it is **indexed** (searchable), and **how** — the analyzer
+- whether it is kept for **sort and aggregations** — `doc_values`
+
+<br />
+
+> Most of a mapping is **fixed** once the field exists: getting it right at creation
+> saves a reindex (chapter 7).
+
+---
+
+# Dynamic mapping
+
+Without a mapping, Elasticsearch **guesses** the types from the first document:
+
 ```json
-POST /auto-index/_doc/1
-{ "name": "Test", "count": 42 }
+PUT /guess/_doc/1
+{ "title": "Germinal", "year": 1885, "price": 9.5, "published": "1885-03-01", "zip": "75001" }
+
+GET /guess/_mapping
 ```
-Result: `name` → `text+keyword`, `count` → `long`
 
-**Advantages**: Quick for prototyping
-
-**Disadvantages**: May guess type incorrectly (dates as strings, etc.)
+| Field | Guessed | The problem |
+|---|---|---|
+| `title` | `text` + `keyword` sub-field | Two indexes for one field: often useless |
+| `year` | `long` | 8 bytes for a year |
+| `price` | `float` | OK |
+| `published` | `date` | OK — because the format is ISO |
+| `zip` | `text` + `keyword` | A zip code is never searched as full text |
 
 ---
 
-# Explicit Mapping
+# The first document wins
 
-* Mapping can be defined when creating the index.
+<!-- ci: expect-error -->
+```json
+PUT /guess/_doc/2
+{ "title": "Nana", "year": "unknown" }
+```
+
+```text
+document_parsing_exception: failed to parse field [year] of type [long]
+```
+
+- The type is set by the **first** value seen; the later ones must comply
+- A date in another format (`03/01/1885`) is mapped as **text**: no range query, no histogram
+- Every new field name **adds** to the mapping: a JSON with free keys makes a **mapping explosion** (limit: `index.mapping.total_fields.limit`, 1000)
+
+---
+
+# An explicit mapping
 
 ```json
 PUT /movies
 {
   "mappings": {
+    "dynamic": "strict",
     "properties": {
-      "title":    { "type": "text" },
-      "year":  { "type": "integer"  },
-      "directors":   { "type": "text"  }
+      "title":    { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+      "genre":    { "type": "keyword" },
+      "year":     { "type": "short" },
+      "rating":   { "type": "scaled_float", "scaling_factor": 10 },
+      "released": { "type": "date", "format": "yyyy-MM-dd||epoch_millis" },
+      "location": { "type": "geo_point" }
     }
   }
 }
 ```
 
-**Best practice**: Always define mapping explicitly in production!
+> In production: an **explicit mapping**, always.
 
 ---
 
-# Mapping
+# `dynamic`: what to do with an unknown field
 
-* We can also modify a mapping.
-* Be careful, depending on the modifications made, this will require reindexing.
+<!-- ci: expect-error -->
+```json
+PUT /movies/_doc/1
+{ "title": "Titanic", "budget": 200000000 }
+```
+
+```text
+strict_dynamic_mapping_exception: mapping set to strict, dynamic introduction of [budget] within [_doc] is not allowed
+```
+
+| `dynamic` | Unknown field |
+|---|---|
+| `true` (default) | Added to the mapping |
+| `runtime` | Added as a **runtime** field: queryable, not indexed |
+| `false` | Kept in `_source`, **not** indexed |
+| `strict` | Document **rejected** |
+
+---
+
+# Adding a field
 
 ```json
 PUT /movies/_mapping
 {
   "properties": {
-    "dialogues": {
-      "type": "text"
-    }
+    "dialogues": { "type": "text" }
   }
 }
-```
 
----
-
-# Mapping
-
-* We can retrieve a mapping.
-
-```json
 GET /movies/_mapping
 ```
 
-* Its deletion will occur when deleting the index.
+- **Adding** a field: at any time, existing documents simply do not have it
+- **Changing** the type of a field: impossible — new index + `_reindex` (chapter 7)
+- The mapping is deleted with its index
+
+---
+
+# Field types
+
+| Family | Types |
+|---|---|
+| Text | `text`, `keyword`, `match_only_text`, `wildcard`, `constant_keyword` |
+| Numbers | `byte`, `short`, `integer`, `long`, `float`, `double`, `scaled_float`, `unsigned_long` |
+| Dates | `date` (with `format`), `date_nanos` |
+| Others | `boolean`, `ip`, `binary`, `*_range` |
+| Objects | `object` (default), `nested`, `flattened` |
+| Geo | `geo_point`, `geo_shape` |
+| Specialized | `completion`, `search_as_you_type`, `dense_vector`, `semantic_text`, `percolator` |
+
+<br />
+
+> No `array` type: every field accepts one value or several.
+
+---
+
+# `text` or `keyword`?
+
+| | `text` | `keyword` |
+|---|---|---|
+| Indexed | **Analyzed**: split into terms, lowercased… | **As is**, a single exact value |
+| For | **Full-text** search: `match` | Exact **filter**, **sort**, **aggregation**: `term` |
+| Example | Description, title, log message | Status, city, tag, email, ID |
+
+<br />
+
+- `"New York"` as `text` → `new`, `york`: found by `york`, **not** sortable
+- `"New York"` as `keyword` → `New York`: found by `New York` only, sortable
+
+---
+
+# Multi-fields: both at once
 
 ```json
-DELETE /movies
-```
-
----
-
-# Main Field Types
-
-| Type | Usage | Example |
-|------|-------|---------|
-| **text** | Full-text search (analyzed) | Articles, descriptions |
-| **keyword** | Exact filtering, aggregations | Statuses, tags, IDs |
-| **date** | Dates and timestamps | `"2025-11-10"`, `1699632000000` |
-| **long/integer** | Integer numbers | Ages, counters |
-| **float/double** | Decimal numbers | Prices, coordinates |
-| **boolean** | True/false | Flags, states |
-| **geo_point**, **geo_shape** | Geographic coordinates and shapes | `{"lat": 48.8566, "lon": 2.3522}` |
-| **object**, **nested** | JSON objects | Addresses, metadata |
-| **ip**, **range**, ... | | |
-
-* No `array` type: any field can hold several values.
-
-Complete documentation: [Field types](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html)
-
----
-
-# The Index Property
-
-* This property indicates whether a property should be indexed.
-* If so, we can use it in our searches.
-* Often, not all properties are useful for search.
-* So, it is recommended to optimize your mapping well.
-
----
-
-# The Index Property
-
-```json
-PUT movies
+PUT /people
 {
   "mappings": {
     "properties": {
-      "dialogues": {
+      "directors": {
         "type": "text",
-        "index": false
+        "fields": { "keyword": { "type": "keyword" } }
       }
     }
   }
 }
 ```
 
+```json
+GET /people/_search?q=directors:charlie
+GET /people/_search?q=directors.keyword:"Charlie+Chaplin"
+```
+
+- `directors`: full text — `directors.keyword`: exact, sort, aggregations
+- Also for other analyzers: `title.english`, `title.autocomplete`… (chapter 6)
+
 ---
 
-# Storing the Original Document
-
-* By default, the indexed document is retrievable via the `_source` property.
-* For performance and disk space usage reasons, you can disable this object.
+# `index` and `doc_values`
 
 ```json
-DELETE movies
-
-PUT movies
+PUT /scripts
 {
   "mappings": {
-    "_source": {
-      "enabled": false
+    "properties": {
+      "dialogues":  { "type": "text", "index": false },
+      "session_id": { "type": "keyword", "doc_values": false }
     }
   }
 }
 ```
 
-* Be careful, disabling the source makes certain operations impossible (simple get, update, update_by_query, reindex).
+| Parameter | Structure | Needed for | `false` saves |
+|---|---|---|---|
+| `index` | Inverted index | **Searching** the field | Disk, indexing time |
+| `doc_values` | Columnar storage | **Sorting**, **aggregating**, scripts | Disk |
+
+> The field stays in `_source`: shown in the results, not searchable.
+
+---
+
+# Other useful parameters
+
+```json
+PUT /events
+{
+  "mappings": {
+    "properties": {
+      "status":   { "type": "keyword", "ignore_above": 256 },
+      "metadata": { "type": "object", "enabled": false },
+      "count":    { "type": "integer", "ignore_malformed": true },
+      "first":    { "type": "text", "copy_to": "full_name" },
+      "last":     { "type": "text", "copy_to": "full_name" },
+      "full_name": { "type": "text" }
+    }
+  }
+}
+```
+
+- `ignore_above`: longer strings are **not indexed** (kept in `_source`)
+- `enabled: false`: the object is stored, **never parsed**
+- `ignore_malformed`: a bad value is skipped instead of rejecting the document
+- `copy_to`: one field to search several
+
+---
+
+# `_source`: the original document
+
+- Every document is stored **as sent**, in `_source`: returned by `GET` and `_search`
+- `_source` is needed by `_update`, `_update_by_query`, `_reindex`, highlighting
+
+```json
+PUT /no-source
+{
+  "mappings": {
+    "_source": { "enabled": false }
+  }
+}
+```
+
+> Disabling it saves disk, but the index can **never** be reindexed or updated: almost
+> never worth it.
 
 ---
 
 # Synthetic `_source`
 
-* Rather than dropping `_source`, let Elasticsearch **rebuild** it from the doc values: less disk, and get, update and reindex keep working.
-* The rebuilt document may differ: fields sorted, arrays sorted and deduplicated for some types.
-* Default of the `logsdb` index mode (`logs-*` data streams in 9.x); otherwise an Enterprise license feature.
+Rather than dropping `_source`, Elasticsearch **rebuilds** it from the doc values:
 
 ```json
-DELETE movies
-
-PUT movies
+PUT /synthetic
 {
   "settings": {
     "index.mapping.source.mode": "synthetic"
@@ -174,168 +274,72 @@ PUT movies
 }
 ```
 
----
-
-# The Fields Property
-
-* It is possible to index a property in different ways.
-    * to manage internationalization
-    * to be able to do aggregations
-    * to perform full-text queries, filters, auto-complete... on the same property
-    * ...
+- Less disk, and `GET`, `_update`, `_reindex` keep working
+- The rebuilt document may differ: keys sorted, arrays sorted and deduplicated
+- Default of the **`logsdb`** index mode (`logs-*` data streams); otherwise a paid feature
 
 ---
 
-# The Fields Property
-
-* To do this, we will define `fields` (a mapping change: the index is recreated).
+# `object`: flattened arrays
 
 ```json
-DELETE movies
-
-PUT movies
-{
-  "mappings": {
-    "properties": {
-      "directors": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type":  "keyword"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
----
-
-# The Fields Property
-
-* We can thus search on the `directors` property and `directors.keyword` property.
-
-```json
-POST movies/_search?q=directors:Charlie
-```
-
-```json
-POST movies/_search?q=directors.keyword:"Charlie Chaplin"
-```
-
----
-
-# Important Mapping Parameters
-
-```json
-{
-  "properties": {
-    "description": {
-      "type": "text",
-      "analyzer": "french",
-      "fields": { "keyword": { "type": "keyword" } }
-    },
-    "status": {
-      "type": "keyword", "ignore_above": 256
-    },
-    "metadata": {
-      "type": "object", "enabled": false
-    }
-  }
-}
-```
-
-**Key parameters**:
-- `analyzer`: Defines how text is analyzed (see the next chapter)
-- `fields`: Multi-fields (same data, multiple types)
-- `ignore_above`: Ignores strings that are too long
-- `enabled`: Enables/disables field indexing
-
----
-
-# Object versus Nested
-
-* It is possible to define properties of type `object`.
-
-```json
-DELETE movies
-
-PUT movies
+PUT /films
 {
   "mappings": {
     "properties": {
       "directors": {
         "properties": {
-            "firstName" : { "type": "keyword" },
-            "lastName" : { "type": "keyword" }
+          "firstName": { "type": "keyword" },
+          "lastName":  { "type": "keyword" }
         }
       }
     }
   }
 }
+
+PUT /films/_doc/1
+{ "directors": [ { "firstName": "Charlie", "lastName": "Chaplin" }, { "firstName": "Buster", "lastName": "Keaton" } ] }
+```
+
+Indexed as:
+
+```text
+directors.firstName: [ "Charlie", "Buster" ]
+directors.lastName:  [ "Chaplin", "Keaton" ]
 ```
 
 ---
 
-# Object versus Nested
+# `object`: the wrong match
 
-* A problem arises when we have an array of objects.
-* Let's imagine that our movie was directed by multiple directors.
+The link between `firstName` and `lastName` is **lost**:
 
 ```json
-POST /movies/_doc
-{
-    "directors": [
-        {"firstName": "Charlie", "lastName": "Chaplin"},
-        {"firstName": "Buster", "lastName": "Keaton"}
-    ]
-}
+GET /films/_search?q=directors.firstName:Charlie+AND+directors.lastName:Keaton
 ```
+
+**Expected result**:
+
+```json
+{ "hits": { "total": { "value": 1 } } }
+```
+
+→ The film matches "Charlie Keaton", who does not exist.
 
 ---
 
-# Object versus Nested
-
-* Elasticsearch translates this structure into a new representation.
+# `nested`: one hidden document per object
 
 ```json
-{
-    "directors.firstName": ["Charlie", "Buster"],
-    "directors.lastName": ["Chaplin", "Keaton"]
-}
-```
-
----
-
-# Object versus Nested
-
-* We thus lose the relationships between properties.
-* This could impact the executed searches.
-* For example, the following search would return the previous movie.
-
-```json
-POST movies/_search?q=directors.firstName:Charlie AND directors.lastName:Keaton
-```
-
----
-
-# Object versus Nested
-
-* To avoid losing these relationships, we can use the `nested` type.
-
-```json
-DELETE movies
-
-PUT movies
+PUT /films_nested
 {
   "mappings": {
     "properties": {
       "directors": {
         "type": "nested",
         "properties": {
-            "firstName" : { "type": "keyword" },
-            "lastName" : { "type": "keyword" }
+          "firstName": { "type": "keyword" },
+          "lastName":  { "type": "keyword" }
         }
       }
     }
@@ -343,115 +347,70 @@ PUT movies
 }
 ```
 
+- Each object is indexed as a **separate** hidden Lucene document: the pairs are kept
+- Queried with the **`nested`** query and aggregation
+- Cost: more documents (limit: `index.mapping.nested_objects.limit`, 10 000 per document)
+
+> Only when you query **several fields of the same object** together.
+
 ---
 
-# Dynamic Templates
+# Dynamic templates
 
-* Dynamic templates map the **new** fields by their name or detected type.
-* While useful for prototyping, it's recommended to define explicit mappings in production.
-* Only you know the exact structure and requirements of your data.
-* Use dynamic templates cautiously and validate the generated mappings.
+Map the **new** fields by their name or detected type:
 
 ```json
-DELETE movies
-
-PUT movies
+PUT /metrics
 {
   "mappings": {
     "dynamic_templates": [
-      {
-        "ids_as_keywords": {
+      { "ids_as_keywords": {
+          "match_mapping_type": "string", "match": "*_id",
+          "mapping": { "type": "keyword" } } },
+      { "counts_as_integers": {
+          "match_mapping_type": "long", "match": "nb_*",
+          "mapping": { "type": "integer" } } },
+      { "strings_as_keywords": {
           "match_mapping_type": "string",
-          "match": "*_id",
-          "mapping": { "type": "keyword" }
-        }
-      },
-      {
-        "counts_as_integers": {
-          "match_mapping_type": "long",
-          "match": "nb_*",
-          "mapping": { "type": "integer" }
-        }
-      }
+          "mapping": { "type": "keyword", "ignore_above": 256 } } }
     ]
   }
 }
 ```
 
---- 
-
-# Index and Component Templates
-
-* We can define `index` and `component` templates
-* This centralizes the configuration of an index
-* And can be reused when a new index is created
-* Using templates is a recommended practice
+- Evaluated **in order**: the first match wins
+- For semi-structured data (logs, labels) — validate the result with `GET /metrics/_mapping`
 
 ---
 
-# Index Templates
+# Quiz
 
-```json
-PUT _index_template/template_1
-{
-  "index_patterns": ["te*", "bar*"],
-  "template": {
-    "settings": {
-      "number_of_shards": 1
-    },
-    "mappings": {
-      "_source": {
-        "enabled": true
-      },
-      "properties": {
-        "host_name": {
-          "type": "keyword"
-        }
-      }
-    },
-    "aliases": {
-      "mydata": { }
-    }
-  }
-}
-```
+**We want to sort restaurants by city. Which type for `city`?**
+
+- A) `text`
+- B) `keyword`
+- C) `object`
+- D) `geo_point`
+
+<v-click>
+
+**Answer: B** — you sort and aggregate on an **exact**, non-analyzed value, stored in doc values.
+
+</v-click>
 
 ---
 
-# Component Templates
+# Quiz
 
-* Index Templates can inherit components from one or more Component Templates.
-* This allows for flexible and modular index configuration.
-* Use Component Templates for common settings, mappings, or aliases to avoid duplication.
-* Define Index Templates with specific index patterns and compose them using relevant Component Templates.
-* Utilize versioning and priority settings to manage template overrides effectively.
+**Each order holds an array of lines `{ product, quantity }`. We look for orders with 2 × "Keyboard". Which type for `lines`?**
 
----
+- A) `object`
+- B) `nested`
+- C) `flattened`
+- D) `keyword`
 
-# Component Templates
+<v-click>
 
-```json
-PUT _component_template/component_template1
-{
-  "template": {
-    "mappings": {
-      "properties": {
-        "@timestamp": {
-          "type": "date"
-        }
-      }
-    }
-  }
-}
-```
+**Answer: B** — with `object`, "Keyboard" from one line and `2` from another would match.
 
-```json
-PUT _index_template/template_1
-{
-  "index_patterns": ["te*", "bar*"],
-  "template": {
-    "settings": { "number_of_shards": 1 }
-  },
-  "composed_of": ["component_template1"]
-}
-```
+</v-click>

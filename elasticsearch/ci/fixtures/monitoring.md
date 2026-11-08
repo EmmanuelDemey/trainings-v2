@@ -1,18 +1,10 @@
-# Fixture — monitoring: the indices whose slow logs and shard allocation the examples inspect
+# Fixture — monitoring: the index whose health, unassigned replica and slow logs the examples inspect
 
-```bash
+On a one-node cluster, its replica stays unassigned: what `_cluster/allocation/explain` explains.
+
+```json
 PUT /my-index
 {
-  "settings": { "number_of_shards": 1, "number_of_replicas": 0 }
-}
-
-PUT /my-index-000001
-{
-  "settings": { "number_of_shards": 1, "number_of_replicas": 0 }
-}
-
-PUT /filebeat-7.9.3-2022.01.07-000015
-{
-  "settings": { "number_of_shards": 3, "number_of_replicas": 1 }
+  "settings": { "number_of_shards": 1, "number_of_replicas": 1 }
 }
 ```

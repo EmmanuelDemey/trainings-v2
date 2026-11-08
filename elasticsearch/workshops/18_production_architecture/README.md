@@ -2,7 +2,7 @@
 
 > Master the advanced settings: shard allocation awareness, Snapshot Lifecycle Management, Field-Level Security, and a complete production architecture.
 
-**Level**: Advanced
+**Duration**: 45 min · **Chapter**: 22 — Production architecture
 
 ## Context
 
@@ -125,7 +125,7 @@ Reference: [Create a snapshot with SLM](https://www.elastic.co/docs/deploy-manag
 
 ### Setup of this part
 
-Check that a repository exists (created in workshop 8):
+Check that a repository exists (created in workshop 14):
 
 <!-- ci: skip -->
 ```json

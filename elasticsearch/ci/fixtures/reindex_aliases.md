@@ -1,4 +1,4 @@
-# Fixture of the chapter « Reindex and Aliases »: movies_v1 behind the alias movies, to reindex, and two monthly logs indices
+# Fixture of the chapter « Reindex, aliases and templates »: movies_v1 behind the alias movies, to reindex, and two monthly logs indices
 
 ```bash
 PUT /movies_v1

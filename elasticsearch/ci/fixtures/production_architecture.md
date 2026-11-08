@@ -1,23 +1,7 @@
-# Production architecture — the indices the tuning and allocation examples act on
+# Production architecture — the indices the allocation and write examples act on
 
-```bash
+```json
 PUT /my-index
-
-PUT /old-index
-
-PUT /products
-{
-  "mappings": {
-    "properties": {
-      "category": { "type": "keyword" },
-      "price": { "type": "double" },
-      "description": { "type": "text" }
-    }
-  }
-}
-
-POST /products/_doc
-{ "category": "electronics", "price": 799, "description": "A smartphone" }
 
 PUT /app-logs-2024.01
 {
