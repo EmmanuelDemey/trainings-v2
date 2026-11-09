@@ -1,0 +1,39 @@
+name: OpenSearch latest
+
+# Every week, the workshops of the OpenSearch training are replayed against the
+# LATEST OpenSearch release, whatever opensearch/ci/Dockerfile pins: a release
+# that breaks a workshop shows up here even before the Dependabot pull request
+# that bumps the pin (.github/dependabot.yml). The twin of elasticsearch-latest.yml.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  replay:
+    name: Workshops on the latest OpenSearch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Start the latest OpenSearch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(gh release view --repo opensearch-project/OpenSearch --json tagName --jq '.tagName | ltrimstr("v")')
+          echo "### OpenSearch $version" >> "$GITHUB_STEP_SUMMARY"
+          # A copy: the pin stays where it is.
+          cp -r opensearch/ci "$RUNNER_TEMP/os"
+          sed -i -E "s#^FROM (opensearchproject/opensearch):.*#FROM \1:$version#" "$RUNNER_TEMP/os/Dockerfile"
+          docker build -t training-os "$RUNNER_TEMP/os"
+          docker run -d --name training-os -p 9200:9200 training-os
+
+      - name: Replay the workshops
+        env:
+          ES_URL: http://localhost:9200
+        run: node scripts/check-console.mjs opensearch
+
+      - name: OpenSearch logs
+        if: failure()
+        run: docker logs training-os 2>&1 | tail -200

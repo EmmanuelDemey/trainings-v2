@@ -98,5 +98,10 @@ node ../scripts/check-console.mjs .              # everything
 node ../scripts/check-console.mjs . 07_ingest    # one file
 ```
 
+Staying on the latest release: Dependabot ([`dependabot.yml`](../.github/dependabot.yml))
+opens a pull request for each new OpenSearch image, whose CI replays everything
+on it; and every Monday, [`opensearch-latest.yml`](../.github/workflows/opensearch-latest.yml)
+replays every request on the latest release, whatever the pin.
+
 Bump the version in `ci/Dockerfile` **and** in `workshops/01_installation/docker-compose.yml`
 (and the image tags in `slides/03_installation.md`).
