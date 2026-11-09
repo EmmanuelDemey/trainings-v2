@@ -1,7 +1,7 @@
 // node --test scripts/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, solutionPath, staleImages, wipe } from './check-console.mjs';
+import { clusterName, consoleSteps, fixtureOf, fixturePath, mismatches, runSteps, solutionPath, staleImages, wipe } from './check-console.mjs';
 
 const fence = (lang, body) => `\`\`\`${lang}\n${body}\n\`\`\``;
 
@@ -315,4 +315,9 @@ test('a wipe deletes the users and roles a workshop created, not the built-in on
   assert.ok(sent.includes('DELETE /_security/user/susan'), sent.join(', '));
   assert.ok(!sent.includes('DELETE /_security/role/superuser'));
   assert.ok(!sent.includes('DELETE /_security/user/elastic'));
+});
+
+test('the cluster replayed against is named after its distribution and version', () => {
+  assert.equal(clusterName({ version: { number: '9.2.0', build_flavor: 'default' } }), 'Elasticsearch 9.2.0');
+  assert.equal(clusterName({ version: { number: '3.9.0', distribution: 'opensearch' } }), 'OpenSearch 3.9.0');
 });

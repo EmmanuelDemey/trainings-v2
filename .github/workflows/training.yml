@@ -100,10 +100,10 @@ jobs:
           fi
           echo "Starters fail as expected."
 
-      # Guided workshops, run in Kibana Dev Tools: every request of their READMEs,
-      # and of the examples of the slides, is replayed against the Elasticsearch
-      # of the training's Dockerfile.
-      - name: Start Elasticsearch
+      # Guided workshops, run in Kibana or OpenSearch Dashboards Dev Tools: every
+      # request of their READMEs, and of the examples of the slides, is replayed
+      # against the Elasticsearch — or OpenSearch — of the training's Dockerfile.
+      - name: Start the cluster
         if: steps.plan.outputs.elasticsearch != ''
         env:
           CONTEXT: ${{ inputs.dir }}/${{ steps.plan.outputs.elasticsearch }}
@@ -111,7 +111,7 @@ jobs:
           docker build -t training-es "$CONTEXT"
           docker run -d --name training-es -p 9200:9200 training-es
 
-      - name: Replay the workshops against Elasticsearch
+      - name: Replay the workshops against the cluster
         if: steps.plan.outputs.elasticsearch != ''
         env:
           TRAINING: ${{ inputs.dir }}
@@ -122,7 +122,7 @@ jobs:
           ES_CI_DIR: ${{ steps.plan.outputs.elasticsearch }}
         run: node scripts/check-console.mjs "$TRAINING"
 
-      - name: Elasticsearch logs
+      - name: Cluster logs
         if: failure() && steps.plan.outputs.elasticsearch != ''
         run: docker logs training-es 2>&1 | tail -200
 

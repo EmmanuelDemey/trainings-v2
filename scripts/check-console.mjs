@@ -1,5 +1,6 @@
 // Replays the Kibana Dev Tools requests of a training's guided workshops, and of
-// the examples of its slides, against a real Elasticsearch — run by the `Workshops` job of .github/workflows/training.yml
+// the examples of its slides, against a real Elasticsearch (or OpenSearch, which
+// shares its REST API) — run by the `Workshops` job of .github/workflows/training.yml
 // for a training whose workshops.ci.mjs sets `elasticsearch`, and runnable as is:
 //
 //   ES_URL=http://localhost:9200 ES_PASSWORD=… node scripts/check-console.mjs <training dir>
@@ -374,6 +375,15 @@ export function solutionPath(dir, file) {
   return match ? join(dir, 'solutions', match[1], 'SOLUTION.md') : null;
 }
 
+/**
+ * What the replay runs against, from the answer of `GET /`: OpenSearch says so in
+ * `version.distribution`, Elasticsearch does not.
+ */
+export function clusterName(info) {
+  const name = info.version?.distribution === 'opensearch' ? 'OpenSearch' : 'Elasticsearch';
+  return `${name} ${info.version?.number}`;
+}
+
 /** Resolves once the cluster answers, for up to `seconds`: a container takes a while to start. */
 async function ready(es, seconds = 180) {
   for (let elapsed = 0; elapsed < seconds; elapsed += 3) {
@@ -385,7 +395,7 @@ async function ready(es, seconds = 180) {
     }
     await new Promise((done) => setTimeout(done, 3000));
   }
-  throw new Error(`Elasticsearch did not answer within ${seconds}s`);
+  throw new Error(`The cluster did not answer within ${seconds}s`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -393,7 +403,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const es = client(process.env.ES_URL ?? 'http://localhost:9200', process.env.ES_PASSWORD);
   await ready(es);
   const { body: info } = await es.request({ method: 'GET', path: '/' });
-  console.log(`Elasticsearch ${info.version?.number}`);
+  console.log(clusterName(info));
   // Every workshop README, then every chapter of the deck: each one on its own,
   // the cluster wiped in between. An optional filter keeps the files whose path
   // holds it: `node scripts/check-console.mjs elasticsearch 09_ilm`.
