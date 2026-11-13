@@ -2,316 +2,236 @@
 layout: cover
 ---
 
-# Focus
+# 04 - Focus and keyboard
 
 ---
 
-# Focus
+# Learning objectives
 
-* Keyboard users will use
-    * the **Tab** key to move to the next focusable element
-    * **Shift + Tab** to move to the previous element
-    * Note: in Safari / macOS, **Option + Tab** (Tab skips links by default)
-    * the **up/down arrow** keys to navigate inside a control
+At the end of this chapter, you will be able to:
 
----
-
-# Focusable elements
-
-* By default, the following HTML elements are **focusable**:
-    * buttons
-    * links
-    * form controls (`input`, `select`, `textarea`)
-    * the `summary` element
-    * editable elements (`contenteditable`)
-* These elements must receive focus in the same order as they are displayed.
+- **Navigate** a page with the keyboard only, the way your users do
+- **Tell** which elements are focusable, and keep the tab order logical
+- **Use** `tabindex` correctly: `0` and `-1`, never a positive value
+- **Add** a skip link and a visible focus indicator (WCAG 2.4.1, 2.4.7)
+- **Trap** the focus in a component that must keep it — and give it back
 
 ---
 
-# Why does focus matter?
+# The keyboard, as your users use it
 
-* **Keyboard navigation**: the only way to interact for some users
-* **Screen readers**: focus determines what is announced
-* **Motor disabilities**: unable to use a mouse
-* **Efficiency**: keyboard shortcuts for power users
-* **WCAG 2.4.7** (AA): focus must be visible
+| Keys | What it does |
+|---|---|
+| **Tab** / **Shift + Tab** | next / previous focusable element |
+| **Enter** | follow a link, press a button, submit a form |
+| **Space** | press a button, tick a checkbox, scroll the page |
+| **Arrows** | move **inside** a control: radios, select, tabs, menu |
+| **Escape** | close a dialog, a menu, a tooltip |
 
----
+<br />
 
-# Use cases
-
-* Only interactive elements should be focusable
-* Otherwise keyboard navigation becomes tedious
-* **Golden rule**: if you can click it, you must be able to reach it with the keyboard
-
----
-
-# Use cases - SPA
-
-* Possible exceptions for **SPAs** (Single Page Applications)
-    * Move focus to the title of the loaded page (navigation handling)
-    * Move focus to new content so the user is notified of it (notifications, error messages)
-    * Handle focus trapping (modals, dropdown menus)
+- Keyboard only: motor impairments, screen reader users, power users
+- **Golden rule**: if you can click it, you can reach it and use it with the
+  keyboard
+- Safari / macOS: Tab skips links by default — **Option + Tab**, or turn on
+  "Press Tab to highlight each item" in the settings
 
 ---
 
-# Tab Order
+# What is focusable — by default
 
-* The order of focusable elements must be logical and follow the visual order
-* Don't do this
+<div style="display: flex; gap: 2em;">
+<div>
+
+### Focusable, for free
+
+- `<a href>` — **with** an `href`
+- `<button>`
+- `<input>`, `<select>`, `<textarea>`
+- `<summary>` (of a `<details>`)
+- any element with `contenteditable`
+
+</div>
+<div>
+
+### Not focusable
+
+- `<div>`, `<span>`, `<p>`, `<li>`, `<img>`…
+- `<a>` **without** `href`
+- anything `disabled`, `hidden`, `display: none`,
+  `visibility: hidden` or inside an `inert` subtree
+
+</div>
+</div>
+
+<br />
+
+- **Only interactive elements** take the focus: tabbing through every paragraph
+  is not "more accessible", it is tedious
+- Exceptions in a **SPA**: move the focus to the new page's heading, to an error
+  summary, into a dialog — with `tabindex="-1"` (below)
+
+---
+
+# The tab order follows the DOM, not the screen
 
 ```html
-<section>
-  <a href="#">1</a>
-  <a href="#">2</a>
-  <a href="#">3</a>
-  <a href="#">4</a>
+<section class="toolbar">
+  <a href="#">1</a> <a href="#">2</a> <a href="#">3</a> <a href="#">4</a>
 </section>
 ```
 
---- 
-
-# Tab Order
-
 ```css
-section {
-  display: flex;
-  flex-direction: row-reverse;
-}
+/* ❌ Seen: 4 3 2 1 — Tab goes 1 2 3 4: the focus jumps backwards */
+.toolbar { display: flex; flex-direction: row-reverse; }
 ```
 
----
-
-# Tab Order
-
-* How to handle hidden focusable elements?
-    * remove them from the **tab order**
-    * `display: none` or `visibility: hidden`
-    * with the `hidden` attribute
+- `row-reverse`, `order`, `grid-area`, `position: absolute`: the **visual** order
+  changes, the **focus** order does not
+- **WCAG 2.4.3** Focus Order (A): the order must preserve meaning
+- Fix it in the **HTML**: write the elements in the order you show them
 
 ---
 
-# Tab Order - JavaScript
-
-* How do we know which element has focus?
-
-```javascript
-// Get the currently focused element
-const focusedElement = document.activeElement;
-console.log(focusedElement);
-
-// Set focus programmatically
-const element = document.querySelector('#main');
-element.focus();
-
-// Listen to focus changes
-element.addEventListener('focus', () => {
-    console.log('Element has focus');
-});
-
-element.addEventListener('blur', () => {
-    console.log('Element lost focus');
-});
-```
-
----
-
-# Tabindex
-
-* The `tabindex` attribute lets you:
-    * make an element focusable (value `0`)
-    * make an element focusable programmatically only (value `-1`)
-    * change the tab order (positive value - **antipattern**)
-    * remove an element from the tab order (with a negative value)
+# `tabindex` — two values, and one to forget
 
 ```html
-<!-- Focusable with Tab -->
-<div tabindex="0">Focusable DIV</div>
-
-<!-- Focusable via JavaScript only -->
-<div tabindex="-1">Programmatically focusable DIV</div>
-
-<!-- Natively focusable element -->
-<button>Submit</button>
+<div tabindex="0">Reached by Tab, in the DOM order</div>
+<div tabindex="-1">Not reached by Tab — but element.focus() works</div>
+<div tabindex="3">❌ Reached BEFORE every other element of the page</div>
 ```
+
+| Value | Tab reaches it? | `.focus()` works? | Use it for |
+|---|---|---|---|
+| none (native) | ✅ | ✅ | buttons, links, fields — the default |
+| `0` | ✅ in DOM order | ✅ | a custom widget (with its `role`, chapter 07) |
+| `-1` | ❌ | ✅ | a target you move the focus to: `<main>`, a heading, a dialog |
+| `> 0` | ✅ **first**, by value | ✅ | **never** — the order becomes unpredictable |
+
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
-# Tabindex
+# The focus, from JavaScript
 
-* We can also set `tabindex` to a value greater than 0
-* Elements with the lowest `tabindex` (> 0) come first in the keyboard sequence
-* Then elements with `tabindex="0"` or that are natively focusable
+```js
+document.activeElement;                  // the element that has the focus now
+
+const main = document.querySelector('#main');
+main.focus();                            // needs tabindex="-1" on a non-focusable element
+
+main.addEventListener('focus', () => { /* got it */ });
+main.addEventListener('blur', () => { /* lost it */ });
+// focusin / focusout: the same, but they bubble — listen on a container
+```
+
+- DevTools tip: **Console → Live expression** `document.activeElement` — see the
+  focus move as you press Tab
+- Moving the focus is a **strong** signal: the screen reader reads the new
+  element. Do it on purpose, never on page load "to help"
+
+---
+
+# Skip link — jump over the header
+
+The first Tab of every page reaches it. Without it, a keyboard user goes
+through the whole menu on **every** page (**WCAG 2.4.1** Bypass Blocks, A).
 
 ```html
-<div tabindex="0">Focusable DIV (order 3)</div>
-<div tabindex="5">Focusable DIV (order 2)</div>
-<div tabindex="1">Focusable DIV (order 1)</div>
-<button>Submit (order 4)</button>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header> … 15 links … </header>
+  <main id="main" tabindex="-1"> … </main>
+</body>
 ```
-
-* **⚠️ Warning: antipattern** - Never use positive values!
-* It creates an unpredictable and confusing navigation order
-
----
-
-# Skip Link
-
-* This feature lets users quickly skip repeated sections (menu, header)
-* Especially useful for keyboard and screen reader users
-* A **Skip Link** consists of:
-    * a link hidden by default, placed at the very beginning of the page
-    * the link becomes visible when it receives focus (via Tab)
-    * when activated, focus moves straight to the main content
-* Avoids going through every menu link on each page
-
----
-
-# Skip Link
-
-* A few examples
-    * [Axesslab](https://axesslab.com/)
-    * [Github](https://github.com/)
-    * [H&M](https://www2.hm.com/en_gb/index.html)
-
----
-layout: statement
----
-
-How would you implement a **skip link** in plain HTML/CSS/JavaScript?
-
----
-
-# Skip Link
-
-```html
-<a class="skip-link" href="#main">Skip to main content</a>
-
-<main id="main" tabindex="-1">
-    ...
-</main>
-```
-```css
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: #000;
-    color: white;
-    padding: 8px;
-    text-decoration: none;
-    z-index: 100;
-}
-
-.skip-link:focus {
-    top: 0;
-}
-```
-
----
-
-# CSS - Visible focus
-
-* Focus **must** be visible on every interactive element
-* Use `:focus-visible` rather than `:focus` (avoids showing focus on mouse click)
-* **Never** use `outline: none` without a visual alternative
 
 ```css
+.skip-link { position: absolute; top: -40px; left: 0; padding: 8px;
+             background: #000; color: #fff; z-index: 100; }
+.skip-link:focus { top: 0; }    /* off screen, until it gets the focus */
+```
+
+- Not `display: none`: an element that is not displayed cannot take the focus
+- `tabindex="-1"` on `<main>`: some browsers scroll to it but leave the focus behind
+- See it live: Tab on [github.com](https://github.com/) or [axesslab.com](https://axesslab.com/)
+
+---
+
+# A visible focus indicator
+
+```css
+/* ❌ The focus is gone — for everybody, for good */
+*:focus { outline: none; }
+
+/* ✅ Ours, contrasted, shown for keyboard users */
+a:focus-visible,
 button:focus-visible {
-    outline: 3px solid #32a1ce;
-    outline-offset: 2px;
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
 }
 ```
 
----
-
-# CSS - Custom focus
-
-* We can define a different design if needed
-* Make sure the contrast is sufficient (3:1 ratio minimum)
-
-```css
-.button:focus-visible {
-    outline: 0; /* Only if an alternative is provided */
-    box-shadow: 0 0 0 3px #fff, 0 0 0 6px #32a1ce;
-}
-
-/* Or with a pseudo-element */
-.button:focus-visible::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border: 2px solid #32a1ce;
-    border-radius: 4px;
-}
-```
+- **WCAG 2.4.7** Focus Visible (AA) — and **1.4.11** Non-text Contrast (AA):
+  the indicator needs **3:1** against what surrounds it
+- `:focus-visible` — the browser shows it for the keyboard, not on a mouse click
+- On a dark header, a blue outline disappears: test on **every** background
+- Replacing the outline (`box-shadow`, a border) is fine — removing it is not
 
 ---
 
-# Focus Trap
+# Focus trap — keep the focus in a dialog
 
-* Some components need to **trap focus**:
-    * Modals / Dialogs
-    * Dropdown menus
-    * Side panels (sidebars)
-* Focus must stay inside the component until it is closed
-* Prevents the user from navigating to hidden content
+While a modal dialog is open, Tab must not escape to the page behind it.
 
----
-
-# Focus Trap - Example
-
-```javascript
-const modal = document.querySelector('.modal');
-const focusableElements = modal.querySelectorAll(
-    'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
-);
-const firstElement = focusableElements[0];
-const lastElement = focusableElements[focusableElements.length - 1];
-
-modal.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') {
-        if (e.shiftKey && document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-        }
-    }
+```js
+modal.addEventListener('keydown', (event) => {
+  if (event.key !== 'Tab') return;
+  const focusables = modal.querySelectorAll(
+    'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  );
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
 });
 ```
 
----
-
-# Best practices
-
-* ✅ **Do**:
-    * Always make focus visible
-    * Follow the natural DOM order
-    * Use native HTML elements whenever possible
-    * Test keyboard navigation regularly
-
-* ❌ **Avoid**:
-    * `outline: none` without an alternative
-    * `tabindex` with positive values
-    * Illogical focus order
-    * Clickable elements that are not focusable
+- Three steps: **move** the focus in, **trap** it, **give it back** to the
+  opener on close
+- Today: `<dialog>` + `showModal()` and the `inert` attribute do most of it —
+  chapter 08 and workshop 07
 
 ---
 
-# Testing tools
+# Checklist — focus and keyboard
 
-* **Browser**: use the Tab key only
-* **Chrome extension**: Accessibility Insights
-* **Chrome/Firefox extension**: axe DevTools
-* **Manual test**: unplug the mouse!
-* **Chrome shortcut**: `chrome://accessibility` to view the accessibility tree
+| ✅ Do | ❌ Avoid |
+|---|---|
+| Native elements: `<button>`, `<a href>` | A clickable `<div>` with no `tabindex` |
+| DOM order = visual order | `flex-direction: row-reverse` on links |
+| `tabindex="0"` / `"-1"` | `tabindex="1"` and above |
+| A skip link, first in the `<body>` | Fifteen Tabs to reach the content |
+| `:focus-visible` with 3:1 contrast | `outline: none` with nothing instead |
+| Move the focus on purpose (dialog, new page) | Steal it on page load |
+
+<br />
+
+> **Test it**: put the mouse away, and go through the page with Tab,
+> Shift+Tab, Enter, Space and Escape. Every action must be possible, and you
+> must always see where you are.
+
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 layout: cover
 ---
 
-# Workshop 3
+# Workshop 03
 
-Focus & skip link
+## Focus and skip link
+
+`workshops/03_focus`

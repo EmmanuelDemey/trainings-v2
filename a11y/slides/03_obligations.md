@@ -2,414 +2,392 @@
 layout: cover
 ---
 
-
-# Obligations
-
----
-
-# Standards
-
-* International: WCAG
-* France: RGAA
-* United Kingdom: BS 8878 (superseded by ISO 30071-1)
-* Belgium: AnySurfer
-* Luxembourg: Renow
-* Switzerland: eCH-0059
+# 03 - Standards and legal obligations
 
 ---
 
+# Learning objectives
 
-# Directive européenne 2016/2102 (EU Web Accessibility Directive)
+At the end of this chapter, you will be able to:
 
-* Adopted on **26 October 2016** by the European Parliament
-* Requires public sector websites and mobile applications to be accessible
-* Based on the **EN 301 549** standard (which references WCAG 2.1 level AA)
-* Phased compliance deadlines:
-  - New websites: September 2019
-  - Existing websites: September 2020
-  - Mobile applications: June 2021
-
-**Source**: [Directive EU 2016/2102](https://eur-lex.europa.eu/eli/dir/2016/2102/oj)
-
----
-
-# Legal obligations
-
-* The European directive has been transposed into national laws:
-    * **Public Sector Bodies Accessibility Regulations 2018** (UK)
-    * **Décret du 24 juillet 2019** (France, decree no. 2019-768)
-    * Each EU member state has its own transposition
+- **Name** the standards — WCAG, EN 301 549, RGAA — and how they relate
+- **Explain** the structure of WCAG 2.2: 4 principles, guidelines, success
+  criteria, levels **A / AA / AAA**
+- **Tell** who is legally bound, in Europe and in France, and which documents
+  are mandatory
+- **Argue** with real cases — lawsuits, success stories, ROI
+- **Audit** a page by hand and map each problem to a WCAG criterion —
+  workshop 02
 
 ---
 
-# Legal obligations
+# The standards, from global to local
 
-* The public sector includes:
-    * Regional, national and local authorities
-    * Any organisation receiving public funding
+| Standard | Scope | What it is |
+|---|---|---|
+| **WCAG 2.2** | International (W3C) | The reference: testable success criteria — also **ISO 40500** (2.0) |
+| **EN 301 549** | European Union | The European standard for ICT products — references **WCAG 2.1 AA** |
+| **RGAA 4.1** | France | A method to **test** WCAG 2.1 AA, criterion by criterion |
+| BS 8878 → **ISO 30071-1** | United Kingdom | A process standard: how to build accessibility in |
+| **AnySurfer** | Belgium | A quality label and its checklist |
+| **Renow** | Luxembourg | The national framework, derived from WCAG |
+| **eCH-0059** | Switzerland | The federal standard, based on WCAG |
 
----
+<br />
 
+> Whatever the country, the **technical** content is WCAG. The local standards
+> say **how to test it** and **who must comply**.
 
-# RGAA 4.1 - The French standard
-
-* **RGAA**: Référentiel Général d'Amélioration de l'Accessibilité (general accessibility improvement framework)
-* Current version: **RGAA 4.1** (February 2021)
-* French technical method to check WCAG 2.1 level AA compliance
-* **106 criteria** organised into 13 themes
-* Directly aligned with WCAG 2.1 level AA + French specifics
-
-**Source**: [Official RGAA 4.1](https://accessibilite.numerique.gouv.fr/)
-
----
-
-# RGAA 4.1 - The 13 themes
-
-1. Images
-2. Frames
-3. Colours
-4. Multimedia
-5. Tables
-6. Links
-7. Scripts
-8. Mandatory elements
-9. Information structure
-10. Information presentation
-11. Forms
-12. Navigation
-13. Consultation
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
-# In France - Public sector
+# The W3C and its accessibility guidelines
 
-* Following the decree of 24 July 2019, mandatory for:
-  - Public administrations
-  - Local authorities
-  - Public institutions
-* **Possible penalties**: fine of up to **€20,000 per year**
+| Acronym | Stands for | Covers |
+|---|---|---|
+| **W3C** | World Wide Web Consortium | The international community that writes the Web standards — led by its inventor, Tim Berners-Lee |
+| **WAI** | Web Accessibility Initiative | The W3C group in charge of accessibility |
+| **WCAG** | Web Content Accessibility Guidelines | The **content**: pages, apps — what you build |
+| **ATAG** | Authoring Tool Accessibility Guidelines | The **tools** that produce content: CMS, editors |
+| **UAAG** | User Agent Accessibility Guidelines | The **browsers** and media players |
+| **ARIA** | Accessible Rich Internet Applications | Roles, states, properties for custom widgets — chapter 07 |
 
-**Source**: [Décret n° 2019-768](https://www.legifrance.gouv.fr/eli/decret/2019/7/24/CPAE1913344D/jo/texte)
+- Stay up to date: [W3C WAI News](https://www.w3.org/WAI/news/)
 
----
-
-# In France - Private sector
-
-* Extended to the private sector since 2019
-* Applies to **companies with a turnover above €250 million**
-* Applies to online communication services
-* Same level of requirement: RGAA 4.1 compliance (WCAG 2.1 AA)
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
-# In France - Mandatory documents
+# WCAG — four principles, POUR
 
-Besides the technical fixes, 3 documents are mandatory:
+<div style="display: flex; gap: 2em;">
+<div>
 
-1. **Déclaration d'accessibilité** (accessibility statement)
-   - Compliance level (non-compliant, partially compliant, fully compliant)
-   - Test results
-   - Justification of non-compliances
+| Principle | The content must be… | For example |
+|---|---|---|
+| **P**erceivable | presented in a way users can **perceive** | text alternatives, captions, contrast |
+| **O**perable | **usable** with any input | keyboard, enough time, no seizures |
+| **U**nderstandable | **understood**, predictable | language, consistent navigation, error help |
+| **R**obust | read by **today's and tomorrow's** tools | valid roles, names and states |
 
-2. **Schéma pluriannuel** (multi-year plan, 3 years)
-   - Accessibility strategy
+</div>
+<div>
 
-3. **Plans d'action annuels** (annual action plans)
-   - Concrete actions derived from the multi-year plan
+### WCAG 2.2, in numbers
 
-**Source**: [RGAA legal obligations](https://accessibilite.numerique.gouv.fr/obligations/)
+- **4** principles
+- **13** guidelines
+- **86** testable success criteria
+- **3** conformance levels
 
----
+Each criterion has a number — *1.1.1 Non-text Content*, *2.4.7 Focus
+Visible* — and a level.
 
-# Acronyms
+</div>
+</div>
 
-* W3C (World Wide Web Consortium)
-* WAI (Web Accessibility Initiative)
-* WCAG (Web Content Accessibility Guidelines)
-* ATAG (Authoring Tool Accessibility Guidelines)
-* UAAG (User Agent Accessibility Guidelines)
-
----
-
-# Acronyms - W3C
-
-* World Wide Web Consortium
-    * International community
-    * Develops Web standards
-    * Led by the inventor of the Web: Tim Berners-Lee
+<style>
+table { font-size: 0.8em; }
+</style>
 
 ---
 
+# WCAG — from 1.0 to 3.0
 
-# Acronyms - WCAG
+| Version | Year | What changed |
+|---|---|---|
+| **1.0** | 1999 | The first version |
+| **2.0** | 2008 | Major overhaul: technology-neutral, testable — became **ISO 40500** |
+| **2.1** | 2018 | **17** criteria added: mobile, low vision, cognitive |
+| **2.2** | Oct. 2023 | **9** criteria added, **4.1.1 Parsing** removed |
+| **3.0** | in progress | New model and scoring — **not** a legal reference yet |
 
-* The W3C publishes the WCAG
-* Web Content Accessibility Guidelines
-* The latest published version is **WCAG 2.2** (October 2023)
-* Has several conformance levels: A, AA and AAA
-* **WCAG 3.0** is under development
-* *ISO 40500* and European standard *EN 301 549*
+WCAG 2.2 additions:
 
-**Sources**:
-- [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/)
-- [W3C WAI News](https://www.w3.org/WAI/news/) - To stay up to date
+- **Focus Not Obscured** (2.4.11 AA, 2.4.12 AAA) · **Focus Appearance** (2.4.13 AAA)
+- **Dragging Movements** (2.5.7 AA) · **Target Size (Minimum)** (2.5.8 AA)
+- **Consistent Help** (3.2.6 A) · **Redundant Entry** (3.3.7 A)
+- **Accessible Authentication** (3.3.8 AA, 3.3.9 AAA)
 
-**Note**: WCAG 2.2 remains the current legal reference; WCAG 3.0 will introduce new criteria.
+**Sources**: [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/) ·
+[WCAG history](https://www.w3.org/WAI/standards-guidelines/wcag/)
 
----
-
-
-# Acronyms - WCAG
-
-* 4 principles
-* content must be:
-    * *perceivable*
-    * *operable*
-    * *understandable*
-    * *robust*
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
-# WCAG history
+# Conformance levels — A, AA, AAA
 
-* **WCAG 1.0** (1999): first version
-* **WCAG 2.0** (2008): major overhaul, became ISO 40500
-* **WCAG 2.1** (2018): 17 criteria added (mobile, low vision, cognitive)
-* **WCAG 2.2** (2023): 9 new criteria added (and 4.1.1 Parsing removed)
-  - Focus Not Obscured (2.4.11, 2.4.12)
-  - Focus Appearance (2.4.13)
-  - Dragging Movements (2.5.7)
-  - Target Size (Minimum) (2.5.8)
-  - Consistent Help (3.2.6)
-  - Redundant Entry (3.3.7)
-  - Accessible Authentication (3.3.8, 3.3.9)
+| Level | Criteria | Means | Example |
+|---|---|---|---|
+| **A** — minimum | **31** | Without them, some users **cannot access** the content at all | Every image has a text alternative (1.1.1) |
+| **AA** — required | **+24** (55 in total) | The **legally required** level almost everywhere | Text contrast of at least **4.5:1** (1.4.3) |
+| **AAA** — excellence | **+31** (86 in total) | Recommended, **not always achievable** for all content | Contrast of **7:1** (1.4.6), sign language for videos (1.2.6) |
 
-**Source**: [W3C WCAG History](https://www.w3.org/WAI/standards-guidelines/wcag/)
+<br />
 
----
-
-# WCAG 2.2 - Structure
-
-* **4 principles** (POUR)
-* **13 guidelines**
-* **86 testable success criteria**
-* **3 conformance levels**: A, AA and AAA
-
----
-
-# WCAG conformance levels
-
-## Level A (Minimum)
-
-* **31 essential baseline criteria**
-* Without them, some users cannot access the content at all
-* Example: every image must have a text alternative
-
----
-
-# WCAG conformance levels
-
-## Level AA (Required)
-
-* **24 additional criteria** (55 in total with A)
-* This is the **legally required level** in most countries
-* Example: minimum contrast ratio of 4.5:1 for normal text
-
----
-
-# WCAG conformance levels
-
-## Level AAA (Excellence)
-
-* **31 additional criteria** (86 in total)
-* The highest conformance level
-* Recommended but **not always achievable** for all content
-* Example: 7:1 contrast ratio, sign language for videos
+> Picture the levels as mountains. The first peak to reach is **AA** — it
+> includes both A and AA criteria. Behind it, in the mist, there is a larger
+> peak, **AAA**. That one is not always completely reachable.
+>
+> — **Marie Guillaumet**
 
 **Source**: [Understanding Levels of Conformance](https://www.w3.org/WAI/WCAG22/Understanding/conformance#levels)
 
----
-layout: statement
----
-
-<blockquote>
-Picture accessibility compliance levels as mountains. The first peak to reach is AA. This includes both A and AA
-criteria. Behind it, in the mist, there is a larger peak, AAA. That one is not always completely reachable.
-
-<p>Marie Guillaumet</p>
-</blockquote>
-
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
+# In Europe — two texts
 
-# Current state
+<div style="display: flex; gap: 2em;">
+<div>
 
-* Most websites are not accessible because:
-    * it is not a priority for the project
-    * people think it brings no added value
-    * few people have the knowledge.
+### Web Accessibility Directive — 2016/2102
 
----
+- Adopted on **26 October 2016**
+- The **public sector**: national, regional and local authorities, and bodies
+  funded by public money
+- Websites and mobile apps, based on **EN 301 549** (WCAG 2.1 AA)
+- Deadlines: new sites **Sept. 2019**, existing sites **Sept. 2020**, mobile
+  apps **June 2021**
+- Transposed by each member state — e.g. the UK *Public Sector Bodies
+  Accessibility Regulations 2018*, the French *décret n° 2019-768*
 
+[Directive (EU) 2016/2102](https://eur-lex.europa.eu/eli/dir/2016/2102/oj)
 
-# Who is involved
+</div>
+<div>
 
-* Accessibility is not only a technical issue
-* Everyone must be made aware
-    * Product Manager, Product Owner, Scrum Master
-    * UX / UI
-    * Developers
-    * Content Designers
-    * QA
+### European Accessibility Act — 2019/882
 
----
+- Applies since **28 June 2025**
+- The **private sector**: e-commerce, banking, transport, e-books,
+  telecoms, and the devices behind them
+- Same technical reference: **EN 301 549**
+- Micro-enterprises providing services (< 10 people, ≤ €2M) are exempt
 
+[Directive (EU) 2019/882](https://eur-lex.europa.eu/eli/dir/2019/882/oj)
 
-# The most common mistakes
-
-* Interactive elements
-* DOM order
-* Text alternatives
-* Skip links
-* Styling of focusable elements
-
----
-layout: statement
----
-
-<blockquote>
-Imagine the needs of disabled people as a rainbow. Each type of disability has specific needs.
-But together, all the accessibility adjustments create a cohesive whole. Accessibility guidelines
-and success criteria help ensure we forget nothing.
-
-<p>Marie Guillaumet</p>
-</blockquote>
+</div>
+</div>
 
 ---
 
-# Court cases - Domino's Pizza (USA)
+# In France — RGAA 4.1
 
-* **2019**: the US Supreme Court declined to hear Domino's appeal, leaving the Ninth Circuit ruling in place
-* Lawsuit filed by a blind user
-* Inaccessible website and mobile app
-* Impossible to order online with a screen reader
-* **Cost**: legal fees + complete website overhaul
-* Key precedent: the ADA applies to websites and apps tied to physical "places of public accommodation"
+<div style="display: flex; gap: 2em;">
+<div>
 
-**Source**: [Robles v. Domino's Pizza](https://www.supremecourt.gov/search.aspx?filename=/docket/docketfiles/html/public/18-1539.html)
+- **R**éférentiel **G**énéral d'**A**mélioration de l'**A**ccessibilité
+- Version **4.1** (February 2021): the French method to check **WCAG 2.1 AA**
+- **106 criteria** in **13 themes**, each with test procedures
+- WCAG 2.1 AA + a few French specifics
 
----
+[Official RGAA 4.1](https://accessibilite.numerique.gouv.fr/)
 
-# Court cases - Beyoncé (USA)
+</div>
+<div>
 
-* **2019**: lawsuit against the parkwood-ent.com website
-* Beyoncé's merchandising website not ADA-compliant
-* Images without text alternatives
-* Impossible to navigate with the keyboard
-* **Out-of-court settlement** + website brought into compliance
+| # | Theme | # | Theme |
+|---|---|---|---|
+| 1 | Images | 8 | Mandatory elements |
+| 2 | Frames | 9 | Information structure |
+| 3 | Colours | 10 | Information presentation |
+| 4 | Multimedia | 11 | Forms |
+| 5 | Tables | 12 | Navigation |
+| 6 | Links | 13 | Consultation |
+| 7 | Scripts | | |
 
-**Source**: [Billboard Article](https://www.billboard.com/business/legal/beyonce-sued-website-violating-americans-disabilities-act-8490493/)
+</div>
+</div>
 
----
-
-# Court cases - France
-
-* **2020**: formal notices sent to several French ministries
-* Failure to meet RGAA obligations
-* No accessibility statement
-* **Areva**: convicted in 2011 (a first in France)
-* Many administrations are still working towards compliance
-
-**Source**: [Baromètre accessibilité numérique](https://accessibilite.numerique.gouv.fr/ressources/barometre-annuel/)
+<style>
+table { font-size: 0.8em; }
+</style>
 
 ---
 
-# Success Story - GOV.UK
+# In France — who must comply, and what to publish
 
-* UK government website
-* **Redesigned in 2012** with accessibility as the #1 priority
-* WCAG 2.1 level AA compliance
-* **Results**:
-  - 60% fewer support calls
-  - User satisfaction up from 62% to 85%
-  - "Design of the Year" award 2013
-  - Estimated savings: £60-80M per year
+<div style="display: flex; gap: 2em;">
+<div>
 
-**Source**: [GOV.UK Accessibility Blog](https://accessibility.blog.gov.uk/)
+### Who
 
----
+- **Public sector** (décret du 24 juillet 2019): administrations, local
+  authorities, public institutions
+- **Private sector**: companies with a turnover above **€250 million** — and,
+  since June 2025, the EAA services
+- Same requirement: **RGAA 4.1** (WCAG 2.1 AA)
+- **Penalty**: up to **€20,000 per service and per year** (raised to €50,000
+  by the EAA transposition)
 
-# Success Story - Microsoft
+[Décret n° 2019-768](https://www.legifrance.gouv.fr/eli/decret/2019/7/24/CPAE1913344D/jo/texte)
 
-* Accessibility programme since the 2000s
-* **Xbox Adaptive Controller** (2018): adapted controller
-* Automatic captions in Teams
-* Narrator (screen reader) built into Windows
-* **Impact**:
-  - Wider market (1 billion people with disabilities)
-  - Positive brand image
-  - Technological innovation that benefits everyone
+</div>
+<div>
 
-**Source**: [Microsoft Accessibility](https://www.microsoft.com/en-us/accessibility)
+### Three mandatory documents
 
----
+1. **Déclaration d'accessibilité** — the statement: compliance level
+   (non / partially / fully compliant), test results, justified exemptions
+2. **Schéma pluriannuel** — the 3-year accessibility strategy
+3. **Plans d'action annuels** — the concrete actions of each year
 
-# Success Story - BBC
+[RGAA legal obligations](https://accessibilite.numerique.gouv.fr/obligations/)
 
-* Strict accessibility standards since 2010
-* **BBC iPlayer**: 100% accessible
-* Testing with disabled users at every iteration
-* **ROI**:
-  - +20% wider audience
-  - Better SEO (improved Google rankings)
-  - More maintainable and faster code
-  - Lower support costs
-
-**Source**: [BBC Accessibility Guidelines](https://www.bbc.co.uk/accessibility/forproducts/)
+</div>
+</div>
 
 ---
 
-# ROI of accessibility
+# Why most sites are still not accessible
 
-## Measurable benefits
+<div style="display: flex; gap: 2em;">
+<div>
 
-* **Wider market**: 16% of the world population (1+ billion)
-* **Spending power**: €6.9 trillion worldwide
-* **SEO**: +30% organic visibility on average
-* **Performance**: accessible sites = faster sites
-* **Maintenance**: -40% costs thanks to semantic code
-* **Image**: positive competitive differentiation
+### The reasons
 
-**Sources**:
-- [WHO Disability Report](https://www.who.int/teams/noncommunicable-diseases/sensory-functions-disability-and-rehabilitation/world-report-on-disability)
-- [Return on Disability Group](https://www.rod-group.com/)
+- **Not a priority** for the project
+- Seen as bringing **no added value**
+- **Few people** know how
+
+### The most common mistakes
+
+- **Interactive elements** that are not buttons or links
+- A **DOM order** that differs from the visual order
+- Missing **text alternatives**
+- No **skip links**
+- No visible **focus** style
+
+</div>
+<div>
+
+### Who is involved — everyone
+
+- **Product** — PM, PO, Scrum Master: it is in the backlog, or it is not
+- **UX / UI** — contrast, targets, focus, flows
+- **Developers** — semantics, keyboard, ARIA
+- **Content designers** — headings, alternatives, plain language
+- **QA** — keyboard and screen reader tests
+
+</div>
+</div>
+
+<br />
+
+> Imagine the needs of disabled people as a rainbow. Each type of disability has
+> specific needs, but together, all the adjustments create a cohesive whole.
+> The guidelines and success criteria help ensure we forget nothing.
+> — **Marie Guillaumet**
 
 ---
 
-# Calculating the ROI of accessibility
+# Court cases
 
-## Investment
+| Case | Year | What happened | Outcome |
+|---|---|---|---|
+| **Robles v. Domino's Pizza** (USA) | 2019 | A blind user could not order on the site or the app with a screen reader | The Supreme Court **declined the appeal**: the ADA applies to sites tied to physical "places of public accommodation". Legal fees + full overhaul |
+| **Parkwood Entertainment** — Beyoncé (USA) | 2019 | Merchandising site: images without alternatives, no keyboard navigation | **Settled** out of court, site brought into compliance |
+| **French ministries** | 2020 | Formal notices: RGAA not met, no accessibility statement | Many administrations still working towards compliance |
 
-- **Initial audit**: 1-2 weeks
-- **Team training**: 1-2 days
-- **Implementation**: 5-10% of development time
-- **Continuous testing**: built into QA
+- [Robles v. Domino's](https://www.supremecourt.gov/search.aspx?filename=/docket/docketfiles/html/public/18-1539.html) ·
+  [Billboard — Beyoncé](https://www.billboard.com/business/legal/beyonce-sued-website-violating-americans-disabilities-act-8490493/) ·
+  [Baromètre accessibilité numérique](https://accessibilite.numerique.gouv.fr/ressources/barometre-annuel/)
 
-## Returns
+<style>
+table { font-size: 0.78em; }
+</style>
 
-- **Audience**: +16% (1+ billion people)
-- **SEO**: +30% organic visibility
-- **Support**: -40% complaints
-- **Legal protection**: avoid lawsuits (average cost: €50K-500K)
-- **Reputation**: positive public relations
+---
 
-**Use these figures to pitch accessibility to your management!**
+# Success stories
+
+| Who | What they did | What it brought |
+|---|---|---|
+| **GOV.UK** | Launched in **2012** with accessibility as priority #1 — now WCAG 2.2 AA | Fewer support calls, higher satisfaction, *Design of the Year* 2013 |
+| **Microsoft** | A programme since the 2000s: Narrator in Windows, live captions in Teams, the **Xbox Adaptive Controller** (2018) | A wider market, brand image, innovations that help everyone |
+| **BBC** | Strict standards since 2010; **iPlayer** tested with disabled users at every iteration | A wider audience, better SEO, more maintainable code, lower support costs |
+
+- [GOV.UK Accessibility Blog](https://accessibility.blog.gov.uk/) ·
+  [Microsoft Accessibility](https://www.microsoft.com/en-us/accessibility) ·
+  [BBC Accessibility Guidelines](https://www.bbc.co.uk/accessibility/forproducts/)
+
+<style>
+table { font-size: 0.8em; }
+</style>
+
+---
+
+# Pitching accessibility — the return on investment
+
+<div style="display: flex; gap: 2em;">
+<div>
+
+### The investment
+
+- **Initial audit**: 1–2 weeks
+- **Team training**: 1–2 days
+- **Implementation**: about 5–10% of development time when built in **from the
+  start** — far more when fixed afterwards
+- **Continuous testing**: part of QA and CI
+
+</div>
+<div>
+
+### The returns
+
+- **Audience**: 16% of the world population — 1.3 billion people, and their
+  families
+- **Spending power**: trillions worldwide
+  ([Return on Disability](https://www.rod-group.com/))
+- **SEO** and **performance**: semantic pages index and load better
+- **Maintenance** and **support**: fewer bugs, fewer complaints
+- **Legal**: avoid lawsuits, fines, settlements
+- **Image**: a positive differentiation
+
+</div>
+</div>
+
+<br />
+
+> Figures vary widely from one study to another: quote **your own** —
+> support tickets, conversion on mobile, audit results — they convince more
+> than any global average.
+
+---
+
+# Recap
+
+- **WCAG 2.2** is the technical reference; **EN 301 549** and the **RGAA** say
+  how to test it and who must comply
+- **POUR**: perceivable, operable, understandable, robust — **AA** is the level
+  the law asks for
+- Public sector since **2019–2021**, private sector with the **EAA** since
+  **June 2025**
+- In France: the RGAA, an **accessibility statement**, a 3-year plan, yearly
+  action plans
+- It is everyone's job: product, design, development, content, QA
+
+> In the workshop, you audit a page **by hand**: each problem you find gets a
+> WCAG criterion number and a fix.
 
 ---
 layout: cover
 ---
 
-# Workshop 2
+# Workshop 02
 
-Manual audit
+## A manual audit
+
+`workshops/02_manual_audit`

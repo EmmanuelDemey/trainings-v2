@@ -2,130 +2,149 @@
 layout: cover
 ---
 
-# Microdata
+# 11 - Microdata
 
 ---
 
-# Microdata
+# Learning objectives
 
-* Adds metadata to the HTML code, which helps search engines understand the content of your page.
-* HTML tags define the structure of the page, while microdata adds semantic information.
-* Microdata structures the page content, making it easier to interpret for search engines and assistive technologies.
-* Several reasons to use Microdata:
-    * **Improve SEO**: search engines understand your content better, which can improve your ranking.
-    * **Rich Snippets**: rich results (stars, recipes, events, etc.) are displayed in search results, increasing the click-through rate.
-    * **Accessibility**: makes the content easier to understand for users and search engines, making it more accessible.
+At the end of this chapter, you will be able to:
 
-* Available through several libraries, including:
-    * **Schema.org**: the most widely used library, offering a wide range of vocabularies for different types of content.
-
----
-
-# Schema.org
-
-* Supported by Bing, Google, Yahoo and other search engines.
-* Each library provides vocabularies, such as:
-    * **Person**: to describe individuals.
-    * **Restaurant**: to describe food establishments.
-    * **Event**: to describe events.
-    * **Product**: to describe products.
-    * **Review**: to describe reviews of products or services.
+- **Explain** what microdata adds to semantic HTML — meaning for machines, not
+  for screen readers
+- **Use** a [schema.org](https://schema.org) vocabulary with `itemscope`,
+  `itemtype` and `itemprop`
+- **Nest** one item in another (a `Person` with a `PostalAddress`)
+- **Write** the same data in **JSON-LD**, and choose between the two
+- **Check** the result with a validator
 
 ---
 
-# Vocabulary
+# One level above semantic HTML
 
-* Each vocabulary provides properties to add to our HTML code.
-* For example, for the `Restaurant` vocabulary:
-    * **name**: the name of the restaurant.
-    * **image**: a picture of the restaurant.
-    * **geo**: the geographic coordinates.
-    * **events**: special events organized by the restaurant.
-    * **menu**: link to the restaurant's menu.
+```html
+<!-- HTML: "this is a table cell" -->
+<td>Dupont</td>
+
+<!-- Microdata: "this cell is the family name of a person" -->
+<tr itemscope itemtype="https://schema.org/Person">
+  <td itemprop="familyName">Dupont</td>
+  <td itemprop="givenName">Jean</td>
+</tr>
+```
+
+- Read by **search engines** (rich results), browser extensions, scrapers — any
+  tool that wants the **data**, not the layout
+- **Invisible**: it changes nothing on screen, and nothing for a screen reader —
+  it is not an accessibility fix, it is the same idea one level up
+- Indirect benefit: the markup only works on **well-structured** HTML
 
 ---
 
-# Vocabulary
+# schema.org — a shared vocabulary
 
-* To add a vocabulary, define the root HTML element containing the data to annotate.
-* Use the `itemscope` and `itemtype` attributes to indicate the type of content.
+| Type | Typical properties | Rich result |
+|---|---|---|
+| `Person` | `givenName`, `familyName`, `birthDate`, `address`, `sameAs` | Knowledge panel |
+| `Organization` | `name`, `logo`, `url`, `contactPoint` | Logo, contact |
+| `Event` | `name`, `startDate`, `location`, `offers` | Date and place in the results |
+| `Product` + `Review` | `name`, `offers`, `aggregateRating` | Price, stars |
+| `Recipe` | `cookTime`, `recipeIngredient`, `nutrition` | Image, time, rating |
+| `Restaurant` | `name`, `address`, `geo`, `menu`, `servesCuisine` | Local results |
+
+- One vocabulary shared by **Google, Bing, Yahoo and Yandex** since 2011
+- Each type lists its properties: [schema.org/Person](https://schema.org/Person)
+
+<style>
+table { font-size: 0.85em; }
+</style>
+
+---
+
+# `itemscope`, `itemtype`, `itemprop`
 
 ```html
 <section itemscope itemtype="https://schema.org/Restaurant">
-    <h1>Super Taco Bar</h1>
-    <h2>Menu</h2>
-    <p>
-       Lille
-   	</p>
+  <h1 itemprop="name">Super Taco Bar</h1>
+  <h2>Menu</h2>                            <!-- no itemprop: ignored -->
+  <p itemprop="address">Lille</p>
 </section>
 ```
 
+- **`itemscope`** — this element is an **item**: its descendants describe it
+- **`itemtype`** — the item is a `Restaurant`, from the schema.org vocabulary
+- **`itemprop`** — the element's text is the value of this property
+- For an `<a>`, `<img>`, `<time>`, `<meta>`: the value is the `href`, `src`,
+  `datetime`, `content` — not the text
+
 ---
 
-# Vocabulary
-
-* Add extra attributes on child elements to provide more details.
-* Use the `itemprop` property to specify the properties of the elements.
+# Nesting items
 
 ```html
 <section itemscope itemtype="https://schema.org/Restaurant">
-    <h1 itemprop="name">Super Taco Bar</h1>
-    <h2>Menu</h2>
-    <p itemprop="address">
-       Lille
-   	</p>
+  <h1 itemprop="name">Super Taco Bar</h1>
+  <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+    <p itemprop="addressLocality">Lille</p>
+    <p itemprop="addressRegion">Hauts-de-France</p>
+    <p itemprop="postalCode">59000</p>
+  </div>
+  <time itemprop="openingHours" datetime="Tu-Sa 12:00-22:00">Tuesday to Saturday, noon to 10 pm</time>
 </section>
 ```
 
-* **Why it matters**: it structures the information so that search engines can easily interpret it.
+- `itemprop` **and** `itemscope` on the same element: the property's value is
+  **another item**
+- `<time datetime>`: a human text for the eyes, a machine value for the parser
+- Detailed addresses feed **local** search results
 
 ---
 
-# Vocabulary
-
-* Nest vocabularies to better structure and organize the information hierarchically.
-
-```html
-<section itemscope itemtype="https://schema.org/Restaurant">
-    <h1 itemprop="name">Super Taco Bar</h1>
-    <h2>Menu</h2>
-    <div itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-        <p itemprop="addressLocality">Lille</p>
-        <p itemprop="addressRegion">Hauts-de-France</p>
-        <p itemprop="postalCode">59000</p>
-    </div>
-</section>
-```
-
-* **Benefit**: it provides detailed information about the address, which can improve visibility in local search results.
-
----
-
-# LD+JSON format
-
-* Use a JSON format to define this metadata, which is often easier to read and maintain.
+# JSON-LD — the same data, apart from the HTML
 
 ```html
 <script type="application/ld+json">
 {
-  "@context": "http://schema.org/",
+  "@context": "https://schema.org",
   "@type": "Person",
   "name": "Emmanuel Demey",
-  "url": "http://twitter.com/EmmanuelDemey",
+  "url": "https://twitter.com/EmmanuelDemey",
   "sameAs": [
-    "http://facebook.com/EmmanuelDemey",
-    "http://linkedin.com/in/EmmanuelDemey"
+    "https://github.com/EmmanuelDemey",
+    "https://linkedin.com/in/EmmanuelDemey"
   ]
 }
 </script>
 ```
 
-* **Using `sameAs`**: links several social profiles to the same person, strengthening credibility and online visibility.
+- Same vocabulary, **no change** to the markup — the format Google recommends
+- `sameAs`: several profiles, **one** person
+- ❌ It can drift from what is on screen: the data must **match** the visible
+  content
+
+---
+
+# Microdata or JSON-LD?
+
+| | Microdata | JSON-LD |
+|---|---|---|
+| Where | **On** the visible elements | In a `<script>`, anywhere in the page |
+| Stays in sync with the page | **By construction** | By discipline |
+| Easy to generate | From the template that renders the rows | From the data, server side |
+| Readable | Mixed with the HTML | One block, easy to review |
+
+<br />
+
+- Check either with the [Schema Markup Validator](https://validator.schema.org/)
+  and Google's [Rich Results Test](https://search.google.com/test/rich-results)
+- Workshop 09 uses **microdata**: the rows are already rendered by `script.js`
 
 ---
 layout: cover
 ---
 
-# Workshop
+# Workshop 09
 
-Workshop 9: microdata
+## Microdata
+
+`workshops/09_microdata`

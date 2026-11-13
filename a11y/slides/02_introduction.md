@@ -2,400 +2,358 @@
 layout: cover
 ---
 
-# Introduction
+# 02 - Why accessibility
+
+---
+
+# Learning objectives
+
+At the end of this chapter, you will be able to:
+
+- **Define** digital accessibility — and see that it concerns far more people
+  than "the disabled"
+- **Argue** for it: legal, business and quality reasons
+- **Name** the four families of impairments and what each one needs from a page
+- **Recognise** the assistive technologies, and explain how a screen reader
+  reads a page through the **accessibility tree**
+- **Drive** a screen reader with its essential shortcuts — workshop 01
 
 ---
 layout: statement
 ---
 
-What does the term *Digital Accessibility* mean to you?
-
----
-layout: statement
----
-
-Who do you think is concerned by this topic?
+What does *digital accessibility* mean to you?
+Who do you think it concerns?
 
 ---
 
-# Synonyms
+# What we are talking about
 
-- Accessibilité (French)
-- Accessibility
-- A11Y
-- E-Accessibility
-- Web Accessibility
-- Digital Accessibility
+<div style="display: flex; gap: 2em;">
+<div style="flex: 1;">
 
----
-layout: statement
----
+> The power of the Web is in its universality. Access by everyone regardless
+> of disability is an essential aspect.
+>
+> — **Tim Berners-Lee**
 
-<blockquote>
-The power of the Web is in its universality. Access by everyone regardless of disability is an essential aspect.
+> Making digital resources available to all individuals, whatever their
+> hardware, network infrastructure, language, culture, geographic location or
+> physical or mental abilities.
+>
+> — **Edutec**
 
-<p>Tim Berners-Lee</p>
-</blockquote>
+</div>
+<div style="flex: 1;">
 
----
-layout: statement
----
+### In one sentence
 
-Web accessibility means making the content of a website available to everyone,
-whatever their context of use.
+Making the content of a website available to **everyone**, whatever their
+**context of use**.
 
+### Also called
 
----
-layout: statement
----
+*Accessibility*, **a11y** (a + 11 letters + y), *e-accessibility*, *web
+accessibility*, *accessibilité* (French)
 
-<blockquote>
-Making digital resources available to all individuals, whatever their hardware, network infrastructure,
-language, culture, geographic location or physical or mental abilities.
+### Not only disability
 
-<p>Edutec</p>
-</blockquote>
+- An app unusable on **mobile**, on a **slow network**, in your **country**
+- Content **hard to understand**, a business task **hard to complete**
+
+</div>
+</div>
 
 ---
 
 # Why accessibility?
 
-* **Legal obligations**
-    * European law (European Accessibility Act - EAA): mandatory since June 2025
-    * France: RGAA (Référentiel Général d'Amélioration de l'Accessibilité, the French accessibility standard)
-    * United States: ADA (Americans with Disabilities Act) and Section 508
-    * Canada: AODA (Accessibility for Ontarians with Disabilities Act)
+<div style="display: flex; gap: 2em;">
+<div>
+
+### Legal
+
+- **Europe** — the European Accessibility Act (EAA): mandatory since **June 2025**
+- **France** — the RGAA
+- **USA** — ADA and Section 508
+- **Canada** — AODA (Ontario)
+- Chapter 03 details them
+
+</div>
+<div>
+
+### Business
+
+- Reach **16%** of the world population
+- Avoid **lawsuits** (many in the USA)
+- A better experience **for everyone**
+- Better **SEO** and performance
+
+</div>
+<div>
+
+### Quality
+
+- Semantic, **maintainable**, robust code
+- Better cross-browser support
+- **Easier tests**: a page testable by role is
+  testable by a screen reader
+- Simpler interfaces, easier to use
+
+</div>
+</div>
+
+<br />
+
+> **16%** of the world population — about **1.3 billion** people — live with a
+> significant disability (WHO, 2023). **70%** of websites are not accessible.
 
 ---
 
-# Why accessibility?
+# Four families of impairments
 
-* **Business reasons**
-    * Reach a wider audience: 16% of the world population
-    * Avoid lawsuits (many cases in the United States)
-    * Improve the user experience for everyone
-    * Positive impact on SEO and performance
+Permanent **or** temporary. This training covers all four.
 
----
+| | Examples | What they need from the page |
+|---|---|---|
+| **Visual** | Blurred vision · colour blindness (protanopia: red, deuteranopia: green, tritanopia: blue, achromatopsia: no colour) · total blindness | Text alternatives, **contrast**, colour never the only signal, a page that zooms, a screen reader that can read it |
+| **Motor** | Paralysis · tremors · arthritis · neuromuscular disorders | **Keyboard only**, switches, eye tracking, voice control — large targets, no precise gestures |
+| **Hearing** | Total or partial deafness · tinnitus | **Captions**, transcripts, visual alerts instead of sounds, sign language |
+| **Cognitive** | Dyslexia · ADHD · memory disorders · autism spectrum | Clear simple content, **consistent** navigation, enough time, no distracting animations |
 
-# Why accessibility?
+- **2.2 billion** people have a near or distance vision impairment (WHO);
+  **300 million** are colour blind
 
-* **Technical and quality reasons**
-    * More maintainable and robust code
-    * Better cross-browser compatibility
-    * Better semantic structure
-    * Easier automated testing
-    * Better overall usability
-
----
-
-# Introduction
-
-- It is not limited to people with disabilities.
-- Have you ever experienced one of the following:
-    * An application unusable on mobile
-    * An application not available in your country
-    * An application unusable on your network
-    * Content that is hard to understand
-    * A business task that is hard to complete
-    * ...
+<style>
+table { font-size: 0.8em; }
+td, th { padding-top: 0.3em !important; padding-bottom: 0.3em !important; }
+</style>
 
 ---
 
-# Introduction
+# Accessibility benefits everyone
 
-- In this training, we will focus on issues related to:
-    * visual impairments
-    * hearing impairments
-    * motor impairments
-    * cognitive impairments
+Situational and temporary disabilities meet the same features:
 
----
+| Situation | The feature that helps |
+|---|---|
+| A **broken arm**, a **baby** in your arms | Keyboard shortcuts, voice control, one-handed navigation |
+| A **noisy** train, a silent open space | Video **captions** |
+| **Bright sunlight** on the screen | High contrast, a dark theme |
+| A **slow** connection | Reduced animations, simpler layouts |
+| Getting **older** | Larger text, zoom, larger targets |
 
-# Secondary goals
+<br />
 
-- Build interfaces that are
-    * simpler
-    * easier to use
-    * easier to maintain
-
----
-
-# Impairments
-
-- Visual impairment
-- Motor impairment
-- Hearing impairment
-- Cognitive impairment
+> Accessible design improves the experience of **everyone**, not only of people
+> with a permanent disability — the *curb cut effect*.
 
 ---
 
-# Impairments
+# Assistive technologies
 
-- An impairment can be
-    * permanent
-    * temporary
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1em; text-align: center; font-size: 0.85em;">
+<div>
 
----
+![Eye tracking](/images/a11y/stephen-hawking.webp)
 
-# Visual impairments
+**Eye tracking** — the gaze moves the pointer
 
-- **Blurred vision**: difficulty focusing on details
-- **Protanopia**: difficulty perceiving red light (red-green colour blindness)
-- **Deuteranopia**: difficulty perceiving green light (red-green colour blindness)
-- **Tritanopia**: difficulty perceiving blue light (blue-yellow colour blindness)
-- **Achromatopsia**: inability to see colours, only shades of grey
-- **Total blindness**: complete absence of vision
+</div>
+<div>
 
----
+![Mouthstick](/images/a11y/mouthstick.jpg)
 
-# Motor impairments
+**Mouthstick** — keys pressed with a stick
 
-- **Partial or total paralysis**: difficulty or inability to move some parts of the body
-- **Tremors**: difficulty making precise movements (clicking, selecting)
-- **Arthritis**: joint pain and stiffness limiting movement
-- **Neuromuscular disorders**: muscle weakness, reduced coordination
-- These people may use:
-    * the keyboard only (no mouse)
-    * switches
-    * an eye-tracking pointing device
-    * speech recognition
+</div>
+<div>
 
----
+![Switch](/images/a11y/switch.png)
 
-# Hearing impairments
+**Switch** — one or two buttons scan the page
 
-- **Total deafness**: complete absence of hearing
-- **Partial deafness**: partial hearing loss
-- **Tinnitus**: perception of phantom sounds
-- These people need:
-    * captions for video and audio content
-    * text transcripts
-    * visual alerts instead of sound alerts
-    * sign language (for some content)
+</div>
+<div>
 
----
+![Screen magnifier](/images/a11y/screenmagnifier.jpeg)
 
-# Cognitive impairments
+**Screen magnifier** — the page zoomed around the focus
 
-- **Dyslexia**: difficulty with reading and spelling
-- **ADHD**: attention deficit disorder, with or without hyperactivity
-- **Memory disorders**: difficulty retaining or recalling information
-- **Autism spectrum disorders**: difficulties with communication and social interaction
-- These people benefit from:
-    * clear and simple content
-    * consistent and predictable navigation
-    * enough reading time
-    * no distracting animations
+</div>
+<div>
 
----
+![Braille display](/images/a11y/braille.jpg)
 
-# Statistics
+**Screen reader** — speech, or a braille display
 
-- 70% of websites are not accessible
-- At least 2.2 billion people worldwide have a near or distance vision impairment (WHO)
-- 300 million people are affected by a colour vision deficiency (colour blindness)
-- 16% of the world population lives with a significant disability, i.e. about 1.3 billion people (WHO, 2023)
-- The global assistive technology market was expected to reach 26 billion dollars by 2024
+</div>
+</div>
 
----
+<br />
 
-# Situational & Temporary Disabilities
+- Most of them **emulate a keyboard**: a page usable with Tab, Enter, Space and
+  the arrows works with all of them — chapter 04
 
-## Accessibility benefits everyone
-
-Many accessibility features also help in temporary situations:
-
-- **Broken arm** → voice control, one-handed navigation
-- **Noisy environment** → video captions
-- **Bright sunlight** → high-contrast mode, dark theme
-- **New parent** → voice control, keyboard shortcuts
-- **Slow connection** → reduced animations, simplified layouts
-
-**Key point**: accessible design improves the experience of everyone, not only of people with a permanent disability!
-
----
-
-# Assistive devices
-
-- Eye Tracking
-- MouthStick
-- Switch
-- Screen magnifiers
-- Screen readers
-
----
-
-# Eye Tracking
-
-![Lens](/images/a11y/stephen-hawking.webp)
-
----
-
-# MouthStick
-
-![Lens](/images/a11y/mouthstick.jpg)
-
----
-
-# Switch
-
-![Lens](/images/a11y/switch.png)
-
----
-
-# Screen magnifiers
-
-![Lens](/images/a11y/screenmagnifier.jpeg)
+<style>
+img { max-height: 140px; margin: 0 auto; object-fit: contain; }
+</style>
 
 ---
 
 # Screen readers
 
-![Lens](/images/a11y/braille.jpg)
+<div style="display: flex; gap: 2em;">
+<div>
+
+- Mainly used by people with a **visual impairment**
+- Turn a page into **speech** or **braille**
+- Provide **shortcuts** to jump through the page: headings, links,
+  landmarks, form fields
+- Users listen at about **350 words per minute** — a sighted reader reads 150
+- On **desktop**: the keyboard. On **mobile**: touch and swipe gestures
+
+</div>
+<div>
+
+| Screen reader | Platform |
+|---|---|
+| **NVDA** (\*) | Windows — free, open source |
+| **JAWS** (\*) | Windows — commercial |
+| **VoiceOver** | macOS, iOS — built in |
+| **TalkBack** | Android — built in |
+| Narrator | Windows — built in |
+| Orca | Linux |
+
+(\*) together, about **80%** of the market
+
+</div>
+</div>
 
 ---
 
-# Screen readers
+# How a screen reader reads a page
 
-- Mainly used by people with a visual impairment.
-- They convert the content of a website or an application into speech or braille.
-- They provide shortcuts to navigate through a page.
-- Content is read faster (350 words per minute) than a person's reading speed (150 words per minute)
-
----
-
-
-# Screen readers
-
-- How do a screen reader and a browser interact?
-    * The browser builds the DOM Tree and the Accessibility Tree
-
-- Once these trees are built, we can interact with them through
-    * DOM: Document Object Model
-    * CSSOM: CSS Object Model
-    * AOM: Accessibility Object Model
-
-- The browser exposes and updates this accessibility information through the operating system APIs
-    * NSAccessibility (macOS), UI Automation (Microsoft), ...
-
-- Screen readers subscribe to this information to render the content of the visited website
-
----
-
-# Screen readers
+<div style="display: flex; gap: 1.5em;">
+<div style="flex: 1; min-width: 0;">
 
 ```html
 <html>
-    <head><title>Demo</title></head>
-    <body>
-        <label for="name">Name</label>
-        <input id="name" value="Manu"/>
-        <div>
-            <button>OK</button>
-        </div>
-    </body>
+  <head><title>Demo</title></head>
+  <body>
+    <label for="name">Name</label>
+    <input id="name" value="Manu" />
+    <div>
+      <button>OK</button>
+    </div>
+  </body>
 </html>
 ```
 
----
-
-# Screen readers
-
-```
-id=1 role=WebArea name="Demo"
-id=2 role=Label name="Name"
+```text
+id=1 role=WebArea   name="Demo"
+id=2 role=Label     name="Name"
 id=3 role=TextField value="Manu" labelledByIds=[2]
 id=4 role=Group
-id=5 role=Button name="OK"
+id=5 role=Button    name="OK"
 ```
 
----
+</div>
+<div style="flex: 1; min-width: 0;">
 
-# Inspecting the Accessibility Tree
+1. The browser builds the **DOM tree** — and from it the **accessibility tree**:
+   each node a **role**, a **name**, a **state**, a value
+2. It exposes that tree through the **OS accessibility APIs**: NSAccessibility
+   (macOS), UI Automation (Windows), AT-SPI (Linux)
+3. The screen reader **subscribes** to it, and reads it to the user
 
-## Chrome/Edge DevTools
+- Scripts reach it through the DOM, the CSSOM — and, one day, the **AOM**
+  (Accessibility Object Model)
+- **Inspect it**: DevTools → *Elements* → *Accessibility* pane, or the
+  full-page accessibility tree view. Use it while you code
 
-1. Open DevTools (F12)
-2. Go to the "Elements" tab
-3. Open the "Accessibility" pane, or enable the full-page accessibility tree view
-4. See how screen readers perceive your content
+</div>
+</div>
 
-**Tip**: use it regularly during development to catch semantic issues early!
+<br />
 
----
-
-# Screen readers
-
-- NVDA (\*)
-- JAWS (\*)
-- VoiceOver (macOS, iOS)
-- TalkBack (Android)
-- Narrator
-- Orca
-
-(\*) account for 80% of the screen reader market.
+> The screen reader **never sees your CSS or your `div`s**: only what lands in
+> that tree. Most of this training is about filling it correctly.
 
 ---
 
-# Screen readers
+# Navigating with VoiceOver — the rotor
 
-- [Assistive Tech - VoiceOver](https://youtu.be/5R-6WvAihms) (8 min) - Web navigation with VoiceOver. Recommended for every developer.
-- [Assistive Tech - VoiceOver on iOS](https://youtu.be/bCHpdjvxBws) (5 min) - Demo of the mobile screen reader
-- [Assistive Tech - Talkback](https://youtu.be/0Zpzl4EKCco) (6 min) - Navigating with the Android screen reader
-- [Assistive Tech - NVDA](https://youtu.be/Jao3s_CwdRU) (7 min) - Windows screen reader (the most used, along with JAWS)
+<div style="display: flex; gap: 2em;">
+<div>
 
-**Pro Tip**: try testing your own website with these tools before deploying!
+| Keys | What it does |
+|---|---|
+| **VO** | Ctrl + Option |
+| Cmd + F5 | VoiceOver on / off |
+| VO + U | the **rotor**: headings, links, landmarks, form controls |
+| VO + ← / → | previous / next item |
+| VO + Cmd + H | next heading |
+| VO + Cmd + L | next link |
+| VO + Fn + ← / → | beginning / end of the page |
 
----
+</div>
+<div>
 
-# Rotor
+- The **rotor** (NVDA: the *elements list*, NVDA + F7) shows the **structure**
+  of the page — and lets you jump in it
+- A page with no headings and no landmarks gives an **empty rotor**: the user
+  has to listen to everything
+- Live demo:
+  - turn VoiceOver on, change the speech rate
+  - open the rotor, filter it, jump to a heading
+  - read a page, fill a field
 
-- Some screen readers provide a **rotor**
-- A mechanism to
-    * view the structure of the page
-    * navigate more easily
+</div>
+</div>
 
-- Example with VoiceOver
-    * VO+U: open the **rotor**
-    * VO+ <-/->: navigate
-    * VO+Fn+ ->: end of the page
-    * VO+Fn+ <-: beginning of the page
-    * VO+Command+L: next link
-    * VO+Command+H: next heading
-    * ...
-
----
-
-# Screen readers
-
-- Users navigate differently on desktop / mobile
-    * Keyboard on desktop
-    * Touch and swipe gestures on mobile.
-
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
-# Demos
+# Watch it before you try it
 
-- Starting VoiceOver
-- Opening the rotor
-- Navigating / filtering through the rotor
-- Navigating the web page
-- Reading content
-- HTML Summary
-- Speech rate
+| Video | Length | What you see |
+|---|---|---|
+| [Assistive Tech — VoiceOver](https://youtu.be/5R-6WvAihms) | 8 min | Browsing the web with VoiceOver — **recommended for every developer** |
+| [Assistive Tech — VoiceOver on iOS](https://youtu.be/bCHpdjvxBws) | 5 min | The mobile screen reader, with gestures |
+| [Assistive Tech — TalkBack](https://youtu.be/0Zpzl4EKCco) | 6 min | The Android screen reader |
+| [Assistive Tech — NVDA](https://youtu.be/Jao3s_CwdRU) | 7 min | The Windows screen reader — the most used, with JAWS |
+
+<br />
+
+> Test your own site with one of them **before** you deploy: five minutes are
+> enough to find the worst problems.
+
+---
+
+# Recap
+
+- Accessibility = the content available to **everyone**, whatever the
+  **context of use** — not only people with a disability
+- **Four families** of impairments — visual, motor, hearing, cognitive —
+  permanent or temporary, and situational for all of us
+- Assistive technologies mostly **emulate a keyboard**; screen readers read
+  the **accessibility tree** — role, name, state — never the CSS
+- The **rotor** shows the page's structure: no headings, no landmarks, no
+  shortcuts
+
+> In the workshop you **hear** your first pages: everything later in the
+> training is about what you heard.
 
 ---
 layout: cover
 ---
 
-# Hands-on
+# Workshop 01
 
----
-layout: cover
----
+## Screen readers
 
-# Workshop 1
-
-Screen reader
+`workshops/01_screen_reader`

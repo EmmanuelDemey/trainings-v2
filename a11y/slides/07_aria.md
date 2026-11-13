@@ -2,433 +2,369 @@
 layout: cover
 ---
 
-# ARIA Standard
+# 07 - ARIA
 
 ---
 
-# ARIA Standard
+# Learning objectives
 
-* **WAI-ARIA**: Web Accessibility Initiative – Accessible Rich Interactive Applications
-* Adds semantics to HTML content
-* Three main categories:
-    * **Roles**: define the type of element
-    * **States**: properties that change (e.g. `aria-checked`)
-    * **Properties**: static characteristics (e.g. `aria-label`)
+At the end of this chapter, you will be able to:
 
----
-
-# ARIA rule #1: prefer native HTML
-
-* **⚠️ Important**: only use ARIA when HTML has no equivalent native element
-* **Native HTML** gives you for free:
-    * Native semantics
-    * Keyboard navigation
-    * Focus management
-    * Expected behavior
-* **ARIA** requires you to code everything by hand:
-    * Visual appearance (CSS)
-    * Behavior (JavaScript)
-    * Focusability (`tabindex`)
-    * Keyboard navigation (events)
+- **Explain** what ARIA changes — the accessibility tree — and what it does
+  **not**: behaviour, focus, keyboard
+- **Apply** the five rules of ARIA, starting with *"no ARIA is better than bad
+  ARIA"*
+- **Use** roles, states and properties, and keep states **in sync** with
+  JavaScript
+- **Build** a custom widget the native way would have given you for free:
+  role, name, state, focus, keyboard
+- **Find** the right pattern in the ARIA Authoring Practices Guide
 
 ---
 
-# ARIA Standard - Use cases
+# WAI-ARIA in one slide
 
-* Only use ARIA when needed to:
-    * Add semantics to non-semantic HTML code
-    * Support older browsers
-    * Build accessible custom components (widgets)
-* **Never use ARIA** to work around CSS/styling issues
-* ARIA attributes **only** affect the Accessibility Tree
+**WAI-ARIA** — *Accessible Rich Internet Applications* — attributes that tell
+assistive tech what an element **is** and what **state** it is in.
+
+| Kind | Answers | Examples | Changes at runtime? |
+|---|---|---|---|
+| **Role** | *What is it?* | `role="tab"`, `role="dialog"`, `role="switch"` | Almost never |
+| **State** | *How is it now?* | `aria-checked`, `aria-expanded`, `aria-selected` | **Yes** — on every interaction |
+| **Property** | *How does it relate?* | `aria-labelledby`, `aria-controls`, `aria-live` | Rarely |
+
+<br />
+
+> ARIA only changes the **accessibility tree**. It adds no style, no focus, no
+> keyboard handling, no behaviour — all of that is still **your** job.
+
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 
-# ARIA Standard - Resources
-
-* **ARIA Authoring Practices Guide (APG)**: https://www.w3.org/WAI/ARIA/apg/
-* Official W3C guide with patterns and examples
-* **Essential** for implementing ARIA components correctly
-
----
-
-# Custom checkbox example
+# What ARIA does — and does not
 
 ```html
-<div tabindex="0" role="checkbox" aria-checked="true">
-    take the accessibility training
+<!-- ❌ Announced "checkbox, checked" … and that is all it does -->
+<div role="checkbox" aria-checked="true">Take the accessibility training</div>
+```
+
+| | `<input type="checkbox">` | `<div role="checkbox">` |
+|---|---|---|
+| Role announced | ✅ | ✅ |
+| Reached with Tab | ✅ | ❌ needs `tabindex="0"` |
+| Toggles with Space | ✅ | ❌ needs a `keydown` handler |
+| Toggles on click | ✅ | ❌ needs a `click` handler + `aria-checked` update |
+| Name from a `<label>` | ✅ | ❌ needs `aria-labelledby` |
+| Submitted with the form | ✅ | ❌ needs a hidden input |
+| Works in Windows high-contrast mode | ✅ | ❌ needs `forced-colors` styles |
+
+<style>
+table { font-size: 0.8em; }
+</style>
+
+---
+
+# The five rules of ARIA
+
+From the W3C *Using ARIA* note:
+
+1. **Native first** — if an HTML element or attribute does the job, use it.
+   *No ARIA is better than bad ARIA*
+2. **Don't change native semantics** — `<h2 role="tab">` breaks the heading:
+   wrap it, `<div role="tab"><h2>…</h2></div>`
+3. **Every interactive role is usable with the keyboard** — a `role="button"`
+   answers Enter **and** Space
+4. **Never hide a focusable element** — no `aria-hidden="true"` or
+   `role="presentation"` on something that takes the focus
+5. **Every interactive element has an accessible name** — from its content,
+   a `<label>`, `aria-labelledby` or `aria-label`
+
+<br />
+
+> In the WebAIM Million, pages **with** ARIA have **more** detected errors
+> than pages without: ARIA is a sharp tool.
+
+---
+
+# When ARIA is the right tool
+
+<div style="display: flex; gap: 2em;">
+<div>
+
+### ✅ Use ARIA to
+
+- Build a **widget HTML does not have**: tabs, tree, combobox, menu, switch
+- Expose a **state** HTML cannot: `aria-expanded` on a toggle,
+  `aria-current="page"`
+- **Relate** elements: `aria-controls`, `aria-describedby`
+- **Announce** dynamic changes: live regions (chapter 08)
+
+</div>
+<div>
+
+### ❌ Don't use ARIA to
+
+- Rebuild a `<button>`, a link, a checkbox, a `<select>` you could just use
+- Fix a **visual** problem — it changes nothing on screen
+- Repeat what HTML already says: `<nav role="navigation">`,
+  `<button role="button">`
+- Silence an automated tool's warning without understanding it
+
+</div>
+</div>
+
+<br />
+
+> The **ARIA Authoring Practices Guide** — https://www.w3.org/WAI/ARIA/apg/ —
+> gives, for each pattern, the roles, states **and the keyboard contract**.
+> Start there before building any widget.
+
+---
+
+# The roles you will meet
+
+| Category | Roles | Native equivalent |
+|---|---|---|
+| **Widgets** | `button`, `checkbox`, `radio`, `switch`, `slider`, `tab`, `combobox`, `menuitem`, `treeitem` | many — `<button>`, `<input>`, `<select>` |
+| **Composite** | `radiogroup`, `tablist`, `listbox`, `menu`, `tree`, `grid` | few — `<fieldset>`, `<select>` |
+| **Landmarks** | `banner`, `navigation`, `main`, `complementary`, `contentinfo`, `search`, `region`, `form` | `<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>`, `<search>` |
+| **Live regions** | `alert`, `status`, `log`, `timer` | `<output>` (≈ `status`) |
+| **Windows** | `dialog`, `alertdialog` | `<dialog>` |
+| **Structure** | `heading`, `list`, `table`, `tooltip`, `toolbar`, `tabpanel` | `<h1>`–`<h6>`, `<ul>`, `<table>` |
+
+<br />
+
+- **Abstract** roles (`widget`, `landmark`…) exist in the spec only: never
+  write them
+- Landmark roles on their HTML5 element are **redundant** today — use the
+  element alone
+
+<style>
+table { font-size: 0.75em; }
+</style>
+
+---
+
+# States change — keep them in sync
+
+| State | Values | Typical use |
+|---|---|---|
+| `aria-checked` | `true` / `false` / `mixed` | checkbox, radio, switch |
+| `aria-selected` | `true` / `false` | tab, option |
+| `aria-pressed` | `true` / `false` | toggle button (bold, mute) |
+| `aria-expanded` | `true` / `false` | disclosure, menu button, accordion, tree item |
+| `aria-current` | `page`, `step`, `date`, `true` | current link in a navigation |
+| `aria-invalid` | `true` / `false` | field in error |
+| `aria-disabled` | `true` / `false` | disabled but still focusable (and discoverable) |
+| `aria-busy` | `true` / `false` | region being updated |
+| `aria-hidden` | `true` | decorative content — never on something focusable |
+
+<br />
+
+> A state that is **not updated** is worse than no state: the screen reader
+> says *"collapsed"* on a panel that is open.
+
+<style>
+table { font-size: 0.8em; }
+</style>
+
+---
+
+# Properties relate elements
+
+| Property | What it does |
+|---|---|
+| `aria-labelledby` | Names the element with **another** element's text (one or several ids) |
+| `aria-label` | Names the element with a string — when no visible text exists |
+| `aria-describedby` | Adds a **description**, read after the name |
+| `aria-controls` | Points to the element this one shows, hides or changes |
+| `aria-live` | Makes a region announce its changes: `polite` or `assertive` |
+| `aria-haspopup` | Says it opens a `menu`, `listbox`, `dialog`… |
+| `aria-required` | Required — for custom widgets that cannot use `required` |
+| `aria-modal` | On a dialog: the rest of the page is out of reach |
+
+<br />
+
+- **Name** order the browser follows: `aria-labelledby` > `aria-label` >
+  native label (`<label>`, `alt`, `<legend>`…) > text content > `title`
+- Prefer a **visible** text: it is translated, and voice users can say it
+
+<style>
+table { font-size: 0.85em; }
+</style>
+
+---
+
+# A toggle: one attribute, kept in sync
+
+```html
+<button type="button" aria-expanded="false" aria-controls="filters">
+  Filters
+</button>
+<div id="filters" hidden>…</div>
+```
+
+```js
+const toggle = document.querySelector('[aria-controls="filters"]');
+const panel = document.getElementById('filters');
+
+toggle.addEventListener('click', () => {
+  const open = toggle.getAttribute('aria-expanded') === 'true';
+  toggle.setAttribute('aria-expanded', String(!open));   // the state …
+  panel.hidden = open;                                     // … and the UI, together
+});
+```
+
+- A real `<button>`: focus, Enter, Space for free — ARIA adds only the
+  **state**
+- Announced *"Filters, button, collapsed"*, then *"expanded"*
+- No JavaScript needed for a simple disclosure: `<details>` + `<summary>`
+
+---
+
+# A more specific role on a native element
+
+```html
+<!-- A button that is on / off: announced "Dark mode, switch, on" -->
+<button type="button" role="switch" aria-checked="true">Dark mode</button>
+
+<!-- A toggle button: announced "Bold, toggle button, pressed" -->
+<button type="button" aria-pressed="true">Bold</button>
+```
+
+- Start from the **closest native** element: the `<button>` keeps its focus
+  and keyboard, the role only refines what is announced
+- `switch` vs `aria-pressed`: a switch is **on / off** (a setting), a pressed
+  button is **active / not** (a tool)
+- Allowed because it does not *break* the button's semantics — rule 2 is
+  about `<h2 role="tab">`, not this
+
+---
+
+# A custom radio group — the markup
+
+```html
+<p id="sex-label">Sex</p>
+<div role="radiogroup" aria-labelledby="sex-label">
+  <div role="radio" aria-checked="true"  tabindex="0">Female</div>
+  <div role="radio" aria-checked="false" tabindex="-1">Male</div>
+  <div role="radio" aria-checked="false" tabindex="-1">Other</div>
 </div>
 ```
 
----
+- `role="radiogroup"` + `aria-labelledby`: announced *"Sex, radio group"* on
+  entry — the `<fieldset>` + `<legend>` of chapter 06
+- `role="radio"` + `aria-checked` on each option: the role and its **state**
+- **Roving tabindex**: only the checked option (or the first, if none) has
+  `tabindex="0"` — **one Tab stop** for the whole group, like native radios
 
-# Roles
-
-* A role is added by setting the `role` attribute on an HTML element.
-
-```html
-<tr role="...">
-    ...
-</tr>
-```
+> ⚠️ This is workshop 06 because it is a **lesson**: in a real project,
+> style a native `<input type="radio">` instead.
 
 ---
 
-# ARIA roles
+# A custom radio group — the keyboard
 
-* Roles are split into six categories:
-    * **Abstract Role**: never use (internal use)
-    * **Document Structure Role**: document structure (toolbar, tooltip, etc.)
-    * **Landmark Role**: main regions (navigation, main, etc.)
-    * **Live Region Role**: dynamic content (alert, status, etc.)
-    * **Widget Role**: interactive components (button, slider, tabs, etc.)
-    * **Window Role**: windows (dialog, alertdialog)
+```js
+group.addEventListener('keydown', (event) => {
+  const radios = [...group.querySelectorAll('[role="radio"]')];
+  const index = radios.indexOf(document.activeElement);
+  let next;
+  if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = (index + 1) % radios.length;
+  else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') next = (index - 1 + radios.length) % radios.length;
+  else if (event.key === ' ') next = index;
+  else return;                         // let Tab and every other key through
+  event.preventDefault();              // no page scroll on arrows and Space
+  check(radios, radios[next]);
+});
 
----
-
-# List of roles
-
-* alert
-* banner
-* checkbox
-* complementary
-* contentinfo
-* combobox
-* link
-* search
-
----
-
-# List of roles
-
-* switch
-* radio
-* radiogroup
-* tab
-* tablist
-* tabpanel
-
----
-
-# List of roles
-
-* toolbar
-* tree
-* treeitem
-
----
-
-# Landmark Role
-
-* Most landmark roles have an HTML5 equivalent
-* Use them **only** to support older browsers
-* **Today**: HTML5 elements are enough in most cases
-
-```html
-<nav role="navigation">
-  <ul>
-    <li><a href="#a">Dexter</a></li>
-    <li><a href="#b">Doctor Who</a></li>
-    <li><a href="#c">Futurama</a></li>
-  </ul>
-</nav>
-```
-
----
-
-# Landmark Role
-
-```html
-<form role="search">
-  <label for="search-input">Search this site</label>
-  <input type="text" id="search-input" name="search">
-  <input type="submit" name="submit-btn" value="Search" />
-</form>
-```
-
---- 
-
-# Landmark Role
-
-```html
-<footer role="contentinfo">
-  <p>&copy; 2020 Small Business Ltd. All rights reserved.</p>
-</footer>
-```
-
----
-
-# States
-
-* A **state** is added through an `aria-*` attribute on an HTML element
-* A state **must be updated dynamically** in JavaScript based on user interactions
-* Example: `aria-checked` must toggle between `true`/`false` on click
-
-```html
-<span aria-busy="true">
-    ...
-</span>
-```
-
----
-
-# States - The most common ones
-
-* List of the most used states:
-    * `aria-busy`: element is loading
-    * `aria-checked`: checked/unchecked state (checkbox, radio)
-    * `aria-current`: current element (page, step, date, etc.)
-    * `aria-disabled`: disabled element
-    * `aria-expanded`: expanded/collapsed element
-    * `aria-hidden`: hides an element from screen readers
-    * `aria-invalid`: invalid value in a form
-    * `aria-pressed`: toggle button on/off
-    * `aria-selected`: selected element (tab, option)
-
----
-
-# State
-
-```html
-<form>
-    <label>
-        Name
-        <input aria-invalid="true"/>
-    </label>
-    <button type="submit">
-        <em class="fa fa-home" aria-hidden="true" />
-        Submit
-    </button>
-</form>
-```
-
----
-
-# Properties
-
-* The ARIA standard also provides **properties**, which are usually static
-* Difference with states: rarely changed after initialization
-    * `aria-controls`: identifies the controlled element
-    * `aria-describedby`: references a description
-    * `aria-label`: invisible text label
-    * `aria-labelledby`: references an element used as the label
-    * `aria-live`: dynamically updated region
-    * `aria-required`: required field
-    * `aria-haspopup`: indicates a menu/dialog that can open
-
----
-
-# Creating a button with a more specific role
-
-```html
-<button role="switch" aria-checked="true">
-    Enable
-</button>
-```
-
----
-
-# Integration - Web Components
-
-* **Best practice**: build accessibility directly into your components
-* For Web Components: add the ARIA attributes in `connectedCallback`
-* That way, accessibility is built in and can't be forgotten
-
-```javascript
-class SwitchButton extends HTMLElement {
-  connectedCallback(){
-    this.setAttribute('role', 'switch');
-    this.setAttribute('aria-checked', 'false');
-    this.setAttribute('tabindex', '0');
+function check(radios, selected) {
+  for (const radio of radios) {
+    const isSelected = radio === selected;
+    radio.setAttribute('aria-checked', String(isSelected));
+    radio.tabIndex = isSelected ? 0 : -1;    // the roving tabindex follows
   }
+  selected.focus();
 }
-
-window.customElements.define('button-switch', SwitchButton)
 ```
 
-* **New API**: ARIA Reflection lets you use native JavaScript properties
+- The **APG contract**: arrows move **and** check, wrapping around; Space
+  checks; Tab leaves the group
+- `event.key`, never the deprecated `keyCode`
 
-```javascript
-class SwitchButton extends HTMLElement {
-  connectedCallback(){
+---
+
+# ARIA in components and in CSS
+
+<div style="display: flex; gap: 2em;">
+<div style="flex: 1; min-width: 0;">
+
+### Built into the component
+
+```js
+class ToggleSwitch extends HTMLElement {
+  connectedCallback() {
+    // ARIA reflection: properties, not strings
     this.role = 'switch';
-    this.ariaChecked = false;
+    this.ariaChecked = 'false';
     this.tabIndex = 0;
   }
 }
-
-window.customElements.define('button-switch', SwitchButton)
+customElements.define('toggle-switch', ToggleSwitch);
 ```
 
----
+- Put the ARIA **in the component** once: nobody can forget it on a page
+- Same in a framework: Angular CDK, React Aria, Radix (chapter 10)
 
-# Integration - Frameworks
+</div>
+<div style="flex: 1; min-width: 0;">
 
-* Example with the Angular CDK (Component Dev Kit)
-* The `cdkFocusRegion*` directives handle focus automatically
-
-```html
-<a mat-list-item routerLink cdkFocusRegionStart>
-    Focus region start
-</a>
-<a mat-list-item routerLink>Link</a>
-<a mat-list-item routerLink cdkFocusInitial>
-    Initially focused
-</a>
-<a mat-list-item routerLink cdkFocusRegionEnd>
-    Focus region end
-</a>
-```
-
----
-
-# Custom checkbox - Full example
-
-* **⚠️ Reminder**: always prefer the native `<input type="checkbox">`
-* This example shows what you must implement if you have to build a custom checkbox
-
-```html
-<p id="question">Question</p>
-<ul aria-labelledby="question" role="group">
-  <li role="checkbox" aria-checked="false" tabindex="0">
-    <img aria-hidden="true" src="checkbox.svg" alt="Not selected: " />
-    Choice 1
-  </li>
-  <li role="checkbox" aria-checked="true" tabindex="0">
-    <img aria-hidden="true" src="checkbox-checked.svg" alt="Selected: " />
-    Choice 2
-  </li>
-  <li role="checkbox" aria-checked="false" tabindex="0">
-    <img aria-hidden="true" src="checkbox.svg" alt="Not selected: " />
-    Choice 3
-  </li>
-</ul>
-```
-
----
-
-# Custom radio - Full example
-
-* **⚠️ Reminder**: always prefer the native `<input type="radio">`
-* Note the `tabindex` difference: only the selected element has `tabindex="0"`
-
-```html
-<p id="question">Question</p>
-<ul aria-labelledby="question" role="radiogroup">
-  <li role="radio" aria-checked="false" tabindex="-1">
-    <img aria-hidden="true" src="radio.svg" alt="Not selected: " />
-    Choice 1
-  </li>
-  <li role="radio" aria-checked="true" tabindex="0">
-    <img aria-hidden="true" src="radio-checked.svg" alt="Selected: " />
-    Choice 2
-  </li>
-  <li role="radio" aria-checked="false" tabindex="-1">
-    <img aria-hidden="true" src="radio.svg" alt="Not selected: " />
-    Choice 3
-  </li>
-</ul>
-```
-
----
-
-# Collapsible Panel
-
-* To implement an accessible collapsible panel:
-    * `aria-controls`: links the button to the panel it controls
-    * `aria-expanded`: indicates the open (`true`) or closed (`false`) state
-* These attributes **must be updated dynamically** in JavaScript
-* Modern alternative: use the native HTML `<details>` and `<summary>` elements!
-
-```html
-<button aria-controls="list" aria-expanded="true">Open</button>
-<ul id="list" hidden>
-    ...
-</ul>
-```
-
----
-
-# Text alternative
-
-* Four ways to define text alternatives (in order of priority):
-    1. **Text content** of the element (preferred)
-    2. **`aria-labelledby`**: references an existing element (ID)
-    3. **`aria-label`**: text directly in the attribute (not translatable)
-    4. **Hidden text** with `.sr-only` (translatable)
-
-* **Rule**: `aria-labelledby` > `aria-label` > visible label > content
-
----
-
-# Additional description
-
-* `aria-describedby`: provides a description **in addition** to the label
-* Difference with `aria-labelledby`:
-    * `aria-labelledby`: **names** the element (essential)
-    * `aria-describedby`: **describes** the element (complementary)
-* Example: label="Email", description="Format: name@domain.com"
-
----
-
-# aria-label / aria-labelledby
-
-```html
-<button id="search" aria-label="Search"><img src="..." alt="" /></button>
-
-<h2 id="searchLabel">Search</h2>
-
-<label for="search">Enter search term
-  <input type="search" id="search">
-</label>
-
-<button aria-labelledby="searchLabel"><img src="..." alt="" /></button>
-```
-
----
-
-# CSS - ARIA selectors
-
-* Using ARIA attributes can simplify stylesheets
-* **Benefit**: the style automatically follows the state
+### Styled from the state
 
 ```css
-/* Style for invalid fields */
 input[aria-invalid='true'] {
-    border-color: red;
+  border-color: #b00020;
 }
-
-/* Style for active toggle buttons */
 button[aria-pressed='true'] {
-    background-color: #007bff;
+  background: #0050b3;
 }
-
-/* Style for expanded elements */
-[aria-expanded='true'] .icon {
-    transform: rotate(180deg);
+[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
 }
 ```
 
+- One source of truth: the **state** drives the style — they can't drift
+  apart
+
+</div>
+</div>
+
 ---
 
-# ARIA - Recap
+# Recap — before you write `role=`
 
-* ✅ **Rule #1**: don't use ARIA if a native HTML element exists
-* ✅ **Rule #2**: never change native semantics
-* ✅ **Rule #3**: elements with an interactive role must be focusable
-* ✅ **Rule #4**: focusable elements must be keyboard accessible
-* ✅ **Rule #5**: don't use `role="presentation"` or `aria-hidden` on focusable elements
+| Ask yourself | If yes |
+|---|---|
+| Does an HTML element do this? | Use it. Stop here |
+| Does the APG have this pattern? | Follow its roles, states **and** keyboard table |
+| Does every interactive part take the focus? | `tabindex="0"` / roving tabindex |
+| Does every state update on **every** interaction? | Click, keyboard, and programmatic changes |
+| Does everything have a name? | Content, `aria-labelledby`, `aria-label` |
+| Did you **test it with a screen reader**? | Not done until you have |
 
-* **Documentation**: https://www.w3.org/WAI/ARIA/apg/
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 layout: cover
 ---
 
-# Hands-on
+# Workshop 06
 
----
-layout: cover
----
+## A custom ARIA radio group
 
-# Workshop 6 - Custom ARIA radio group
+`workshops/06_aria_radio`

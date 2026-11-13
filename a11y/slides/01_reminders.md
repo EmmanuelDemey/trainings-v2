@@ -2,17 +2,31 @@
 layout: cover
 ---
 
-# Reminders
+# 01 - Reminders
 
 ---
 
-# Selectors
+# Learning objectives
 
-* Here are different syntaxes to select an HTML element
-* These selectors can be used:
+At the end of this chapter, you will be able to:
 
-* in CSS
+- **Select** elements with CSS selectors, in CSS and in JavaScript
+- **Read and write** attributes — the way every ARIA state is toggled
+- **Listen** to events, and stop their propagation or default behaviour
+- **Hide** content visually while keeping it for screen readers: `.sr-only`
+
+> The workshops are **plain HTML, CSS and JavaScript**. These are the only
+> DOM APIs they need.
+
+---
+
+# Selecting elements
+
+<div style="display: flex; gap: 1.5em;">
+<div style="flex: 1; min-width: 0;">
+
 ```css
+/* The same selectors, in CSS… */
 #id { }
 .className { }
 button { }
@@ -20,114 +34,73 @@ button { }
 img[aria-hidden='true'] { }
 ```
 
-* and in JavaScript (modern syntax recommended)
-```javascript
-// Recommended: querySelector (more flexible)
-const element = document.querySelector(selector);
+```js
+// …and in JavaScript
 const input = document.querySelector('#nameInput');
-const button = document.querySelector('button[aria-label="Submit"]');
+const submit = document.querySelector('button[aria-label="Submit"]');
 
-// Legacy syntax (still works)
-const elementById = document.getElementById("nameInput");
+// Legacy, still works
+const same = document.getElementById('nameInput');
 ```
+
+</div>
+<div style="flex: 1; min-width: 0;">
+
+```js
+// Several elements: a NodeList
+const errors = document.querySelectorAll('[aria-invalid="true"]');
+
+// To an Array, for map / filter / forEach
+const buttons = [...document.querySelectorAll('button')];
+// or Array.from(document.querySelectorAll('button'))
+
+if (!buttons.length) console.log('No button found');
+
+// Legacy, still works
+document.getElementsByTagName('p');
+document.getElementsByClassName('error');
+```
+
+</div>
+</div>
+
+- An **attribute selector** like `[aria-invalid="true"]` styles and finds
+  elements by their **state** — chapter 07 builds on it
+
 ---
 
-# Manipulating HTML elements
+# Attributes and events
 
-- Once an element is retrieved, we can manipulate its attributes:
+```js
+const field = document.querySelector('#email');
 
-```javascript
-const elt = document.querySelector(selector);
-
-elt.hasAttribute("aria-invalid");
-elt.setAttribute("aria-invalid", "true");
-elt.removeAttribute("aria-invalid");
+field.hasAttribute('aria-invalid');
+field.setAttribute('aria-invalid', 'true');   // ARIA states are plain attributes
+field.removeAttribute('aria-invalid');
 ```
 
----
+```js
+document.addEventListener('DOMContentLoaded', () => {   // the HTML is parsed
+  const button = document.querySelector('button');
 
-# Selecting HTML elements
-
-- To select several elements:
-
-```javascript
-// Recommended: querySelectorAll (CSS selectors)
-const buttons = document.querySelectorAll("button");
-const errorFields = document.querySelectorAll('[aria-invalid="true"]');
-
-// Legacy syntax (still works)
-const paragraphs = document.getElementsByTagName("p");
-const errors = document.getElementsByClassName("error");
-```
-
-- The **querySelectorAll** method returns a **NodeList** object
-
-```javascript
-const buttons = document.querySelectorAll("button");
-// Classic loop
-for (let i = 0; i < buttons.length; i++) {
-  console.log(buttons[i]);
-}
-```
-
-- We can convert it to an **Array** to use modern methods
-
-```javascript
-// Converting to an Array (2 ways)
-const buttons = Array.from(document.querySelectorAll("button"));
-// or
-const buttons2 = [...document.querySelectorAll("button")];
-
-// Using Array methods, with error handling
-if (!buttons.length) {
-  console.log("No button found");
-} else {
-  buttons.forEach((button) => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('Button clicked:', button.textContent);
-    });
+  button.addEventListener('click', (e) => {
+    e.stopPropagation();   // stop the bubbling to the parents
+    e.preventDefault();    // cancel the default action (submit, navigate…)
+    console.log('Button clicked:', button.textContent);
   });
-}
-```
-
----
-
-# Event Listener
-
-- To listen to an event on an element, we use the **addEventListener** method.
-- By default, an event propagates from element to element.
-- This mechanism is called **bubbling**.
-- We can stop the **bubbling** and prevent the default behaviour of the event.
-
-
-```javascript
-const button = document.querySelector('button');
-
-button.addEventListener('click', e => {
-    e.stopPropagation();
-    e.preventDefault();
-    ...
 });
 ```
 
----
-
-# Event Listener
-
-- For example, the **DOMContentLoaded** event lets us run code once the HTML document has been fully loaded and parsed.
-
-```javascript
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM fully loaded and parsed");
-});
-```
+- By default an event **bubbles**: it is dispatched on the target, then on each
+  of its ancestors
+- `keydown` + `e.key` is what custom widgets listen to (chapters 07 and 08)
 
 ---
 
-# CSS reminder - the .sr-only class
+# `.sr-only` — visible to screen readers only
 
-**Screen Reader Only**: visually hidden, but still available to screen readers
+<div style="display: flex; gap: 1.5em;">
+<div style="flex: 1; min-width: 0;">
 
 ```css
 .sr-only {
@@ -143,68 +116,49 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 ```
 
----
+| Technique | Seen | Read out |
+|---|---|---|
+| `display: none` | ❌ | ❌ |
+| `visibility: hidden` | ❌ | ❌ |
+| `opacity: 0` | ❌ | ✅ — but still clickable: confusing |
+| **`.sr-only`** | ❌ | ✅ |
 
-# Why .sr-only?
-
-**Context**: some information is visually obvious but not for screen readers
-
-**Common use cases**:
-- **Skip links**: "Skip to main content"
-- **Hidden labels**: icons without visible text
-- **Instructions**: help to navigate a complex component
-- **Extra context**: "opens in a new tab"
+</div>
+<div style="flex: 1; min-width: 0;">
 
 ```html
-<!-- Skip link -->
+<!-- Skip link (shown on focus, chapter 04) -->
 <a href="#main-content" class="sr-only">Skip to main content</a>
 
 <!-- Icon button -->
 <button>
   <span class="sr-only">Close</span>
-  <svg aria-hidden="true"><!-- X icon --></svg>
+  <svg aria-hidden="true"><!-- X --></svg>
 </button>
 
-<!-- External link -->
+<!-- Extra context -->
 <a href="https://example.com" target="_blank">
   Documentation
   <span class="sr-only">(opens in a new tab)</span>
 </a>
 ```
 
----
+- For what is **visually obvious** but not spoken: skip links, icon labels,
+  instructions for a complex widget, "opens in a new tab"
 
-# .sr-only vs other techniques
+</div>
+</div>
 
-**DO NOT use these to hide content that must stay accessible**:
-
-```css
-/* ❌ display: none - Ignored by screen readers */
-.hidden {
-  display: none;
-}
-
-/* ❌ visibility: hidden - Also ignored */
-.invisible {
-  visibility: hidden;
-}
-
-/* ❌ opacity: 0 - Can be confusing */
-.transparent {
-  opacity: 0;
-}
-
-/* ✅ .sr-only - Only perceivable by screen readers */
-.sr-only {
-  /* ... code above ... */
-}
-```
+<style>
+table { font-size: 0.8em; }
+</style>
 
 ---
 
-# What about frameworks?
+# And in a framework?
 
-* The concepts covered here (selecting elements, events, manipulating attributes) also apply to frameworks
-* React, Vue, Angular and Svelte provide their own APIs to manage focus and ARIA attributes
-* We will come back to this in the **Frameworks and Libraries** chapter
-* In this training, the workshops use **plain HTML, CSS and JavaScript**
+- Selecting, listening, toggling attributes: the **same concepts** in React,
+  Vue, Angular, Svelte — through refs, bindings and directives
+- They add their own APIs for **focus** and **ARIA attributes**: chapter 10
+- What you learn here on plain HTML applies there unchanged — the browser and
+  the screen reader only ever see the **DOM**

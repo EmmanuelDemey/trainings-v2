@@ -2,574 +2,305 @@
 layout: cover
 ---
 
-# Frameworks and Libraries
+# 10 - Frameworks and libraries
 
 ---
 
-# Accessibility in Frameworks
+# Learning objectives
 
-* Modern JavaScript frameworks can help... or hurt accessibility
-* **Warning**: a framework is not accessible by default
-* You must **always** apply good practices
+At the end of this chapter, you will be able to:
 
----
-
-# Common pitfalls with frameworks
-
-* ❌ **SPA (Single Page Application)**: native navigation is lost
-    * The "page" change is not announced
-    * History can be broken
-    * Focus is not managed
-
-* ❌ **Custom components**: reinventing the wheel
-    * Buttons as `<div>`
-    * Links as `<span>`
-    * Inaccessible custom forms
-
-* ❌ **Client-side rendering**: content not immediately available
-    * Problem for screen readers
-    * SEO is impacted
+- **Explain** why a framework is not accessible by default — and what a SPA
+  breaks that the browser used to do for you
+- **Announce** a route change and **move** the focus after it
+- **Recognise** what each framework gives you: linters, focus helpers, live
+  announcers
+- **Choose** a headless component library instead of rewriting a dialog, a
+  combobox or tabs
+- **Test** components by role, and with axe, in Storybook and in the CI
 
 ---
 
-# Good practices - SPA
+# A framework renders HTML — good or bad
 
-**1. Announce page changes**
+```tsx
+// ❌ What a component makes easy
+<div className="btn" onClick={save}>Save</div>
+<span className="link" onClick={() => navigate('/people')}>People</span>
 
-```javascript
-// React example
-useEffect(() => {
-  // Update the title
-  document.title = `${pageTitle} - My App`;
-
-  // Announce the change via aria-live
-  const announcement = document.getElementById('route-announcer');
-  announcement.textContent = `Navigated to ${pageTitle}`;
-}, [location]);
+// ✅ What the browser already knows how to handle
+<button type="button" onClick={save}>Save</button>
+<Link to="/people">People</Link>        {/* renders <a href="/people"> */}
 ```
 
-```html
-<!-- Add this element to your HTML -->
-<div
-  id="route-announcer"
-  aria-live="assertive"
-  aria-atomic="true"
-  className="sr-only"
-></div>
-```
+- Everything of chapters 04 to 08 still applies: the framework **outputs HTML**,
+  and the browser builds the accessibility tree from it
+- A component written once is **reused everywhere**: one `<div onClick>` in a
+  design system is a thousand broken buttons
+- **No framework is accessible by default** — some only make the right thing
+  easier
 
 ---
 
-# Good practices - SPA
+# What a SPA breaks
 
-**2. Manage focus on route change**
+| The browser, on a real navigation | A SPA, on a client-side route change |
+|---|---|
+| Loads a new `<title>` | Keeps the old one — unless you set it |
+| The screen reader announces the new page | **Silence**: nothing tells the user the page changed |
+| Focus goes back to the top of the document | Focus stays on the clicked link — or on `<body>`, if the link was removed |
+| Back / Forward restore the page and the scroll | Only if the router manages history and scroll |
+| Content is in the HTML on arrival | Rendered by JavaScript: **empty** until it runs |
 
-```javascript
-// React Router v6
-import { useLocation, useNavigate } from 'react-router-dom';
+<br />
 
-function App() {
+> WCAG 2.4.2 Page Titled (A), 2.4.3 Focus Order (A), 4.1.3 Status Messages (AA):
+> a SPA has to do by hand what a page load did for free.
+
+<style>
+table { font-size: 0.85em; }
+</style>
+
+---
+
+# Route change — update the title, announce it
+
+```tsx
+// RouteAnnouncer.tsx — rendered once, in the layout
+export function RouteAnnouncer({ title }: Readonly<{ title: string }>) {
   const location = useLocation();
-  const mainRef = useRef(null);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    // Move focus to the main content
-    mainRef.current?.focus();
+    document.title = `${title} - Genea11y`;   // WCAG 2.4.2
+    setMessage(`${title}, page loaded`);        // read by the live region below
+  }, [location.pathname, title]);
 
-    // Scroll to the top
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
-  return <main ref={mainRef} tabIndex={-1}>...</main>;
-}
-```
-
----
-
-# React and accessibility
-
-## Official React resources
-
-* [React Accessibility Guide](https://react.dev/learn/accessibility)
-* **JSX**: supports all ARIA attributes
-
-```jsx
-<div
-  role="button"
-  tabIndex={0}
-  aria-pressed={isPressed}
-  onClick={handleClick}
-  onKeyDown={handleKeyDown}
->
-  {label}
-</div>
-```
-
-* **Fragment**: avoids useless `<div>`s
-
-```jsx
-<>
-  <label htmlFor="name">Name</label>
-  <input id="name" type="text" />
-</>
-```
-
----
-
-# React - Useful hooks
-
-```javascript
-// Hook to manage focus
-function useFocusTrap(ref) {
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const focusableElements = element.querySelectorAll(
-      'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
-    );
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    function handleTab(e) {
-      if (e.key !== 'Tab') return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          lastElement.focus();
-          e.preventDefault();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          firstElement.focus();
-          e.preventDefault();
-        }
-      }
-    }
-
-    element.addEventListener('keydown', handleTab);
-    return () => element.removeEventListener('keydown', handleTab);
-  }, [ref]);
-}
-```
-
----
-
-# React - Accessible libraries
-
-## **React Aria (Adobe)**
-
-* Hooks to build accessible components
-* No styling: you keep full control
-* Based on the WAI-ARIA Practices
-
-```jsx
-import { useButton } from '@react-aria/button';
-
-function MyButton(props) {
-  let ref = useRef();
-  let { buttonProps } = useButton(props, ref);
-
-  return <button {...buttonProps} ref={ref}>{props.children}</button>;
-}
-```
-
-* **Website**: https://react-spectrum.adobe.com/react-aria/
-
----
-
-# React - Accessible libraries
-
-## **Radix UI**
-
-* Accessible headless components
-* Style them with your favorite method
-* Excellent accessibility quality
-
-```jsx
-import * as Dialog from '@radix-ui/react-dialog';
-
-function MyDialog() {
   return (
-    <Dialog.Root>
-      <Dialog.Trigger>Open</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay />
-        <Dialog.Content>
-          <Dialog.Title>Title</Dialog.Title>
-          <Dialog.Description>Description</Dialog.Description>
-          <Dialog.Close>Close</Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+      {message}
+    </div>
   );
 }
 ```
 
-* **Website**: https://www.radix-ui.com/
+- The live region must **exist before** its text changes: render it once, in
+  the layout, never conditionally
+- `polite`, not `assertive`: the user hears the current sentence end first
+- **Next.js** (`next/link`), **Nuxt**, **SvelteKit** and **Angular** (with
+  `TitleStrategy`) ship a route announcer: check it is on before writing one
 
 ---
 
-# React - Accessible libraries
+# Route change — move the focus
 
-## **shadcn/ui**
+```tsx
+function Layout() {
+  const location = useLocation();
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
-* Collection of reusable components
-* Based on Radix UI
-* You copy the code into your project
+  useEffect(() => {
+    headingRef.current?.focus();   // the user starts reading the new page here
+  }, [location.pathname]);
 
-```bash
-npx shadcn-ui@latest add button
-npx shadcn-ui@latest add dialog
+  return (
+    <main id="main">
+      <h1 ref={headingRef} tabIndex={-1}>{title}</h1>
+      <Outlet />
+    </main>
+  );
+}
 ```
 
-* **Website**: https://ui.shadcn.com/
-
-## **Headless UI**
-
-* By the creators of Tailwind CSS
-* Unstyled, accessible components
-
-* **Website**: https://headlessui.com/
+- Focus the page's **`<h1>`** (or `<main>`): the screen reader reads it, and the
+  next Tab goes into the content
+- `tabIndex={-1}`: focusable **by script**, not added to the Tab order
+- ❌ Don't leave the focus on a link that was **removed** from the DOM: it falls
+  back to `<body>`, and the user starts again from the top
 
 ---
 
-# React - Testing Library
+# What each framework gives you
 
-* **@testing-library/react**: tests accessibility
+| | React | Vue | Angular | Svelte |
+|---|---|---|---|---|
+| **Linter** | `eslint-plugin-jsx-a11y` | `eslint-plugin-vuejs-accessibility` | `@angular-eslint/template` (a11y rules) | **Built into the compiler**: `a11y_*` warnings |
+| **Focus trap** | `react-aria` `FocusScope`, `focus-trap-react` | `focus-trap-vue` | CDK `cdkTrapFocus` | `focus-trap` |
+| **Live announcer** | `react-aria` `announce()` | your own `aria-live` region | CDK `LiveAnnouncer` | your own `aria-live` region |
+| **Headless components** | **React Aria**, **Radix UI**, Headless UI, Ariakit | **Reka UI** (ex-Radix Vue), Headless UI | **Angular CDK**, Angular Aria | **Bits UI**, Melt UI |
+| **Styled kits** | shadcn/ui (Radix), MUI, Chakra | PrimeVue, Vuetify | Angular Material, PrimeNG | shadcn-svelte |
+| **Docs** | react.dev/learn/accessibility | vuejs.org — Accessibility | angular.dev/best-practices/a11y | svelte.dev — Accessibility warnings |
 
-```javascript
+<br />
+
+> **Headless** = behaviour, keyboard and ARIA done for you, **no styling**: you
+> keep your design system, they keep the WAI-ARIA patterns.
+
+<style>
+table { font-size: 0.7em; }
+</style>
+
+---
+
+# A headless dialog — what you no longer write
+
+```tsx
+import * as Dialog from '@radix-ui/react-dialog';
+
+<Dialog.Root>
+  <Dialog.Trigger>Details</Dialog.Trigger>
+  <Dialog.Portal>
+    <Dialog.Overlay className="overlay" />
+    <Dialog.Content className="dialog">
+      <Dialog.Title>Jean Dupont</Dialog.Title>
+      <Dialog.Description>Born in 1932, in Lille.</Dialog.Description>
+      <Dialog.Close>Close</Dialog.Close>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+- `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby` — set
+- Focus **moved in**, **trapped**, **given back** to the trigger, Escape closes —
+  everything of workshop 07, done
+- The same contract in React Aria (`<Modal>`), Reka UI, Bits UI, the Angular CDK
+  (`Dialog`) — and the native **`<dialog>`** + `showModal()` for the simple cases
+
+---
+
+# Framework-specific helpers
+
+<div style="display: flex; gap: 2em;">
+<div>
+
+### Angular CDK
+
+```ts
+// Where did the focus come from?
+this.focusMonitor.monitor(this.el, true)
+  .subscribe((origin) => console.log(origin));
+  // 'mouse' | 'keyboard' | 'touch' | 'program' | null
+
+// Announce without a visible change
+this.liveAnnouncer.announce('Person saved', 'polite');
+```
+
+```html
+<div cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+  <button cdkFocusInitial>First</button>
+</div>
+```
+
+</div>
+<div>
+
+### Svelte — the compiler warns
+
+```svelte
+<!-- ⚠ a11y_missing_attribute -->
+<img src="photo.jpg" />
+
+<!-- ⚠ a11y_click_events_have_key_events,
+     a11y_no_static_element_interactions -->
+<div onclick={open}>Details</div>
+
+<!-- ✅ -->
+<img src="photo.jpg" alt="Jean Dupont in 1960" />
+<button onclick={open}>Details</button>
+```
+
+</div>
+</div>
+
+---
+
+# Web Components — the shadow DOM
+
+```js
+class MyToggle extends HTMLElement {
+  connectedCallback() {
+    // ✅ a real <button> inside: role, focus and keyboard for free
+    this.attachShadow({ mode: 'open' }).innerHTML = `<button aria-pressed="false"><slot></slot></button>`;
+    const button = this.shadowRoot.querySelector('button');
+    button.addEventListener('click', () => {
+      button.setAttribute('aria-pressed', String(button.getAttribute('aria-pressed') !== 'true'));
+    });
+  }
+}
+customElements.define('my-toggle', MyToggle);
+```
+
+- Put a **native element** inside, rather than `role="button"` on the host
+- ❌ `aria-labelledby` / `for` **cannot cross** the shadow boundary: a `<label>`
+  outside cannot name an `<input>` inside
+- `ElementInternals` (`this.attachInternals()`) sets a role and states on the
+  host itself; **Lit** makes all this shorter
+
+---
+
+# Testing components
+
+```ts
+// Vitest + Testing Library + vitest-axe (same API as jest-axe)
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { axe } from 'vitest-axe';
 
-test('the button is accessible', async () => {
-  render(<MyButton>Click me</MyButton>);
+test('the toggle is a pressed button after a click', async () => {
+  const { container } = render(<Toggle>Dark theme</Toggle>);
+  const button = screen.getByRole('button', { name: 'Dark theme' });
 
-  // Use accessible queries
-  const button = screen.getByRole('button', { name: /click me/i });
-
-  // Test the interaction
   await userEvent.click(button);
 
   expect(button).toHaveAttribute('aria-pressed', 'true');
+  expect(await axe(container)).toHaveNoViolations();
 });
 ```
 
-* Encourages accessibility good practices
-* **Website**: https://testing-library.com/
+- `getByRole` + axe in every component test — chapter 09
+- **Storybook** `@storybook/addon-a11y`: axe on every story, in the panel and in
+  the test runner
+- **Cypress**: `cypress-axe` (`cy.injectAxe()`, `cy.checkA11y()`); **Playwright**:
+  `@axe-core/playwright`
 
 ---
 
-# Vue.js and accessibility
+# Choosing a library — the checklist
 
-## Official Vue resources
+- ✅ It has an **accessibility page** — which patterns, which keyboard
+  interactions, which screen readers were tested
+- ✅ It follows the **ARIA Authoring Practices Guide** (APG) patterns
+- ✅ **Unplug the mouse** on its docs site: dialog, menu, combobox, tabs
+- ✅ **Turn on a screen reader** on the same demos
+- ✅ Read its **GitHub issues** labelled `a11y` / `accessibility`: how many,
+  how old, how answered
+- ✅ It renders **native elements** when they exist (`<button>`, `<a>`,
+  `<input>`, `<dialog>`)
 
-* [Vue Accessibility Guide](https://vuejs.org/guide/best-practices/accessibility.html)
-* **Template**: supports ARIA attributes
+<br />
 
-```vue
-<template>
-  <button
-    :aria-pressed="isPressed"
-    @click="handleClick"
-    @keydown="handleKeyDown"
-  >
-    {{ label }}
-  </button>
-</template>
-```
+> A library that never mentions accessibility probably never tested it.
 
 ---
 
-# Vue - Accessible libraries
-
-## **Headless UI for Vue**
-
-```vue
-<template>
-  <Dialog v-model:open="isOpen">
-    <DialogPanel>
-      <DialogTitle>Title</DialogTitle>
-      <DialogDescription>Description</DialogDescription>
-      <button @click="isOpen = false">Close</button>
-    </DialogPanel>
-  </Dialog>
-</template>
-
-<script setup>
-import { ref } from 'vue';
-import { Dialog, DialogPanel, DialogTitle, DialogDescription } from '@headlessui/vue';
-
-const isOpen = ref(false);
-</script>
-```
-
-* **Website**: https://headlessui.com/vue/
-
----
-
-# Vue - Accessible libraries
-
-## **PrimeVue**
-
-* Complete component library
-* Good accessibility out of the box
-* Customizable themes
-
-```vue
-<template>
-  <Dialog v-model:visible="visible" header="Title" :modal="true">
-    <p>Dialog content</p>
-    <template #footer>
-      <Button label="No" @click="visible = false" />
-      <Button label="Yes" @click="visible = false" autofocus />
-    </template>
-  </Dialog>
-</template>
-```
-
-* **Website**: https://primevue.org/
-* **Accessibility**: https://primevue.org/accessibility/
-
----
-
-# Angular and accessibility
-
-## Angular CDK (Component Dev Kit)
-
-* Tools to build accessible components
-* Focus, keyboard, overlay management, etc.
-
-```typescript
-import { A11yModule } from '@angular/cdk/a11y';
-
-@Component({
-  template: `
-    <div cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
-      <button cdkFocusInitial>First element</button>
-      <button>Second element</button>
-      <button>Last element</button>
-    </div>
-  `
-})
-export class MyComponent {}
-```
-
-* **Website**: https://material.angular.io/cdk/a11y/overview
-
----
-
-# Angular - Accessible libraries
-
-## **Angular Material**
-
-* Official component library
-* Built-in accessibility
-* Based on Material Design
-
-```typescript
-import { MatDialogModule } from '@angular/material/dialog';
-
-@Component({
-  template: `
-    <button mat-button (click)="openDialog()">Open</button>
-  `
-})
-export class MyComponent {
-  constructor(public dialog: MatDialog) {}
-
-  openDialog() {
-    this.dialog.open(MyDialogComponent);
-  }
-}
-```
-
-* **Website**: https://material.angular.io/
-* **Accessibility**: WCAG 2.1 AA compliant
-
----
-
-# Angular - Useful directives
-
-```typescript
-// Initial focus
-<input cdkFocusInitial />
-
-// Focus monitor
-import { FocusMonitor } from '@angular/cdk/a11y';
-
-constructor(private focusMonitor: FocusMonitor, private el: ElementRef) {
-  this.focusMonitor.monitor(this.el, true).subscribe(origin => {
-    console.log('Focus origin:', origin); // 'mouse' | 'keyboard' | 'touch' | 'program'
-  });
-}
-
-// Live announcer
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-
-constructor(private liveAnnouncer: LiveAnnouncer) {}
-
-announce(message: string) {
-  this.liveAnnouncer.announce(message, 'polite');
-}
-```
-
----
-
-# Svelte and accessibility
-
-* **a11y warnings**: Svelte warns about accessibility issues
-
-```svelte
-<!-- Svelte will warn you if alt is missing -->
-<img src="photo.jpg" />
-
-<!-- ✅ Correct -->
-<img src="photo.jpg" alt="Description" />
-
-<!-- ❌ Svelte will warn you -->
-<div on:click={handleClick}>Clickable</div>
-
-<!-- ✅ Correct -->
-<button on:click={handleClick}>Clickable</button>
-```
-
----
-
-# Accessible Web Components
-
-* **Lit**: modern framework for Web Components
-
-```javascript
-import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-
-@customElement('my-button')
-class MyButton extends LitElement {
-  @property({ type: Boolean }) pressed = false;
-
-  render() {
-    return html`
-      <button
-        role="button"
-        aria-pressed="${this.pressed}"
-        @click="${this._handleClick}"
-      >
-        <slot></slot>
-      </button>
-    `;
-  }
-
-  _handleClick() {
-    this.pressed = !this.pressed;
-  }
-}
-```
-
-* **Website**: https://lit.dev/
-
----
-
-# Accessibility testing tools
-
-## **Jest + jest-axe**
-
-```javascript
-import { render } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
-
-expect.extend(toHaveNoViolations);
-
-test('should not have accessibility violations', async () => {
-  const { container } = render(<MyComponent />);
-  const results = await axe(container);
-  expect(results).toHaveNoViolations();
-});
-```
-
----
-
-# Accessibility testing tools
-
-## **Cypress + cypress-axe**
-
-```javascript
-describe('Accessibility', () => {
-  beforeEach(() => {
-    cy.visit('/');
-    cy.injectAxe();
-  });
-
-  it('has no accessibility violations', () => {
-    cy.checkA11y();
-  });
-
-  it('checks a specific element', () => {
-    cy.checkA11y('.my-component');
-  });
-});
-```
-
----
-
-# Accessibility testing tools
-
-## **Storybook + Accessibility Addon**
-
-```javascript
-// .storybook/main.js
-module.exports = {
-  addons: ['@storybook/addon-a11y'],
-};
-```
-
-* Tests accessibility directly in Storybook
-* Visual report of violations
-* Automated tests with axe-core
-
-* **Website**: https://storybook.js.org/addons/@storybook/addon-a11y
-
----
-
-# Accessible Design Systems
-
-## Examples of accessible design systems
-
-* **GOV.UK Design System**: https://design-system.service.gov.uk/
-* **U.S. Web Design System**: https://designsystem.digital.gov/
-* **Material Design**: https://m3.material.io/foundations/accessible-design
-* **Carbon Design System (IBM)**: https://carbondesignsystem.com/guidelines/accessibility/overview
-* **Atlassian Design System**: https://atlassian.design/foundations/accessibility
-
----
-
-# Checklist - Framework
-
-Before choosing a framework or library:
-
-* ✅ Check the accessibility documentation
-* ✅ Test the components with a screen reader
-* ✅ Check keyboard support
-* ✅ Browse the GitHub issues about accessibility
-* ✅ Check whether a11y audits have been carried out
-* ✅ Look at the code examples for ARIA attributes
-
-**Golden rule**: a framework that does not mention accessibility probably does not take it seriously.
-
----
-
-# Resources - Frameworks
-
-* **React Aria**: https://react-spectrum.adobe.com/react-aria/
-* **Radix UI**: https://www.radix-ui.com/
-* **Headless UI**: https://headlessui.com/
-* **Angular CDK**: https://material.angular.io/cdk/
-* **Inclusive Components**: https://inclusive-components.design/
-* **A11y Style Guide**: https://a11y-style-guide.com/
-
----
-layout: cover
----
-
-# Questions?
+# Accessible design systems — to learn from
+
+| Design system | Why look at it |
+|---|---|
+| [GOV.UK Design System](https://design-system.service.gov.uk/) | Every component tested with users of assistive technologies |
+| [U.S. Web Design System](https://designsystem.digital.gov/) | Section 508 conformance, documented per component |
+| [Carbon (IBM)](https://carbondesignsystem.com/guidelines/accessibility/overview) | Accessibility guidelines for design **and** development |
+| [Atlassian Design System](https://atlassian.design/foundations/accessibility) | Foundations: colour, focus, motion |
+| [Material Design 3](https://m3.material.io/foundations/accessible-design) | Accessible design principles, touch targets |
+
+<br />
+
+- More: [React Aria](https://react-spectrum.adobe.com/react-aria/) ·
+  [Radix UI](https://www.radix-ui.com/) · [Headless UI](https://headlessui.com/) ·
+  [Angular CDK](https://material.angular.io/cdk/a11y/overview) ·
+  [Inclusive Components](https://inclusive-components.design/) ·
+  [A11y Style Guide](https://a11y-style-guide.com/)
+
+<style>
+table { font-size: 0.85em; }
+</style>

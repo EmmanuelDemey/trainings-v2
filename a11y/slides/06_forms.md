@@ -2,287 +2,307 @@
 layout: cover
 ---
 
-# Forms
+# 06 - Accessible forms
 
 ---
 
-# Forms
+# Learning objectives
 
-* Elements that let the user enter data
-* Several elements are available: `form`, `input`, `checkbox`, `radio`, `textarea`, `select`, etc.
-* Forms are essential for interaction but also a major source of accessibility issues
+At the end of this chapter, you will be able to:
 
----
-
-# Forms - Input types
-
-* The HTML5 standard provides different input types
-    * text
-    * email
-    * number
-    * range
-    * date
-* ...
+- **Name** every field: pick between `<label>`, `aria-labelledby`,
+  `aria-label` and `.sr-only` — and know why `placeholder` is not a label
+- **Group** related fields with `<fieldset>` and `<legend>`
+- **Help** the user fill in: input types, `autocomplete`, hints with
+  `aria-describedby`
+- **Mark** required fields and **announce** errors a screen reader can hear
+  (`aria-invalid`, `aria-describedby`, focus on the first error)
 
 ---
 
-# Forms - Label
+# Why forms matter
 
-* We must associate a form input with a label
+- A form is where the user **acts**: sign up, pay, search, contact. A blocked
+  form is a blocked user — no workaround
+- And the most common source of failures: in the WebAIM Million, **missing
+  form labels** are in the top 5 every year
+- What a screen reader announces on a field, in that order:
 
-```html
-<label for="firstName">FirstName</label>
-<input id="firstName" />
+```text
+"Email, edit text, required, invalid entry, You must enter a valid email"
+   │        │          │            │                 │
+  name     role      state        state           description
+ <label>  <input>   required   aria-invalid   aria-describedby
 ```
 
+- Every piece of that sentence comes from the **markup** — none from the CSS
+
 ---
 
-# Forms - Label
+# Every field has a `<label>`
+
+<div style="display: flex; gap: 2em;">
+<div style="flex: 1; min-width: 0;">
+
+### Explicit — `for` + `id`
+
+```html
+<label for="first-name">First name</label>
+<input id="first-name" name="firstName" />
+```
+
+### Implicit — the input inside
 
 ```html
 <label>
-    FirstName
-    <input />
+  First name
+  <input name="firstName" />
 </label>
 ```
 
+</div>
+<div style="flex: 1; min-width: 0;">
+
+- Both give the input its **accessible name**
+- Clicking the label **focuses** the field — a bigger target for everyone
+  (and the checkbox toggles)
+- Prefer the explicit form: some older assistive tech and some CSS layouts
+  handle it better
+- WCAG **1.3.1** Info and Relationships (A), **3.3.2** Labels or
+  Instructions (A), **4.1.2** Name, Role, Value (A)
+
+</div>
+</div>
+
 ---
 
-# Forms - Hidden label
+# Which label, when?
 
-* ⚠️ Never use the `hidden` attribute, because the label won't be detected by screen readers
-* The same problem occurs with the CSS properties `display: none` or `visibility: hidden`
-* These methods also hide the content from assistive technologies
+| Technique | Visible | Translated | Use it when |
+|---|---|---|---|
+| `<label for>` | ✅ | ✅ | **Always, by default** |
+| `<label>` + `.sr-only` | ❌ | ✅ | The design has no visible label (a search box with an icon) |
+| `aria-labelledby="id"` | ✅ | ✅ | The visible text is elsewhere on the page (a heading, a table header) |
+| `aria-label="…"` | ❌ | ⚠️ often not | No text exists anywhere — last resort |
+| `placeholder` alone | until you type | ✅ | **Never as the label**: it disappears, and its contrast is low |
+| `<label hidden>` / `display: none` | ❌ | — | **Never**: removed from the accessibility tree too |
+
+<br />
+
+> `aria-labelledby` and `aria-label` **override** the `<label>`: when both
+> exist, the screen reader only reads the ARIA one.
+
+<style>
+table { font-size: 0.8em; }
+</style>
+
+---
+
+# The ARIA ways to name a field
 
 ```html
-<label for="m" hidden>Label m</label>
-<input id="m">
+<!-- The name is a visible text, somewhere else -->
+<h2 id="billing">Billing address</h2>
+<input aria-labelledby="billing" name="billingAddress" />
+
+<!-- No visible text at all: an icon-only search -->
+<input type="search" aria-label="Search the site" />
+
+<!-- Visually hidden, but a real label: translated, clickable -->
+<label for="q" class="sr-only">Search the site</label>
+<input type="search" id="q" />
 ```
 
+- `aria-labelledby` can take **several** ids: `aria-labelledby="billing street"`
+  reads *"Billing address Street"*
+- Automatic translation tools (and some screen readers) skip attribute values:
+  prefer a real text node when you have the choice
+- WCAG **2.5.3** Label in Name (A): the accessible name must **contain** the
+  visible text — voice users say what they see
+
 ---
 
-# Forms - Visually hidden label
+# Help the user fill in
 
-* If you want labels that are visually hidden but accessible to screen readers, use the `.sr-only` class (seen in the Reminders chapter)
+<div style="display: flex; gap: 2em;">
+<div style="flex: 1; min-width: 0;">
 
----
+### The right input type
 
-# Forms - ARIA Labels
+| `type` | What it gives |
+|---|---|
+| `email` | `@` on mobile keyboards, native check |
+| `tel` | numeric keypad |
+| `url` | `/` and `.com` keys |
+| `number` | spinner, numeric keypad |
+| `date`, `time` | native, accessible pickers |
 
-* You can also use `aria-label` or `aria-labelledby`
-* ⚠️ **Important**: these two attributes **override** the label defined with the `<label>` element
-* Only use them when really necessary
+</div>
+<div style="flex: 1; min-width: 0;">
+
+### `autocomplete` — WCAG 1.3.5 (AA)
 
 ```html
-<input aria-label="firstName">
+<input type="text" autocomplete="name" />
+<input type="email" autocomplete="email" />
+<input type="tel" autocomplete="tel" />
+<input type="password"
+       autocomplete="current-password" />
+<input type="password"
+       autocomplete="new-password" />
 ```
+
+- The browser fills in what the user typed before: less typing, less memory
+  — a big help for motor and cognitive impairments
+- `new-password` lets the browser **suggest** a strong one
+
+</div>
+</div>
 
 ---
 
-# Forms - Label
+# Hints are tied with `aria-describedby`
 
 ```html
-<p id="firstNameLabel">FirstName</p>
-<input aria-labelledby="firstNameLabel">
+<label for="email">Email</label>
+<input type="email" id="email" aria-describedby="email-hint" />
+<p id="email-hint" class="hint">We only use it to send your receipt.</p>
 ```
 
----
+<div style="display: flex; gap: 2em;">
+<div>
 
-# Forms - Label: which one to choose?
+### `aria-labelledby` — **names**
 
-* **Decision tree** to pick the right approach:
-    1. ✅ **Preferred**: use `<label>` (always the first choice)
-    2. If the label is visible but elsewhere on the page → `aria-labelledby`
-    3. If the label is hidden but must be translatable → `<label>` + `.sr-only` class
-    4. If the label is programmatic only → `aria-label` (not translatable)
+- *What* the field is
+- Read **first**, replaces the label
+- Short: *"Email"*
 
-* **Priority order**: `<label>` > `aria-labelledby` > `aria-label` > `placeholder`
+</div>
+<div>
 
----
+### `aria-describedby` — **describes**
 
-# Forms - Autocomplete
+- *How* to fill it, extra context
+- Read **after** the name, role and state
+- Longer: a format, a rule, an error
 
-* We can enable an autocomplete mechanism
-* Based on data your user entered previously (in the browser)
-* Uses the `autocomplete` attribute
-* **WCAG 1.3.5** (level AA): helps users fill in forms more easily
-* Especially useful for people with cognitive impairments
+</div>
+</div>
 
----
+<br />
 
-# Forms - Autocomplete
-
-```html
-<label for="frmNameA">Name</label>
-<input type="text" name="name" id="frmNameA"
-  placeholder="Full name" required autocomplete="name">
-
-<label for="frmEmailA">Email</label>
-<input type="email" name="email" id="frmEmailA"
-  placeholder="name@example.com" required autocomplete="email">
-
-<label for="frmPhoneNumA">Phone</label>
-<input type="tel" name="phone" id="frmPhoneNumA"
-  placeholder="+1-555-555-1212" required autocomplete="tel">
-```
+- The hint is **visible** to everyone — the attribute only ties it to the field
+- Native alternative for a short suggestion list: `<input list="…">` +
+  `<datalist>` — no JavaScript widget to rebuild
 
 ---
 
-# Forms - Autocomplete for passwords
-
-* We can also ask the browser to generate a secure password
-* Improves security and user experience
-
-```html
-<input type="password" autocomplete="new-password" id="new-password" />
-```
-
-* Common values:
-    * `current-password`: for signing in
-    * `new-password`: for account creation/password change
-
----
-
-# Fieldset
-
-* The `<fieldset>` element groups sets of related form fields
-* **Mandatory**: define a caption with the `<legend>` element
-* **WCAG 1.3.1** (level A): Info and Relationships
-* Use cases:
-    * radio button groups (mandatory)
-    * checkbox groups
-    * sets of related fields (address, bank details)
-
----
-
-# Fieldset
+# `<fieldset>` + `<legend>` name a group
 
 ```html
 <fieldset>
-    <legend>Select your pizza toppings:</legend>
-    <input id="ham" type="checkbox" name="toppings" value="ham">
-    <label for="ham">Ham</label><br>
-    <input id="pepperoni" type="checkbox" name="toppings" value="pepperoni">
-    <label for="pepperoni">Pepperoni</label><br>
+  <legend>Shipping method</legend>
+  <input type="radio" id="standard" name="shipping" value="standard" />
+  <label for="standard">Standard — 3 days</label>
+  <input type="radio" id="express" name="shipping" value="express" />
+  <label for="express">Express — next day</label>
 </fieldset>
 ```
 
+- The `<legend>` is read when the focus **enters** the group:
+  *"Shipping method, grouping — Standard, radio button, 1 of 2"*
+- Without it, *"Express, radio button"* — express **what**?
+- **Mandatory** for radio groups and checkbox groups; useful for any set of
+  related fields: an address, bank details
+- WCAG **1.3.1** Info and Relationships (A)
+
 ---
 
-# Fieldset
+# Required: say it, then enforce it
+
+| Attribute | Announced | Blocks the submit | Use it |
+|---|---|---|---|
+| `required` | ✅ *"required"* | ✅ native validation | **By default** |
+| `aria-required="true"` | ✅ *"required"* | ❌ | Custom widgets (`role="radiogroup"`…), or when you validate in JS with `novalidate` |
 
 ```html
-<fieldset>
-    <legend>Choose a shipping method:</legend>
-    <input id="overnight" type="radio" name="shipping" value="overnight">
-    <label for="overnight">Overnight</label><br>
-    <input id="twoday" type="radio" name="shipping" value="twoday">
-    <label for="twoday">Two day</label><br>
-</fieldset>
+<p>Fields marked with <span aria-hidden="true">*</span> are required.</p>
+
+<label for="last-name">Last name <span aria-hidden="true">*</span></label>
+<input id="last-name" name="lastName" required />
 ```
 
----
+- The asterisk is **explained once**, then hidden from screen readers: they
+  already hear *"required"*, not *"star"*
+- WCAG **3.3.2** Labels or Instructions (A): say what is expected **before**
+  the user submits
 
-# Datalist
-
-* Native HTML element for building an autocomplete system
-* Accessible alternative to complex JavaScript plugins
-* Well supported by modern browsers
-
-```html
-<label for="ice-cream-choice">Choose a flavor:</label>
-<input list="ice-cream-flavors" id="ice-cream-choice" name="ice-cream-choice" />
-
-<datalist id="ice-cream-flavors">
-    <option value="Chocolate">
-    <option value="Coconut">
-    <option value="Mint">
-    <option value="Strawberry">
-    <option value="Vanilla">
-</datalist>
-
-```
+<style>
+table { font-size: 0.8em; }
+</style>
 
 ---
 
-# Additional information
-
-* To add extra information (help, expected format), use the `aria-describedby` attribute
-* Different from `aria-labelledby`: it describes instead of naming
-* Screen readers read the referenced content after the label
+# Errors a screen reader can hear
 
 ```html
-<label for="email">Your email</label>
+<label for="email">Email</label>
 <input type="email" id="email"
-        aria-describedby="emailHint">
-<p class="hint" id="emailHint">
-    You must enter a valid email
-</p>
+       aria-invalid="true" aria-describedby="email-error" />
+<p id="email-error" class="error">Enter an email like name@example.com</p>
 ```
 
----
+<div style="display: flex; gap: 2em;">
+<div>
 
-# Forms - Required fields
+### On submit
 
-* To mark a field as required, we have two options:
-    * `required`: native HTML5 validation (recommended)
-    * `aria-required="true"`: semantic indication only
-* **Difference**: `required` triggers the browser's native validation with error messages
-* **Best practice**: use `required` + a visual indicator (asterisk, "required" text)
+1. Set `aria-invalid="true"` on each invalid field
+2. Show the message **next to** the field, tied with `aria-describedby`
+3. Move the focus to the **first** invalid field
+4. On a long form: an error **summary** at the top, with links to the fields
 
----
+</div>
+<div>
 
-# Forms - Error handling
+### The rules
 
-* **WCAG 3.3.1** (level A): Error Identification
-* **WCAG 3.3.3** (level AA): Error Suggestion
-* **Best practices**:
-    * Display errors as close as possible to the related field
-    * Use `aria-describedby` to link the error to the field
-    * Use `aria-invalid="true"` when there is an error
-    * Move focus to the first invalid field after validation
-    * Provide an error summary at the top of the form
-* `aria-errormessage` exists but has limited support (prefer `aria-describedby`)
+- The message says **how to fix**, not just *"invalid"* — WCAG **3.3.3**
+  Error Suggestion (AA)
+- Identify the error **in text**, not by a red border alone — WCAG **3.3.1**
+  (A) and **1.4.1** Use of Color (A)
+- Field fixed? Remove `aria-invalid`, the message **and** the
+  `aria-describedby`
+- `aria-errormessage`: support is still uneven — prefer `aria-describedby`
 
-
-```html
-<label for="email">Your email</label>
-<input type="email" id="email" aria-invalid="true" aria-describedby="emailHint">
-<p class="hint" id="emailHint">Invalid email address.</p>
-```
+</div>
+</div>
 
 ---
 
-# Forms - Modern input types
+# Recap — check a form in five minutes
 
-* **Use the appropriate input types** to improve the mobile experience:
-    * `type="email"`: shows @ on the mobile keyboard
-    * `type="tel"`: shows the numeric keypad
-    * `type="url"`: shows .com and / on the keyboard
-    * `type="number"`: for numeric values
-    * `type="date"`, `type="time"`: native pickers
-* Native validation + better UX
+| Check | How |
+|---|---|
+| Every field has a **name** | Accessibility pane of the devtools, or the screen reader |
+| Clicking the label focuses the field | The mouse |
+| Groups have a `<legend>` | Tab into the group with the screen reader on |
+| Input types and `autocomplete` are set | Mobile keyboard, browser autofill |
+| Required fields are announced and explained | *"required"* is read |
+| Errors are in text, tied, and get the focus | Submit empty, listen |
+| The whole form works with **Tab, Space, Enter** | Unplug the mouse |
 
----
-
-# Forms - Recap
-
-* ✅ **Every field** must have an associated `<label>`
-* ✅ Use `<fieldset>` and `<legend>` to group related fields
-* ✅ Add `autocomplete` to make data entry easier
-* ✅ Clearly indicate **required** fields
-* ✅ Display **errors** clearly with `aria-invalid` and `aria-describedby`
-* ✅ Use the appropriate **input types**
-* ✅ Test **keyboard** navigation (Tab, Enter)
+<style>
+table { font-size: 0.85em; }
+</style>
 
 ---
 layout: cover
 ---
 
-# Hands-on
+# Workshop 05
 
----
-layout: cover
----
+## Accessible forms
 
-# Workshop 5 - Accessible forms
+`workshops/05_forms`
