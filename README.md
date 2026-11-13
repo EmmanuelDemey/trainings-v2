@@ -10,6 +10,7 @@ react/               the React training, 3 days — a training-kit project, its 
 zod/                 the Zod training, half a day — a training-kit project, its own Netlify site
 typescript/          the TypeScript training, 2 days — a training-kit project, its own Netlify site
 vitest/              the Vitest training, 1 day — a training-kit project, its own Netlify site
+a11y/                the Digital Accessibility training — a training-kit project, its own Netlify site
 elasticsearch/       the Elasticsearch training, 3 days — a training-kit project, its own Netlify site
 elastic-security/    Elastic Security for SIEM, 3 days — same
 elasticsearch-common/     what those two share: slide fragments, images, the CI's Elasticsearch
@@ -28,7 +29,7 @@ site/                the workshops site of the other trainings (Astro + Starligh
 scripts/             the build that assembles it
 ```
 
-`javascript/`, `vuejs-advanced/`, `react/`, `zod/`, `typescript/`, `vitest/`, `elasticsearch/`, `elastic-security/`, `opensearch/`, the three `tanstack-query-*/` and the two `sentry-*/` trainings are
+`javascript/`, `vuejs-advanced/`, `react/`, `zod/`, `typescript/`, `vitest/`, `a11y/`, `elasticsearch/`, `elastic-security/`, `opensearch/`, the three `tanstack-query-*/` and the two `sentry-*/` trainings are
 built by [training-kit](https://www.npmjs.com/package/@emmanueldemey/training-kit):
 each folder is self-contained (its own `package.json`, lockfile and
 `netlify.toml`), and its README says how to write, build and deploy it. The three

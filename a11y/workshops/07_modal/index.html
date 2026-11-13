@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>People - Genea11y</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header>
+      <h1>Genea11y</h1>
+      <nav aria-label="Main menu">
+        <ul>
+          <li><a href="index.html" aria-current="page">Home</a></li>
+          <li><a href="create.html">Add a person</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <h2>People</h2>
+
+      <table>
+        <caption>People in the family tree</caption>
+        <thead>
+          <tr>
+            <th scope="col">Last name</th>
+            <th scope="col">First name</th>
+            <th scope="col">Birth date</th>
+          </tr>
+        </thead>
+        <tbody id="people">
+          <!-- Rows rendered by script.js -->
+        </tbody>
+      </table>
+    </main>
+
+    <footer>
+      <p>Genea11y - Digital Accessibility training</p>
+    </footer>
+
+    <!-- TODO workshop 7: the details dialog goes here -->
+
+    <script src="script.js"></script>
+  </body>
+</html>

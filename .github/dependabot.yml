@@ -57,6 +57,21 @@ updates:
       include: scope
   - package-ecosystem: npm
     directories:
+      - /a11y
+    schedule:
+      interval: weekly
+    groups:
+      a11y:
+        update-types: [minor, patch]
+      a11y-major:
+        update-types: [major]
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+  - package-ecosystem: npm
+    directories:
       - /opensearch
     schedule:
       interval: weekly

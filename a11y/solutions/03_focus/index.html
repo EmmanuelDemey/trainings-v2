@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>People - Genea11y</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header>
+      <h1>Genea11y</h1>
+      <!-- TODO workshop 4: turn these links into a navigation landmark with a list -->
+      <a href="index.html">Home</a>
+      <a href="create.html">Add a person</a>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <h2>People</h2>
+
+      <!-- TODO workshop 4: this grid of <div>s is a table, without the semantics of one -->
+      <div class="people" id="people">
+        <div class="row header-row">
+          <div>Last name</div>
+          <div>First name</div>
+          <div>Birth date</div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Genea11y - Digital Accessibility training</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

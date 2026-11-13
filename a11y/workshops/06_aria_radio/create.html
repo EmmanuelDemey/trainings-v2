@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add a person - Genea11y</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header>
+      <h1>Genea11y</h1>
+      <nav aria-label="Main menu">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="create.html" aria-current="page">Add a person</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <h2>Add a person</h2>
+
+      <!-- Announced politely once a person is added -->
+      <p class="status-message" role="status" id="form-status"></p>
+
+      <!-- novalidate: the errors are ours, announced and linked, not the browser's bubbles -->
+      <form id="create-form" novalidate>
+        <p>Fields marked with <span aria-hidden="true">*</span> are required.</p>
+
+        <fieldset>
+          <legend>Identity</legend>
+
+          <label for="last-name">Last name <span aria-hidden="true">*</span></label>
+          <input type="text" id="last-name" name="lastName" required autocomplete="family-name" />
+
+          <label for="first-name">First name <span aria-hidden="true">*</span></label>
+          <input type="text" id="first-name" name="firstName" required autocomplete="given-name" />
+
+          <label for="birth-date">Birth date</label>
+          <input type="date" id="birth-date" name="birthDate" autocomplete="bday" />
+
+          <label for="death-date">Death date <span class="sr-only">(optional)</span></label>
+          <input type="date" id="death-date" name="deathDate" />
+        </fieldset>
+
+        <!-- TODO workshop 6: replace these native radios with a custom role="radiogroup" -->
+        <fieldset>
+          <legend>Sex</legend>
+          <div>
+            <input type="radio" id="sex-m" name="sex" value="M" />
+            <label for="sex-m">Male</label>
+          </div>
+          <div>
+            <input type="radio" id="sex-f" name="sex" value="F" />
+            <label for="sex-f">Female</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Parents</legend>
+
+          <label for="parent1-last-name">Parent 1 last name</label>
+          <input type="text" id="parent1-last-name" name="parent1LastName" />
+
+          <label for="parent1-first-name">Parent 1 first name</label>
+          <input type="text" id="parent1-first-name" name="parent1FirstName" />
+
+          <label for="parent2-last-name">Parent 2 last name</label>
+          <input type="text" id="parent2-last-name" name="parent2LastName" />
+
+          <label for="parent2-first-name">Parent 2 first name</label>
+          <input type="text" id="parent2-first-name" name="parent2FirstName" />
+        </fieldset>
+
+        <button type="submit">Add the person</button>
+      </form>
+    </main>
+
+    <footer>
+      <p>Genea11y - Digital Accessibility training</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

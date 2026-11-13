@@ -4,8 +4,9 @@ Ce dossier contient les scripts pour générer les PDFs des formations.
 
 ## generateA11y.js
 
-Script de génération des PDFs pour toutes les formations (Accessibilité, Elasticsearch Ops
-et Vue.js Avancé).
+Script de génération des PDFs pour les formations Elasticsearch Ops et Vue.js Avancé.
+La formation Accessibilité n'en fait plus partie : c'est un projet training-kit
+autonome, dans [`a11y/`](../../a11y/README.md).
 
 ### Prérequis
 
@@ -27,11 +28,10 @@ pnpm install
 Depuis le dossier `training/` :
 
 ```bash
-# Tous les PDFs (A11y + Elasticsearch + Vue.js Avancé) — plusieurs minutes
+# Tous les PDFs (Elasticsearch + Vue.js Avancé) — plusieurs minutes
 pnpm run generate:all
 
 # Une seule formation (slides + cahier d'exercices)
-pnpm run generate:a11y
 pnpm run generate:elasticsearch
 pnpm run generate:vuejs-advanced
 
@@ -45,7 +45,7 @@ Les alias ci-dessus reposent sur deux options, combinables :
 
 | Option | Effet |
 |---|---|
-| `--only=<formation>` | Restreint aux formations données (séparées par des virgules). Valeurs : `a11y`, `elasticsearch`, `vuejs-advanced` |
+| `--only=<formation>` | Restreint aux formations données (séparées par des virgules). Valeurs : `elasticsearch`, `vuejs-advanced` |
 | `--slides` | Seulement les slides (Slidev) |
 | `--exercices` | Seulement les cahiers d'exercices (Puppeteer) |
 
@@ -53,7 +53,7 @@ Sans option, tout est généré.
 
 ```bash
 node ./scripts/generateA11y.js --only=vuejs-advanced --exercices
-node ./scripts/generateA11y.js --only=a11y,vuejs-advanced --slides
+node ./scripts/generateA11y.js --only=elasticsearch,vuejs-advanced --slides
 ```
 
 L'export Slidev est de loin l'étape la plus lente (~45 s par formation, séquentiel à
@@ -69,10 +69,6 @@ node ../scripts/generateA11y.js
 ### Sortie
 
 Les PDFs sont générés dans le dossier `dist/` :
-
-**Formation Accessibilité:**
-- `dist/a11y_slides.pdf` - Les slides de la formation (Slidev)
-- `dist/a11y_exercices.pdf` - Le cahier d'exercices pratiques (Puppeteer)
 
 **Formation Elasticsearch Ops:**
 - `dist/elasticsearch_ops_slides.pdf` - Les slides de la formation (Slidev)
@@ -103,8 +99,6 @@ de page avant chaque `h1` : un atelier commence toujours en haut d'une page.
 1. **Vérification des dépendances** : Le script vérifie que toutes les dépendances nécessaires sont installées
 2. **Création du dossier dist** : Créé automatiquement s'il n'existe pas
 3. **Génération en parallèle** (toutes les formations en même temps) :
-   - **Slides A11y** : Utilise Slidev Export pour convertir `a11y.md` en PDF
-   - **Exercices A11y** : Utilise Puppeteer pour convertir `a11y_pw.md` en PDF via HTML intermédiaire
    - **Slides Elasticsearch** : Utilise Slidev Export pour convertir `elasticsearch_ops.md` en PDF
    - **Exercices Elasticsearch** : Utilise Puppeteer pour convertir `elasticsearch_ops_pw.md` en PDF via HTML intermédiaire
    - **Cheatsheet Elasticsearch** : Utilise Puppeteer pour convertir `Elasticsearch_ops_cheatsheet.md` en PDF via HTML intermédiaire
@@ -129,7 +123,7 @@ pnpm install
 ```
 
 **Erreur Slidev** :
-Vérifiez que les fichiers `a11y.md` et `elasticsearch_ops.md` sont valides et que tous les chapitres inclus existent.
+Vérifiez que le fichier `elasticsearch_ops.md` est valide et que tous les chapitres inclus existent.
 
 **Erreur Puppeteer** :
 Sur certains systèmes, Puppeteer peut nécessiter des dépendances système supplémentaires. Consultez la [documentation Puppeteer](https://pptr.dev/troubleshooting).
@@ -168,14 +162,6 @@ optionnelle `^1.10.0`, donc c'est bien la version du projet qui décide.
 📁 Création du répertoire dist/
 📦 Génération des PDFs...
 
-📊 [A11Y] Génération du PDF des slides avec Slidev...
-✅ [A11Y] Slides PDF généré: /path/to/dist/a11y_slides.pdf
-   Taille: 3.45 MB
-
-📝 [A11Y] Génération du PDF du cahier d'exercices avec Puppeteer...
-✅ [A11Y] Cahier d'exercices PDF généré: /path/to/dist/a11y_exercices.pdf
-   Taille: 0.52 MB
-
 📊 [ES] Génération du PDF des slides avec Slidev...
 ✅ [ES] Slides PDF généré: /path/to/dist/elasticsearch_ops_slides.pdf
    Taille: 4.12 MB
@@ -193,10 +179,6 @@ optionnelle `^1.10.0`, donc c'est bien la version du projet qui décide.
 
 📂 Fichiers générés:
 
-📘 Formation Accessibilité:
-   - /path/to/dist/a11y_slides.pdf
-   - /path/to/dist/a11y_exercices.pdf
-
 📙 Formation Elasticsearch Ops:
    - /path/to/dist/elasticsearch_ops_slides.pdf
    - /path/to/dist/elasticsearch_ops_exercices.pdf
@@ -206,7 +188,6 @@ optionnelle `^1.10.0`, donc c'est bien la version du projet qui décide.
 ## Architecture du script
 
 Le script `generateA11y.js` est conçu pour être extensible et génère actuellement :
-- Formation Accessibilité (2 PDFs)
 - Formation Elasticsearch Ops (3 PDFs)
 - Formation Vue.js Avancé (2 PDFs)
 

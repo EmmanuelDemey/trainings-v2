@@ -4,8 +4,6 @@
  * Script de génération des PDFs pour les formations
  *
  * Formations Accessibilité:
- * - Génère le PDF des slides (a11y.md) avec Slidev
- * - Génère le PDF du cahier d'exercices (a11y_pw.md) avec Puppeteer
  *
  * Formations Elasticsearch Ops:
  * - Génère le PDF des slides (elasticsearch_ops.md) avec Slidev
@@ -30,12 +28,6 @@ const execAsync = promisify(exec);
 const ROOT_DIR = path.join(__dirname, '../..');
 const TRAINING_DIR = path.join(ROOT_DIR, 'training');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
-
-// Accessibilité
-const A11Y_SLIDES_INPUT = path.join(TRAINING_DIR, 'a11y.md');
-const A11Y_PW_INPUT = path.join(TRAINING_DIR, 'a11y_pw.md');
-const A11Y_SLIDES_OUTPUT = path.join(DIST_DIR, 'a11y_slides.pdf');
-const A11Y_PW_OUTPUT = path.join(DIST_DIR, 'a11y_exercices.pdf');
 
 // Elasticsearch Ops
 const ES_SLIDES_INPUT = path.join(TRAINING_DIR, 'elasticsearch_ops.md');
@@ -86,39 +78,6 @@ function chromeExecutableFlag() {
     // Puppeteer introuvable : on laisse Slidev utiliser son Chromium Playwright
   }
   return '';
-}
-
-/**
- * Générer le PDF des slides A11y avec Slidev
- */
-async function generateA11ySlidesPdf() {
-  console.log('📊 [A11Y] Génération du PDF des slides avec Slidev...');
-
-  try {
-    const { stdout, stderr } = await execAsync(
-      `cd "${TRAINING_DIR}" && npx slidev export a11y.md --output ../dist/a11y_slides.pdf --timeout 180000${chromeExecutableFlag()}`,
-      {
-        maxBuffer: 1024 * 1024 * 10,
-        timeout: 600000 // 10 minutes pour le process Node
-      }
-    );
-
-    if (stderr && !stderr.includes('Fetching') && !stderr.includes('warning')) {
-      console.warn('⚠️  Avertissements:', stderr);
-    }
-
-    if (fs.existsSync(A11Y_SLIDES_OUTPUT)) {
-      const stats = fs.statSync(A11Y_SLIDES_OUTPUT);
-      const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
-      console.log(`✅ [A11Y] Slides PDF généré: ${A11Y_SLIDES_OUTPUT}`);
-      console.log(`   Taille: ${fileSizeInMB} MB\n`);
-    } else {
-      throw new Error('Le fichier PDF des slides A11y n\'a pas été créé');
-    }
-  } catch (error) {
-    console.error('❌ [A11Y] Erreur lors de la génération des slides:', error.message);
-    throw error;
-  }
 }
 
 /**
@@ -276,66 +235,6 @@ async function generateVueAdvancedExercisesPdf() {
     }
   } catch (error) {
     console.error('❌ [VUE-ADV] Erreur lors de la génération du cahier d\'exercices:', error.message);
-    throw error;
-  }
-}
-
-/**
- * Générer le PDF du cahier d'exercices A11y avec Puppeteer
- */
-async function generateA11yExercisesPdf() {
-  console.log('📝 [A11Y] Génération du PDF du cahier d\'exercices avec Puppeteer...');
-
-  const puppeteer = require('puppeteer');
-  const { marked } = require('marked');
-
-  try {
-    const markdownContent = fs.readFileSync(A11Y_PW_INPUT, 'utf-8');
-    const htmlContent = marked.parse(markdownContent);
-    const fullHtml = createHtmlDocument(htmlContent, 'Formation Accessibilité - Cahier d\'Exercices Pratiques');
-
-    const tempHtml = path.join(DIST_DIR, 'a11y_pw_temp.html');
-    fs.writeFileSync(tempHtml, fullHtml, 'utf-8');
-
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
-    const page = await browser.newPage();
-    await page.goto(`file://${tempHtml}`, { waitUntil: 'networkidle0' });
-
-    await page.pdf({
-      path: A11Y_PW_OUTPUT,
-      format: 'A4',
-      margin: { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' },
-      printBackground: true,
-      displayHeaderFooter: true,
-      headerTemplate: `
-        <div style="font-size: 9px; text-align: center; width: 100%; color: #666; margin-top: 10px;">
-          Formation Accessibilité - Cahier d'Exercices Pratiques
-        </div>
-      `,
-      footerTemplate: `
-        <div style="font-size: 9px; text-align: center; width: 100%; color: #666; margin-bottom: 10px;">
-          Page <span class="pageNumber"></span> / <span class="totalPages"></span>
-        </div>
-      `
-    });
-
-    await browser.close();
-    fs.unlinkSync(tempHtml);
-
-    if (fs.existsSync(A11Y_PW_OUTPUT)) {
-      const stats = fs.statSync(A11Y_PW_OUTPUT);
-      const fileSizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
-      console.log(`✅ [A11Y] Cahier d'exercices PDF généré: ${A11Y_PW_OUTPUT}`);
-      console.log(`   Taille: ${fileSizeInMB} MB\n`);
-    } else {
-      throw new Error('Le fichier PDF du cahier d\'exercices A11y n\'a pas été créé');
-    }
-  } catch (error) {
-    console.error('❌ [A11Y] Erreur lors de la génération du cahier d\'exercices:', error.message);
     throw error;
   }
 }
@@ -692,8 +591,6 @@ async function checkDependencies() {
  * par Puppeteer (parallélisables).
  */
 const DOCUMENTS = [
-  { formation: 'a11y', type: 'slides', output: A11Y_SLIDES_OUTPUT, run: generateA11ySlidesPdf },
-  { formation: 'a11y', type: 'exercices', output: A11Y_PW_OUTPUT, run: generateA11yExercisesPdf },
   { formation: 'elasticsearch', type: 'slides', output: ES_SLIDES_OUTPUT, run: generateElasticsearchSlidesPdf },
   { formation: 'elasticsearch', type: 'exercices', output: ES_PW_OUTPUT, run: generateElasticsearchExercisesPdf },
   { formation: 'elasticsearch', type: 'exercices', output: ES_CHEATSHEET_OUTPUT, run: generateElasticsearchCheatsheetPdf },
