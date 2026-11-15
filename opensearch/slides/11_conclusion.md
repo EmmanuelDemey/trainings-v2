@@ -46,13 +46,13 @@ What the day did not cover, and the two-day program goes into:
 **An `email` field is used for an exact filter and for an aggregation. Which type?**
 
 - A) `text`
-- B) `keyword`
-- C) `text` with the `email` analyzer
+- B) `text` with the `email` analyzer
+- C) `keyword`
 - D) `object`
 
 <v-click>
 
-**Answer: B** — an exact value, not analyzed, with doc values.
+**Answer: C** — an exact value, not analyzed, with doc values.
 
 </v-click>
 
@@ -62,14 +62,14 @@ What the day did not cover, and the two-day program goes into:
 
 **The single-node cluster is `yellow`. Why?**
 
-- A) A primary shard is lost
-- B) An index has replicas that cannot be allocated
+- A) An index has replicas that cannot be allocated
+- B) A primary shard is lost
 - C) The JVM heap is full
 - D) The security plugin is disabled
 
 <v-click>
 
-**Answer: B** — a replica is never placed on the node of its primary.
+**Answer: A** — a replica is never placed on the node of its primary.
 
 </v-click>
 
@@ -80,13 +80,13 @@ What the day did not cover, and the two-day program goes into:
 **You want to extract the IP address and the HTTP status from a raw log line before indexing it. With what?**
 
 - A) A custom analyzer
-- B) An ingest pipeline with a `grok` processor
+- B) An index template
 - C) A `terms` aggregation
-- D) An index template
+- D) An ingest pipeline with a `grok` processor
 
 <v-click>
 
-**Answer: B** — an analyzer splits text for search; it does not create fields.
+**Answer: D** — an analyzer splits text for search; it does not create fields.
 
 </v-click>
 

@@ -259,14 +259,14 @@ GET /logs-2026.10.27/_mapping
 
 **We want to sort restaurants by city. Which type for `city`?**
 
-- A) `text`
-- B) `keyword`
+- A) `keyword`
+- B) `text`
 - C) `object`
 - D) `geo_point`
 
 <v-click>
 
-**Answer: B** — you sort and aggregate on an **exact**, non-analyzed value.
+**Answer: A** — you sort and aggregate on an **exact**, non-analyzed value.
 
 </v-click>
 

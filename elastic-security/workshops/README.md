@@ -1,36 +1,37 @@
-# Elastic Security for SIEM — Travaux pratiques
+# Elastic Security for SIEM — Workshops
 
-Les exercices pratiques de la formation **Elastic Security for SIEM**. Chaque TP
-est **guidé** : les requêtes à envoyer, les manipulations dans Kibana et les
-réponses attendues sont dans son énoncé, avec des critères de succès et une
-section de dépannage.
+The hands-on exercises of the **Elastic Security for SIEM** training. Each
+workshop states the goal of every step, a folded hint, and the expected result
+to check your own answer, with success criteria and a troubleshooting section.
+The answers are in the solutions, for the trainer.
 
-## Ce qu'il faut
+## What you need
 
-- **Docker** (Compose v2) et **8 Go de RAM** libres, pour la stack du lab —
-  Elasticsearch, Kibana et un Fleet Server 9.5.6, dans le dossier `lab/` de
-  chaque TP (`docker compose up -d --wait`) ; ou un essai **Elastic Cloud** ;
-- un navigateur récent (Chrome ou Firefox), **sans bloqueur de publicité** ;
-- **Kibana Dev Tools** (Console) : les blocs `GET /…`, `POST /…`, `PUT /…` des
-  énoncés s'y collent tels quels.
+- **Docker** (Compose v2) and **8 GB of free RAM**, for the lab stack —
+  Elasticsearch, Kibana and a Fleet Server 9.5.6, in the `lab/` folder of each
+  workshop (`docker compose up -d --wait`); or an **Elastic Cloud** trial;
+- a recent browser (Chrome or Firefox), **without an ad blocker**;
+- **Kibana Dev Tools** (Console): the `GET /…`, `POST /…`, `PUT /…` blocks of
+  the instructions paste into it as is.
 
-Chaque TP est **autonome** : à partir du TP 2, son setup charge le **jeu de
-données du lab** — 25 événements ECS, dans `logs-lab-default`, qui racontent une
-intrusion : brute force SSH, phishing, beacon C2, reconnaissance, mouvement
-latéral, dump d'identifiants et exfiltration. Ses dates sont recalculées au
-chargement : réglez Kibana sur **Last 4 hours**.
+Each workshop **stands on its own**: from workshop 2 on, its setup loads the
+**lab dataset** — 25 ECS events, in `logs-lab-default`, that tell the story of
+an intrusion: SSH brute force, phishing, C2 beacon, reconnaissance, lateral
+movement, credential dumping and exfiltration. Their dates are recomputed at
+load time: set Kibana to **Last 4 hours**.
 
-Toutes les requêtes Dev Tools sont rejouées par la CI sur Elasticsearch 9.5.6 :
-elles passent, et les réponses ont la forme annoncée.
+Every Dev Tools request, of the workshops and of their solutions, is replayed
+by the CI on Elasticsearch 9.5.6: they pass, and the responses have the shape
+shown.
 
-## Les TP
+## The workshops
 
-| Jour | TP | Dossier | Sujet |
-|------|----|---------|-------|
-| 1 | 1 | `01_lab_fleet/` | La stack du lab, Fleet Server, agent policy, enrôler un Elastic Agent |
-| 1 | 2 | `02_ecs/` | Lire l'ECS, ses types, normaliser un log brut avec un pipeline |
-| 1 | 3 | `03_discover/` | Discover : data view, KQL, Lucene, ES\|QL |
-| 2 | 4 | `04_visualizations_dashboards/` | Lens, formules, dashboard SOC, contrôles, drilldown |
-| 2 | 5 | `05_security_app_rules/` | Hosts, Users, Network ; règles KQL, seuil, EQL, ES\|QL |
-| 3 | 6 | `06_alerts_timeline_cases/` | Triage des alertes, Timeline, Cases ; *optionnel* : pousser le case vers TheHive |
-| 3 | 7 | `07_hunt_capstone/` | Capstone : quatre missions de chasse, seul puis en équipe |
+| Day | Workshop | Folder | Topic |
+|-----|----------|--------|-------|
+| 1 | 1 | `01_lab_fleet/` | The lab stack, Fleet Server, agent policy, enrolling an Elastic Agent |
+| 1 | 2 | `02_ecs/` | Reading ECS, its types, normalizing a raw log with a pipeline |
+| 1 | 3 | `03_discover/` | Discover: data view, KQL, Lucene, ES\|QL |
+| 2 | 4 | `04_visualizations_dashboards/` | Lens, formulas, SOC dashboard, controls, drilldown |
+| 2 | 5 | `05_security_app_rules/` | Hosts, Users, Network; KQL, threshold, EQL, ES\|QL rules |
+| 3 | 6 | `06_alerts_timeline_cases/` | Alert triage, Timeline, Cases; *optional*: push the case to TheHive |
+| 3 | 7 | `07_hunt_capstone/` | Capstone: four hunting missions, alone then in teams |

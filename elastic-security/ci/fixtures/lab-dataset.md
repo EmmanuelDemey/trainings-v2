@@ -3,7 +3,7 @@
 ```json
 PUT /_ingest/pipeline/lab-replay
 {
-  "description": "Rejoue le jeu de données du lab : décale les événements pour que le dernier ait eu lieu il y a 10 minutes",
+  "description": "Replays the lab dataset: shifts the events so that the last one happened 10 minutes ago",
   "processors": [
     {
       "script": {

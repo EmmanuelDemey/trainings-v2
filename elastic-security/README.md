@@ -7,8 +7,9 @@ a slide deck, hands-on workshops, and the site that publishes them — built by
 
 ```
 slides/            one Markdown file per chapter (Slidev)
-workshops/         one folder per workshop, its README.md (in French), and lab/ —
+workshops/         one folder per workshop, its README.md, and lab/ —
                    a gitignored copy of ../elasticsearch-common/lab
+solutions/         the answers of each workshop, SOLUTION.md, replayed by the CI
 ci/fixtures/       the lab dataset, replayed before the chapters that query it
 training.config.mjs
 ```
@@ -49,8 +50,8 @@ pnpm run build:fast     # without the PDF exports (the slow part)
 ```
 
 The downloads: `elastic-security-slides.pdf`, `elastic-security-workshops.pdf`,
-`elastic-security-participants.zip`, plus a starter ZIP per workshop. The
-workshops are guided, so there are no solutions and no online editor.
+`elastic-security-participants.zip`, `elastic-security-solutions.zip`, plus a
+starter ZIP per workshop. No online editor.
 
 ## Deploy
 

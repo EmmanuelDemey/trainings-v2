@@ -71,8 +71,9 @@ npx tsc --init
 <br />
 
 > **TypeScript 7** is the **native** port of the compiler (written in Go):
-> same `tsc` command, same options, **8 to 12× faster**. Since 7.0 it ships as
-> the `typescript` package itself.
+> same `tsc` command, same options, **8 to 12× faster** on a full build
+> (VS Code: 126 s → 11 s). On a whole CI, expect less — Prisma measured **~3×**
+> on its monorepo. Since 7.0 it ships as the `typescript` package itself.
 
 ---
 
@@ -119,6 +120,9 @@ error TS2304: Cannot find name 'process'.     ← the classic one after upgradin
 - Gone in 7.0: `target: "es5"`, `moduleResolution: "node10"`, `baseUrl`, `outFile`,
   `module: "amd" | "umd" | "system"` — see chapter 9
 - `tsc file.ts` next to a `tsconfig.json` is now an **error**: `--ignoreConfig` to bypass it
+- `tsc --init` now writes a short, opinionated file: `module: nodenext`, `target: esnext`,
+  `types: []`, `strict`, plus `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
+  `verbatimModuleSyntax`, `isolatedModules` — read it before keeping it
 
 ---
 
@@ -179,6 +183,9 @@ function add(a        , b        )         { return a + b; }
   (`"allowImportingTsExtensions": true` lets `tsc` accept it)
 - `"verbatimModuleSyntax": true`: a type-only import must say so —
   `import type { Todo } from './todo.ts'` — so it can be erased safely
+- `node --experimental-transform-types` also **transforms** `enum` and `namespace` —
+  still experimental, and it breaks the "spaces only" promise: source maps are
+  needed again. Prefer `erasableSyntaxOnly`
 
 ---
 

@@ -8,17 +8,17 @@ Déjà couvert : `erasableSyntaxOnly`, type stripping, `using`, `satisfies`, `No
 
 ## 0. Global / transverse
 
-- [ ] Monter `typescript`, `@types/node`, `vitest` à la dernière version dans
+- [x] Monter `typescript`, `@types/node`, `vitest` à la dernière version dans
       `workshops/*` et `solutions/*`
-- [ ] Relancer `workshops.ci.mjs` : starters rouges, solutions vertes
-- [ ] Vérifier `.nvmrc` (24) vs Node LTS du moment
+- [x] Relancer `workshops.ci.mjs` : starters rouges, solutions vertes
+- [x] Vérifier `.nvmrc` (24) vs Node LTS du moment
 - [ ] Vérifier chaque TP dans StackBlitz (le playground tourne-t-il avec TS 7 natif ?)
-- [ ] `workshops/09_modules/dist` et `workshops/10_tooling/tsconfig.tsbuildinfo` :
+- [x] `workshops/09_modules/dist` et `workshops/10_tooling/tsconfig.tsbuildinfo` :
       artefacts de build — vérifier qu'ils sont ignorés / à supprimer
-- [ ] Rebuild `pnpm run build` + contrôle visuel du deck
+- [x] Rebuild `pnpm run build` + contrôle visuel du deck
 - [ ] Timing : 10 chapitres en 2 jours = serré. Chronométrer chaque TP, marquer
       les sections « bonus » sautables
-- [ ] Mettre à jour `RESSOURCES.md` avec la section « À lire » ci-dessous
+- [x] Mettre à jour `RESSOURCES.md` avec la section « À lire » ci-dessous
 
 ## 00 — Intro
 
@@ -28,23 +28,23 @@ Déjà couvert : `erasableSyntaxOnly`, type stripping, `using`, `satisfies`, `No
 
 ## 01 — From JavaScript to TypeScript · TP 1
 
-- [ ] Slide `tsconfig.json` : aligner sur les **nouveaux défauts TS 6/7**
+- [x] Slide `tsconfig.json` : aligner sur les **nouveaux défauts TS 6/7**
       (`strict` par défaut, `types` vide par défaut, `module`/`target` par défaut)
       et sur la sortie actuelle de `tsc --init`
-- [ ] Slide TS 7 : chiffres de perf réels, ce qui a changé (API du compilateur,
+- [x] Slide TS 7 : chiffres de perf réels, ce qui a changé (API du compilateur,
       plugins de language service), options retirées (cf. dépréciations 6.0)
-- [ ] Type stripping : Node 24 sans flag ; mentionner `--experimental-transform-types`
+- [x] Type stripping : Node 24 sans flag ; mentionner `--experimental-transform-types`
       et ses limites
-- [ ] TP 1 : l'exercice « activer `strict` » a-t-il encore du sens si `strict` est
+- [x] TP 1 : l'exercice « activer `strict` » a-t-il encore du sens si `strict` est
       le défaut ? (mettre `"strict": false` explicite dans le starter)
 
 ## 02 — Everyday types · TP 2
 
-- [ ] Enrichir le slide `using` : `await using`, `DisposableStack`
-- [ ] Nouvelles API typées de `lib` récente : iterator helpers (`Iterator.from`,
+- [x] Enrichir le slide `using` : `await using`, `DisposableStack`
+- [x] Nouvelles API typées de `lib` récente : iterator helpers (`Iterator.from`,
       `.map`/`.filter` sur itérateurs), méthodes de `Set` (`union`, `intersection`),
       `Promise.withResolvers`, `Object.groupBy`
-- [ ] TP 2 : éventuellement une étape `using` (ressource jetable)
+- [x] TP 2 : éventuellement une étape `using` (ressource jetable)
 
 ## 03 — Classes & interfaces · TP 3
 

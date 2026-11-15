@@ -5,8 +5,8 @@ export default defineConfig({
   title: 'Elastic Security for SIEM',
   slug: 'elastic-security',
   author: 'Emmanuel Demey',
-  // The workshops are written in French, as those of the elasticsearch training.
-  lang: 'fr',
+  // The workshops are written in English, as those of the elasticsearch training.
+  lang: 'en',
 
   // One Markdown file per chapter, in the order of its number. What this
   // training shares with the elasticsearch one — the Elastic Stack, the Kibana
@@ -15,10 +15,11 @@ export default defineConfig({
   // slides/public/images/common/ by `pnpm run sync`.
   slides: 'slides',
   workshops: 'workshops',
-  // The workshops are guided: every request and its expected response is in
-  // the README, run in Kibana against the learner's own stack. There is no code
-  // to hand out, hence no solutions — and no online editor.
-  solutions: false,
+  // The learners run the workshops in Kibana against their own stack: the README
+  // gives the goal, a hint and the expected result. The answers live in
+  // solutions/<workshop>/SOLUTION.md, replayed by the CI and published as a ZIP
+  // per workshop on the Resources page. No online editor.
+  solutions: 'solutions',
 
   repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'elastic-security' },
 

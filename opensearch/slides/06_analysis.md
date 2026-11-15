@@ -174,13 +174,13 @@ Typical case — **prefix autocompletion**:
 **A `text` field with the `standard` analyzer holds "Crème brûlée". Does the `match` query "creme brulee" find it?**
 
 - A) Yes, `standard` removes the accents
-- B) No, it needs the `asciifolding` filter
-- C) Yes, `match` ignores the accents
+- B) Yes, `match` ignores the accents
+- C) No, it needs the `asciifolding` filter
 - D) No, it needs a `keyword`
 
 <v-click>
 
-**Answer: B** — `standard` only lowercases: `crème` ≠ `creme`.
+**Answer: C** — `standard` only lowercases: `crème` ≠ `creme`.
 
 </v-click>
 

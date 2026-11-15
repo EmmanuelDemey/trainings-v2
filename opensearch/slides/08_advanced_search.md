@@ -221,13 +221,13 @@ GET /alerts/_search
 **A user wants page 2,000 of a search, 10 results per page. What happens with `from` / `size`?**
 
 - A) It works, it's just slow
-- B) Error: `from + size` exceeds `max_result_window` (10,000)
+- B) OpenSearch switches to `scroll`
 - C) OpenSearch returns the last page
-- D) OpenSearch switches to `scroll`
+- D) Error: `from + size` exceeds `max_result_window` (10,000)
 
 <v-click>
 
-**Answer: B** — beyond that, `search_after` (+ PIT). And a UI does not offer page 2,000 anyway.
+**Answer: D** — beyond that, `search_after` (+ PIT). And a UI does not offer page 2,000 anyway.
 
 </v-click>
 

@@ -100,10 +100,21 @@
 - Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html#the-jsdoc-import-tag (le tag `@import`)
 - Lire — https://www.typescriptlang.org/docs/handbook/declaration-files/dts-from-js.html (générer des `.d.ts` depuis du JavaScript)
 
+## Nouveautés récentes de TypeScript
+
+- Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-5.html (prédicats de type inférés, `isolatedDeclarations`, vérification des regex)
+- Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-6.html (iterator helpers, `noUncheckedSideEffectImports`, `--noCheck`)
+- Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-7.html (`rewriteRelativeImportExtensions`, ES2024)
+- Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-8.html (`erasableSyntaxOnly`, `require(esm)`, `--module node18`)
+- Lire — https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-9.html (`import defer`, `--module node20`, nouveau `tsc --init`)
+- Lire — https://github.com/microsoft/TypeScript/wiki/Roadmap
+
 ## Veille
 
-- Lire — https://devblogs.microsoft.com/typescript/
+- Lire — https://devblogs.microsoft.com/typescript/ (annonces de TypeScript 6.0 et 7.0)
 - Lire — https://github.com/microsoft/TypeScript/releases
+- Lire — https://typescript-eslint.io/blog (support de TypeScript 7)
+- Lire — https://github.com/tc39/proposals (décorateurs, `import defer`, Temporal…)
 - Lire — https://www.totaltypescript.com/articles
 - Lire — https://bytes.dev
 - Écouter — https://syntax.fm
