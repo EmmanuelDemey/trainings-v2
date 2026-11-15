@@ -14,7 +14,7 @@
     "verify": "training-kit verify"
   },
   "devDependencies": {
-    "@astrojs/starlight": "^0.42.9",
+    "@astrojs/starlight": "^0.42.10",
     "@emmanueldemey/training-kit": "^0.1.0",
     "@slidev/cli": "52.14.2",
     "@slidev/theme-default": "^0.25.0",
