@@ -42,7 +42,7 @@ each kind — read it first. Keep `npm run test:watch` open.
 |---|---|---|---|
 | 1 | `Image`, `Video`, `Audio`, and their union | `src/attachments.ts` | The `Attachment` type specs are green |
 | 2 | `assertNever`, `render` | `src/attachments.ts` | The `render` specs are green |
-| 3 | `isPlayable` as a type guard, durations | `src/attachments.ts` | The `isPlayable`, `totalDuration` and `formatDuration` specs are green |
+| 3 | `isPlayable` as a type guard, `images`, durations | `src/attachments.ts` | The `isPlayable`, `images`, `totalDuration` and `formatDuration` specs are green |
 | 4 | `assert`, `parseAttachment` | `src/parse.ts` | The `assert` and `parseAttachment` specs are green |
 | 5 | `Upload` as a discriminated union | `src/upload.ts` | The `Upload` type specs are green |
 | 6 | `next`, `describe` | `src/upload.ts` | `npm test` and `npm run typecheck` are green |
@@ -76,10 +76,13 @@ typecheck` flags the code that now reads a field some kinds do not have.
 1. `isPlayable` returns a `boolean`: `filter(isPlayable)` still gives
    `Attachment[]`, and `attachment.duration` does not compile. Make it a **type
    guard** — `attachment is Video | Audio` — and check with the `in` operator.
-2. `totalDuration` filters, then sums. No cast needed.
-3. `formatDuration`: `padStart` is your friend.
+2. `images` is one `filter` on `kind` — and this time, **no** guard written
+   by hand and no return type: since TypeScript 5.5 the arrow function's
+   predicate `attachment is Image` is **inferred**. Hover over the result.
+3. `totalDuration` filters, then sums. No cast needed.
+4. `formatDuration`: `padStart` is your friend.
 
-→ **Done when** the `isPlayable`, `totalDuration` and `formatDuration` specs are green.
+→ **Done when** the `isPlayable`, `images`, `totalDuration` and `formatDuration` specs are green.
 
 ### 4. Parsing `unknown` — `src/parse.ts`
 
@@ -125,7 +128,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
-- [ ] `npm test` exits 0 — the thirty-one specs
+- [ ] `npm test` exits 0 — the thirty-three specs
 - [ ] `grep -rn TODO src` returns nothing
 
 **The behaviour is there**

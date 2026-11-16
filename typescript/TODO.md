@@ -48,20 +48,20 @@ Déjà couvert : `erasableSyntaxOnly`, type stripping, `using`, `satisfies`, `No
 
 ## 03 — Classes & interfaces · TP 3
 
-- [ ] Vérifier le slide « Erasable syntax only » face au comportement TS 7
-- [ ] Teaser `accessor` (auto-accessors) vers chapitre 8
-- [ ] TP 3 : relire les consignes après montée de versions
+- [x] Vérifier le slide « Erasable syntax only » face au comportement TS 7
+- [x] Teaser `accessor` (auto-accessors) vers chapitre 8
+- [x] TP 3 : relire les consignes après montée de versions
 
 ## 04 — Unions & narrowing · TP 4
 
-- [ ] **Ajouter** : *inferred type predicates* (TS 5.5) — `arr.filter(x => x !== undefined)`
+- [x] **Ajouter** : *inferred type predicates* (TS 5.5) — `arr.filter(x => x !== undefined)`
       narrowe tout seul. Absent des slides
-- [ ] **Ajouter** : narrowing conservé dans les closures après dernière assignation (5.4)
+- [x] **Ajouter** : narrowing conservé dans les closures après dernière assignation (5.4)
       et sur accès indexé constant `obj[key]` (5.5)
-- [ ] Erreurs « condition toujours vraie/fausse » sur checks nullish/truthy (5.6)
-- [ ] Mention Zod (« that is what Zod is for ») : renvoyer vers le chapitre
+- [x] Erreurs « condition toujours vraie/fausse » sur checks nullish/truthy (5.6)
+- [x] Mention Zod (« that is what Zod is for ») : renvoyer vers le chapitre
       validation runtime si ajouté
-- [ ] TP 4 : un `filter` dont le prédicat est inféré
+- [x] TP 4 : un `filter` dont le prédicat est inféré
 
 ## 05 — Generics · TP 5
 

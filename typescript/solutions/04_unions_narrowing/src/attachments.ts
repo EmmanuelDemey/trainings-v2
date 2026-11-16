@@ -58,6 +58,11 @@ export function totalDuration(attachments: readonly Attachment[]): number {
   return attachments.filter(isPlayable).reduce((total, attachment) => total + attachment.duration, 0);
 }
 
+/** The images of a post — `filter` infers the type guard on its own (TS 5.5). */
+export function images(attachments: readonly Attachment[]) {
+  return attachments.filter((attachment) => attachment.kind === 'image');
+}
+
 /** `3:07` — or `1:02:05` past an hour. */
 export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);

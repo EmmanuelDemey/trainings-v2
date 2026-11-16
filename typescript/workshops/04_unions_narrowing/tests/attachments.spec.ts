@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { formatDuration, isPlayable, render, totalDuration } from '../src/attachments.ts';
+import { formatDuration, images, isPlayable, render, totalDuration } from '../src/attachments.ts';
 import { clip, photo, podcast } from './fixtures.ts';
 
 describe('render', () => {
@@ -22,6 +22,12 @@ describe('render', () => {
 describe('isPlayable', () => {
   test('is true for a video and a sound, false for an image', () => {
     expect([photo, clip, podcast].map(isPlayable)).toEqual([false, true, true]);
+  });
+});
+
+describe('images', () => {
+  test('keeps only the images, in order', () => {
+    expect(images([clip, photo, podcast, photo])).toEqual([photo, photo]);
   });
 });
 

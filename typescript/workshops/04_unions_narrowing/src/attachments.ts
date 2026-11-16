@@ -50,6 +50,14 @@ export function totalDuration(attachments: readonly Attachment[]): number {
   return 0;
 }
 
+/**
+ * TODO 3: only the images, in order. One `filter`, no `is` written by hand —
+ * and no return type either: let TypeScript infer `Image[]`.
+ */
+export function images(attachments: readonly Attachment[]) {
+  return attachments;
+}
+
 /** TODO 3: `3:07` — or `1:02:05` past an hour. */
 export function formatDuration(seconds: number): string {
   return '';

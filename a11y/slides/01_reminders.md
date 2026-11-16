@@ -39,7 +39,7 @@ img[aria-hidden='true'] { }
 const input = document.querySelector('#nameInput');
 const submit = document.querySelector('button[aria-label="Submit"]');
 
-// Legacy, still works
+// Older API, still fine
 const same = document.getElementById('nameInput');
 ```
 
@@ -56,7 +56,7 @@ const buttons = [...document.querySelectorAll('button')];
 
 if (!buttons.length) console.log('No button found');
 
-// Legacy, still works
+// Older APIs: live collections, not NodeLists
 document.getElementsByTagName('p');
 document.getElementsByClassName('error');
 ```
@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {   // the HTML is parsed
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip: rect(0, 0, 0, 0);     /* deprecated, kept for old browsers */
+  clip-path: inset(50%);
   white-space: nowrap;
   border-width: 0;
 }
@@ -120,14 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {   // the HTML is parsed
 |---|---|---|
 | `display: none` | ❌ | ❌ |
 | `visibility: hidden` | ❌ | ❌ |
-| `opacity: 0` | ❌ | ✅ — but still clickable: confusing |
+| `opacity: 0` | ❌ | ✅ — but still clickable and focusable: confusing |
 | **`.sr-only`** | ❌ | ✅ |
 
 </div>
 <div style="flex: 1; min-width: 0;">
 
 ```html
-<!-- Skip link (shown on focus, chapter 04) -->
+<!-- Skip link (needs a :focus style to show up, chapter 04) -->
 <a href="#main-content" class="sr-only">Skip to main content</a>
 
 <!-- Icon button -->
@@ -162,3 +163,8 @@ table { font-size: 0.8em; }
 - They add their own APIs for **focus** and **ARIA attributes**: chapter 10
 - What you learn here on plain HTML applies there unchanged — the browser and
   the screen reader only ever see the **DOM**
+
+<br />
+
+> Next — chapter 02: **who** these tools are for, and how a screen reader
+> turns the DOM into speech.

@@ -106,7 +106,7 @@ an `unknown` — narrow it before you read its `code`.
 
 → **Done when** `npm test` and `npm run typecheck` are both green.
 
-### 6. *(Bonus)* — a status without `enum`
+### 6. *(Bonus)* — a priority without `enum`
 
 Add a `priority` to `Todo`: `low`, `normal` or `high`. `enum` is not erasable
 either: write `const Priority = { Low: 'low', … } as const`, and derive the type

@@ -173,6 +173,10 @@ new Temperature(20).fahrenheit;   // 68 — read like a field
 Temperature.instances;            // 1
 ```
 
+> Coming next — `accessor discount = 0` declares a getter/setter pair in one
+> line: the **auto-accessor**, made for decorators (chapter 8). `tsc` accepts
+> it; Node.js 24 does not run it yet.
+
 ---
 
 # Erasable syntax only
@@ -200,7 +204,9 @@ const Status = { Idle: 'idle', Loading: 'loading' } as const;
 type Status = (typeof Status)[keyof typeof Status];    // 'idle' | 'loading'
 ```
 
-> Same for `namespace` with values. The rest of TypeScript is **just types**.
+> Also refused: `const enum`, a `namespace` with values, `import x = require()`
+> and the `<T>value` cast (write `value as T`). Still fine: `declare enum`,
+> type-only namespaces. Everything else is **just types**.
 
 ---
 

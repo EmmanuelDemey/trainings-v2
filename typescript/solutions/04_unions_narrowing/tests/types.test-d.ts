@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest';
-import { isPlayable } from '../src/attachments.ts';
-import type { Attachment, AttachmentKind, Audio, Video } from '../src/attachments.ts';
+import { images, isPlayable } from '../src/attachments.ts';
+import type { Attachment, AttachmentKind, Audio, Image, Video } from '../src/attachments.ts';
 import { assert } from '../src/parse.ts';
 import type { Upload } from '../src/upload.ts';
 
@@ -18,6 +18,12 @@ describe('Attachment', () => {
 describe('isPlayable', () => {
   test('is a type guard', () => {
     expectTypeOf(isPlayable).guards.toEqualTypeOf<Video | Audio>();
+  });
+});
+
+describe('images', () => {
+  test('gives Image[], with no type guard written', () => {
+    expectTypeOf(images).returns.toEqualTypeOf<Image[]>();
   });
 });
 

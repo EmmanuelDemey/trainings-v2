@@ -30,6 +30,12 @@ layout: cover
 </div>
 </div>
 
+<!--
+Two minutes each, no more. Write down the expectations: come back to them in
+the retro (chapter 12). The answers to the question tell you how much to
+insist on the screen reader demo in chapter 02.
+-->
+
 ---
 
 # Objectives of the training
@@ -47,6 +53,12 @@ At the end of the two days, you will be able to:
 - **Build** complex components: a modal dialog, tabs, live regions
 - **Audit** a page by hand and with tools (axe, Lighthouse, Playwright), and
   map each issue to its WCAG criterion
+
+<!--
+These objectives are the ones of the final questionnaire. EAA: applicable
+since 28 June 2025. RGAA 4.1 still tests WCAG 2.1 AA; WCAG 2.2 adds 9
+criteria — chapter 03 details the gap.
+-->
 
 ---
 
@@ -72,6 +84,12 @@ table { font-size: 0.75em; }
 td, th { padding-top: 0.2em !important; padding-bottom: 0.2em !important; }
 </style>
 
+<!--
+Chapters 01 to 03 are mostly theory: keep them short to reach the first
+coding workshop (03 — Focus) right after lunch on day 1. Chapter 11 and
+workshop 09 are the first to cut if time runs out.
+-->
+
 ---
 
 # Prerequisites
@@ -80,7 +98,7 @@ td, th { padding-top: 0.2em !important; padding-bottom: 0.2em !important; }
 - **JavaScript** reading level: `querySelector`, `addEventListener`,
   attributes — chapter 01 is a reminder
 - The **browser devtools**: Elements panel, console
-- A **laptop** with a recent Chrome or Firefox, **Node.js 22** and **pnpm**
+- A **laptop** with a recent Chrome or Firefox, **Node.js 22.12+** and **pnpm**
   (for the local server and the verify script)
 - A **screen reader** you can run: NVDA (Windows), VoiceOver (macOS), Orca
   (Linux) — workshop 01 installs it
@@ -90,6 +108,12 @@ td, th { padding-top: 0.2em !important; padding-bottom: 0.2em !important; }
 
 > No framework: the workshops are **plain HTML, CSS and JavaScript**. What you
 > learn applies to React, Vue, Angular or Svelte — chapter 10 shows how.
+
+<!--
+Check the setup now, not at workshop 03: `node -v`, `pnpm -v`, and the
+screen reader starts. Locked-down corporate laptops often cannot install NVDA:
+offer the portable version, or pair people up.
+-->
 
 ---
 
@@ -118,6 +142,11 @@ td, th { padding-top: 0.2em !important; padding-bottom: 0.2em !important; }
 
 </div>
 </div>
+
+<!--
+Make sure everyone filled in the self-assessment before starting. Half of
+the time is hands-on: protect it, cut theory rather than workshops.
+-->
 
 ---
 
@@ -150,6 +179,12 @@ td, th { padding-top: 0.2em !important; padding-bottom: 0.2em !important; }
 <br />
 
 > The places to work on are marked with `TODO workshop N` comments.
+
+<!--
+Open the app live and try it with the keyboard for 30 seconds: the focus
+gets lost quickly, which sets up chapter 04. A late learner can start from
+any workshop folder.
+-->
 
 ---
 
@@ -193,6 +228,12 @@ pnpm run verify --dir workshops --tp 03       # one workshop
 .slidev-code { --slidev-code-font-size: 11px; --slidev-code-line-height: 16px; }
 </style>
 
+<!--
+Run the commands live once. `playwright install chromium` downloads about
+150 MB: have it done during the first break. The verify script is a help,
+not the goal — the keyboard and the screen reader come first.
+-->
+
 ---
 
 # Definition of done
@@ -215,3 +256,9 @@ A workshop is done when:
   file, not the whole folder
 - Workshops **01** and **02** have no code: you install a screen reader, then
   audit a page by hand
+
+<!--
+Transition: before the users and the law (chapter 02), chapter 01 is a
+short reminder of the DOM, events and `.sr-only` — the tools every
+workshop uses.
+-->
