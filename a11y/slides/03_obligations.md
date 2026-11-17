@@ -25,9 +25,9 @@ At the end of this chapter, you will be able to:
 
 | Standard | Scope | What it is |
 |---|---|---|
-| **WCAG 2.2** | International (W3C) | The reference: testable success criteria — also **ISO 40500** (2.0) |
-| **EN 301 549** | European Union | The European standard for ICT products — references **WCAG 2.1 AA** |
-| **RGAA 4.1** | France | A method to **test** WCAG 2.1 AA, criterion by criterion |
+| **WCAG 2.2** | International (W3C) | The reference: testable success criteria — also **ISO/IEC 40500:2025** |
+| **EN 301 549** | European Union | The European standard for ICT products — **V3.2.1** (WCAG 2.1 AA) in force, **V4.1.1** (WCAG 2.2 AA) published |
+| **RGAA 4.1.2** | France | A method to **test** WCAG 2.1 AA, criterion by criterion |
 | BS 8878 → **ISO 30071-1** | United Kingdom | A process standard: how to build accessibility in |
 | **AnySurfer** | Belgium | A quality label and its checklist |
 | **Renow** | Luxembourg | The national framework, derived from WCAG |
@@ -37,6 +37,13 @@ At the end of this chapter, you will be able to:
 
 > Whatever the country, the **technical** content is WCAG. The local standards
 > say **how to test it** and **who must comply**.
+
+<!--
+ISO/IEC 40500:2025 = WCAG 2.2, approved 21 October 2025 (it replaces the
+2012 edition, WCAG 2.0). EN 301 549 V4.1.1 was published in September 2026;
+it gives a presumption of conformity only once cited in the EU Official
+Journal (expected end of 2026). Check before each session.
+-->
 
 <style>
 table { font-size: 0.85em; }
@@ -104,7 +111,7 @@ table { font-size: 0.8em; }
 | **1.0** | 1999 | The first version |
 | **2.0** | 2008 | Major overhaul: technology-neutral, testable — became **ISO 40500** |
 | **2.1** | 2018 | **17** criteria added: mobile, low vision, cognitive |
-| **2.2** | Oct. 2023 | **9** criteria added, **4.1.1 Parsing** removed |
+| **2.2** | Oct. 2023 | **9** criteria added, **4.1.1 Parsing** removed — ISO/IEC 40500 since 2025 |
 | **3.0** | in progress | New model and scoring — **not** a legal reference yet |
 
 WCAG 2.2 additions:
@@ -157,7 +164,7 @@ table { font-size: 0.85em; }
 - Adopted on **26 October 2016**
 - The **public sector**: national, regional and local authorities, and bodies
   funded by public money
-- Websites and mobile apps, based on **EN 301 549** (WCAG 2.1 AA)
+- Websites and mobile apps, based on **EN 301 549** V3.2.1 (WCAG 2.1 AA)
 - Deadlines: new sites **Sept. 2019**, existing sites **Sept. 2020**, mobile
   apps **June 2021**
 - Transposed by each member state — e.g. the UK *Public Sector Bodies
@@ -173,27 +180,41 @@ table { font-size: 0.85em; }
 - Applies since **28 June 2025**
 - The **private sector**: e-commerce, banking, transport, e-books,
   telecoms, and the devices behind them
-- Same technical reference: **EN 301 549**
-- Micro-enterprises providing services (< 10 people, ≤ €2M) are exempt
+- Same technical reference: **EN 301 549** — **V4.1.1** (WCAG 2.2 AA) maps
+  its clauses to the EAA in annex ZB
+- Micro-enterprises providing **services** (< 10 people, ≤ €2M) are exempt —
+  not those making **products**
 
 [Directive (EU) 2019/882](https://eur-lex.europa.eu/eli/dir/2019/882/oj)
 
 </div>
 </div>
 
+<!--
+A harmonised standard gives a "presumption of conformity" only once the
+Commission cites it in the Official Journal. V3.2.1 is cited for the
+directive 2016/2102 (decision 2021/1339). V4.1.1 (Sept. 2026) was not cited
+yet mid-November 2026. Products other than services: the micro-enterprises
+only get lighter documentation duties.
+-->
+
 ---
 
-# In France — RGAA 4.1
+# In France — RGAA 4.1.2
 
 <div style="display: flex; gap: 2em;">
 <div>
 
 - **R**éférentiel **G**énéral d'**A**mélioration de l'**A**ccessibilité
-- Version **4.1** (February 2021): the French method to check **WCAG 2.1 AA**
-- **106 criteria** in **13 themes**, each with test procedures
+- Version **4.1.2** (April 2023): the French method to check **WCAG 2.1 AA**
+- **106 criteria** in **13 themes**, **258 tests**
 - WCAG 2.1 AA + a few French specifics
+- **Next: RGAA 5**, announced for **December 2026**, made official by a
+  décret in 2027 — **WCAG 2.2** and EN 301 549 V4.1.1, about **40 new
+  criteria**, separate frameworks for web, mobile and documents
 
-[Official RGAA 4.1](https://accessibilite.numerique.gouv.fr/)
+[Official RGAA](https://accessibilite.numerique.gouv.fr/) ·
+[RGAA 5 announcement](https://design.numerique.gouv.fr/articles/2026-11-03-rgaa5/)
 
 </div>
 <div>
@@ -215,6 +236,15 @@ table { font-size: 0.85em; }
 table { font-size: 0.8em; }
 </style>
 
+<!--
+Until RGAA 5 is published, keep working on 4.1.2: the DINUM says the work
+must not be postponed. Statements made before RGAA 5 stay valid 18 months
+(within 3 years of their date). RGAA 5 also drops the average compliance
+rate and declares "non conforme" as soon as a blocking issue exists.
+Décret 2026-816 (24 August 2026) already ties the RGAA to the EU harmonised
+standards: the legal basis for RGAA 5.
+-->
+
 ---
 
 # In France — who must comply, and what to publish
@@ -224,15 +254,16 @@ table { font-size: 0.8em; }
 
 ### Who
 
-- **Public sector** (décret du 24 juillet 2019): administrations, local
-  authorities, public institutions
-- **Private sector**: companies with a turnover above **€250 million** — and,
-  since June 2025, the EAA services
-- Same requirement: **RGAA 4.1** (WCAG 2.1 AA)
-- **Penalty**: up to **€20,000 per service and per year** (raised to €50,000
-  by the EAA transposition)
+- **Public sector** (loi 2005-102, art. 47): administrations, local
+  authorities, bodies with a public service mission
+- **Private sector**: companies with a turnover above **€250 million**
+- Requirement: **RGAA 4.1.2** (WCAG 2.1 AA)
+- Controlled by **Arcom** since 2023: public formal notice first, then up to
+  **€50,000** for an inaccessible service (public sector) and **€25,000** for
+  a missing statement or plan (everyone) — again every **6 months** if it lasts
 
-[Décret n° 2019-768](https://www.legifrance.gouv.fr/eli/decret/2019/7/24/CPAE1913344D/jo/texte)
+[Décret n° 2019-768](https://www.legifrance.gouv.fr/eli/decret/2019/7/24/CPAE1913344D/jo/texte) ·
+[Art. 47-1](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048050174)
 
 </div>
 <div>
@@ -248,6 +279,63 @@ table { font-size: 0.8em; }
 
 </div>
 </div>
+
+<!--
+Ordonnance 2023-859 (6 Sept. 2023) created art. 47-1 and gave the control
+to Arcom; the former caps were €20,000. The €50,000 cap covers the
+accessibility duty (art. 47 I) of the public sector and its delegates; the
+€25,000 cap covers the statement and the plans (art. 47 III and IV) for all,
+including the €250M companies.
+-->
+
+---
+
+# In France — the EAA, for products and services
+
+<div style="display: flex; gap: 2em;">
+<div>
+
+### The texts
+
+- **Loi n° 2023-171** (9 March 2023) transposes the EAA
+- **Décret n° 2023-931** (9 October 2023): products and services in scope,
+  obligations, CE marking
+- Applies to products placed on the market and services provided after
+  **28 June 2025**
+- **Exempt**: micro-enterprises providing services (< 10 people, ≤ €2M)
+- **Disproportionate burden**: an exemption to justify and document
+
+</div>
+<div>
+
+### Control and sanctions
+
+| Sector | Authority |
+|---|---|
+| E-commerce, transport, e-books | **DGCCRF** |
+| Banking | ACPR, AMF, Banque de France |
+| Electronic communications | Arcep |
+| Audiovisual media | Arcom |
+
+- 5th-class contravention: up to **€7,500 per breach** for a company,
+  cumulative — plus injunction and, if it persists, withdrawal from the market
+
+</div>
+</div>
+
+[Décret n° 2023-931](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000048178349)
+
+<!--
+Two regimes, not to be mixed: RGAA + Arcom (art. 47, public sector and
+€250M companies) and EAA + DGCCRF and co. (code de la consommation, all
+companies selling the listed services, whatever their size above the
+micro-enterprise). The DGCCRF shares the control with the sector
+authorities. Users report through SignalConso.
+-->
+
+<style>
+table { font-size: 0.8em; }
+</style>
 
 ---
 
@@ -298,16 +386,24 @@ table { font-size: 0.8em; }
 | Case | Year | What happened | Outcome |
 |---|---|---|---|
 | **Robles v. Domino's Pizza** (USA) | 2019 | A blind user could not order on the site or the app with a screen reader | The Supreme Court **declined the appeal**: the ADA applies to sites tied to physical "places of public accommodation". Legal fees + full overhaul |
-| **Parkwood Entertainment** — Beyoncé (USA) | 2019 | Merchandising site: images without alternatives, no keyboard navigation | **Settled** out of court, site brought into compliance |
-| **French ministries** | 2020 | Formal notices: RGAA not met, no accessibility statement | Many administrations still working towards compliance |
+| **Parkwood Entertainment** — Beyoncé (USA) | 2019 | Merchandising site: images without alternatives, no keyboard navigation | **Class action** filed in New York — every e-commerce site is a target |
+| **impots.gouv.fr** (France) | 2026 | Tax return, messaging, PDF tax notices not usable with a keyboard or a screen reader; a statement claiming "full compliance" for a measured **42%** | First public **formal notice** by Arcom: 9 months to fix, 2 months for the statements |
 
 - [Robles v. Domino's](https://www.supremecourt.gov/search.aspx?filename=/docket/docketfiles/html/public/18-1539.html) ·
   [Billboard — Beyoncé](https://www.billboard.com/business/legal/beyonce-sued-website-violating-americans-disabilities-act-8490493/) ·
-  [Baromètre accessibilité numérique](https://accessibilite.numerique.gouv.fr/ressources/barometre-annuel/)
+  [Arcom decision, 24 June 2026](https://www.arcom.fr/se-documenter/espace-juridique/decisions/decision-du-24-juin-2026-mettant-en-demeure-le-ministere-de-laction-et-des-comptes-publics)
 
 <style>
 table { font-size: 0.78em; }
 </style>
+
+<!--
+Domino's: after the Supreme Court refused the case (Oct. 2019), it went back
+to the district court and ended in a settlement in 2022. impots.gouv.fr:
+decision n° 2026-358, published in the Journal officiel; the RGAA criteria
+cited are 13.3 (PDF), 10.8 (hidden content), 12.11 (keyboard), 5.7
+(table headers). Workshop 02 hits the same kind of problems.
+-->
 
 ---
 
@@ -375,12 +471,18 @@ table { font-size: 0.8em; }
   the law asks for
 - Public sector since **2019–2021**, private sector with the **EAA** since
   **June 2025**
-- In France: the RGAA, an **accessibility statement**, a 3-year plan, yearly
-  action plans
+- In France: **RGAA 4.1.2** — RGAA 5 (WCAG 2.2) is coming — an
+  **accessibility statement**, a 3-year plan, yearly action plans; Arcom
+  controls, the DGCCRF for the EAA
 - It is everyone's job: product, design, development, content, QA
 
 > In the workshop, you audit a page **by hand**: each problem you find gets a
 > WCAG criterion number and a fix.
+
+<!--
+Transition: workshop 02 is manual, like workshop 01 — no automated grading.
+Its findings feed chapters 04 to 08, where each problem gets fixed in code.
+-->
 
 ---
 layout: cover

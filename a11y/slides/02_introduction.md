@@ -106,7 +106,15 @@ accessibility*, *accessibilité* (French)
 <br />
 
 > **16%** of the world population — about **1.3 billion** people — live with a
-> significant disability (WHO, 2023). **70%** of websites are not accessible.
+> significant disability (WHO, 2023). **95.9%** of the top million home pages
+> fail WCAG on errors a tool can detect (WebAIM Million, 2026).
+
+<!--
+The WebAIM figure is a floor: only automatically detectable errors are
+counted. Top errors: low contrast (84%), missing alt (53%), missing form
+labels (51%) — all covered in the workshops.
+https://webaim.org/projects/million/
+-->
 
 ---
 
@@ -155,9 +163,9 @@ Situational and temporary disabilities meet the same features:
 <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1em; text-align: center; font-size: 0.85em;">
 <div>
 
-![Eye tracking](/images/a11y/stephen-hawking.webp)
+![Stephen Hawking, an infrared sensor fixed on his glasses](/images/a11y/stephen-hawking.webp)
 
-**Eye tracking** — the gaze moves the pointer
+**Cheek sensor** — a muscle twitch selects a letter
 
 </div>
 <div>
@@ -199,6 +207,12 @@ Situational and temporary disabilities meet the same features:
 img { max-height: 140px; margin: 0 auto; object-fit: contain; }
 </style>
 
+<!--
+Stephen Hawking did not use eye tracking: an infrared sensor on his glasses
+detected a cheek twitch, and software scanned letters — a single-switch
+setup. Eye tracking exists too (Tobii, built in iOS 18 and Windows).
+-->
+
 ---
 
 # Screen readers
@@ -210,7 +224,8 @@ img { max-height: 140px; margin: 0 auto; object-fit: contain; }
 - Turn a page into **speech** or **braille**
 - Provide **shortcuts** to jump through the page: headings, links,
   landmarks, form fields
-- Users listen at about **350 words per minute** — a sighted reader reads 150
+- Experienced users listen at **300+ words per minute** — twice the pace of
+  normal speech
 - On **desktop**: the keyboard. On **mobile**: touch and swipe gestures
 
 </div>
@@ -225,10 +240,17 @@ img { max-height: 140px; margin: 0 auto; object-fit: contain; }
 | Narrator | Windows — built in |
 | Orca | Linux |
 
-(\*) together, about **80%** of the market
+(\*) together, almost **90%** of primary desktop screen readers — JAWS 55%,
+NVDA 33% (WebAIM survey, 2026)
 
 </div>
 </div>
+
+<!--
+WebAIM Screen Reader User Survey #11 (2026): JAWS rebounds (55% primary,
+41% in 2024), NVDA 33%. On mobile, iOS/VoiceOver 73%, Android 24%.
+https://webaim.org/projects/screenreadersurvey11/
+-->
 
 ---
 
@@ -254,7 +276,7 @@ img { max-height: 140px; margin: 0 auto; object-fit: contain; }
 id=1 role=WebArea   name="Demo"
 id=2 role=Label     name="Name"
 id=3 role=TextField value="Manu" labelledByIds=[2]
-id=4 role=Group
+id=4 role=generic   (ignored)
 id=5 role=Button    name="OK"
 ```
 
@@ -279,6 +301,12 @@ id=5 role=Button    name="OK"
 
 > The screen reader **never sees your CSS or your `div`s**: only what lands in
 > that tree. Most of this training is about filling it correctly.
+
+<!--
+Demo: open this snippet in Chrome, DevTools → Elements → Accessibility, tick
+"Enable full-page accessibility tree". The `div` has no role worth
+exposing: Chrome drops it from the tree. The label gives the field its name.
+-->
 
 ---
 
@@ -316,16 +344,22 @@ id=5 role=Button    name="OK"
 table { font-size: 0.85em; }
 </style>
 
+<!--
+Lower the speech rate first, the room cannot follow the default. Windows
+attendees: same demo with NVDA (NVDA + F7 for the elements list, H for next
+heading, K for next link).
+-->
+
 ---
 
 # Watch it before you try it
 
 | Video | Length | What you see |
 |---|---|---|
-| [Assistive Tech — VoiceOver](https://youtu.be/5R-6WvAihms) | 8 min | Browsing the web with VoiceOver — **recommended for every developer** |
-| [Assistive Tech — VoiceOver on iOS](https://youtu.be/bCHpdjvxBws) | 5 min | The mobile screen reader, with gestures |
-| [Assistive Tech — TalkBack](https://youtu.be/0Zpzl4EKCco) | 6 min | The Android screen reader |
-| [Assistive Tech — NVDA](https://youtu.be/Jao3s_CwdRU) | 7 min | The Windows screen reader — the most used, with JAWS |
+| [Screen Reader Basics — VoiceOver](https://youtu.be/5R-6WvAihms) | 12 min | Browsing the web with VoiceOver — **recommended for every developer** |
+| [Assistive Tech — VoiceOver on iOS](https://youtu.be/bCHpdjvxBws) | 7 min | The mobile screen reader, with gestures |
+| [Assistive Tech — TalkBack](https://youtu.be/0Zpzl4EKCco) | 11 min | The Android screen reader |
+| [Screen Reader Basics — NVDA](https://youtu.be/Jao3s_CwdRU) | 9 min | The Windows screen reader — the most used, with JAWS |
 
 <br />
 
@@ -347,6 +381,12 @@ table { font-size: 0.85em; }
 
 > In the workshop you **hear** your first pages: everything later in the
 > training is about what you heard.
+
+<!--
+Transition: workshop 01 is manual, no automated grading. Pair people whose
+laptop cannot run a screen reader. Then chapter 03: the standards that say
+what "accessible" means, and who must comply.
+-->
 
 ---
 layout: cover

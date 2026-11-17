@@ -67,7 +67,7 @@ td, th { padding-top: 0.25em !important; padding-bottom: 0.25em !important; }
 - [WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/)
 - [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/) —
   patterns with keyboard behaviour
-- [RGAA 4.1](https://accessibilite.numerique.gouv.fr/)
+- [RGAA 4.1.2](https://accessibilite.numerique.gouv.fr/)
 
 </div>
 <div>

@@ -43,7 +43,7 @@ insist on the screen reader demo in chapter 02.
 At the end of the two days, you will be able to:
 
 - **Explain** who digital accessibility is for, and what the law requires
-  (EAA, RGAA 4.1, WCAG 2.2)
+  (EAA, RGAA 4.1.2, WCAG 2.2)
 - **Navigate** a page with the keyboard and a **screen reader**, the way your
   users do
 - **Build** accessible pages with **semantic HTML**: landmarks, headings,
@@ -56,7 +56,7 @@ At the end of the two days, you will be able to:
 
 <!--
 These objectives are the ones of the final questionnaire. EAA: applicable
-since 28 June 2025. RGAA 4.1 still tests WCAG 2.1 AA; WCAG 2.2 adds 9
+since 28 June 2025. RGAA 4.1.2 still tests WCAG 2.1 AA; WCAG 2.2 adds 9
 criteria — chapter 03 details the gap.
 -->
 

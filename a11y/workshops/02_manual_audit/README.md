@@ -96,5 +96,5 @@ If you audited `workshops/03_focus/`, compare your report with the sample in
 - [How to Meet WCAG — quick reference](https://www.w3.org/WAI/WCAG22/quickref/)
 - [Understanding WCAG 2.2](https://www.w3.org/WAI/WCAG22/Understanding/)
 - [Easy Checks — a first review of web accessibility](https://www.w3.org/WAI/test-evaluate/preliminary/)
-- [RGAA 4.1](https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/)
+- [RGAA 4.1.2](https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/)
 - [WebAIM contrast checker](https://webaim.org/resources/contrastchecker/)
