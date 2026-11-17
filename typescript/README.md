@@ -68,7 +68,7 @@ deploy. [`netlify.toml`](netlify.toml) only carries the headers.
 Each chapter's quiz (3 questions) is in the time of its slides. If a day runs
 late, the bonus steps of its workshops are the ones to leave for afterwards.
 
-The end-of-day retro is not a chapter: it lives in `slides/shared/retro.md` and
+The end-of-day retro is not a chapter: it lives in [`../typescript-common/slides/retro.md`](../typescript-common/slides/retro.md) and
 is imported at the end of chapters 5 and 10. Course resources and further
 reading are in [`RESSOURCES.md`](RESSOURCES.md).
 

@@ -5,165 +5,32 @@ layout: cover
 # Program
 
 ---
-
-<table>
-<tbody>
- <tr style="border: 0; font-size: 0.85em">
-    <td>
-        <strong>Day 1</strong>
-        <ul>
-            <li>0 - Introduction to the training</li>
-            <li>1 - From JavaScript to TypeScript
-                <ul>
-                    <li>The compiler, <code>tsconfig.json</code>, <code>strict</code></li>
-                    <li>Running TypeScript: type stripping vs type checking</li>
-                </ul>
-            </li>
-            <li>2 - Everyday types
-                <ul>
-                    <li>Primitives, arrays, tuples, objects, functions</li>
-                    <li><code>any</code>, <code>unknown</code>, <code>never</code>, <code>as const</code>, <code>satisfies</code></li>
-                </ul>
-            </li>
-            <li>3 - Classes &amp; interfaces</li>
-            <li>4 - Unions &amp; narrowing
-                <ul>
-                    <li>Discriminated unions, type guards, exhaustiveness</li>
-                </ul>
-            </li>
-            <li>5 - Generics</li>
-        </ul>
-    </td>
-    <td>
-        <strong>Day 2</strong>
-        <ul>
-            <li>6 - Utility types
-                <ul>
-                    <li><code>Partial</code>, <code>Pick</code>, <code>Omit</code>, <code>Record</code>, <code>ReturnType</code>…</li>
-                </ul>
-            </li>
-            <li>7 - Type-level programming
-                <ul>
-                    <li>Mapped, conditional, template literal, recursive and branded types</li>
-                </ul>
-            </li>
-            <li>8 - Decorators</li>
-            <li>9 - Modules &amp; declaration files</li>
-            <li>10 - Tooling
-                <ul>
-                    <li>tsconfig in depth, performance, lint, tests, docs</li>
-                </ul>
-        <strong>Optional — picked with the group</strong>
-        <ul>
-            <li>11 - Runtime validation: Zod &amp; Standard Schema</li>
-            <li>12 - Migrating a JavaScript project</li>
-        </ul>
-            </li>
-        </ul>
-        <strong>Optional — picked with the group</strong>
-        <ul>
-            <li>11 - Runtime validation: Zod &amp; Standard Schema</li>
-            <li>12 - Migrating a JavaScript project</li>
-        </ul>
-    </td>
- </tr>
- </tbody>
-</table>
-
+src: ../../typescript-common/slides/00_intro/intro.md
 ---
 
-# Training objectives
-
-- Understand what **TypeScript checks**, when — and what it never checks
-- Configure a project: **`tsconfig.json`**, `strict`, and how TypeScript code
-  is **run**
-- Describe a domain with **types, interfaces, classes and unions**, and let
-  **narrowing** do the work
-- Write **reusable, type-safe code** with generics
-- **Derive** types from other types instead of writing them twice — utility,
-  mapped, conditional and template literal types
-- Use **decorators**, **modules** and **declaration files**
-- Equip a project: lint, type tests, docs, compiler diagnostics
-
-<br />
-
-> This training is based on **TypeScript 7**, **Node.js 24** and **Vitest 5**.
-
+---
+src: ../../typescript-common/slides/00_intro/training-objectives.md
 ---
 
-# What's new — TypeScript 5.x to 7.0
-
-| Version | What changed for you | Chapter |
-|---|---|---|
-| 5.0 | Standard decorators, `const` type parameters | 8, 5 |
-| 5.2 | `using` / `await using` | 2 |
-| 5.4 | `NoInfer`, narrowing kept in closures | 5, 4 |
-| 5.5 | Inferred type predicates, `isolatedDeclarations`, JSDoc `@import` | 4, 9, 12 |
-| 5.6 – 5.7 | "Always truthy" errors, checked side-effect imports, `rewriteRelativeImportExtensions` | 4, 9 |
-| 5.8 | `erasableSyntaxOnly`, `require(esm)` | 1, 9 |
-| 5.9 | `import defer`, `module: node20`, a leaner `tsc --init` | 9 |
-| **6.0** | New defaults (`strict`, `types: []`…), legacy options deprecated | 1, 9 |
-| **7.0** | The native compiler: 8–12× faster, legacy options removed | 1, 10 |
-
+---
+src: ../../typescript-common/slides/00_intro/what-s-new-typescript-5-x-to-7-0.md
 ---
 
-# Prerequisites
-
-- **Modern JavaScript** (ES2015+): `const` / `let`, arrow functions,
-  destructuring, spread, classes, modules, `async` / `await`
-- Basic use of **npm** and a terminal
-- No prior experience with TypeScript
-- A **laptop** with Node.js >= 22.22.2 installed (24.15+ recommended), and an
-  editor with TypeScript support (VS Code, WebStorm…)
-
+---
+src: ../../typescript-common/slides/00_intro/prerequisites.md
 ---
 
-# Target audience
-
-- JavaScript developers — front-end, back-end, full-stack — moving to TypeScript
-- TypeScript users who want to understand the type system beyond the basics
-
-Duration: **2 days** (14 hours)
-
+---
+src: ../../typescript-common/slides/00_intro/target-audience.md
 ---
 
-# How a day runs
-
-| Day 1 | | Day 2 | |
-|---|---|---|---|
-| 1 — From JS to TS | TP 1 | 6 — Utility types | TP 6 |
-| 2 — Everyday types | TP 2 | 7 — Type-level programming | TP 7 |
-| 3 — Classes &amp; interfaces | TP 3 | 8 — Decorators | TP 8 |
-| 4 — Unions &amp; narrowing | TP 4 | 9 — Modules &amp; declaration files | TP 9 |
-| 5 — Generics | TP 5 | 10 — Tooling | TP 10 |
-| Retro | | Retro | |
-
-Optional, in place of a chapter when the group needs it: **11 — Runtime
-validation** (TP 11), **12 — Migrating a JavaScript project** (TP 12).
-
-<br />
-
-- **Ten hands-on sessions**, each on its own standalone project — about half the time
-- Each chapter closes with a **quiz** corrected together, each day with a **retro**
-
+---
+src: ../../typescript-common/slides/00_intro/how-a-day-runs.md
 ---
 
-# Teaching methods
-
-- Alternation between **theoretical lectures** and **hands-on practice**
-- Workshops driven by **red specs** you turn green — runtime specs, and **type
-  specs** that check the types themselves
-- Field experience feedback from the trainer
-- Digital course materials provided
-
-<br />
-
-# Evaluation
-
-- A **self-assessment questionnaire** before the session
-- A short **formative quiz** closing each chapter, corrected together
-- Continuous evaluation through the **workshops** and their Definition of Done
-- A **final questionnaire** mirroring the self-assessment, to measure progress
+---
+src: ../../typescript-common/slides/00_intro/teaching-methods.md
+---
 
 ---
 

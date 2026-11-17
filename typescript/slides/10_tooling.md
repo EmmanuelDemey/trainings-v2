@@ -5,38 +5,12 @@ layout: cover
 # 10 - Tooling
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Configure** `tsconfig.json` beyond `strict`, and share options with `extends`
-- **Split** a code base into project references, and build it with `tsc -b`
-- **Diagnose** a slow or surprising compilation: `--showConfig`, `--listFiles`,
-  `--extendedDiagnostics`, `--generateTrace`
-- **Add** type-aware linting with typescript-eslint
-- **Test** types as well as values, with Vitest's `expectTypeOf`
-- **Choose** how to run TypeScript: `tsc`, Node.js type stripping, tsx, a bundler
-
+src: ../../typescript-common/slides/10_tooling/learning-objectives.md
 ---
 
-# How `tsc` works
-
-- **Scanner** — the source text into a stream of tokens
-- **Parser** — the tokens into an Abstract Syntax Tree (AST)
-- **Binder** — connects declarations and their uses: symbols and scopes
-- **Checker** — the types: by far the biggest and slowest part
-- **Emitter** — the JavaScript, the `.d.ts`, the source maps
-
-<br />
-
-- **TypeScript 7** is a **native port** of that compiler, written in Go:
-  same command, same options, same errors — **8 to 12× faster** on a full build, in parallel
-- The editor's language service runs on the same native code
-- Parallelism: `--checkers <n>`, `--builders <n>` (project references),
-  `--singleThreaded` to turn it off
-- **No compiler API in 7.0** (a new one is planned for 7.1): tools that need it,
-  like typescript-eslint, still install TypeScript 6 side by side
+---
+src: ../../typescript-common/slides/10_tooling/how-tsc-works.md
+---
 
 ---
 
@@ -233,79 +207,12 @@ export class Statistics {
 - **TypeDoc** turns them into a site: `npx typedoc src/index.ts`
 
 ---
-
-# Running TypeScript
-
-| | Checks types | Runs | Notes |
-|---|---|---|---|
-| `tsc` | ✅ | — | emits `.js` and `.d.ts` |
-| `node file.ts` | ❌ | ✅ | type stripping: **erasable syntax only** |
-| `tsx file.ts` | ❌ | ✅ | esbuild: `enum`, decorators… |
-| Vite, esbuild, swc | ❌ | bundles | one file at a time |
-| Deno, Bun | ❌ | ✅ | TypeScript built in |
-
-- Only `tsc` **checks**: everything else **strips** and runs
-- So the type check is a **step of its own**: `tsc --noEmit` in CI and in a
-  pre-commit hook, next to the tests
-
+src: ../../typescript-common/slides/10_tooling/running-typescript.md
 ---
 
-# Quiz — Question 1 / 3
-
-**Under `exactOptionalPropertyTypes`, `ReportOptions` has `currency?: string`.
-Which value is refused?**
-
-- **A.** `{}`
-- **B.** `{ currency: 'EUR' }`
-- **C.** `{ currency: undefined }`
-- **D.** None of them
-
-<v-click>
-
-> ✅ **C** — An optional property may be **absent**, not **present and
-> `undefined`**. The difference shows in a spread: `{ currency: 'EUR', ...options }`
-> keeps `'EUR'` for `{}`, and loses it for `{ currency: undefined }`.
-
-</v-click>
-
 ---
-
-# Quiz — Question 2 / 3
-
-**A project references another with `tsc -b`. What is the cli checked against?**
-
-- **A.** The `.ts` sources of the core
-- **B.** The `.d.ts` emitted by the core's build
-- **C.** The `.js` emitted by the core's build
-- **D.** Nothing: references switch the check off
-
-<v-click>
-
-> ✅ **B** — The referenced project is built first, and its **declarations** are
-> what the referencing project sees. That is why `composite` requires them, and
-> why a second `tsc -b` with nothing changed does nothing.
-
-</v-click>
-
+src: ../../typescript-common/slides/10_tooling/quiz.md
 ---
-
-# Quiz — Question 3 / 3
-
-**`npm test` runs with Vitest, `npm start` with `node src/main.ts`. A type
-error slips into a file. Which command fails?**
-
-- **A.** Both
-- **B.** `npm test` only
-- **C.** `npm start` only
-- **D.** Neither — only `tsc` checks types
-
-<v-click>
-
-> ✅ **D** — Vitest and Node.js **strip** the types and run what is left. Only
-> `tsc` (or `vitest --typecheck` for its `*.test-d.ts` files) checks them: keep
-> `tsc --noEmit` as a step of its own in CI.
-
-</v-click>
 
 ---
 layout: cover
@@ -316,5 +223,5 @@ layout: cover
 ## Workshop 10 - Tooling
 
 ---
-src: ./shared/retro.md
+src: ../../typescript-common/slides/retro.md
 ---

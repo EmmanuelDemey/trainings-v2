@@ -1,0 +1,10 @@
+{
+  // The configuration of the tools: runs in Node.js, never in the browser.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "lib": ["esnext"],
+    "types": ["node"]
+  },
+  "include": ["vite.config.ts"]
+}

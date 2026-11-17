@@ -66,14 +66,14 @@ Déjà couvert : `erasableSyntaxOnly`, type stripping, `using`, `satisfies`, `No
 ## 05 — Generics · TP 5
 
 - [ ] Slide bonus : annotations de variance `in` / `out` (absentes)
-- [ ] Relire « Good practices » (un type param doit apparaître au moins 2 fois)
-- [ ] TP 5 : relire après montée de versions
+- [x] Relire « Good practices » (un type param doit apparaître au moins 2 fois)
+- [x] TP 5 : relire après montée de versions
 
 ## 06 — Utility types · TP 6
 
-- [ ] Vérifier la liste des utility types vs `lib.es5.d.ts` actuel
-- [ ] `Awaited` avec `Promise.all` / tuples si pas assez montré
-- [ ] TP 6 : relire après montée de versions
+- [x] Vérifier la liste des utility types vs `lib.es5.d.ts` actuel
+- [x] `Awaited` avec `Promise.all` / tuples si pas assez montré
+- [x] TP 6 : relire après montée de versions
 
 ## 07 — Type-level programming · TP 7
 

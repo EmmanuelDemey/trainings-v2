@@ -10,7 +10,7 @@
     "site": "training-kit site",
     "build": "training-kit build",
     "build:fast": "training-kit build --no-pdf",
-    "check": "training-kit check",
+    "check": "training-kit check && node ../typescript-common/scripts/parity.mjs",
     "verify": "training-kit verify"
   },
   "devDependencies": {

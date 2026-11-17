@@ -1,0 +1,11 @@
+{
+  // What Vitest checks the type-level specs (tests/*.test-d.tsx) against: the
+  // options of tsconfig.base.json, the ones every project compiles with.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "types": ["node", "vite/client"],
+    "jsx": "react-jsx"
+  },
+  "include": ["src", "tests", "vite.config.ts"]
+}

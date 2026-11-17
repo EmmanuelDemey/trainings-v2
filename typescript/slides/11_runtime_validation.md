@@ -5,18 +5,8 @@ layout: cover
 # 11 - Runtime validation
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Explain** why a type annotation checks nothing at run time
-- **Validate** the data that enters the app with a **Zod** schema
-- **Infer** types from a schema — `z.infer`, `z.input`, `z.output` — instead of
-  writing them twice
-- **Choose** between `parse` and `safeParse`
-- **Transform**, **coerce** and **brand** while validating
-- **Write** code that accepts any validation library, through **Standard Schema**
+src: ../../typescript-common/slides/11_runtime_validation/learning-objectives.md
+---
 
 ---
 
@@ -195,76 +185,12 @@ const user = await validate(v.object({ … }), json);   // a Valibot one
 - `validate` may answer in a `Promise`: always `await` it
 
 ---
-
-# Where to validate
-
-- At the **edges** — once, where data enters:
-  - HTTP responses, request bodies, query strings
-  - `process.env`, at start-up: fail **before** serving anything
-  - `JSON.parse`, `localStorage`, files, messages from a queue or a worker
-  - form data
-- **Inside** the app, trust the types: no `parse` deep in the domain
-- Zod is not the only one: **Valibot** is tree-shakable (smaller bundles),
-  **ArkType** uses TypeScript syntax in strings and is fast
-- `z.toJSONSchema(schema)` documents the contract for other teams —
-  `{ io: 'input' }` when the schema has a `transform`
-
+src: ../../typescript-common/slides/11_runtime_validation/where-to-validate.md
 ---
 
-# Quiz — Question 1 / 3
-
-**`const book: Book = JSON.parse(text)`. What is checked at run time?**
-
-- **A.** Every field of `Book`
-- **B.** Only that `text` is valid JSON
-- **C.** Only the required fields of `Book`
-- **D.** Nothing at all — not even the JSON
-
-<v-click>
-
-> ✅ **B** — `JSON.parse` throws on invalid JSON, and returns `any`. The
-> annotation is erased: the shape of the value is never checked. To check it,
-> pass it through a schema.
-
-</v-click>
-
 ---
-
-# Quiz — Question 2 / 3
-
-**`const S = z.object({ at: z.iso.date().transform((d) => new Date(d)) })`.
-What are `z.input<typeof S>['at']` and `z.output<typeof S>['at']`?**
-
-- **A.** `Date` and `Date`
-- **B.** `string` and `string`
-- **C.** `string` and `Date`
-- **D.** `Date` and `string`
-
-<v-click>
-
-> ✅ **C** — The input is what the schema accepts, before the `transform`: a
-> string. The output is what `parse` returns: a `Date`. `z.infer` is the output.
-
-</v-click>
-
+src: ../../typescript-common/slides/11_runtime_validation/quiz.md
 ---
-
-# Quiz — Question 3 / 3
-
-**A form library accepts a Zod, a Valibot or an ArkType schema. How?**
-
-- **A.** It depends on all three libraries
-- **B.** It reads the `~standard` property every one of them implements
-- **C.** It converts each schema to JSON Schema first
-- **D.** It only checks the types, at compile time
-
-<v-click>
-
-> ✅ **B** — Standard Schema is one interface: `schema['~standard'].validate(value)`
-> returns `{ value }` or `{ issues }`, and `InferOutput` gives the type. The
-> library depends on a type-only package, not on any validator.
-
-</v-click>
 
 ---
 layout: cover

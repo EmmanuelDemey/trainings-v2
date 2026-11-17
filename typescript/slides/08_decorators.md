@@ -5,19 +5,8 @@ layout: cover
 # 8 - Decorators
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Write** class, method, accessor and field decorators with the **standard**
-  (TC39) API — the TypeScript default since 5.0
-- **Read** the `context` object: `kind`, `name`, `static`, `private`,
-  `addInitializer`, `metadata`
-- **Write** a decorator **factory** that takes parameters
-- **Store** metadata on a class, and read it back through `Symbol.metadata`
-- **Tell** standard decorators from the legacy `experimentalDecorators` used by
-  Angular and NestJS
+src: ../../typescript-common/slides/08_decorators/learning-objectives.md
+---
 
 ---
 
@@ -42,20 +31,8 @@ class Cart {
 - **No parameter decorators** in the standard: those only exist in the legacy flavour
 
 ---
-
-# Two flavours of decorators
-
-| | Standard (TC39, stage 3) | Legacy (`experimentalDecorators`) |
-|---|---|---|
-| TypeScript | default since **5.0** | opt-in flag, since 1.5 |
-| Signature | `(value, context)` | `(target, key, descriptor)` |
-| Parameter decorators | ❌ | ✅ |
-| `emitDecoratorMetadata` | ❌ — `context.metadata` | ✅ with `reflect-metadata` |
-| Used by | Lit 3, MobX 6, new code | **Angular**, **NestJS**, TypeORM |
-
-- Both compile — **not** at the same time: the flag switches the whole project
-- This chapter teaches the **standard** API; the last slides come back to the
-  legacy one
+src: ../../typescript-common/slides/08_decorators/two-flavours-of-decorators.md
+---
 
 ---
 
@@ -352,44 +329,8 @@ class Cart {
 </v-click>
 
 ---
-
-# Quiz — Question 2 / 3
-
-**A method decorator returns an arrow function that calls `target(...args)`.
-What breaks?**
-
-- **A.** Nothing
-- **B.** The return value is lost
-- **C.** `this` inside the method is no longer the instance
-- **D.** The decorator is applied twice
-
-<v-click>
-
-> ✅ **C** — An arrow has no `this` of its own, and `target(...args)` calls the
-> method without one. Return a `function`, and call `target.call(this, ...args)`.
-
-</v-click>
-
+src: ../../typescript-common/slides/08_decorators/quiz.md
 ---
-
-# Quiz — Question 3 / 3
-
-**`node cart.ts` fails with a `SyntaxError` on `@logged`, while `tsc --noEmit`
-is happy. Why?**
-
-- **A.** Node.js needs `experimentalDecorators`
-- **B.** Type stripping only removes types: a decorator is code that must be
-  compiled, and no engine runs it natively yet
-- **C.** `tsc --noEmit` does not check decorators
-- **D.** The file must be named `.mts`
-
-<v-click>
-
-> ✅ **B** — Decorators are not **erasable** syntax. Run the file through a tool
-> that compiles them — `tsc`, `tsx`, esbuild — and add `erasableSyntaxOnly` to the
-> projects meant to run on bare Node.js.
-
-</v-click>
 
 ---
 layout: cover

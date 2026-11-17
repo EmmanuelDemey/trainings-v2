@@ -9,6 +9,8 @@ vuejs-advanced/      the Advanced Vue.js training — a training-kit project, it
 react/               the React training, 3 days — a training-kit project, its own Netlify site
 zod/                 the Zod training, half a day — a training-kit project, its own Netlify site
 typescript/          the TypeScript training, 2 days — a training-kit project, its own Netlify site
+typescript-react/    TypeScript for React developers, 2 days — the same content with React snippets
+typescript-common/   what the two TypeScript trainings share: the slides without code, the parity check
 vitest/              the Vitest training, 1 day — a training-kit project, its own Netlify site
 a11y/                the Digital Accessibility training — a training-kit project, its own Netlify site
 elasticsearch/       the Elasticsearch training, 3 days — a training-kit project, its own Netlify site
@@ -29,7 +31,7 @@ site/                the workshops site of the other trainings (Astro + Starligh
 scripts/             the build that assembles it
 ```
 
-`javascript/`, `vuejs-advanced/`, `react/`, `zod/`, `typescript/`, `vitest/`, `a11y/`, `elasticsearch/`, `elastic-security/`, `opensearch/`, the three `tanstack-query-*/` and the two `sentry-*/` trainings are
+`javascript/`, `vuejs-advanced/`, `react/`, `zod/`, `typescript/`, `typescript-react/`, `vitest/`, `a11y/`, `elasticsearch/`, `elastic-security/`, `opensearch/`, the three `tanstack-query-*/` and the two `sentry-*/` trainings are
 built by [training-kit](https://www.npmjs.com/package/@emmanueldemey/training-kit):
 each folder is self-contained (its own `package.json`, lockfile and
 `netlify.toml`), and its README says how to write, build and deploy it. The three

@@ -5,18 +5,8 @@ layout: cover
 # 9 - Modules & declaration files
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Import** values and types between ES modules, and tell `import` from
-  `import type`
-- **Choose** a `module` / `moduleResolution` for Node.js or for a bundler
-- **Write** a declaration file for a JavaScript package that ships no types
-- **Extend** a type you do not own: module augmentation, `declare global`
-- **Ship** a package with its declarations: `declaration`, `isolatedDeclarations`,
-  `exports` and `types`
+src: ../../typescript-common/slides/09_modules/learning-objectives.md
+---
 
 ---
 
@@ -60,19 +50,8 @@ import { emit, type EventMap } from './events.ts';
   esbuild, swc, Vite — they cannot know `Article` is a type
 
 ---
-
-# `module` and `moduleResolution`
-
-| Target | `module` | Imports look like |
-|---|---|---|
-| **Node.js** (code that runs as is, libraries) | `nodenext` | `'./articles.ts'`, `'./articles.js'` — the extension is **required** |
-| **A bundler** (Vite, webpack, esbuild) | `preserve` (+ `moduleResolution: bundler`) | `'./articles'` — no extension needed |
-
-- `nodenext` follows Node.js's rules: ESM or CommonJS from `"type"` in
-  `package.json` and the extension (`.mts`, `.cts`)
-- `bundler` is more lenient — and lets through imports Node.js would refuse
-- Pick the one that matches **what runs the code**, not the most lenient one
-- `node20` pins Node.js 20+ behaviour; `nodenext` follows the latest Node.js
+src: ../../typescript-common/slides/09_modules/module-and-moduleresolution.md
+---
 
 ---
 
@@ -308,63 +287,8 @@ export function publish(title: string): Article { /* … */ }   // ✅
 - … so any tool can emit the `.d.ts` **file by file**, in parallel, without the checker
 
 ---
-
-# Quiz — Question 1 / 3
-
-**Under `verbatimModuleSyntax`, `Article` is an interface. Which import compiles?**
-
-- **A.** `import { Article } from './articles.ts';`
-- **B.** `import { type Article } from './articles.ts';`
-- **C.** `import Article from './articles.ts';`
-- **D.** All three
-
-<v-click>
-
-> ✅ **B** — Under `verbatimModuleSyntax`, an import not marked `type` is kept in
-> the JavaScript — and `Article` does not exist at run time. `import type { Article }`
-> works as well.
-
-</v-click>
-
+src: ../../typescript-common/slides/09_modules/quiz.md
 ---
-
-# Quiz — Question 2 / 3
-
-**A package ships no types and has no `@types`. What does
-`declare module 'legacy-lib';` give you?**
-
-- **A.** Types generated from the package's JavaScript
-- **B.** An error until you list every export
-- **C.** An import that compiles — with everything it exports typed `any`
-- **D.** A type check at run time
-
-<v-click>
-
-> ✅ **C** — A **shorthand** ambient module silences the error, and switches the
-> checker off for that package. A first step — then describe what you use, with a
-> `declare module 'legacy-lib' { … }` block.
-
-</v-click>
-
----
-
-# Quiz — Question 3 / 3
-
-**A library declares `export interface Theme {}`. How do you add a `brand`
-color to it, from your code?**
-
-- **A.** `type Theme = Theme & { brand: string }`
-- **B.** `declare module 'the-lib' { interface Theme { brand: string } }`
-- **C.** Fork the library
-- **D.** `declare global { interface Theme { brand: string } }`
-
-<v-click>
-
-> ✅ **B** — **Module augmentation**: the two `interface Theme` declarations merge.
-> **A** creates a new type nobody else uses; **D** declares a different, global
-> `Theme`.
-
-</v-click>
 
 ---
 layout: cover

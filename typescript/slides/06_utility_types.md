@@ -5,19 +5,8 @@ layout: cover
 # 6 - Utility types
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Derive** a type from a value with `typeof`, and from another type with
-  `keyof` and indexed access
-- **Reshape** an object type with `Partial`, `Required`, `Readonly`, `Pick`,
-  `Omit` and `Record`
-- **Filter** a union with `Exclude`, `Extract` and `NonNullable`
-- **Read** the types of a function or a class with `ReturnType`, `Parameters`,
-  `Awaited` and `InstanceType`
-- **Keep** a single source of truth for a domain model
+src: ../../typescript-common/slides/06_utility_types/learning-objectives.md
+---
 
 ---
 
@@ -200,6 +189,36 @@ type FetchedUser = Awaited<ReturnType<typeof fetchUser>>;
 
 ---
 
+# `Awaited` and `Promise.all`
+
+```ts
+const [user, orders] = await Promise.all([fetchUser('u1'), fetchOrders('u1')]);
+// user: User · orders: Order[] — one type per position, not (User | Order[])[]
+
+async function loadDashboard() {
+  return Promise.all([fetchUser('u1'), fetchOrders('u1'), 42]);
+}
+type Dashboard = Awaited<ReturnType<typeof loadDashboard>>;
+// [User, Order[], number]
+
+type Mixed = Awaited<number | Promise<string>>;   // number | string
+type Tuple = Awaited<[Promise<number>]>;          // [Promise<number>] — not unwrapped
+```
+
+- `Promise.all` maps a **tuple** of promises to a tuple of `Awaited` values:
+  its signature is `{ -readonly [P in keyof T]: Awaited<T[P]> }`
+- `Awaited` is **distributive** on a union, and leaves non-promises as they are
+- It unwraps the promise itself, not the promises **inside** a tuple — that is
+  `Promise.all`'s job
+
+<!--
+Read the signature of Promise.all in lib.es2015.promise.d.ts with the room:
+a mapped type over a tuple (chapter 7) that applies Awaited to each element.
+That is why the destructured variables keep their own types.
+-->
+
+---
+
 # Classes: `InstanceType`
 
 ```ts
@@ -221,76 +240,12 @@ function createService<C extends new (...args: any[]) => unknown>(Ctor: C): Inst
 - Mostly met in factories and dependency injection
 
 ---
-
-# The cheat sheet
-
-| Utility | Gives |
-|---|---|
-| `Partial<T>` / `Required<T>` / `Readonly<T>` | every property optional / required / readonly |
-| `Pick<T, K>` / `Omit<T, K>` | only the keys `K` / every key but `K` |
-| `Record<K, V>` | one `V` per key of `K` |
-| `Exclude<U, X>` / `Extract<U, X>` | the members of `U` not assignable / assignable to `X` |
-| `NonNullable<T>` | `T` without `null` and `undefined` |
-| `ReturnType<F>` / `Parameters<F>` | the return type / the parameter tuple of a function type |
-| `Awaited<T>` | what a promise resolves to |
-| `InstanceType<C>` / `ConstructorParameters<C>` | what a constructor builds / takes |
-
-All of them live in `lib.es5.d.ts` — and are written in plain TypeScript.
-
+src: ../../typescript-common/slides/06_utility_types/the-cheat-sheet.md
 ---
 
-# Quiz — Question 1 / 3
-
-**What is `Partial<Omit<User, 'id'>>`?**
-
-- **A.** A user whose `id` is optional
-- **B.** Every field of a user but `id`, each optional
-- **C.** Every field of a user, each optional, `id` included
-- **D.** A compile error: utility types cannot be nested
-
-<v-click>
-
-> ✅ **B** — Read inside out: `Omit` removes `id`, then `Partial` makes what
-> is left optional. That is the body of a PATCH: it can never carry an `id`.
-
-</v-click>
-
 ---
-
-# Quiz — Question 2 / 3
-
-**`const SIZES = ['S', 'M', 'L'];` — what is `(typeof SIZES)[number]`?**
-
-- **A.** `'S' | 'M' | 'L'`
-- **B.** `string`
-- **C.** `number`
-- **D.** A compile error
-
-<v-click>
-
-> ✅ **B** — Without `as const`, the array is widened to `string[]`, and its
-> elements to `string`. `const SIZES = ['S', 'M', 'L'] as const` gives **A**.
-
-</v-click>
-
+src: ../../typescript-common/slides/06_utility_types/quiz.md
 ---
-
-# Quiz — Question 3 / 3
-
-**`async function load(): Promise<Config>` — which gives `Config`?**
-
-- **A.** `ReturnType<load>`
-- **B.** `ReturnType<typeof load>`
-- **C.** `Awaited<ReturnType<typeof load>>`
-- **D.** `Awaited<typeof load>`
-
-<v-click>
-
-> ✅ **C** — `load` is a value: its type is `typeof load`. `ReturnType` of it
-> is `Promise<Config>`, and `Awaited` unwraps it. **A** does not compile; **B**
-> is the promise; **D** leaves the function type as it is.
-
-</v-click>
 
 ---
 layout: cover

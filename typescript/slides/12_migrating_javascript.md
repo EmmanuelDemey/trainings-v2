@@ -5,36 +5,12 @@ layout: cover
 # 12 - Migrating a JavaScript project
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Plan** a migration that ships every day — no "big rewrite" branch
-- **Check** JavaScript files with `allowJs` and `checkJs`, or one file at a time with `// @ts-check`
-- **Type** JavaScript without converting it, with **JSDoc**
-- **Convert** a file from `.js` to `.ts`, one at a time
-- **Silence** an error on purpose with `@ts-expect-error` — and know why not `@ts-ignore`
-- **Turn on** `strict` step by step, and **ship** `.d.ts` files from JavaScript
-
+src: ../../typescript-common/slides/12_migrating_javascript/learning-objectives.md
 ---
 
-# A migration, not a rewrite
-
-- JavaScript **is** TypeScript: every `.js` file can stay as it is, next to the `.ts` ones
-- Migrate **incrementally**: every step builds, passes the tests, and ships
-
-<br />
-
-1. Add `typescript` and a `tsconfig.json` — `allowJs`, nothing checked yet
-2. Let the checker **read** the JavaScript: `checkJs`, or `// @ts-check` file by file
-3. Type the **leaves** first — the modules everything else imports
-4. Rename `.js` to `.ts` where it pays: new code, code that changes often
-5. Tighten the compiler — `strict`, then the flags beyond it
-
-<br />
-
-> The goal is not "zero `.js` files". It is **every file checked**.
+---
+src: ../../typescript-common/slides/12_migrating_javascript/a-migration-not-a-rewrite.md
+---
 
 ---
 
@@ -177,22 +153,8 @@ const c: number = 3;          // ✘ Unused '@ts-expect-error' directive.
 - typescript-eslint's `ban-ts-comment` forbids `@ts-ignore`, and asks for a description
 
 ---
-
-# `strict`, step by step
-
-- **TypeScript 7** turns `strict` on **by default**: an old project that never
-  set it gets every check at once. Say `"strict": false` explicitly while you migrate
-- Then flag by flag — the order of the most value for the least work:
-
-| Step | Flag | What it finds |
-|---|---|---|
-| 1 | `noImplicitAny` | Every untyped parameter — the bulk of the work |
-| 2 | `strictNullChecks` | Every `null` / `undefined` not handled — the bugs |
-| 3 | `strict: true` | The rest of the family: `strictFunctionTypes`, `useUnknownInCatchVariables`… |
-| 4 | Beyond | `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` (chapter 10) |
-
-- Per **folder** instead of per flag: one `tsconfig.json` per package, wired with
-  **project references** — the new packages strict from day one
+src: ../../typescript-common/slides/12_migrating_javascript/strict-step-by-step.md
+---
 
 ---
 
@@ -245,62 +207,8 @@ error TS5108: Option 'esModuleInterop=false' has been removed.
   is an error
 
 ---
-
-# Quiz — Question 1 / 3
-
-**A project has `"allowJs": true`, and `npx tsc --noEmit` is green. What does
-that say about its `.js` files?**
-
-- **A.** They are free of type errors
-- **B.** Nothing: `allowJs` adds them to the program, it does not check them
-- **C.** They have been converted to TypeScript
-- **D.** They are only checked when `strict` is on
-
-<v-click>
-
-> ✅ **B** — `allowJs` lets `.ts` files import them, with their inferred types.
-> **Checking** them takes `checkJs` — or a `// @ts-check` at the top of each file.
-
-</v-click>
-
+src: ../../typescript-common/slides/12_migrating_javascript/quiz.md
 ---
-
-# Quiz — Question 2 / 3
-
-**Why prefer `// @ts-expect-error` to `// @ts-ignore`?**
-
-- **A.** `@ts-ignore` does not work in `.js` files
-- **B.** `@ts-expect-error` is an error when the line below has **no** error
-- **C.** `@ts-expect-error` also checks the type at run time
-- **D.** `@ts-ignore` silences the whole file
-
-<v-click>
-
-> ✅ **B** — *Unused '@ts-expect-error' directive*. When the bug is fixed, the
-> comment has to go: the debt cannot outlive its reason. `@ts-ignore` stays
-> silent forever — even over the next error, the one nobody saw.
-
-</v-click>
-
----
-
-# Quiz — Question 3 / 3
-
-**`src/format.js` becomes `src/format.ts`, in a `module: nodenext` project.
-What happens to `import { formatPrice } from './format.js'` in the other files?**
-
-- **A.** It must become `'./format.ts'`
-- **B.** It must become `'./format'`
-- **C.** Nothing: the import names the emitted file, `format.js`
-- **D.** It must become `import type`
-
-<v-click>
-
-> ✅ **C** — `tsc` maps `./format.js` back to `format.ts`. Renaming one file does
-> not ripple through the project: that is what makes a file-by-file migration
-> possible.
-
-</v-click>
 
 ---
 layout: cover

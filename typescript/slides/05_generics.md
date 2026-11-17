@@ -5,16 +5,8 @@ layout: cover
 # 5 - Generics
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Write** a generic function, and let TypeScript **infer** its type arguments
-- **Constrain** a type parameter with `extends` — and with `keyof`
-- **Write** generic interfaces and classes, with **default** type arguments
-- **Keep** literal types with a `const` type parameter
-- **Stop** an argument from widening an inference with `NoInfer`
+src: ../../typescript-common/slides/05_generics/learning-objectives.md
+---
 
 ---
 
@@ -262,26 +254,18 @@ function log(value: unknown): void { console.log(value); }  // ✔
 
 - Constrain as **little** as needed: `T extends { id: string }`, not `T extends User`
 - Prefer `readonly T[]` for inputs you do not mutate: callers can pass both kinds of array
+- Let the linter check the rule: `@typescript-eslint/no-unnecessary-type-parameters`
+
+<!--
+"Appears at least twice" counts every place in the signature: parameters,
+return type, constraints of other type parameters. `fetchJson<T>(url): Promise<T>`
+uses T once: the lint rule flags it — it is the "cast in disguise" of the
+earlier slide. `pluck<T, K extends keyof T>` is fine: K uses T in its constraint.
+-->
 
 ---
-
-
-# Quiz — Question 1 / 3
-
-**`function wrap<T>(value: T) { return [value]; }` — what is the type of
-`wrap('a')`?**
-
-- **A.** `any[]`
-- **B.** `unknown[]`
-- **C.** `string[]`
-- **D.** `'a'[]`
-
-<v-click>
-
-> ✅ **C** — `T` is inferred from the argument. A string literal passed to a
-> plain `T` is **widened** to `string`. With `<const T>`, it would be `'a'[]`.
-
-</v-click>
+src: ../../typescript-common/slides/05_generics/quiz.md
+---
 
 ---
 
@@ -308,25 +292,8 @@ function getId<T>(entity: T) {
 </v-click>
 
 ---
-
-# Quiz — Question 3 / 3
-
-**`pick<T extends string>(options: T[], initial: T)` accepts
-`pick(['low', 'high'], 'none')` — `T` becomes `'low' | 'high' | 'none'`. What fixes it?**
-
-- **A.** `initial: NoInfer<T>`
-- **B.** `<const T extends string>`
-- **C.** `initial: string`
-- **D.** `options: readonly T[]`
-
-<v-click>
-
-> ✅ **A** — `'none'` takes part in the inference of `T`. `NoInfer<T>` makes
-> `T` come from `options` only; `'none'` is then **checked** against
-> `'low' | 'high'`, and refused. **B** keeps literals, but `'none'` is one too.
-> **C** accepts any string: the very bug.
-
-</v-click>
+src: ../../typescript-common/slides/05_generics/quiz-2.md
+---
 
 ---
 layout: cover
@@ -337,5 +304,5 @@ layout: cover
 ## Workshop 5 - Generics
 
 ---
-src: ./shared/retro.md
+src: ../../typescript-common/slides/retro.md
 ---

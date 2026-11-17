@@ -1,0 +1,48 @@
+import { describe, expect, test, vi } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { Emitter, useEvent } from '../src/emitter.ts';
+
+interface ShopEvents {
+  added: { sku: string; quantity: number };
+  cleared: undefined;
+}
+
+describe('Emitter', () => {
+  test('calls the listeners of an event with its payload', () => {
+    const emitter = new Emitter<ShopEvents>();
+    const listener = vi.fn();
+    emitter.on('added', listener);
+    emitter.emit('added', { sku: 'TS-7', quantity: 2 });
+    expect(listener).toHaveBeenCalledWith({ sku: 'TS-7', quantity: 2 });
+  });
+
+  test('does not call the listeners of another event', () => {
+    const emitter = new Emitter<ShopEvents>();
+    const listener = vi.fn();
+    emitter.on('cleared', listener);
+    emitter.emit('added', { sku: 'TS-7', quantity: 2 });
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  test('stops calling a listener once unsubscribed', () => {
+    const emitter = new Emitter<ShopEvents>();
+    const listener = vi.fn();
+    const off = emitter.on('cleared', listener);
+    off();
+    emitter.emit('cleared', undefined);
+    expect(listener).not.toHaveBeenCalled();
+  });
+});
+
+describe('useEvent', () => {
+  test('listens while the component is mounted, and stops on unmount', () => {
+    const emitter = new Emitter<ShopEvents>();
+    const listener = vi.fn();
+    const { unmount } = renderHook(() => useEvent(emitter, 'added', listener));
+    act(() => emitter.emit('added', { sku: 'TS-7', quantity: 2 }));
+    unmount();
+    emitter.emit('added', { sku: 'TS-8', quantity: 1 });
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith({ sku: 'TS-7', quantity: 2 });
+  });
+});

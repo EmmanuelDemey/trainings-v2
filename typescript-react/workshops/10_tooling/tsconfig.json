@@ -1,0 +1,12 @@
+{
+  // TODO 3: one project for the browser code and the Node.js code alike — the
+  // app sees `process`, the config sees `document`. Split it: a root that
+  // references tsconfig.app.json and tsconfig.node.json, and compiles nothing itself.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "types": ["node", "vite/client"],
+    "jsx": "react-jsx"
+  },
+  "include": ["src", "vite.config.ts"]
+}

@@ -6,9 +6,10 @@ export default defineConfig({
   slug: 'typescript',
   author: 'Emmanuel Demey',
 
-  // One Markdown file per chapter, in the order of its number. The end-of-day
-  // retro lives in slides/shared/ — a sub-folder, so not a chapter — and is
-  // imported at the end of the last chapter of each day (5 and 10).
+  // One Markdown file per chapter, in the order of its number. The slides
+  // without code — and the end-of-day retro, imported at the end of chapters 5
+  // and 10 — live in ../typescript-common/slides/, shared with the other
+  // TypeScript training. See ../typescript-common/README.md.
   slides: 'slides',
   workshops: 'workshops',
   solutions: 'solutions',

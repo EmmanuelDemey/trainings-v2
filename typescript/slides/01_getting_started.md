@@ -5,16 +5,8 @@ layout: cover
 # 1 - From JavaScript to TypeScript
 
 ---
-
-# Learning objectives
-
-At the end of this chapter, you will be able to:
-
-- **Explain** what TypeScript adds to JavaScript — and what it removes before running
-- **Set up** a project: `typescript`, `tsc`, `tsconfig.json`
-- **Run** a `.ts` file, and tell **type stripping** from **type checking**
-- **Turn on** `strict`, and read the errors it reports
-- **Describe** the stages of a compilation
+src: ../../typescript-common/slides/01_getting_started/learning-objectives.md
+---
 
 ---
 
@@ -39,19 +31,8 @@ total(['10', '20']);
   at run time — keep that in mind for the whole training
 
 ---
-
-# Why bother
-
-- **Errors move left**: a typo, a missing `null` check, a wrong argument is
-  found in the editor, not in production
-- **The editor knows your code**: completion, go to definition, safe renames
-- **Types are documentation** that cannot drift from the code
-- **Refactoring at scale**: change a type, follow the errors
-
-<br />
-
-> TypeScript is not a test framework: it says the code is **consistent**, not
-> that it is **right**. `total([10, 20])` returning `40` type checks perfectly.
+src: ../../typescript-common/slides/01_getting_started/why-bother.md
+---
 
 ---
 
@@ -150,19 +131,8 @@ last.toUpperCase();                     // ✘ 'last' is possibly 'undefined'.
 > `"strict": false` — migrate it flag by flag.
 
 ---
-
-# Running TypeScript
-
-| | Checks the types? | How |
-|---|---|---|
-| `tsc` | ✔ | Checks, then writes `.js` files |
-| `node file.ts` | ✘ | Node.js 22.18+ **strips** the types and runs what is left |
-| `tsx file.ts` | ✘ | esbuild strips the types — and supports every syntax |
-| Vite, Vitest, esbuild… | ✘ | Same: they **transpile**, they never check |
-
-- Every runner **erases** the types — only `tsc` reads them
-- So a project runs with one tool, and **checks** with `tsc --noEmit` — in the
-  editor, in a pre-commit hook, in the CI
+src: ../../typescript-common/slides/01_getting_started/running-typescript.md
+---
 
 ---
 
@@ -210,76 +180,12 @@ flowchart LR
 > `.js` even when there are type errors. `noEmitOnError` changes that.
 
 ---
-
-# The editor
-
-- The editor runs the **same** checker as `tsc`, on every keystroke — via the
-  TypeScript language server
-- **VS Code**: built in. **WebStorm** / **IntelliJ IDEA**: built in
-- Hover to see an inferred type; `Ctrl` / `Cmd` + click to jump to a declaration
-- The **Pretty TypeScript Errors** extension (`yoavbls.pretty-ts-errors`) makes
-  long errors readable
-- The [TypeScript Playground](https://www.typescriptlang.org/play) runs the
-  compiler in the browser: perfect to test a type, or to share one
-
+src: ../../typescript-common/slides/01_getting_started/the-editor.md
 ---
 
-# Quiz — Question 1 / 3
-
-**`node src/cli.ts` prints the right output, but `npx tsc --noEmit` reports
-three errors. How is that possible?**
-
-- **A.** Node.js uses an older version of TypeScript
-- **B.** Node.js strips the types without checking them
-- **C.** `tsc --noEmit` only checks, so its errors do not count
-- **D.** Node.js fixes the errors before running the file
-
-<v-click>
-
-> ✅ **B** — Running and checking are two different jobs. Node.js, tsx, Vite and
-> Vitest all **erase** the types; only `tsc` (and the editor) **reads** them.
-> A green run says nothing about the types.
-
-</v-click>
-
 ---
-
-# Quiz — Question 2 / 3
-
-**With `strict` off, what is the type of `title` in
-`function createTodo(title) {}`?**
-
-- **A.** `string`
-- **B.** `unknown`
-- **C.** `any`
-- **D.** It is a compile error
-
-<v-click>
-
-> ✅ **C** — An **implicit `any`**: anything is accepted, nothing is checked.
-> With `strict` (precisely `noImplicitAny`), it becomes the error
-> *Parameter 'title' implicitly has an 'any' type* — which is the point.
-
-</v-click>
-
+src: ../../typescript-common/slides/01_getting_started/quiz.md
 ---
-
-# Quiz — Question 3 / 3
-
-**Why does `node file.ts` refuse an `enum`, when it accepts an interface?**
-
-- **A.** Node.js does not support TypeScript 5 syntax
-- **B.** An `enum` generates JavaScript code; an interface is erased entirely
-- **C.** An `enum` needs `"strict": true`
-- **D.** Interfaces are part of JavaScript
-
-<v-click>
-
-> ✅ **B** — Type stripping can only **remove** text. An `enum` becomes an
-> object at run time: it is not erasable syntax. `"erasableSyntaxOnly": true`
-> makes `tsc` report it before Node.js does.
-
-</v-click>
 
 ---
 layout: cover
