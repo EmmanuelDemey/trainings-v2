@@ -48,3 +48,4 @@ trainer's solutions: each expected result is the one a correct answer gets.
 | 3 | 18 | 22 | `18_production_architecture/` | Allocation awareness, SLM, Field-Level Security |
 | 3 | 19 | 23 | `19_monitoring/` | Cluster health, node statistics, slow logs |
 | 3 | 20 | 24 | `20_alerting/` | Kibana Rules, webhooks, alert history |
+| 2 | 21 | 33, 34 | `21_hybrid_search_app/` | A hybrid semantic search application: `semantic_text`, `rrf`, facets, reranking, search template, RAG prompt in ES\|QL |
