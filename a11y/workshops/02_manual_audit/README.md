@@ -2,6 +2,8 @@
 
 > Find the accessibility problems of a web page by hand, map each one to its WCAG criterion, and propose a fix.
 
+**Duration**: 45 min (30 min of audit, 15 min to write the report) · **Chapter**: 3 — Standards and legal obligations
+
 ## Goal
 
 Chapter 3 — The law refers to the WCAG (and, in France, to the RGAA built on
@@ -24,6 +26,9 @@ Choose the page you audit:
   cd workshops/03_focus
   npx serve .
   ```
+
+  No local clone? Open the online editor on the page of **workshop 3**: it
+  serves the same starter. The page of this workshop holds only this README.
 
 Keep your screen reader from workshop 1 at hand, and the
 [WCAG quick reference](https://www.w3.org/WAI/WCAG22/quickref/) open in a tab.
@@ -59,13 +64,16 @@ A **mini report of at least 5 issues**. For each one:
 - the **description** of the problem, and where it is;
 - the **WCAG criterion** it breaks, with its number and level — for example
   *1.1.1 Non-text Content (A)*;
+- in France, the matching **RGAA 4.1.2 criterion** — for example *1.1* (each
+  RGAA criterion lists the WCAG ones it covers); some WCAG criteria have none,
+  the AAA ones and those added in WCAG 2.2;
 - the **fix** you propose.
 
 A table is enough:
 
-| # | Issue | Where | WCAG criterion | Fix |
-|---|---|---|---|---|
-| 1 | The logo has no text alternative | header, every page | 1.1.1 Non-text Content (A) | `alt="Genea11y"`, or `alt=""` if the name is also written next to it |
+| # | Issue | Where | WCAG criterion | RGAA | Fix |
+|---|---|---|---|---|---|
+| 1 | The logo has no text alternative | header, every page | 1.1.1 Non-text Content (A) | 1.1 | `alt="Genea11y"`, or `alt=""` if the name is also written next to it |
 
 Finish with a sentence or two: which issue would you fix first, and why?
 
@@ -85,8 +93,9 @@ If you audited `workshops/03_focus/`, compare your report with the sample in
 - Classify your issues by **impact** too (blocks a task, slows it down, an
   annoyance): the level of a criterion does not tell how bad a failure is for a
   user.
-- Redo the audit with the **RGAA** checklist: map each of your issues to an RGAA
-  criterion, and notice how much more precise the RGAA tests are.
+- Open the **RGAA tests** of two of your issues (12.7.1, 10.7.1…): notice how
+  much more precise they are than the WCAG criterion, and redo the check with
+  them.
 - Write the *accessibility statement* (*déclaration d'accessibilité*) that the
   page would need today: conformance status, known non-conformities, contact.
 

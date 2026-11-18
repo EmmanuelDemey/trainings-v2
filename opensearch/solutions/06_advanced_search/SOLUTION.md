@@ -6,7 +6,7 @@ The CI replays them right after the workshop README, and checks each « Expected
 ## Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 4,
   "sort": [ { "price": "asc" }, { "name.keyword": "asc" } ],
@@ -17,7 +17,7 @@ GET /restaurants/_search
 The last hit carries `"sort": [18, "Pizzeria Napoli"]`.
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 4,
   "sort": [ { "price": "asc" }, { "name.keyword": "asc" } ],
@@ -47,7 +47,7 @@ Without a second criterion, two restaurants at the same price have no guaranteed
 ## Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "match": { "description": "grilled" } },
   "highlight": {
@@ -89,7 +89,7 @@ POST /restaurant_names/_bulk?refresh=true
 { "index": { "_id": "4" } }
 { "suggest": "La Trattoria" }
 
-GET /restaurant_names/_search
+POST /restaurant_names/_search
 {
   "suggest": {
     "names": { "prefix": "le", "completion": { "field": "suggest" } }
@@ -112,7 +112,7 @@ GET /restaurant_names/_search
 ## Step 4
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "bool": {
@@ -168,7 +168,7 @@ PUT /alerts/_doc/japanese-lyon
 PUT /alerts/_doc/budget?refresh=true
 { "query": { "range": { "price": { "lt": 20 } } } }
 
-GET /alerts/_search
+POST /alerts/_search
 {
   "query": {
     "percolate": {

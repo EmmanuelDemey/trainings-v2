@@ -42,7 +42,7 @@ The examples of chapters 5 to 8 query the `restaurants` index:
 # The shape of a search
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "match": { "description": "pasta" } },
   "size": 5,
@@ -74,7 +74,7 @@ GET /restaurants/_search
 The query text is **analyzed** like the field, then searched term by term:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "match": { "description": { "query": "fresh pasta", "operator": "and" } }
@@ -94,12 +94,12 @@ GET /restaurants/_search
 # Exact values: `term`, `terms`, `range`
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "term": { "city": "Lyon" } }
 }
 
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "range": { "price": { "gte": 20, "lte": 40 } } }
 }
@@ -114,7 +114,7 @@ GET /restaurants/_search
 # Combining: `bool`
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "bool": {
@@ -174,7 +174,7 @@ GET /restaurants/_explain/2
 Give more weight to a field, or to a clause:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "multi_match": {
@@ -184,7 +184,7 @@ GET /restaurants/_search
   }
 }
 
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "bool": {
@@ -204,7 +204,7 @@ GET /restaurants/_search
 Blend text relevance with a **business value** — here, the rating:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "function_score": {

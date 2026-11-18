@@ -55,3 +55,18 @@ built.
 3. A screen reader takes much longer than the eyes to scan a page: every useless
    tab stop, every unnamed button, every missing heading is paid for again and
    again.
+
+## Running the workshop
+
+- Check before the session that the learners can install software: on a
+  locked-down Windows laptop, the NVDA installer can still **run NVDA without
+  installing it**. Ask everyone to bring headphones.
+- Give the first 10 minutes to the setup and the shortcut tables, with
+  everyone on the same page (the starter of workshop 3, served locally, works
+  well), then let people pick their own sites.
+- Most first-timers stay stuck in focus mode, or press Tab only. Show browse
+  mode and the H key on the projector in the first minutes.
+- VoiceOver users get less out of single letters: show the rotor (VO + U) and
+  Quick Nav (VO + Q) explicitly.
+- Collect the *"what was hard"* lists at the end (5 minutes): they are the
+  agenda of workshops 3 to 5.

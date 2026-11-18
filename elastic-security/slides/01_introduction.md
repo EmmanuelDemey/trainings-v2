@@ -16,8 +16,10 @@ At the end of these three days, you will be able to:
 - **Build** visualizations and dashboards for security use cases
 - **Use** the **Security app**: hosts, network, users, AI Assistant, Attack Discovery
 - **Write** detection rules with KQL, EQL, Lucene and ES|QL, and **triage** their alerts
+- **Detect** anomalies with **machine learning** jobs
 - **Investigate** with Timeline and **track** incidents with Cases
-- **Hunt** an adversary across a dataset, from the first beacon to the exfiltration
+- **Hunt** an adversary across a dataset, from the first beacon to the exfiltration,
+  and **respond** on the endpoint with **Elastic Defend**
 
 ---
 
@@ -79,8 +81,9 @@ At the end of these three days, you will be able to:
 
 # The lab
 
-* An **Elastic Stack 9.5** — Elasticsearch, Kibana, Fleet Server — on your machine
-  (Docker), or an Elastic Cloud trial
+* An **Elastic Stack 9.5** (9.5.6) — Elasticsearch, Kibana, Fleet Server — on your
+  machine (Docker), or an Elastic Cloud trial; a **trial licence** unlocks ML,
+  Elastic Defend's response actions and the AI features
 * One **Elastic Agent**, enrolled in Fleet, that collects your own machine's logs
 * A **lab dataset**, `logs-lab-default`: 25 ECS events telling one intrusion
   * a **brute force** on an SSH server, then a download and a script run

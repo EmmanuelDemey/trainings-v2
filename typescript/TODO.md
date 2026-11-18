@@ -77,17 +77,17 @@ Déjà couvert : `erasableSyntaxOnly`, type stripping, `using`, `satisfies`, `No
 
 ## 07 — Type-level programming · TP 7
 
-- [ ] Limites de récursion (profondeur d'instanciation), tail-recursion des
+- [x] Limites de récursion (profondeur d'instanciation), tail-recursion des
       conditional types
-- [ ] Renvoyer vers `type-challenges` en fin de chapitre
-- [ ] TP 7 : vérifier les temps de check sous TS 7 (`Get<'a.b.c'>`)
+- [x] Renvoyer vers `type-challenges` en fin de chapitre
+- [x] TP 7 : vérifier les temps de check sous TS 7 (`Get<'a.b.c'>`)
 
 ## 08 — Decorators · TP 8
 
-- [ ] Statut TC39 décorateurs + metadata, support natif navigateurs/Node
+- [x] Statut TC39 décorateurs + metadata, support natif navigateurs/Node
       (`src/polyfill.ts` pour `Symbol.metadata` encore nécessaire ?)
-- [ ] Support des décorateurs par outil (Node type stripping, esbuild/tsx, swc) : à jour
-- [ ] Chapitre le plus long (400 lignes) : candidat à raccourcir si besoin de temps
+- [x] Support des décorateurs par outil (Node type stripping, esbuild/tsx, swc) : à jour
+- [x] Chapitre le plus long (400 lignes) : candidat à raccourcir si besoin de temps
 
 ## 09 — Modules & declaration files · TP 9
 

@@ -2,6 +2,8 @@
 
 > Install a screen reader, learn its few essential shortcuts, and browse the web the way a blind user does.
 
+**Duration**: 45 min (1 h if NVDA has to be installed first) · **Chapter**: 2 — Introduction to accessibility
+
 ## Goal
 
 Chapter 2 — Every workshop after this one ends with *"test it with a screen
@@ -16,9 +18,13 @@ Depending on your operating system, you may have to install one:
 
 - **Windows**: install [NVDA](https://www.nvaccess.org/download/), free and
   open source. Windows also ships *Narrator* (Ctrl + Win + Enter), but NVDA is
-  the one most screen reader users run, with JAWS.
+  the one most screen reader users run, with JAWS. No admin rights? The
+  installer offers to **continue running** NVDA without installing it.
 - **macOS**: VoiceOver is already there. Turn it on and off with
-  **Cmd + F5**. Use Safari with it: it is the pair Apple tests.
+  **Cmd + F5** (Fn + Cmd + F5 on some laptop keyboards). Use Safari with it: it
+  is the pair Apple tests. In Safari, open *Settings → Advanced* and tick
+  *Press Tab to highlight each item on a webpage*: without it, Tab skips the
+  links.
 - **Linux**: install **Orca** from your package manager
   (`sudo apt install orca`, `sudo dnf install orca`…), and turn it on with
   **Super + Alt + S** in GNOME.
@@ -34,7 +40,7 @@ down at first. Users run it much faster than you will.
 
 | Keys | What it does |
 |---|---|
-| NVDA + Down arrow | read everything from here |
+| NVDA + Down arrow (laptop layout: NVDA + A) | read everything from here |
 | Ctrl | stop speaking |
 | NVDA + Space | switch between browse mode and focus (forms) mode |
 | H / Shift + H | next / previous heading |
@@ -53,7 +59,8 @@ down at first. Users run it much faster than you will.
 | Ctrl | stop speaking |
 | VO + arrows | move from element to element |
 | VO + U | the rotor: lists of headings, links, landmarks, form controls (arrows to change list) |
-| VO + Cmd + H | next heading |
+| VO + Cmd + H / VO + Cmd + L / VO + Cmd + J | next heading / link / form control |
+| VO + Q | single-key Quick Nav on / off: then H, L, J, T jump like NVDA's H, K, F, T |
 | VO + Space | activate the current element |
 | VO + Shift + Down / Up | interact with / stop interacting with a group (a table, a web area) |
 
@@ -62,10 +69,11 @@ down at first. Users run it much faster than you will.
 
 | Keys | What it does |
 |---|---|
-| Orca + ; | read everything |
-| H / K / F / T | next heading / link / form field / table |
+| Numpad + (laptop layout: Orca + ;) | read everything |
+| H / K / F / T / M | next heading / link / form field / table / landmark |
+| Alt + Shift + H (or K, F…) | the list of headings (links, form fields…) |
 | Orca + A | switch browse mode and focus mode |
-| Orca + H | Orca's help |
+| Orca + H | learn mode: press keys to hear what they do, F2 lists the shortcuts, Esc leaves |
 
 In every one of them, **Tab** still moves from focusable element to focusable
 element, exactly as without a screen reader.
@@ -79,7 +87,8 @@ element, exactly as without a screen reader.
    page is organised from its headings alone?
 3. Jump from link to link (K). Are all of them meaningful out of context, or do
    you hear *"Read more, Read more, Click here"*?
-4. Jump from landmark to landmark (D, or the rotor). Is there a *navigation*, a
+4. Jump from landmark to landmark (D in NVDA, M in Orca, the rotor in
+   VoiceOver). Is there a *navigation*, a
    *main*, a *banner*?
 5. Find an image. What is announced: a description, a file name, nothing?
 
@@ -107,6 +116,34 @@ Nothing automated. You are done when, with your screen reader on, you can:
 - jump from link to link and from form field to form field;
 - fill in and submit a simple form without looking;
 - name three things that made a site hard to use.
+
+## Troubleshooting
+
+**Problem**: the letters (H, K…) type into a field instead of jumping
+→ You are in focus (forms) mode. Press **Esc**, or NVDA + Space / Orca + A, to
+go back to browse mode.
+
+**Problem**: H, K, F do nothing with VoiceOver
+→ Single-key Quick Nav is off. Turn it on with **VO + Q**, or use the rotor
+(VO + U).
+
+**Problem**: Tab skips the links in Safari
+→ *Settings → Advanced → Press Tab to highlight each item on a webpage*, or
+use Option + Tab.
+
+**Problem**: Cmd + F5 does nothing on a Mac laptop
+→ The F keys act as media keys: press **Fn + Cmd + F5**, or triple-press
+Touch ID.
+
+**Problem**: the NVDA key does not work (remote desktop, virtual machine)
+→ Insert is often captured by the remote session. Choose Caps Lock as NVDA key
+(*NVDA menu → Preferences → Settings → Keyboard*), or run NVDA on your own
+machine.
+
+**Problem**: the speech is too fast or too slow
+→ NVDA: **NVDA + Ctrl + Left / Right** picks a voice setting (*Rate*),
+**NVDA + Ctrl + Up / Down** changes it. VoiceOver: the same with **VO + Cmd**.
+Orca: Orca + Space, *Voice* tab.
 
 ## Going further
 

@@ -20,7 +20,7 @@ By the end of this sequence (**~30 min**, workshop included), you will be able t
 # The shape of an aggregation
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -59,7 +59,7 @@ GET /restaurants/_search
 # Buckets: `terms`
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -94,7 +94,7 @@ GET /restaurants/_search
 The average rating and the max price, **per city**:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -117,7 +117,7 @@ GET /restaurants/_search
 # Buckets: `range` and `date_histogram`
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -144,7 +144,7 @@ GET /restaurants/_search
 The `query` narrows the aggregated documents:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "query": { "range": { "rating": { "gte": 4 } } },
@@ -166,7 +166,7 @@ GET /restaurants/_search
 They compute over the **result** of other aggregations, through `buckets_path`:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {

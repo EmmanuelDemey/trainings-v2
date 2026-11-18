@@ -17,7 +17,14 @@ At the end of this chapter, you will be able to:
 - **Write** text alternatives for images, icons and emoji
 - **Use** the right element for lists, key-value pairs, tables, disclosures
   and dates
-- **Respect** user preferences: theme, reduced motion, orientation, contrast
+- **Respect** user preferences: text size, theme, reduced motion,
+  orientation, contrast
+
+<!--
+Five blocks, in the order of the chapter: document, structure, interaction,
+content, preferences. Everything here is fixed in workshop 04 (navigation
+landmark, data table) — forms come in chapter 06, ARIA in chapter 07.
+-->
 
 ---
 layout: statement
@@ -29,6 +36,12 @@ Always use the HTML element made for the interaction you build.
 
 **HTML first** — then CSS for the look — then JavaScript for the behaviour.
 The content still works without the last two: **progressive enhancement**.
+
+<!--
+The first rule of ARIA says the same: if a native element exists, use it
+(chapter 07). Ask: who turned off JavaScript today? Nobody — but a slow
+network, a failing bundle or a blocked script does it for them.
+-->
 
 ---
 
@@ -53,6 +66,12 @@ The content still works without the last two: **progressive enhancement**.
 - **`lang` on a part** — **WCAG 3.1.2** Language of Parts (AA)
 - A missing doctype puts the page in **quirks mode**: layout surprises included
 
+<!--
+RGAA 4.1.2: 8.1 (doctype), 8.3 / 8.4 (default language present and valid),
+8.7 (change of language). Demo: the same English sentence with lang="fr",
+read by NVDA — the French voice mangles it.
+-->
+
 ---
 
 # A unique, descriptive page title
@@ -67,6 +86,12 @@ The content still works without the last two: **progressive enhancement**.
   the name of the tab and of the bookmark
 - The **specific** part first: ten tabs of "Genea11y - …" all look alike
 - In a SPA, update `document.title` on every route change (chapter 10)
+
+<!--
+RGAA 8.5 (title present) and 8.6 (title relevant). Show a browser with many
+tabs open: only the start of each title is visible. GOV.UK prefixes the
+title with "Error: " after a failed submit — same idea.
+-->
 
 ---
 
@@ -83,11 +108,22 @@ The content still works without the last two: **progressive enhancement**.
 - A component instantiated twice duplicates its static ids: generate them
   (`useId()` in React, a counter elsewhere)
 
+<!--
+WCAG 2.2 removed 4.1.1 Parsing (duplicate ids were part of it), but the
+broken relationships still fail 1.3.1 and 4.1.2. RGAA 4.1.2 still checks
+8.2 (valid code), which covers unique ids.
+-->
+
 ---
 
 # Landmarks — the skeleton of the page
 
-![Landmarks](/images/a11y/landmarks.png)
+![Wireframe of a page: a header band at the top, a sidebar on the left, the main area on the right, a footer at the bottom](/images/a11y/landmarks.png)
+
+<!--
+Ask the room to name each zone before the next slide: banner, navigation,
+main, complementary, contentinfo.
+-->
 
 ---
 
@@ -109,8 +145,15 @@ The content still works without the last two: **progressive enhancement**.
 - A screen reader lists them and jumps between them (**D** in NVDA, the rotor
   in VoiceOver) — **WCAG 1.3.1** Info and Relationships (A)
 - The elements carry the role: `<main role="main">` is redundant today
-- Inside an `<article>` or a `<section>`, `<header>` / `<footer>` are **not**
-  landmarks
+- Inside an `<article>`, `<aside>`, `<main>`, `<nav>` or `<section>`,
+  `<header>` / `<footer>` are **not** landmarks
+
+<!--
+RGAA 12.6 (header, main navigation, main content, footer and search zones
+reachable) and 9.2 (document structure). <search> is in the HTML living
+standard since 2023, supported in all current browsers. A <section> or
+<form> without a name has no landmark role at all.
+-->
 
 <style>
 table { font-size: 0.8em; }
@@ -125,8 +168,10 @@ table { font-size: 0.8em; }
   <a href="/">Genea11y</a>
   <nav aria-label="Main"> <ul> … </ul> </nav>
   <search>
-    <label for="q">Search people</label> <input id="q" type="search">
-    <button>Go</button>
+    <form action="/search">
+      <label for="q">Search people</label> <input id="q" name="q" type="search">
+      <button>Go</button>
+    </form>
   </search>
 </header>
 <main id="main"> … </main>
@@ -138,6 +183,11 @@ table { font-size: 0.8em; }
   out (`region` rule)
 - Two landmarks of the same kind need **different names**: `aria-label`, or
   `aria-labelledby` pointing at a visible heading
+
+<!--
+<search> wraps the form, it does not replace it: the <form> still submits.
+Demo: NVDA Insert+F7 (elements list), Landmarks tab — or VoiceOver rotor.
+-->
 
 ---
 
@@ -160,6 +210,12 @@ table { font-size: 0.8em; }
 - No visible heading in the design but needed in the structure? Keep it, with
   `.sr-only` — not `display: none`, which hides it from screen readers too
 
+<!--
+WebAIM screen reader survey: headings are the first way to find
+information on a long page for most respondents. RGAA 9.1 (heading
+hierarchy). Demo: the HeadingsMap extension, or NVDA Insert+F7, Headings.
+-->
+
 ---
 
 # `<article>` and `<section>`
@@ -180,6 +236,12 @@ table { font-size: 0.8em; }
 - **`<section>`**: a thematic group, **with a heading**; with an accessible name
   it becomes a `region` landmark
 - Neither is a styling wrapper: for that, `<div>` is the right element
+
+<!--
+The old "document outline" (an <h1> in every <section>) was never
+implemented by browsers and was removed from the HTML spec in 2022: the
+<hx> level is what counts.
+-->
 
 ---
 
@@ -206,6 +268,12 @@ table { font-size: 0.8em; }
 | `date` · `time` | a calendar, a timetable |
 | `true` | any other "the current one in a set" |
 
+<!--
+Workshop 04, step 1, is exactly this slide: a "Main menu" nav, a list of
+2 links, aria-current="page" — and a visual mark too (bold), checked by
+the verify script. RGAA 3.1 for information given by colour alone.
+-->
+
 <style>
 table { font-size: 0.8em; }
 </style>
@@ -231,8 +299,14 @@ table { font-size: 0.8em; }
 
 - The **button** opens the submenu, and says whether it is open with
   `aria-expanded` — it is an action, not a destination
-- The sub-list is nested **inside** its `<li>`: the structure is read as
-  "list of 2 items, level 2"
+- The sub-list is nested **inside** its `<li>`: the screen reader announces a
+  **nested** list of 2 items
+
+<!--
+This is the disclosure navigation pattern of the ARIA APG — not a
+role="menu" (menus are for application menus, chapter 08). Toggle
+aria-expanded and hide the sub-list with JavaScript.
+-->
 
 ---
 
@@ -242,7 +316,7 @@ table { font-size: 0.8em; }
 <!-- ❌ Not focusable, not announced, Enter and Space do nothing -->
 <div class="btn" onclick="save()">Save</div>
 
-<!-- ❌ Rebuilding the button by hand: still no Space, no disabled, no form submit -->
+<!-- ❌ Rebuilding the button by hand: still no Enter, no Space, no disabled, no form submit -->
 <div class="btn" role="button" tabindex="0" onclick="save()">Save</div>
 
 <!-- ✅ Focusable, announced "Save, button", Enter and Space, disabled, form submit -->
@@ -257,6 +331,13 @@ table { font-size: 0.8em; }
 | Disabled | `aria-disabled` + your checks | ✅ `disabled` |
 | Submits its form | your code | ✅ `type="submit"` |
 
+<!--
+role="button" gives the role only: the keyboard is still yours. A div with
+an onclick handler does not react to Enter either — only <a href> and
+<button> turn Enter into a click. RGAA 7.1 (scripts compatible with
+assistive tech) and 11.9 (button names).
+-->
+
 <style>
 table { font-size: 0.8em; }
 </style>
@@ -269,6 +350,10 @@ layout: statement
 The button element can't be styled.
 <p>A developer (who is wrong)</p>
 </blockquote>
+
+<!--
+Let them react, then the next slide: six CSS lines reset it.
+-->
 
 ---
 
@@ -298,6 +383,12 @@ button {
 - Keep the target big enough: **WCAG 2.5.8** Target Size (AA) — **24×24 px**
   minimum, **44×44 px** for **2.5.5** (AAA)
 
+<!--
+2.5.8 has exceptions: spacing (a 24 px circle around the target hits no
+other target), inline links in a sentence, the browser's own controls.
+Focus styles were covered in chapter 04: do not reset outline here.
+-->
+
 ---
 
 # A link goes somewhere — with an `href`
@@ -321,6 +412,12 @@ button {
   list**, from **Tab**, from **open in a new tab**, from **bookmarks**, from the
   URL preview — and from search engines
 
+<!--
+RGAA 6.2 (every link has a name). An <a> without href is a placeholder
+link: no role "link" at all. href="#" also breaks the back button and
+writes "#" in the URL.
+-->
+
 ---
 
 # Button or link?
@@ -337,6 +434,11 @@ button {
 
 > **Ask**: does the URL change? A link. Does the state change? A button. A link
 > styled as a button stays a link — and the other way around.
+
+<!--
+A common trap: a "Download" control is a link (the file has a URL); a
+"Delete" control is a button, even if it then redirects.
+-->
 
 <style>
 table { font-size: 0.85em; }
@@ -362,6 +464,12 @@ table { font-size: 0.85em; }
 - Prefer **visible** text, or `.sr-only` text, to `aria-label`: speech
   recognition users say what they **see** (**WCAG 2.5.3** Label in Name, A)
 
+<!--
+RGAA 6.1 (explicit links: the link text, or its context). If you use
+aria-label anyway, it must start with the visible text — "Learn more about
+Ada Lovelace", not "Ada Lovelace biography".
+-->
+
 ---
 
 # Images — a text alternative, or an empty one
@@ -383,6 +491,12 @@ table { font-size: 0.85em; }
 - Do not start with "Image of…" or "Logo of the company": the role "image" is
   already announced. Say what the image **tells**, in its context
 
+<!--
+RGAA 1.1 (informative images have an alternative), 1.2 (decorative images
+are ignored), 1.3 (the alternative is relevant). A complex chart needs a
+long description next to it (RGAA 1.6) — the alt only summarises.
+-->
+
 ---
 
 # Icons and emoji
@@ -403,6 +517,12 @@ table { font-size: 0.85em; }
 - An **inline SVG** icon: `aria-hidden="true"` when decorative,
   `role="img"` + `<title>` when it is the only content
 
+<!--
+Font icons use private-use Unicode characters: a screen reader reads
+nothing, or a strange glyph name. Emoji have names ("birthday cake"),
+role="img" + aria-label gives the meaning in context. RGAA 1.1, 11.9.
+-->
+
 ---
 
 # Lists — `<ul>`, `<ol>`, `<dl>`
@@ -422,6 +542,11 @@ table { font-size: 0.85em; }
 - `<dl>`: glossaries, metadata, FAQ — one `<dt>` can have several `<dd>`
 - ⚠️ Safari + VoiceOver drops the list semantics of a `<ul>` with
   `list-style: none`: add `role="list"` when the count matters
+
+<!--
+RGAA 9.3 (lists correctly structured). The Safari behaviour is a WebKit
+choice ("list-itis"): role="list" brings the semantics back.
+-->
 
 ---
 
@@ -450,9 +575,15 @@ table { font-size: 0.85em; }
   column only
 - A grid of `<div>`s is not a table — and a `<table>` is not a layout tool
 
+<!--
+RGAA 5.4 (caption associated), 5.6 / 5.7 (headers declared and associated).
+Workshop 04, step 2: this table, and the sortable header as a bonus — the
+pattern is the APG "Sortable Table" example.
+-->
+
 ---
 
-# Native widgets — `<details>`, `<time>`
+# Native semantics, no JavaScript — `<details>`, `<time>`
 
 <div style="display: flex; gap: 2em;">
 <div>
@@ -489,6 +620,12 @@ details[open] > summary::marker { content: '− '; }
 </div>
 </div>
 
+<!--
+::details-content is recent (2025): check caniuse before you rely on it. Use <details> for a disclosure, not for an
+accordion with a forced single open panel (the name attribute does that
+today, but the keyboard model stays a disclosure).
+-->
+
 ---
 
 # Sizes — relative units
@@ -507,6 +644,12 @@ p { font-size: 14px; }            /* ⚠️ ignores the user's default size */
   no horizontal scroll at **320 px** wide
 - `%`, `vw` / `vh`, `max-width` for layout; avoid fixed heights on text boxes
 
+<!--
+RGAA 10.4 (text resized to 200 %) and 10.11 (reflow at 320 px). Demo:
+browser settings, font size "Very large", then a page in px versus rem.
+Zoom works either way: the font size setting is the one px breaks.
+-->
+
 ---
 
 # User preferences — media queries
@@ -516,7 +659,7 @@ p { font-size: 14px; }            /* ⚠️ ignores the user's default size */
 | `prefers-color-scheme: dark` | a dark theme (photophobia, migraines) | switch your colour tokens |
 | `prefers-reduced-motion: reduce` | less motion (vestibular disorders) | drop or shorten animations |
 | `prefers-contrast: more` | more contrast | strengthen borders, colours |
-| `forced-colors: active` | Windows High Contrast | use system colours, keep borders |
+| `forced-colors: active` | a forced palette (Windows contrast themes) | use system colours, keep borders |
 
 ```css
 :root { --text: #1a1a1a; --background: #fff; }
@@ -526,6 +669,13 @@ p { font-size: 14px; }            /* ⚠️ ignores the user's default size */
 ```
 
 - DevTools → **Rendering** panel: emulate each preference without changing your OS
+
+<!--
+DevTools, Rendering panel: "Emulate CSS media feature" for
+prefers-color-scheme, prefers-reduced-motion, prefers-contrast and
+forced-colors. In forced colours, box-shadow and background images
+disappear: a focus ring drawn with box-shadow vanishes.
+-->
 
 <style>
 table { font-size: 0.8em; }
@@ -557,6 +707,12 @@ table { font-size: 0.8em; }
 - **WCAG 2.3.1** Three Flashes (A) · **2.2.2** Pause, Stop, Hide (A) ·
   **2.3.3** Animation from Interactions (AAA)
 
+<!--
+2.3.1 is about flashes (more than 3 per second), not motion; 2.2.2 is about
+content that moves on its own for more than 5 s; 2.3.3 covers motion
+triggered by an interaction. RGAA 13.7 (flashes) and 13.8 (moving content).
+-->
+
 ---
 
 # The same preferences, in JavaScript — `matchMedia`
@@ -576,6 +732,11 @@ reducedMotion.addEventListener('change', (event) => {
   `(orientation: portrait)`
 - `addListener` is deprecated: use `addEventListener('change', …)`
 - For what CSS cannot do: a carousel, a video autoplay, a canvas animation
+
+<!--
+MediaQueryList.addListener still works but is marked deprecated in the
+spec; addEventListener('change') is supported everywhere today.
+-->
 
 ---
 
@@ -598,6 +759,12 @@ screen.orientation.lock('landscape');
 - Never ask "please rotate your device" unless the orientation is essential
   (a piano app, a bank cheque scan)
 
+<!--
+RGAA 13.9 (content viewable in both orientations). screen.orientation.lock
+only works in fullscreen on most mobile browsers — but the warning stays:
+do not force it.
+-->
+
 ---
 
 # Contrast ratio
@@ -610,11 +777,18 @@ screen.orientation.lock('landscape');
 
 <br />
 
-- Ratio = `(L1 + 0.05) / (L2 + 0.05)` on the **relative luminance** (0 = black,
-  1 = white): from **1:1** to **21:1**
+- Ratio = `(L1 + 0.05) / (L2 + 0.05)`, L1 the **lighter** colour's relative
+  luminance (0 = black, 1 = white): from **1:1** to **21:1**
 - **Measure** it: DevTools colour picker (shows the ratio and the AA / AAA
   lines), axe DevTools, WAVE, the WebAIM Contrast Checker
 - Check it in the **design** phase: a palette fixed late is a palette redone
+
+<!--
+RGAA 3.2 (text contrast) and 3.3 (UI components and graphics). Large text:
+18 pt (24 px) regular, or 14 pt (18.66 px) bold. Incidental text, logos
+and disabled controls are exempt. Focus Appearance (2.4.13, AAA) asks
+3:1 too — seen in chapter 04.
+-->
 
 <style>
 table { font-size: 0.85em; }
@@ -637,6 +811,13 @@ table { font-size: 0.85em; }
 
 > **Test it**: the accessibility tree in DevTools, then the screen reader's
 > headings, landmarks and links lists. If the lists read well, the page does.
+
+<!--
+Transition: workshop 04 applies two of these lines — a named navigation
+landmark with aria-current, and a real data table instead of a grid of
+divs. `pnpm run verify --dir workshops --tp 04` checks it. Next chapter:
+forms, the other big source of failures.
+-->
 
 <style>
 table { font-size: 0.85em; }

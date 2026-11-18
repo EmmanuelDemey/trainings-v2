@@ -123,7 +123,7 @@ POST /_reindex?refresh=true
 POST /_aliases
 { "actions": [ { "add": { "index": "books_v2", "alias": "books" } } ] }
 
-GET /books/_search
+POST /books/_search
 { "query": { "match": { "author": "camus" } } }
 ```
 

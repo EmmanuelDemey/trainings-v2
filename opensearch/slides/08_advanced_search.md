@@ -21,7 +21,7 @@ By the end of this sequence (**~40 min**, workshop included), you will be able t
 # Sorting
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "term": { "city": "Paris" } },
   "sort": [
@@ -53,7 +53,7 @@ GET /restaurants/_search
 | `scroll` | Full export, legacy | Prefer PIT |
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 3,
   "sort": [ { "price": "asc" }, { "name.keyword": "asc" } ],
@@ -69,7 +69,7 @@ GET /restaurants/_search
 Show **why** a document matches:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "match": { "description": "pasta" } },
   "highlight": {
@@ -102,7 +102,7 @@ GET /restaurants/_search
 The **term suggester** offers terms close to those of the index:
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "suggest": {
@@ -141,7 +141,7 @@ POST /cities/_bulk?refresh=true
 { "index": { "_id": "3" } }
 { "suggest": { "input": ["Lyon"], "weight": 8 } }
 
-GET /cities/_search
+POST /cities/_search
 { "suggest": { "cities": { "prefix": "pa", "completion": { "field": "suggest" } } } }
 ```
 
@@ -158,7 +158,7 @@ GET /cities/_search
 A `geo_point` field: `{ "lat": 48.85, "lon": 2.35 }`, `"48.85,2.35"`, or `[2.35, 48.85]` (lon, lat!)
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "bool": {
@@ -198,7 +198,7 @@ PUT /alerts
 PUT /alerts/_doc/cheap-japanese?refresh=true
 { "query": { "bool": { "must": { "match": { "description": "sushi" } }, "filter": { "range": { "price": { "lte": 30 } } } } } }
 
-GET /alerts/_search
+POST /alerts/_search
 {
   "query": {
     "percolate": { "field": "query", "document": { "description": "All-you-can-eat sushi", "price": 25 } }

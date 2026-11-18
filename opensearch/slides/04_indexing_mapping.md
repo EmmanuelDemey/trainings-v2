@@ -217,7 +217,8 @@ POST /_reindex
 POST /_aliases
 {
   "actions": [
-    { "add": { "index": "products_v2", "alias": "products_current" } }
+    { "remove": { "index": "products",    "alias": "products_current" } },
+    { "add":    { "index": "products_v2", "alias": "products_current" } }
   ]
 }
 ```

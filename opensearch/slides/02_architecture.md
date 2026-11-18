@@ -104,7 +104,7 @@ restaurants  [P0] [R1]        [P1] [R2]        [P2] [R0]
 
 # A search, step by step
 
-1. The client sends `GET /restaurants/_search` to **any** node: it becomes the **coordinator**
+1. The client sends `POST /restaurants/_search` to **any** node: it becomes the **coordinator**
 2. **Query** — the coordinator queries **one copy** (primary or replica) of **each** shard; each one returns its best `_id`s and scores
 3. The coordinator **merges** and sorts
 4. **Fetch** — it retrieves the `_source` of the selected documents, from the shards that hold them

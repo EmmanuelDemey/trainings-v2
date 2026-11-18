@@ -6,7 +6,7 @@ The CI replays them right after the workshop README, and checks each « Expected
 ## Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "match": { "description": "fish" } },
   "_source": false
@@ -30,7 +30,7 @@ stem.
 ## Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "match_phrase": { "description": "fresh pasta" } },
   "_source": false
@@ -53,7 +53,7 @@ GET /restaurants/_search
 Finds nothing: the index holds `sushi` and `zen`, not `Sushi Zen`.
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 { "query": { "term": { "name": "Sushi Zen" } } }
 ```
 
@@ -64,7 +64,7 @@ GET /restaurants/_search
 ```
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": { "term": { "name.keyword": "Sushi Zen" } },
   "_source": false
@@ -85,7 +85,7 @@ GET /restaurants/_search
 ## Step 4
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "bool": {
@@ -120,7 +120,7 @@ the filters only remove documents, they never score.
 ## Step 5
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "multi_match": { "query": "tart", "fields": ["name^3", "description"] }
@@ -138,7 +138,7 @@ GET /restaurants/_search
 ## Step 6
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "query": {
     "function_score": {

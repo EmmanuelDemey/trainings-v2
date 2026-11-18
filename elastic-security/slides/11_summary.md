@@ -19,10 +19,12 @@ layout: section
 - Lens and aggregation-based visualizations, dashboards and drilldowns
 - The Security app: hosts, network, users, AI Assistant, Attack Discovery
 - Detection rules: query, threshold, EQL, ES|QL, indicator match, new terms
+- Machine learning: anomaly detection jobs and ML rules
 
 **Day 3 - Investigate and hunt**:
 - Alerts triage, Timeline, Cases
 - The hunting loop, the kill chain, the capstone
+- Elastic Defend: endpoint data, protections, response actions
 
 </v-clicks>
 

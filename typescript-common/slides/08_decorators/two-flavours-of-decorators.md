@@ -1,6 +1,6 @@
 # Two flavours of decorators
 
-| | Standard (TC39, stage 3) | Legacy (`experimentalDecorators`) |
+| | Standard (TC39, stage 2.7) | Legacy (`experimentalDecorators`) |
 |---|---|---|
 | TypeScript | default since **5.0** | opt-in flag, since 1.5 |
 | Signature | `(value, context)` | `(target, key, descriptor)` |
@@ -11,3 +11,9 @@
 - Both compile — **not** at the same time: the flag switches the whole project
 - This chapter teaches the **standard** API; the last slides come back to the
   legacy one
+
+<!--
+Stage 2.7, not 3: TC39 moved decorators (and decorator metadata) back on
+19/05/2026, since no engine shipped them. TypeScript still calls them
+"stage 3 decorators" in its docs and release notes — same API, the one taught here.
+-->

@@ -13,6 +13,7 @@ At the end of this chapter, you will be able to:
 - **Choose** the right hunt tool for each question
 - **Know** when to dig deeper — and when to stop
 - **Apply** the kill chain to structure a hunt
+- **Hunt** with Elastic Defend's endpoint data and **respond** with its actions
 - **Hand over** a hunt to response operations
 - **Run** individual and team hunts across a full dataset
 
@@ -187,12 +188,71 @@ POST /_query?format=txt
 
 ---
 
+# Elastic Defend — the endpoint in the hunt
+
+* An **integration** of Elastic Agent: one agent collects, **protects** and **responds**
+* Its events are ECS, in their own data streams — the hunt's richest source
+
+| Data stream | Holds |
+|-------------|-------|
+| `logs-endpoint.events.process-*` | process start/end, command line, parent, hashes, signer |
+| `logs-endpoint.events.network-*` | connections per process — who opened that C2 socket |
+| `logs-endpoint.events.file-*` | creations, renames, deletions — ransomware notes, dropped binaries |
+| `logs-endpoint.events.registry-*` | Run keys, services — persistence (Windows) |
+| `logs-endpoint.alerts-*` | what the protections blocked or detected |
+
+* `event.dataset: endpoint.events.process` in the lab dataset: the same shape
+
+---
+
+# Elastic Defend — protections
+
+* Set per **integration policy**, each in **Prevent** or **Detect** mode:
+  * **Malware**: ML model on the file, before it runs
+  * **Ransomware**: canary files, mass encryption — stop the process
+  * **Memory threats**: shellcode, injection, Cobalt Strike-like implants
+  * **Malicious behavior**: on-host rules — the `elastic/protections-artifacts` repo
+* **Attack surface reduction**: credential hardening — LSASS protection
+* Every protection writes an **alert**, with the **process tree** for the **Analyzer**
+  and, on Linux, the **Session view** (a terminal replay)
+* Tune with **artifacts**: *trusted applications*, *event filters*, *blocklist*,
+  *host isolation exceptions*, *endpoint exceptions*
+
+---
+
+# Elastic Defend — response actions
+
+* From an alert, a host page or **Assets → Endpoints**, the **response console**:
+
+```text
+isolate                       # cut the host from the network, except Fleet and Kibana
+processes                     # the running processes
+kill-process --pid 7342       # stop updater.exe
+get-file --path "C:\Users\alice\AppData\Local\Temp\updater.exe"
+scan --path "C:\Users\alice"  # malware scan of a folder
+execute --command "netstat -ano"
+release                       # back on the network
+```
+
+* Every action is **logged** (who, when, which host) and can be added to a **case**
+* Automate it: a rule action can **isolate** the host on alert
+* **Licence**: isolation from Platinum; the other actions need **Enterprise**
+  (the trial unlocks all of them)
+
+<v-click>
+
+> The hunt on `ws-02` ends here: isolate, kill `updater.exe`, collect it, then reset the credentials.
+
+</v-click>
+
+---
+
 # Response operations
 
 <v-clicks>
 
-* **Contain**: isolate the host (Elastic Defend), disable the account, block the IP
-* **Collect**: response actions — process list, file retrieval, memory dump
+* **Contain**: `isolate` the host (Elastic Defend), disable the account, block the IP
+* **Collect**: response actions — `processes`, `get-file`, `execute`
 * **Eradicate**: kill the process, delete the binary, remove the persistence
 * **Recover**: reset credentials — every account seen on the dumped host
 * **Learn**: every finding becomes a **rule**, an **exception**, a **dashboard**

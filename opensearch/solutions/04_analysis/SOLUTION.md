@@ -119,7 +119,7 @@ POST /dishes/_bulk?refresh=true
 { "index": { "_id": "3" } }
 { "dish": "<p>Beef burger, French fries</p>" }
 
-GET /dishes/_search
+POST /dishes/_search
 { "query": { "match": { "dish": "burger" } }, "_source": false }
 ```
 
@@ -135,7 +135,7 @@ GET /dishes/_search
 ```
 
 ```json
-GET /dishes/_search
+POST /dishes/_search
 { "query": { "match": { "dish": "creme brulee" } }, "_source": false }
 ```
 

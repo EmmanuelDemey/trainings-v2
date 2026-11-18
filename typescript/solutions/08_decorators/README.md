@@ -34,7 +34,7 @@ npm run typecheck    # tsc --noEmit
 Decorators are **not** erasable syntax: Node.js's type stripping refuses them,
 which is why `npm start` goes through **tsx**, and why `vitest.config.ts`
 transforms the code with **esbuild** — read its comment. `src/polyfill.ts`
-defines `Symbol.metadata`, which Node.js 24 does not ship yet.
+defines `Symbol.metadata`, which no Node.js version ships yet (26 included).
 
 ## The workshop at a glance
 

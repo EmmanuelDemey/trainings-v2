@@ -210,7 +210,12 @@ type A = MyAwaited<Promise<Promise<number>>>;   // number
 
 - A type alias may reference **itself** — for trees, JSON, nested objects
 - `DeepReadonly` stops on primitives and functions, recurses on objects and arrays
-- The compiler has a depth limit: around a thousand levels of instantiation
+- The compiler has a depth limit — two slides ahead
+
+<!--
+Keep this slide about the shape of recursion. The limits and the
+"Type instantiation is excessively deep" error come after the accumulator.
+-->
 
 ---
 
@@ -235,6 +240,10 @@ type Path = Join<['users', ':id', 'posts'], '/'>;   // 'users/:id/posts'
 - A tuple's `length` is a **literal** number: a counter
 - A default type parameter (`Acc = []`) carries state from one call to the next
 - Variadic tuple types (`[...Acc, T]`) append; `[infer Head, ...infer Rest]` destructure
+
+---
+src: ../../typescript-common/slides/07_type_level/recursion-limits.md
+---
 
 ---
 
@@ -263,6 +272,10 @@ const other: CommentId = postId(42);      // ✘ another brand
 - TypeScript is **structural**: two aliases of `number` are the same type
 - The brand is a property that **never exists**: only the compiler sees it
 - A **constructor function** is the one place that checks — and writes the `as`
+
+---
+src: ../../typescript-common/slides/07_type_level/type-challenges.md
+---
 
 ---
 src: ../../typescript-common/slides/07_type_level/quiz.md

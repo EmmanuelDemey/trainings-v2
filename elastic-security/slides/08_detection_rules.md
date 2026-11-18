@@ -13,6 +13,7 @@ At the end of this chapter, you will be able to:
 - **Identify** how the detection engine searches the activity and generates alerts
 - **Choose** the right rule type for a detection
 - **Construct** custom rules with **KQL**, **Lucene**, **EQL** and **ES|QL**
+- **Detect** anomalies with **machine learning** jobs and ML rules
 - **Manage** prebuilt rules, exceptions and the MITRE ATT&CK coverage
 
 ---
@@ -147,6 +148,69 @@ FROM logs-*
 * **Aggregating** query: one alert per row, the `BY` fields in the alert
 * **Non-aggregating** query: one alert per event — add `METADATA _id, _index`
   to deduplicate
+
+---
+
+# Machine learning — anomaly detection
+
+* A rule finds what you **describe**; an ML job finds what is **unusual** — no
+  threshold to guess
+* An **anomaly detection job** learns a **baseline** from the data, then scores
+  every new time bucket against it
+
+```text
+ datafeed (logs-*)  ─▶  job: detector + bucket span  ─▶  anomaly records
+                                                          score 0–100
+                                                          .ml-anomalies-*
+```
+
+| Detector | Detects |
+|----------|---------|
+| `rare` process **by** `host.name` | a process never seen on that host |
+| `high_count` **partition by** `user.name` | a burst of failed logons for one user |
+| `high_sum(source.bytes)` **by** `host.name` | an unusual volume sent out |
+| `time_of_day` **by** `user.name` | a logon at 3 a.m. for a 9-to-5 user |
+
+* **Influencers** (`host.name`, `user.name`, `source.ip`): who explains the anomaly
+
+---
+
+# Prebuilt security ML jobs
+
+* **Machine Learning → Anomaly Detection → Create job**, or from the **Security
+  app** (*Rules → ML job settings*): ready-made jobs, per data source
+  * **Authentication**: unusual logon hour, rare source IP, spike in failures
+  * **Linux / Windows**: rare process, rare parent–child, unusual user, rare `sudo`
+  * **Network**: unusual destination port, spike in traffic, rare country
+  * Integrations: **DGA** (generated domains), **ProblemChild** (living off the land),
+    **lateral movement**, **data exfiltration**
+* They expect **ECS** fields — one more reason to normalize
+* They need **history**: a baseline takes days to weeks; a job started yesterday
+  is still learning
+* **Licence**: Platinum or above (the lab runs a 30-day **trial**)
+
+---
+
+# The Machine learning rule
+
+* Rule type **Machine learning**: select the job, set the **anomaly score
+  threshold** (e.g. `75`) — each anomaly above it becomes an alert
+* The prebuilt **ML rules** (*Unusual Linux Process*, *Spike in Failed Logon
+  Events*…) already pair each job with a rule
+* Where anomalies show up: **Explore → Hosts / Users → Anomalies**, the alert
+  flyout, **Anomaly Explorer**, and the **entity risk score**
+
+<!-- ci: skip -->
+```json
+GET /_ml/anomaly_detectors/_stats?filter_path=jobs.job_id,jobs.state,jobs.data_counts.processed_record_count
+```
+
+<v-click>
+
+> ML **complements** the rules — it ranks the unusual, the analyst decides if it is malicious.
+> Tune it like a rule: influencers, bucket span, exceptions on known jobs.
+
+</v-click>
 
 ---
 

@@ -46,15 +46,34 @@ class Cart {
 
 - A type annotation can be **stripped**; a decorator must be **compiled** into code
   that calls it
-- `node cart.ts` (type stripping) **refuses** it: `SyntaxError`
-- No JavaScript engine runs standard decorators natively yet
+- `node cart.ts` (type stripping) **refuses** it: `SyntaxError` — and Node.js 26
+  removed `--experimental-transform-types`: no flag left to compile them
+- No JavaScript engine runs standard decorators natively — TC39 moved them back
+  to **stage 2.7** in May 2026
 
 <br />
 
-- **`tsc`** compiles them — and so do **esbuild**, **tsx**, **swc**, Babel
+- **`tsc`** compiles them — and so do **esbuild**, **tsx** (esbuild inside), Babel
+- **swc** only with `jsc.transform.decoratorVersion: "2023-11"`: its default is legacy
 - Vite's default transform (**oxc**) only lowers the **legacy** ones today
 - `erasableSyntaxOnly` in `tsconfig.json` forbids them, along with `enum` and
   `namespace`
+
+<!--
+Checked on 18/11/2026.
+- Node.js 22.22, 24.21 and 26.13: `node cart.ts` fails with
+  "SyntaxError: Invalid or unexpected token" on the `@`. The Node docs say it
+  will not support decorators until engines do. `--experimental-transform-types`
+  was removed in Node 26.0: tsx (or `node --import=tsx`) is the way.
+- TC39, plenary of 19/05/2026: decorators and decorator metadata were demoted
+  from stage 3 to stage 2.7. No engine had shipped them in 4 years (the V8 work
+  stopped, SpiderMonkey's is partial, nothing in JSC). The design is not
+  expected to change, but it may. TypeScript keeps them as its default flavour.
+- swc: `decoratorVersion` is "2021-12" (legacy) by default; "2022-03" and
+  "2023-11" are the standard ones (2023-11 = with metadata).
+- oxc (Vite 8, Vitest 5): oxc-project/oxc#9170 still open, lowering PR #28882
+  still a draft. That is why the workshop's vitest.config.ts uses esbuild.
+-->
 
 ---
 
@@ -265,11 +284,23 @@ Git[Symbol.metadata]?.commands;   // { st: 'status', co: 'checkout' }
 - **One object per class**, shared by all its decorators, then attached as
   `Class[Symbol.metadata]`
 - A subclass's metadata **inherits** from its parent's (prototype chain)
-- Node.js 24 has no `Symbol.metadata` yet: polyfill it **before** any decorated class
+- No runtime defines `Symbol.metadata` yet (Node.js 26 included): polyfill it
+  **before** any decorated class
 
 ```ts
 (Symbol as { metadata?: symbol }).metadata ??= Symbol('Symbol.metadata');
 ```
+
+<!--
+Checked on 18/11/2026: `node -e "console.log(Symbol.metadata)"` prints
+`undefined` on Node.js 22.22, 24.21 and 26.13 (V8 14.6). MDN does not even list
+it among the well-known symbols: it belongs to the decorator metadata proposal,
+back at stage 2.7 since May 2026.
+Without the polyfill: tsc gives `context.metadata === undefined` (TypeError on
+`.commands`); esbuild / tsx fall back to `Symbol.for('Symbol.metadata')`, so
+`Git[Symbol.metadata]` reads `Git[undefined]` — undefined. The polyfill is
+still needed.
+-->
 
 ---
 

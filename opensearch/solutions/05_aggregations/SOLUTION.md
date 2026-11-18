@@ -6,7 +6,7 @@ The CI replays them right after the workshop README, and checks each « Expected
 ## Step 1
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": { "ratings": { "stats": { "field": "rating" } } }
@@ -25,7 +25,7 @@ and the aggregation computes in `double` over these approximated values.
 ## Step 2
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": { "cuisines": { "cardinality": { "field": "cuisine" } } }
@@ -41,7 +41,7 @@ GET /restaurants/_search
 ## Step 3
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -73,7 +73,7 @@ The average of Paris is pulled up by L'Étoile du Nord (€125): the median
 (`percentiles`, 50) is much lower.
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "query": { "term": { "city": "Paris" } },
@@ -84,7 +84,7 @@ GET /restaurants/_search
 ## Step 4
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -114,7 +114,7 @@ GET /restaurants/_search
 ## Step 5
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
@@ -151,7 +151,7 @@ GET /restaurants/_search
 ## Step 6
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "query": { "term": { "city": "Paris" } },
@@ -184,7 +184,7 @@ GET /restaurants/_search
 ## Step 7
 
 ```json
-GET /restaurants/_search
+POST /restaurants/_search
 {
   "size": 0,
   "aggs": {
