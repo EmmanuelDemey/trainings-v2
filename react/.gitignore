@@ -12,3 +12,4 @@ coverage/
 storybook-static/
 .env.local
 .env.*.local
+target/

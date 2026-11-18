@@ -26,12 +26,9 @@ GET /_cluster/health
 
 Elasticsearch already ships a template for the logs of Elastic Agent. Find it, and its index patterns and priority.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 It is an index template named after the type of data it holds.
-
-</details>
+:::
 
 **Expected result** (an excerpt):
 
@@ -56,12 +53,9 @@ It is an index template named after the type of data it holds.
 
 Create the template `logs-shop-template` for `logs-shop-*`, taking precedence over the built-in one: a data stream in **LogsDB** mode, 0 replicas, with `@timestamp` (date), `host.name` (keyword), `message` (a text **without positions nor scoring**) and `http.status` (integer); a **retention of 7 days** managed by the data stream lifecycle; and a **failure store** enabled.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [`index.mode` setting](https://www.elastic.co/docs/manage-data/data-store/data-streams/logs-data-stream), at the [`match_only_text`](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/text#match-only-text-field-type) type, at [`lifecycle`](https://www.elastic.co/docs/manage-data/lifecycle/data-stream) in a template, and at the [failure store](https://www.elastic.co/docs/manage-data/data-store/data-streams/failure-store) under `data_stream_options`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -83,12 +77,9 @@ Index these three logs into `logs-shop-production` — the data stream is create
 
 Then look at the data stream.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A data stream only takes **creations**: in a `_bulk`, the action is `create`, not `index`.
-
-</details>
+:::
 
 **Expected result** (an excerpt of the data stream):
 
@@ -146,12 +137,9 @@ POST /logs-shop-production/_search
 
 Read the lifecycle of `logs-shop-production`. The security team asks for **30 days**: change the retention of this data stream, **without** touching the template. Then ask the lifecycle to explain the state of its backing indices.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The data stream has a `_lifecycle` endpoint; its backing indices have a `_lifecycle/explain` one.
-
-</details>
+:::
 
 **Expected result** (the change):
 
@@ -184,12 +172,9 @@ Index into `logs-shop-production` a log of `web-2` with the message `log without
 
 Search the failure store of `logs-shop-production`, keeping only `error.type`, `error.message` and `document.source`. Then count the failures per `error.type` in ES|QL.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A **selector** after the name of the data stream gives the failure store, as if it were an index. Refresh it first.
-
-</details>
+:::
 
 **Expected result** (an excerpt of the search):
 
@@ -225,12 +210,9 @@ Reference: [Time series data streams](https://www.elastic.co/docs/manage-data/da
 
 A TSDS only takes points close to « now » (by default, from 2 hours before to 30 minutes after). Elastic Agent timestamps its metrics; here, create the ingest pipeline `metrics-shop-timestamp` that sets `@timestamp` to the time of reception — **unless** the document has one already.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [`set` processor](https://www.elastic.co/docs/reference/enrich-processor/set-processor), and the ingest metadata `_ingest.timestamp`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -242,12 +224,9 @@ The [`set` processor](https://www.elastic.co/docs/reference/enrich-processor/set
 
 Create the template `metrics-shop-template`, priority 200, for `metrics-shop-*`: a data stream in **time series** mode that goes through `metrics-shop-timestamp` by default, 0 replicas. The series are identified by `host.name`; `cpu.pct` is a value that goes up and down, `http.requests` a counter that only grows. Keep the data 90 days, **downsampled** to one point per hour after 1 day, and one per day after 7 days.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at `time_series_dimension` and `time_series_metric` in the mapping, at `index.default_pipeline`, and at `downsampling` in the `lifecycle`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -282,12 +261,9 @@ Then look at the data stream.
 
 In ES|QL, compute the **maximum CPU per host**, sorted by host, reading `metrics-shop-production` as a time series.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 ES|QL has a source command of its own for time series data streams.
-
-</details>
+:::
 
 **Expected result**:
 

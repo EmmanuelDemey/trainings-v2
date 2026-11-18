@@ -34,12 +34,9 @@ Reference: [Mappings and field types](https://docs.opensearch.org/latest/field-t
 
 Index book 1, with the `_id` `1`, into a `books_guess` index that does not exist yet. Display the mapping OpenSearch created.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `PUT /books_guess/_doc/1` creates the index along the way. Then `GET /books_guess/_mapping`.
-
-</details>
+:::
 
 **Expected result** (an excerpt of the mapping):
 
@@ -64,12 +61,9 @@ Index book 1, with the `_id` `1`, into a `books_guess` index that does not exist
 
 Index into `books_guess`, with the `_id` `2`, a book whose `price` is `"out of print"`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The type of a field is set by the first document.
-
-</details>
+:::
 
 **Expected result**: a `mapper_parsing_exception` error.
 
@@ -82,12 +76,9 @@ Create `books_v1`, 1 shard and 0 replicas, with a mapping that **rejects** any u
 - `isbn` and `tags` are exact values;
 - `price` is a decimal number, `pages` an integer, `published` a date.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `"dynamic": "strict"` at the `mappings` level. A `fields` multi-field for `title`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -99,12 +90,9 @@ Create `books_v1`, 1 shard and 0 replicas, with a mapping that **rejects** any u
 
 Index the three books into `books_v1` in **a single** request, with the `_id`s `1`, `2` and `3`, and make them searchable immediately. Then count the documents.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `POST /books_v1/_bulk?refresh=true`: a `{ "index": { "_id": "…" } }` line, then a document line. Counting: `_count`.
-
-</details>
+:::
 
 **Expected result** (the count):
 
@@ -118,12 +106,9 @@ Index the three books into `books_v1` in **a single** request, with the `_id`s `
 
 The team wants to aggregate on the **author**. Impossible on a plain `text` — and you cannot change the type of an existing field. Create `books_v2`, same mapping, but `author` gets a `keyword` sub-field. Copy the documents of `books_v1` into it, then point the `books` alias to `books_v2`. Finally, search Camus's books through the alias.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `POST /_reindex`, then `POST /_aliases` with an `add` action. A `match` on `author`, querying `/books/_search`.
-
-</details>
+:::
 
 **Expected result** (the search):
 

@@ -32,12 +32,9 @@ Reference: [Text analysis](https://docs.opensearch.org/latest/analyzers/).
 
 Analyze "The chef's vegetarian Hamburger and its homemade fries" with the `standard` analyzer.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `POST /_analyze`, with `analyzer` and `text`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -73,12 +70,9 @@ Analyze the same text with the `english` analyzer.
 
 Without creating an index, test the chain: `html_strip` char filter, `standard` tokenizer, `lowercase` and `asciifolding` filters, on the text `<p>Crème brûlée</p>`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `_analyze` accepts `char_filter`, `tokenizer` and `filter` instead of `analyzer`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -100,12 +94,9 @@ Create the `dishes` index (1 shard, 0 replicas) with a `dish_en` analyzer that:
 
 The `dish` field of the index uses this analyzer. Check it with `_analyze` on `<b>The Chef's</b> vegetarian Hamburger and its fries`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `settings.analysis`: some `filter` (`stemmer` with `possessive_english`, `stop` with `_english_`, `synonym`), then an `analyzer` of type `custom`. The order of the filters matters: `lowercase` before `stop` and `synonym`.
-
-</details>
+:::
 
 **Expected result** (the analysis):
 

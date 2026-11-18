@@ -50,8 +50,11 @@ helper `src/tests/render.ts`, the workshop code and the READMEs.
 ```bash
 pnpm install        # also runs the sync
 pnpm run list       # what the numbering picks up, and what it leaves out
-pnpm run dev        # the deck, live — http://localhost:3030
-pnpm run site       # the workshops site, live — http://localhost:4321
+pnpm run dev        # the deck and the site, live — http://localhost:3030 and :4321
+pnpm run slides     # the deck alone, with Slidev's keyboard shortcuts
+pnpm run site       # the workshops site alone
+pnpm run check      # what would break, without building
+pnpm run verify     # the tests of every solution
 ```
 
 **The number at the start of a name is its place.** `slides/03_….md` is

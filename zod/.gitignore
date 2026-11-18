@@ -9,3 +9,7 @@ build/
 # What the workshops produce when they are run.
 coverage/
 .vitest/
+dist/
+target/
+.env.local
+.env.*.local

@@ -78,12 +78,9 @@ Create and start a transform `customers-live`, writing to `customers-live`: one 
 - it looks for changes **every second**;
 - it finds the new orders through `event.ingested`, and lets them **1 second** to become searchable.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Two settings at the root of the transform configuration: one sets how often it checks, the other — `sync` — which date field tells what is new, and with which delay. In a real cluster, keep the defaults (1 minute, 60 seconds): every check is a search on the source.
-
-</details>
+:::
 
 Check that `customers-live` holds **5** customers:
 
@@ -113,12 +110,9 @@ POST /orders/_bulk?refresh=true
 
 Without touching the transform, wait a few seconds, then get the document of `c-003` in `customers-live`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A plain search, with a `term` query on `customer_id`. Nothing to do on the transform side: that is the point.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -182,12 +176,9 @@ Check that `c-006` now has **2** orders, for `250.0`.
 
 Create the index `last-orders`, with the same mapping as `orders`. Then create and start a transform `last-order`, writing to it: for each customer, their **most recent** order (by `@timestamp`), copied as is. Get the last order of `c-001`, then of `c-006`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Not a `pivot`: the other kind of transform keeps, for each value of a key, the document with the highest value of a sort field. Why create the destination index first? Try without, and look at its mapping.
-
-</details>
+:::
 
 **Expected result** (`c-001`):
 
@@ -208,12 +199,9 @@ Not a `pivot`: the other kind of transform keeps, for each value of a key, the d
 
 Slow `customers-live` down to one check **per minute**, without recreating it. Then stop it, waiting for the current checkpoint to end, and check its state.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A transform has an `_update` endpoint — for most of its settings, not for its `pivot`. `_stop` takes a parameter to wait.
-
-</details>
+:::
 
 **Expected result** (the stats):
 

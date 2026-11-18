@@ -40,12 +40,9 @@ node.attr.zone: az3
 
 Restart the nodes, then list the custom attributes of each node: its name, the attribute and its value.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 There is a `_cat` API for node attributes. Its `h` parameter picks the columns.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -62,12 +59,9 @@ Steps 2 to 6 need a cluster whose nodes carry the `zone` attribute. On a node wi
 
 Make Elasticsearch take the `zone` attribute into account when it allocates shards, in a **persistent** cluster setting.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look for `cluster.routing.allocation.awareness.*` in the cluster settings API.
-
-</details>
+:::
 
 ### Step 3: Forced awareness
 
@@ -85,23 +79,17 @@ Create `zone-aware-index` with 3 primary shards and 1 replica each, then list it
 
 Move shard `0` of `zone-aware-index` from `node-az1` to `node-az2`, then follow the relocation.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The cluster reroute API takes a list of commands; one of them is `move`. A `_cat` API shows the recoveries in progress.
-
-</details>
+:::
 
 ### Step 6: Drain a node for maintenance
 
 Get every shard off `node-az1`, by its name, without stopping it. Then let it take shards again.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [cluster-level shard allocation filtering](https://www.elastic.co/docs/reference/elasticsearch/configuration-reference/cluster-level-shard-allocation-routing-settings#cluster-shard-allocation-filtering) settings. A setting is reset to its default by setting it to `null`.
-
-</details>
+:::
 
 ### Step 7: Turn awareness off before the next parts
 
@@ -180,12 +168,9 @@ Create the SLM policy `daily-critical-backup`, in `my_backup`:
 - with the metadata `criticality: high` and `team: finance`;
 - kept 90 days, but always at least 30, and never more than 120.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `schedule` is a [cron expression](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/api-conventions#api-cron-expressions) with seconds first. The `name` accepts [date math](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/api-conventions#api-date-math-index-names): `<prefix-{now/d}>`. The retention has three keys.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -207,12 +192,9 @@ Create `daily-logs-backup`: every day at **1:00 am**, snapshots named `logs-` fo
 
 List every SLM policy, run the three policies right away instead of waiting for their schedule, and list the snapshots of `my_backup`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [SLM APIs](https://www.elastic.co/docs/api/doc/elasticsearch/group/endpoint-slm) can execute a policy on demand.
-
-</details>
+:::
 
 ### Step 5: Statistics
 
@@ -294,12 +276,9 @@ POST /employees_full/_bulk
 
 Create the role `employee_public_view`: the `monitor` cluster privilege, and `read` on `employees_full` showing **only** `employee_id`, `name`, `department`, `position`, `hire_date`, `email_corporate` and `phone_work`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 An index privilege takes a `field_security` object, with a `grant` list.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -311,12 +290,9 @@ An index privilege takes a `field_security` object, with a `grant` list.
 
 Create `hr_team_view`: `monitor`, then `read` and `write` on `employees_full`, every field **except** `ssn` and `disciplinary_notes`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `field_security` also takes an `except` list. Wildcards work in both lists.
-
-</details>
+:::
 
 **Question**: what happens if `except` names a field that `grant` does not cover?
 
@@ -358,12 +334,9 @@ Do the same as `jane_hr` (get document `1`) and as `susan_hrmanager` (get docume
 
 Create the role `sales_dept_restricted`: `monitor`, and `read` on `employees_full` restricted to the employees of the `sales` department, showing only `employee_id`, `name`, `department`, `position`, `email_corporate` and `phone_work`. Give it to a new user `sales_viewer` (password `SalesView123!`), and search as them.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Document-Level Security is a `query` next to `field_security`, in the same index privilege.
-
-</details>
+:::
 
 **Expected result**: 1 document only (EMP-001, the only « sales » employee), with the restricted fields.
 
@@ -405,12 +378,9 @@ Create the ILM policy `logs-lifecycle`:
 - **cold**, after 37 days: priority 0, moved to the cold nodes, turned into a searchable snapshot in `s3_backup`;
 - **delete**, after 90 days, its searchable snapshot included.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Every action has its page under [Index lifecycle actions](https://www.elastic.co/docs/reference/elasticsearch/index-lifecycle-actions). `min_age` is counted from the rollover.
-
-</details>
+:::
 
 **Expected result**:
 

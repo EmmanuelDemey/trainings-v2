@@ -62,12 +62,9 @@ Reference: [Query string syntax](https://www.elastic.co/docs/reference/query-lan
 
 Find the restaurants that mention `pizza`, anywhere, with `GET /restaurants/_search?q=…`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Without a field name, the word is searched in all the fields.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -84,12 +81,9 @@ Without a field name, the word is searched in all the fields.
 
 Find the **French** restaurants of **Paris**, still with `q`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The syntax is `field:value`. Look at the boolean operators of the syntax — and at their case.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -108,12 +102,9 @@ The syntax is `field:value`. Look at the boolean operators of the syntax — and
 
 Find the restaurants that cost **20 or less**, still with `q`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The syntax has inclusive ranges between square brackets, with `*` for an open bound.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -136,12 +127,9 @@ From now on, the query goes in the body of `GET /restaurants/_search`. Reference
 
 Find the restaurants whose **description** speaks of `pizza`. Notice that one of them says « pizzas ».
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `match` query analyses the text you search with the analyzer of the field. Look at the mapping: which analyzer does `description` use? `_analyze` shows what it does to « pizzas ».
-
-</details>
+:::
 
 **Expected result**:
 
@@ -158,12 +146,9 @@ The `match` query analyses the text you search with the analyzer of the field. L
 
 Find the restaurants whose description holds **both** `ramen` **and** `broth`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 By default `match` is an **OR** between the words. One of its parameters changes that.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -182,12 +167,9 @@ By default `match` is an **OR** between the words. One of its parameters changes
 
 Find the restaurants whose description holds `fresh produce`: these two words, side by side, in this order.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 There is a variant of `match` for phrases.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -206,12 +188,9 @@ There is a variant of `match` for phrases.
 
 Search `port` in both the **name** and the **description**, the name counting **three times** more.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 One query searches several fields at once. A field can be boosted with `^`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -227,12 +206,9 @@ One query searches several fields at once. A field can be boosted with `^`.
 
 A reader types `sushsi`. Find Sakura anyway.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the `fuzziness` parameter of `match`, and its `AUTO` value.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -254,12 +230,9 @@ Reference: [Term-level queries](https://www.elastic.co/docs/reference/query-lang
 
 Find the **Japanese** restaurants, with a query that does not analyse its value.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `cuisine` is a `keyword`: the exact value is what is indexed.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -278,12 +251,9 @@ Find the **Japanese** restaurants, with a query that does not analyse its value.
 
 Find the restaurants of **Lyon** or **Marseille**, in one condition.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The exact query has a plural form.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -300,12 +270,9 @@ The exact query has a plural form.
 
 Find the restaurants opened **on 1 January 2018 or later**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A range query works on dates as on numbers.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -326,12 +293,9 @@ The Opéra Garnier is at `48.8719, 2.3316`. Reference: [Geo queries](https://www
 
 Find the restaurants **less than 2 km** from the Opéra Garnier.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A geo query takes a distance and the point it is measured from, on a `geo_point` field.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -348,12 +312,9 @@ A geo query takes a distance and the point it is measured from, on a `geo_point`
 
 List the restaurants of **Paris**, the **closest** to the Opéra Garnier **first**, the distances in km.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 This is not a query but a [sort](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/sort-search-results), on a special key for geo distances.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -376,12 +337,9 @@ The order matters here. **Question**: where does the response show each distance
 
 Find the restaurants in the rectangle whose top-left corner is `46.5, 3.5` and bottom-right corner `43.0, 7.5` — the south-east of France.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 One geo query takes the two corners of a box.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -402,12 +360,9 @@ Reference: [Boolean query](https://www.elastic.co/docs/reference/query-languages
 
 A reader looks for `cooking` in the description, in **Paris or Lyon**, **40 or less**, **preferably** rated 4.5 or more, but **no Italian**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `bool` query has four clauses: `must`, `filter`, `should`, `must_not`. Which ones score, which ones only keep or drop documents?
-
-</details>
+:::
 
 **Expected result**:
 
@@ -428,12 +383,9 @@ A `bool` query has four clauses: `must`, `filter`, `should`, `must_not`. Which o
 
 List the **3 best-rated** restaurants, the best first, returning only their `name` and `rating`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at [paginate](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/paginate-search-results) and at [source filtering](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/retrieve-selected-fields).
-
-</details>
+:::
 
 **Expected result**:
 

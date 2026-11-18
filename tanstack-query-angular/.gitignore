@@ -11,6 +11,7 @@ dist/
 coverage/
 .env.local
 .env.*.local
+target/
 
 # The Angular CLI's build cache, in every workshop.
 .angular/

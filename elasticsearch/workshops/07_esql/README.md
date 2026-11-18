@@ -62,12 +62,9 @@ Reference: [ES|QL](https://www.elastic.co/docs/reference/query-languages/esql) �
 
 Show the **3 slowest** requests, with only the columns `@timestamp`, `url`, `status` and `response_ms`, slowest first.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A query starts with a **source command** (`FROM`), followed by **processing commands** separated by `|`. You need one to sort, one to choose the columns, one to cut the rows.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -95,12 +92,9 @@ A query starts with a **source command** (`FROM`), followed by **processing comm
 
 Count the server errors (`status` 500 or more), in a column named `errors`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 One command keeps the rows matching a condition, another computes aggregates — the ES|QL counterpart of a `COUNT(*)` in SQL.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -118,12 +112,9 @@ For every request, keep `url` and `status`, and add:
 - `family`: `server error` for a status of 500 or more, `client error` for 400 or more, `ok` otherwise;
 - `kb`: the size in kilobytes (`bytes` / 1024), rounded to 2 decimals.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The command that adds columns is `EVAL`. Look among the [conditional functions](https://www.elastic.co/docs/reference/query-languages/esql/functions-operators/conditional-functions-and-expressions) and the math ones. Beware of the integer division.
-
-</details>
+:::
 
 **Expected result** (some of the rows):
 
@@ -150,12 +141,9 @@ The command that adds columns is `EVAL`. Look among the [conditional functions](
 
 For the errors (`status` 400 or more), compute per `url`: the number of errors `errors` and the average response time `avg_ms`. Most errors first.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The aggregation command takes a `BY` clause, like SQL's `GROUP BY`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -174,12 +162,9 @@ The aggregation command takes a `BY` clause, like SQL's `GROUP BY`.
 
 Count the requests per **30-minute slot**, in a column `requests`, the slot in a column `slot`, in time order.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [grouping functions](https://www.elastic.co/docs/reference/query-languages/esql/functions-operators/grouping-functions): one of them rounds a date down to a fixed span, right inside the `BY`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -208,12 +193,9 @@ ES  Spain
 
 Then count the server errors per `country_name`, sorted by name.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 ES|QL joins with [`LOOKUP JOIN`](https://www.elastic.co/docs/reference/query-languages/esql/commands/lookup-join), and only on an index created in a special **index mode**: find which one in its documentation. That mode cannot be set on an existing index.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -233,12 +215,9 @@ ES|QL joins with [`LOOKUP JOIN`](https://www.elastic.co/docs/reference/query-lan
 
 Count the requests whose `message` matches `payment timeout` as **full text** — through the inverted index, as a `match` query of the Query DSL would — in a column `failures`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [search functions](https://www.elastic.co/docs/reference/query-languages/esql/functions-operators/search-functions). The relevance score is not a column by default: `FROM … METADATA _score` adds it.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -254,12 +233,9 @@ Look at the [search functions](https://www.elastic.co/docs/reference/query-langu
 
 Count, in a column `slow`, the requests to a given page slower than a given time — `/cart` and `2000` ms — **without writing these two values in the query string**: pass them as parameters.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [`_query` API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-esql-query) takes a `params` array next to `query`; the query refers to a named parameter as `?name`.
-
-</details>
+:::
 
 **Expected result**:
 

@@ -11,3 +11,10 @@ build/
 # and `pnpm run build` run. The single source stays in elasticsearch-common/.
 slides/public/images/common/
 workshops/*/lab/
+
+# What the workshops produce when they are run.
+dist/
+target/
+coverage/
+.env.local
+.env.*.local

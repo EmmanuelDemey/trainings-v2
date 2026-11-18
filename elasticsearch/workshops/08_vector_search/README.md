@@ -78,12 +78,9 @@ Look at the mapping of `recipes`: which `index_options` did Elasticsearch choose
 
 Find the **2** recipes closest to the « very sweet » vector `[0.9, 0.1, 0.05]`, exploring 10 candidates, and return only their `title`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `knn` section sits at the top level of the search body, next to (or instead of) `query`. It takes the field, the query vector, `k` and `num_candidates`.
-
-</details>
+:::
 
 **Expected result** (excerpt):
 
@@ -108,12 +105,9 @@ A `knn` section sits at the top level of the search body, next to (or instead of
 
 Same vector, but find the single closest recipe among the `main` dishes.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `knn` takes a `filter`. Is it applied before, during, or after walking the graph?
-
-</details>
+:::
 
 **Expected result** (excerpt):
 
@@ -149,12 +143,9 @@ Search the titles for « apple », lexically.
 
 Combine the lexical search « apple » and the kNN search of step 2 (with `k` 3) by their **ranks**, over a window of 10, and keep the 2 first hits.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `rrf` retriever takes a list of `retrievers`: a `standard` one wraps a `query`, a `knn` one takes the same keys as the `knn` section.
-
-</details>
+:::
 
 **Expected result** (excerpt): the pie and the stewed apples, found by both searches, come before the pork chops.
 
@@ -175,12 +166,9 @@ The `rrf` retriever takes a list of `retrievers`: a `standard` one wraps a `quer
 
 Same two searches, but now normalise their scores with `minmax` and make the vector similarity count **twice** as much as the lexical score.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the `linear` retriever: each of its retrievers has a `weight` and a `normalizer`.
-
-</details>
+:::
 
 ## Part C: Let Elasticsearch compute the embeddings
 
@@ -190,12 +178,9 @@ Reference: [Semantic search with `semantic_text`](https://www.elastic.co/docs/so
 
 List the inference endpoints of your cluster. Find the one that computes **dense embeddings, multilingual**, and the one that **reranks**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The inference API lists its endpoints with a `GET` on its root. The built-in ones start with a dot.
-
-</details>
+:::
 
 ### Step 8: A semantic_text field
 
@@ -213,12 +198,9 @@ The **first** indexing downloads and deploys the model: it may take a minute or 
 
 Search `articles` for « drowsy feline », and keep the best hit only.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `semantic_text` field is searched with the queries you already know.
-
-</details>
+:::
 
 **Expected result** (excerpt):
 
@@ -236,12 +218,9 @@ A `semantic_text` field is searched with the queries you already know.
 
 Take the lexical search « apple » of step 4, and have its 10 best hits read again by the reranking endpoint against the question « a fruit dessert ». The first call deploys the model: send it again if it fails on a timeout.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the `text_similarity_reranker` retriever: it wraps another retriever, and names the field to read, the inference endpoint and the text to compare with.
-
-</details>
+:::
 
 **Question**: where are the pork chops now?
 

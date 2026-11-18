@@ -36,12 +36,9 @@ Reference: [OpenSearch Dashboards](https://docs.opensearch.org/latest/dashboards
 
 Adding the sample data created an index pattern. Create **another one**, your own: pattern `opensearch_dashboards_sample_data_logs*`, time field `timestamp`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Menu ☰ → **Dashboards Management** → **Index patterns** → **Create index pattern**.
-
-</details>
+:::
 
 **Expected result**: the index pattern lists about thirty fields; `geo.coordinates` is of type `geo_point`, `bytes` of type `number`, aggregatable.
 
@@ -57,12 +54,9 @@ In **Discover**, with your index pattern:
 4. Add a **filter** that excludes the `win xp` operating system.
 5. Save the search as `503 errors`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 DQL: `response:503`. For the filter: **+ Add filter**, `machine.os.keyword` **is not** `win xp` — or hover a value in a document, and click the crossed-out magnifier.
-
-</details>
+:::
 
 **Expected result**: a few dozen documents, all `503`, no `win xp`.
 
@@ -72,23 +66,17 @@ DQL: `response:503`. For the filter: **+ Add filter**, `machine.os.keyword` **is
 
 Menu ☰ → **Visualize** → **Create visualization** → **Metric**. Show the **total number of requests** and the **average size** (`bytes`). Save it as `Traffic — key figures`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 **Metrics** → **Add** → *Average* on `bytes`. The first metric, *Count*, is already there.
-
-</details>
+:::
 
 ### Step 4: Traffic over time, per HTTP status
 
 A **Vertical bar**: on the X axis, a **Date Histogram** on `timestamp`; the bars **stacked** by HTTP status (`response.keyword`). Save it as `Traffic per HTTP status`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 **Buckets** → **Add** → **X-axis** → *Date Histogram*. Then **Add** → **Split series** → *Terms* on `response.keyword`. Right-hand panel → **Metrics & axes** → **Mode**: *stacked*.
-
-</details>
+:::
 
 **Question**: which aggregations of chapter 7 does this visualization send? Check with **Inspect** → **Requests**.
 
@@ -96,23 +84,17 @@ A **Vertical bar**: on the X axis, a **Date Histogram** on `timestamp`; the bars
 
 A **Pie** (as a ring, *donut*): the share of each operating system (`machine.os.keyword`), then, inside each operating system, the share of each extension (`extension.keyword`, top 3). Save it as `Systems and files`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Two **Split slices**: a *Terms* on `machine.os.keyword`, then a *Terms* on `extension.keyword`. The order of the buckets matters.
-
-</details>
+:::
 
 ### Step 6: The map
 
 Menu ☰ → **Maps** → **Create map**. Add a **Documents** layer on your index pattern, geo field `geo.coordinates`. Color the points by `response.keyword`. Save the map as `Visitors`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 **Add layer** → **Documents**. **Style** tab → color by field. If **Maps** does not show up, use **Visualize** → **Coordinate Map**, with a *Geohash* aggregation on `geo.coordinates`.
-
-</details>
+:::
 
 **Question**: without the `geo_point` type in the mapping, would this map be possible?
 

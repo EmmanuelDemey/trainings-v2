@@ -51,12 +51,9 @@ Reference: [Ingest pipelines](https://docs.opensearch.org/latest/ingest-pipeline
 
 Test, **without creating a pipeline**, a processor that splits line 1 into `restaurant_id`, `author`, `stars`, `date` and `comment`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `POST /_ingest/pipeline/_simulate`, with a `pipeline` and some `docs`. The [`csv`](https://docs.opensearch.org/latest/ingest-pipelines/processors/csv/) processor handles quotes. In the JSON of `docs`, a quote is written `\"`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -84,12 +81,9 @@ Test, **without creating a pipeline**, a processor that splits line 1 into `rest
 
 Add to the simulated pipeline: the conversion of `stars` to an integer, the parsing of `date` (format `dd/MM/yyyy`, Paris time) into `@timestamp`, then the removal of `message` and `date`. Simulate on line 1.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `convert`, `date` (`formats`, `target_field`, `timezone`) and `remove` processors — the latter accepts a list of fields.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -105,12 +99,9 @@ The `convert`, `date` (`formats`, `target_field`, `timezone`) and `remove` proce
 
 Add a `sentiment` field: `positive` for **4 stars or more**, `negative` for **2 or fewer**, nothing otherwise. Simulate on lines 1 and 2.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Two `set` processors, each with an `if` in Painless: `ctx.stars >= 4`. This is where the conversion of step 2 pays off.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -127,12 +118,9 @@ Two `set` processors, each with an `if` in Painless: `ctx.stars >= 4`. This is w
 
 Simulate on line 4: the pipeline fails. Add error handling that keeps the document, writing the error message into `error`. Finally, save the pipeline under the name `reviews`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 An `on_failure` block at the pipeline level, with a `set` and `{{ _ingest.on_failure_message }}`. Then `PUT /_ingest/pipeline/reviews`.
-
-</details>
+:::
 
 **Expected result** (the save):
 
@@ -144,12 +132,9 @@ An `on_failure` block at the pipeline level, with a `set` and `{{ _ingest.on_fai
 
 The applications that write to `reviews` should not have to name the pipeline. Make it the **default** pipeline of the index, then index the four lines — `_id` `1` to `4` — in a single request, searchable right away. Read review `1`, then count the **positive** reviews, and the ones **in error**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `index.default_pipeline` is a dynamic setting. A `_bulk` with `{ "message": "…" }` per document. For the errors: the `exists` query on `error`.
-
-</details>
+:::
 
 **Expected result** (review 1):
 

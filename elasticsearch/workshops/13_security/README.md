@@ -37,12 +37,9 @@ Reference: [User roles](https://www.elastic.co/docs/deploy-manage/users-roles/cl
 
 Find, through the API, which user you are connected as, and its roles.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The security API has an endpoint that **authenticates** the caller.
-
-</details>
+:::
 
 ### Step 2: Two roles
 
@@ -53,23 +50,17 @@ Create:
 
 Give each a `description` in its metadata.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [create role API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-security-put-role). A role holds a list of cluster privileges, and a list of index patterns with their privileges.
-
-</details>
+:::
 
 ### Step 3: Two users
 
 Create `alice_reader` (password `ReadOnlyPass123!`, role `logs_readonly`, full name `Alice Reader`) and `charlie_dev` (password `DevPass789!`, role `developer`, full name `Charlie Developer`).
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The create user API, next to the role one.
-
-</details>
+:::
 
 ### Step 4: Test the permissions
 
@@ -123,12 +114,9 @@ POST /orders/_bulk?refresh=true
 
 Create the role `sales_team`: `monitor`, and `read` and `view_index_metadata` on `orders` — but **only the orders of the `sales` department**. Then the user `sarah_sales` (password `SalesPass123!`, role `sales_team`, full name `Sarah Sales`).
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at [document level security](https://www.elastic.co/docs/deploy-manage/users-roles/cluster-or-deployment-auth/controlling-access-at-document-field-level): an index privilege can carry a query.
-
-</details>
+:::
 
 Test it:
 

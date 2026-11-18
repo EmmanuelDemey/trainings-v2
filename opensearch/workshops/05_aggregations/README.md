@@ -69,12 +69,9 @@ Reference: [Aggregations](https://docs.opensearch.org/latest/aggregations/).
 
 In a single aggregation, get the count, the minimum, the maximum, the average and the sum of the ratings (`rating`). No document in the response.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `"size": 0`, and the `stats` aggregation.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -88,12 +85,9 @@ In a single aggregation, get the count, the minimum, the maximum, the average an
 
 Count the number of **distinct cuisines**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `cardinality`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -105,12 +99,9 @@ Count the number of **distinct cuisines**.
 
 The number of restaurants per city, and in **each** city, the average price.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `terms` on `city`, and an `avg` sub-aggregation on `price`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -134,12 +125,9 @@ The number of restaurants per city, and in **each** city, the average price.
 
 The cuisines, sorted by **descending average rating**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `order` parameter of a `terms` accepts the name of a sub-aggregation.
-
-</details>
+:::
 
 **Expected result** (the first buckets):
 
@@ -160,12 +148,9 @@ The `order` parameter of a `terms` accepts the name of a sub-aggregation.
 
 Split the restaurants into three ranges: under €20, from €20 to €50, €50 and above. Name them `budget`, `mid-range`, `high-end`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `range`, with a `key` per range. `to` is excluded, `from` included.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -187,12 +172,9 @@ Split the restaurants into three ranges: under €20, from €20 to €50, €50
 
 The number of **Paris** restaurants opened each year, the years without an opening left out.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `query` for Paris, and a `date_histogram` with `calendar_interval`, `format` and `min_doc_count`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -216,12 +198,9 @@ A `query` for Paris, and a `date_histogram` with `calendar_interval`, `format` a
 
 Take step 3 again, and add a **pipeline** aggregation that gives the city with the highest average price.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `max_bucket`, with `"buckets_path": "by_city>avg_price"` — at the same level as `by_city`.
-
-</details>
+:::
 
 **Expected result**:
 

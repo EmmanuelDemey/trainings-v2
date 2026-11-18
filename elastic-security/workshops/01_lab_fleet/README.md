@@ -64,12 +64,9 @@ Un seul nœud : statut `green` ou `yellow`.
 
 **Question** : dans quel data stream arriveront les logs d'authentification Linux ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 `logs-system.auth-default` : type `logs`, dataset `system.auth`, namespace `default` — le namespace de la policy.
-
-</details>
+:::
 
 ## Exercice 4 — Ajouter une intégration
 

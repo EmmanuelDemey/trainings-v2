@@ -103,12 +103,9 @@ Repérez les field sets : `event`, `host`, `user`, `source`, et le `message` d'o
 
 **Question** : quelles sont les valeurs de `event.category` et `event.outcome` ? Sont-elles libres ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 `authentication` et `failure`. Non : ce sont des **valeurs autorisées** par ECS — c'est ce qui permet à une même requête de couvrir SSH, Windows et Okta.
-
-</details>
+:::
 
 ## Exercice 2 — Les types ECS
 
@@ -118,9 +115,7 @@ GET /logs-lab-default/_mapping/field/source.ip,event.category,source.bytes,@time
 
 **Question** : quel est le type de chaque champ ? Que permet le type de `source.ip` ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 `ip`, `keyword`, `long`, `date`. Un champ `ip` accepte les requêtes **CIDR** :
 
 ```json
@@ -135,8 +130,7 @@ Résultat attendu :
 ```json
 { "count": 10 }
 ```
-
-</details>
+:::
 
 ## Exercice 3 — Une catégorie, toutes les sources
 

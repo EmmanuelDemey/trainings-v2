@@ -105,12 +105,9 @@ Reference: [Snapshot and restore](https://www.elastic.co/docs/deploy-manage/tool
 
 Register a **filesystem** repository named `my_backup`, at `/usr/share/elasticsearch/backups`, **compressed**, with chunks of 128 MB and snapshot and restore throttled to 40 MB/s each. Then check that every node can write to it.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [shared filesystem repository](https://www.elastic.co/docs/deploy-manage/tools/snapshot-and-restore/shared-file-system-repository) settings. A repository has a `_verify` endpoint.
-
-</details>
+:::
 
 **Expected result** (the registration):
 
@@ -124,12 +121,9 @@ Look at the [shared filesystem repository](https://www.elastic.co/docs/deploy-ma
 
 Take the snapshot `snapshot_full_2024_01_15` of **every** index, **with** the global state, and the metadata `taken_by: ops-team` and `taken_because: lab-exercise-full-backup`. Make the request wait until the snapshot is done.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 By default the snapshot API answers right away and the snapshot carries on in the background. One URL parameter makes it wait.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -154,12 +148,9 @@ By default the snapshot API answers right away and the snapshot carries on in th
 
 Take the snapshot `snapshot_products_orders` of `products` and `orders` only, **without** the global state, failing if one of them is missing.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at `ignore_unavailable` and `partial`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -179,12 +170,9 @@ Look at `ignore_unavailable` and `partial`.
 
 List every snapshot of `my_backup`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The get snapshot API takes a name, or a wildcard.
-
-</details>
+:::
 
 ### Step 5: Scenario 1 — an accidental delete
 
@@ -192,12 +180,9 @@ Delete the `orders` index — by mistake: `DELETE /orders`.
 
 Restore **only** `orders` from the full snapshot, without the global state, and make the request wait for the end of the restore. Then count its documents.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `_restore` endpoint of a snapshot takes the same `indices` filter as the snapshot API. A `_cat` API follows the shard recoveries.
-
-</details>
+:::
 
 **Expected result** (the count):
 
@@ -211,12 +196,9 @@ The `_restore` endpoint of a snapshot takes the same `indices` filter as the sna
 
 Restore `products` from the full snapshot as `restored_products`, next to the live `products`, without its aliases and with 0 replicas. Then count its documents.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at `rename_pattern` and `rename_replacement`: a regular expression and its replacement. Settings can be changed at restore time.
-
-</details>
+:::
 
 **Expected result** (the count):
 
@@ -228,12 +210,9 @@ Look at `rename_pattern` and `rename_replacement`: a regular expression and its 
 
 Delete `products`, `orders`, `users` and `restored_products` (only on a test cluster!), then restore the **three application indices** from the full snapshot.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Restoring `"*"` looks like the obvious answer. Think about what else the full snapshot holds: why would it fail, and how are the system indices restored instead?
-
-</details>
+:::
 
 **Expected result** (`GET /_cat/indices/products,orders,users?format=json&h=index,docs.count`):
 

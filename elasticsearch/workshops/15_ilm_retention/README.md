@@ -38,12 +38,9 @@ Reference: [Index lifecycle management](https://www.elastic.co/docs/manage-data/
 
 On a cluster of three nodes, make one node **hot** (and holder of the indices that are not time series), one **warm**, one **cold**. Then list the nodes with their roles.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Since 7.10 the tiers are [node roles](https://www.elastic.co/docs/deploy-manage/distributed-architecture/clusters-nodes-shards/node-roles), set in `elasticsearch.yml`, not custom attributes. Look for the `data_*` roles. A `_cat` API lists the nodes and their roles.
-
-</details>
+:::
 
 On a one-node cluster (Docker), that node holds every role: the whole workshop works, the data simply changes phase without changing node.
 
@@ -60,12 +57,9 @@ Create the policy `logs-policy`:
 - **cold**, after 30 days: turn into a searchable snapshot in `my-repository`; priority 0;
 - **delete**, after 90 days.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Every action has its page under [Index lifecycle actions](https://www.elastic.co/docs/reference/elasticsearch/index-lifecycle-actions). A phase starts after its `min_age`, counted from the rollover. Look at the conditions of `rollover`: which one is about the size of a **shard**?
-
-</details>
+:::
 
 **Expected result**:
 
@@ -87,12 +81,9 @@ Reference: [Data streams](https://www.elastic.co/docs/manage-data/data-store/dat
 
 Create the index template `app-logs-template`, priority 500, that makes `app-logs*` a **data stream**, with 2 shards, 1 replica, managed by `logs-policy`, and a mapping of `@timestamp` (date) and `message` (text).
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A template becomes a data stream template with one key next to `index_patterns`. The policy is an index setting.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -106,12 +97,9 @@ A template becomes a data stream template with one key next to `index_patterns`.
 
 Create the data stream `app-logs`, then look at it.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 It is created at the first document indexed, or with an API of its own.
-
-</details>
+:::
 
 **Expected result** (the look):
 
@@ -136,12 +124,9 @@ It is created at the first document indexed, or with an API of its own.
 
 Index into `app-logs` a document with the `@timestamp` `2026-10-08T10:00:00Z` and the message `Test log entry`. Then force a rollover, by hand, for the test.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A data stream only takes **creations**, and every document needs a `@timestamp`. The rollover API takes the name of the data stream.
-
-</details>
+:::
 
 **Expected result** (the rollover):
 
@@ -160,12 +145,9 @@ A data stream only takes **creations**, and every document needs a `@timestamp`.
 
 ILM checks its policies every 10 minutes. For the workshop, make it check every **10 seconds**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 It is a dynamic cluster setting: `indices.lifecycle.poll_interval`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -177,12 +159,9 @@ It is a dynamic cluster setting: `indices.lifecycle.poll_interval`.
 
 Replace `logs-policy` with a quick one: **hot** rolls over at 100 documents; **warm**, after 1 minute, force-merges to 1 segment. Wait 1–2 minutes, then ask ILM where each backing index of `app-logs` stands.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Updating a policy is creating it again under the same name. Another ILM API **explains** the state of an index.
-
-</details>
+:::
 
 **Question**: which backing index moved to `warm`, and why not the other one?
 
@@ -190,12 +169,9 @@ Updating a policy is creating it again under the same name. Another ILM API **ex
 
 Put the ILM poll interval back to its default.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A setting set to `null` goes back to its default.
-
-</details>
+:::
 
 ## Part 6: Questions
 

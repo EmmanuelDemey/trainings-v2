@@ -132,12 +132,9 @@ Résultat attendu (extrait) :
 
 **Question** : brute force ou password spraying ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 Brute force : 5 essais, **un seul** utilisateur. Un spraying viserait beaucoup d'utilisateurs avec peu d'essais chacun.
-
-</details>
+:::
 
 ## Exercice 2 — Lens : les échecs dans le temps
 
@@ -156,12 +153,9 @@ Brute force : 5 essais, **un seul** utilisateur. Un spraying viserait beaucoup d
 
 **Question** : qui est en tête, et de combien ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 `ws-02` → `198.51.100.7` : environ **48 Mo**, des milliers de fois plus que les autres paires.
-
-</details>
+:::
 
 ## Exercice 4 — Lens : ce qui est rare
 
@@ -204,12 +198,9 @@ count(kql='event.outcome: failure') / count()
 3. **Color by value** : rouge au-dessus de 50 %.
 4. Titre : *Authentication failure rate*. **Save**.
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 5 échecs sur 7 authentifications : **71 %**.
-
-</details>
+:::
 
 ## Exercice 6 — Le dashboard
 

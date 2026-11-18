@@ -34,12 +34,9 @@ Get the health of the whole cluster, then the health of `health-test` only.
 
 The status of the cluster is the **worst** status of its indices. Its counters (`active_shards`…) also count the system indices (`.security`, `.kibana`…), whose number changes from one cluster to the other — which is why you narrow it to one index.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The cluster health API accepts an index name in its path.
-
-</details>
+:::
 
 **Expected result** (one-node cluster, health of `health-test`):
 
@@ -61,23 +58,17 @@ The cluster health API accepts an index name in its path.
 
 Get the health of the cluster with **one entry per index**, to spot which index makes it yellow.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The API has a `level` parameter.
-
-</details>
+:::
 
 ### Step 3: Which shards are unassigned, and why
 
 List the shards of `health-test` with, for each one: index, shard number, primary or replica, state, and the reason it is unassigned.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `_cat` API lists shards. Its `h` parameter picks the columns, `?help` lists those available.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -103,12 +94,9 @@ Fill this table from what you saw and from the documentation:
 
 Ask Elasticsearch to explain why the **replica** of shard `0` of `health-test` is not allocated.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [cluster allocation explain API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-allocation-explain). Without a body, it explains the first unassigned shard it finds — maybe not yours.
-
-</details>
+:::
 
 **Expected result** (excerpt):
 
@@ -128,12 +116,9 @@ Look at the [cluster allocation explain API](https://www.elastic.co/docs/api/doc
 
 A deployment script must wait until the cluster is at least `yellow`, for 30 seconds at most. Write the request it sends.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the `wait_for_status` and `timeout` parameters of the cluster health API.
-
-</details>
+:::
 
 **Expected result** (excerpt):
 
@@ -151,12 +136,9 @@ Reference: [Nodes stats API](https://www.elastic.co/docs/api/doc/elasticsearch/o
 
 The responses of this API are huge. For each step, keep **only** the node name and the metrics asked for.
 
-<details>
-<summary>Hint (for all of part B)</summary>
-
+:::hint[Hint (for all of part B)]
 The nodes stats API takes a metric in its path (`jvm`, `os`, `fs`, `indices`…), and every API accepts a [`filter_path`](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options#common-options-response-filtering) parameter, with `*` wildcards: `nodes.*.name`.
-
-</details>
+:::
 
 ### Step 1: Heap usage
 
@@ -249,12 +231,9 @@ Reference: [Slow query and index logging](https://www.elastic.co/docs/reference/
 
 On `slowlog-test`, log the **query** phase of the searches that take longer than 500 ms as `warn`, 250 ms as `info`, 100 ms as `debug`, and 50 ms as `trace`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 These are dynamic index settings: `index.search.slowlog.threshold.<phase>.<level>`, changed with the update index settings API.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -277,12 +256,9 @@ With the Docker image, every log goes to the standard output: `docker logs <cont
 
 Search `slowlog-test` for the documents whose `content` holds a term matching the pattern `*long*content*`, up to 100 hits.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [term-level queries](https://www.elastic.co/docs/reference/query-languages/query-dsl/term-level-queries): one takes a pattern with `*`.
-
-</details>
+:::
 
 **Question**: how many hits? Why? (Think about what the pattern is matched against: the text, or each of its terms?)
 
@@ -318,12 +294,9 @@ A leading wildcard has to walk every term of the index. Rewrite the search of st
 
 Show the slow log settings of `slowlog-test` — defaults included, nothing else. Then turn off the four thresholds you set.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `include_defaults` and `filter_path` are parameters of the get index settings API. A threshold of `-1` turns it off.
-
-</details>
+:::
 
 ## Success criteria
 

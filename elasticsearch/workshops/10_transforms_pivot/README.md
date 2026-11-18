@@ -68,12 +68,9 @@ Without creating anything, get **one document per customer** from `orders`, with
 - `orders`: the number of orders;
 - `total_spent`: the sum of `total`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The transform API has an endpoint that runs a configuration and returns its first documents, without saving it. A `pivot` takes a `group_by` — the same sources as a `composite` aggregation — and `aggregations`.
-
-</details>
+:::
 
 **Expected result** (some of the documents):
 
@@ -100,12 +97,9 @@ Same preview, but:
 - add `categories`, the number of **distinct** categories bought;
 - add `avg_basket`, computed **from** `total_spent` and `orders` — not with an `avg`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `source` of a transform takes a `query`, as a search does. For `avg_basket`, look at the pipeline aggregation that runs a script on the values of other aggregations of the same bucket.
-
-</details>
+:::
 
 **Expected result** (some of the documents):
 
@@ -124,12 +118,9 @@ The `source` of a transform takes a `query`, as a search does. For `avg_basket`,
 
 Save the pivot of step 2 as a transform `customers`, writing to the index `customers`. Then start it.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The configuration is the one of the preview, plus a `dest`. Creating a transform and starting it are two different calls.
-
-</details>
+:::
 
 Check that the index `customers` holds **5** documents:
 
@@ -150,12 +141,9 @@ GET /customers/_count
 
 Get the state of the transform `customers` and its counters.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Every transform has a `_stats` endpoint.
-
-</details>
+:::
 
 **Expected result** (part of it):
 
@@ -180,12 +168,9 @@ Every transform has a `_stats` endpoint.
 
 The index `customers` is an index like any other. Get the **two** customers who spent the most, best first, keeping only `customer_id` and `total_spent` in `_source`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A plain `_search`: `sort`, `size`, and source filtering.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -206,12 +191,9 @@ A plain `_search`: `sort`, `size`, and source filtering.
 
 Create and start a transform `daily-revenue`, writing to `daily-revenue`: one document per **country and day**, with `revenue` (the sum of `total`) and `orders` (the number of orders), all orders included. Then get the revenue of France on October 1st.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `group_by` takes several sources: each combination of their values is a group. One of them buckets dates by day.
-
-</details>
+:::
 
 **Expected result** (the search on `daily-revenue`):
 

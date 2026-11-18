@@ -5,3 +5,10 @@ node_modules/
 deck.generated.md
 .training-kit/
 build/
+
+# What the workshops produce when they are run.
+dist/
+target/
+coverage/
+.env.local
+.env.*.local

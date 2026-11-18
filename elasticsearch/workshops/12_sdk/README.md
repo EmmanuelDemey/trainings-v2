@@ -46,12 +46,9 @@ export async function countByGenre(client) {}        // → { genre: count, … 
 
 `connect()` returns a client for the cluster at `ES_URL` (default `http://localhost:9200`), as the user `elastic` with the password of `ES_PASSWORD`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The client is the `Client` class of `@elastic/elasticsearch`. Look at [connecting](https://www.elastic.co/docs/reference/elasticsearch/clients/javascript/connecting): `node` and `auth`.
-
-</details>
+:::
 
 **Question**: what would you use in production instead of a user and a password? And for a cluster in HTTPS with a self-signed certificate?
 
@@ -59,12 +56,9 @@ The client is the `Client` class of `@elastic/elasticsearch`. Look at [connectin
 
 `createIndex(client)` creates the index `movies`: 1 shard, 0 replicas, with `title` (`text`), `genre` (`keyword`) and `year` (`integer`).
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The client mirrors the REST API: `PUT /movies` is `client.indices.create(…)`. The body of the request becomes the properties of its argument.
-
-</details>
+:::
 
 **Question**: compare your code with the `PUT /movies` you would write in Dev Tools. What changes?
 
@@ -72,12 +66,9 @@ The client mirrors the REST API: `PUT /movies` is `client.indices.create(…)`. 
 
 `load(client, movies)` indexes an array of movies into `movies` with **one** call that cuts the work into `_bulk` requests, makes them searchable at the end, and returns the number of movies indexed.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [client helpers](https://www.elastic.co/docs/reference/elasticsearch/clients/javascript/client-helpers): one of them takes a `datasource`, and asks for each document what to do with it. Look at what it resolves with.
-
-</details>
+:::
 
 **Question**: what does that helper do that a plain `client.bulk` does not?
 
@@ -86,12 +77,9 @@ Look at the [client helpers](https://www.elastic.co/docs/reference/elasticsearch
 - `searchByTitle(client, text)` returns the **titles** of the movies whose `title` matches `text` (full text).
 - `countByGenre(client)` returns the number of movies per `genre`, as an object — `{ 'sci-fi': 2, comedy: 1 }` — with no hits fetched.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `client.search` takes the same `query` and `aggs` as the search API of Dev Tools. The response holds `hits.hits` and `aggregations`. Workshops 5 (search) and 6 (aggregations) hold the queries you need.
-
-</details>
+:::
 
 ### Step 5: Try it against your cluster
 
@@ -150,12 +138,9 @@ After all the tests, it closes the client and stops the container. Two tests:
 - `finds the movies whose title matches`: searching `matrix` returns 2 titles;
 - `counts the movies of each genre`: `{ 'sci-fi': 2, comedy: 1 }`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The container has methods for its HTTP URL, its user and its password. `beforeAll` and `afterAll` take a timeout as their second argument.
-
-</details>
+:::
 
 ### Step 2: Run the tests
 

@@ -97,12 +97,9 @@ Ajoutez ensuite `logs-lab-*` aux index de l'app Security : **Stack Management** 
 2. Ouvrez `ws-02`. Onglet **Uncommon processes** : lesquels ?
 3. Onglet **Events** : filtrez sur `event.category: process` et lisez la chaîne de parents.
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 `winword.exe` → `powershell.exe` (`-enc`) → `updater.exe`, qui lance ensuite `whoami.exe` et `net.exe`.
-
-</details>
+:::
 
 ## Exercice 2 — Users et Network
 
@@ -239,28 +236,22 @@ POST /_query?format=txt
 }
 ```
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 | Règle | Alertes |
 |-------|---------|
 | SSH brute force followed by a success | 5 (une par événement de la séquence) |
 | Encoded PowerShell command | 1 |
 | Repeated failed logons from one IP | 1 |
 | Large upload to one destination | 1 |
-
-</details>
+:::
 
 ## Exercice 9 — MITRE ATT&CK coverage
 
 **Rules** → **MITRE ATT&CK® coverage** : vos quatre règles couvrent Execution, Credential Access et Exfiltration. Quelles tactiques du jeu de données restent sans règle ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 Command and Control (le beacon), Discovery (`whoami`, `net group`), Lateral Movement (SMB vers `10.0.0.20`), Credential Access par dump LSASS — le TP 7 les chasse.
-
-</details>
+:::
 
 ## Critères de succès
 

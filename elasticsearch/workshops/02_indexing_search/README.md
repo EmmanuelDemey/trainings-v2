@@ -26,12 +26,9 @@ Reference: [Elasticsearch REST APIs](https://www.elastic.co/docs/api/doc/elastic
 
 Create an index named `products`, with **one primary shard and no replica**, and no explicit mapping: let Elasticsearch infer it from the documents.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [create index API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-create). The number of shards and replicas are index **settings**.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -59,12 +56,9 @@ Index these five products, each with the ID shown before it (`1` to `5`):
 
 Then count the documents of the index.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [index API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-index) takes the ID in the path. Five requests are fine; `_bulk` does it in one. Counting has an API of its own: `_count`.
-
-</details>
+:::
 
 **Expected result** (the count):
 

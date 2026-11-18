@@ -127,9 +127,7 @@ Résultat attendu :
 2. Quel est l'intervalle entre deux connexions ?
 3. Qui a lancé `updater.exe` ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 1. Six connexions de 1 024 octets (le beacon) et une de 2 048 (l'exfiltration, sur la même session C2).
 2. 60 secondes — une régularité qu'aucun humain ne produit.
 3. `powershell.exe`, lui-même lancé par `winword.exe` :
@@ -146,8 +144,7 @@ Résultat attendu :
 ```json
 { "hits": { "hits": [{ "_source": { "process": { "parent": { "name": "powershell.exe" } } } }] } }
 ```
-
-</details>
+:::
 
 **Livrable** : une règle ES|QL *Beaconing* — `connections >= 5` vers une même destination en 10 minutes.
 
@@ -184,13 +181,10 @@ Résultat attendu (extrait) :
 1. Que fait `rundll32.exe comsvcs.dll, MiniDump 624 …` ?
 2. Comment l'adversaire est-il arrivé sur `db-01` ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 1. Il **dumpe la mémoire de LSASS** (PID 624) : les identifiants de tous les comptes connectés à `db-01` — T1003.001.
 2. Par **SMB** depuis `ws-02` : `updater.exe` ouvre une connexion vers `10.0.0.20:445` à 10:15, une minute avant le dump.
-
-</details>
+:::
 
 **Livrable** : une règle EQL *LSASS dump via comsvcs.dll*, severity **Critical**.
 
@@ -240,12 +234,9 @@ Résultat attendu :
 
 **Question** : quel est l'événement `?`, et faut-il creuser ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 La connexion de `chrome.exe` vers `142.250.74.110` — du trafic web ordinaire, vu une fois, gros volume **entrant**. On s'arrête : c'est expliqué. On le **note** dans le case, pour que l'équipe suivante ne refasse pas le travail.
-
-</details>
+:::
 
 **Livrable** : la kill chain complète, en commentaire du case, avec l'heure de chaque étape.
 
@@ -277,14 +268,11 @@ Résultat attendu :
 2. Qu'a fait l'adversaire sur `web-01` après le script ?
 3. Quelles réponses proposez-vous, dans quel ordre ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 1. La même **infrastructure** : `198.51.100.7` sert le script de `web-01` et le C2 de `ws-02`.
 2. `crontab -l` à 08:03 — il regarde la persistance possible. À vérifier sur la machine : une entrée cron a-t-elle été ajoutée ?
 3. **Contenir** : isoler `ws-02`, `db-01` et `web-01` ; bloquer `198.51.100.7` et `203.0.113.50`. **Éradiquer** : supprimer `updater.exe`, `/tmp/x.sh`, vérifier cron. **Récupérer** : réinitialiser `admin`, `alice`, et **tous** les comptes connectés à `db-01` (dump LSASS). **Apprendre** : les règles des missions 1 et 2.
-
-</details>
+:::
 
 ## En équipe
 

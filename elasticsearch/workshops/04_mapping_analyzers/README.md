@@ -44,12 +44,9 @@ Create the `blog_posts` index — one primary shard, no replica — with a custo
 | `author_location` | geographic searches |
 | `metadata` | an object kept in the document, but **not indexed at all** |
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Analyzers are declared in the index **settings**, under `analysis.analyzer`, then referenced by name from a field. A field can be indexed in several ways with [multi-fields](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/multi-fields) (`fields`). For `metadata`, look at the [`enabled`](https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/enabled) parameter.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -100,12 +97,9 @@ Index these three posts, with the IDs `1`, `2` and `3`:
 ]
 ```
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 One request per document with the [index API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-index), or all at once with [`_bulk`](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-bulk) — one action line, then one document line.
-
-</details>
+:::
 
 ### Step 3: Put each field type to work
 
@@ -220,12 +214,9 @@ Index this fourth post, ID `4` — it carries a `new_field` the mapping does not
 
 Then look at the mapping **of that field only**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 There is an API to [get the mapping of one field](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-get-field-mapping), rather than the whole index.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -291,12 +282,9 @@ POST /books-2025/_bulk?refresh=true
 
 The application queries `books`, never `books-2025`. Make `books` an **alias** of `books-2025`, then count the documents through it.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [aliases API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-update-aliases) takes a list of `actions`.
-
-</details>
+:::
 
 **Expected result** (the count):
 
@@ -310,12 +298,9 @@ The [aliases API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/op
 
 Create the alias `books-camus`: on `books-2025`, it only shows the books whose `author` matches `Camus`. Count through it.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 An alias can carry a `filter`: a query. The one you need is `{ "match": { "author": "Camus" } }`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -335,23 +320,17 @@ Create the index template `books`, so that every future `books-*` index gets:
 - this mapping: `title` a `text` with the `english` analyzer, `author` a `text` with a `keyword` sub-field, `year` and `stock` `integer`;
 - the alias `books-next`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [index template API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-indices-put-index-template): `index_patterns` says which indices, `template` holds `settings`, `mappings` and `aliases`.
-
-</details>
+:::
 
 ### Step 9: Simulate before creating
 
 **Without creating it**, ask Elasticsearch what `books-2026` would look like if it were created now.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The index template API has a `_simulate_index` endpoint.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -398,12 +377,9 @@ Load these two books into `books-2026` — **without creating the index first** 
 
 Move the alias `books` from `books-2025` to `books-2026` so that **no request ever sees it empty, nor pointing at both**. Then count through `books`, and ask which index `books` points at.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The actions of one call to the aliases API are applied atomically.
-
-</details>
+:::
 
 **Expected result** (the count, then the alias):
 

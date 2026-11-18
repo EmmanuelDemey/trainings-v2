@@ -69,12 +69,9 @@ Reference: [Query DSL](https://docs.opensearch.org/latest/query-dsl/).
 
 Find the restaurants whose **description** mentions "fish". Don't return the `_source`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `match` query. `"_source": false` keeps the response short.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -93,12 +90,9 @@ A `match` query. `"_source": false` keeps the response short.
 
 Find the restaurants that serve "fresh pasta" — both words, **side by side and in this order**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `match_phrase`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -115,12 +109,9 @@ Find the restaurants that serve "fresh pasta" — both words, **side by side and
 
 Look for the restaurant named exactly "Sushi Zen" with a `term` query on the `name` field. Then fix the query so that it finds it.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `name` is a `text`: it is indexed lowercased, word by word. Its sub-field keeps the value as is.
-
-</details>
+:::
 
 **Expected result** (the fixed query):
 
@@ -137,12 +128,9 @@ Look for the restaurant named exactly "Sushi Zen" with a `term` query on the `na
 
 The user types "cuisine", ticks the cities **Paris** and **Lyon**, and a budget of **€40 at most**. Write the query: only the typed text may count in the score. Return the name only.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `bool`: the text in `must`, the ticked boxes in `filter` (`terms`, `range`).
-
-</details>
+:::
 
 **Expected result**:
 
@@ -164,12 +152,9 @@ A `bool`: the text in `must`, the ticked boxes in `filter` (`terms`, `range`).
 
 Search "tart" in both the name and the description, a word found in the **name** being worth **three times** more.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `multi_match`, and the `field^3` notation.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -181,12 +166,9 @@ Search "tart" in both the name and the description, a word found in the **name**
 
 Search "cuisine" in the description, **multiplying** the score by the restaurant's `rating`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `function_score` with `field_value_factor` and `"boost_mode": "multiply"`.
-
-</details>
+:::
 
 **Expected result**:
 

@@ -42,12 +42,9 @@ Reference: [Compact and aligned text (CAT) APIs](https://www.elastic.co/docs/api
 
 List every index of the cluster, **with the column headers**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `_cat` API about indices. One short URL parameter adds the headers.
-
-</details>
+:::
 
 **Question**: what do the columns `pri`, `rep`, `docs.count` and `store.size` mean? Why is `logs-2023.11` `yellow`?
 
@@ -55,12 +52,9 @@ The `_cat` API about indices. One short URL parameter adds the headers.
 
 List the indices with **only** the columns `index`, `health`, `docs.count` and `store.size`, the **largest first**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Every _cat API takes the same parameters: one picks the columns, another sorts (`column:desc`).
-
-</details>
+:::
 
 **Try**: the system indices, starting with a `.`, do not show. Find the parameter that adds them.
 
@@ -68,12 +62,9 @@ Every _cat API takes the same parameters: one picks the columns, another sorts (
 
 For `logs-2023.11` only, show for each shard: `index`, `shard`, `prirep`, `state` and the **reason** why it is unassigned — in JSON.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `_cat` API about shards takes an index in its path. `?help` on any _cat API lists the columns it can show.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -94,12 +85,9 @@ The `_cat` API about shards takes an index in its path. `?help` on any _cat API 
 
 Show the disk usage and the number of shards **per node**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The `_cat` API about shard **allocation**.
-
-</details>
+:::
 
 **Question**: what is the row named `UNASSIGNED`? At which disk percentage does Elasticsearch stop putting new shards on a node?
 
@@ -107,12 +95,9 @@ The `_cat` API about shard **allocation**.
 
 Show the cluster-level changes waiting for the master node.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Its name is the one of a queue of tasks not done yet.
-
-</details>
+:::
 
 **Expected result** (on a quiet cluster):
 
@@ -126,12 +111,9 @@ Its name is the one of a queue of tasks not done yet.
 
 List the nodes with only `name`, `heap.percent`, `ram.percent`, `cpu` and `node.role`, in JSON.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The same column and format parameters as before, on the `_cat` API about nodes.
-
-</details>
+:::
 
 **Question**: the _cat APIs are meant for humans. What should a monitoring script call instead?
 

@@ -34,12 +34,9 @@ Reference: [Installing OpenSearch with Docker](https://docs.opensearch.org/lates
 
 Ask the cluster for its version and its distribution.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The root `/` of the API.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -53,12 +50,9 @@ The root `/` of the API.
 
 Display the health of the cluster, then the list of its nodes with their roles, as a table.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `_cluster/health`, then a `_cat` API — `?v` adds the headers.
-
-</details>
+:::
 
 **Expected result** (the health):
 
@@ -72,12 +66,9 @@ Display the health of the cluster, then the list of its nodes with their roles, 
 
 Create a `hello` index with **1 shard** and **1 replica**, then display the health of this index.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `PUT /hello` with a `settings` block. The health of an index: `_cluster/health/<index>`, or `_cat/indices`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -91,12 +82,9 @@ Create a `hello` index with **1 shard** and **1 replica**, then display the heal
 
 Without recreating the index, make it `green`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `number_of_replicas` is a **dynamic** setting: `PUT /hello/_settings`.
-
-</details>
+:::
 
 **Expected result** (the health of the index):
 
@@ -108,12 +96,9 @@ Without recreating the index, make it `green`.
 
 From a terminal, list the indices with `curl`, showing only the `index`, `health` and `docs.count` columns.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `_cat/indices?v&h=…`. In Dev Tools, the wrench icon → **Copy as cURL** gives you the command.
-
-</details>
+:::
 
 ## Success criteria
 

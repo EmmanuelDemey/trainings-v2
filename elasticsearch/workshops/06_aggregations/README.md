@@ -111,12 +111,9 @@ In **a single request**, compute:
 - `avg_views`: the average of `views`, on its own;
 - `max_views`: the maximum of `views`, on its own.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Look at the [metrics aggregations](https://www.elastic.co/docs/reference/aggregations/metrics): one of them returns the five values together. Several aggregations can sit side by side under the same `aggs` object, each under its own name.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -143,12 +140,9 @@ Look at the [metrics aggregations](https://www.elastic.co/docs/reference/aggrega
 
 Name the aggregation `posts_per_author`: one bucket per author, with the number of posts each one wrote.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A [bucket aggregation](https://www.elastic.co/docs/reference/aggregations/bucket) groups documents by the distinct values of a field. `author` is a `keyword`: it can be grouped on as is.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -172,12 +166,9 @@ A [bucket aggregation](https://www.elastic.co/docs/reference/aggregations/bucket
 
 Name the aggregation `posts_per_month`: one bucket per calendar month of `published_date`, its key shown as `2023-10`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 There is a histogram made for dates. Read the difference between `calendar_interval` and `fixed_interval`, and look at its `format` parameter for the `key_as_string`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -200,12 +191,9 @@ There is a histogram made for dates. Read the difference between `calendar_inter
 
 Name the aggregation `stats_per_author`: for each author, compute `avg_views` (average views), `avg_rating` (average rating) and `total_views` (sum of views).
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A bucket aggregation can hold its own `aggs`: they are then computed once per bucket, on the documents of that bucket only.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -241,12 +229,9 @@ A bucket aggregation can hold its own `aggs`: they are then computed once per bu
 
 Keep the `stats_per_author` buckets with their `avg_views`, and add next to them an aggregation `avg_of_avg_views`: the average of the per-author averages.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A [pipeline aggregation](https://www.elastic.co/docs/reference/aggregations/pipeline) works on the output of other aggregations, not on documents. It points at them with a `buckets_path`, whose syntax is `parent>child`.
-
-</details>
+:::
 
 **Expected result**:
 

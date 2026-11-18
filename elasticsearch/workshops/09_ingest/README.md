@@ -52,12 +52,9 @@ Reference: [Ingest pipelines](https://www.elastic.co/docs/manage-data/ingest/tra
 
 Test, **without creating a pipeline**, a `grok` processor on line 1. It extracts `client.ip`, `http.method`, `url.path`, `http.status` and `duration_ms` — the last two as **integers**.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [simulate API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-ingest-simulate) takes a `pipeline` and some `docs`. The [`grok` processor](https://www.elastic.co/docs/reference/enrich-processor/grok-processor) has patterns for an IP, a word, a URL path and a number; `%{NUMBER:field:int}` converts on the fly.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -84,12 +81,9 @@ The [simulate API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/o
 
 Add to the pipeline you simulate a processor that reads `timestamp` and writes `@timestamp`, then one that removes `timestamp`. Simulate it on line 1.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [`date` processor](https://www.elastic.co/docs/reference/enrich-processor/date-processor) takes the formats it should try, in the Java syntax. Then the [`remove` processor](https://www.elastic.co/docs/reference/enrich-processor/remove-processor).
-
-</details>
+:::
 
 **Expected result**:
 
@@ -105,12 +99,9 @@ The [`date` processor](https://www.elastic.co/docs/reference/enrich-processor/da
 
 Add a field `event.outcome`: `failure` when the status is **400 or more**, `success` otherwise. Simulate on lines 1 and 2.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Every processor accepts an `if`: a Painless condition on `ctx`, the document.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -127,12 +118,9 @@ Every processor accepts an `if`: a Painless condition on `ctx`, the document.
 
 Simulate on line 4. The pipeline fails, and in production the document would be **lost**. Make the pipeline keep it instead: when a processor fails, set `event.kind` to `pipeline_error`, and keep the reason in `error.message`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A pipeline — or a processor — can have an `on_failure` list of processors. `{{ _ingest.on_failure_message }}` holds the reason.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -150,12 +138,9 @@ A pipeline — or a processor — can have an `on_failure` list of processors. `
 
 Save the pipeline under the name `weblogs`. Index line 1 in `weblogs` with the ID `1`, **naming the pipeline in the request**, then read the document back.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [create pipeline API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-ingest-put-pipeline) takes the `processors` and `on_failure` you simulated. The index API has a `pipeline` parameter.
-
-</details>
+:::
 
 **Expected result** (the read):
 
@@ -174,12 +159,9 @@ The [create pipeline API](https://www.elastic.co/docs/api/doc/elasticsearch/oper
 
 The applications that write to `weblogs` should not have to name the pipeline. Make it the **default** pipeline of the index, then index lines 2, 3 and 4 — IDs `2`, `3`, `4` — in one request, without naming it. Count the failures, then the lines that did not parse.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `index.default_pipeline` is a dynamic index setting: it changes on a live index.
-
-</details>
+:::
 
 **Expected result** (the two counts):
 

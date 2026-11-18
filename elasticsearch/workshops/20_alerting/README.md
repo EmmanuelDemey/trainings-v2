@@ -46,23 +46,17 @@ Reference: [Alerting](https://www.elastic.co/docs/explore-analyze/alerts-cases/a
 
 In Kibana, create a rule named `cluster-health-monitor`, tagged `cluster`, `health`, `ops`, that fires when `cluster_health_logs` holds a document of the **last 5 minutes** whose `status` is `yellow` or `red`. It checks **every minute**, and notifies **every time** the alert is active.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The rules live under **Stack Management**. Look for the rule type that runs a query on an index. Its query is written in Query DSL: one condition on time, one on the status — which of the two should score?
-
-</details>
+:::
 
 ### Step 2: The action
 
 Give the rule a **Server log** action whose message names the cluster, its status, its number of nodes and of unassigned shards, the date, and tells what to check.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The message is a Mustache template. The **Add variable** button of the action lists what the rule type exposes: look at what it offers about the documents that matched.
-
-</details>
+:::
 
 ### Step 3: Make it fire
 
@@ -87,12 +81,9 @@ Create two connectors:
 - `ops-webhook-notifier`: a **webhook**, `POST` to your URL, with the headers `Content-Type: application/json` and `X-Alert-Source: elasticsearch-ops`. Test it.
 - `alert-history-index`: it **indexes** each alert into `alert-history`, refreshed, with `@timestamp` as time field.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Connectors live next to the rules, in **Stack Management**. Reference: [Connectors](https://www.elastic.co/docs/reference/kibana/connectors-kibana).
-
-</details>
+:::
 
 **Question**: why are connectors separate from the rules?
 

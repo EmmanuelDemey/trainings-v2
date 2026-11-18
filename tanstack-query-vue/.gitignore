@@ -11,6 +11,7 @@ dist/
 coverage/
 .env.local
 .env.*.local
+target/
 
 # Copies written by the sync (`pnpm run sync`, also run by `pnpm install` and
 # `pnpm run build`): the single source is ../tanstack-query-common/ — the fake

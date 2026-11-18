@@ -11,6 +11,7 @@ dist/
 coverage/
 .env.local
 .env.*.local
+target/
 
 # Copies of ../tanstack-query-common (the fake API, the Network panel and the
 # shared specs), written into every workshop and solution by

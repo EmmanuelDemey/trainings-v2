@@ -35,12 +35,9 @@ Index this book in `books-2025`, **with the ID `1`**:
 { "title": "The Little Prince", "author": "Antoine de Saint-Exupéry", "year": 1943, "stock": 3 }
 ```
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [index API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-index): the ID goes in the path, after `_doc`. Which HTTP method fits a resource whose URL you know?
-
-</details>
+:::
 
 **Expected result**:
 
@@ -61,12 +58,9 @@ Index this book and **let Elasticsearch generate its ID**:
 { "title": "The Stranger", "author": "Albert Camus", "year": 1942, "stock": 5 }
 ```
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 Same API, no ID in the path — and so not the same HTTP method as step 2.
-
-</details>
+:::
 
 **Expected result**: `"result": "created"`, and an `_id` you did not choose.
 
@@ -90,12 +84,9 @@ Read back the document `1`.
 
 Set the `stock` of book `1` to `2`, **sending only that field**. Read it back: the title must still be there.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The [update API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-update) merges a partial document, given under `doc`, into the stored one.
-
-</details>
+:::
 
 **Expected result** (the read):
 
@@ -110,12 +101,9 @@ The [update API](https://www.elastic.co/docs/api/doc/elasticsearch/operation/ope
 
 One more copy was sold: **decrement** the stock of book `1` by one, without reading it first — the number sold given as a parameter. Then read back **only** its `stock`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The update API also takes a `script`, in Painless: the document is `ctx._source`. Values are passed in `params`. A read can trim the `_source` with a query parameter.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -167,12 +155,9 @@ In **one request**, on `books-2025`:
 9782253006329  { "title": "Germinal",          "author": "Émile Zola",               "year": 1885, "stock": 4 }
 ```
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The body is NDJSON: one **action** line (`index`, `create`, `update`, `delete`, with its `_id`), then — except for `delete` — one line of document. Each on a single line, and the body ends with a newline. `?refresh=true` makes the result searchable at once.
-
-</details>
+:::
 
 **Expected result**:
 

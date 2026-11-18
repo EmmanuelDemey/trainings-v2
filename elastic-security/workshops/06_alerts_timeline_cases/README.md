@@ -98,12 +98,9 @@ Ce TP part des **règles du TP 5** : si vous ne les avez pas, créez au moins `E
 3. Onglet **Insights** → **Prevalence** : `198.51.100.7` est-elle vue sur un ou plusieurs hôtes ?
 4. Passez l'alerte en **Acknowledged**, assignez-la-vous.
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 `ws-02`. L'IP `198.51.100.7` est vue sur **deux** hôtes : `ws-02` (C2) et `web-01` (téléchargement du script) — un indice qu'il s'agit d'une seule campagne.
-
-</details>
+:::
 
 ## Exercice 2 — L'analyzer
 
@@ -149,9 +146,7 @@ Résultat attendu :
 
 **Question** : quelles sont les étapes, et leurs tactiques MITRE ATT&CK ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 | Heure (jeu d'origine) | Événement | Tactique |
 |-----------------------|-----------|----------|
 | 09:58 | `winword.exe` ouvre `invoice.docm` | Initial Access (phishing) |
@@ -161,8 +156,7 @@ Résultat attendu :
 | 10:12 | `whoami /all`, `net group "Domain Admins"` | Discovery |
 | 10:15 | SMB (445) vers `10.0.0.20` | Lateral Movement |
 | 10:20 | 48 Mo vers `198.51.100.7` | Exfiltration |
-
-</details>
+:::
 
 ## Exercice 4 — L'onglet Correlation
 
@@ -208,12 +202,9 @@ Résultat attendu :
 2. Dans le case, ajoutez une **observable** : l'IP `198.51.100.7`.
 3. **Question** : quelle règle aurait détecté cette intrusion **plus tôt** ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 Une règle sur le **beacon** (Command and Control), dès 10:05 — au lieu de 10:20 pour l'exfiltration. Ou une règle *New terms* sur `destination.ip` par `host.name`. Le TP 7 l'écrit.
-
-</details>
+:::
 
 ## Exercice 7 (optionnel) — Pousser le case vers TheHive
 
@@ -252,12 +243,9 @@ Le SOC suit ses incidents dans un outil dédié — Jira, ServiceNow, TheHive. U
 
 **Question** : la severity *High* de Kibana, que devient-elle dans TheHive ? Et dans quel sens va la synchronisation ?
 
-<details>
-<summary>Réponse</summary>
-
+:::hint[Réponse]
 *High* devient la severity **3** de TheHive (1 *Low* → 4 *Critical*) ; titre, description, tags et commentaires suivent. La synchronisation va **dans un seul sens**, de Kibana vers TheHive, et seulement au **push** : ce qui change dans TheHive ne revient pas dans Kibana, et un commentaire Kibana n'arrive qu'au push suivant.
-
-</details>
+:::
 
 Pour arrêter TheHive : `docker compose down -v`, dans `thehive/`.
 

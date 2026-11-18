@@ -11,6 +11,7 @@ dist/
 coverage/
 .env.local
 .env.*.local
+target/
 
 # Written by unplugin-vue-components when workshop 8 runs.
 components.d.ts

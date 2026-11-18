@@ -11,6 +11,7 @@ dist/
 coverage/
 .env.local
 .env.*.local
+target/
 
 # Copies of ../sentry-common/testkit (the fake Sentry transport the specs read),
 # written into every workshop and solution by `pnpm run sync` — which

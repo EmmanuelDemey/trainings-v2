@@ -74,12 +74,9 @@ Reference: [Search features](https://docs.opensearch.org/latest/search-plugins/s
 
 The restaurants from the **cheapest to the most expensive**, by name at equal price, **4 per page**. Show only the name and the price. Then ask for the **next page** without using `from`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 `sort` on `price` then `name.keyword`. Each hit carries a `sort` array: pass the one of the **last** hit to `search_after`.
-
-</details>
+:::
 
 **Expected result** (page 2):
 
@@ -102,12 +99,9 @@ The restaurants from the **cheapest to the most expensive**, by name at equal pr
 
 Search for "grilled" in the description, and wrap the matched terms in `<em>` … `</em>`. No `_source`.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `highlight` block with `pre_tags`, `post_tags` and `fields`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -126,12 +120,9 @@ A `highlight` block with `pre_tags`, `post_tags` and `fields`.
 
 Create a `restaurant_names` index (1 shard, 0 replicas) with a `suggest` field of type `completion`. Index three names: "Le Bouchon Lyonnais", "Le Vieux Port", "La Trattoria", with the `_id`s `1`, `5` and `4`. Then ask for the completions of "le".
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The mapping `{ "suggest": { "type": "completion" } }`, documents `{ "suggest": "Le Vieux Port" }`, then a `suggest` block with `prefix` and `completion.field`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -151,12 +142,9 @@ The mapping `{ "suggest": { "type": "completion" } }`, documents `{ "suggest": "
 
 You are at the Eiffel Tower (lat `48.8584`, lon `2.2945`). Find the restaurants less than **5 km** away, from the closest to the farthest, with the distance in km. Show only the name.
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 A `geo_distance` inside a `filter`, and a `_geo_distance` sort with `unit`.
-
-</details>
+:::
 
 **Expected result**:
 
@@ -184,12 +172,9 @@ One user wants to be told when a **Japanese** restaurant opens in **Lyon**, anot
 { "name": "Udon Lyon", "cuisine": "japanese", "city": "Lyon", "price": 15 }
 ```
 
-<details>
-<summary>Hint</summary>
-
+:::hint
 The mapping declares a `query` field of type `percolator`, **and** the fields the queries look at (`cuisine`, `city`, `price`). Then a `percolate` search with `document`.
-
-</details>
+:::
 
 **Expected result**:
 
