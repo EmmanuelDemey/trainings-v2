@@ -2,6 +2,8 @@
 
 > Turn loose links into a navigation landmark, and a grid of divs into a real data table.
 
+**Duration**: 40 min (30 min for the steps, 10 min to check with the screen reader and `verify`) · **Chapter**: 5 — Semantic HTML
+
 ## Goal
 
 Chapter 5 — The right element gives the right role, for free: a screen reader
@@ -169,6 +171,23 @@ Other ideas:
   or your screen reader's headings list). Is it logical?
 - Add a `<th scope="row">` on the last name of each row: what changes in the
   announcements?
+
+## For the trainer
+
+Where learners get stuck, most often:
+
+- **`aria-current="page"` copied on the same link in both pages**: in
+  `create.html`, it goes on *Add a person*. `verify` names the page and the link.
+- **`aria-current` written as `class="active"`**: nothing is announced. Use it to
+  show why the CSS styles from the attribute.
+- **The `id="people"` left on a `<div>` around the table**: `script.js` then
+  appends the rows outside the `<tbody>`. It has to move to the `<tbody>`.
+- **`<th>` without `scope`**: screen readers often guess right on a simple table,
+  so it "works" by ear — `scope="col"` makes it reliable, and `verify` checks it.
+- **The rows built with `innerHTML`**: it passes the checks, but it is an XSS
+  hole on real data. Ask for `createElement` and `textContent`.
+- **`list-style: none` and Safari**: VoiceOver on Safari may stop announcing a
+  list without bullets. Mention it; the menu here is short enough not to matter.
 
 ## Useful links
 

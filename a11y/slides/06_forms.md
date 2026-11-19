@@ -18,6 +18,10 @@ At the end of this chapter, you will be able to:
 - **Mark** required fields and **announce** errors a screen reader can hear
   (`aria-invalid`, `aria-describedby`, focus on the first error)
 
+<!--
+Four verbs, four blocks of the chapter: name, group, help, errors. All of them are applied in workshop 05 on the "Add a person" form.
+-->
+
 ---
 
 # Why forms matter
@@ -36,6 +40,10 @@ At the end of this chapter, you will be able to:
 ```
 
 - Every piece of that sentence comes from the **markup** — none from the CSS
+
+<!--
+Read the announced sentence aloud, slowly, then point at each part: the name comes from the label, the role from the element, the states from attributes. Nothing comes from the CSS — a red border is silent.
+-->
 
 ---
 
@@ -74,6 +82,10 @@ At the end of this chapter, you will be able to:
 </div>
 </div>
 
+<!--
+Demo: click the label, the field gets the focus. Then remove the for attribute and run the devtools accessibility pane: the name is gone.
+-->
+
 ---
 
 # Which label, when?
@@ -95,6 +107,10 @@ At the end of this chapter, you will be able to:
 <style>
 table { font-size: 0.8em; }
 </style>
+
+<!--
+The answer is almost always the first line. Insist on the last two rows: placeholder is not a label, and display: none removes the label for everyone.
+-->
 
 ---
 
@@ -120,6 +136,10 @@ table { font-size: 0.8em; }
 - WCAG **2.5.3** Label in Name (A): the accessible name must **contain** the
   visible text — voice users say what they see
 
+<!--
+Label in Name: a voice user says "click Search". If the accessible name is "Find in the site", the command fails.
+-->
+
 ---
 
 # Help the user fill in
@@ -135,7 +155,7 @@ table { font-size: 0.8em; }
 | `tel` | numeric keypad |
 | `url` | `/` and `.com` keys |
 | `number` | spinner, numeric keypad |
-| `date`, `time` | native, accessible pickers |
+| `date`, `time` | native pickers — **test them**: support varies |
 
 </div>
 <div style="flex: 1; min-width: 0;">
@@ -158,6 +178,10 @@ table { font-size: 0.8em; }
 
 </div>
 </div>
+
+<!--
+Show the mobile keyboard for email and tel if a phone is at hand. autocomplete is AA and cheap: one attribute per identity field.
+-->
 
 ---
 
@@ -196,6 +220,10 @@ table { font-size: 0.8em; }
 - Native alternative for a short suggestion list: `<input list="…">` +
   `<datalist>` — no JavaScript widget to rebuild
 
+<!--
+Labelled = what it is, described = how to fill it. The hint stays visible: the attribute is for screen readers, the text is for everyone.
+-->
+
 ---
 
 # `<fieldset>` + `<legend>` name a group
@@ -216,6 +244,10 @@ table { font-size: 0.8em; }
 - **Mandatory** for radio groups and checkbox groups; useful for any set of
   related fields: an address, bank details
 - WCAG **1.3.1** Info and Relationships (A)
+
+<!--
+Demo with NVDA: Tab into the group and hear the legend once. Without fieldset, each radio is announced alone — express what?
+-->
 
 ---
 
@@ -241,6 +273,10 @@ table { font-size: 0.8em; }
 <style>
 table { font-size: 0.8em; }
 </style>
+
+<!--
+Explain the asterisk once at the top of the form, hide it with aria-hidden. required gives both the announcement and the native check.
+-->
 
 ---
 
@@ -275,9 +311,50 @@ table { font-size: 0.8em; }
 - Field fixed? Remove `aria-invalid`, the message **and** the
   `aria-describedby`
 - `aria-errormessage`: support is still uneven — prefer `aria-describedby`
+- Success too: *"Person added"* in a `role="status"` region — WCAG **4.1.3**
+  Status Messages (AA), live regions in chapter 08
 
 </div>
 </div>
+
+<!--
+The four steps on submit are exactly the steps of workshop 05. The success message uses role="status": live regions are detailed in chapter 08.
+-->
+
+---
+
+# WCAG 2.2 — less typing, less memory
+
+<div style="display: flex; gap: 2em;">
+<div style="flex: 1; min-width: 0;">
+
+### 3.3.7 Redundant Entry (A)
+
+- Don't ask **twice** for what the user already gave in the same process
+- Pre-fill it, or offer a choice: *"Billing address same as shipping"*
+
+```html
+<input type="checkbox" id="same" checked />
+<label for="same">Same as the shipping address</label>
+```
+
+</div>
+<div style="flex: 1; min-width: 0;">
+
+### 3.3.8 Accessible Authentication (AA)
+
+- No **cognitive test** to log in: no memorising, no transcribing, no puzzle
+- Let **paste** and **password managers** work: never block `paste`, keep
+  `autocomplete="current-password"`
+- A puzzle CAPTCHA needs another way in — recognising objects is still
+  allowed at AA, not at **3.3.9** (AAA)
+
+</div>
+</div>
+
+<!--
+Two of the new WCAG 2.2 criteria, both about forms. Ask the room: who has a site that blocks paste in the password field? It fails 3.3.8.
+-->
 
 ---
 
@@ -297,6 +374,10 @@ table { font-size: 0.8em; }
 table { font-size: 0.85em; }
 </style>
 
+<!--
+A checklist the learners can reuse on their own forms. The last line is the fastest test: unplug the mouse.
+-->
+
 ---
 layout: cover
 ---
@@ -306,3 +387,7 @@ layout: cover
 ## Accessible forms
 
 `workshops/05_forms`
+
+<!--
+Transition: workshop 05 builds the "Add a person" form — labels, fieldset, autocomplete, error summary, focus on the first error, status message. `pnpm run verify --tp 05` checks it. Next chapter: ARIA, for what HTML cannot express.
+-->

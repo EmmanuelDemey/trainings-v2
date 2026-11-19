@@ -130,6 +130,10 @@ npx tsc -b --clean
 - `incremental: true` gives a single project the same `.tsbuildinfo` cache
 
 ---
+src: ../../typescript-common/slides/10_tooling/faster-builds.md
+---
+
+---
 
 # Linting — typescript-eslint
 

@@ -2,6 +2,8 @@
 
 > Let keyboard users skip the header, and always see where the focus is.
 
+**Duration**: 30 min (20 min for the steps, 10 min to check by hand and with `verify`) · **Chapter**: 4 — Focus and keyboard
+
 ## Goal
 
 Chapter 4 — Two things every keyboard user needs before anything else:
@@ -131,6 +133,25 @@ first Tab lands on the Home link.
   `position: sticky` and Tab back up the page: is the focus hidden?
 - Turn on the dark colour scheme of your OS: the page has one
   (`prefers-color-scheme`). Is your focus still contrasted enough?
+
+## For the trainer
+
+Where learners get stuck, most often:
+
+- **The skip link is hidden with `display: none`** or `visibility: hidden`: it
+  never gets the focus. `verify` then reports the first Tab on *Home*.
+- **The skip link is not the first element of the `<body>`**: added inside the
+  `<header>`, after the links, it is no longer the first Tab stop.
+- **Enter scrolls, but the next Tab goes back to the header**: `tabindex="-1"` is
+  missing on `<main>`. Show it in Firefox and Safari, where it is most visible.
+- **`:focus` instead of `:focus-visible`**: the ring appears after every mouse
+  click on a button. Not a WCAG failure, but users complain — the reason
+  designers ask for `outline: none`.
+- **The outline is invisible on the header**: the blue on blue is 1:1. Measure
+  it live with the devtools colour picker: the yellow `#ffbf47` gives 3.15:1 on
+  the light-theme blue, 5.3:1 on the dark one.
+- **Testing with the mouse**: ask everyone to put the mouse aside for the
+  whole check.
 
 ## Useful links
 

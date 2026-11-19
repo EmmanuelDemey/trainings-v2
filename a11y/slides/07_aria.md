@@ -20,6 +20,10 @@ At the end of this chapter, you will be able to:
   role, name, state, focus, keyboard
 - **Find** the right pattern in the ARIA Authoring Practices Guide
 
+<!--
+Five verbs. The key message of the chapter is the second one: no ARIA is better than bad ARIA. Workshop 06 makes the learners feel the cost of a custom widget.
+-->
+
 ---
 
 # WAI-ARIA in one slide
@@ -41,6 +45,10 @@ assistive tech what an element **is** and what **state** it is in.
 <style>
 table { font-size: 0.85em; }
 </style>
+
+<!--
+Three kinds of attributes. Insist on the quote: ARIA changes what is announced, never what happens.
+-->
 
 ---
 
@@ -65,6 +73,10 @@ table { font-size: 0.85em; }
 table { font-size: 0.8em; }
 </style>
 
+<!--
+Demo: a div role=checkbox. NVDA announces it — then try Tab and Space: nothing happens. Every ❌ line is code you now own.
+-->
+
 ---
 
 # The five rules of ARIA
@@ -76,7 +88,7 @@ From the W3C *Using ARIA* note:
 2. **Don't change native semantics** — `<h2 role="tab">` breaks the heading:
    wrap it, `<div role="tab"><h2>…</h2></div>`
 3. **Every interactive role is usable with the keyboard** — a `role="button"`
-   answers Enter **and** Space
+   answers Enter **and** Space, like a `<button>`
 4. **Never hide a focusable element** — no `aria-hidden="true"` or
    `role="presentation"` on something that takes the focus
 5. **Every interactive element has an accessible name** — from its content,
@@ -86,6 +98,10 @@ From the W3C *Using ARIA* note:
 
 > In the WebAIM Million, pages **with** ARIA have **more** detected errors
 > than pages without: ARIA is a sharp tool.
+
+<!--
+Rule 1 is the one to remember. The WebAIM Million figure: pages with ARIA average more errors — not because ARIA is bad, but because it is misused.
+-->
 
 ---
 
@@ -122,6 +138,10 @@ From the W3C *Using ARIA* note:
 > gives, for each pattern, the roles, states **and the keyboard contract**.
 > Start there before building any widget.
 
+<!--
+Left column: what HTML lacks. Right column: the most common misuses, seen in audits. Open the APG on the radio group pattern now — it is workshop 06.
+-->
+
 ---
 
 # The roles you will meet
@@ -146,6 +166,10 @@ From the W3C *Using ARIA* note:
 table { font-size: 0.75em; }
 </style>
 
+<!--
+No need to learn the list: know that categories exist, and that landmarks already come from the HTML5 elements of chapter 05.
+-->
+
 ---
 
 # States change — keep them in sync
@@ -158,9 +182,9 @@ table { font-size: 0.75em; }
 | `aria-expanded` | `true` / `false` | disclosure, menu button, accordion, tree item |
 | `aria-current` | `page`, `step`, `date`, `true` | current link in a navigation |
 | `aria-invalid` | `true` / `false` | field in error |
-| `aria-disabled` | `true` / `false` | disabled but still focusable (and discoverable) |
+| `aria-disabled` | `true` / `false` | disabled but still focusable — **you** block the action in JS |
 | `aria-busy` | `true` / `false` | region being updated |
-| `aria-hidden` | `true` | decorative content — never on something focusable |
+| `aria-hidden` | `true` (omit it otherwise) | decorative content — never on something focusable |
 
 <br />
 
@@ -170,6 +194,10 @@ table { font-size: 0.75em; }
 <style>
 table { font-size: 0.8em; }
 </style>
+
+<!--
+The most frequent ARIA bug in audits: a state set in the HTML and never updated by the JavaScript.
+-->
 
 ---
 
@@ -195,6 +223,10 @@ table { font-size: 0.8em; }
 <style>
 table { font-size: 0.85em; }
 </style>
+
+<!--
+The name computation order explains the chapter 06 rule: aria-labelledby and aria-label override the <label>.
+-->
 
 ---
 
@@ -223,6 +255,10 @@ toggle.addEventListener('click', () => {
 - Announced *"Filters, button, collapsed"*, then *"expanded"*
 - No JavaScript needed for a simple disclosure: `<details>` + `<summary>`
 
+<!--
+The state and the UI change on the same line of code. Show <details> as the zero-JavaScript alternative.
+-->
+
 ---
 
 # A more specific role on a native element
@@ -241,6 +277,10 @@ toggle.addEventListener('click', () => {
   button is **active / not** (a tool)
 - Allowed because it does not *break* the button's semantics — rule 2 is
   about `<h2 role="tab">`, not this
+
+<!--
+Refining a role is allowed; breaking one is not. Ask the room: switch or pressed for a mute button? (pressed: it is a tool, not a setting.)
+-->
 
 ---
 
@@ -263,6 +303,10 @@ toggle.addEventListener('click', () => {
 
 > ⚠️ This is workshop 06 because it is a **lesson**: in a real project,
 > style a native `<input type="radio">` instead.
+
+<!--
+This is the markup of workshop 06. Point at the roving tabindex: one Tab stop, the arrows move inside.
+-->
 
 ---
 
@@ -295,6 +339,10 @@ function check(radios, selected) {
   checks; Tab leaves the group
 - `event.key`, never the deprecated `keyCode`
 
+<!--
+The keyboard contract comes straight from the APG radio group page. preventDefault only on the keys we handle: Tab must still leave the group.
+-->
+
 ---
 
 # ARIA in components and in CSS
@@ -306,10 +354,11 @@ function check(radios, selected) {
 
 ```js
 class ToggleSwitch extends HTMLElement {
+  #internals = this.attachInternals();
   connectedCallback() {
-    // ARIA reflection: properties, not strings
-    this.role = 'switch';
-    this.ariaChecked = 'false';
+    // Default semantics: the page can still override them
+    this.#internals.role = 'switch';
+    this.#internals.ariaChecked = 'false';
     this.tabIndex = 0;
   }
 }
@@ -317,6 +366,8 @@ customElements.define('toggle-switch', ToggleSwitch);
 ```
 
 - Put the ARIA **in the component** once: nobody can forget it on a page
+- `ElementInternals` sets the defaults without writing attributes on the
+  host; `this.ariaChecked` (ARIA reflection) works too
 - Same in a framework: Angular CDK, React Aria, Radix (chapter 10)
 
 </div>
@@ -342,6 +393,10 @@ button[aria-pressed='true'] {
 </div>
 </div>
 
+<!--
+Two ways to make the ARIA impossible to forget: inside the component, and as the styling hook. The CSS selectors on state also catch a state that is not updated — it shows on screen.
+-->
+
 ---
 
 # Recap — before you write `role=`
@@ -359,6 +414,10 @@ button[aria-pressed='true'] {
 table { font-size: 0.85em; }
 </style>
 
+<!--
+The last line is not optional: an ARIA widget is not finished until it was tested with a screen reader.
+-->
+
 ---
 layout: cover
 ---
@@ -368,3 +427,7 @@ layout: cover
 ## A custom ARIA radio group
 
 `workshops/06_aria_radio`
+
+<!--
+Transition: workshop 06 rebuilds the Sex radios as a role=radiogroup with roving tabindex. `pnpm run verify --tp 06` checks the keyboard contract. Next chapter: complex components — modal, live regions — built on these rules.
+-->
