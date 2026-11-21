@@ -18,6 +18,10 @@ At the end of this chapter, you will be able to:
 - **Write** tests that find elements by **role and accessible name**
 - **Run** a manual audit: keyboard, screen reader, accessibility tree
 
+<!--
+Five verbs. The key message is the first one: a tool gives a floor, never a verdict. Workshop 08 ends on exactly that question.
+-->
+
 ---
 
 # Two kinds of evaluation
@@ -27,7 +31,8 @@ At the end of this chapter, you will be able to:
 
 ### Automated — fast, never tired
 
-- Finds about **30 to 40%** of the WCAG issues
+- Can fully test only **about a third** of the WCAG criteria
+  (Deque: ~57% of the issues *by volume*, because they are the frequent ones)
 - Missing `alt`, contrast, a field with no name, invalid ARIA, a missing `lang`
 - Runs on **every commit**: nothing that was fixed comes back
 
@@ -49,6 +54,10 @@ At the end of this chapter, you will be able to:
 > **Zero violation is not "accessible".** `<img alt="image">` passes every
 > tool. A modal that loses the focus passes most of them.
 
+<!--
+The figures differ by method: by criterion, a third at best; by volume of issues (Deque's 2021 study), a bit more than half. Either way, the other half needs a human. The RGAA audit is manual by design: its tests are run by a person.
+-->
+
 ---
 
 # The tools — which one, when
@@ -61,16 +70,20 @@ At the end of this chapter, you will be able to:
 | **Playwright** + `@axe-core/playwright` | **End-to-end**, in the CI | The axe rules on a real page, in every state |
 | `toMatchAriaSnapshot` | End-to-end | A **change** in the accessibility tree |
 | **Lighthouse**, **axe DevTools**, WAVE | **In the browser**, by hand | The axe rules, with a visual report |
-| Chrome DevTools — *Rendering* | In the browser | Colour vision deficiencies, contrast, `prefers-*` |
+| Chrome DevTools — *Rendering* | In the browser | Colour vision deficiencies, `prefers-*`, `forced-colors` |
 
 <br />
 
 > Lighthouse, axe DevTools, jest-axe and `@axe-core/playwright` share the same
-> engine: **axe-core** (Deque, open source).
+> engine: **axe-core** (Deque, open source) — Lighthouse runs a subset of its rules.
 
 <style>
 table { font-size: 0.8em; }
 </style>
+
+<!--
+Read the table top to bottom: the earlier, the cheaper. Stress that four rows are the same engine — running Lighthouse after axe DevTools finds nothing new.
+-->
 
 ---
 
@@ -99,6 +112,10 @@ export default [
 - The **cheapest** feedback: before the commit, before the review
 - Only sees the **source**: not the rendered page, not the CSS, not the state
 
+<!--
+jsx-a11y for React; eslint-plugin-vuejs-accessibility, eslint-plugin-svelte (a11y rules built into the compiler), angular-eslint template rules. Chapter 10 comes back to them per framework.
+-->
+
 ---
 
 # In the unit tests — query by role
@@ -120,6 +137,10 @@ it('shows an error for each empty required field', async () => {
 - A `<div onClick>` has no role `button`: the test **cannot find it**, and fails
 - The test is an **accessibility check for free** — and resists CSS refactors
 
+<!--
+Testing Library's priority list puts getByRole first for that reason. getByTestId is the last resort: it finds a div a screen reader cannot use.
+-->
+
 ---
 
 # End-to-end — axe-core in Playwright
@@ -129,7 +150,7 @@ npm init playwright@latest
 npm install -D @axe-core/playwright
 ```
 
-```ts {all|7-9|11-15}
+```ts {all|7-11|14-17}
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -145,11 +166,16 @@ test('the home page has no detectable violation', async ({ page }) => {
 
 // Audit a part of the page, in a given state
 await page.getByRole('button', { name: 'Details' }).first().click();
-await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
+const dialog = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
+expect(dialog.violations).toEqual([]);
 ```
 
 - Audit **every state**: the form in error, the dialog open, the menu expanded —
   axe only sees what is in the DOM **now**
+
+<!--
+The tags select the rule sets: WCAG 2.0, 2.1, 2.2, levels A and AA. Without withTags, axe also runs its best-practice rules — useful, but not a compliance claim. Asserting on an empty array prints the whole violation list when it fails.
+-->
 
 ---
 
@@ -175,6 +201,10 @@ test('the main navigation', async ({ page }) => {
   disappears — the regressions **axe does not flag**
 - `npx playwright test --update-snapshots` writes the first version
 
+<!--
+Demo: start from an empty toMatchAriaSnapshot(``), run with --update-snapshots, Playwright fills the template. Then turn a link into a span and watch it fail. Docs: playwright.dev/docs/aria-snapshots.
+-->
+
 ---
 
 # The workshops are graded the same way
@@ -198,6 +228,10 @@ const { violations } = await page.evaluate(() => window.axe.run(document));
 - **Playwright** drives a real Chromium: Tab, submit the form empty, open the dialog
 - Every element is found by **role and accessible name** — never by a CSS class
 - From workshop 08 on, **axe-core** runs on top: the engine of Lighthouse
+
+<!--
+Show the real file, scripts/verify.mjs: the learners have been graded by an end-to-end accessibility test since workshop 03. Each workshop replays the checks of the previous ones, so nothing fixed earlier comes back.
+-->
 
 ---
 
@@ -225,6 +259,10 @@ const { violations } = await page.evaluate(() => window.axe.run(document));
 </div>
 </div>
 
+<!--
+Demo: Rendering, achromatopsia on the Genea11y form — does anything rely on colour alone? Then axe DevTools, "Scan all of my page", and open one issue to show the "how to fix" link.
+-->
+
 ---
 
 # The manual audit — the checklist
@@ -237,7 +275,7 @@ const { violations } = await page.evaluate(() => window.axe.run(document));
 | The **accessibility tree** says what the page means | DevTools → Accessibility, full-page tree |
 | Dynamic **ARIA states** follow the UI | `aria-expanded`, `aria-invalid`, `aria-current` in the Elements panel |
 | The **screen reader** tells the story | Headings list, landmarks list, a form filled with eyes closed |
-| **Zoom** at 200% and 400% | No content lost, no horizontal scroll at 320 px width |
+| **Zoom** at 200% (1.4.4) and 400% (1.4.10) | No content lost, no horizontal scroll at 320 px width |
 
 <br />
 
@@ -248,6 +286,10 @@ const { violations } = await page.evaluate(() => window.axe.run(document));
 table { font-size: 0.8em; }
 </style>
 
+<!--
+This is the checklist of workshop 02, now that the learners know every topic behind it. A full compliance audit follows the RGAA method: 106 criteria, on a sample of pages, each with its tests.
+-->
+
 ---
 
 # Going further
@@ -257,6 +299,14 @@ table { font-size: 0.8em; }
 - [a11y.css](https://ffoodd.github.io/a11y.css) — a stylesheet that highlights problems in the page
 - [`@guidepup/guidepup`](https://www.guidepup.dev/) — drive VoiceOver and NVDA from a test
 - Puppeteer `page.emulateVisionDeficiency('deuteranopia')` — screenshots per deficiency
+- [Playwright — accessibility testing](https://playwright.dev/docs/accessibility-testing) ·
+  [ARIA snapshots](https://playwright.dev/docs/aria-snapshots)
+- [The RGAA audit method](https://accessibilite.numerique.gouv.fr/methode/) ·
+  [Deque — automated coverage report](https://www.deque.com/automated-accessibility-coverage-report/)
+
+<!--
+Guidepup is still young: good for a smoke test of a widget, not for a whole suite.
+-->
 
 ---
 layout: cover
@@ -267,3 +317,7 @@ layout: cover
 ## An automated audit
 
 `workshops/08_automated_audit`
+
+<!--
+Transition: workshop 08 — Lighthouse and axe DevTools on every page and every state, fix the defects slipped in since workshop 07, reach zero violation, then list what the tools did not see. `pnpm run verify --tp 08` runs axe-core like the CI. Next chapter: frameworks — what a SPA breaks, and how linters, focus helpers and headless libraries help.
+-->

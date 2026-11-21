@@ -2,6 +2,8 @@
 
 > Build the "Add a person" form with labels, groups and errors that a screen reader announces.
 
+**Duration**: 1 h (15 min for the form, 30 min for the validation script, 15 min to check with the screen reader and `verify`) · **Chapter**: 6 — Accessible forms
+
 ## Goal
 
 Chapter 6 — A form everyone can fill in, and recover from:
@@ -201,6 +203,38 @@ error in the page.
   Genea11y`), as GOV.UK does: it is the first thing read after a reload.
 - Remove `novalidate` and compare the browser's own error bubbles with yours,
   with the screen reader on, in two browsers.
+
+## For the trainer
+
+Where learners get stuck, most often:
+
+- **A `placeholder` instead of a `<label>`**: it looks labelled, but the text
+  vanishes on typing and many screen readers skip it. `verify` finds the fields
+  by their label, so it fails on *"labelled fields"*.
+- **`for` pointing at the `name`, not the `id`**: `for="lastName"` ties nothing.
+  Clicking the label is the quickest test: the field must take the focus.
+- **`novalidate` forgotten**: the browser bubble shows up first and the submit
+  handler never runs; `verify` then fails on *aria-invalid*.
+- **The summary built once and only toggled**: a `role="alert"` region already
+  in the page, its content swapped, is not always re-read. Removing it and
+  inserting a new one on each submit (as the steps say) is the reliable way.
+- **The alert cut short by the focus move**: NVDA and VoiceOver may read the
+  focused field over the summary. It is expected; the summary is still reached
+  by Shift+Tab, and the field message is read through `aria-describedby`. Let
+  learners hear it rather than hide it.
+- **The same success twice is silent**: writing the same text into the
+  `role="status"` paragraph does not trigger a new announcement. That is why
+  it is emptied on an error submit; the *Going further* blur idea makes it
+  audible.
+- **Old messages piling up**: `setFieldError` must remove the previous
+  `#…-error` first, or every submit adds one more message under the field.
+- **`aria-describedby` left on a fixed field**: it points at a removed id. Harmless
+  by ear, but `verify` checks that a fixed field is clean.
+- **`innerHTML` for the messages**: works, but the habit leaks to real data.
+  Ask for `createElement` and `textContent`.
+- **The red is 4.8:1 on white, 4.4:1 on the summary pink**: fine for the bold
+  title, borderline for the links (AA asks 4.5:1 for normal text). A good
+  question to ask during the debrief.
 
 ## Useful links
 

@@ -34,6 +34,20 @@ Chapters 1 (Reminders), 10 (Frameworks) and 12 (Conclusion) have no workshop.
 Workshops 1 and 2 have no code: you install a screen reader, then audit a page
 by hand.
 
+## Before the training: check your laptop
+
+Run this about a week before day 1, from the `workshops/` folder (it needs
+nothing but Node.js):
+
+```bash
+node check-env.mjs              # Node, pnpm, browser, screen reader, axe DevTools
+node check-env.mjs --offline    # skip the network checks
+node check-env.mjs --help
+```
+
+Every line is `✔` (ok), `!` (warning, usable) or `✘` (blocker). If there is a
+blocker, send the whole output to your trainer.
+
 ## How to run a workshop
 
 The pages are best served over a real `http://` origin. From inside the

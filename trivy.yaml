@@ -1,0 +1,27 @@
+# Trivy — what the CI (.github/workflows/trivy.yml) scans, and what fails it.
+#
+#   docker run --rm -v "$PWD":/src -w /src aquasec/trivy:0.76.2 fs .
+#
+# The vulnerabilities of every lockfile (each workshop and solution has its own),
+# the secrets committed by mistake, and the misconfigurations of the Dockerfiles
+# and Kubernetes manifests. Only a HIGH or CRITICAL finding that has a fix fails
+# the run: a vulnerability nobody can fix yet would block every pull request.
+#
+# A finding kept on purpose — a workshop starter that is wrong by design — is
+# listed, with its reason, in .trivyignore.yaml.
+scan:
+  scanners:
+    - vuln
+    - secret
+    - misconfig
+  skip-dirs:
+    - '**/node_modules'
+    - '**/dist'
+    - build
+severity:
+  - HIGH
+  - CRITICAL
+vulnerability:
+  ignore-unfixed: true
+ignorefile: .trivyignore.yaml
+exit-code: 1

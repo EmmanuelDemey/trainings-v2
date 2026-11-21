@@ -13,11 +13,16 @@ At the end of this chapter, you will be able to:
 - **Build** a modal dialog that moves the focus in, keeps it inside, closes
   on Escape and gives it back — and **prefer** the native `<dialog>`
 - **Use** `inert` to take the rest of the page out of reach
-- **Implement** tabs and tooltips that work with the keyboard, following the
-  ARIA Authoring Practices Guide
+- **Implement** tabs, tooltips and tree views that work with the keyboard,
+  following the ARIA Authoring Practices Guide
 - **Announce** dynamic messages with live regions: `status`, `alert`,
   `aria-live`
 - **Provide** captions and transcripts for video and audio
+
+
+<!--
+Five verbs. The heart of the chapter is the modal dialog: it is workshop 07, and the component most often broken in audits. Everything else is a pattern to recognise, with its APG page.
+-->
 
 ---
 
@@ -41,6 +46,11 @@ At the end of this chapter, you will be able to:
 <style>
 table { font-size: 0.85em; }
 </style>
+
+
+<!--
+The reflex from chapter 07, applied to widgets: native first, the APG pattern only when HTML has nothing. Open the APG patterns page (https://www.w3.org/WAI/ARIA/apg/patterns/) and show one keyboard table.
+-->
 
 ---
 
@@ -75,6 +85,11 @@ table { font-size: 0.85em; }
 > Forget the last step and a keyboard user is sent back to the top of the
 > page — every time they close the dialog.
 
+
+<!--
+Two columns: what the dialog says (name, role) and what it does (the focus, four moments). Trapping Tab is not a 2.1.2 failure: Escape and the close buttons let the user out. Insist on the quote — forgetting to give the focus back is the most frequent bug.
+-->
+
 ---
 
 # The recommended way — native `<dialog>`
@@ -103,6 +118,11 @@ document.getElementById('open-details')
 - `::backdrop` styles the overlay; baseline in every browser since 2022
 - `show()` (not `showModal()`) opens a **non-modal** dialog: none of the above
 
+
+<!--
+Demo: open a native dialog with showModal(), Tab around, press Escape — the focus comes back to the button. Every line of the contract, for free. form method="dialog" closes it without any script.
+-->
+
 ---
 
 # `inert` — the rest of the page, out of reach
@@ -126,6 +146,11 @@ for (const region of [header, main, footer]) region.inert = false;  // on close
   only for a custom `role="dialog"`
 - Baseline in every browser since 2023
 
+
+<!--
+inert is the missing piece of the old custom dialogs. Point out the difference with aria-modal: aria-modal is a promise to the screen reader, inert is a fact for everyone — keyboard, mouse and assistive technology.
+-->
+
 ---
 
 # Custom dialog — the markup
@@ -134,14 +159,14 @@ When you cannot use `<dialog>` (an old design system, a library) — and in
 **workshop 07**, to see every piece:
 
 ```html
-<button type="button" class="open-details" data-id="1">Details of Ada Lovelace</button>
+<button type="button" class="btn-details" data-id="1">Details of Ada Lovelace</button>
 
-<div class="overlay"></div>
+<div class="modal-overlay" id="modal-overlay"></div>
 <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal">
   <button type="button" class="close-btn" aria-label="Close">✕</button>
   <h2 id="modal-title">Ada Lovelace</h2>
   <p>Born in 1815, in London.</p>
-  <button type="button" class="close">Close</button>
+  <button type="button" id="modal-close">Close</button>
 </div>
 ```
 
@@ -149,6 +174,11 @@ When you cannot use `<dialog>` (an old design system, a library) — and in
 - `aria-labelledby` on the heading: the dialog is **named** by its title —
   `aria-label="…"` when there is no visible title
 - `aria-label="Close"` on the ✕: a glyph is not a name
+
+
+<!--
+This is the markup of workshop 07, the same class names and ids. Three things make it a dialog for the screen reader: the role, aria-modal and the name from the heading.
+-->
 
 ---
 
@@ -177,6 +207,11 @@ function openModal(event) {
 - Move the focus to the **first** control, or to the least destructive one
   (*Cancel*, *Close*) — the APG leaves the choice to you
 
+
+<!--
+Remember the trigger first: step 4 needs it. The invalid selector input:not[disabled] still circulates in copy-pasted snippets — it throws, and the dialog never opens.
+-->
+
 ---
 
 # Custom dialog — step 2, trap Tab
@@ -204,6 +239,11 @@ modal.addEventListener('keydown', (event) => {
   from leaving to the browser's **address bar**
 - `event.key === 'Tab'`, never the deprecated `event.keyCode === 9`
 
+
+<!--
+Read the list of focusable elements on every key press: content can be added after the dialog opened. With inert on the page, the trap only has to handle the two ends.
+-->
+
 ---
 
 # Custom dialog — step 3, Escape · step 4, close
@@ -228,6 +268,11 @@ function closeModal() {
 - `inert = false` **before** `trigger.focus()`: an inert element cannot take
   the focus
 - Count it: four steps, about forty lines — `showModal()` does all of it
+
+
+<!--
+One closeModal for every way out. Order matters: remove inert before focusing the trigger. Then count the lines — that is the argument for showModal().
+-->
 
 ---
 
@@ -254,6 +299,11 @@ function closeModal() {
 - Roving tabindex: **one** Tab stop for the tab list, then Tab goes to the
   panel
 
+
+<!--
+Three roles tied both ways. Roving tabindex, already seen with the radio group of workshop 06: only the selected tab is in the Tab order.
+-->
+
 ---
 
 # Tabs — the keyboard
@@ -278,6 +328,11 @@ function closeModal() {
 table { font-size: 0.9em; }
 </style>
 
+
+<!--
+The keyboard table from the APG. Automatic activation by default; manual when a panel is slow. Tabs are not a site navigation: a common audit finding is a nav menu built with role=tab.
+-->
+
 ---
 
 # Tooltips — not only on hover
@@ -285,7 +340,6 @@ table { font-size: 0.9em; }
 ```html
 <label for="birth">Birth date</label>
 <input id="birth" type="date" aria-describedby="birth-tip" />
-<button type="button" aria-label="Help about the birth date" aria-expanded="false">?</button>
 <div role="tooltip" id="birth-tip" hidden>Leave it empty if unknown.</div>
 ```
 
@@ -314,6 +368,11 @@ table { font-size: 0.9em; }
 > Information the user **needs** does not belong in a tooltip: put it on the
 > page, as a hint.
 
+
+<!--
+Three conditions of 1.4.13: dismissable, hoverable, persistent. A tooltip only describes: its text joins the accessible description through aria-describedby. A help button that opens a bubble on click is a different pattern, a toggletip.
+-->
+
 ---
 
 # Tree views
@@ -336,6 +395,11 @@ table { font-size: 0.9em; }
 - Keyboard (APG): ↑ ↓ move, → opens / goes to the first child, ← closes / goes
   to the parent, Home / End, roving tabindex
 - Heavy to build: check whether a list of headings and `<details>` would do
+
+
+<!--
+Show it, do not build it in the training: a tree is heavy. Often nested lists with headings, or details/summary, are enough — and much less code.
+-->
 
 ---
 
@@ -366,6 +430,11 @@ status.textContent = 'Ada Lovelace was added to the family tree.';
 table { font-size: 0.85em; }
 </style>
 
+
+<!--
+The classic bug: inserting the region with its text already in it. Demo with NVDA: same message, region present from the start versus inserted — only the first is read. The success message of workshop 05 uses role=status.
+-->
+
 ---
 
 # Video and audio — captions and transcripts
@@ -392,6 +461,11 @@ table { font-size: 0.85em; }
 <style>
 table { font-size: 0.85em; }
 </style>
+
+
+<!--
+Captions are for deaf users, subtitles are a translation: the kind attribute matters. Audio description is the most often forgotten, and it is AA.
+-->
 
 ---
 
@@ -440,6 +514,11 @@ WEBVTT
 </div>
 </div>
 
+
+<!--
+WebVTT is the only format browsers read in a track element. Mark the sounds that carry meaning, not only the dialogue.
+-->
+
 ---
 
 # Recap — complex components
@@ -457,6 +536,11 @@ WEBVTT
 table { font-size: 0.85em; }
 </style>
 
+
+<!--
+One line per component, the minimum before shipping. And, as for every ARIA widget: test it with a screen reader before calling it done.
+-->
+
 ---
 layout: cover
 ---
@@ -466,3 +550,7 @@ layout: cover
 ## A modal dialog
 
 `workshops/07_modal`
+
+<!--
+Transition: workshop 07 builds the custom dialog of this chapter on the Details buttons of the list — focus in, trapped, Escape, focus back. `pnpm run verify --tp 07` checks the keyboard contract. Next chapter: auditing — which of these checks a tool can automate, and which only a human can do.
+-->

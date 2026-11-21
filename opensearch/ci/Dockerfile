@@ -15,3 +15,7 @@ ENV discovery.type=single-node \
     DISABLE_SECURITY_PLUGIN=true \
     DISABLE_INSTALL_DEMO_CONFIG=true \
     OPENSEARCH_JAVA_OPTS="-Xms1g -Xmx1g"
+
+# The base image already runs as `opensearch` (uid 1000): stated here so the
+# scanners (Trivy, .github/workflows/trivy.yml) read it too.
+USER 1000

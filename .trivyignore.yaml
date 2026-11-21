@@ -1,0 +1,58 @@
+# The Trivy findings kept on purpose (trivy.yaml). Each one names the files it
+# applies to and why: a new file with the same issue still fails the CI.
+
+vulnerabilities:
+  # Pulled by pptxgenjs (^1.2.1), behind the PPTX export of @slidev/cli. Fixed in
+  # image-size 2 only, a major that pptxgenjs does not accept; at build time it
+  # reads nothing but the images of our own slides. Drop it once pptxgenjs moves on.
+  - id: CVE-2025-71329
+    purls:
+      - pkg:npm/image-size@1.2.1
+    statement: Transitive (pptxgenjs ^1); fixed only in a major; reads our own slide images only.
+  - id: CVE-2025-71330
+    purls:
+      - pkg:npm/image-size@1.2.1
+    statement: Transitive (pptxgenjs ^1); fixed only in a major; reads our own slide images only.
+
+misconfigurations:
+  # The starters of the React "Docker" workshop are naive ON PURPOSE: running as
+  # root, no securityContext — the learners fix them (see the TODOs in each
+  # file). The solution, react/solutions/22_docker, is scanned with no exception
+  # but KSV-0014 below.
+  - id: DS-0002
+    paths:
+      - react/workshops/22_docker/Dockerfile
+    statement: Workshop starter, wrong by design; TODO 3.3 makes it non-root.
+  - id: KSV-0014
+    paths:
+      - react/workshops/22_docker/k8s/deployment.yaml
+    statement: Workshop starter, wrong by design.
+  - id: KSV-0118
+    paths:
+      - react/workshops/22_docker/k8s/deployment.yaml
+    statement: Workshop starter, wrong by design; TODO 5.1 adds the securityContext.
+
+  # A read-only root filesystem would stop docker/40-env-js.sh from writing
+  # /usr/share/nginx/html/env.js at startup — the runtime configuration the
+  # workshop is about.
+  - id: KSV-0014
+    paths:
+      - react/solutions/22_docker/k8s/deployment.yaml
+    statement: The entrypoint rewrites env.js in the image's html folder at startup.
+
+  # The official nginx image: its master process starts as root to bind port 80,
+  # its workers run as `nginx`. The workshop, its README and its compose.yml are
+  # built around port 80; the unprivileged variant is the subject of the React
+  # Docker workshop, not of this one.
+  - id: DS-0002
+    paths:
+      - vuejs-advanced/workshops/16_production/docker/Dockerfile
+      - vuejs-advanced/solutions/16_production/docker/Dockerfile
+    statement: Official nginx image (root master, nginx workers), out of the workshop's scope.
+
+  # The password of a throwaway Elasticsearch, started by the CI to replay the
+  # workshops and gone at the end of the job — the one the workshops print.
+  - id: DS-0031
+    paths:
+      - elasticsearch-common/ci/Dockerfile
+    statement: Throwaway CI cluster; `training` is a public, documented password.

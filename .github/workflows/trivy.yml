@@ -1,0 +1,42 @@
+name: Trivy
+
+# Scans the whole repository with Trivy — every lockfile, the secrets, the
+# Dockerfiles and the Kubernetes manifests. What is scanned and what fails the
+# run is in trivy.yaml; the findings kept on purpose are in .trivyignore.yaml.
+#
+#   push main / PR  → fails on a HIGH or CRITICAL finding that has a fix
+#   weekly          → same scan: a CVE published since the last push shows up
+#                     without waiting for one
+#
+# Locally:
+#   docker run --rm -v "$PWD":/src -w /src aquasec/trivy:0.76.2 fs .
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trivy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Pinned to a commit: an action runs with the job's token. v0.36.0.
+      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          scan-type: fs
+          scan-ref: .
+          trivy-config: trivy.yaml
+          version: v0.76.2

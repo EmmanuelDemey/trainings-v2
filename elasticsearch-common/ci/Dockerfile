@@ -19,3 +19,7 @@ ENV discovery.type=single-node \
     ELASTIC_PASSWORD=training \
     path.repo=/usr/share/elasticsearch/backups \
     ES_JAVA_OPTS="-Xms2g -Xmx2g"
+
+# The base image already runs as `elasticsearch` (uid 1000, gid 0): stated here
+# so the scanners (Trivy, .github/workflows/trivy.yml) read it too.
+USER 1000:0

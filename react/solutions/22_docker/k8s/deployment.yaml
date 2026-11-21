@@ -19,6 +19,10 @@ spec:
       # guarantee that does not depend on who wrote the Dockerfile.
       securityContext:
         runAsNonRoot: true
+        # The syscall filter of the container runtime: off by default in
+        # Kubernetes, on in Docker.
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: web
           # The image the workflow of .github/workflows/ publishes, at a tag:
@@ -34,6 +38,9 @@ spec:
               value: 'production'
           securityContext:
             allowPrivilegeEscalation: false
+            # nginx listens on 8080 as uid 101: it needs no Linux capability.
+            capabilities:
+              drop: ['ALL']
           # Ready: the Service may send it traffic. Live: no need to restart it.
           readinessProbe:
             httpGet:
@@ -51,3 +58,4 @@ spec:
               cpu: '25m'
             limits:
               memory: '64Mi'
+              cpu: '250m'
