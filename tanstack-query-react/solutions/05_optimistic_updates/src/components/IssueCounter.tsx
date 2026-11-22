@@ -1,5 +1,5 @@
-import { useIsMutating, useQuery } from '@tanstack/react-query';
-import { issueMutationKeys, issuesQuery } from '../queries/issues';
+import { useQuery } from '@tanstack/react-query';
+import { issuesQuery } from '../queries/issues';
 
 /**
  * The header counter. Same key as the list — and nobody tells it about a new
@@ -11,11 +11,9 @@ export function IssueCounter() {
     select: (issues) => issues.length,
   });
 
-  const saving = useIsMutating({ mutationKey: issueMutationKeys.all });
-
   return (
     <span className="counter" data-testid="open-count">
-      {(count! + saving) ?? '…'} open
+      {count ?? '…'} open
     </span>
   );
 }
