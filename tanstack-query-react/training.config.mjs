@@ -26,8 +26,6 @@ export default defineConfig({
       'Everything runs online: Vite, `npm test`, `npm run typecheck` and the React Query devtools (the floating button at the top right of the app).',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'tanstack-query-react' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

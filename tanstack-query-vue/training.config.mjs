@@ -25,8 +25,6 @@ export default defineConfig({
       'Vite, `npm test` and `npm run typecheck` run online, and so does the TanStack Query devtools panel. The Vue Devtools browser extension needs a local clone.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'tanstack-query-vue' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

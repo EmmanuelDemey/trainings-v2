@@ -38,8 +38,6 @@ export default defineConfig({
     },
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'javascript' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

@@ -26,8 +26,6 @@ export default defineConfig({
       'Everything runs online: `npm test`, `npm run typecheck` and `npm run build`. Spotlight and a real Sentry project need a local machine: the API cannot reach them from the online editor.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'sentry-nestjs' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

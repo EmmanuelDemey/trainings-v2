@@ -24,8 +24,6 @@ export default defineConfig({
       'Vite, `npm test` and `npm run typecheck` run online. Cypress (`npm run e2e`, workshop 12) and the Vue Devtools browser extension need a local clone.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'vuejs-advanced' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

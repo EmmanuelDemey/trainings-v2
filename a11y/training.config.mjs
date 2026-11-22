@@ -34,8 +34,6 @@ export default defineConfig({
       'The pages run online. A screen reader, the browser extensions (axe DevTools) and `pnpm run verify` need a local clone.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'a11y' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

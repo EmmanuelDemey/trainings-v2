@@ -21,8 +21,6 @@ export default defineConfig({
   // per workshop on the Resources page. No online editor.
   solutions: 'solutions',
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'elastic-security' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

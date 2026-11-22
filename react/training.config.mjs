@@ -23,8 +23,6 @@ export default defineConfig({
       'Vite, `npm test` and `npm run typecheck` run online. Cypress (workshop 21), Docker (workshop 22) and the React Developer Tools browser extension need a local clone.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'react' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

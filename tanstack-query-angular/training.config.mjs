@@ -24,8 +24,6 @@ export default defineConfig({
       '`npm run dev` (`ng serve`), `npm run build` and `npm run typecheck` run online. `npm test` (`ng test`: Vitest and jsdom in Node.js) is checked locally and in the CI only — if it misbehaves in the online editor, use a local clone. The TanStack Query devtools are the floating panel of the app itself: no browser extension to install.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'tanstack-query-angular' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

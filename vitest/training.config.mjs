@@ -25,8 +25,6 @@ export default defineConfig({
     limits: '`npm test`, `npm run test:watch` and `npm run typecheck` run online. `npm run test:ui` and `npm run dev` (workshop 6) need a local clone.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'vitest' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

@@ -20,8 +20,6 @@ export default defineConfig({
   // online editor.
   solutions: false,
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'opensearch' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

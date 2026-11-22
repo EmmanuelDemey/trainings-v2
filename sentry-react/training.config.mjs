@@ -26,8 +26,6 @@ export default defineConfig({
       'Everything runs online: Vite, `npm test` and `npm run typecheck`. Spotlight (the local Sentry UI) and the source map upload need your own machine.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'sentry-react' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

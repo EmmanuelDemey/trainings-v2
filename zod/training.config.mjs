@@ -25,8 +25,6 @@ export default defineConfig({
     limits: '`npm test`, `npm run test:watch` and `npm run typecheck` run online, as does `npm start` in workshop 4.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'zod' },
-
   deck: {
     theme: 'seriph',
     headmatter: {

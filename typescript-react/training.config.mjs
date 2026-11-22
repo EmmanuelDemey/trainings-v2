@@ -26,8 +26,6 @@ export default defineConfig({
     limits: '`npm test`, `npm run test:watch` and `npm run typecheck` run online, as does `npm start`.',
   },
 
-  repository: { url: 'https://github.com/EmmanuelDemey/trainings-v2', branch: 'main', dir: 'typescript-react' },
-
   deck: {
     theme: 'seriph',
     headmatter: {
