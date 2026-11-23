@@ -19,6 +19,10 @@ At the end of this chapter, you will be able to:
   combobox or tabs
 - **Test** components by role, and with axe, in Storybook and in the CI
 
+<!--
+Five verbs. The thread of the chapter: everything from chapters 04 to 09 still applies — a framework only changes where the mistakes are made, and how many times they are copied.
+-->
+
 ---
 
 # A framework renders HTML — good or bad
@@ -40,6 +44,10 @@ At the end of this chapter, you will be able to:
 - **No framework is accessible by default** — some only make the right thing
   easier
 
+<!--
+Open the dev tools on any SPA and look at the accessibility tree: it is built from the rendered HTML, not from the components. A Link component that renders an a with an href keeps middle-click, "open in a new tab", and the "link" role. A span with onClick keeps none of that.
+-->
+
 ---
 
 # What a SPA breaks
@@ -60,6 +68,10 @@ At the end of this chapter, you will be able to:
 <style>
 table { font-size: 0.85em; }
 </style>
+
+<!--
+Do the demo: on a classic site, follow a link with the screen reader on — it reads the new title. On a SPA, the same click says nothing. 4.1.3 is the criterion usually cited for the announcement; the focus part is 2.4.3. The last row is chapter 05: an empty HTML shell has no headings and no landmarks until the JavaScript runs.
+-->
 
 ---
 
@@ -87,15 +99,21 @@ export function RouteAnnouncer({ title }: Readonly<{ title: string }>) {
 - The live region must **exist before** its text changes: render it once, in
   the layout, never conditionally
 - `polite`, not `assertive`: the user hears the current sentence end first
-- **Next.js** (`next/link`), **Nuxt**, **SvelteKit** and **Angular** (with
-  `TitleStrategy`) ship a route announcer: check it is on before writing one
+- **Next.js**, **SvelteKit** and **Nuxt** (`<NuxtRouteAnnouncer>`) ship a
+  route announcer: check it is on before writing one
+- **Angular** sets the title (route `title`, `TitleStrategy`) but announces
+  nothing: use the CDK `LiveAnnouncer`
+
+<!--
+Next.js and SvelteKit announce the new title (or the h1) on every client-side navigation, out of the box. Nuxt has a NuxtRouteAnnouncer component, added to app.vue by the starter templates: check it is there. Angular only manages document.title — the announcement is up to you. Re-announcing the same text twice may be ignored by a screen reader: that is why the message is reset on each route.
+-->
 
 ---
 
 # Route change — move the focus
 
 ```tsx
-function Layout() {
+function Layout({ title }: Readonly<{ title: string }>) {
   const location = useLocation();
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -118,6 +136,10 @@ function Layout() {
 - ❌ Don't leave the focus on a link that was **removed** from the DOM: it falls
   back to `<body>`, and the user starts again from the top
 
+<!--
+WCAG 2.4.3 Focus Order. Pick one strategy and test it with a screen reader: focusing the h1 already reads the new title, so a live announcement on top of it is read twice. Give the focused heading a visible focus style, or hide the outline only when it was focused by script (:focus-visible does that in most browsers). Do not move the focus on the first page load, nor when only a query parameter changes (a filter, a sort): the user did not leave the page.
+-->
+
 ---
 
 # What each framework gives you
@@ -129,7 +151,7 @@ function Layout() {
 | **Live announcer** | `react-aria` `announce()` | your own `aria-live` region | CDK `LiveAnnouncer` | your own `aria-live` region |
 | **Headless components** | **React Aria**, **Radix UI**, Headless UI, Ariakit | **Reka UI** (ex-Radix Vue), Headless UI | **Angular CDK**, Angular Aria | **Bits UI**, Melt UI |
 | **Styled kits** | shadcn/ui (Radix), MUI, Chakra | PrimeVue, Vuetify | Angular Material, PrimeNG | shadcn-svelte |
-| **Docs** | react.dev/learn/accessibility | vuejs.org — Accessibility | angular.dev/best-practices/a11y | svelte.dev — Accessibility warnings |
+| **Docs** | legacy.reactjs.org — Accessibility | vuejs.org — Accessibility | angular.dev/best-practices/a11y | svelte.dev — Accessibility warnings |
 
 <br />
 
@@ -139,6 +161,10 @@ function Layout() {
 <style>
 table { font-size: 0.7em; }
 </style>
+
+<!--
+Not to be learnt by heart: it is a map, to be read with your own stack. The linter row is chapter 09: the earlier the cheaper. Angular Aria is recent (developer preview): check its status before choosing it. React docs: the accessibility page is still on legacy.reactjs.org — react.dev has no dedicated page yet.
+-->
 
 ---
 
@@ -163,8 +189,13 @@ import * as Dialog from '@radix-ui/react-dialog';
 - `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby` — set
 - Focus **moved in**, **trapped**, **given back** to the trigger, Escape closes —
   everything of workshop 07, done
-- The same contract in React Aria (`<Modal>`), Reka UI, Bits UI, the Angular CDK
-  (`Dialog`) — and the native **`<dialog>`** + `showModal()` for the simple cases
+- The same contract in React Aria (`<Modal>` + `<Dialog>`), Reka UI, Bits UI,
+  the Angular CDK (`Dialog`) — and the native **`<dialog>`** + `showModal()` for
+  the simple cases
+
+<!--
+Put it next to the solution of workshop 07: some forty lines of focus management disappear. Radix warns in the console when Title or Description is missing — that is the library teaching accessibility. Still test it: the library guarantees the pattern, not your labels, your contrast or your focus style.
+-->
 
 ---
 
@@ -212,6 +243,10 @@ this.liveAnnouncer.announce('Person saved', 'polite');
 </div>
 </div>
 
+<!--
+FocusMonitor is what lets you show a focus ring for the keyboard only, when :focus-visible is not enough; call stopMonitoring in ngOnDestroy. In Svelte the warnings come from the compiler itself: no ESLint plugin to install, and they show up in the terminal at every build. Do not silence them with svelte-ignore without a reason written next to it.
+-->
+
 ---
 
 # Web Components — the shadow DOM
@@ -236,6 +271,10 @@ customElements.define('my-toggle', MyToggle);
 - `ElementInternals` (`this.attachInternals()`) sets a role and states on the
   host itself; **Lit** makes all this shorter
 
+<!--
+The text in the slot names the inner button: slotted content stays in the light DOM, but is rendered inside, so the accessible name works. What does not work is an ID reference across the boundary — the Reference Target proposal aims to fix it, not usable yet. Form controls inside a shadow root also need ElementInternals (formAssociated) to take part in a form.
+-->
+
 ---
 
 # Testing components
@@ -259,9 +298,15 @@ test('the toggle is a pressed button after a click', async () => {
 
 - `getByRole` + axe in every component test — chapter 09
 - **Storybook** `@storybook/addon-a11y`: axe on every story, in the panel and in
-  the test runner
+  the tests (`@storybook/addon-vitest`)
 - **Cypress**: `cypress-axe` (`cy.injectAxe()`, `cy.checkA11y()`); **Playwright**:
   `@axe-core/playwright`
+- In the **CI**: the same tests, failing the build — like `pnpm run verify` in the
+  workshops
+
+<!--
+Setup not shown: vitest-axe needs its matchers registered (expect.extend with vitest-axe/matchers) and toHaveAttribute comes from @testing-library/jest-dom. jsdom has no layout: axe cannot check colour contrast there — that is for Storybook or Playwright, in a real browser. In recent Storybook versions, the a11y addon can be set to fail the tests ("error") instead of only warning.
+-->
 
 ---
 
@@ -281,6 +326,10 @@ test('the toggle is a pressed button after a click', async () => {
 
 > A library that never mentions accessibility probably never tested it.
 
+<!--
+Ten minutes per library, before adopting it: keyboard, then screen reader, on its own docs. If the docs site itself fails, the components will. Switching a design system later costs far more than this check.
+-->
+
 ---
 
 # Accessible design systems — to learn from
@@ -289,18 +338,22 @@ test('the toggle is a pressed button after a click', async () => {
 |---|---|
 | [GOV.UK Design System](https://design-system.service.gov.uk/) | Every component tested with users of assistive technologies |
 | [U.S. Web Design System](https://designsystem.digital.gov/) | Section 508 conformance, documented per component |
-| [Carbon (IBM)](https://carbondesignsystem.com/guidelines/accessibility/overview) | Accessibility guidelines for design **and** development |
+| [Carbon (IBM)](https://carbondesignsystem.com/building-blocks/foundations/accessibility/overview) | Accessibility guidelines for design **and** development |
 | [Atlassian Design System](https://atlassian.design/foundations/accessibility) | Foundations: colour, focus, motion |
 | [Material Design 3](https://m3.material.io/foundations/accessible-design) | Accessible design principles, touch targets |
 
 <br />
 
-- More: [React Aria](https://react-spectrum.adobe.com/react-aria/) ·
+- More: [React Aria](https://react-aria.adobe.com/) ·
   [Radix UI](https://www.radix-ui.com/) · [Headless UI](https://headlessui.com/) ·
-  [Angular CDK](https://material.angular.io/cdk/a11y/overview) ·
+  [Angular CDK](https://material.angular.dev/cdk/a11y/overview) ·
   [Inclusive Components](https://inclusive-components.design/) ·
-  [A11y Style Guide](https://a11y-style-guide.com/)
+  [The A11Y Project](https://www.a11yproject.com/)
 
 <style>
 table { font-size: 0.85em; }
 </style>
+
+<!--
+Transition: no workshop for this chapter — the workshops are framework-free on purpose, everything learnt there carries over to any stack. Next chapter: microdata — one level above semantic HTML, meaning for machines rather than for screen readers, then workshop 09.
+-->

@@ -4,6 +4,10 @@ layout: cover
 
 # 12 - Conclusion
 
+<!--
+Last 30 minutes: 5 min recap, 15 min retro, 10 min final questionnaire. Leave the checklist slide on screen while people ask their last questions.
+-->
+
 ---
 
 # What to remember
@@ -24,13 +28,20 @@ layout: cover
 
 ### In a real project
 
-- A **design system** that ships accessible components — fix once, everywhere
+- A **design system** — or a headless library — that ships accessible
+  components: fix once, everywhere
+- In a SPA, **announce** route changes and **move** the focus
 - **axe in the CI**: automated checks catch the regressions
-- **Manual checkpoints** at each release: tools only see 30–40 % of issues
+- **Manual checkpoints** at each release: tools fully test only about a third
+  of the criteria
 - An **accessibility statement** kept up to date (RGAA, EAA)
 
 </div>
 </div>
+
+<!--
+Left column = chapters 02 to 08, right column = chapters 09 and 10. Ask the room to name the chapter behind each bullet: it doubles as a quick recall exercise. The "third" figure is the one from chapter 09 (by criterion; Deque counts ~57% by volume of issues).
+-->
 
 ---
 
@@ -46,13 +57,17 @@ layout: cover
 | Contrast | 4.5:1 for text, 3:1 for large text and UI components | 1.4.3 · 1.4.11 |
 | Keyboard | Everything reachable, logical order, no trap | 2.1.1 · 2.4.3 |
 | Focus | Always **visible** | 2.4.7 |
-| Preferences | `prefers-reduced-motion`, `prefers-color-scheme`, zoom 200 % | 2.3.3 · 1.4.4 |
+| Preferences | `prefers-reduced-motion`, zoom 200 %, reflow at 320 px | 2.3.3 · 1.4.4 · 1.4.10 |
 | Testing | Keyboard + screen reader + axe | — |
 
 <style>
 table { font-size: 0.8em; }
 td, th { padding-top: 0.25em !important; padding-bottom: 0.25em !important; }
 </style>
+
+<!--
+2.3.3 is a AAA criterion: not required by RGAA or EAA, but prefers-reduced-motion is cheap to honour (chapter 05). prefers-color-scheme has no WCAG criterion: it is comfort, not compliance, so it left the grid. The grid is a floor for a code review, not a full RGAA audit (106 criteria).
+-->
 
 ---
 
@@ -81,6 +96,15 @@ td, th { padding-top: 0.25em !important; padding-bottom: 0.25em !important; }
 
 </div>
 </div>
+
+<br />
+
+> The full list, chapter by chapter, is in **`RESSOURCES.md`** with the course
+> materials.
+
+<!--
+If people keep only one link: the WCAG 2.2 Quick Reference, filtered on level AA. The APG is the one to open before writing any custom widget. The Udacity course is free and old (2016) but its focus and ARIA parts are still accurate.
+-->
 
 ---
 
@@ -121,6 +145,10 @@ td, th { padding-top: 0.25em !important; padding-bottom: 0.25em !important; }
 > 1 = wasted my time, 5 = far more than expected. Anything below 3 gets a
 > "what would have made it a 4?" follow-up.
 
+<!--
+Go round the table, the trainer speaks last. Note the "still fuzzy" topics: answer the quick ones now, send a link from RESSOURCES.md for the others. Do the ROTI before the questionnaire, while the energy is still there.
+-->
+
 ---
 
 # End-of-training evaluation
@@ -152,9 +180,17 @@ and we can measure the progress.
 </div>
 </div>
 
+<!--
+Frameworks (10) and microdata (11) are not in the questionnaire: it mirrors the training objectives of chapter 00. Give the link, stay in the room, and do not comment on the answers while people fill it in.
+-->
+
 ---
 layout: statement
 ---
 
 Accessibility is not a feature.
 It is a **fundamental quality** of the web.
+
+<!--
+Thank everyone, remind them where the materials and solutions live, and close.
+-->

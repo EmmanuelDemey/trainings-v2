@@ -2,6 +2,8 @@
 
 > Audit Genea11y with Lighthouse and axe DevTools, fix every violation they report, and know what they cannot see.
 
+**Duration**: 45 min (20 min to audit with both tools in every state, 15 min to fix, 10 min for step 5 and `verify`) · **Chapter**: 9 — Auditing
+
 ## Goal
 
 Chapter 9 — Automated tools are fast and never tired, and they catch a good
@@ -156,7 +158,7 @@ Then:
 - add a test for **the form in error** (click *Add the person* first) and one
   for **the dialog open** (click a *View details* button first);
 - restrict the rules to the WCAG levels you target:
-  `.withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])`;
+  `.withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])`;
 - scan a part of the page only with `.include('#modal')`;
 - run it in your CI, so that an accessibility regression fails the build.
 
@@ -167,6 +169,31 @@ Other ideas:
   that way fails when the accessibility breaks.
 - Try another engine on the same pages: [WAVE](https://wave.webaim.org/) or
   the Firefox *Accessibility* tab's *Check for issues*. Do they agree?
+
+## For the trainer
+
+The defects slipped into the starter, and how learners meet them:
+
+- **The logo has no `alt`** (`image-alt`, both pages). Expect `alt="Genea11y
+  logo"`: the `<h1>` is then read "Genea11y logo Genea11y". The logo sits next
+  to the name, so it is decorative: `alt=""`.
+- **`create.html` has no `lang`** (`html-has-lang`). Only on that page: a
+  reminder to audit every page, not just the home one.
+- **The footer text is too light** (`color-contrast`, `#a3aebd`). The fix is the
+  existing `var(--color-text-light)`, not a new hard-coded grey.
+- **The error red fails on the error summary** (`color-contrast` ×3, only with
+  the form in error). `#dc2626` passes on white but reaches 4.41:1 on the pink
+  background. Learners who only scan the page at load never see it: that is the
+  point of step 3. Change `--color-error`, which is used in five places.
+- **The ✕ close button lost its `aria-label`**: axe does **not** report it, the
+  button has a text ("✕"), just not a meaningful one. Only `verify` catches it,
+  or a screen reader announcing the symbol name ("multiplication x, button")
+  instead of "Close". It is the best example for
+  step 5.
+- **"Lighthouse says 100, we are done"**: the dialog-open scan passes on the
+  starter despite the ✕ defect. Use it to close the workshop.
+- **Lighthouse runs fewer rules than axe DevTools**: do not expect more from
+  running both; the difference comes from the states, not the tool.
 
 ## Useful links
 
