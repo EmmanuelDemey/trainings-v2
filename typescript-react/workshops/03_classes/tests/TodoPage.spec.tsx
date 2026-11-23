@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InMemoryTodoStore } from '../src/in-memory-todo-store.ts';
-import { TodoErrorBoundary } from '../src/TodoErrorBoundary.tsx';
+import { TodoNotFoundError } from '../src/todo-store.ts';
 import { TodoPage } from '../src/TodoPage.tsx';
 
 describe('TodoPage', () => {
@@ -16,13 +16,8 @@ describe('TodoPage', () => {
     expect(store.getSnapshot()[0]?.done).toBe(true);
   });
 
-  test('ends in the error boundary for an unknown id', () => {
+  test('throws a TodoNotFoundError for an unknown id', () => {
     using _console = vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(
-      <TodoErrorBoundary>
-        <TodoPage store={new InMemoryTodoStore()} id="42" />
-      </TodoErrorBoundary>,
-    );
-    expect(screen.getByRole('alert').textContent).toBe('No todo with id 42');
+    expect(() => render(<TodoPage store={new InMemoryTodoStore()} id="42" />)).toThrow(TodoNotFoundError);
   });
 });

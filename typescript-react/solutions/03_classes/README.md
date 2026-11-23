@@ -15,8 +15,8 @@ Chapter 3 — Classes & interfaces:
   subclasses with **`protected abstract`** methods
 - Hide state with a **`#private`** field, expose it with a **getter**, and count
   instances with a **`static`** member
-- Extend **`Error`** with a class of your own, and catch it with `instanceof` —
-  in an **error boundary**, the one class component React still needs
+- Extend **`Error`** with a class of your own, and recognise it with
+  `instanceof`
 - Accept an id as a `string` **or** a `number`, and narrow it with `typeof`
 - Write classes Node.js can run **as is**: no parameter properties, no `enum`
 
@@ -40,8 +40,7 @@ The specs are given and **red**:
   `tests/in-memory-todo-store.spec.tsx` and
   `tests/local-storage-todo-store.spec.tsx` run it against each implementation.
   Read it first.
-- `tests/TodoErrorBoundary.spec.tsx` and `tests/TodoPage.spec.tsx` render the
-  components with Testing Library.
+- `tests/TodoPage.spec.tsx` renders the page of a todo with Testing Library.
 - `tests/types.test-d.tsx` is checked by the compiler, never run. A
   `// @ts-expect-error` line is a spec too: it fails when the line **compiles**.
 
@@ -52,7 +51,7 @@ The specs are given and **red**:
 
 | # | What you do | Where | Done when |
 |---|---|---|---|
-| 1 | `TodoNotFoundError`, `toId` and `TodoErrorBoundary` | `src/todo-store.ts`, `src/TodoErrorBoundary.tsx` | The `toId`, `TodoNotFoundError` and `TodoErrorBoundary` specs are green |
+| 1 | `TodoNotFoundError` and `toId` | `src/todo-store.ts` | The `toId` and `TodoNotFoundError` specs are green |
 | 2 | Make `BaseTodoStore` abstract | `src/base-todo-store.ts` | The "abstract base class" and "how they store" type specs are green |
 | 3 | `subscribe`, `getSnapshot` and the three operations, once | `src/base-todo-store.ts` | — (nothing runs until step 4) |
 | 4 | `InMemoryTodoStore` | `src/in-memory-todo-store.ts` | The `InMemoryTodoStore` and `TodoPage` specs are green |
@@ -60,7 +59,7 @@ The specs are given and **red**:
 
 ## Steps
 
-### 1. Ids and errors — `src/todo-store.ts`, `src/TodoErrorBoundary.tsx`
+### 1. Ids and errors — `src/todo-store.ts`
 
 1. `TodoNotFoundError` extends `Error`. Pass the message to `super(…)`, set
    `this.name`, and keep the id in a `readonly` field **declared in the class
@@ -68,17 +67,12 @@ The specs are given and **red**:
 2. `toId` takes a `TodoId` — `string | number`: a route param is a string.
    Narrow it with `typeof`, turn the string into a number, and refuse anything
    that is not a positive integer.
-3. `TodoErrorBoundary` extends `Component<Props, State>`. Call `super(props)` in
-   its constructor before setting `this.state`, catch the error in `static
-   getDerivedStateFromError`, and in `render` — marked **`override`** — show
-   the message of a `TodoNotFoundError` (`instanceof`), throw any other error
-   again.
 
 > Why not `constructor(readonly id: number)`? That **parameter property** is
 > TypeScript-only syntax that emits code: `erasableSyntaxOnly` refuses it,
 > because Node.js — which only strips types — could not run it.
 
-→ **Done when** the `toId`, `TodoNotFoundError` and `TodoErrorBoundary` specs are green.
+→ **Done when** the `toId` and `TodoNotFoundError` specs are green.
 
 ### 2. An abstract base — `src/base-todo-store.ts`
 
@@ -141,7 +135,7 @@ section are **not** part of this list.
 **It builds and runs**
 
 - [ ] `npm run typecheck` exits 0
-- [ ] `npm test` exits 0 — the forty-four specs
+- [ ] `npm test` exits 0 — the forty-one specs
 - [ ] `grep -rn TODO src` returns nothing
 
 **The behaviour is there**

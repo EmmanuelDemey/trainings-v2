@@ -12,7 +12,7 @@ export type TodoId = string | number;
 
 export interface TodoStore {
   /** Calls `listener` after every change. Returns the function that unsubscribes. */
-  subscribe(listener: () => void): () => void;
+  subscribe(listener: () => void): void;
   /** The todos — the same array until something changes. */
   getSnapshot(): readonly Todo[];
   add(title: string): Todo;
@@ -27,13 +27,18 @@ export interface TodoStore {
  */
 export class TodoNotFoundError extends Error {
   id: number = 0;
+  name: string
 
   constructor(id: number) {
-    super();
+    super('No todo with id ' + id)
+    this.id = id;
+    this.name = 'TodoNotFoundError'
   }
 }
 
 /** TODO 1: `3` and `"3"` both give `3`; anything else throws `Invalid id: <id>`. */
 export function toId(id: TodoId): number {
-  throw new Error(`TODO 1: read the id ${id}`);
+  const value = typeof id === 'string' ? Number(id) : id;
+  if (!Number.isInteger(value) || value <= 0) throw new Error(`Invalid id: ${id}`);
+  return value;
 }

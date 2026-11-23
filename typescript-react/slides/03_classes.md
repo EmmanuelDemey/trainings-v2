@@ -67,34 +67,45 @@ Object.keys(auth);           // ['user', 'baseUrl', 'apiKey'] — no #token
 # Inheritance
 
 ```tsx
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);                               // before any `this`
-    this.state = { error: null };
+class HttpError extends Error {
+  readonly status: number;
+  constructor(status: number, message: string) {
+    super(message);                            // before any `this`
+    this.name = 'HttpError';
+    this.status = status;
   }
-  static getDerivedStateFromError(error: Error): State {
-    return { error };
-  }
-  override componentDidCatch(error: Error, info: ErrorInfo) {   // `noImplicitOverride`:
-    reportError(error, info.componentStack);                    // say it on purpose
-  }
-  override render() {
-    return this.state.error ? this.props.fallback : this.props.children;
+  describe(): string {
+    return `${this.status} — ${this.message}`;
   }
 }
+
+class NotFoundError extends HttpError {
+  constructor(url: string) {
+    super(404, `Nothing at ${url}`);
+    this.name = 'NotFoundError';
+  }
+  override describe(): string {                // `noImplicitOverride`: say it on purpose
+    return `Not found — ${this.message}`;
+  }
+}
+
+const ErrorMessage = ({ error }: { error: unknown }) =>
+  error instanceof HttpError ? <p role="alert">{error.describe()}</p> : <p>Something went wrong</p>;
 ```
 
 - Built on JavaScript's **prototypes**: `class` is the syntax, not a new model
 - `override` catches the method renamed in the parent class, and no longer overriding anything
 
 <!--
-The error boundary is the one class component React still needs: no hook
-catches a render error. `override componentDidCath(…)` (typo) is refused:
-"This member cannot have an 'override' modifier because it is not declared in
-the base class 'Component<Props, State, any>'. Did you mean 'componentDidCatch'?"
-Without `override`, under `noImplicitOverride`, `render` is refused too: "This
-member must have an 'override' modifier because it overrides a member in the
-base class".
+Components are functions: in React code, classes live in the model, the
+services and the errors — not in the UI. Extending `Error` is the inheritance
+everyone writes, and `instanceof` narrows the `unknown` a `catch` (or a query
+library) hands you.
+`override descrbe()` (typo) is refused: "This member cannot have an 'override'
+modifier because it is not declared in the base class 'HttpError'". Without
+`override`, under `noImplicitOverride`, `describe` is refused too: "This member
+must have an 'override' modifier because it overrides a member in the base
+class 'HttpError'".
 -->
 
 ---
