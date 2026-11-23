@@ -70,7 +70,7 @@ DI is the seam Angular gives you instead: a test provides another `ISSUE_API`.
    `retry: false` — a failing query fails now, not after three retries with a
    growing delay. `gcTime: Infinity` — no garbage-collection timer left behind.
 2. `renderWithClient(component, options = {})`: build a client, call
-   `render(component, { ...options, providers: [provideTanStackQuery(queryClient), ...(options.providers ?? [])] })`
+   `render(component, { ...options, providers: [provideTanStackQuery(() => queryClient), ...(options.providers ?? [])] })`
    from `@testing-library/angular`, and return `{ ...result, queryClient }`.
 
 Cleanup is automatic: after each test, Testing Library destroys the fixture and
@@ -118,7 +118,7 @@ rejects, an error shows" — keep mocks for what a test cannot run.
 
 ### 5. An inject function, alone — `issue-mutations.spec.ts`
 
-1. `TestBed.configureTestingModule({ providers: [provideTanStackQuery(queryClient)] })`
+1. `TestBed.configureTestingModule({ providers: [provideTanStackQuery(() => queryClient)] })`
    with a client from `createTestQueryClient()`.
 2. `using invalidate = vi.spyOn(queryClient, 'invalidateQueries');` — `using`
    restores the spy when the test's scope ends: no `mockRestore()`, no `afterEach`.

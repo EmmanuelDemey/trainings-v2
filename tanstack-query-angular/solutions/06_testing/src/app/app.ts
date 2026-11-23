@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { injectIsMutating } from '@tanstack/angular-query-experimental';
+import { injectIsMutating } from '@tanstack/angular-query';
 import { IssueList } from './issues/issue-list';
 import { NewIssueForm } from './issues/new-issue-form';
 import { OpenCount } from './issues/open-count';

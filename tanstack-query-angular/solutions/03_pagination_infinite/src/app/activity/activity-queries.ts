@@ -1,4 +1,4 @@
-import { infiniteQueryOptions } from '@tanstack/angular-query-experimental';
+import { infiniteQueryOptions } from '@tanstack/angular-query';
 import { fetchActivity } from '../../api/fakeApi';
 
 export const activityKeys = {

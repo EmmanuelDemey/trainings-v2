@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/angular-query-experimental';
+import { QueryClient } from '@tanstack/angular-query';
 
 /**
  * The one place the app's `QueryClient` is built.

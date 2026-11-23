@@ -3,7 +3,7 @@
  * only ever call what this file exports.
  */
 import { inject, Injectable } from '@angular/core';
-import { queryOptions } from '@tanstack/angular-query-experimental';
+import { queryOptions } from '@tanstack/angular-query';
 import type { IssueFilter } from '../../api/fakeApi';
 import { ISSUE_API } from './issue-api';
 

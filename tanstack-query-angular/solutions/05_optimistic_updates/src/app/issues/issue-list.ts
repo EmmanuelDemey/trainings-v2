@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import { injectQuery } from '@tanstack/angular-query';
 import type { IssueFilter } from '../../api/fakeApi';
 import { injectDeleteIssue, injectSetIssueStatus } from './issue-mutations';
 import { issuesQuery } from './issue-queries';

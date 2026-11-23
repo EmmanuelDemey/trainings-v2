@@ -119,7 +119,7 @@ export class App {
   // how many mutations are in flight, in the whole app: Signal<number>
   protected readonly mutating = injectIsMutating();
   // or only some of them
-  protected readonly deleting = injectIsMutating({ mutationKey: issueMutationKeys.delete() });
+  protected readonly deleting = injectIsMutating(() => ({ mutationKey: issueMutationKeys.delete() }));
   // queries too: Signal<number>
   protected readonly fetching = injectIsFetching();
 

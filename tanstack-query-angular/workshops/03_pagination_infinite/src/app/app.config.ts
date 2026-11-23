@@ -1,6 +1,6 @@
 import { type ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideTanStackQuery } from '@tanstack/angular-query-experimental';
-import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
+import { provideTanStackQuery } from '@tanstack/angular-query';
+import { withDevtools } from '@tanstack/angular-query-devtools';
 import { createQueryClient } from '../queryClient';
 
 export const appConfig: ApplicationConfig = {
@@ -10,6 +10,6 @@ export const appConfig: ApplicationConfig = {
     // its cache. `withDevtools()` adds the floating TanStack Query panel — in
     // development builds only: the `/devtools` entry point resolves to a stub
     // in production.
-    provideTanStackQuery(createQueryClient(), withDevtools()),
+    provideTanStackQuery(createQueryClient, withDevtools()),
   ],
 };

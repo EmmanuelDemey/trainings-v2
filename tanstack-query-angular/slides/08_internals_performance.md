@@ -26,7 +26,7 @@ src: ../../tanstack-query-common/slides/08_internals_performance/architecture.md
 # Inside `injectQuery`
 
 ```ts
-// simplified from @tanstack/angular-query-experimental 5.104 — create-base-query.ts
+// simplified from @tanstack/angular-query 5.108 — inject-base-query.ts
 const queryClient = inject(QueryClient);
 const options = computed(() => queryClient.defaultQueryOptions(optionsFn()));   // your function
 const observer = new QueryObserver(queryClient, options());                       // once
@@ -82,12 +82,12 @@ src: ../../tanstack-query-common/slides/08_internals_performance/checklist.md
 
 # Checklist — the Angular extras
 
-- [ ] `@tanstack/angular-query-experimental` **pinned exactly**, upgraded on purpose
-- [ ] One client, from `provideTanStackQuery` — in a token factory if its global
-      handlers need services
-- [ ] `withDevtools()` from `…/devtools` (stubbed in production), or
-      `…/devtools/production` behind a flag
-- [ ] Every `inject*` call in an injection context — or given an `injector`
+- [ ] `@tanstack/angular-query` (stable, Angular 20.1+) — not the old `…-experimental`
+- [ ] One client, from `provideTanStackQuery(factory)` — the factory runs in an
+      injection context, so it may `inject()` the services its global handlers need
+- [ ] `withDevtools()` from `@tanstack/angular-query-devtools` (stubbed in production), or
+      `@tanstack/angular-query-devtools/production` behind a flag
+- [ ] Every `inject*` call in an injection context — or in `runInInjectionContext`
 - [ ] Query options in services or factory files; components hold one line per query
 - [ ] Specs render with a **fresh** client (`retry: false`), and mock through DI
 - [ ] No `subscribe()` in a component to read server state: the result is signals

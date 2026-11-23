@@ -1,7 +1,7 @@
 # TanStack Query for Angular — Workshops (TP)
 
 Hands-on exercises for the **TanStack Query for Angular** training, based on
-**Angular 22.2**, **`@tanstack/angular-query-experimental` 5.104.1**,
+**Angular 22.2**, **`@tanstack/angular-query` 5.108.2** (stable),
 **TypeScript 6.0**, **Vitest 5** (run by `ng test`) and **Testing Library**
 (`@testing-library/angular` 19, `@testing-library/dom` 10, `user-event` 14).
 
@@ -51,11 +51,11 @@ npm run build        # ng build
 
 ## Toolchain versions
 
-Dependencies were last refreshed on **2026-10-08**. One deliberate pin:
+Dependencies were last refreshed on **2026-11-22**. One deliberate pin:
 
 | Pin | Why |
 |---|---|
-| `@tanstack/angular-query-experimental` **5.104.1**, exactly | The Angular adapter is labelled *experimental*: breaking changes may land in minor **and patch** releases. Its own README asks you to pin the exact version — and so does every workshop. |
+| `@tanstack/angular-query` and `@tanstack/angular-query-devtools` **5.108.2**, exactly | The adapter is stable since 5.108 (it was `@tanstack/angular-query-experimental` before). Pinned exactly so every attendee runs the same version as the slides. |
 | `typescript` **~6.0** | Angular 22 requires `>=6.0 <6.1`. |
 
 `npm test` runs **Vitest through the Angular CLI** — the
@@ -81,7 +81,7 @@ here.
 The spec only knows two things: what the page shows (`data-testid`s), and
 `apiLog`, the list of requests the fake server received. It renders the whole
 app through **`src/tests/render.ts`** — the one file of the specs that knows it
-is Angular: `render(App, { providers: [provideTanStackQuery(createQueryClient())] })`
+is Angular: `render(App, { providers: [provideTanStackQuery(createQueryClient)] })`
 from `@testing-library/angular`, a fresh client per test, cleaned up after each.
 
 ## The Network panel

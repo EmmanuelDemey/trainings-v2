@@ -27,29 +27,30 @@ src: ../../tanstack-query-common/slides/06_devtools_testing/devtools.md
 # Devtools in Angular — `withDevtools`
 
 ```ts
-import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
+import { withDevtools } from '@tanstack/angular-query-devtools';
 
-provideTanStackQuery(createQueryClient(), withDevtools());
+provideTanStackQuery(createQueryClient, withDevtools());
 
 // with options — a function, re-evaluated: it may read signals
 provideTanStackQuery(
-  createQueryClient(),
+  createQueryClient,
   withDevtools(() => ({ initialIsOpen: false, buttonPosition: 'bottom-left' })),
 );
 ```
 
 | Entry point | Development build | Production build |
 |---|---|---|
-| `…/devtools` | the panel | **a stub** — nothing is bundled |
-| `…/devtools/production` | the panel | the panel (lazy-loaded) |
+| `@tanstack/angular-query-devtools` | the panel | **a stub** — nothing is bundled |
+| `@tanstack/angular-query-devtools/production` | the panel | the panel (lazy-loaded) |
 
 - The switch is the `development` export condition: the Angular builder sets it
   when scripts are not optimised (`ng serve`, `--configuration development`),
   `production` otherwise (`ng build`)
-- Devtools on demand in production: `…/devtools/production` +
-  `withDevtools((flags: Flags) => ({ loadDevtools: flags.devtools() }), { deps: [Flags] })`
+- Devtools on demand in production: `@tanstack/angular-query-devtools/production` +
+  `withDevtools(() => ({ loadDevtools: inject(Flags).devtools() }))` — the
+  callback runs in an injection context (the old `deps` option is gone)
 - An embedded panel instead of the floating one: `injectDevtoolsPanel` from
-  `…/devtools-panel`
+  `@tanstack/angular-query-devtools/devtools-panel`
 
 ---
 src: ../../tanstack-query-common/slides/06_devtools_testing/testing-principles.md
@@ -91,7 +92,7 @@ export async function renderWithClient<T>(component: Type<T>, options: RenderCom
   const queryClient = createTestQueryClient();
   const result = await render(component, {
     ...options,
-    providers: [provideTanStackQuery(queryClient), ...(options.providers ?? [])],
+    providers: [provideTanStackQuery(() => queryClient), ...(options.providers ?? [])],
   });
   return { ...result, queryClient };
 }
@@ -145,7 +146,7 @@ await renderWithClient(IssueList, {
 ```ts
 it('creates the issue, then invalidates every issue query', async () => {
   const queryClient = createTestQueryClient();
-  TestBed.configureTestingModule({ providers: [provideTanStackQuery(queryClient)] });
+  TestBed.configureTestingModule({ providers: [provideTanStackQuery(() => queryClient)] });
   using invalidate = vi.spyOn(queryClient, 'invalidateQueries');   // restored at the end of the test
 
   const createIssue = TestBed.runInInjectionContext(() => injectCreateIssue());

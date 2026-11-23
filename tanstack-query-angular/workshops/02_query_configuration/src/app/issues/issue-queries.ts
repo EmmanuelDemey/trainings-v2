@@ -2,7 +2,7 @@
  * Everything the app knows about reading issues lives here: the components
  * only ever call what this file exports.
  */
-import { queryOptions } from '@tanstack/angular-query-experimental';
+import { queryOptions } from '@tanstack/angular-query';
 import { fetchIssue, fetchIssues, type IssueFilter } from '../../api/fakeApi';
 
 /**

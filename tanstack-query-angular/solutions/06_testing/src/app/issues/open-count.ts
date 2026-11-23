@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import { injectQuery } from '@tanstack/angular-query';
 import { IssueQueries } from './issue-queries';
 
 /**

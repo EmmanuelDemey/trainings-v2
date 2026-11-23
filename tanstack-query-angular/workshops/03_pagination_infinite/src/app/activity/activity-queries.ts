@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/angular-query-experimental';
+import { queryOptions } from '@tanstack/angular-query';
 import { fetchActivity } from '../../api/fakeApi';
 
 export const activityKeys = {

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/angular';
-import { provideTanStackQuery } from '@tanstack/angular-query-experimental';
+import { provideTanStackQuery } from '@tanstack/angular-query';
 import { App } from '../app/app';
 import { createQueryClient } from '../queryClient';
 
@@ -17,6 +17,6 @@ import { createQueryClient } from '../queryClient';
  */
 export async function renderApp(): Promise<void> {
   await render(App, {
-    providers: [provideTanStackQuery(createQueryClient())],
+    providers: [provideTanStackQuery(createQueryClient)],
   });
 }

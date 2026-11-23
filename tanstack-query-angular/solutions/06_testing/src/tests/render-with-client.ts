@@ -1,6 +1,6 @@
 import type { Type } from '@angular/core';
 import { render, type RenderComponentOptions } from '@testing-library/angular';
-import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query';
 
 /**
  * A client for ONE test:
@@ -26,7 +26,7 @@ export async function renderWithClient<T>(component: Type<T>, options: RenderCom
   const queryClient = createTestQueryClient();
   const result = await render(component, {
     ...options,
-    providers: [provideTanStackQuery(queryClient), ...(options.providers ?? [])],
+    providers: [provideTanStackQuery(() => queryClient), ...(options.providers ?? [])],
   });
   return { ...result, queryClient };
 }

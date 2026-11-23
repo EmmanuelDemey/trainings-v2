@@ -28,8 +28,9 @@ src: ../../tanstack-query-common/slides/00_intro/agenda.md
 | Tool | Version | Note |
 |---|---|---|
 | Angular | **22.2** | standalone components, signals, zoneless by default |
-| `@tanstack/angular-query-experimental` | **5.104.1**, pinned exactly | the Angular adapter — see next slide |
-| `@tanstack/query-core` | 5.104.1 | the engine, shared with React, Vue, Solid, Svelte |
+| `@tanstack/angular-query` | **5.108.2** | the Angular adapter — stable since 5.108, see next slide |
+| `@tanstack/angular-query-devtools` | 5.108.2 | the devtools, now a package of their own |
+| `@tanstack/query-core` | 5.108.2 | the engine, shared with React, Vue, Solid, Svelte |
 | TypeScript | **6.0** | Angular 22 requires `>=6.0 <6.1` |
 | Vitest | 5.0 | run by `ng test` — the `@angular/build:unit-test` builder |
 | Testing Library | dom 10, angular 19.5, user-event 14 | |
@@ -42,22 +43,23 @@ src: ../../tanstack-query-common/slides/00_intro/agenda.md
 
 ---
 
-# "experimental" — what it means
+# From "experimental" to stable
 
 ```bash
-npm install --save-exact @tanstack/angular-query-experimental
+npm install @tanstack/angular-query @tanstack/angular-query-devtools
 ```
 
 - The **engine** (`query-core`) is the same stable code as React Query's: caching,
   retries, invalidation, optimistic updates behave identically
-- The **adapter** — the `inject*` functions, the providers — is labelled
-  experimental: *breaking changes may land in minor **and patch** releases*
-- So: **pin the exact version** (`"5.104.1"`, no `^`), read the changelog before
-  each upgrade, and upgrade on purpose — the workshops do exactly that
-- In practice the API has been steady across 5.x — but `injectQueries` still sits
-  behind an extra door: `@tanstack/angular-query-experimental/inject-queries-experimental`
-- Two names are already **deprecated**: `provideAngularQuery` (use
-  `provideTanStackQuery`) and `injectQueryClient()` (use `inject(QueryClient)`)
+- The **adapter** left `@tanstack/angular-query-experimental` in 5.108: semver
+  applies now — it requires **Angular 20.1+**
+- `injectQueries` is stable, exported by the main entry point; the devtools moved
+  to `@tanstack/angular-query-devtools`
+- Coming from the experimental package? A schematic does most of the work:
+  `ng generate @tanstack/angular-query:migrate-from-experimental`
+- What changed on the way: `provideTanStackQuery` takes a client **factory**, the
+  `injector` options are gone, `injectIsFetching` / `injectIsMutating` take a
+  filters **function**, `injectQueryClient()` → `inject(QueryClient)`
 
 ---
 
@@ -65,7 +67,7 @@ npm install --save-exact @tanstack/angular-query-experimental
 
 ```ts
 // src/queryClient.ts — the app AND the tests build their client here
-import { QueryClient } from '@tanstack/angular-query-experimental';
+import { QueryClient } from '@tanstack/angular-query';
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } });
@@ -74,17 +76,19 @@ export function createQueryClient(): QueryClient {
 
 ```ts
 // src/app/app.config.ts
-import { provideTanStackQuery } from '@tanstack/angular-query-experimental';
-import { withDevtools } from '@tanstack/angular-query-experimental/devtools';
+import { provideTanStackQuery } from '@tanstack/angular-query';
+import { withDevtools } from '@tanstack/angular-query-devtools';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideTanStackQuery(createQueryClient(), withDevtools()),
+    provideTanStackQuery(createQueryClient, withDevtools()),
   ],
 };
 ```
 
+- `createQueryClient` is passed, not called: Angular runs the factory once per
+  injector, inside an injection context
 - One client per application, in the **root** injector: every `injectQuery`
   below reads and writes the same cache
 - `QueryClient` is itself the DI token: `inject(QueryClient)` anywhere

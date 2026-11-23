@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import { injectQuery } from '@tanstack/angular-query';
 import { issuePageQuery } from './issue-queries';
 
 @Component({

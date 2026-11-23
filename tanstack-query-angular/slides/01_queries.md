@@ -66,7 +66,7 @@ src: ../../tanstack-query-common/slides/01_queries/query-function.md
 # `injectQuery` — the Angular adapter
 
 ```ts
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import { injectQuery } from '@tanstack/angular-query';
 
 @Component({
   selector: 'app-open-count',
@@ -156,15 +156,16 @@ export class IssueList {
 ```
 
 ```ts
-// Anywhere else: hand it an injector — or run in its context
+// Anywhere else: run it in an injection context
 private readonly injector = inject(Injector);
 
 load() {
-  return injectQuery(() => issuesQuery('open'), { injector: this.injector });
-  // or: runInInjectionContext(this.injector, () => injectQuery(…))
+  return runInInjectionContext(this.injector, () => injectQuery(() => issuesQuery('open')));
 }
 ```
 
+- The stable adapter has **no** `injector` option any more:
+  `runInInjectionContext` is the one way
 - **Your own** `injectXxx()` functions inherit the rule — and the benefit:
   `injectCreateIssue()` is just a function that calls `inject` and `injectMutation`
 
@@ -207,7 +208,7 @@ src: ../../tanstack-query-common/slides/01_queries/statuses.md
 # Several queries at once — `injectQueries`
 
 ```ts
-import { injectQueries } from '@tanstack/angular-query-experimental/inject-queries-experimental';
+import { injectQueries } from '@tanstack/angular-query';
 
 export class IssueCompare {
   readonly ids = input.required<number[]>();
@@ -227,9 +228,7 @@ export class IssueCompare {
 
 - A **dynamic** number of queries — `injectQuery` in a `@for` is impossible
 - Returns **one** signal (`issues()`) holding an array of results, each made of signals
-- Note the entry point: experimental **inside** the experimental package — its
-  `combine` option works, but in 5.104 its types still describe signals where the
-  function receives plain results
+- Stable since 5.108, from the main entry point — no extra `…-experimental` door
 
 ---
 

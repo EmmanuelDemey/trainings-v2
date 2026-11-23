@@ -78,7 +78,7 @@ whose `issueId` is an `input<number>()` — `undefined` until something is selec
 
 1. Make `issueDetailQuery` accept `id: number | undefined`.
 2. Give it `queryFn: id === undefined ? skipToken : () => fetchIssue(id)`.
-   `skipToken` (from `@tanstack/angular-query-experimental`) disables the query
+   `skipToken` (from `@tanstack/angular-query`) disables the query
    like `enabled: false` — and lets TypeScript narrow `id` to a number in the
    function. With `enabled: id !== undefined` you would still need `fetchIssue(id!)`.
 3. In `IssueDetail`, drop the `as number`:

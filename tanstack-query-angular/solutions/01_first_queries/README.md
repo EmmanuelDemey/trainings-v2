@@ -6,7 +6,7 @@
 
 ## Goal
 
-Chapter 01 — Replace hand-rolled fetching with **`@tanstack/angular-query-experimental`**:
+Chapter 01 — Replace hand-rolled fetching with **`@tanstack/angular-query`**:
 
 - **One client** for the whole app, with the devtools
 - **One cache**: two components, the same key, one request
@@ -41,12 +41,12 @@ edit them.
 
 **Already done for you:**
 
-- `@tanstack/angular-query-experimental` is in `package.json` — pinned to an
-  exact version, because the adapter is *experimental* (breaking changes may
-  come in a patch).
+- `@tanstack/angular-query` and `@tanstack/angular-query-devtools` are in
+  `package.json` — pinned to an exact version, so you run the same version as
+  the slides.
 - `src/queryClient.ts` exports `createQueryClient()`. The app does not use it
   yet — but **`src/tests/render.ts` does**: the spec renders `App` with
-  `provideTanStackQuery(createQueryClient())` in its providers. That is why the
+  `provideTanStackQuery(createQueryClient)` in its providers. That is why the
   starter can be rendered by the spec at all, and why it is still red: the
   components ignore the client. Step 1 gives the same client to the real app.
 
@@ -72,9 +72,9 @@ edit them.
 
 ### 1. One client for the app — `app/app.config.ts`
 
-1. Add `provideTanStackQuery(createQueryClient(), withDevtools())` to the
-   providers. `provideTanStackQuery` comes from `@tanstack/angular-query-experimental`,
-   `withDevtools` from `@tanstack/angular-query-experimental/devtools`.
+1. Add `provideTanStackQuery(createQueryClient, withDevtools())` to the
+   providers. `provideTanStackQuery` comes from `@tanstack/angular-query`,
+   `withDevtools` from `@tanstack/angular-query-devtools`.
 2. Nothing else changes yet: no component uses the client.
 
 **Check it**: `npm run dev`. A TanStack flower button sits at the bottom of the

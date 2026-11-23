@@ -57,7 +57,7 @@ provided (`app.config.ts`), with `staleTime: 30_000` (`queryClient.ts`).
 ### 1. A paginated query — `issue-table.ts`
 
 1. Spread the options and add `placeholderData: keepPreviousData` (from
-   `@tanstack/angular-query-experimental`):
+   `@tanstack/angular-query`):
    `injectQuery(() => ({ ...issuePageQuery(this.page()), placeholderData: keepPreviousData }))`.
    Until the new page lands, the query shows the last data it had:
    `isPending()` stays false, `isPlaceholderData()` is true.
@@ -76,7 +76,7 @@ provided (`app.config.ts`), with `staleTime: 30_000` (`queryClient.ts`).
 2. In the constructor, an `effect()`: read `this.issues.data()`; if there is a
    real page (not a placeholder) and a page after it, call
    `this.queryClient.query(issuePageQuery(current.page + 1)).catch(noop)`
-   (`noop` is exported by `@tanstack/angular-query-experimental`).
+   (`noop` is exported by `@tanstack/angular-query`).
 
 Why an `effect()` and not the click handler? The **data** decides: the first
 load, the back button, any way of reaching a page — all prefetch the same. And

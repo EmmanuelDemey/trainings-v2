@@ -62,31 +62,30 @@ src: ../../tanstack-query-common/slides/07_at_scale/defaults-errors.md
 
 # A client built inside DI
 
-`provideTanStackQuery` also accepts an **`InjectionToken<QueryClient>`**:
+`provideTanStackQuery` takes a **factory** — and runs it in an injection context:
 
 ```ts
-export const QUERY_CLIENT = new InjectionToken<QueryClient>('QUERY_CLIENT', {
-  factory: () => {
-    const toasts = inject(Toasts);               // any service of the app
-    return new QueryClient({
-      defaultOptions: { queries: { staleTime: 30_000 } },
-      queryCache: new QueryCache({
-        onError: (error, query) => { if (query.state.data !== undefined) toasts.show(error.message); },
-      }),
-      mutationCache: new MutationCache({ onError: (error) => toasts.show(error.message) }),
-    });
-  },
-});
+export function createQueryClient(): QueryClient {
+  const toasts = inject(Toasts);                 // any service of the app
+  return new QueryClient({
+    defaultOptions: { queries: { staleTime: 30_000 } },
+    queryCache: new QueryCache({
+      onError: (error, query) => { if (query.state.data !== undefined) toasts.show(error.message); },
+    }),
+    mutationCache: new MutationCache({ onError: (error) => toasts.show(error.message) }),
+  });
+}
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideTanStackQuery(QUERY_CLIENT, withDevtools())],
+  providers: [provideTanStackQuery(createQueryClient, withDevtools())],
 };
 ```
 
-- `new QueryClient()` in `app.config.ts` runs **outside** any injection context;
-  the token's factory runs inside one
-- `throwOnError: true` sends the error to Angular's `ErrorHandler` — there is no
-  error boundary component in Angular
+- Angular calls the factory once per injector, **inside** an injection context:
+  no `InjectionToken` needed any more
+- No `throwOnError` on Angular observers: the stable adapter removed it — read
+  the `error` signal, or route errors to Angular's `ErrorHandler` from the cache
+  callbacks (`refetch({ throwOnError: true })` still works imperatively)
 
 ---
 src: ../../tanstack-query-common/slides/07_at_scale/prefetching.md

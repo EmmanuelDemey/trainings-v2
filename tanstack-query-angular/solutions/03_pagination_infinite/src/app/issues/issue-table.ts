@@ -1,5 +1,5 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { injectQuery, keepPreviousData, noop, QueryClient } from '@tanstack/angular-query-experimental';
+import { injectQuery, keepPreviousData, noop, QueryClient } from '@tanstack/angular-query';
 import { issuePageQuery } from './issue-queries';
 
 @Component({

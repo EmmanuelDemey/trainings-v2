@@ -4,7 +4,7 @@
  * constructor), like `injectMutation` itself.
  */
 import { inject } from '@angular/core';
-import { injectMutation, QueryClient } from '@tanstack/angular-query-experimental';
+import { injectMutation, QueryClient } from '@tanstack/angular-query';
 import { ISSUE_API } from './issue-api';
 import { issueKeys } from './issue-queries';
 

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { provideTanStackQuery } from '@tanstack/angular-query-experimental';
+import { provideTanStackQuery } from '@tanstack/angular-query';
 import { apiSettings, resetApi } from '../api/fakeApi';
 import { injectCreateIssue } from '../app/issues/issue-mutations';
 import { issueKeys } from '../app/issues/issue-queries';
@@ -14,7 +14,7 @@ beforeEach(() => {
 describe('injectCreateIssue, without a component', () => {
   it('creates the issue, then invalidates every issue query', async () => {
     const queryClient = createTestQueryClient();
-    TestBed.configureTestingModule({ providers: [provideTanStackQuery(queryClient)] });
+    TestBed.configureTestingModule({ providers: [provideTanStackQuery(() => queryClient)] });
     // `using`: the spy is restored (`mockRestore()`) when the test's scope
     // ends — no `afterEach` to forget.
     using invalidate = vi.spyOn(queryClient, 'invalidateQueries');

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { injectInfiniteQuery } from '@tanstack/angular-query-experimental';
+import { injectInfiniteQuery } from '@tanstack/angular-query';
 import { activityFeedQuery } from './activity-queries';
 
 @Component({
