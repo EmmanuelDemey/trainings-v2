@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReBoot — refurbished phones</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <p class="logo"><span>Re</span>Boot</p>
+        <nav aria-label="Main menu">
+          <ul>
+            <li><a href="index.html" aria-current="page">Phones</a></li>
+            <li><a href="#about">Our commitment</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <picture>
+          <source type="image/avif" srcset="images/hero-800.avif 800w, images/hero-1200.avif 1200w" sizes="(min-width: 72rem) 70rem, 100vw" />
+          <img
+            src="images/hero-1200.webp"
+            srcset="images/hero-800.webp 800w, images/hero-1200.webp 1200w"
+            sizes="(min-width: 72rem) 70rem, 100vw"
+            width="1200"
+            height="600"
+            alt=""
+            class="hero-image"
+            fetchpriority="high"
+          />
+        </picture>
+        <div class="hero-text">
+          <h1>Refurbished phones, as good as new</h1>
+          <p>Up to 70 % cheaper, and 80 % less carbon than a new one.</p>
+        </div>
+      </section>
+
+      <!-- TODO workshop 5: the promo banner, as the marketing team uploaded it -->
+      <section class="promo">
+        <img src="images/promo.png" alt="Black Friday: −20 % on every Fairphone" class="promo-image" />
+      </section>
+
+      <section>
+        <h2>Our phones</h2>
+        <p class="stock" id="stock">Checking the stock…</p>
+        <ul class="products" id="products"></ul>
+      </section>
+
+      <section>
+        <h2>What our customers say</h2>
+        <button type="button" id="show-reviews">Show the reviews</button>
+        <ol class="reviews" id="reviews" hidden></ol>
+      </section>
+
+      <section id="about">
+        <h2>Our commitment</h2>
+        <p>
+          Making a phone weighs far more than using it: about 80 % of its footprint comes before you switch it on.
+          Every phone we refurbish is a phone that is not made.
+        </p>
+      </section>
+    </main>
+
+    <footer><p>ReBoot — a fictional shop, for the Green IT training.</p></footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

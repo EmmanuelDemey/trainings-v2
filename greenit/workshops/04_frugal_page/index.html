@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReBoot — refurbished phones</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- TODO workshop 4: 200 kB of code, for one function -->
+    <script src="vendor/everything.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="logo-wrapper"><div class="logo"><span>Re</span>Boot</div></div>
+        <nav aria-label="Main menu">
+          <ul>
+            <li><a href="index.html" aria-current="page">Phones</a></li>
+            <li><a href="#about">Our commitment</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <!-- TODO workshop 4: a 1920px PNG, for a banner -->
+        <img src="images/hero.png" alt="" class="hero-image" />
+        <div class="hero-text">
+          <h1>Refurbished phones, as good as new</h1>
+          <p>Up to 70 % cheaper, and 80 % less carbon than a new one.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Our phones</h2>
+        <p class="stock" id="stock">Checking the stock…</p>
+        <!-- TODO workshop 4: 1000px PNGs, displayed at 240px, all loaded at once -->
+        <ul class="products" id="products"></ul>
+      </section>
+
+      <section>
+        <h2>What our customers say</h2>
+        <button type="button" id="show-reviews">Show the reviews</button>
+        <!-- TODO workshop 4: 400 reviews in the DOM, before anyone asks for them -->
+        <ol class="reviews" id="reviews" hidden></ol>
+      </section>
+
+      <section id="about">
+        <h2>Our commitment</h2>
+        <p>
+          Making a phone weighs far more than using it: about 80 % of its footprint comes before you switch it on.
+          Every phone we refurbish is a phone that is not made.
+        </p>
+      </section>
+    </main>
+
+    <footer><p>ReBoot — a fictional shop, for the Green IT training.</p></footer>
+
+    <script src="products.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "maxDom": 400,
+  "maxRequests": 20,
+  "maxSizeKb": 300,
+  "minGrade": "A"
+}

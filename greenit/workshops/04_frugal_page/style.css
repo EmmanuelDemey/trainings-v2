@@ -1,0 +1,31 @@
+:root {
+  --green: #1f6f4a;
+  --ink: #1d1f24;
+  --paper: #f6f7f4;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; color: var(--ink); background: var(--paper); line-height: 1.5; }
+header { background: var(--green); color: white; }
+.header-inner { display: flex; justify-content: space-between; align-items: center; max-width: 72rem; margin: auto; padding: 0.75rem 1rem; }
+.logo { font-weight: 800; font-size: 1.5rem; }
+.logo span { color: #b8f5d0; }
+nav ul { display: flex; gap: 1.5rem; list-style: none; margin: 0; padding: 0; }
+nav a { color: white; }
+main { max-width: 72rem; margin: auto; padding: 0 1rem 2rem; }
+.hero { position: relative; margin: 1rem 0 2rem; }
+.hero-image { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; object-fit: cover; border-radius: 0.5rem; }
+.hero-text { position: absolute; left: 2rem; bottom: 2rem; background: rgb(255 255 255 / 0.9); padding: 1rem 1.5rem; border-radius: 0.5rem; max-width: 30rem; }
+.hero-text h1 { margin: 0 0 0.25rem; font-size: 1.75rem; }
+.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+.product img { display: block; width: 100%; height: auto; aspect-ratio: 1; border-radius: 0.5rem 0.5rem 0 0; }
+.card { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgb(0 0 0 / 0.15); }
+.card-body { padding: 0.75rem 1rem 1rem; }
+.card-body h3 { margin: 0; }
+.grade { font-size: 0.875rem; color: #4a5a52; }
+.price { font-weight: 700; font-size: 1.25rem; color: var(--green); }
+.reviews { columns: 3 14rem; }
+.review { break-inside: avoid; }
+.author { font-weight: 600; }
+.stars { color: #9a6700; margin-left: 0.5rem; }
+button { font: inherit; padding: 0.5rem 1rem; border: 2px solid var(--green); background: white; color: var(--green); border-radius: 0.25rem; cursor: pointer; }
+footer { text-align: center; padding: 1rem; color: #4a5a52; }
