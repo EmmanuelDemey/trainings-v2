@@ -357,3 +357,21 @@ table { font-size: 0.85em; }
 <!--
 Transition: no workshop for this chapter — the workshops are framework-free on purpose, everything learnt there carries over to any stack. Next chapter: microdata — one level above semantic HTML, meaning for machines rather than for screen readers, then workshop 09.
 -->
+
+---
+
+# Quiz — Frameworks and libraries
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. What does a SPA route change miss that a page load did for free?
+2. After a route change, where do you move the focus?
+3. What is a *headless* component library?
+
+<!--
+Answers:
+
+1. A new title, an announcement, the focus back at the top.
+2. To the page's `<h1>` (or `<main>`), with `tabIndex={-1}`.
+3. Behaviour, keyboard and ARIA done for you, **no styling**: React Aria, Radix, Reka UI…
+-->

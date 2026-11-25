@@ -16,7 +16,12 @@ At the end of this chapter, you will be able to:
 - **Name** the four families of impairments and what each one needs from a page
 - **Recognise** the assistive technologies, and explain how a screen reader
   reads a page through the **accessibility tree**
-- **Drive** a screen reader with its essential shortcuts — workshop 01
+- **Drive** a screen reader with its essential shortcuts, on desktop and on a
+  phone — workshop 01
+
+<!--
+Five verbs: the first two are the "why", the last three the "how". Ask the room early who has a screen reader on their phone: there is always one already on it, VoiceOver or TalkBack.
+-->
 
 ---
 layout: statement
@@ -24,6 +29,10 @@ layout: statement
 
 What does *digital accessibility* mean to you?
 Who do you think it concerns?
+
+<!--
+Two or three minutes, collect the answers on the board. Most people answer "blind people" and "the law": the next slides widen both. Keep the board: the recap comes back to it.
+-->
 
 ---
 
@@ -63,6 +72,10 @@ accessibility*, *accessibilité* (French)
 
 </div>
 </div>
+
+<!--
+The Edutec definition is wider than disability on purpose: hardware, network, language. That is the bridge to "accessibility benefits everyone" a few slides later. a11y is a numeronym, like i18n.
+-->
 
 ---
 
@@ -132,6 +145,10 @@ Permanent **or** temporary. This training covers all four.
 - **2.2 billion** people have a near or distance vision impairment (WHO);
   **300 million** are colour blind
 
+<!--
+Insist on the cognitive family: it is the largest and the least known, and its needs (plain language, consistency, time) are rarely tested. Colour blindness: about 1 man in 12, 1 woman in 200 — test it in DevTools, Rendering, Emulate vision deficiencies (chapter 09).
+-->
+
 <style>
 table { font-size: 0.8em; }
 td, th { padding-top: 0.3em !important; padding-bottom: 0.3em !important; }
@@ -155,6 +172,10 @@ Situational and temporary disabilities meet the same features:
 
 > Accessible design improves the experience of **everyone**, not only of people
 > with a permanent disability — the *curb cut effect*.
+
+<!--
+Curb cuts were made for wheelchairs; prams, suitcases and bikes use them every day. Same with captions: most viewers who turn them on are not deaf. Microsoft's Inclusive Design toolkit frames it as permanent, temporary and situational: one arm, an arm injury, a new parent.
+-->
 
 ---
 
@@ -352,6 +373,68 @@ heading, K for next link).
 
 ---
 
+# On mobile — VoiceOver (iOS) and TalkBack (Android)
+
+| Action | VoiceOver — iOS | TalkBack — Android |
+|---|---|---|
+| Turn on / off | Settings → Accessibility, Siri, or a triple-click of the side button once set as the Accessibility Shortcut | Hold **both volume keys** a few seconds |
+| Explore | Drag a finger: what is under it is read | Same |
+| Next / previous item | Swipe **right** / **left** | Swipe **right** / **left** |
+| Activate | **Double-tap** | **Double-tap** |
+| Read from the top / from here | Two-finger swipe **up** / **down** | — / two-finger **triple-tap** (from the next item) |
+| Pause speech | Two-finger tap | Two-finger tap |
+| Scroll | **Three**-finger swipe | **Two**-finger swipe |
+| Jump by type | The **rotor**: two-finger rotation, then swipe up / down | **Reading controls**: three-finger swipe up / down, then swipe up / down |
+| Back | Two-finger **scrub** (a "Z") | Swipe down then left |
+
+<style>
+table { font-size: 0.72em; }
+td, th { padding-top: 0.15em !important; padding-bottom: 0.15em !important; }
+</style>
+
+<!--
+Sources: Apple, "Learn VoiceOver gestures on iPhone"; Google, "Use TalkBack gestures" (TalkBack 9.1+, multi-finger). Gestures vary with the TalkBack version and the phone maker: check on the device you demo with. Screen curtain on iOS (three-finger triple-tap) blacks out the screen while VoiceOver keeps running: the most convincing demo. Mobile use matters: in the WebAIM 2026 survey, most respondents also use a screen reader on a phone — iOS/VoiceOver 73%, Android 24%.
+-->
+
+---
+
+# Mobile versus desktop — what changes
+
+<div style="display: flex; gap: 2em;">
+<div>
+
+### For the user
+
+- **No Tab key**: the swipe follows the **DOM order**, not the visual one
+- A single tap **selects**, a **double-tap** activates: hover and
+  "tap to reveal" do not exist
+- The **rotor** / reading controls replace the shortcut keys: headings,
+  links, form controls, landmarks
+- An **on-screen keyboard** takes half the screen when a field has the focus
+- Screen **curtain**: many users browse with the screen off
+
+</div>
+<div>
+
+### For you
+
+- Same rules, same tree: **roles, names, states**
+- Touch **targets** of at least **24 × 24 px** (2.5.8, AA) — 44 px is better
+- No gesture that **needs** several fingers or a path (2.5.1) or a drag
+  (2.5.7): give a simple tap alternative
+- **Orientation** and **zoom** never locked (1.3.4, 1.4.4) — chapter 05
+- Test on a **real phone**: the simulators do not run VoiceOver or TalkBack
+  the same way
+
+</div>
+</div>
+
+<!--
+The swipe order is the DOM order: a CSS grid or flex `order` that reorders visually breaks it, exactly as with Tab on desktop. `user-scalable=no` or `maximum-scale=1` in the viewport meta blocks pinch-zoom: iOS Safari ignores it since iOS 10, Android Chrome does not always. On iOS the Xcode simulator has no VoiceOver: use the Accessibility Inspector, or a real device.
+-->
+
+---
+
 # Watch it before you try it
 
 | Video | Length | What you see |
@@ -366,6 +449,10 @@ heading, K for next link).
 > Test your own site with one of them **before** you deploy: five minutes are
 > enough to find the worst problems.
 
+<!--
+Do not play them in the room: give the links, they are homework or the first step of workshop 01. If you show one, the VoiceOver basics, two minutes, at a high speech rate: it makes the "300 words per minute" figure concrete.
+-->
+
 ---
 
 # Recap
@@ -378,6 +465,8 @@ heading, K for next link).
   the **accessibility tree** — role, name, state — never the CSS
 - The **rotor** shows the page's structure: no headings, no landmarks, no
   shortcuts
+- On a **phone**: swipe, double-tap, the rotor or the reading controls — the
+  same tree, read in **DOM order**
 
 > In the workshop you **hear** your first pages: everything later in the
 > training is about what you heard.
@@ -386,6 +475,22 @@ heading, K for next link).
 Transition: workshop 01 is manual, no automated grading. Pair people whose
 laptop cannot run a screen reader. Then chapter 03: the standards that say
 what "accessible" means, and who must comply.
+-->
+
+# Quiz — Why accessibility
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. Who benefits from an accessible page?
+2. What does a screen reader read: the HTML, the CSS, or something else?
+3. Most assistive technologies emulate which device — and so what must work?
+
+<!--
+Answers:
+
+1. Everyone: permanent, temporary and situational impairments — a broken arm, the sun on a phone, a noisy train.
+2. The **accessibility tree**: role, name, state of each node. Never the CSS.
+3. A **keyboard**: everything must work with Tab, Enter, Space and the arrows.
 -->
 
 ---
@@ -397,3 +502,7 @@ layout: cover
 ## Screen readers
 
 `workshops/01_screen_reader`
+
+<!--
+45 minutes, 1 h if NVDA has to be installed. No code, no verify. Those who finish early: the same steps with VoiceOver or TalkBack on their phone. Next chapter: the standards that say what "accessible" means, and who must comply.
+-->

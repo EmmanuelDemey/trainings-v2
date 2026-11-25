@@ -418,6 +418,22 @@ table { font-size: 0.85em; }
 The last line is not optional: an ARIA widget is not finished until it was tested with a screen reader.
 -->
 
+# Quiz — ARIA
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. The first rule of ARIA?
+2. `role="button"` on a `<div>`: what does it add?
+3. A disclosure button opens a panel: which attribute changes?
+
+<!--
+Answers:
+
+1. Don't use ARIA when a native HTML element does the job.
+2. Only the **announcement**. The focus and the keyboard are still yours to write.
+3. `aria-expanded`, kept in sync on every interaction.
+-->
+
 ---
 layout: cover
 ---

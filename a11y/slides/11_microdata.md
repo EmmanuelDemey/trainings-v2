@@ -143,31 +143,12 @@ Why not <time datetime="Tu-Sa 12:00-22:00">? It is not a valid datetime value fo
 - Same vocabulary, **no change** to the markup — the format Google recommends
 - `sameAs`: several profiles, **one** person
 - ❌ It can drift from what is on screen: the data must **match** the visible
-  content
+  content — microdata, **on** the visible elements, stays in sync by construction
+- Check either with the [Schema Markup Validator](https://validator.schema.org/)
+  or Google's [Rich Results Test](https://search.google.com/test/rich-results)
 
 <!--
 Google's guidelines say structured data must describe the visible content; markup that does not can be ignored or penalised. That is the price of JSON-LD's convenience.
--->
-
----
-
-# Microdata or JSON-LD?
-
-| | Microdata | JSON-LD |
-|---|---|---|
-| Where | **On** the visible elements | In a `<script>`, anywhere in the page |
-| Stays in sync with the page | **By construction** | By discipline |
-| Easy to generate | From the template that renders the rows | From the data, server side |
-| Readable | Mixed with the HTML | One block, easy to review |
-
-<br />
-
-- Check either with the [Schema Markup Validator](https://validator.schema.org/)
-  and Google's [Rich Results Test](https://search.google.com/test/rich-results)
-- Workshop 09 uses **microdata**: the rows are already rendered by `script.js`
-
-<!--
-No dogma: both are valid, both use schema.org. Choose microdata when the template already renders the data, JSON-LD when the data lives server side or when the HTML is hard to touch.
 -->
 
 ---

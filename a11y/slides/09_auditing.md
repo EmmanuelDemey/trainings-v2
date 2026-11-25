@@ -16,6 +16,8 @@ At the end of this chapter, you will be able to:
 - **Run** axe-core from Playwright, and lock the accessibility tree with
   `toMatchAriaSnapshot`
 - **Write** tests that find elements by **role and accessible name**
+- **Gate** every pull request in the CI: Playwright + axe, Pa11y CI,
+  Lighthouse CI
 - **Run** a manual audit: keyboard, screen reader, accessibility tree
 
 <!--
@@ -69,6 +71,8 @@ The figures differ by method: by criterion, a third at best; by volume of issues
 | **jest-axe** / **vitest-axe** | Unit tests, one component | The axe rules on a rendered component |
 | **Playwright** + `@axe-core/playwright` | **End-to-end**, in the CI | The axe rules on a real page, in every state |
 | `toMatchAriaSnapshot` | End-to-end | A **change** in the accessibility tree |
+| **Pa11y CI** | **In the CI**, a list of URLs | axe and HTML_CodeSniffer rules, no test code |
+| **Lighthouse CI** | In the CI, next to performance | An accessibility **score**, a subset of axe |
 | **Lighthouse**, **axe DevTools**, WAVE | **In the browser**, by hand | The axe rules, with a visual report |
 | Chrome DevTools — *Rendering* | In the browser | Colour vision deficiencies, `prefers-*`, `forced-colors` |
 
@@ -207,6 +211,132 @@ Demo: start from an empty toMatchAriaSnapshot(``), run with --update-snapshots, 
 
 ---
 
+# In the CI — a red check blocks the merge
+
+```yaml
+# .github/workflows/accessibility.yml
+name: Accessibility
+on: [pull_request]
+
+jobs:
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test          # the axe and ARIA snapshot tests
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with: { name: playwright-report, path: playwright-report/ }
+```
+
+- The tests of the two previous slides, on **every pull request**
+- `webServer` in `playwright.config.ts` builds and starts the app before the tests
+- A **required check** (branch protection): a regression cannot be merged
+- On failure, the HTML report is attached: each violation, its node, its fix
+
+<!--
+The point is not the YAML, it is the required check: without branch protection, a red job is a suggestion. Start with the pages that matter most, and with zero violations on them — a baseline of 200 known violations that nobody reads is worse than five pages that are clean and stay clean.
+-->
+
+---
+
+# Pa11y CI — a list of URLs, no test code
+
+```json
+// .pa11yci.json
+{
+  "defaults": {
+    "standard": "WCAG2AA",
+    "runners": ["axe", "htmlcs"]
+  },
+  "urls": [
+    "http://localhost:4173/",
+    "http://localhost:4173/people/new",
+    {
+      "url": "http://localhost:4173/people",
+      "actions": ["click element #details-1", "wait for element [role=dialog] to be visible"]
+    }
+  ]
+}
+```
+
+```bash
+npx pa11y-ci                                     # the URLs of .pa11yci.json
+npx pa11y-ci --sitemap https://example.com/sitemap.xml   # every page of a site
+```
+
+- **Configuration only**: good for a content site with many pages
+- Two engines side by side: **axe** and **HTML_CodeSniffer**
+- Only the state **on load** — unless you script `actions`; past a few clicks,
+  write Playwright tests instead
+
+<!--
+Pa11y CI exits with a non-zero code as soon as a URL has an error: that is all a CI needs. `--threshold` tolerates a number of errors while a legacy site is being fixed; lower it release after release. The sitemap mode is the cheapest way to cover a whole documentation or marketing site.
+-->
+
+---
+
+# Lighthouse CI — a score as a gate
+
+```json
+// lighthouserc.json
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "npm run preview",
+      "url": ["http://localhost:4173/", "http://localhost:4173/people/new"]
+    },
+    "assert": {
+      "assertions": {
+        "categories:accessibility": ["error", { "minScore": 1 }]
+      }
+    }
+  }
+}
+```
+
+```bash
+npx @lhci/cli autorun
+```
+
+- Worth it when Lighthouse **already runs** for performance: one more assertion
+- A **subset** of the axe rules, on the state on load only
+- ❌ A score of 100 is not a verdict: `<img alt="image">` scores 100
+
+<!--
+minScore 1 means 100/100: on a new project, start there and never go below. On an existing one, start at the current score and raise it. The score is a weighted average of the audits: one failing heavy audit costs more than several light ones, which makes it a poor progress indicator — the list of failing audits is what to read.
+-->
+
+---
+
+# Which one in the CI?
+
+| | Playwright + axe | Pa11y CI | Lighthouse CI |
+|---|---|---|---|
+| **What you write** | Tests, in code | A list of URLs | A list of URLs and a score |
+| **States** | Every state you drive | On load, or scripted `actions` | On load |
+| **Finds elements by role** | Yes — and `toMatchAriaSnapshot` | No | No |
+| **Best for** | An application | A site with many pages | A project already on Lighthouse |
+
+<br />
+
+> Pick **one** engine run in the CI, not three: they share most rules. Then
+> spend the time saved on the **manual** checks no tool runs.
+
+<style>
+table { font-size: 0.85em; }
+</style>
+
+<!--
+For an application, Playwright + axe covers what the other two do, and the states they miss. Pa11y CI shines on a documentation or marketing site with a sitemap. Transition: this training's own repository runs the first option — next slide.
+-->
+
+---
+
 # The workshops are graded the same way
 
 ```bash
@@ -228,6 +358,8 @@ const { violations } = await page.evaluate(() => window.axe.run(document));
 - **Playwright** drives a real Chromium: Tab, submit the form empty, open the dialog
 - Every element is found by **role and accessible name** — never by a CSS class
 - From workshop 08 on, **axe-core** runs on top: the engine of Lighthouse
+- The CI of this repository runs `pnpm run verify` on every push: the solutions
+  must pass, the starters must **fail**
 
 <!--
 Show the real file, scripts/verify.mjs: the learners have been graded by an end-to-end accessibility test since workshop 03. Each workshop replays the checks of the previous ones, so nothing fixed earlier comes back.
@@ -299,6 +431,8 @@ This is the checklist of workshop 02, now that the learners know every topic beh
 - [a11y.css](https://ffoodd.github.io/a11y.css) — a stylesheet that highlights problems in the page
 - [`@guidepup/guidepup`](https://www.guidepup.dev/) — drive VoiceOver and NVDA from a test
 - Puppeteer `page.emulateVisionDeficiency('deuteranopia')` — screenshots per deficiency
+- [Pa11y CI](https://github.com/pa11y/pa11y-ci) ·
+  [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)
 - [Playwright — accessibility testing](https://playwright.dev/docs/accessibility-testing) ·
   [ARIA snapshots](https://playwright.dev/docs/aria-snapshots)
 - [The RGAA audit method](https://accessibilite.numerique.gouv.fr/methode/) ·
@@ -306,6 +440,22 @@ This is the checklist of workshop 02, now that the learners know every topic beh
 
 <!--
 Guidepup is still young: good for a smoke test of a widget, not for a whole suite.
+-->
+
+# Quiz — Auditing
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. Zero axe violations: is the page accessible?
+2. Why `getByRole` rather than `getByTestId`?
+3. What makes an accessibility CI job actually block a regression?
+
+<!--
+Answers:
+
+1. No. Tools fully test about a third of the criteria: `alt="image"` passes.
+2. It finds elements the way a screen reader does: no role or no name, the test fails.
+3. A **required check** on the branch: a red job alone is only a suggestion.
 -->
 
 ---

@@ -652,6 +652,77 @@ Zoom works either way: the font size setting is the one px breaks.
 
 ---
 
+# Zoom and reflow — 200 %, 400 %, 320 px
+
+<div style="display: flex; gap: 2em;">
+<div>
+
+### The criteria
+
+- **1.4.4** Resize Text (AA) — text resized to **200 %**, nothing lost
+- **1.4.10** Reflow (AA) — at **320 CSS px** wide, a **single column**: no
+  horizontal scroll for vertical text
+- 320 px = a **1280 px** screen zoomed to **400 %** — the same test
+- **1.4.12** Text Spacing (AA) — larger line, letter and word spacing do
+  not cut the text
+
+</div>
+<div>
+
+### How to test
+
+1. Browser zoom **200 %**, then **400 %** (Ctrl / Cmd and +)
+2. Or DevTools → device toolbar, **320 px** wide
+3. Look for: horizontal scrollbar, text **cut** or **overlapping**, a sticky
+   header that covers the screen, content that disappears
+4. Exceptions: data tables, maps, diagrams, toolbars may scroll in two
+   directions
+
+</div>
+</div>
+
+<!--
+Who needs it: low vision users zoom to 400 % and more, often with a screen magnifier (chapter 02). RGAA 10.4 (text at 200 %) and 10.11 (reflow at 320 px) — 10.12 for text spacing. A responsive site usually passes reflow for free; what fails is fixed widths, fixed heights on text, and sticky headers that take half the screen once zoomed (also 2.4.11 Focus Not Obscured).
+-->
+
+---
+
+# Reflow — what breaks, and the fix
+
+```css
+/* ❌ A fixed width: a horizontal scrollbar at 320 px */
+.layout { width: 1200px; }
+/* ✅ */
+.layout { max-width: 75rem; width: 100%; }
+
+/* ❌ A fixed height: the text overflows when it is zoomed or spaced */
+.card { height: 180px; overflow: hidden; }
+/* ✅ */
+.card { min-height: 11rem; }
+
+/* ✅ Columns that wrap instead of shrinking */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); }
+
+/* ✅ A sticky header only when there is room for it */
+@media (min-height: 30rem) { header { position: sticky; top: 0; } }
+
+/* ✅ Long words and URLs */
+p { overflow-wrap: anywhere; }
+```
+
+```html
+<!-- ❌ Blocks pinch-zoom on mobile -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<!-- ✅ -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+<!--
+Zooming the page makes the CSS viewport narrower, so the media queries apply: the same mobile layout serves 400 % zoom on desktop. The sticky header trick: at 400 % on a laptop the viewport is about 180 px high, a 100 px header leaves almost nothing. Test the text spacing with the bookmarklet of Steve Faulkner (link in RESSOURCES.md).
+-->
+
+---
+
 # User preferences — media queries
 
 | Media query | The user asked for… | You… |
@@ -823,6 +894,22 @@ forms, the other big source of failures.
 table { font-size: 0.85em; }
 </style>
 
+# Quiz — Semantic HTML
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. A `<div>` with a click handler: what is missing for a keyboard user?
+2. Button or link?
+3. A decorative image: which `alt`?
+
+<!--
+Answers:
+
+1. Everything: no focus, no Enter/Space, no role. Use a `<button>`.
+2. `<button>` to **act**, `<a href>` to **go** somewhere.
+3. An **empty** one, `alt=""` — not a missing one: the file name would be read.
+-->
+
 ---
 layout: cover
 ---
@@ -832,3 +919,7 @@ layout: cover
 ## Semantic HTML
 
 `workshops/04_semantic_html`
+
+---
+src: ./shared/retro.md
+---

@@ -19,6 +19,10 @@ At the end of this chapter, you will be able to:
 - **Audit** a page by hand and map each problem to a WCAG criterion —
   workshop 02
 
+<!--
+The densest chapter of the training: keep the legal part to what the room needs. A public-sector audience wants the RGAA and Arcom; an e-commerce one wants the EAA and the DGCCRF. Ask who works where before going through it.
+-->
+
 ---
 
 # The standards, from global to local
@@ -64,6 +68,10 @@ table { font-size: 0.85em; }
 
 - Stay up to date: [W3C WAI News](https://www.w3.org/WAI/news/)
 
+<!--
+Only WCAG and ARIA matter for developers; ATAG explains why a CMS must let editors add alt text, UAAG why browsers offer zoom and caret browsing.
+-->
+
 <style>
 table { font-size: 0.85em; }
 </style>
@@ -98,6 +106,10 @@ Visible* — and a level.
 </div>
 </div>
 
+<!--
+The number reads principle.guideline.criterion: 2.4.7 is principle 2 (Operable), guideline 4 (Navigable), criterion 7. Every finding of workshop 02 gets one. The "Understanding" document of each criterion is the one to open: intent, examples, failures.
+-->
+
 <style>
 table { font-size: 0.8em; }
 </style>
@@ -124,6 +136,10 @@ WCAG 2.2 additions:
 **Sources**: [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/) ·
 [WCAG history](https://www.w3.org/WAI/standards-guidelines/wcag/)
 
+<!--
+WCAG 2.x versions are backwards compatible: a page that meets 2.2 meets 2.1 and 2.0 (4.1.1 aside, removed as obsolete). WCAG 3.0 is a Working Draft with a different scoring model; no law refers to it, and it will not be final for several years. The 2.2 criteria most often failed in audits: 2.5.8 target size and 2.4.11 focus hidden by a sticky header.
+-->
+
 <style>
 table { font-size: 0.85em; }
 </style>
@@ -147,6 +163,10 @@ table { font-size: 0.85em; }
 > — **Marie Guillaumet**
 
 **Source**: [Understanding Levels of Conformance](https://www.w3.org/WAI/WCAG22/Understanding/conformance#levels)
+
+<!--
+The counts are for WCAG 2.2: 31 A, 24 AA, 31 AAA = 86. Conformance is per page, and all-or-nothing: one AA failure and the page is not AA. The W3C itself does not recommend requiring AAA for whole sites.
+-->
 
 <style>
 table { font-size: 0.85em; }
@@ -379,6 +399,10 @@ table { font-size: 0.8em; }
 > The guidelines and success criteria help ensure we forget nothing.
 > — **Marie Guillaumet**
 
+<!--
+Ask the room which reason they meet most. The five mistakes on the left are the five first workshops of the training — say so: by the end of tomorrow, they know how to fix all of them. "Everyone is involved": most accessibility bugs are designed before they are coded.
+-->
+
 ---
 
 # Court cases
@@ -418,6 +442,10 @@ cited are 13.3 (PDF), 10.8 (hidden content), 12.11 (keyboard), 5.7
 - [GOV.UK Accessibility Blog](https://accessibility.blog.gov.uk/) ·
   [Microsoft Accessibility](https://www.microsoft.com/en-us/accessibility) ·
   [BBC Accessibility Guidelines](https://www.bbc.co.uk/accessibility/forproducts/)
+
+<!--
+After the court cases, end on positive examples: the argument that lasts is quality, not fear. GOV.UK publishes its design system with the accessibility notes of each component, a good source for the workshops of tomorrow.
+-->
 
 <style>
 table { font-size: 0.8em; }
@@ -461,6 +489,10 @@ table { font-size: 0.8em; }
 > support tickets, conversion on mobile, audit results — they convince more
 > than any global average.
 
+<!--
+The 5–10% figure is an order of magnitude from industry practice, not a study: present it as such. Fixing after release costs several times more, because it touches design, code and tests again. Ask the room for one figure of their own they could bring to their manager.
+-->
+
 ---
 
 # Recap
@@ -484,6 +516,22 @@ Transition: workshop 02 is manual, like workshop 01 — no automated grading.
 Its findings feed chapters 04 to 08, where each problem gets fixed in code.
 -->
 
+# Quiz — Standards and legal obligations
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. Which WCAG level does the law ask for?
+2. Since when must private-sector products and services be accessible in the EU?
+3. What does POUR stand for?
+
+<!--
+Answers:
+
+1. **AA** — which includes the A criteria. 55 criteria in WCAG 2.2.
+2. **June 2025**, with the European Accessibility Act (EAA).
+3. Perceivable, Operable, Understandable, Robust.
+-->
+
 ---
 layout: cover
 ---
@@ -493,3 +541,7 @@ layout: cover
 ## A manual audit
 
 `workshops/02_manual_audit`
+
+<!--
+45 minutes: 30 of audit, 15 to write the report. Push people to audit their own app. The sample report is in solutions/02_manual_audit/: show it only after they wrote theirs.
+-->

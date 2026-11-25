@@ -378,6 +378,22 @@ table { font-size: 0.85em; }
 A checklist the learners can reuse on their own forms. The last line is the fastest test: unplug the mouse.
 -->
 
+# Quiz — Accessible forms
+
+**3 minutes.** Answer out loud, or on a sticky note.
+
+1. A placeholder instead of a `<label>`: why not?
+2. How is an error message tied to its field?
+3. Which element names a group of radio buttons?
+
+<!--
+Answers:
+
+1. It disappears on input, is often low-contrast, and is not a reliable accessible name.
+2. `aria-invalid="true"` on the field, and `aria-describedby` pointing to the message.
+3. `<fieldset>` and its `<legend>`.
+-->
+
 ---
 layout: cover
 ---

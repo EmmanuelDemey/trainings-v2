@@ -34,6 +34,8 @@
 - Regarder — https://youtu.be/Jao3s_CwdRU (Screen Reader Basics — NVDA, 9 min)
 - Regarder — https://youtu.be/bCHpdjvxBws (VoiceOver sur iOS, 7 min)
 - Regarder — https://youtu.be/0Zpzl4EKCco (TalkBack sur Android, 11 min)
+- Lire — https://support.apple.com/guide/iphone/learn-voiceover-gestures-iph3e2e2281/ios (gestes VoiceOver sur iPhone)
+- Lire — https://support.google.com/accessibility/android/answer/6151827 (gestes TalkBack)
 - Lire — https://www.rod-group.com/ (le poids économique du handicap)
 
 ### Atelier 1 — Lecteur d'écran
@@ -77,6 +79,11 @@
 - Lire — https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current
 - Lire — https://www.w3.org/WAI/tutorials/tables/
 - Lire — https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/
+- Lire — https://www.w3.org/WAI/WCAG22/Understanding/reflow.html (1.4.10 Reflow, 320 px)
+- Lire — https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html (1.4.4 Resize Text, 200 %)
+- Lire — https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html (1.4.12 Text Spacing)
+- Outil — https://www.html5accessibility.com/tests/tsbookmarklet.html (bookmarklet d'espacement du texte, Steve Faulkner)
+- Lire — https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
 
 ## 6. Formulaires accessibles
 
