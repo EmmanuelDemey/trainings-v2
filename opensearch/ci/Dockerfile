@@ -6,7 +6,7 @@
 #   docker build -t training-os opensearch/ci
 #   docker run --rm -p 9200:9200 training-os
 #   node scripts/check-console.mjs opensearch
-FROM opensearchproject/opensearch:3.9.0
+FROM opensearchproject/opensearch:3.10.0
 
 # One node, as in the learners' lab (lab/docker-compose.yml). The security plugin
 # is off, as in the lab: plain HTTP, no user — the checker's credentials are
