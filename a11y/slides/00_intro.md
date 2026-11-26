@@ -64,23 +64,25 @@ criteria — chapter 03 details the gap.
 
 # The two days
 
-| | Chapter | Hands-on |
-|---|---|---|
-| **Day 1** · morning | **01** — Reminders (DOM, events, `.sr-only`) | — |
-| | **02** — Why accessibility · impairments · assistive technologies | Workshop 01 — Screen readers |
-| | **03** — Standards and legal obligations | Workshop 02 — A manual audit |
-| **Day 1** · afternoon | **04** — Focus and keyboard | Workshop 03 — Focus and skip link |
-| | **05** — Semantic HTML | Workshop 04 — Semantic HTML |
-| **Day 2** · morning | **06** — Accessible forms | Workshop 05 — Accessible forms |
-| | **07** — ARIA | Workshop 06 — A custom ARIA radio group |
-| | **08** — Complex components | Workshop 07 — A modal dialog |
-| **Day 2** · afternoon | **09** — Auditing | Workshop 08 — An automated audit |
-| | **10** — Frameworks and libraries | — |
-| | **11** — Microdata | Workshop 09 — Microdata |
-| | **12** — Conclusion · retro | — |
+| | | Chapter | Hands-on |
+|---|---|---|---|
+| **Day 1** · morning | 9:20 | **01** — Reminders (DOM, events, `.sr-only`) | — |
+| | 9:35 | **02** — Why accessibility · impairments · assistive technologies | 10:10 · Workshop 01 — Screen readers (45 min) |
+| | 11:10 | **03** — Standards and legal obligations | 11:45 · Workshop 02 — A manual audit (45 min) |
+| **Day 1** · afternoon | 13:45 | **04** — Focus and keyboard | 14:15 · Workshop 03 — Focus and skip link (30 min) |
+| | 14:45 | **05** — Semantic HTML | 16:20 · Workshop 04 — Semantic HTML (40 min) |
+| **Day 2** · morning | 9:05 | **06** — Accessible forms | 9:35 · Workshop 05 — Accessible forms (1 h) |
+| | 10:50 | **07** — ARIA | 11:20 · Workshop 06 — A custom ARIA radio group (40 min) |
+| | 12:00 | **08** — Complex components | 13:55 · Workshop 07 — A modal dialog (50 min) |
+| **Day 2** · afternoon | 14:45 | **09** — Auditing | 15:15 · Workshop 08 — An automated audit (45 min) |
+| | 16:10 | **10** — Frameworks and libraries | — |
+| | 16:30 | **11** — Microdata | 16:40 · Workshop 09 — Microdata (20 min) |
+| | 17:00 | **12** — Conclusion · retro | — |
+
+9:00 – 17:30 · lunch 12:30 – 13:45 · breaks 10:55 and 15:30 (day 1), 10:35 and 16:00 (day 2) · day 1 ends with 30 min of buffer and questions
 
 <style>
-table { font-size: 0.75em; }
+table { font-size: 0.7em; }
 td, th { padding-top: 0.2em !important; padding-bottom: 0.2em !important; }
 </style>
 
