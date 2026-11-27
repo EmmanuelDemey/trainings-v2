@@ -34,6 +34,9 @@ button { }
 img[aria-hidden='true'] { }
 ```
 
+</div>
+<div style="flex: 1; min-width: 0;">
+
 ```js
 // …and in JavaScript
 const input = document.querySelector('#nameInput');
@@ -44,6 +47,13 @@ const same = document.getElementById('nameInput');
 ```
 
 </div>
+</div>
+
+---
+
+# Selecting several elements
+
+<div style="display: flex; gap: 1.5em;">
 <div style="flex: 1; min-width: 0;">
 
 ```js
@@ -55,7 +65,12 @@ const buttons = [...document.querySelectorAll('button')];
 // or Array.from(document.querySelectorAll('button'))
 
 if (!buttons.length) console.log('No button found');
+```
 
+</div>
+<div style="flex: 1; min-width: 0;">
+
+```js
 // Older APIs: live collections, not NodeLists
 document.getElementsByTagName('p');
 document.getElementsByClassName('error');
@@ -117,6 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {   // the HTML is parsed
 }
 ```
 
+</div>
+<div style="flex: 1; min-width: 0;">
+
 | Technique | Seen | Read out |
 |---|---|---|
 | `display: none` | ❌ | ❌ |
@@ -125,7 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {   // the HTML is parsed
 | **`.sr-only`** | ❌ | ✅ |
 
 </div>
-<div style="flex: 1; min-width: 0;">
+</div>
+
+<style>
+table { font-size: 0.8em; }
+</style>
+
+---
+
+# `.sr-only` — when to use it
 
 ```html
 <!-- Skip link (needs a :focus style to show up, chapter 04) -->
@@ -146,13 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {   // the HTML is parsed
 
 - For what is **visually obvious** but not spoken: skip links, icon labels,
   instructions for a complex widget, "opens in a new tab"
-
-</div>
-</div>
-
-<style>
-table { font-size: 0.8em; }
-</style>
 
 ---
 
