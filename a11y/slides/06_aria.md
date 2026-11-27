@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 07 - ARIA
+# 06 - ARIA
 
 ---
 
@@ -116,7 +116,7 @@ Rule 1 is the one to remember. The WebAIM Million figure: pages with ARIA averag
 - Expose a **state** HTML cannot: `aria-expanded` on a toggle,
   `aria-current="page"`
 - **Relate** elements: `aria-controls`, `aria-describedby`
-- **Announce** dynamic changes: live regions (chapter 08)
+- **Announce** dynamic changes: live regions (chapter 07)
 
 </div>
 <div>
@@ -167,7 +167,7 @@ table { font-size: 0.75em; }
 </style>
 
 <!--
-No need to learn the list: know that categories exist, and that landmarks already come from the HTML5 elements of chapter 05.
+No need to learn the list: know that categories exist, and that landmarks already come from the HTML5 elements of chapter 04.
 -->
 
 ---
@@ -225,7 +225,7 @@ table { font-size: 0.85em; }
 </style>
 
 <!--
-The name computation order explains the chapter 06 rule: aria-labelledby and aria-label override the <label>.
+The name computation order explains the chapter 05 rule: aria-labelledby and aria-label override the <label>.
 -->
 
 ---
@@ -296,7 +296,7 @@ Refining a role is allowed; breaking one is not. Ask the room: switch or pressed
 ```
 
 - `role="radiogroup"` + `aria-labelledby`: announced *"Sex, radio group"* on
-  entry — the `<fieldset>` + `<legend>` of chapter 06
+  entry — the `<fieldset>` + `<legend>` of chapter 05
 - `role="radio"` + `aria-checked` on each option: the role and its **state**
 - **Roving tabindex**: only the checked option (or the first, if none) has
   `tabindex="0"` — **one Tab stop** for the whole group, like native radios

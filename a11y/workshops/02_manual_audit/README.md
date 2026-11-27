@@ -2,11 +2,11 @@
 
 > Find the accessibility problems of a web page by hand, map each one to its WCAG criterion, and propose a fix.
 
-**Duration**: 45 min (30 min of audit, 15 min to write the report) · **Chapter**: 3 — Standards and legal obligations
+**Duration**: 45 min (30 min of audit, 15 min to write the report) · **Chapter**: 2 — Standards and legal obligations
 
 ## Goal
 
-Chapter 3 — The law refers to the WCAG (and, in France, to the RGAA built on
+Chapter 2 — The law refers to the WCAG (and, in France, to the RGAA built on
 them). Before any tool, learn to **find problems yourself**, to **name the
 criterion** each one breaks, with its level (A, AA, AAA), and to **propose a
 fix**. Automated tools find roughly a third of the problems: the rest is this

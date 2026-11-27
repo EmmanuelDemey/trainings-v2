@@ -20,7 +20,7 @@ At the end of this chapter, you will be able to:
 - **Test** components by role, and with axe, in Storybook and in the CI
 
 <!--
-Five verbs. The thread of the chapter: everything from chapters 04 to 09 still applies — a framework only changes where the mistakes are made, and how many times they are copied.
+Five verbs. The thread of the chapter: everything from chapters 03 to 08 still applies — a framework only changes where the mistakes are made, and how many times they are copied.
 -->
 
 ---
@@ -37,7 +37,7 @@ Five verbs. The thread of the chapter: everything from chapters 04 to 09 still a
 <Link to="/people">People</Link>        {/* renders <a href="/people"> */}
 ```
 
-- Everything of chapters 04 to 08 still applies: the framework **outputs HTML**,
+- Everything of chapters 03 to 07 still applies: the framework **outputs HTML**,
   and the browser builds the accessibility tree from it
 - A component written once is **reused everywhere**: one `<div onClick>` in a
   design system is a thousand broken buttons
@@ -70,7 +70,7 @@ table { font-size: 0.85em; }
 </style>
 
 <!--
-Do the demo: on a classic site, follow a link with the screen reader on — it reads the new title. On a SPA, the same click says nothing. 4.1.3 is the criterion usually cited for the announcement; the focus part is 2.4.3. The last row is chapter 05: an empty HTML shell has no headings and no landmarks until the JavaScript runs.
+Do the demo: on a classic site, follow a link with the screen reader on — it reads the new title. On a SPA, the same click says nothing. 4.1.3 is the criterion usually cited for the announcement; the focus part is 2.4.3. The last row is chapter 04: an empty HTML shell has no headings and no landmarks until the JavaScript runs.
 -->
 
 ---
@@ -163,7 +163,7 @@ table { font-size: 0.7em; }
 </style>
 
 <!--
-Not to be learnt by heart: it is a map, to be read with your own stack. The linter row is chapter 09: the earlier the cheaper. Angular Aria is recent (developer preview): check its status before choosing it. React docs: the accessibility page is still on legacy.reactjs.org — react.dev has no dedicated page yet.
+Not to be learnt by heart: it is a map, to be read with your own stack. The linter row is chapter 08: the earlier the cheaper. Angular Aria is recent (developer preview): check its status before choosing it. React docs: the accessibility page is still on legacy.reactjs.org — react.dev has no dedicated page yet.
 -->
 
 ---
@@ -296,7 +296,7 @@ test('the toggle is a pressed button after a click', async () => {
 });
 ```
 
-- `getByRole` + axe in every component test — chapter 09
+- `getByRole` + axe in every component test — chapter 08
 - **Storybook** `@storybook/addon-a11y`: axe on every story, in the panel and in
   the tests (`@storybook/addon-vitest`)
 - **Cypress**: `cypress-axe` (`cy.injectAxe()`, `cy.checkA11y()`); **Playwright**:
@@ -355,7 +355,7 @@ table { font-size: 0.85em; }
 </style>
 
 <!--
-Transition: no workshop for this chapter — the workshops are framework-free on purpose, everything learnt there carries over to any stack. Next chapter: microdata — one level above semantic HTML, meaning for machines rather than for screen readers, then workshop 09.
+Transition: no workshop for this chapter — the workshops are framework-free on purpose, everything learnt there carries over to any stack. Next chapter: the conclusion — what to remember and how to keep going.
 -->
 
 ---

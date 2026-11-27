@@ -20,17 +20,18 @@ comments.
 
 | # | Folder | Chapter |
 |---|--------|---------|
-| 1 | `01_screen_reader` | 2 - Introduction to accessibility |
-| 2 | `02_manual_audit` | 3 - Legal obligations |
-| 3 | `03_focus` | 4 - Focus |
-| 4 | `04_semantic_html` | 5 - Semantic HTML |
-| 5 | `05_forms` | 6 - Forms |
-| 6 | `06_aria_radio` | 7 - ARIA |
-| 7 | `07_modal` | 8 - Complex components |
-| 8 | `08_automated_audit` | 9 - Auditing |
-| 9 | `09_microdata` | 11 - Microdata |
+| 1 | `01_screen_reader` | 1 - Why accessibility |
+| 2 | `02_manual_audit` | 2 - Standards and legal obligations |
+| 3 | `03_focus` | 3 - Focus, keyboard and visual design |
+| 4 | `04_semantic_html` | 4 - Semantic HTML |
+| 5 | `05_forms` | 5 - Accessible forms |
+| 6 | `06_aria_radio` | 6 - ARIA |
+| 7 | `07_modal` | 7 - Complex components |
+| 8 | `08_automated_audit` | 8 - Auditing |
+| 9 | `09_microdata` | 9 - Microdata |
 
-Chapters 1 (Reminders), 10 (Frameworks) and 12 (Conclusion) have no workshop.
+**Workshop N goes with chapter N.** Chapters 0 (Introduction and DOM
+reminders), 10 (Frameworks) and 11 (Conclusion) have no workshop.
 Workshops 1 and 2 have no code: you install a screen reader, then audit a page
 by hand.
 

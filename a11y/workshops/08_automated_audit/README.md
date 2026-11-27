@@ -2,11 +2,11 @@
 
 > Audit Genea11y with Lighthouse and axe DevTools, fix every violation they report, and know what they cannot see.
 
-**Duration**: 45 min (20 min to audit with both tools in every state, 15 min to fix, 10 min for step 5 and `verify`) · **Chapter**: 9 — Auditing
+**Duration**: 45 min (20 min to audit with both tools in every state, 15 min to fix, 10 min for step 5 and `verify`) · **Chapter**: 8 — Auditing
 
 ## Goal
 
-Chapter 9 — Automated tools are fast and never tired, and they catch a good
+Chapter 8 — Automated tools are fast and never tired, and they catch a good
 share of the problems: missing alternatives, contrast, missing names, invalid
 ARIA. They also miss most of what you fixed in workshops 3 to 7. In this
 workshop you will:
@@ -32,6 +32,16 @@ npx serve .
 Use Chrome (or Edge) for Lighthouse, and install the
 [axe DevTools](https://www.deque.com/axe/devtools/) extension for Chrome or
 Firefox.
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | Lighthouse on both pages | the browser | You have its list of failures |
+| 2 | axe DevTools on both pages | the browser | You have its list, with the rule of each issue |
+| 3 | Both tools in every state: form in error, dialog open | the browser | Every state audited |
+| 4 | Fix, and run again | `*.html`, `style.css` | No violation left in any state |
+| 5 | What the tools did not see | the browser, the keyboard | You found the defect no tool reports |
 
 ## Steps
 
@@ -111,6 +121,29 @@ It also replays the checks of workshop 3 (skip link, focus) and workshop 7 (the
 dialog): one of the defects is something axe does **not** report, and only a
 check written for this app catches.
 
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 08` prints only `OK` — the checks of the earlier workshops included
+- [ ] `grep -rn "TODO workshop 8" .` returns nothing but the README
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] No axe violation on both pages, with the form in error, with the dialog open
+- [ ] The keyboard and screen reader checks of the previous workshops still pass
+- [ ] You found the defect only a keyboard test catches
+
+**You can explain**
+
+- [ ] Why an automated score of 100 does not mean accessible
+- [ ] The rule behind each fix, and its WCAG criterion
+- [ ] Which tool to put in the CI, and why not only that one
+
 ## Going further
 
 **Automate the audit in your own project**, with Playwright and
@@ -169,31 +202,6 @@ Other ideas:
   that way fails when the accessibility breaks.
 - Try another engine on the same pages: [WAVE](https://wave.webaim.org/) or
   the Firefox *Accessibility* tab's *Check for issues*. Do they agree?
-
-## For the trainer
-
-The defects slipped into the starter, and how learners meet them:
-
-- **The logo has no `alt`** (`image-alt`, both pages). Expect `alt="Genea11y
-  logo"`: the `<h1>` is then read "Genea11y logo Genea11y". The logo sits next
-  to the name, so it is decorative: `alt=""`.
-- **`create.html` has no `lang`** (`html-has-lang`). Only on that page: a
-  reminder to audit every page, not just the home one.
-- **The footer text is too light** (`color-contrast`, `#a3aebd`). The fix is the
-  existing `var(--color-text-light)`, not a new hard-coded grey.
-- **The error red fails on the error summary** (`color-contrast` ×3, only with
-  the form in error). `#dc2626` passes on white but reaches 4.41:1 on the pink
-  background. Learners who only scan the page at load never see it: that is the
-  point of step 3. Change `--color-error`, which is used in five places.
-- **The ✕ close button lost its `aria-label`**: axe does **not** report it, the
-  button has a text ("✕"), just not a meaningful one. Only `verify` catches it,
-  or a screen reader announcing the symbol name ("multiplication x, button")
-  instead of "Close". It is the best example for
-  step 5.
-- **"Lighthouse says 100, we are done"**: the dialog-open scan passes on the
-  starter despite the ✕ defect. Use it to close the workshop.
-- **Lighthouse runs fewer rules than axe DevTools**: do not expect more from
-  running both; the difference comes from the states, not the tool.
 
 ## Useful links
 

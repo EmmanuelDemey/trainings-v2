@@ -290,7 +290,7 @@ footer {
   background: white;
   border-radius: 8px;
   padding: 2rem;
-  min-width: 400px;
+  width: min(25rem, 90vw);
   max-width: 90vw;
   z-index: 101;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);

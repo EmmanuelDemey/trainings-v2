@@ -2,11 +2,11 @@
 
 > Install a screen reader, learn its few essential shortcuts, and browse the web the way a blind user does.
 
-**Duration**: 45 min (1 h if NVDA has to be installed first) · **Chapter**: 2 — Introduction to accessibility
+**Duration**: 45 min (1 h if NVDA has to be installed first) · **Chapter**: 1 — Introduction to accessibility
 
 ## Goal
 
-Chapter 2 — Every workshop after this one ends with *"test it with a screen
+Chapter 1 — Every workshop after this one ends with *"test it with a screen
 reader"*. This one makes sure you have one installed, and that you can use it
 well enough to tell a good page from a broken one.
 

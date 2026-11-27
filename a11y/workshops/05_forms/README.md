@@ -2,11 +2,11 @@
 
 > Build the "Add a person" form with labels, groups and errors that a screen reader announces.
 
-**Duration**: 1 h (15 min for the form, 30 min for the validation script, 15 min to check with the screen reader and `verify`) · **Chapter**: 6 — Accessible forms
+**Duration**: 1 h (15 min for the form, 30 min for the validation script, 15 min to check with the screen reader and `verify`) · **Chapter**: 5 — Accessible forms
 
 ## Goal
 
-Chapter 6 — A form everyone can fill in, and recover from:
+Chapter 5 — A form everyone can fill in, and recover from:
 
 - every field has a **label** tied to it (WCAG 3.3.2 Labels or Instructions, A);
 - related fields are **grouped** with `<fieldset>` and `<legend>` (1.3.1, A);
@@ -27,6 +27,14 @@ npx serve .
 ```
 
 Open http://localhost:3000/create.html: the form is a placeholder paragraph.
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | The form: labels, fieldsets, `required`, `autocomplete` | `create.html` | Every field announced with its label, group and *required* |
+| 2 | The validation: `aria-invalid`, `aria-describedby`, a `role="alert"` summary, the focus | `script.js` | Submitting empty: the summary is read, the focus is on *Last name* |
+| 3 | The style of the errors, not colour only | `style.css` | A field in error has a 2px border and a message |
 
 ## Steps
 
@@ -193,6 +201,30 @@ the summary lists one link only. It fills in *Ada* and submits: the summary is
 gone, and a `role="status"` region says *Ada Lovelace*. Finally: no JavaScript
 error in the page.
 
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 05` prints only `OK` — the checks of the earlier workshops included
+- [ ] `grep -rn "TODO workshop 5" .` returns nothing but the README
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] Submitting the empty form with the keyboard: the summary is read, the focus is on *Last name*, announced *invalid* with its message
+- [ ] Fixing one field: one error left in the summary
+- [ ] A valid form: the success message is announced
+- [ ] The errors are visible without colour (border, text)
+
+**You can explain**
+
+- [ ] `<label for>` versus `aria-label` versus `placeholder`
+- [ ] Why the summary is `role="alert"` and the success `role="status"`
+- [ ] What `autocomplete="family-name"` gives, and to whom (WCAG 1.3.5)
+
 ## Going further
 
 - Validate on **blur** as well, but only once the user has left a field, never
@@ -203,38 +235,6 @@ error in the page.
   Genea11y`), as GOV.UK does: it is the first thing read after a reload.
 - Remove `novalidate` and compare the browser's own error bubbles with yours,
   with the screen reader on, in two browsers.
-
-## For the trainer
-
-Where learners get stuck, most often:
-
-- **A `placeholder` instead of a `<label>`**: it looks labelled, but the text
-  vanishes on typing and many screen readers skip it. `verify` finds the fields
-  by their label, so it fails on *"labelled fields"*.
-- **`for` pointing at the `name`, not the `id`**: `for="lastName"` ties nothing.
-  Clicking the label is the quickest test: the field must take the focus.
-- **`novalidate` forgotten**: the browser bubble shows up first and the submit
-  handler never runs; `verify` then fails on *aria-invalid*.
-- **The summary built once and only toggled**: a `role="alert"` region already
-  in the page, its content swapped, is not always re-read. Removing it and
-  inserting a new one on each submit (as the steps say) is the reliable way.
-- **The alert cut short by the focus move**: NVDA and VoiceOver may read the
-  focused field over the summary. It is expected; the summary is still reached
-  by Shift+Tab, and the field message is read through `aria-describedby`. Let
-  learners hear it rather than hide it.
-- **The same success twice is silent**: writing the same text into the
-  `role="status"` paragraph does not trigger a new announcement. That is why
-  it is emptied on an error submit; the *Going further* blur idea makes it
-  audible.
-- **Old messages piling up**: `setFieldError` must remove the previous
-  `#…-error` first, or every submit adds one more message under the field.
-- **`aria-describedby` left on a fixed field**: it points at a removed id. Harmless
-  by ear, but `verify` checks that a fixed field is clean.
-- **`innerHTML` for the messages**: works, but the habit leaks to real data.
-  Ask for `createElement` and `textContent`.
-- **The red is 4.8:1 on white, 4.4:1 on the summary pink**: fine for the bold
-  title, borderline for the links (AA asks 4.5:1 for normal text). A good
-  question to ask during the debrief.
 
 ## Useful links
 

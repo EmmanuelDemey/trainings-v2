@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 08 - Complex components
+# 07 - Complex components
 
 ---
 
@@ -49,7 +49,7 @@ table { font-size: 0.85em; }
 
 
 <!--
-The reflex from chapter 07, applied to widgets: native first, the APG pattern only when HTML has nothing. Open the APG patterns page (https://www.w3.org/WAI/ARIA/apg/patterns/) and show one keyboard table.
+The reflex from chapter 06, applied to widgets: native first, the APG pattern only when HTML has nothing. Open the APG patterns page (https://www.w3.org/WAI/ARIA/apg/patterns/) and show one keyboard table.
 -->
 
 ---

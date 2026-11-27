@@ -2,11 +2,11 @@
 
 > Rebuild the "Sex" radios as a custom role="radiogroup", and make it work with the keyboard like a native one.
 
-**Duration**: 40 min (5 min for the markup, 25 min for the keyboard, 10 min to check with the screen reader and `verify`) · **Chapter**: 7 — ARIA
+**Duration**: 40 min (5 min for the markup, 25 min for the keyboard, 10 min to check with the screen reader and `verify`) · **Chapter**: 6 — ARIA
 
 ## Goal
 
-Chapter 7 — See what it takes to rebuild, with `<div>`s and ARIA, what one
+Chapter 6 — See what it takes to rebuild, with `<div>`s and ARIA, what one
 `<input type="radio">` gives for free: a **role**, a **state**, a **name**, and
 the **keyboard behaviour** (WCAG 4.1.2 Name, Role, Value, A; 2.1.1 Keyboard,
 A). You will implement the **roving tabindex**, the pattern behind every
@@ -30,6 +30,14 @@ npx serve .
 Open `create.html` and play with the native *Sex* radios first, keyboard only:
 Tab enters the group **once**, the arrows move **and** check, Tab leaves. That is
 the behaviour to reproduce.
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | The markup: `role="radiogroup"`, `aria-labelledby`, `role="radio"`, `aria-checked` | `create.html` | The screen reader announces *Sex, radio group*, then *radio button, 1 of 2* |
+| 2 | The keyboard: one Tab stop, Space, the arrows (roving tabindex) | `script.js` | Tab enters once, the arrows move **and** check, Tab leaves |
+| 3 | The look: the checked state not by colour alone | `style.css` | The checked option is visible in greyscale |
 
 ## Steps
 
@@ -121,6 +129,30 @@ Then, from the field right after the group (*Parent 1 last name*):
 - a click checks too;
 - no JavaScript error in the page.
 
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 06` prints only `OK` — the checks of the earlier workshops included
+- [ ] `grep -rn "TODO workshop 6" .` returns nothing but the README
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] Tab enters the group once, and leaves it with one Tab
+- [ ] Space checks, the arrows move and check, and wrap
+- [ ] The Tab stop follows the checked radio
+- [ ] The screen reader announces the group name, each role, state and position
+
+**You can explain**
+
+- [ ] What the five lines of ARIA replaced: two native `<input type="radio">`
+- [ ] Roving tabindex: why `0` on one radio and `-1` on the others
+- [ ] Why `keydown` and not `keyup`
+
 ## Going further
 
 - The custom radio is **not** submitted with the form: a `<div>` has no
@@ -131,31 +163,6 @@ Then, from the field right after the group (*Parent 1 last name*):
   error in the summary when nothing is checked. Where does the focus go?
 - Count the lines you wrote, then put the native radios back. Which version
   would you rather maintain, and test in five screen readers?
-
-## For the trainer
-
-Where learners get stuck, most often:
-
-- **`tabindex="0"` on both radios**: the group becomes two Tab stops. `verify`
-  reports it at start, and again when Tab does not leave the group.
-- **The Tab stop does not follow the check**: `aria-checked` is updated but not
-  `tabindex`. Shift+Tab then Tab lands back on the first radio, not on the
-  checked one. Ask them to try it by hand.
-- **One listener per radio, with `this` or a stale index**: it works, but the
-  index computed at load breaks as soon as a radio is added. Push for one
-  listener on the group and `radios.indexOf(document.activeElement)`.
-- **`keyup` instead of `keydown`**: `preventDefault()` comes too late, the page
-  has already scrolled on Space and the arrows.
-- **`event.key === 'Space'`**: the key is `' '`. `'Spacebar'` is only old Edge.
-- **Moving the focus without checking**: that is the toolbar or listbox
-  behaviour, not the radio group one. In a radio group, the arrows move **and**
-  check (APG).
-- **The checked state shown by colour only**: the given style changes the
-  border colour and a light background. That is the question of step 3: a dot
-  (`::before`) or a check mark makes it pass WCAG 1.4.1 Use of Color.
-- **Nothing in the form data**: the success message does not show the sex. It
-  is expected — that is the first *Going further*, and the best argument for
-  the native element.
 
 ## Useful links
 

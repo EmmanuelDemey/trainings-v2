@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 06 - Accessible forms
+# 05 - Accessible forms
 
 ---
 
@@ -312,13 +312,13 @@ Explain the asterisk once at the top of the form, hide it with aria-hidden. requ
   `aria-describedby`
 - `aria-errormessage`: support is still uneven — prefer `aria-describedby`
 - Success too: *"Person added"* in a `role="status"` region — WCAG **4.1.3**
-  Status Messages (AA), live regions in chapter 08
+  Status Messages (AA), live regions in chapter 07
 
 </div>
 </div>
 
 <!--
-The four steps on submit are exactly the steps of workshop 05. The success message uses role="status": live regions are detailed in chapter 08.
+The four steps on submit are exactly the steps of workshop 05. The success message uses role="status": live regions are detailed in chapter 07.
 -->
 
 ---

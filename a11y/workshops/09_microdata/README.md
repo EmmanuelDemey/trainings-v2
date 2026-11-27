@@ -2,11 +2,11 @@
 
 > Mark each row of the table as a schema.org Person, so that machines read the people as people.
 
-**Duration**: 20 min (10 min for the markup, 10 min to check with the validator and `verify`) · **Chapter**: 11 — Microdata
+**Duration**: 20 min (10 min for the markup, 10 min to check with the validator and `verify`) · **Chapter**: 9 — Microdata
 
 ## Goal
 
-Chapter 11 — HTML says *this is a table cell*. **Microdata** adds *this cell is
+Chapter 9 — HTML says *this is a table cell*. **Microdata** adds *this cell is
 the family name of a person*. Search engines read it (rich results), and so can
 browser extensions, scrapers, and any tool that wants the data rather than the
 layout. You will annotate the table of people with the
@@ -25,6 +25,14 @@ violation left.
 cd workshops/09_microdata
 npx serve .
 ```
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | The markup to produce: `itemscope`, `itemtype`, `itemprop` | read the README | You know the target HTML of a row |
+| 2 | Render it from the data | `script.js` | Each `<tr>` is a `Person` |
+| 3 | Test it | the Schema.org validator | 5 `Person` items, no error |
 
 ## Steps
 
@@ -97,6 +105,27 @@ and the axe audit of workshop 8, then checks that, on `index.html`:
 - *Dupont* has `familyName`, `givenName` *Jean* and `birthDate` `1980-05-15`;
 - every Person has all three, with a `YYYY-MM-DD` birth date.
 
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 09` prints only `OK` — the checks of the earlier workshops included
+- [ ] `grep -rn "TODO workshop 9" .` returns nothing but the README
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] The validator finds 5 `Person` items, with `familyName`, `givenName` and `birthDate`
+- [ ] The page looks and sounds exactly as before
+
+**You can explain**
+
+- [ ] Microdata versus JSON-LD: when to choose which
+- [ ] Why `<time datetime>` serves the screen reader and the microdata at once
+
 ## Going further
 
 - Add microdata to the **creation form**: an `itemscope itemtype="https://schema.org/Person"`
@@ -108,30 +137,6 @@ and the axe audit of workshop 8, then checks that, on `index.html`:
   **RDFa**. Generate the JSON-LD of the 5 people from the `people` array.
 - Add `deathDate` and `gender` to the people of the sample data, and to the
   table.
-
-## For the trainer
-
-Where learners get stuck, most often:
-
-- **`row.itemScope = true`**: the microdata DOM API (`itemScope`, `itemType`,
-  `itemProp`) was never shipped in Chrome and was removed from Firefox. The
-  property is silently ignored. Use `setAttribute`.
-- **`setAttribute('itemscope')`** without a value throws: the second argument
-  is required. An empty string is enough.
-- **A short `itemtype`**: `Person` or `schema.org/Person` is not a type. It must
-  be the full URL, `https://schema.org/Person`, which is also what `verify`
-  looks for.
-- **Invented property names**: `firstName`, `lastName`, `birthday`. They are
-  the names of the JavaScript object, not of schema.org. The validator reports
-  them as unknown; `verify` finds no `givenName`.
-- **`itemprop="birthDate"` on the `<td>`** instead of the `<time>`: the value
-  becomes the cell text. It works here because the text is already
-  `YYYY-MM-DD`, but it breaks as soon as the date is formatted for humans.
-- **Testing the page source**: *View source* shows an empty `<tbody>`, the rows
-  are rendered by `script.js`. Copy the outer HTML from the Elements panel,
-  after the render.
-- **"Nothing changed"**: that is the expected result. Microdata is invisible to
-  the eyes and to screen readers; only the validator and `verify` see it.
 
 ## Useful links
 

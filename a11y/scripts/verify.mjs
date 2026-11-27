@@ -148,6 +148,25 @@ async function checkFocus(folder) {
   await page.close();
 }
 
+async function checkReflow(folder) {
+  for (const file of ['index.html', 'create.html']) {
+    const page = await browser.newPage({ viewport: { width: 320, height: 640 } });
+    await page.goto(`${origin}/${folder}/${file}`);
+    const overflowing = await page.evaluate(() =>
+      [...document.body.querySelectorAll('*')]
+        .filter((element) => !element.closest('table'))
+        .filter((element) => {
+          const box = element.getBoundingClientRect();
+          return box.width > 1 && box.right > window.innerWidth + 1;
+        })
+        .slice(0, 3)
+        .map((element) => `<${element.tagName.toLowerCase()}> ${Math.round(element.getBoundingClientRect().width)}px`),
+    );
+    ok(`${file}: at 320px wide, nothing overflows but a data table`, overflowing.length === 0, overflowing.join(', '));
+    await page.close();
+  }
+}
+
 /** Workshop 4: landmarks, a current page, and a real data table. */
 async function checkSemantics(folder) {
   for (const [file, current] of [
@@ -400,12 +419,12 @@ async function checkMicrodata(folder) {
 // Workshops 1 and 2 (a screen reader, a manual audit) have nothing to run.
 const form = (folder) => checkForm(folder, { nativeRadios: false });
 const WORKSHOPS = [
-  ['03_focus', [checkFocus]],
-  ['04_semantic_html', [checkFocus, checkSemantics]],
-  ['05_forms', [checkFocus, checkSemantics, checkForm]],
-  ['06_aria_radio', [checkFocus, checkSemantics, form, checkRadioGroup]],
-  ['07_modal', [checkFocus, checkSemantics, form, checkRadioGroup, checkDialog]],
-  ['08_automated_audit', [checkFocus, checkDialog, checkAxe]],
+  ['03_focus', [checkFocus, checkReflow]],
+  ['04_semantic_html', [checkFocus, checkReflow, checkSemantics]],
+  ['05_forms', [checkFocus, checkReflow, checkSemantics, checkForm]],
+  ['06_aria_radio', [checkFocus, checkReflow, checkSemantics, form, checkRadioGroup]],
+  ['07_modal', [checkFocus, checkReflow, checkSemantics, form, checkRadioGroup, checkDialog]],
+  ['08_automated_audit', [checkFocus, checkReflow, checkDialog, checkAxe]],
   ['09_microdata', [checkSemantics, checkDialog, checkAxe, checkMicrodata]],
 ];
 

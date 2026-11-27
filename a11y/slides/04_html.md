@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 05 - Semantic HTML
+# 04 - Semantic HTML
 
 ---
 
@@ -17,13 +17,11 @@ At the end of this chapter, you will be able to:
 - **Write** text alternatives for images, icons and emoji
 - **Use** the right element for lists, key-value pairs, tables, disclosures
   and dates
-- **Respect** user preferences: text size, theme, reduced motion,
-  orientation, contrast
 
 <!--
-Five blocks, in the order of the chapter: document, structure, interaction,
-content, preferences. Everything here is fixed in workshop 04 (navigation
-landmark, data table) — forms come in chapter 06, ARIA in chapter 07.
+Four blocks, in the order of the chapter: document, structure, interaction,
+content. Sizes, preferences and contrast were chapter 03. Everything here is fixed in workshop 04 (navigation
+landmark, data table) — forms come in chapter 05, ARIA in chapter 06.
 -->
 
 ---
@@ -39,7 +37,7 @@ The content still works without the last two: **progressive enhancement**.
 
 <!--
 The first rule of ARIA says the same: if a native element exists, use it
-(chapter 07). Ask: who turned off JavaScript today? Nobody — but a slow
+(chapter 06). Ask: who turned off JavaScript today? Nobody — but a slow
 network, a failing bundle or a blocked script does it for them.
 -->
 
@@ -304,7 +302,7 @@ table { font-size: 0.8em; }
 
 <!--
 This is the disclosure navigation pattern of the ARIA APG — not a
-role="menu" (menus are for application menus, chapter 08). Toggle
+role="menu" (menus are for application menus, chapter 07). Toggle
 aria-expanded and hide the sub-list with JavaScript.
 -->
 
@@ -386,7 +384,7 @@ button {
 <!--
 2.5.8 has exceptions: spacing (a 24 px circle around the target hits no
 other target), inline links in a sentence, the browser's own controls.
-Focus styles were covered in chapter 04: do not reset outline here.
+Focus styles were covered in chapter 03: do not reset outline here.
 -->
 
 ---
@@ -615,7 +613,7 @@ details[open] > summary::marker { content: '− '; }
 ```
 
 - A **human** text, a **machine** value (ISO 8601) in `datetime`
-- Read by search engines, calendars, translation tools — chapter 11 builds on it
+- Read by search engines, calendars, translation tools — chapter 09 builds on it
 
 </div>
 </div>
@@ -628,245 +626,6 @@ today, but the keyboard model stays a disclosure).
 
 ---
 
-# Sizes — relative units
-
-```css
-html { font-size: 100%; }         /* ✅ the user's setting: 16px by default */
-body { font-size: 1rem; }         /* ✅ text follows the user's choice */
-.card { max-width: 40rem; width: 100%; }
-h1 { font-size: 2.5rem; }
-
-p { font-size: 14px; }            /* ⚠️ ignores the user's default size */
-```
-
-- **`rem` / `em`** for text: it follows the browser's font size setting
-- **WCAG 1.4.4** Resize Text (AA): readable at **200 %**; **1.4.10** Reflow (AA):
-  no horizontal scroll at **320 px** wide
-- `%`, `vw` / `vh`, `max-width` for layout; avoid fixed heights on text boxes
-
-<!--
-RGAA 10.4 (text resized to 200 %) and 10.11 (reflow at 320 px). Demo:
-browser settings, font size "Very large", then a page in px versus rem.
-Zoom works either way: the font size setting is the one px breaks.
--->
-
----
-
-# Zoom and reflow — 200 %, 400 %, 320 px
-
-<div style="display: flex; gap: 2em;">
-<div>
-
-### The criteria
-
-- **1.4.4** Resize Text (AA) — text resized to **200 %**, nothing lost
-- **1.4.10** Reflow (AA) — at **320 CSS px** wide, a **single column**: no
-  horizontal scroll for vertical text
-- 320 px = a **1280 px** screen zoomed to **400 %** — the same test
-- **1.4.12** Text Spacing (AA) — larger line, letter and word spacing do
-  not cut the text
-
-</div>
-<div>
-
-### How to test
-
-1. Browser zoom **200 %**, then **400 %** (Ctrl / Cmd and +)
-2. Or DevTools → device toolbar, **320 px** wide
-3. Look for: horizontal scrollbar, text **cut** or **overlapping**, a sticky
-   header that covers the screen, content that disappears
-4. Exceptions: data tables, maps, diagrams, toolbars may scroll in two
-   directions
-
-</div>
-</div>
-
-<!--
-Who needs it: low vision users zoom to 400 % and more, often with a screen magnifier (chapter 02). RGAA 10.4 (text at 200 %) and 10.11 (reflow at 320 px) — 10.12 for text spacing. A responsive site usually passes reflow for free; what fails is fixed widths, fixed heights on text, and sticky headers that take half the screen once zoomed (also 2.4.11 Focus Not Obscured).
--->
-
----
-
-# Reflow — what breaks, and the fix
-
-```css
-/* ❌ A fixed width: a horizontal scrollbar at 320 px */
-.layout { width: 1200px; }
-/* ✅ */
-.layout { max-width: 75rem; width: 100%; }
-
-/* ❌ A fixed height: the text overflows when it is zoomed or spaced */
-.card { height: 180px; overflow: hidden; }
-/* ✅ */
-.card { min-height: 11rem; }
-
-/* ✅ Columns that wrap instead of shrinking */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); }
-
-/* ✅ A sticky header only when there is room for it */
-@media (min-height: 30rem) { header { position: sticky; top: 0; } }
-
-/* ✅ Long words and URLs */
-p { overflow-wrap: anywhere; }
-```
-
-```html
-<!-- ❌ Blocks pinch-zoom on mobile -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<!-- ✅ -->
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-```
-
-<!--
-Zooming the page makes the CSS viewport narrower, so the media queries apply: the same mobile layout serves 400 % zoom on desktop. The sticky header trick: at 400 % on a laptop the viewport is about 180 px high, a 100 px header leaves almost nothing. Test the text spacing with the bookmarklet of Steve Faulkner (link in RESSOURCES.md).
--->
-
----
-
-# User preferences — media queries
-
-| Media query | The user asked for… | You… |
-|---|---|---|
-| `prefers-color-scheme: dark` | a dark theme (photophobia, migraines) | switch your colour tokens |
-| `prefers-reduced-motion: reduce` | less motion (vestibular disorders) | drop or shorten animations |
-| `prefers-contrast: more` | more contrast | strengthen borders, colours |
-| `forced-colors: active` | a forced palette (Windows contrast themes) | use system colours, keep borders |
-
-```css
-:root { --text: #1a1a1a; --background: #fff; }
-@media (prefers-color-scheme: dark) {
-  :root { --text: #f0f0f0; --background: #121212; }
-}
-```
-
-- DevTools → **Rendering** panel: emulate each preference without changing your OS
-
-<!--
-DevTools, Rendering panel: "Emulate CSS media feature" for
-prefers-color-scheme, prefers-reduced-motion, prefers-contrast and
-forced-colors. In forced colours, box-shadow and background images
-disappear: a focus ring drawn with box-shadow vanishes.
--->
-
-<style>
-table { font-size: 0.8em; }
-</style>
-
----
-
-# Reduced motion
-
-```css
-/* Animations only for users who did not ask for less motion */
-@media (prefers-reduced-motion: no-preference) {
-  .card { transition: transform 300ms; }
-  .card:hover { transform: scale(1.05); }
-}
-
-/* Or: a safety net for everything */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-```
-
-- Motion can trigger **dizziness, nausea**; flashes can trigger **seizures**
-- **WCAG 2.3.1** Three Flashes (A) · **2.2.2** Pause, Stop, Hide (A) ·
-  **2.3.3** Animation from Interactions (AAA)
-
-<!--
-2.3.1 is about flashes (more than 3 per second), not motion; 2.2.2 is about
-content that moves on its own for more than 5 s; 2.3.3 covers motion
-triggered by an interaction. RGAA 13.7 (flashes) and 13.8 (moving content).
--->
-
----
-
-# The same preferences, in JavaScript — `matchMedia`
-
-```js
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-if (!reducedMotion.matches) startCarousel();
-
-// React when the user changes the setting while the page is open
-reducedMotion.addEventListener('change', (event) => {
-  if (event.matches) stopCarousel();
-});
-```
-
-- Any media query: `(prefers-color-scheme: dark)`, `(forced-colors: active)`,
-  `(orientation: portrait)`
-- `addListener` is deprecated: use `addEventListener('change', …)`
-- For what CSS cannot do: a carousel, a video autoplay, a canvas animation
-
-<!--
-MediaQueryList.addListener still works but is marked deprecated in the
-spec; addEventListener('change') is supported everywhere today.
--->
-
----
-
-# Orientation — adapt, never lock
-
-```css
-/* ✅ Adapt the layout to the orientation */
-.tree { display: flex; flex-direction: row; }
-@media (orientation: portrait) {
-  .tree { flex-direction: column; }
-}
-```
-
-```js
-// ❌ Locks the screen: a user whose tablet is mounted on a wheelchair is stuck
-screen.orientation.lock('landscape');
-```
-
-- **WCAG 1.3.4** Orientation (AA): the content works in **both** orientations
-- Never ask "please rotate your device" unless the orientation is essential
-  (a piano app, a bank cheque scan)
-
-<!--
-RGAA 13.9 (content viewable in both orientations). screen.orientation.lock
-only works in fullscreen on most mobile browsers — but the warning stays:
-do not force it.
--->
-
----
-
-# Contrast ratio
-
-| Content | AA | AAA |
-|---|---|---|
-| Body text | **4.5:1** — WCAG 1.4.3 | **7:1** — WCAG 1.4.6 |
-| Large text (24 px, or 18.66 px bold) | **3:1** — WCAG 1.4.3 | **4.5:1** — WCAG 1.4.6 |
-| UI components, focus indicator, icons | **3:1** — WCAG 1.4.11 | — |
-
-<br />
-
-- Ratio = `(L1 + 0.05) / (L2 + 0.05)`, L1 the **lighter** colour's relative
-  luminance (0 = black, 1 = white): from **1:1** to **21:1**
-- **Measure** it: DevTools colour picker (shows the ratio and the AA / AAA
-  lines), axe DevTools, WAVE, the WebAIM Contrast Checker
-- Check it in the **design** phase: a palette fixed late is a palette redone
-
-<!--
-RGAA 3.2 (text contrast) and 3.3 (UI components and graphics). Large text:
-18 pt (24 px) regular, or 14 pt (18.66 px) bold. Incidental text, logos
-and disabled controls are exempt. Focus Appearance (2.4.13, AAA) asks
-3:1 too — seen in chapter 04.
--->
-
-<style>
-table { font-size: 0.85em; }
-</style>
-
----
-
 # Recap — semantic HTML
 
 | ✅ | |
@@ -875,8 +634,6 @@ table { font-size: 0.85em; }
 | Structure | landmarks with names, one `<h1>`, levels without gaps |
 | Interaction | `<button>` to act, `<a href>` to go, link texts that make sense |
 | Content | `alt` on every image (empty when decorative), lists, real tables |
-| Preferences | `rem`, dark theme, reduced motion, both orientations |
-| Contrast | 4.5:1 for text, 3:1 for large text and UI |
 
 <br />
 

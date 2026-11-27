@@ -2,11 +2,11 @@
 
 > Turn loose links into a navigation landmark, and a grid of divs into a real data table.
 
-**Duration**: 40 min (30 min for the steps, 10 min to check with the screen reader and `verify`) · **Chapter**: 5 — Semantic HTML
+**Duration**: 40 min (30 min for the steps, 10 min to check with the screen reader and `verify`) · **Chapter**: 4 — Semantic HTML
 
 ## Goal
 
-Chapter 5 — The right element gives the right role, for free: a screen reader
+Chapter 4 — The right element gives the right role, for free: a screen reader
 user can jump to a `<nav>`, hears *"list, 2 items"*, and moves through a
 `<table>` cell by cell with its column headers read out. A `<div>` gives none of
 that (WCAG 1.3.1 Info and Relationships, level A).
@@ -24,6 +24,14 @@ npx serve .
 
 Before you change anything, open `index.html` with your screen reader: list the
 landmarks, then try the *next table* shortcut (T). Nothing.
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | A named `<nav>` with a list, and `aria-current="page"` | `index.html`, `create.html`, `style.css` | The screen reader's landmarks list shows *Main menu*, and the current page is announced |
+| 2 | A real `<table>`: caption, `<thead>`, `<th scope="col">` | `index.html` | Moving cell to cell, the column header is read |
+| 3 | Render the rows as `<tr>`, the dates as `<time>` | `script.js` | 5 rows, *Dupont* in a real cell |
 
 ## Steps
 
@@ -142,6 +150,30 @@ And on `index.html`:
 - the birth dates are `<time datetime="YYYY-MM-DD">`;
 - no `.people .row` grid of `<div>`s is left.
 
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 04` prints only `OK` — the checks of the earlier workshops included
+- [ ] `grep -rn "TODO workshop 4" .` returns nothing but the README
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] The screen reader's landmarks list shows a navigation named *Main menu*
+- [ ] The current page is announced, and visibly marked (not by colour alone)
+- [ ] Press T: the table is announced with its caption and its size
+- [ ] No `.people .row` grid of `<div>`s is left
+
+**You can explain**
+
+- [ ] Why a `<nav>` and not `role="navigation"`
+- [ ] What `scope="col"` changes when moving through the table
+- [ ] Why the current page needs more than a colour
+
 ## Going further
 
 **Bonus — a sortable table** (not checked by `verify`). Let the user sort by last
@@ -171,23 +203,6 @@ Other ideas:
   or your screen reader's headings list). Is it logical?
 - Add a `<th scope="row">` on the last name of each row: what changes in the
   announcements?
-
-## For the trainer
-
-Where learners get stuck, most often:
-
-- **`aria-current="page"` copied on the same link in both pages**: in
-  `create.html`, it goes on *Add a person*. `verify` names the page and the link.
-- **`aria-current` written as `class="active"`**: nothing is announced. Use it to
-  show why the CSS styles from the attribute.
-- **The `id="people"` left on a `<div>` around the table**: `script.js` then
-  appends the rows outside the `<tbody>`. It has to move to the `<tbody>`.
-- **`<th>` without `scope`**: screen readers often guess right on a simple table,
-  so it "works" by ear — `scope="col"` makes it reliable, and `verify` checks it.
-- **The rows built with `innerHTML`**: it passes the checks, but it is an XSS
-  hole on real data. Ask for `createElement` and `textContent`.
-- **`list-style: none` and Safari**: VoiceOver on Safari may stop announcing a
-  list without bullets. Mention it; the menu here is short enough not to matter.
 
 ## Useful links
 

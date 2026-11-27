@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 02 - Why accessibility
+# 01 - Why accessibility
 
 ---
 
@@ -90,7 +90,7 @@ The Edutec definition is wider than disability on purpose: hardware, network, la
 - **France** — the RGAA
 - **USA** — ADA and Section 508
 - **Canada** — AODA (Ontario)
-- Chapter 03 details them
+- Chapter 02 details them
 
 </div>
 <div>
@@ -146,7 +146,7 @@ Permanent **or** temporary. This training covers all four.
   **300 million** are colour blind
 
 <!--
-Insist on the cognitive family: it is the largest and the least known, and its needs (plain language, consistency, time) are rarely tested. Colour blindness: about 1 man in 12, 1 woman in 200 — test it in DevTools, Rendering, Emulate vision deficiencies (chapter 09).
+Insist on the cognitive family: it is the largest and the least known, and its needs (plain language, consistency, time) are rarely tested. Colour blindness: about 1 man in 12, 1 woman in 200 — test it in DevTools, Rendering, Emulate vision deficiencies (chapter 08).
 -->
 
 <style>
@@ -222,7 +222,7 @@ Curb cuts were made for wheelchairs; prams, suitcases and bikes use them every d
 <br />
 
 - Most of them **emulate a keyboard**: a page usable with Tab, Enter, Space and
-  the arrows works with all of them — chapter 04
+  the arrows works with all of them — chapter 03
 
 <style>
 img { max-height: 140px; margin: 0 auto; object-fit: contain; }
@@ -422,7 +422,7 @@ Sources: Apple, "Learn VoiceOver gestures on iPhone"; Google, "Use TalkBack gest
 - Touch **targets** of at least **24 × 24 px** (2.5.8, AA) — 44 px is better
 - No gesture that **needs** several fingers or a path (2.5.1) or a drag
   (2.5.7): give a simple tap alternative
-- **Orientation** and **zoom** never locked (1.3.4, 1.4.4) — chapter 05
+- **Orientation** and **zoom** never locked (1.3.4, 1.4.4) — chapter 03
 - Test on a **real phone**: the simulators do not run VoiceOver or TalkBack
   the same way
 
@@ -473,7 +473,7 @@ Do not play them in the room: give the links, they are homework or the first ste
 
 <!--
 Transition: workshop 01 is manual, no automated grading. Pair people whose
-laptop cannot run a screen reader. Then chapter 03: the standards that say
+laptop cannot run a screen reader. Then chapter 02: the standards that say
 what "accessible" means, and who must comply.
 -->
 

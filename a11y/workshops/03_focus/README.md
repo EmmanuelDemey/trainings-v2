@@ -1,18 +1,22 @@
-# TP 3 — Focus and skip link
+# TP 3 — Focus, skip link and reflow
 
-> Let keyboard users skip the header, and always see where the focus is.
+> Let keyboard users skip the header, always see where the focus is — and keep
+> the page readable for the users who zoom it to 400 %.
 
-**Duration**: 30 min (20 min for the steps, 10 min to check by hand and with `verify`) · **Chapter**: 4 — Focus and keyboard
+**Duration**: 45 min (20 min for the focus, 10 min for the reflow, 15 min to check by hand and with `verify`) · **Chapter**: 3 — Focus and keyboard
 
 ## Goal
 
-Chapter 4 — Two things every keyboard user needs before anything else:
+Chapter 3 — Two things every keyboard user needs before anything else, and one
+every low vision user needs:
 
 - a **skip link**, the first thing Tab reaches, that jumps over the header to
   the content (WCAG 2.4.1 Bypass Blocks, level A);
 - a **visible focus indicator** of our own on links and buttons, contrasted
   enough to be seen on every background (WCAG 2.4.7 Focus Visible, AA, and
-  1.4.11 Non-text Contrast, AA).
+  1.4.11 Non-text Contrast, AA);
+- a layout that **reflows** at 320 CSS px wide — the width of a 1280 px screen
+  zoomed to 400 % — without a horizontal scrollbar (WCAG 1.4.10 Reflow, AA).
 
 **Files:** `index.html`, `create.html`, `style.css`. The `TODO workshop 3`
 comments mark the places.
@@ -25,7 +29,16 @@ npx serve .
 ```
 
 Click in the address bar, then press **Tab** a few times. Where does the focus
-go first? Can you see it on the blue header?
+go first? Can you see it on the blue header? Then zoom the page to **400 %**
+(Ctrl / Cmd and +): can you read a line without scrolling sideways?
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | A skip link, first in the `<body>`, hidden until focused | `index.html`, `create.html`, `style.css` | The first Tab shows it; Enter puts the focus in `<main>` |
+| 2 | A `:focus-visible` outline of our own, 3:1 on every background | `style.css` | The focus is visible on the white page **and** the blue header |
+| 3 | A layout that reflows at 320 px | `style.css` (the `main` rule) | No horizontal scrollbar at 400 % zoom |
 
 ## Steps
 
@@ -65,6 +78,9 @@ go first? Can you see it on the blue header?
 4. `<main>` now takes the focus, and the browser draws its ring around the whole
    content. It is not a control: remove its outline with `main:focus { outline: none; }`.
 
+→ **Done when** the first Tab shows the skip link, and Enter on it sends the
+next Tab to the first link after the header.
+
 ### 2. A visible focus
 
 1. In `style.css`, at the `TODO workshop 3` near the buttons, add a
@@ -89,6 +105,30 @@ go first? Can you see it on the blue header?
 
 3. Never write `outline: none` on a control without putting something at least
    as visible in its place.
+
+→ **Done when** you can Tab through both pages and always see where you are,
+including on the blue header.
+
+### 3. A page that reflows
+
+1. Open the DevTools device toolbar, and set the width to **320 px** (or zoom
+   a 1280 px window to 400 %). A horizontal scrollbar appears: the content is
+   960 px wide, whatever the screen.
+2. In `style.css`, find the `main` rule. Its `width: var(--max-width)` is a
+   **fixed** width. Make it a **maximum** instead, and let it shrink:
+
+   ```css
+   max-width: var(--max-width);
+   width: 100%;
+   ```
+
+3. Reload at 320 px: one column, no sideways scrolling. Check `create.html`
+   too.
+
+A data table may still scroll on its own at that width: WCAG 1.4.10 allows it
+for content that needs two dimensions. The page around it may not.
+
+→ **Done when** neither page scrolls sideways at 320 px.
 
 ## Checking your work
 
@@ -115,10 +155,36 @@ On both `index.html` and `create.html`, it checks that:
 - Enter on it moves the focus into `<main>`.
 
 And on `index.html`, that a header link focused from the keyboard shows **your**
-outline: at least 2px, and not the browser default (`auto`).
+outline: at least 2px, and not the browser default (`auto`). Last, at 320 px
+wide, that nothing but a data table overflows the window, on both pages.
 
 A `KO` line says what it found instead, for example `-> <a> "Home"` when the
 first Tab lands on the Home link.
+
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 03` prints only `OK`
+- [ ] `grep -n "TODO workshop 3" *.html *.css` returns nothing
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] The first Tab, on both pages, shows "Skip to main content"
+- [ ] Enter on it, then Tab: the focus is on the first link after the header
+- [ ] Every link and button shows a contrasted ring, on the header too
+- [ ] At 400 % zoom, both pages read in one column
+
+**You can explain**
+
+- [ ] Why `display: none` cannot hide a skip link
+- [ ] Why `<main>` needs `tabindex="-1"`, and why `-1` rather than `0`
+- [ ] `:focus` versus `:focus-visible`
+- [ ] Which WCAG criterion each of the three steps fixes
 
 ## Going further
 
@@ -133,25 +199,6 @@ first Tab lands on the Home link.
   `position: sticky` and Tab back up the page: is the focus hidden?
 - Turn on the dark colour scheme of your OS: the page has one
   (`prefers-color-scheme`). Is your focus still contrasted enough?
-
-## For the trainer
-
-Where learners get stuck, most often:
-
-- **The skip link is hidden with `display: none`** or `visibility: hidden`: it
-  never gets the focus. `verify` then reports the first Tab on *Home*.
-- **The skip link is not the first element of the `<body>`**: added inside the
-  `<header>`, after the links, it is no longer the first Tab stop.
-- **Enter scrolls, but the next Tab goes back to the header**: `tabindex="-1"` is
-  missing on `<main>`. Show it in Firefox and Safari, where it is most visible.
-- **`:focus` instead of `:focus-visible`**: the ring appears after every mouse
-  click on a button. Not a WCAG failure, but users complain — the reason
-  designers ask for `outline: none`.
-- **The outline is invisible on the header**: the blue on blue is 1:1. Measure
-  it live with the devtools colour picker: the yellow `#ffbf47` gives 3.15:1 on
-  the light-theme blue, 5.3:1 on the dark one.
-- **Testing with the mouse**: ask everyone to put the mouse aside for the
-  whole check.
 
 ## Useful links
 

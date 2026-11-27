@@ -2,11 +2,11 @@
 
 > Open the details of a person in a modal dialog: focus moved in, trapped inside, and given back on close.
 
-**Duration**: 50 min (10 min for the markup and the buttons, 30 min for open / trap / close, 10 min to check with the screen reader and `verify`) · **Chapter**: 8 — Complex components
+**Duration**: 50 min (10 min for the markup and the buttons, 30 min for open / trap / close, 10 min to check with the screen reader and `verify`) · **Chapter**: 7 — Complex components
 
 ## Goal
 
-Chapter 8 — A modal dialog is the complex component you will build most often,
+Chapter 7 — A modal dialog is the complex component you will build most often,
 and the one most often broken. For a keyboard and screen reader user, it must:
 
 - **say what it is**: a dialog, modal, with a name (WCAG 4.1.2, A);
@@ -30,6 +30,16 @@ class. The app starts where workshop 6 ended.
 cd workshops/07_modal
 npx serve .
 ```
+
+## The workshop at a glance
+
+| # | What you do | Where | Done when |
+|---|---|---|---|
+| 1 | The dialog: `role="dialog"`, `aria-modal`, `aria-labelledby`, named close buttons | `index.html` | The markup is there, hidden at start |
+| 2 | A *View details of …* button per row | `script.js` | Each button names its person |
+| 3 | Open: fill, show, move the focus in, make the page `inert` | `script.js` | Enter opens it, the screen reader announces *Marie Martin, dialog* |
+| 4 | Trap Tab and Shift+Tab | `script.js` | The focus cycles between the two close buttons |
+| 5 | Close: Escape, the buttons, the overlay — and give the focus back | `script.js` | The focus is back on the button that opened it |
 
 ## Steps
 
@@ -168,6 +178,30 @@ Then: Escape closes it, the focus is back on the button that opened it, and
 nothing is inert anymore; the *Close* button closes it; a click on the overlay
 closes it; no JavaScript error in the page.
 
+## Definition of Done
+
+Tick every box before moving on. The "Going further" section is **not** part
+of this list.
+
+**It works**
+
+- [ ] `pnpm run verify --dir workshops --tp 07` prints only `OK` — the checks of the earlier workshops included
+- [ ] `grep -rn "TODO workshop 7" .` returns nothing but the README
+- [ ] No error in the browser console
+
+**By hand, mouse aside**
+
+- [ ] Enter on *View details* opens the dialog, announced with its name
+- [ ] Tab and Shift+Tab never leave the dialog
+- [ ] The virtual cursor cannot read the page behind
+- [ ] Escape closes it, and the focus is back on its button
+
+**You can explain**
+
+- [ ] The three steps of a dialog: move the focus in, keep it, give it back
+- [ ] What `inert` does that `aria-hidden` does not
+- [ ] What native `<dialog>` + `showModal()` would have given for free
+
 ## Going further
 
 - Rebuild it with the native **`<dialog>`** element and `showModal()`: the
@@ -177,33 +211,6 @@ closes it; no JavaScript error in the page.
 - Prevent the page behind from scrolling while the dialog is open.
 - Put a long content in the dialog, and a form: does the trap still work with an
   `<input type="date">`, which has several Tab stops?
-
-## For the trainer
-
-Where learners get stuck, most often:
-
-- **The ✕ without `aria-label`**: it is announced *"multiplication x"*, or
-  nothing. `verify` reports that both close buttons must be named *Close*.
-- **A `.sr-only` text placed first**: *"Marie Martin View details"* breaks
-  2.5.3 Label in Name for voice control users. The visible text must start the
-  name.
-- **One listener per button**, added in `renderPeople()`: it works, but it is
-  lost each time the table is rendered again. Push for one listener on
-  `#people` with `closest('.btn-details')`.
-- **The focus moved before `is-open`**: `focus()` on an element still in
-  `display: none` does nothing. Show the dialog first, then move the focus.
-- **`inert` on `body`**: the dialog is in `body`, so it becomes inert too, and
-  nothing can be focused. Only the siblings of the dialog go inert.
-- **`aria-modal` without `inert`**: Tab still reaches the page in some
-  browsers, and the virtual cursor of some screen readers still reads it.
-  `verify` checks that `header` and `main` are inert.
-- **The focusable list read once, at open**: it works here, but breaks as soon
-  as the content of the dialog changes. Read it on each Tab.
-- **Escape listened on `document`, never removed**: it fires when the dialog
-  is closed and sends the focus to a stale trigger. Listen on the dialog, and
-  guard `closeDialog()` when it is already closed.
-- **The focus not given back**: it falls to `<body>`, and the keyboard user
-  starts again from the top of the page. Ask them to try it by hand.
 
 ## Useful links
 

@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 09 - Auditing
+# 08 - Auditing
 
 ---
 
@@ -502,5 +502,5 @@ layout: cover
 ## An automated audit
 
 <!--
-Transition: workshop 08 — Lighthouse and axe DevTools on every page and every state, fix the defects slipped in since workshop 07, reach zero violation, then list what the tools did not see. `pnpm run verify --tp 08` runs axe-core like the CI. Next chapter: frameworks — what a SPA breaks, and how linters, focus helpers and headless libraries help.
+Transition: workshop 08 — Lighthouse and axe DevTools on every page and every state, fix the defects slipped in since workshop 07, reach zero violation, then list what the tools did not see. `pnpm run verify --tp 08` runs axe-core like the CI. Next chapter: microdata — one level above semantic HTML, meaning for machines rather than for screen readers, then workshop 09.
 -->

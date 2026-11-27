@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 12 - Conclusion
+# 11 - Conclusion
 
 <!--
 Last 30 minutes: 5 min recap, 15 min retro, 10 min final questionnaire. Leave the checklist slide on screen while people ask their last questions.
@@ -40,7 +40,7 @@ Last 30 minutes: 5 min recap, 15 min retro, 10 min final questionnaire. Leave th
 </div>
 
 <!--
-Left column = chapters 02 to 08, right column = chapters 09 and 10. Ask the room to name the chapter behind each bullet: it doubles as a quick recall exercise. The "third" figure is the one from chapter 09 (by criterion; Deque counts ~57% by volume of issues).
+Left column = chapters 01 to 07, right column = chapters 08 and 10. Ask the room to name the chapter behind each bullet: it doubles as a quick recall exercise. The "third" figure is the one from chapter 08 (by criterion; Deque counts ~57% by volume of issues).
 -->
 
 ---
@@ -66,7 +66,7 @@ td, th { padding-top: 0.25em !important; padding-bottom: 0.25em !important; }
 </style>
 
 <!--
-2.3.3 is a AAA criterion: not required by RGAA or EAA, but prefers-reduced-motion is cheap to honour (chapter 05). prefers-color-scheme has no WCAG criterion: it is comfort, not compliance, so it left the grid. The grid is a floor for a code review, not a full RGAA audit (106 criteria).
+2.3.3 is a AAA criterion: not required by RGAA or EAA, but prefers-reduced-motion is cheap to honour (chapter 03). prefers-color-scheme has no WCAG criterion: it is comfort, not compliance, so it left the grid. The grid is a floor for a code review, not a full RGAA audit (106 criteria).
 -->
 
 ---

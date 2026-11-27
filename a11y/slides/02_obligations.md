@@ -2,7 +2,7 @@
 layout: cover
 ---
 
-# 03 - Standards and legal obligations
+# 02 - Standards and legal obligations
 
 ---
 
@@ -64,7 +64,7 @@ table { font-size: 0.85em; }
 | **WCAG** | Web Content Accessibility Guidelines | The **content**: pages, apps — what you build |
 | **ATAG** | Authoring Tool Accessibility Guidelines | The **tools** that produce content: CMS, editors |
 | **UAAG** | User Agent Accessibility Guidelines | The **browsers** and media players |
-| **ARIA** | Accessible Rich Internet Applications | Roles, states, properties for custom widgets — chapter 07 |
+| **ARIA** | Accessible Rich Internet Applications | Roles, states, properties for custom widgets — chapter 06 |
 
 - Stay up to date: [W3C WAI News](https://www.w3.org/WAI/news/)
 
@@ -513,7 +513,7 @@ The 5–10% figure is an order of magnitude from industry practice, not a study:
 
 <!--
 Transition: workshop 02 is manual, like workshop 01 — no automated grading.
-Its findings feed chapters 04 to 08, where each problem gets fixed in code.
+Its findings feed chapters 03 to 07, where each problem gets fixed in code.
 -->
 
 ---
