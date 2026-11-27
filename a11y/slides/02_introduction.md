@@ -477,21 +477,56 @@ laptop cannot run a screen reader. Then chapter 03: the standards that say
 what "accessible" means, and who must comply.
 -->
 
+---
+
 # Quiz — Why accessibility
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**Who benefits from an accessible page?**
 
-1. Who benefits from an accessible page?
-2. What does a screen reader read: the HTML, the CSS, or something else?
-3. Most assistive technologies emulate which device — and so what must work?
+- A) Only blind people
+- B) Only people with a permanent disability
+- C) Only the users of assistive technologies
+- D) Everyone: permanent, temporary and situational impairments
 
-<!--
-Answers:
+<v-click>
 
-1. Everyone: permanent, temporary and situational impairments — a broken arm, the sun on a phone, a noisy train.
-2. The **accessibility tree**: role, name, state of each node. Never the CSS.
-3. A **keyboard**: everything must work with Tab, Enter, Space and the arrows.
--->
+**Answer: D** — Everyone — a broken arm, the sun on a phone, a noisy train.
+
+</v-click>
+
+---
+
+# Quiz — Why accessibility
+
+**What does a screen reader read?**
+
+- A) The **accessibility tree**
+- B) The CSS
+- C) The raw HTML source
+- D) The pixels on the screen
+
+<v-click>
+
+**Answer: A** — The accessibility tree: **role, name, state** of each node. Never the CSS.
+
+</v-click>
+
+---
+
+# Quiz — Why accessibility
+
+**Most assistive technologies emulate which device?**
+
+- A) A mouse
+- B) A touch screen
+- C) A **keyboard**
+- D) A game controller
+
+<v-click>
+
+**Answer: C** — A keyboard: everything must work with Tab, Enter, Space and the arrows.
+
+</v-click>
 
 ---
 layout: cover
@@ -500,8 +535,6 @@ layout: cover
 # Workshop 01
 
 ## Screen readers
-
-`workshops/01_screen_reader`
 
 <!--
 45 minutes, 1 h if NVDA has to be installed. No code, no verify. Those who finish early: the same steps with VoiceOver or TalkBack on their phone. Next chapter: the standards that say what "accessible" means, and who must comply.

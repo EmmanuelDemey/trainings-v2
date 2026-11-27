@@ -516,21 +516,56 @@ Transition: workshop 02 is manual, like workshop 01 — no automated grading.
 Its findings feed chapters 04 to 08, where each problem gets fixed in code.
 -->
 
+---
+
 # Quiz — Standards and legal obligations
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**Which WCAG level does the law ask for?**
 
-1. Which WCAG level does the law ask for?
-2. Since when must private-sector products and services be accessible in the EU?
-3. What does POUR stand for?
+- A) A
+- B) AA
+- C) AAA
+- D) No level: only "best effort"
 
-<!--
-Answers:
+<v-click>
 
-1. **AA** — which includes the A criteria. 55 criteria in WCAG 2.2.
-2. **June 2025**, with the European Accessibility Act (EAA).
-3. Perceivable, Operable, Understandable, Robust.
--->
+**Answer: B** — **AA** — which includes the A criteria. 55 criteria in WCAG 2.2.
+
+</v-click>
+
+---
+
+# Quiz — Standards and legal obligations
+
+**Since when must private-sector products and services be accessible in the EU?**
+
+- A) January 2018
+- B) September 2020
+- C) December 2023
+- D) June 2025
+
+<v-click>
+
+**Answer: D** — **June 2025**, with the European Accessibility Act (EAA).
+
+</v-click>
+
+---
+
+# Quiz — Standards and legal obligations
+
+**What does POUR stand for?**
+
+- A) Perceivable, Operable, Understandable, Robust
+- B) Portable, Open, Usable, Responsive
+- C) Perceivable, Organised, Usable, Readable
+- D) Public, Operable, Universal, Robust
+
+<v-click>
+
+**Answer: A** — Perceivable, Operable, Understandable, Robust — the four WCAG principles.
+
+</v-click>
 
 ---
 layout: cover
@@ -539,8 +574,6 @@ layout: cover
 # Workshop 02
 
 ## A manual audit
-
-`workshops/02_manual_audit`
 
 <!--
 45 minutes: 30 of audit, 15 to write the report. Push people to audit their own app. The sample report is in solutions/02_manual_audit/: show it only after they wrote theirs.

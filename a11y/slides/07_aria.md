@@ -418,21 +418,56 @@ table { font-size: 0.85em; }
 The last line is not optional: an ARIA widget is not finished until it was tested with a screen reader.
 -->
 
+---
+
 # Quiz — ARIA
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**The first rule of ARIA?**
 
-1. The first rule of ARIA?
-2. `role="button"` on a `<div>`: what does it add?
-3. A disclosure button opens a panel: which attribute changes?
+- A) Always add a `role`
+- B) Don't use ARIA when a native HTML element does the job
+- C) Put an `aria-label` on every element
+- D) ARIA is only for frameworks
 
-<!--
-Answers:
+<v-click>
 
-1. Don't use ARIA when a native HTML element does the job.
-2. Only the **announcement**. The focus and the keyboard are still yours to write.
-3. `aria-expanded`, kept in sync on every interaction.
--->
+**Answer: B** — Don't use ARIA when a native HTML element does the job.
+
+</v-click>
+
+---
+
+# Quiz — ARIA
+
+**`role="button"` on a `<div>`: what does it add?**
+
+- A) The focus and the keyboard
+- B) The look of a button
+- C) Only the announcement
+- D) Everything a `<button>` does
+
+<v-click>
+
+**Answer: C** — Only the **announcement**. The focus and the keyboard are still yours to write.
+
+</v-click>
+
+---
+
+# Quiz — ARIA
+
+**A disclosure button opens a panel: which attribute changes?**
+
+- A) `aria-expanded`
+- B) `aria-selected`
+- C) `aria-pressed`
+- D) `aria-hidden` on the button
+
+<v-click>
+
+**Answer: A** — `aria-expanded`, kept in sync on every interaction.
+
+</v-click>
 
 ---
 layout: cover
@@ -441,8 +476,6 @@ layout: cover
 # Workshop 06
 
 ## A custom ARIA radio group
-
-`workshops/06_aria_radio`
 
 <!--
 Transition: workshop 06 rebuilds the Sex radios as a role=radiogroup with roving tabindex. `pnpm run verify --tp 06` checks the keyboard contract. Next chapter: complex components — modal, live regions — built on these rules.

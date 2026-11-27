@@ -159,8 +159,6 @@ layout: cover
 
 ## Microdata
 
-`workshops/09_microdata`
-
 <!--
 Transition: workshop 09 — mark each row of the table as a schema.org Person (familyName, givenName, birthDate on the <time>), check it in the Schema Markup Validator, then `pnpm run verify --dir workshops --tp 09`. The page must look and sound exactly as before. Next chapter: the conclusion — what to remember and how to keep going.
 -->

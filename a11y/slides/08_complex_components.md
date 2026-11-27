@@ -541,21 +541,56 @@ table { font-size: 0.85em; }
 One line per component, the minimum before shipping. And, as for every ARIA widget: test it with a screen reader before calling it done.
 -->
 
+---
+
 # Quiz — Complex components
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**A modal dialog: its keyboard contract?**
 
-1. A modal dialog: the four steps of its keyboard contract?
-2. A live region added to the page at the moment of the message: announced?
-3. A tooltip that appears on hover only: what fails?
+- A) The focus stays on the opener
+- B) Tab leaves the dialog freely
+- C) Only Escape closes it
+- D) Focus in, Tab trapped, Escape closes, focus back to the opener
 
-<!--
-Answers:
+<v-click>
 
-1. Focus in, Tab trapped, Escape closes, focus back to the opener — or `showModal()`.
-2. Often not: it must **exist before** its content changes.
-3. Keyboard users never see it — it must also show on focus, and close with Escape.
--->
+**Answer: D** — Focus in, Tab trapped, Escape closes, focus back to the opener — or `showModal()`.
+
+</v-click>
+
+---
+
+# Quiz — Complex components
+
+**A live region added to the page at the moment of the message: announced?**
+
+- A) Always
+- B) Only with NVDA
+- C) Often not: it must exist before its content changes
+- D) Only if it has `aria-hidden="false"`
+
+<v-click>
+
+**Answer: C** — Often not: it must **exist before** its content changes.
+
+</v-click>
+
+---
+
+# Quiz — Complex components
+
+**A tooltip that appears on hover only: what fails?**
+
+- A) Keyboard users never see it
+- B) Nothing: screen readers read it anyway
+- C) Only mobile users miss it
+- D) Nothing, if it has a `title`
+
+<v-click>
+
+**Answer: A** — Keyboard users never see it — it must also show on focus, and close with Escape.
+
+</v-click>
 
 ---
 layout: cover
@@ -564,8 +599,6 @@ layout: cover
 # Workshop 07
 
 ## A modal dialog
-
-`workshops/07_modal`
 
 <!--
 Transition: workshop 07 builds the custom dialog of this chapter on the Details buttons of the list — focus in, trapped, Escape, focus back. `pnpm run verify --tp 07` checks the keyboard contract. Next chapter: auditing — which of these checks a tool can automate, and which only a human can do.

@@ -362,16 +362,49 @@ Transition: no workshop for this chapter — the workshops are framework-free on
 
 # Quiz — Frameworks and libraries
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**What does a SPA route change miss that a page load did for free?**
 
-1. What does a SPA route change miss that a page load did for free?
-2. After a route change, where do you move the focus?
-3. What is a *headless* component library?
+- A) A new title, an announcement, the focus back at the top
+- B) Nothing: the browser handles it
+- C) The CSS
+- D) The JavaScript state
 
-<!--
-Answers:
+<v-click>
 
-1. A new title, an announcement, the focus back at the top.
-2. To the page's `<h1>` (or `<main>`), with `tabIndex={-1}`.
-3. Behaviour, keyboard and ARIA done for you, **no styling**: React Aria, Radix, Reka UI…
--->
+**Answer: A** — A new title, an announcement, the focus back at the top.
+
+</v-click>
+
+---
+
+# Quiz — Frameworks and libraries
+
+**After a route change, where do you move the focus?**
+
+- A) Leave it where it was
+- B) On the first link of the navigation
+- C) On `<body>`
+- D) On the page's `<h1>` (or `<main>`), with `tabIndex={-1}`
+
+<v-click>
+
+**Answer: D** — To the page's `<h1>` (or `<main>`), with `tabIndex={-1}`.
+
+</v-click>
+
+---
+
+# Quiz — Frameworks and libraries
+
+**What is a *headless* component library?**
+
+- A) A library rendered on the server only
+- B) A library for tests in a headless browser
+- C) Behaviour, keyboard and ARIA done for you, **no styling**
+- D) A library without JavaScript
+
+<v-click>
+
+**Answer: C** — Behaviour, keyboard and ARIA done for you, no styling: React Aria, Radix, Reka UI…
+
+</v-click>

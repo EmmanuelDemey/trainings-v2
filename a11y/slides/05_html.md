@@ -894,21 +894,56 @@ forms, the other big source of failures.
 table { font-size: 0.85em; }
 </style>
 
+---
+
 # Quiz — Semantic HTML
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**A `<div>` with a click handler: what is missing for a keyboard user?**
 
-1. A `<div>` with a click handler: what is missing for a keyboard user?
-2. Button or link?
-3. A decorative image: which `alt`?
+- A) Nothing: a click also fires with the keyboard
+- B) Only `role="button"`
+- C) Only `tabindex="0"`
+- D) The focus, Enter/Space and the role
 
-<!--
-Answers:
+<v-click>
 
-1. Everything: no focus, no Enter/Space, no role. Use a `<button>`.
-2. `<button>` to **act**, `<a href>` to **go** somewhere.
-3. An **empty** one, `alt=""` — not a missing one: the file name would be read.
--->
+**Answer: D** — Everything: no focus, no Enter/Space, no role. Use a `<button>`.
+
+</v-click>
+
+---
+
+# Quiz — Semantic HTML
+
+**Button or link?**
+
+- A) `<a href>` to act, `<button>` to go somewhere
+- B) `<button>` to act, `<a href>` to go somewhere
+- C) Always a `<button>`: easier to style
+- D) The same: pick by the look
+
+<v-click>
+
+**Answer: B** — `<button>` to **act**, `<a href>` to **go** somewhere.
+
+</v-click>
+
+---
+
+# Quiz — Semantic HTML
+
+**A decorative image: which `alt`?**
+
+- A) `alt=""`
+- B) No `alt` attribute
+- C) `alt="decorative"`
+- D) `alt="image"`
+
+<v-click>
+
+**Answer: A** — An **empty** one, `alt=""` — not a missing one: the file name would be read.
+
+</v-click>
 
 ---
 layout: cover
@@ -917,8 +952,6 @@ layout: cover
 # Workshop 04
 
 ## Semantic HTML
-
-`workshops/04_semantic_html`
 
 ---
 src: ./shared/retro.md

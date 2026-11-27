@@ -378,21 +378,56 @@ table { font-size: 0.85em; }
 A checklist the learners can reuse on their own forms. The last line is the fastest test: unplug the mouse.
 -->
 
+---
+
 # Quiz — Accessible forms
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**A placeholder instead of a `<label>`: why not?**
 
-1. A placeholder instead of a `<label>`: why not?
-2. How is an error message tied to its field?
-3. Which element names a group of radio buttons?
+- A) It is invalid HTML
+- B) Safari does not support it
+- C) It disappears on input, is often low-contrast, and is not a reliable accessible name
+- D) It prevents autocomplete
 
-<!--
-Answers:
+<v-click>
 
-1. It disappears on input, is often low-contrast, and is not a reliable accessible name.
-2. `aria-invalid="true"` on the field, and `aria-describedby` pointing to the message.
-3. `<fieldset>` and its `<legend>`.
--->
+**Answer: C** — It disappears on input, is often low-contrast, and is not a reliable accessible name.
+
+</v-click>
+
+---
+
+# Quiz — Accessible forms
+
+**How is an error message tied to its field?**
+
+- A) `aria-invalid="true"` on the field, `aria-describedby` pointing to the message
+- B) A red border on the field
+- C) `role="alert"` on the field
+- D) A `title` attribute on the field
+
+<v-click>
+
+**Answer: A** — `aria-invalid="true"` on the field, and `aria-describedby` pointing to the message.
+
+</v-click>
+
+---
+
+# Quiz — Accessible forms
+
+**Which element names a group of radio buttons?**
+
+- A) A `<label>` on each radio
+- B) `aria-label` on the first radio
+- C) A `<div>` with a heading above it
+- D) `<fieldset>` and its `<legend>`
+
+<v-click>
+
+**Answer: D** — `<fieldset>` and its `<legend>`.
+
+</v-click>
 
 ---
 layout: cover
@@ -401,8 +436,6 @@ layout: cover
 # Workshop 05
 
 ## Accessible forms
-
-`workshops/05_forms`
 
 <!--
 Transition: workshop 05 builds the "Add a person" form — labels, fieldset, autocomplete, error summary, focus on the first error, status message. `pnpm run verify --tp 05` checks it. Next chapter: ARIA, for what HTML cannot express.

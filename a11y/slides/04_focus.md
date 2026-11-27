@@ -306,21 +306,56 @@ link and the visible focus — on the Genea11y pages, graded with
 and workshop 07.
 -->
 
+---
+
 # Quiz — Focus and keyboard
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**`tabindex="-1"`: reached by Tab? Focusable by `.focus()`?**
 
-1. `tabindex="-1"`: reached by Tab? Focusable by `.focus()`?
-2. Why never `tabindex="3"`?
-3. `outline: none` on `:focus` — what must you add?
+- A) Reached by Tab, not focusable by `.focus()`
+- B) Neither
+- C) Not reached by Tab, focusable by `.focus()`
+- D) Both, but last in the Tab order
 
-<!--
-Answers:
+<v-click>
 
-1. Not by Tab, yes by `.focus()` — for a heading, `<main>`, a dialog.
-2. Every positive value jumps ahead of the whole page: the order becomes unpredictable.
-3. A visible `:focus-visible` style, 3:1 contrast — WCAG 2.4.7.
--->
+**Answer: C** — Not by Tab, yes by `.focus()` — for a heading, `<main>`, a dialog.
+
+</v-click>
+
+---
+
+# Quiz — Focus and keyboard
+
+**Why never `tabindex="3"`?**
+
+- A) It is invalid HTML
+- B) It jumps ahead of the whole page: the order becomes unpredictable
+- C) It only works on links
+- D) Screen readers ignore it
+
+<v-click>
+
+**Answer: B** — Every positive value jumps ahead of the whole page: the order becomes unpredictable.
+
+</v-click>
+
+---
+
+# Quiz — Focus and keyboard
+
+**`outline: none` on `:focus` — what must you add?**
+
+- A) Nothing: the browser handles it
+- B) `tabindex="0"`
+- C) `aria-hidden="true"`
+- D) A visible `:focus-visible` style, 3:1 contrast
+
+<v-click>
+
+**Answer: D** — A visible `:focus-visible` style, 3:1 contrast — WCAG 2.4.7.
+
+</v-click>
 
 ---
 layout: cover
@@ -329,8 +364,6 @@ layout: cover
 # Workshop 03
 
 ## Focus and skip link
-
-`workshops/03_focus`
 
 <!--
 Transition: workshop 03 adds the skip link and a visible focus style to both pages. `pnpm run verify --tp 03` checks them; then Tab through the page by hand. Next chapter: semantic HTML — the landmarks, the navigation and the table of the same app.

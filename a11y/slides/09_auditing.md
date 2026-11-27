@@ -442,21 +442,56 @@ This is the checklist of workshop 02, now that the learners know every topic beh
 Guidepup is still young: good for a smoke test of a widget, not for a whole suite.
 -->
 
+---
+
 # Quiz — Auditing
 
-**3 minutes.** Answer out loud, or on a sticky note.
+**Zero axe violations: is the page accessible?**
 
-1. Zero axe violations: is the page accessible?
-2. Why `getByRole` rather than `getByTestId`?
-3. What makes an accessibility CI job actually block a regression?
+- A) Yes
+- B) Yes, if Lighthouse also scores 100
+- C) No: tools fully test about a third of the criteria
+- D) Only at level A
 
-<!--
-Answers:
+<v-click>
 
-1. No. Tools fully test about a third of the criteria: `alt="image"` passes.
-2. It finds elements the way a screen reader does: no role or no name, the test fails.
-3. A **required check** on the branch: a red job alone is only a suggestion.
--->
+**Answer: C** — No. Tools fully test about a third of the criteria: `alt="image"` passes.
+
+</v-click>
+
+---
+
+# Quiz — Auditing
+
+**Why `getByRole` rather than `getByTestId`?**
+
+- A) It is faster
+- B) `getByTestId` is deprecated
+- C) It works without a DOM
+- D) It finds elements the way a screen reader does
+
+<v-click>
+
+**Answer: D** — It finds elements the way a screen reader does: no role or no name, the test fails.
+
+</v-click>
+
+---
+
+# Quiz — Auditing
+
+**What makes an accessibility CI job actually block a regression?**
+
+- A) A red badge in the README
+- B) A **required check** on the branch
+- C) A Slack notification
+- D) Running it every night
+
+<v-click>
+
+**Answer: B** — A **required check** on the branch: a red job alone is only a suggestion.
+
+</v-click>
 
 ---
 layout: cover
@@ -465,8 +500,6 @@ layout: cover
 # Workshop 08
 
 ## An automated audit
-
-`workshops/08_automated_audit`
 
 <!--
 Transition: workshop 08 — Lighthouse and axe DevTools on every page and every state, fix the defects slipped in since workshop 07, reach zero violation, then list what the tools did not see. `pnpm run verify --tp 08` runs axe-core like the CI. Next chapter: frameworks — what a SPA breaks, and how linters, focus helpers and headless libraries help.
